@@ -1,0 +1,11 @@
+name: DisplayEntityUtils
+version: '${project.version}'
+main: com.pzdonny.displayentityutils.DisplayEntityPlugin
+api-version: '1.20'
+author: DonnyPZ
+#softdepend: [DisplayEntityEditor]
+commands:
+  managedisplays:
+    aliases: [mdis, mdisplay]
+    description:
+    usage:

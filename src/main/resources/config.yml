@@ -1,0 +1,31 @@
+########################
+# Display Entity Utils #
+#      By DonnyPZ      #
+########################
+
+localStorageEnabled: true
+
+#The database and collection will automatically be created if it does not exist already
+mongodb:
+  enabled: false
+  connectionString: ""
+  database: "DisplayEntityUtils"
+  collection: "saved_displays"
+
+mysql:
+  enabled: false
+  host: "localhost"
+  port: 3306
+  database: "mydb"
+  username: "root"
+  password: "password"
+  useSSL: false
+#Using connection url will override settings above
+  connectionURL: ""
+
+#Despawns groups spawned during the current server session
+#If groups were created before the server's current session those will not be despawned automatically
+despawnGroupsOnServerStop: false
+
+#If a storage location contains display A and display B is to be saved to that location while having the same tag as display A, display B will replace display A
+overrideExistingSaves: true
