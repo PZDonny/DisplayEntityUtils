@@ -1,6 +1,7 @@
 
 ## About DisplayEntityUtils
-This plugin was created to easy save and manipulate display entities and interactions without hassle
+This plugin was created to easy save and manipulate display entities and interactions without hassle.
+
 This is the first spigot plugin I have made publicly avaliabele so expect for there to potentially be issues
 ## **How do I make my own Models**
 [Use this tool to create your own Models.](https://eszesbalint.github.io/bdstudio/editor)
