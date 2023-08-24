@@ -26,6 +26,7 @@ class TabCompleter implements org.bukkit.command.TabCompleter {
             suggestions.add("movehere");
             suggestions.add("move");
             suggestions.add("translate");
+            suggestions.add("translateparts");
             suggestions.add("despawn");
             suggestions.add("save");
             suggestions.add("delete");
