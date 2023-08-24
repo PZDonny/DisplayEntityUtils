@@ -1,12 +1,11 @@
 
 ## About DisplayEntityUtils
 This plugin was created to easy save and manipulate display entities and interactions without hassle
-## FAQ
-### **How do I make my own Models**
+## **How do I make my own Models**
 [Use this tool to create your own Models.](https://eszesbalint.github.io/bdstudio/editor)
 ***UNDERSTAND, I DO NOT OWN THIS TOOL! IT IS CREATED BY Eszes Bálint, and the repo for this project can be found [here](https://github.com/eszesbalint/bdstudio)***
 
-### **What are the commands?**
+## **What are the commands?**
 
 **/mdis help** *(Permission: deu.help)*
 - Opens the help page to list all commands
@@ -80,7 +79,7 @@ This plugin was created to easy save and manipulate display entities and interac
 **/mdis translateparts [direction]** *(Permission: deu.translate)*
 - Uses the translation of display entities to translate each display entity in a player's part selection in a direciton, stopping when the distance is reached, taking the set amount of ticks to complete. Interaction entities in the group are smoothly teleported with the same logic
 
-### **How do I access the API?**
+## **How do I access the API?**
 
 *Maven*
 ```
