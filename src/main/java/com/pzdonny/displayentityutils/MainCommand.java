@@ -417,7 +417,7 @@ class MainCommand implements CommandExecutor {
         sender.sendMessage(ChatColor.GRAY+"/mdis getparttag");
         sender.sendMessage(ChatColor.GRAY+"/mdis selectparts <part-tag>");
         sender.sendMessage(ChatColor.GRAY+"/mdis highlightparts");
-        sender.sendMessage(ChatColor.GRAY+"/mdis transformparts <direction>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis translateparts <direction>");
     }
 
     static void invalidDirection(CommandSender sender){
