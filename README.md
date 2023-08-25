@@ -63,7 +63,7 @@ This is the first spigot plugin I have made publicly avaliabele so expect for th
 **/mdis reload** *(Permission: deu.reload)*
 - Reloads the plugin's config
 
-**/mdis cycleparts [first | prev | next]** *(Permission: deu.cycleparts)*
+**/mdis cyclepart [first | prev | next]** *(Permission: deu.cyclepart)*
 - Cycle through the parts the player's selected display entity group
 
 **/mdis setparttag [part-tag]** *(Permission: deu.setparttag)*
@@ -72,13 +72,16 @@ This is the first spigot plugin I have made publicly avaliabele so expect for th
 **/mdis getparttag** *(Permission: deu.getparttag)*
 - Gets the part tag of a player's selected part
 
-**/mdis selectparts [part-tag]** *(Permission: deu.selectparts)*
+**/mdis selectpart [part-tag]** *(Permission: deu.selectpart)*
 - Creates a part selection for a player, selecting only the parts in a player's selected display entity group with the part tag specified
+
+**/mdis removepart** *(Permission: deu.removepart)*
+- Remove the player's part selection from the player's selected group
 
 **/mdis highlightparts** *(Permission: deu.highlight)*
 - Highlights all the parts in a player's part selection
 
-**/mdis translateparts [direction]** *(Permission: deu.translate)*
+**/mdis translatepart [direction]** *(Permission: deu.translate)*
 - Uses the translation of display entities to translate each display entity in a player's part selection in a direciton, stopping when the distance is reached, taking the set amount of ticks to complete. Interaction entities in the group are smoothly teleported with the same logic
 
 **/mdis spawnpartinteraction** *(Permission: deu.partinteraction)*
