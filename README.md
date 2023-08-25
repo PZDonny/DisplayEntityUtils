@@ -81,6 +81,9 @@ This is the first spigot plugin I have made publicly avaliabele so expect for th
 **/mdis translateparts [direction]** *(Permission: deu.translate)*
 - Uses the translation of display entities to translate each display entity in a player's part selection in a direciton, stopping when the distance is reached, taking the set amount of ticks to complete. Interaction entities in the group are smoothly teleported with the same logic
 
+**/mdis spawnpartinteraction** *(Permission: deu.partinteraction)*
+- Spawns an interaction entity at the center of the player's selected display entity part(s)
+
 ## **How do I access the API?**
 
 *Maven*
