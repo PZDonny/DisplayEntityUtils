@@ -5,7 +5,7 @@ This plugin was created to easy save and manipulate display entities and interac
 This is the first spigot plugin I have made publicly avaliabele so expect for there to potentially be issues
 ## **How do I make my own Models**
 [Use this tool to create your own Models.](https://eszesbalint.github.io/bdstudio/editor)
-***UNDERSTAND, I DO NOT OWN THIS TOOL! IT IS CREATED BY Eszes Bálint, AND THE REPO FOR THIS PROJECT CAN BE FOUND [HERE](https://github.com/eszesbalint/bdstudio)***
+> ***UNDERSTAND, I DO NOT OWN THIS TOOL! IT IS CREATED BY [eszesbalint](https://github.com/eszesbalint), AND THE REPO FOR THIS PROJECT CAN BE FOUND [HERE](https://github.com/eszesbalint/bdstudio)***
 
 ## **What are the commands?**
 
@@ -44,6 +44,9 @@ This is the first spigot plugin I have made publicly avaliabele so expect for th
 
 **/mdis translate [direction] [distance] [tick-duration]** *(Permission: deu.translate)*
 - Uses the translation of display entities to translate each display entity within the group in a direciton, stopping when the distance is reached, taking the set amount of ticks to complete. Interaction entities in the group are smoothly teleported with the same logic
+
+**/mdis setyaw [yaw] ** *(Permission: deu.translate)*
+- Set's the yaw of the player's selected display entity group to the yaw specified
 
 **/mdis save [storage]** *(Permission: deu.save)*
 - Save the player's selected display entity group to a storage location
