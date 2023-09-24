@@ -1,6 +1,7 @@
 package com.pzdonny.displayentityutils.managers;
 
 import com.pzdonny.displayentityutils.DisplayEntityPlugin;
+import com.pzdonny.displayentityutils.events.GroupDespawnedEvent;
 import com.pzdonny.displayentityutils.events.PartTranslateEvent;
 import com.pzdonny.displayentityutils.utils.Direction;
 import com.pzdonny.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
@@ -136,6 +137,11 @@ public final class DisplayGroupManager {
      * @param spawnedGroup The SpawnedDisplayEntityGroup to be removed
      */
     public static void removeSpawnedGroup(SpawnedDisplayEntityGroup spawnedGroup){
+        GroupDespawnedEvent event = new GroupDespawnedEvent(spawnedGroup);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()){
+            return;
+        }
         allSpawnedGroups.remove(spawnedGroup.getMasterPart());
         spawnedGroup.removeAllPartSelections();
         for (SpawnedDisplayEntityPart part : spawnedGroup.getSpawnedParts()){
@@ -460,6 +466,10 @@ public final class DisplayGroupManager {
         return partTag.replace(DisplayEntityPlugin.partTagPrefix, "");
     }
 
+    private static String shortenInteractionCommand(String interactionCommand){
+        return interactionCommand.replace(DisplayEntityPlugin.interactionCommandPrefix, "");
+    }
+
     /**
      * Gets the part tag of a Display Entity
      * @param display Display Entity to retrieve the tag from
@@ -485,20 +495,72 @@ public final class DisplayGroupManager {
         return null;
     }
 
+    /**
+     * Gets the set command of an interaction entity
+     * @param interaction
+     * @return
+     */
+    public static String getInteractionCommand(Interaction interaction){
+        for (String tag : interaction.getScoreboardTags()){
+            if (tag.contains(DisplayEntityPlugin.interactionCommandPrefix)){
+                String command = shortenInteractionCommand(tag);
+                return command.replace("+_.deu._+", " ");
+            }
+        }
+        return null;
+    }
 
     /**
-     * Checks whether or not this display entity has a part tag
+     * Gets the tag corresponding to the set command of an interaction entity
+     * @param interaction
+     * @return
+     */
+    public static String getInteractionCommandTag(Interaction interaction){
+        for (String tag : interaction.getScoreboardTags()){
+            if (tag.contains(DisplayEntityPlugin.interactionCommandPrefix)){
+                return tag;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Sets the command of an interaction entity when clicked
+     * @param interaction
+     * @param command
+     */
+    public static void setInteractionCommand(Interaction interaction, String command){
+        if (command != null && !command.isBlank()){
+            String existing = getInteractionCommand(interaction);
+            if (existing != null){
+                interaction.removeScoreboardTag(existing);
+            }
+            command = command.replace(" ", "+_.deu._+");
+            interaction.addScoreboardTag(DisplayEntityPlugin.interactionCommandPrefix+command);
+        }
+    }
+
+    public static void removeInteractionCommand(Interaction interaction){
+        String cmd = getInteractionCommandTag(interaction);
+        if (cmd != null){
+            interaction.removeScoreboardTag(cmd);
+        }
+    }
+
+
+    /**
+     * Checks if this display entity has a part tag
      * @param display Display Entity to check for a part tag
-     * @return boolean whether or not this display entity has a part tag
+     * @return boolean whether this display entity has a part tag
      */
     public static boolean hasPartTag(Display display, String tag){
         return display.getScoreboardTags().contains(DisplayEntityPlugin.partTagPrefix+tag);
     }
 
     /**
-     * Checks whether or not this interaction entity has a part tag
+     * Checks if this interaction entity has a part tag
      * @param interaction Interaction Entity to check for a part tag
-     * @return boolean whether or not this interaction entity has a part tag
+     * @return boolean whether this interaction entity has a part tag
      */
     public static boolean hasPartTag(Interaction interaction, String tag){
         return interaction.getScoreboardTags().contains(DisplayEntityPlugin.partTagPrefix+tag);
