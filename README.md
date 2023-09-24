@@ -5,7 +5,7 @@ This plugin was created to easy save and manipulate display entities and interac
 This is the first spigot plugin I have made publicly avaliabele so expect for there to potentially be issues
 ## **How do I make my own Models**
 [Use this tool to create your own Models.](https://eszesbalint.github.io/bdstudio/editor)
-***UNDERSTAND, I DO NOT OWN THIS TOOL! IT IS CREATED BY Eszes Bálint, AND THE REPO FOR THIS PROJECT CAN BE FOUND [HERE](https://github.com/eszesbalint/bdstudio)***
+> ***UNDERSTAND, I DO NOT OWN THIS TOOL! IT IS CREATED BY [eszesbalint](https://github.com/eszesbalint), AND THE REPO FOR THIS PROJECT CAN BE FOUND [HERE](https://github.com/eszesbalint/bdstudio)***
 
 ## **What are the commands?**
 
@@ -45,6 +45,9 @@ This is the first spigot plugin I have made publicly avaliabele so expect for th
 **/mdis translate [direction] [distance] [tick-duration]** *(Permission: deu.translate)*
 - Uses the translation of display entities to translate each display entity within the group in a direciton, stopping when the distance is reached, taking the set amount of ticks to complete. Interaction entities in the group are smoothly teleported with the same logic
 
+**/mdis setyaw [yaw] ** *(Permission: deu.translate)*
+- Set's the yaw of the player's selected display entity group to the yaw specified
+
 **/mdis save [storage]** *(Permission: deu.save)*
 - Save the player's selected display entity group to a storage location
 
@@ -63,7 +66,7 @@ This is the first spigot plugin I have made publicly avaliabele so expect for th
 **/mdis reload** *(Permission: deu.reload)*
 - Reloads the plugin's config
 
-**/mdis cycleparts [first | prev | next]** *(Permission: deu.cycleparts)*
+**/mdis cyclepart [first | prev | next]** *(Permission: deu.cyclepart)*
 - Cycle through the parts the player's selected display entity group
 
 **/mdis setparttag [part-tag]** *(Permission: deu.setparttag)*
@@ -72,14 +75,20 @@ This is the first spigot plugin I have made publicly avaliabele so expect for th
 **/mdis getparttag** *(Permission: deu.getparttag)*
 - Gets the part tag of a player's selected part
 
-**/mdis selectparts [part-tag]** *(Permission: deu.selectparts)*
+**/mdis selectpart [part-tag]** *(Permission: deu.selectpart)*
 - Creates a part selection for a player, selecting only the parts in a player's selected display entity group with the part tag specified
+
+**/mdis removepart** *(Permission: deu.removepart)*
+- Remove the player's part selection from the player's selected group
 
 **/mdis highlightparts** *(Permission: deu.highlight)*
 - Highlights all the parts in a player's part selection
 
-**/mdis translateparts [direction]** *(Permission: deu.translate)*
+**/mdis translatepart [direction]** *(Permission: deu.translate)*
 - Uses the translation of display entities to translate each display entity in a player's part selection in a direciton, stopping when the distance is reached, taking the set amount of ticks to complete. Interaction entities in the group are smoothly teleported with the same logic
+
+**/mdis spawnpartinteraction** *(Permission: deu.partinteraction)*
+- Spawns an interaction entity at the center of the player's selected display entity part(s)
 
 ## **How do I access the API?**
 
