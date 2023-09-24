@@ -93,7 +93,7 @@ class MainCommand implements CommandExecutor {
             group.highlight(100);
             return true;
         }
-        else if (args[0].equalsIgnoreCase("highlightparts")){
+        else if (args[0].equalsIgnoreCase("highlightpart")){
             if (!hasPermission(p, "deu.highlight")) return true;
             SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
             if (group == null){
@@ -139,6 +139,22 @@ class MainCommand implements CommandExecutor {
             getPartTag(p);
             return true;
         }
+        else if (args[0].equals("spawnpartinteraction")){
+            if (!hasPermission(p, "deu.partinteraction")) return true;
+            spawnPartInteraction(p);
+            return true;
+        }
+        else if (args[0].equals("removepart")){
+            if (!hasPermission(p, "deu.removepart")) return true;
+            removePart(p);
+            return true;
+        }
+        else if (args[0].equalsIgnoreCase("removeinteractioncommand")){
+            if (!hasPermission(p, "deu.interactioncmd")) return true;
+            removeInteractionCommand(p);
+            return true;
+        }
+
         else if (args.length < 2){
             errorMessage(sender);
             return true;
@@ -157,8 +173,8 @@ class MainCommand implements CommandExecutor {
             setTag(p, group, tag);
             return true;
         }
-        else if (args[0].equalsIgnoreCase("cycleparts")){
-            if (!hasPermission(p, "deu.cycleparts")) return true;
+        else if (args[0].equalsIgnoreCase("cyclepart")){
+            if (!hasPermission(p, "deu.cyclepart")) return true;
             SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
             if (group == null){
                 noSelection(p);
@@ -274,8 +290,8 @@ class MainCommand implements CommandExecutor {
             return true;
         }
 
-        else if (args[0].equalsIgnoreCase("selectparts")){
-            if (!hasPermission(p, "deu.selectparts")) return true;
+        else if (args[0].equalsIgnoreCase("selectpart")){
+            if (!hasPermission(p, "deu.selectpart")) return true;
             SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
             if (group == null){
                 noSelection(p);
@@ -341,6 +357,18 @@ class MainCommand implements CommandExecutor {
             }
             p.sendMessage("------------------------");
         }
+        else if (args[0].equalsIgnoreCase("setyaw")){
+            if (!hasPermission(p, "deu.translate")) return true;
+            TransformationSubCommands.setYaw(p, args);
+            return true;
+        }
+
+        else if (args[0].equalsIgnoreCase("setinteractioncommand")){
+            if (!hasPermission(p, "deu.interactioncmd")) return true;
+            setInteractionCommand(p, args);
+            return true;
+        }
+
         else if (args.length < 3){
             errorMessage(sender);
             return true;
@@ -367,7 +395,7 @@ class MainCommand implements CommandExecutor {
             TransformationSubCommands.translate(p, args);
             return true;
         }
-        else if (args[0].equalsIgnoreCase("translateparts")){
+        else if (args[0].equalsIgnoreCase("translatepart")){
             if (!hasPermission(p, "deu.translate")) return true;
             TransformationSubCommands.translateParts(p, args);
             return true;
@@ -397,6 +425,7 @@ class MainCommand implements CommandExecutor {
         sender.sendMessage(ChatColor.GRAY+"/mdis movehere");
         sender.sendMessage(ChatColor.GRAY+"/mdis move <direction> <distance> <tick-duration>");
         sender.sendMessage(ChatColor.GRAY+"/mdis translate <direction> <distance> <tick-duration>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis setyaw <yaw>");
         sender.sendMessage(ChatColor.GRAY+"/mdis save <storage>");
         sender.sendMessage(ChatColor.GRAY+"/mdis delete <tag> <storage>");
         sender.sendMessage(ChatColor.GRAY+"/mdis spawn <tag> <storage>");
@@ -412,12 +441,16 @@ class MainCommand implements CommandExecutor {
         sender.sendMessage(ChatColor.AQUA+"Multiple parts can have the same part tag");
         sender.sendMessage(ChatColor.GRAY+"This is mainly useful for API users / usage with addon plugins");
         sender.sendMessage();
-        sender.sendMessage(ChatColor.GRAY+"/mdis cycleparts <first | prev | next>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis cyclepart <first | prev | next>");
         sender.sendMessage(ChatColor.GRAY+"/mdis setparttag <part-tag>");
         sender.sendMessage(ChatColor.GRAY+"/mdis getparttag");
-        sender.sendMessage(ChatColor.GRAY+"/mdis selectparts <part-tag>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis highlightparts");
-        sender.sendMessage(ChatColor.GRAY+"/mdis translateparts <direction>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis selectpart <part-tag>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis removepart");
+        sender.sendMessage(ChatColor.GRAY+"/mdis highlightpart");
+        sender.sendMessage(ChatColor.GRAY+"/mdis translatepart <direction>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis spawnpartinteraction");
+        sender.sendMessage(ChatColor.GRAY+"/mdis setinteractioncommand");
+        sender.sendMessage(ChatColor.GRAY+"/mdis removeinteractioncommand");
     }
 
     static void invalidDirection(CommandSender sender){
@@ -517,6 +550,117 @@ class MainCommand implements CommandExecutor {
             return;
         }
         p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.WHITE+"(Part(s) Tagged: "+partTag+")");
+    }
+
+    private void spawnPartInteraction(Player p){
+        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
+        if (group == null){
+            noSelection(p);
+            return;
+        }
+        SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
+        if (partSelection == null){
+            noPartSelection(p);
+            return;
+        }
+        boolean spawned = false;
+        for (SpawnedDisplayEntityPart part : partSelection.getSelectedParts()){
+            if (part.getEntity() instanceof Interaction){
+                continue;
+            }
+            if (part.spawnInteractionAtDisplay() != null){
+                spawned = true;
+            }
+        }
+        if (spawned){
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Interaction entity(s) spawned!");
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GRAY+"If the interaction does not look correct, it is probably because it was spawned on a display entity with rotations");
+        }
+        else{
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Failed to create interaction entity(s)");
+            p.sendMessage(ChatColor.GRAY+"Make sure you are not attempting to spawn it at a text or interaction entity, nor any entity with a scale of 0");
+            p.sendMessage(ChatColor.GRAY+"If any parts were skipped it is because, one of the values for the part's scaling was 0, the x and z of the part's scale aren't the same, or the part is a text display or interaction entity");
+        }
+    }
+
+    private void removePart(Player p){
+        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
+        if (group == null){
+            noSelection(p);
+            return;
+        }
+        SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
+        if (partSelection == null){
+            noPartSelection(p);
+            return;
+        }
+        for (SpawnedDisplayEntityPart part : partSelection.getSelectedParts()){
+            if (part.isMaster()){
+                p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You cannot despawn the master part by itself!");
+                continue;
+            }
+            part.remove(true);
+        }
+        if (partSelection.getGroup().getSpawnedParts().size() <= 1){
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Despawning your group, not enough parts remain");
+            partSelection.getGroup().despawn();
+            return;
+        }
+        partSelection.remove();
+    }
+
+    private void setInteractionCommand(Player p , String[] args){
+        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
+        if (group == null){
+            noSelection(p);
+            return;
+        }
+        SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
+        if (partSelection == null){
+            noPartSelection(p);
+            return;
+        }
+        if (partSelection.getSelectedParts().size() > 1){
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You can only do this with one part selected");
+            return;
+        }
+        if (partSelection.getSelectedParts().get(0).getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You can only do this with interaction entities");
+        }
+
+        Interaction interaction = (Interaction) partSelection.getSelectedParts().get(0).getEntity();
+        StringBuilder builder = new StringBuilder();
+        for (int i = 1; i < args.length; i++){
+            builder.append(args[i]);
+            if (i+1 != args.length) builder.append(" ");
+        }
+        String command = builder.toString();
+        DisplayGroupManager.setInteractionCommand(interaction, command);
+        p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Command Set! "+ChatColor.YELLOW+"("+command+")");
+    }
+
+    private void removeInteractionCommand(Player p){
+        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
+        if (group == null){
+            noSelection(p);
+            return;
+        }
+        SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
+        if (partSelection == null){
+            noPartSelection(p);
+            return;
+        }
+        if (partSelection.getSelectedParts().size() > 1){
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You can only do this with one part selected");
+            return;
+        }
+        if (partSelection.getSelectedParts().get(0).getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You can only do this with interaction entities");
+        }
+
+        Interaction interaction = (Interaction) partSelection.getSelectedParts().get(0).getEntity();
+        DisplayGroupManager.removeInteractionCommand(interaction);
+        p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Removed any existing commands from interaction entity");
     }
 
     private void singlePartSelected(Player p, SpawnedPartSelection partSelection){
