@@ -1,7 +1,10 @@
 package com.pzdonny.displayentityutils.utils.DisplayEntities;
 
 import com.pzdonny.displayentityutils.DisplayEntityPlugin;
+import com.pzdonny.displayentityutils.events.GroupSpawnedEvent;
+import com.pzdonny.displayentityutils.events.PreGroupSpawnedEvent;
 import com.pzdonny.displayentityutils.managers.DisplayGroupManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
@@ -143,6 +146,10 @@ public class DisplayEntityGroup implements Serializable{
      * @return A SpawnedDisplayEntityGroup representative of this DisplayEntityGroup
      */
     public SpawnedDisplayEntityGroup spawn(Location location){
+        PreGroupSpawnedEvent event = new PreGroupSpawnedEvent(this);
+        if (event.isCancelled()){
+            return null;
+        }
         SpawnedDisplayEntityGroup spawnedGroup = new SpawnedDisplayEntityGroup();
         spawnedGroup.setTag(tag);
 
@@ -160,12 +167,17 @@ public class DisplayEntityGroup implements Serializable{
             Location spawnLocation = spawnedGroup.getMasterPart().getEntity().getLocation().clone().subtract(v);
             Interaction interaction = entity.createEntity(spawnLocation);
             spawnedGroup.addInteractionEntity(interaction).setPartTag(entity.getPartTag());
+            if (entity.command != null){
+                DisplayGroupManager.setInteractionCommand(interaction, entity.command);
+            }
+
 
         }
         if (tag != null){
             spawnedGroup.setTag(tag.replace(DisplayEntityPlugin.tagPrefix, ""));
         }
         DisplayGroupManager.addSpawnedGroup(spawnedGroup.getMasterPart(), spawnedGroup);
+        Bukkit.getPluginManager().callEvent(new GroupSpawnedEvent(spawnedGroup));
         return spawnedGroup;
     }
 }
