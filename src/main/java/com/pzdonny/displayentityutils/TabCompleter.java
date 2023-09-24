@@ -16,27 +16,32 @@ class TabCompleter implements org.bukkit.command.TabCompleter {
             suggestions.add("help");
             suggestions.add("partshelp");
             suggestions.add("selectnearest");
+            suggestions.add("spawnpartinteraction");
             suggestions.add("addinteractions");
             suggestions.add("removeinteractions");
+            suggestions.add("setinteractioncommand");
+            suggestions.add("removeinteractioncommand");
             suggestions.add("settag");
             suggestions.add("gettag");
             suggestions.add("highlight");
-            suggestions.add("highlightparts");
+            suggestions.add("highlightpart");
             suggestions.add("clone");
             suggestions.add("movehere");
             suggestions.add("move");
             suggestions.add("translate");
-            suggestions.add("translateparts");
+            suggestions.add("translatepart");
+            suggestions.add("setyaw");
             suggestions.add("despawn");
             suggestions.add("save");
             suggestions.add("delete");
             suggestions.add("spawn");
             suggestions.add("list");
             suggestions.add("reload");
-            suggestions.add("cycleparts");
+            suggestions.add("cyclepart");
             suggestions.add("setparttag");
             suggestions.add("getparttag");
-            suggestions.add("selectparts");
+            suggestions.add("selectpart");
+            suggestions.add("removepart");
             return suggestions;
         }
         else if (args.length == 2){

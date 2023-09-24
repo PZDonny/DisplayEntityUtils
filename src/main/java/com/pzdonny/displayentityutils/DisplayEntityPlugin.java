@@ -5,20 +5,17 @@ import com.pzdonny.displayentityutils.managers.DisplayGroupManager;
 import com.pzdonny.displayentityutils.managers.LocalManager;
 import com.pzdonny.displayentityutils.managers.MYSQLManager;
 import com.pzdonny.displayentityutils.managers.MongoManager;
-import com.pzdonny.displayentityutils.utils.DisplayEntities.BlockDisplaySpecifics;
 import com.pzdonny.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.spigotmc.event.entity.EntityMountEvent;
 
 public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
@@ -27,6 +24,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     public static final String pluginPrefixLong = ChatColor.WHITE+"-----"+ChatColor.YELLOW+"DisplayEntityUtils"+ChatColor.WHITE+"-----";
     public static final String tagPrefix = "displayentityutilsplugintag_";
     public static final String partTagPrefix = "displayentityutilspluginparttag_";
+    public static final String interactionCommandPrefix = "displayentityutilsinteractioncmd_";
     private static boolean isMongoEnabled = false;
     private static boolean isMYSQLEnabled = false;
     private static boolean isLocalEnabled;
@@ -162,15 +160,24 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void rClick(PlayerInteractEntityEvent e){
-        Interaction entity = (Interaction) e.getRightClicked();
-        Bukkit.getPluginManager().callEvent(new InteractionClickEvent(entity, InteractionClickEvent.ClickType.RIGHT));
+        if (e.getRightClicked() instanceof Interaction entity){
+            String command = DisplayGroupManager.getInteractionCommand(entity);
+            callInteractionEvent(new InteractionClickEvent(e.getPlayer(), entity, InteractionClickEvent.ClickType.RIGHT, command));
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    private void lClick(EntityDamageEvent e){
-        if (e.getEntity() instanceof Interaction){
-            Interaction entity = (Interaction) e.getEntity();
-            Bukkit.getPluginManager().callEvent(new InteractionClickEvent(entity, InteractionClickEvent.ClickType.LEFT));
+    private void lClick(EntityDamageByEntityEvent e){
+        if (e.getEntity() instanceof Interaction entity){
+            String command = DisplayGroupManager.getInteractionCommand(entity);
+            callInteractionEvent(new InteractionClickEvent((Player) e.getDamager(), entity, InteractionClickEvent.ClickType.LEFT, command));
         }
+    }
+
+    private void callInteractionEvent(InteractionClickEvent event){
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) return;
+        String command = event.getCommand();
+        event.getPlayer().performCommand(command);
     }
 }
