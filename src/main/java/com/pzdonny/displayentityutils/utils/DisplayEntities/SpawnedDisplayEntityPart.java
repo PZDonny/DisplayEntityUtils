@@ -3,6 +3,7 @@ package com.pzdonny.displayentityutils.utils.DisplayEntities;
 import com.pzdonny.displayentityutils.DisplayEntityPlugin;
 import com.pzdonny.displayentityutils.managers.DisplayGroupManager;
 import com.pzdonny.displayentityutils.utils.Direction;
+import com.pzdonny.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
@@ -10,6 +11,7 @@ import org.bukkit.entity.*;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.joml.Vector3f;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -110,8 +112,8 @@ public final class SpawnedDisplayEntityPart {
      * @return this
      */
     public SpawnedDisplayEntityPart setPartTag(String partTag){
-        removeExistingPartTag(entity);
         if (partTag != null){
+            removeExistingPartTag(entity);
             entity.addScoreboardTag(DisplayEntityPlugin.partTagPrefix+partTag);
             this.partTag = partTag;
         }
@@ -246,6 +248,14 @@ public final class SpawnedDisplayEntityPart {
         }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, 2);
     }
 
+    public void setYaw(float yaw){
+        if (entity instanceof Interaction){
+            return;
+        }
+        Display display = (Display) entity;
+        display.setRotation(yaw, display.getLocation().getPitch());
+    }
+
     /**
      * Change the translation of a SpawnedDisplayEntityPart.
      * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
@@ -268,6 +278,35 @@ public final class SpawnedDisplayEntityPart {
      */
     public void translate(float distance, int durationInTicks, Direction direction){
         DisplayGroupManager.translate(this, distance, durationInTicks, direction);
+    }
+
+
+
+    /**
+     * Attempts to spawn an Interaction entity based upon the scaling of the part. May not work 100% of the time
+     * @return the spawned interaction. Null if any part of the scale is 0, the x and z of the scale aren't the same, or the part is a text display
+     */
+    public Interaction spawnInteractionAtDisplay(){
+        if (entity instanceof TextDisplay){
+            return null;
+        }
+        Display display = (Display) entity;
+        Vector3f scale = display.getTransformation().getScale();
+
+        if (scale.x == 0f || scale.y == 0f || (Math.abs(scale.x-scale.z) > 0.1)){
+            return null;
+        }
+
+        float width = scale.x;
+        float height = scale.y;
+        Location spawnLoc = DisplayUtils.getModelLocation(display);
+        Interaction interaction = display.getWorld().spawn(spawnLoc, Interaction.class, i -> {
+            i.setInteractionWidth(width);
+            i.setInteractionHeight(height);
+        });
+        group.addInteractionEntity(interaction);
+
+        return interaction;
     }
 
     public enum PartType{
