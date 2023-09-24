@@ -9,6 +9,22 @@ import org.bukkit.entity.Player;
 
 public class TransformationSubCommands {
 
+    static void setYaw(Player p, String[] args){
+        try{
+            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
+            if (group == null){
+                MainCommand.noSelection(p);
+                return;
+            }
+            double yaw = Double.parseDouble(args[1].toUpperCase());
+            group.setYaw((float) yaw);
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Yaw set!");
+        }
+        catch(NumberFormatException e){
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Please enter a valid number!");
+        }
+    }
+
     static void move(Player p, String[] args){
         try{
             SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
