@@ -72,8 +72,7 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     SpawnedDisplayEntityPart addInteractionEntity(@Nonnull Interaction interactionEntity){
-        SpawnedDisplayEntityPart part = new SpawnedDisplayEntityPart(this, interactionEntity);
-        return part;
+        return new SpawnedDisplayEntityPart(this, interactionEntity);
     }
 
     /**
@@ -161,6 +160,7 @@ public final class SpawnedDisplayEntityGroup {
      * Change the actual location of all the SpawnedDisplayEntityParts with normal teleportation.
      * @param location The location to teleport this SpawnedDisplayEntityGroup
      * @param respectGroupDirection Whether to respect this group's pitch and yaw or the location's pitch and yaw
+     * @return The success status of the teleport
      */
     public boolean teleport(Location location, boolean respectGroupDirection){
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORT, location);
@@ -241,6 +241,16 @@ public final class SpawnedDisplayEntityGroup {
      */
     public void teleportMove(@Nonnull Direction direction, double distance, int durationInTicks){
         teleportMove(direction.getDirection(masterPart), distance, durationInTicks);
+    }
+
+    /**
+     * Change the yaw of this group
+     * @param yaw The yaw to set for this group
+     */
+    public void setYaw(float yaw){
+        for (SpawnedDisplayEntityPart part : spawnedParts){
+            part.setYaw(yaw);
+        }
     }
 
     /**
@@ -383,7 +393,7 @@ public final class SpawnedDisplayEntityGroup {
 
     /**
      * Removes and despawns this SpawnedDisplayEntityGroup along with it's SpawnedPartSelections
-     * This will become unusuable afterwards
+     * This will become unusable afterwards
      */
     public void despawn(){
         DisplayGroupManager.removeSpawnedGroup(this);
