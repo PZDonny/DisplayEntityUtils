@@ -1,6 +1,8 @@
 package com.pzdonny.displayentityutils.utils.DisplayEntities;
 
 import com.pzdonny.displayentityutils.DisplayEntityPlugin;
+import com.pzdonny.displayentityutils.events.EntityRideGroupEvent;
+import com.pzdonny.displayentityutils.events.GroupRideEntityEvent;
 import com.pzdonny.displayentityutils.events.GroupTranslateEvent;
 import com.pzdonny.displayentityutils.managers.DisplayGroupManager;
 import com.pzdonny.displayentityutils.utils.Direction;
@@ -254,6 +256,16 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
+     * Change the pitch of this group
+     * @param pitch The pitch to set for this group
+     */
+    public void setPitch(float pitch){
+        for (SpawnedDisplayEntityPart part : spawnedParts){
+            part.setPitch(pitch);
+        }
+    }
+
+    /**
      * Change the translation of all the SpawnedDisplayEntityParts in this group.
      * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results
@@ -349,6 +361,56 @@ public final class SpawnedDisplayEntityGroup {
             part.highlight(durationInTicks);
         }
         return this;
+    }
+
+    /**
+     * Put a SpawnedDisplayEntityGroup on top of an entity
+     * Calls the GroupMountEntityEvent when successful
+     * @param mount The entity for the SpawnedDisplayEntityGroup to ride
+     * @return Whether the mount was successful or not
+     */
+    public boolean rideEntity(Entity mount){
+        try{
+            Entity masterEntity = masterPart.getEntity();
+            GroupRideEntityEvent event = new GroupRideEntityEvent(this, mount);
+            Bukkit.getPluginManager().callEvent(event);
+            if (event.isCancelled()){
+                return false;
+            }
+            mount.addPassenger(masterEntity);
+            return true;
+        }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Put an Entity on top of an SpawnedDisplayEntityGroup
+     * Calls the EntityMountGroupEvent when successful
+     * @param passenger The entity to ride the SpawnedDisplayEntityGroup
+     * @return Whether the mount was successful or not
+     */
+    public boolean addEntityPassenger(Entity passenger){
+        try{
+            Entity masterEntity = masterPart.getEntity();
+            EntityRideGroupEvent event = new EntityRideGroupEvent(this, passenger);
+            Bukkit.getPluginManager().callEvent(event);
+            if (event.isCancelled()){
+                return false;
+            }
+            masterEntity.addPassenger(passenger);
+            return true;
+        }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean isMountedToEntity(Entity entity){
+        return entity.getPassengers().contains(masterPart.getEntity());
     }
 
     /**
