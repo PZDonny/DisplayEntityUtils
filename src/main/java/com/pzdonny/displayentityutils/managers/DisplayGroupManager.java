@@ -22,6 +22,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -253,6 +254,39 @@ public final class DisplayGroupManager {
             }
         }
         return null;
+    }
+
+    /**
+     * Get a Display Entity Group from a saved file
+     * @param file File of a saved Display Entity Group
+     * @return The found DisplayEntityGroup. Null if not found.
+     */
+    public static DisplayEntityGroup retrieveDisplayEntityGroup(File file){
+        try{
+            FileInputStream fileIn = new FileInputStream(file);
+            ObjectInputStream objIn = new ObjectInputStream(fileIn);
+            return (DisplayEntityGroup) objIn.readObject();
+        }
+        catch(IOException | ClassNotFoundException ex){
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Get a Display Entity Group from an input stream
+     * @param inputStream InputStream containing a saved Display Entity Group
+     * @return The found DisplayEntityGroup. Null if not found.
+     */
+    public static DisplayEntityGroup retrieveDisplayEntityGroup(InputStream inputStream){
+        try{
+            ObjectInputStream objIn = new ObjectInputStream(inputStream);
+            return (DisplayEntityGroup) objIn.readObject();
+        }
+        catch(IOException | ClassNotFoundException ex){
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     private static SpawnedDisplayEntityGroup getSpawnedGroup(Display mainEntity, double radius, @Nullable Player getter){
