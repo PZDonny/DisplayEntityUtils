@@ -256,6 +256,14 @@ public final class SpawnedDisplayEntityPart {
         display.setRotation(yaw, display.getLocation().getPitch());
     }
 
+    public void setPitch(float pitch){
+        if (entity instanceof Interaction){
+            return;
+        }
+        Display display = (Display) entity;
+        display.setRotation(display.getLocation().getYaw(), pitch);
+    }
+
     /**
      * Change the translation of a SpawnedDisplayEntityPart.
      * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
