@@ -7,16 +7,16 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * Called when a SpawnDisplayEntityGroup is mounted on top of an Entity.
+ * Called when an Entity is mounted on top of a SpawnedDisplayEntityGroup.
  * Can be cancelled
  */
-public class GroupMountEntityEvent extends Event implements Cancellable {
+public class EntityRideGroupEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     SpawnedDisplayEntityGroup spawnedDisplayEntityGroup;
     Entity entity;
     private boolean isCancelled;
 
-    public GroupMountEntityEvent(SpawnedDisplayEntityGroup group, Entity entity){
+    public EntityRideGroupEvent(SpawnedDisplayEntityGroup group, Entity entity){
         this.spawnedDisplayEntityGroup = group;
         this.entity = entity;
         isCancelled = false;
