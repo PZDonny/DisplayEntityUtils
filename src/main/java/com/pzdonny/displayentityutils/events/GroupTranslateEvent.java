@@ -66,6 +66,7 @@ public class GroupTranslateEvent extends Event implements Cancellable {
      */
     public enum GroupTranslateType{
         TELEPORT,
-        TELEPORTMOVE;
+        TELEPORTMOVE,
+        VANILLATRANSLATE;
     }
 }

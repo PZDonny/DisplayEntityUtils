@@ -212,8 +212,10 @@ public final class SpawnedDisplayEntityGroup {
         Location destination = masterPart.getEntity().getLocation().clone().add(direction.clone().normalize().multiply(distance));
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination);
         Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) return;
-        if (durationInTicks == 0){
+        if (event.isCancelled()){
+            return;
+        }
+        if (durationInTicks <= 0){
             durationInTicks = 1;
         }
         direction.normalize();
@@ -274,6 +276,12 @@ public final class SpawnedDisplayEntityGroup {
      * @param direction The direction to translate the part
      */
     public void translate(@Nonnull Vector direction, float distance, int durationInTicks){
+        Location destination = masterPart.getEntity().getLocation().clone().add(direction.clone().normalize().multiply(distance));
+        GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.VANILLATRANSLATE, destination);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()){
+            return;
+        }
         for(SpawnedDisplayEntityPart part : spawnedParts){
             part.translate(distance, durationInTicks, direction);
         }
@@ -288,9 +296,7 @@ public final class SpawnedDisplayEntityGroup {
      * @param durationInTicks How long it should take for the translation to complete
      */
     public void translate(@Nonnull Direction direction, float distance, int durationInTicks){
-        for (SpawnedDisplayEntityPart part : spawnedParts){
-            part.translate(distance, durationInTicks, direction);
-        }
+        translate(direction.getDirection(masterPart), distance, durationInTicks);
     }
 
     /**
@@ -459,5 +465,9 @@ public final class SpawnedDisplayEntityGroup {
      */
     public void despawn(){
         DisplayGroupManager.removeSpawnedGroup(this);
+    }
+
+    public boolean isSpawned(){
+        return DisplayGroupManager.isGroupSpawned(this);
     }
 }
