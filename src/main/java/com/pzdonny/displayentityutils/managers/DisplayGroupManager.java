@@ -150,6 +150,10 @@ public final class DisplayGroupManager {
         }
     }
 
+    public static boolean isGroupSpawned(SpawnedDisplayEntityGroup spawnedGroup){
+        return allSpawnedGroups.containsKey(spawnedGroup.getMasterPart());
+    }
+
 
     /**
      * Save a Display Entity Group to a Data Location
@@ -264,10 +268,9 @@ public final class DisplayGroupManager {
     public static DisplayEntityGroup retrieveDisplayEntityGroup(File file){
         try{
             FileInputStream fileIn = new FileInputStream(file);
-            ObjectInputStream objIn = new ObjectInputStream(fileIn);
-            return (DisplayEntityGroup) objIn.readObject();
+            return retrieveDisplayEntityGroup(fileIn);
         }
-        catch(IOException | ClassNotFoundException ex){
+        catch(IOException ex){
             ex.printStackTrace();
             return null;
         }
