@@ -23,6 +23,7 @@ public final class LocalManager {
             ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
             objOut.writeObject(displayEntityGroup);
             byte[] data = byteOut.toByteArray();
+
             File saveFile = new File(saveFolder, "/"+displayEntityGroup.getTag()+".deg");
             if (saveFile.exists()){
                 if (DisplayEntityPlugin.overrideExistingSaves()){
