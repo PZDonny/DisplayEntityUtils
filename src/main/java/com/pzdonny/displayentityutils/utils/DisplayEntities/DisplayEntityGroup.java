@@ -20,8 +20,6 @@ public class DisplayEntityGroup implements Serializable{
     DisplayEntity masterEntity;
     private String tag;
 
-
-
     @Serial
     private static final long serialVersionUID = 99L;
 
