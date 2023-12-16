@@ -9,7 +9,6 @@ import org.bukkit.util.Vector;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
-import javax.swing.*;
 import java.io.*;
 
 public final class InteractionEntity implements Serializable {
