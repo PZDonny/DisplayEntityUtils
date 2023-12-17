@@ -3,10 +3,8 @@ package com.pzdonny.displayentityutils.utils;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Interaction;
-import org.bukkit.entity.ItemDisplay;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
-import org.joml.Quaternionf;
 
 public final class DisplayUtils {
 
@@ -22,8 +20,31 @@ public final class DisplayUtils {
      */
     public static Location getModelLocation(Display display){
         Transformation transformation = display.getTransformation();
-        Location modelLocation = display.getLocation().clone().add(Vector.fromJOML(transformation.getTranslation()));
-        if (display instanceof ItemDisplay){
+        Vector vectorFromCenter = Vector.fromJOML(transformation.getTranslation());
+
+        Location displayLoc = display.getLocation().clone();
+        float yaw = displayLoc.getYaw();
+        float pitch = displayLoc.getPitch();
+        vectorFromCenter.rotateAroundY(Math.toRadians(360-yaw));
+        Vector pitchVector = display.getLocation().getDirection();
+        pitchVector.setX(0);
+        pitchVector.setZ(0);
+        vectorFromCenter.subtract(pitchVector);
+
+    /*If the pitch is something other than 0, the transformation doesnt recognize the change and sends the translation vector
+    * as if the pitch was 0
+    * This gets the percentage difference between the display's pitch and the max pitch (90/-90)
+    * The y value is kept the same because the pitch doesn't affect where the y of the model location is, but affects the x and z
+    * A copied vector with the length of the percentage difference is subtracted from the main vector (vectorFromCenter)
+    * which updates the values of the x and z
+    */
+
+        double vectorY = vectorFromCenter.getY();
+        double pitchOffsetChange = Math.abs(pitch)/90;
+        vectorFromCenter.subtract(vectorFromCenter.clone().multiply(pitchOffsetChange));
+        vectorFromCenter.setY(vectorY);
+        return display.getLocation().clone().add(vectorFromCenter);
+        /*if (display instanceof ItemDisplay){
             modelLocation.subtract(0, Math.abs(display.getTransformation().getScale().y)/2, 0);
         }
         else{
@@ -42,7 +63,8 @@ public final class DisplayUtils {
             }
             modelLocation.add(v);
         }
-        return modelLocation;
+        modelLocation.getWorld().spawnParticle(Particle.FLAME, modelLocation, 2, 0, 0,0, 0);
+        return modelLocation;*/
     }
 
     /**
