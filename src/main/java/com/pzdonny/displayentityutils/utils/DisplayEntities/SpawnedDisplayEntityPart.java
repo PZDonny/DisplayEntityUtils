@@ -4,6 +4,7 @@ import com.pzdonny.displayentityutils.DisplayEntityPlugin;
 import com.pzdonny.displayentityutils.managers.DisplayGroupManager;
 import com.pzdonny.displayentityutils.utils.Direction;
 import com.pzdonny.displayentityutils.utils.DisplayUtils;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
@@ -263,6 +264,32 @@ public final class SpawnedDisplayEntityPart {
         Display display = (Display) entity;
         display.setRotation(display.getLocation().getYaw(), pitch);
     }
+
+    public void setBrightness(Display.Brightness brightness){
+        if (entity instanceof Interaction){
+            return;
+        }
+        Display display = (Display) entity;
+        display.setBrightness(brightness);
+    }
+
+    public void setViewRange(float range){
+        if (entity instanceof Interaction){
+            return;
+        }
+        Display display = (Display) entity;
+        display.setViewRange(range);
+    }
+
+    public void setGlowColor(Color color){
+        if (entity instanceof Interaction){
+            return;
+        }
+        Display display = (Display) entity;
+        display.setGlowColorOverride(color);
+    }
+
+
 
     /**
      * Change the translation of a SpawnedDisplayEntityPart.

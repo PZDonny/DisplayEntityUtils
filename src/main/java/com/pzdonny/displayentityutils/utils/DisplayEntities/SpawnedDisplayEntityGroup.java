@@ -7,6 +7,7 @@ import com.pzdonny.displayentityutils.events.GroupTranslateEvent;
 import com.pzdonny.displayentityutils.managers.DisplayGroupManager;
 import com.pzdonny.displayentityutils.utils.Direction;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Display;
@@ -266,6 +267,25 @@ public final class SpawnedDisplayEntityGroup {
             part.setPitch(pitch);
         }
     }
+
+    public void setBrightness(Display.Brightness brightness){
+        for (SpawnedDisplayEntityPart part : spawnedParts){
+            part.setBrightness(brightness);
+        }
+    }
+
+    public void setViewRange(float range){
+        for (SpawnedDisplayEntityPart part : spawnedParts){
+            part.setViewRange(range);
+        }
+    }
+
+    public void setGlowColor(Color color){
+        for (SpawnedDisplayEntityPart part : spawnedParts){
+            part.setGlowColor(color);
+        }
+    }
+
 
     /**
      * Change the translation of all the SpawnedDisplayEntityParts in this group.
