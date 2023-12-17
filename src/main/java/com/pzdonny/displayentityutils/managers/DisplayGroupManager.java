@@ -632,7 +632,9 @@ public final class DisplayGroupManager {
         //SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(display);
         PartTranslateEvent event = new PartTranslateEvent(display, PartTranslateEvent.EntityType.DISPLAY, destination);
         Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) return;
+        if (event.isCancelled()){
+            return;
+        }
 
         display.setInterpolationDuration(durationInTicks);
         display.setInterpolationDelay(-1);
