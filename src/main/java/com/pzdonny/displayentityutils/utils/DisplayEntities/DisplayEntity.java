@@ -30,16 +30,13 @@ public class DisplayEntity implements Serializable {
     DisplayEntity(Display entity, Type type, DisplayEntityGroup group){
         this.type = type;
         this.group = group;
-        if (entity instanceof BlockDisplay) {
-            BlockDisplay bd = (BlockDisplay) entity;
+        if (entity instanceof BlockDisplay bd) {
             specifics = new BlockDisplaySpecifics(bd);
         }
-        else if (entity instanceof ItemDisplay) {
-            ItemDisplay id = (ItemDisplay) entity;
+        else if (entity instanceof ItemDisplay id) {
             specifics = new ItemDisplaySpecifics(id);
         }
-        else if (entity instanceof TextDisplay) {
-            TextDisplay td = (TextDisplay) entity;
+        else if (entity instanceof TextDisplay td) {
             specifics = new TextDisplaySpecifics(td);
         }
 
@@ -95,8 +92,8 @@ public class DisplayEntity implements Serializable {
             display.setAlignment(spec.getAlignment());
             display.setText(spec.getText());
             display.setLineWidth(spec.getLineWidth());
-            if (spec.getBackgroundColorRGB() != -1){
-                display.setBackgroundColor(Color.fromRGB(spec.getBackgroundColorRGB()));
+            if (spec.getBackgroundColorARGB() != Color.BLACK.asARGB()){
+                display.setBackgroundColor(Color.fromARGB(spec.getBackgroundColorARGB()));
             }
             display.setTextOpacity(spec.getTextOpacity());
             display.setShadowed(spec.isShadowed());
