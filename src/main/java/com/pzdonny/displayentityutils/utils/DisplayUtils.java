@@ -15,6 +15,7 @@ public final class DisplayUtils {
     /**
      * Get the location of the model of a display entity. Not the entity's actual location but the location
      * based off of it's transformation
+     * This may not be a perfect representation of where the model's location actually is, due to the the shape of models varying (e.g.: Stone Block vs Stone Pressure Plate)
      * @param display The entity to get the location from
      * @return Location of the model
      */
