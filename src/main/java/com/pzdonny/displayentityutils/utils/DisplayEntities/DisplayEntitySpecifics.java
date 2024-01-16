@@ -2,6 +2,7 @@ package com.pzdonny.displayentityutils.utils.DisplayEntities;
 
 import com.pzdonny.displayentityutils.DisplayEntityPlugin;
 import com.pzdonny.displayentityutils.managers.DisplayGroupManager;
+import org.bukkit.Color;
 import org.bukkit.entity.Display;
 
 import java.io.Serial;
@@ -23,6 +24,8 @@ public abstract class DisplayEntitySpecifics implements Serializable {
     private int brightnessBlockLight;
     private int brightnessSkyLight;
 
+    private int glowColorOverride = Color.WHITE.asRGB();
+
     DisplayEntitySpecifics(Display displayEntity){
         this.partTag = DisplayGroupManager.getPartTag(displayEntity);
         this.serialTransformation = new SerialTransformation(displayEntity.getTransformation());
@@ -32,6 +35,9 @@ public abstract class DisplayEntitySpecifics implements Serializable {
         this.shadowStrength = displayEntity.getShadowStrength();
         this.displayWidth = displayEntity.getDisplayWidth();
         this.displayHeight = displayEntity.getDisplayHeight();
+        if (displayEntity.getGlowColorOverride() != null && displayEntity.getGlowColorOverride().asRGB() != Color.WHITE.asRGB()){
+            this.glowColorOverride = displayEntity.getGlowColorOverride().asRGB();
+        }
         Display.Brightness brightness = displayEntity.getBrightness();
         if (brightness != null) {
             this.brightnessBlockLight = displayEntity.getBrightness().getBlockLight();
@@ -79,6 +85,10 @@ public abstract class DisplayEntitySpecifics implements Serializable {
         return brightnessSkyLight;
     }
 
+    int getGlowColorOverride(){
+        return glowColorOverride;
+    }
+
     void updateDisplay(Display display){
         display.setTransformation(serialTransformation.toTransformation());
         display.setBillboard(billboard);
@@ -87,6 +97,9 @@ public abstract class DisplayEntitySpecifics implements Serializable {
         display.setShadowStrength(shadowStrength);
         display.setDisplayWidth(displayWidth);
         display.setDisplayHeight(displayHeight);
+        if (glowColorOverride != Color.WHITE.asRGB()){
+            display.setGlowColorOverride(Color.fromRGB(glowColorOverride));
+        }
         if (brightnessBlockLight != 0 && brightnessSkyLight != 0){
             display.setBrightness(new Display.Brightness(brightnessBlockLight, brightnessSkyLight));
         }
