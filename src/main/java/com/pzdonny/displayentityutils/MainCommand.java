@@ -23,8 +23,9 @@ class MainCommand implements CommandExecutor {
 
     static void noSelection(Player p){
         p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You have not selected a spawned display entity group!");
-        p.sendMessage(ChatColor.GRAY+"/mdis select <interaction-distance>");
+        p.sendMessage(ChatColor.GRAY+"/mdis group selectnearest <interaction-distance>");
     }
+
     static void noPartSelection(Player p){
         p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You have not selected a part!");
         p.sendMessage(ChatColor.GRAY+"/mdis cyclepart <first | prev | next>");
@@ -38,282 +39,43 @@ class MainCommand implements CommandExecutor {
         }
         return true;
     }
+
+
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length == 0 ){
-            errorMessage(sender);
-            return true;
-        }
-
-        if (!(sender instanceof Player)){
+        if (!(sender instanceof Player p)){
             sender.sendMessage(ChatColor.RED+"You cannot use this command in the console!");
             return true;
         }
-        Player p = (Player) sender;
 
-        if (args[0].equalsIgnoreCase("reload")){
-            if (!hasPermission(p, "deu.reload")) return true;
-            DisplayEntityPlugin.getInstance().reloadPlugin();
+        if (args.length == 0 ){
+            mainCommandList(sender);
+            return true;
+        }
+        String firstArg = args[0];
+        if (firstArg.equalsIgnoreCase("help")){
+            mainCommandList(sender);
+            return true;
+        }
+
+        else if (firstArg.equalsIgnoreCase("reload")){
+            if (!hasPermission(p, "deu.reload")){
+                return true;
+            }
+            DisplayEntityPlugin.getInstance().reloadPlugin(false);
             sender.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Plugin Reloaded!");
             return true;
         }
-        else if (args[0].equalsIgnoreCase("partshelp") || args[0].equalsIgnoreCase("parthelp")){
-            if (!hasPermission(p, "deu.help")) return true;
-            partsHelpMessage(sender);
-            return true;
-        }
-        else if (args[0].equalsIgnoreCase("gettag")){
-            if (!hasPermission(p, "deu.gettag")) return true;
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
-            if (group == null){
-                noSelection(p);
-                return true;
-            }
-            getTag((Player) sender, group);
-            return true;
-        }
-        else if (args[0].equalsIgnoreCase("despawn")){
-            if (!hasPermission(p, "deu.despawn")) return true;
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
-            if (group == null){
-                noSelection(p);
-                return true;
-            }
-            despawn(p, group);
-            return true;
-        }
-        else if (args[0].equalsIgnoreCase("highlight")){
-            if (!hasPermission(p, "deu.highlight")) return true;
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
-            if (group == null){
-                noSelection(p);
-                return true;
-            }
-            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Highlighting selected entity!");
-            group.highlight(100);
-            return true;
-        }
-        else if (args[0].equalsIgnoreCase("highlightpart")){
-            if (!hasPermission(p, "deu.highlight")) return true;
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
-            if (group == null){
-                noSelection(p);
-                return true;
-            }
-            SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
-            if (partSelection == null){
-                noPartSelection(p);
-                return true;
-            }
-            partSelection.highlight(80);
-            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Highlighting selected part(s)!");
-            return true;
-        }
-        else if (args[0].equalsIgnoreCase("movehere")){
-            if (!hasPermission(p, "deu.movehere")) return true;
-            TransformationSubCommands.moveHere(p);
-            return true;
-        }
-        else if (args[0].equalsIgnoreCase("clone")){
-            if (!hasPermission(p, "deu.clone")) return true;
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
-            if (group == null){
-                noSelection(p);
-                return true;
-            }
-            clone(p, group);
-            return true;
-        }
-        else if (args[0].equalsIgnoreCase("removeinteractions")){
-            if (!hasPermission(p, "deu.removeinteractions")) return true;
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
-            if (group == null){
-                noSelection(p);
-                return true;
-            }
-            removeInteractions(p, group);
-            return true;
-        }
-        else if (args[0].equalsIgnoreCase("getparttag")){
-            if (!hasPermission(p, "deu.getparttag")) return true;
-            getPartTag(p);
-            return true;
-        }
-        else if (args[0].equals("spawnpartinteraction")){
-            if (!hasPermission(p, "deu.partinteraction")) return true;
-            spawnPartInteraction(p);
-            return true;
-        }
-        else if (args[0].equals("removepart")){
-            if (!hasPermission(p, "deu.removepart")) return true;
-            removePart(p);
-            return true;
-        }
-        else if (args[0].equalsIgnoreCase("removeinteractioncommand")){
-            if (!hasPermission(p, "deu.interactioncmd")) return true;
-            removeInteractionCommand(p);
-            return true;
-        }
 
-        else if (args.length < 2){
-            errorMessage(sender);
-            return true;
-        }
-
-
-
-        String tag = args[1];
-        if (args[0].equalsIgnoreCase("settag")){
-            if (!hasPermission(p, "deu.settag")) return true;
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
-            if (group == null){
-                noSelection(p);
+        else if (firstArg.equalsIgnoreCase("list")){
+            if (!hasPermission(p, "deu.list")){
                 return true;
             }
-            setTag(p, group, tag);
-            return true;
-        }
-        else if (args[0].equalsIgnoreCase("cyclepart")){
-            if (!hasPermission(p, "deu.cyclepart")) return true;
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
-            if (group == null){
-                noSelection(p);
+            if (args.length == 1){
+                p.sendMessage(ChatColor.RED+"Incorrect Usage! /mdis list <storage> [page-number]");
                 return true;
             }
-            SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
-            if (partSelection == null){
-                ArrayList<String> valid = new ArrayList<>();
-                valid.add("first");
-                valid.add("prev");
-                valid.add("previous");
-                valid.add("next");
-                if (!valid.contains(args[1])){
-                    p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Invalid Option! /mdis cycleparts <first | prev | next>");
-                    return true;
-                }
-                partSelection = new SpawnedPartSelection(group);
-                args[1] = "first";
-                DisplayGroupManager.setPartSelection(p, partSelection, false);
-            }
-            else if (!partSelection.isValid()){
-                p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Invalid part selection! Please try again!");
-                return true;
-            }
-            switch(args[1]){
-                case "first" -> {
-                    partSelection.setToFirstPart();
-                    singlePartSelected(p, partSelection);
-                    return true;
-                }
-                case "prev", "previous" -> {
-                    partSelection.setToPreviousPart();
-                    singlePartSelected(p, partSelection);
-                    return true;
-                }
-                case "next" -> {
-                    partSelection.setToNextPart();
-                    singlePartSelected(p, partSelection);
-                    return true;
-                }
-                default ->{
-                    p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Invalid Option! /mdis cycleparts <first | prev | next>");
-                    return true;
-                }
-            }
-        }
-        else if (args[0].equalsIgnoreCase("setparttag")){
-            if (!hasPermission(p, "deu.setparttag")) return true;
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
-            if (group == null){
-                noSelection(p);
-                return true;
-            }
-            SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
-            if (partSelection == null){
-                noPartSelection(p);
-                return true;
-            }
-            else if (!partSelection.isValid()){
-                p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Invalid part selection! Please try again!");
-                return true;
-            }
-            setPartTags(p, partSelection, args[1]);
-            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Part tag successfully set! "+ChatColor.WHITE+"(Part(s) Tagged: "+args[1]+")");
-            return true;
-        }
-
-        else if (args[0].equalsIgnoreCase("selectnearest") || args[0].equalsIgnoreCase("select")){
-            if (!hasPermission(p, "deu.select")) return true;
-            SpawnedDisplayEntityGroup group;
-            int interactionDistance = 0;
-            try{
-                interactionDistance = Integer.parseInt(args[1]);
-            }
-            catch(NumberFormatException e){
-                p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a number for the distance to select interaction entities");
-                return true;
-            }
-            group = DisplayGroupManager.getSpawnedGroupNearLocation(p.getLocation(), 2, p);
-            if (group != null){
-                p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN + "Selection made!");
-                DisplayGroupManager.setSelectedSpawnedGroup(p, group);
-                DisplayGroupManager.removePartSelection(p);
-
-                group.getUnaddedInteractionEntitiesInRange(interactionDistance, true);
-                group.highlight(100);
-            }
-            return true;
-
-        }
-        else if (args[0].equalsIgnoreCase("addinteractions")){
-            if (!hasPermission(p, "deu.addinteractions")) return true;
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
-            if (group == null){
-                noSelection(p);
-                return true;
-            }
-            int interactionDistance = 0;
-            try{
-                interactionDistance = Integer.parseInt(args[1]);
-            }
-            catch(NumberFormatException e){
-                p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a number for the distance to select interaction entities");
-                return true;
-            }
-            addInteractions(p, group, interactionDistance);
-            return true;
-        }
-
-        else if (args[0].equalsIgnoreCase("save")){
-            if (!hasPermission(p, "deu.save")) return true;
-            DataSubCommands.save(p, args[1]);
-            return true;
-        }
-
-        else if (args[0].equalsIgnoreCase("selectpart")){
-            if (!hasPermission(p, "deu.selectpart")) return true;
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
-            if (group == null){
-                noSelection(p);
-                return true;
-            }
-            SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
-            if (partSelection != null){
-                partSelection.remove();
-            }
-            partSelection = new SpawnedPartSelection(group, tag);
-            if (partSelection.getSelectedParts().isEmpty()){
-                p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Failed to find parts with that part tag!");
-                return true;
-            }
-            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Part(s) successfully selected! "+ChatColor.WHITE+"(Part(s) Tagged: "+args[1]+")");
-            DisplayGroupManager.setPartSelection(p, partSelection, false);
-            partSelection.highlight(30);
-            return true;
-        }
-
-        else if (args[0].equalsIgnoreCase("list")){
-            if (!hasPermission(p, "deu.list")) return true;
             DisplayGroupManager.LoadMethod method;
             try{
                 method = DisplayGroupManager.LoadMethod.valueOf(args[1].toUpperCase());
@@ -323,6 +85,7 @@ class MainCommand implements CommandExecutor {
                     sender.sendMessage(ChatColor.RED+"You cannot use \"all\" here!");
                 }
                 sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
+                p.sendMessage(ChatColor.RED+"Invalid Storage Location!");
                 sender.sendMessage(ChatColor.GRAY+"/mdis list local");
                 sender.sendMessage(ChatColor.GRAY+"/mdis list mongodb");
                 sender.sendMessage(ChatColor.GRAY+"/mdis list mysql");
@@ -357,101 +120,426 @@ class MainCommand implements CommandExecutor {
             }
             p.sendMessage("------------------------");
         }
-        else if (args[0].equalsIgnoreCase("setyaw")){
-            if (!hasPermission(p, "deu.translate")) return true;
-            TransformationSubCommands.setYaw(p, args);
-            return true;
+
+        else if (firstArg.equalsIgnoreCase("parts")){
+            if (!hasPermission(p, "deu.help")){
+                return true;
+            }
+
+            if (args.length == 1){
+                partsHelp(p);
+                return true;
+            }
+
+            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
+            if (group == null){
+                noSelection(p);
+                return true;
+            }
+
+            String arg2 = args[1];
+            switch (arg2){
+                case "cycle" -> {
+                    if (!hasPermission(p, "deu.parts.cycle")){
+                        return true;
+                    }
+                    if (args.length == 2){
+                        p.sendMessage(ChatColor.GRAY+"/mdis parts cycle <first | prev | next>");
+                        return true;
+                    }
+                    SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
+                    if (partSelection == null){
+                        partSelection = new SpawnedPartSelection(group);
+                    }
+                    //DisplayGroupManager.setPartSelection(p, partSelection, false);
+
+                    switch(args[1]){
+                        case "first" -> {
+                            partSelection.setToFirstPart();
+                            singlePartSelected(p, partSelection);
+                            return true;
+                        }
+                        case "prev", "previous" -> {
+                            partSelection.setToPreviousPart();
+                            singlePartSelected(p, partSelection);
+                            return true;
+                        }
+                        case "next" -> {
+                            partSelection.setToNextPart();
+                            singlePartSelected(p, partSelection);
+                            return true;
+                        }
+                        default ->{
+                            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Invalid Option! /mdis parts cycle <first | prev | next>");
+                            return true;
+                        }
+                    }
+                }
+
+                case "select" -> {
+                    if (!hasPermission(p, "deu.parts.select")){
+                        return true;
+                    }
+                    SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
+                    if (partSelection != null){
+                        partSelection.remove();
+                    }
+                    if (args.length < 3){
+                        p.sendMessage(ChatColor.RED+"/mdis parts select <part-tag>");
+                    }
+                    partSelection = new SpawnedPartSelection(group, args[2]);
+                    if (partSelection.getSelectedParts().isEmpty()){
+                        p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Failed to find parts with that part tag!");
+                        return true;
+                    }
+                    p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Part(s) successfully selected! "+ChatColor.WHITE+"(Part(s) Tagged: "+args[1]+")");
+                    DisplayGroupManager.setPartSelection(p, partSelection, false);
+                    partSelection.highlight(30);
+                    return true;
+                }
+
+                case "settag" -> {
+                    if (!hasPermission(p, "deu.parts.settag")){
+                        return true;
+                    }
+                    SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
+                    if (partSelection == null){
+                        noPartSelection(p);
+                        return true;
+                    }
+                    if (!partSelection.isValid()){
+                        p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Invalid part selection! Please try again!");
+                        return true;
+                    }
+                    if (args.length == 3){
+                        setPartTags(p, partSelection, args[2]);
+                        return true;
+                    }
+                    else{
+                        p.sendMessage(ChatColor.RED+"Provide a part tag! /mdis parts settag <part-tag>");
+                    }
+
+                }
+
+                case "gettag" -> {
+                    if (!hasPermission(p, "deu.parts.gettag")){
+                        return true;
+                    }
+                    getPartTag(p, group);
+                }
+
+                case "remove" -> {
+                    if (!hasPermission(p, "deu.parts.remove")){
+                        return true;
+                    }
+                    removePart(p, group);
+                }
+
+                case "translate" -> {
+                    if (!hasPermission(p, "deu.parts.translate")){
+                        return true;
+                    }
+                    SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
+                    if (partSelection == null){
+                        noPartSelection(p);
+                        return true;
+                    }
+                    if (args.length < 5){
+                        sender.sendMessage(ChatColor.RED+"/mdis parts translate <direction> <distance> <tick-duration>");
+                        return true;
+                    }
+                    TransformationSubCommands.translateParts(p, args, partSelection);
+                }
+
+                case "glow" -> {
+                    if (!hasPermission(p, "deu.parts.glow")){
+                        return true;
+                    }
+                    SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
+                    if (partSelection == null){
+                        noPartSelection(p);
+                        return true;
+                    }
+                    partSelection.highlight(80);
+                    p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Glowing selected part(s)!");
+                }
+                case "removeinteractioncommand" ->{
+                    if (!hasPermission(p, "deu.parts.interactioncmd")){
+                        return true;
+                    }
+                    removeInteractionCommand(p);
+                }
+                case "setinteractioncommand" -> {
+                    if (!hasPermission(p, "deu.parts.interactioncmd")){
+                        return true;
+                    }
+                    if (args.length < 3){
+                        p.sendMessage(ChatColor.RED+"/mdis parts setinteractioncommand <command>");
+                        return true;
+                    }
+                    setInteractionCommand(p, args);
+                }
+            }
         }
 
-        else if (args[0].equalsIgnoreCase("setinteractioncommand")){
-            if (!hasPermission(p, "deu.interactioncmd")) return true;
-            setInteractionCommand(p, args);
-            return true;
-        }
+        else if (firstArg.equalsIgnoreCase("group")){
+            if (!hasPermission(p, "deu.help")){
+                return true;
+            }
+            if (args.length == 1){
+                groupHelp(p);
+                return true;
+            }
 
-        else if (args.length < 3){
-            errorMessage(sender);
-            return true;
-        }
-        else if (args[0].equalsIgnoreCase("delete")){
-            if (!hasPermission(p, "deu.delete")) return true;
-            DataSubCommands.delete(p, tag, args[2]);
-        }
-        else if (args[0].equalsIgnoreCase("spawn")){
-            if (!hasPermission(p, "deu.spawn")) return true;
-            DataSubCommands.spawn(p, tag, args[2]);
-        }
+            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
+            String arg2 = args[1];
+            switch (arg2){
+                case "spawn" -> {
+                    if (!hasPermission(p, "deu.group.spawn")){
+                        return true;
+                    }
+                    if (args.length < 4){
+                        sender.sendMessage(ChatColor.RED+"Incorrect Usage! /mdis group spawn <group-tag> <storage>");
+                        return true;
+                    }
+                    DataSubCommands.spawn(p, args[2], args[3]);
+                }
 
-        else if (args.length < 4){
-            errorMessage(sender);
-        }
-        else if (args[0].equalsIgnoreCase("move")){
-            if (!hasPermission(p, "deu.move")) return true;
-            TransformationSubCommands.move(p, args);
-            return true;
-        }
-        else if (args[0].equalsIgnoreCase("translate")){
-            if (!hasPermission(p, "deu.translate")) return true;
-            TransformationSubCommands.translate(p, args);
-            return true;
-        }
-        else if (args[0].equalsIgnoreCase("translatepart")){
-            if (!hasPermission(p, "deu.translate")) return true;
-            TransformationSubCommands.translateParts(p, args);
-            return true;
+                case "save" -> {
+                    if (!hasPermission(p, "deu.group.save")){
+                        return true;
+                    }
+                    if (args.length < 3){
+                        sender.sendMessage(ChatColor.RED+"Incorrect Usage /mdis group save <storage>");
+                        return true;
+                    }
+                    DataSubCommands.save(p, args[2].toLowerCase());
+                }
+
+                case "delete" -> {
+                    if (!hasPermission(p, "deu.group.delete")){
+                        return true;
+                    }
+                    if (args.length < 4){
+                        sender.sendMessage(ChatColor.RED+"/mdis group delete <group-tag> <storage-location>");
+                        return true;
+                    }
+                    DataSubCommands.delete(p, args[2], args[3].toLowerCase());
+                }
+
+                case "selectnearest" -> {
+                    if (!hasPermission(p, "deu.group.selectnearest")){
+                        return true;
+                    }
+                    int interactionDistance = 0;
+                    if (args.length >= 3){
+                        try{
+                            interactionDistance = Integer.parseInt(args[2]);
+                        }
+                        catch(NumberFormatException e){
+                            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a number for the distance to select interaction entities");
+                            return true;
+                        }
+                    }
+
+                    group = DisplayGroupManager.getSpawnedGroupNearLocation(p.getLocation(), 2, p);
+                    if (group != null){
+                        p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN + "Selection made!");
+                        DisplayGroupManager.setSelectedSpawnedGroup(p, group);
+                        DisplayGroupManager.removePartSelection(p);
+
+                        group.getUnaddedInteractionEntitiesInRange(interactionDistance, true);
+                        group.highlight(100);
+                    }
+                }
+
+                case "movehere" -> {
+                    if (!hasPermission(p, "deu.group.movehere")){
+                        return true;
+                    }
+                    TransformationSubCommands.moveHere(p);
+                }
+
+                case "move" -> {
+                    if (!hasPermission(p, "deu.group.move")){
+                        return true;
+                    }
+                    if (group == null){
+                        noSelection(p);
+                        return true;
+                    }
+                    if (args.length < 5){
+                        sender.sendMessage(ChatColor.RED+"/mdis move translate <direction> <distance> <tick-duration>");
+                        return true;
+                    }
+                    TransformationSubCommands.move(p, args, group);
+                }
+
+                case "translate" -> {
+                    if (!hasPermission(p, "deu.group.translate")){
+                        return true;
+                    }
+                    if (group == null){
+                        noSelection(p);
+                        return true;
+                    }
+                    if (args.length < 5){
+                        sender.sendMessage(ChatColor.RED+"/mdis group translate <direction> <distance> <tick-duration>");
+                        return true;
+                    }
+                    TransformationSubCommands.translate(p, args, group);
+                }
+
+                case "setyaw" -> {
+                    if (!hasPermission(p, "deu.translate")){
+                        return true;
+                    }
+                    if (group == null){
+                        noSelection(p);
+                        return true;
+                    }
+                    if (args.length < 3){
+                        sender.sendMessage(ChatColor.RED+"/mdis group setyaw <yaw>");
+                        return true;
+                    }
+                    TransformationSubCommands.setYaw(p, args[2]);
+                    return true;
+                }
+
+                case "removeinteractions" -> {
+                    if (!hasPermission(p, "deu.group.removeinteractions")){
+                        return true;
+                    }
+                    if (group == null){
+                        noSelection(p);
+                        return true;
+                    }
+                    removeInteractions(p, group);
+                    return true;
+                }
+
+                case "settag" -> {
+                    if (!hasPermission(p, "deu.group.settag")){
+                        return true;
+                    }
+                    if (group == null){
+                        noSelection(p);
+                        return true;
+                    }
+
+                    if (args.length == 3){
+                        setTag(p, group, args[2]);
+                        return true;
+                    }
+                    else{
+                        p.sendMessage(ChatColor.RED+"Provide a part tag! /mdis group settag <part-tag>");
+                        return true;
+                    }
+                }
+
+                case "gettag" -> {
+                    if (!hasPermission(p, "deu.group.gettag")){
+                        return true;
+                    }
+                    if (group == null){
+                        noSelection(p);
+                        return true;
+                    }
+                    getTag((Player) sender, group);
+                    return true;
+                }
+
+                case "glow" -> {
+                    if (!hasPermission(p, "deu.group.glow")) return true;
+                    if (group == null){
+                        noSelection(p);
+                        return true;
+                    }
+                    p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Glowing selected spawned display entity group!");
+                    group.highlight(100);
+                    return true;
+                }
+
+                case "clone" -> {
+                    if (!hasPermission(p, "deu.group.clone")){
+                        return true;
+                    }
+                    if (group == null){
+                        noSelection(p);
+                        return true;
+                    }
+                    clone(p, group);
+                    return true;
+                }
+
+                case "despawn" -> {
+                    if (!hasPermission(p, "deu.group.despawn")) {
+                        return true;
+                    }
+                    if (group == null){
+                        noSelection(p);
+                        return true;
+                    }
+                    despawn(p, group);
+                    return true;
+                }
+            }
         }
         else{
-            if (!hasPermission(p, "deu.help")) return true;
-            errorMessage(p);
-            return true;
+            mainCommandList(p);
         }
         return true;
     }
 
 
-    static void errorMessage(CommandSender sender){
+    static void mainCommandList(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         sender.sendMessage(ChatColor.DARK_AQUA+"Valid storage is \"local\", \"mongodb\", \"mysql\", and \"all\"");
         sender.sendMessage();
         sender.sendMessage(ChatColor.GRAY+"/mdis help");
-        sender.sendMessage(ChatColor.GRAY+"/mdis partshelp");
-        sender.sendMessage(ChatColor.GRAY+"/mdis selectnearest <interaction-distance>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis addinteractions <interaction-distance>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis removeinteractions");
-        sender.sendMessage(ChatColor.GRAY+"/mdis settag <tag>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis gettag");
-        sender.sendMessage(ChatColor.GRAY+"/mdis highlight");
-        sender.sendMessage(ChatColor.GRAY+"/mdis clone");
-        sender.sendMessage(ChatColor.GRAY+"/mdis movehere");
-        sender.sendMessage(ChatColor.GRAY+"/mdis move <direction> <distance> <tick-duration>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis translate <direction> <distance> <tick-duration>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis setyaw <yaw>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis save <storage>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis delete <tag> <storage>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis spawn <tag> <storage>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis despawn");
+        sender.sendMessage(ChatColor.GRAY+"/mdis parts");
+        sender.sendMessage(ChatColor.GRAY+"/mdis group");
         sender.sendMessage(ChatColor.GRAY+"/mdis list <storage> [page-number]");
         sender.sendMessage(ChatColor.GRAY+"/mdis reload");
     }
 
-    static void partsHelpMessage(CommandSender sender){
+    static void groupHelp(CommandSender sender){
+        sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
+        sender.sendMessage(ChatColor.WHITE+"-Group Help");
+        sender.sendMessage(ChatColor.GRAY+"/mdis group selectnearest <interaction-distance>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis group spawn <group-tag> <storage>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis group despawn");
+        sender.sendMessage(ChatColor.GRAY+"/mdis group save <storage-location>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis group delete <group-tag> <storage-location>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis group removeinteractions");
+        sender.sendMessage(ChatColor.GRAY+"/mdis group settag <group-tag>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis group gettag");
+        sender.sendMessage(ChatColor.GRAY+"/mdis group setyaw <yaw>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis group clone");
+        sender.sendMessage(ChatColor.GRAY+"/mdis group move <direction> <distance> <tick-duration>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis group translate <direction> <distance> <tick-duration>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis group movehere");
+        sender.sendMessage(ChatColor.GRAY+"/mdis group glow");
+    }
+
+    static void partsHelp(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         sender.sendMessage(ChatColor.AQUA+"\"Parts\" are each individual display/interaction entity that is spawned within the group");
-        sender.sendMessage(ChatColor.AQUA+"Each part can be given a part tag, separate from the group tag to identify each individual part");
-        sender.sendMessage(ChatColor.AQUA+"Multiple parts can have the same part tag");
+        sender.sendMessage(ChatColor.AQUA+"Each part can be given a part tag to identify each individual part");
+        sender.sendMessage(ChatColor.AQUA+"Parts can share the same part tag to create part selections");
         sender.sendMessage(ChatColor.GRAY+"This is mainly useful for API users / usage with addon plugins");
         sender.sendMessage();
-        sender.sendMessage(ChatColor.GRAY+"/mdis cyclepart <first | prev | next>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis setparttag <part-tag>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis getparttag");
-        sender.sendMessage(ChatColor.GRAY+"/mdis selectpart <part-tag>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis removepart");
-        sender.sendMessage(ChatColor.GRAY+"/mdis highlightpart");
-        sender.sendMessage(ChatColor.GRAY+"/mdis translatepart <direction>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis spawnpartinteraction");
-        sender.sendMessage(ChatColor.GRAY+"/mdis setinteractioncommand");
-        sender.sendMessage(ChatColor.GRAY+"/mdis removeinteractioncommand");
+        sender.sendMessage(ChatColor.GRAY+"/mdis parts cycle <first | prev | next>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis parts settag <part-tag>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis parts gettag");
+        sender.sendMessage(ChatColor.GRAY+"/mdis parts select <part-tag>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis parts remove");
+        sender.sendMessage(ChatColor.GRAY+"/mdis parts glow");
+        sender.sendMessage(ChatColor.GRAY+"/mdis parts translate <direction> <distance> <tick-duration>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis parts setinteractioncommand");
+        sender.sendMessage(ChatColor.GRAY+"/mdis parts removeinteractioncommand");
     }
+
 
     static void invalidDirection(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Invalid direction type!");
@@ -472,8 +560,7 @@ class MainCommand implements CommandExecutor {
 
     private void setTag(Player p, SpawnedDisplayEntityGroup spawnedGroup, String newTag){
         spawnedGroup.setTag(newTag);
-        p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Successfully tagged unsaved display entities! "+ChatColor.WHITE+"(Tagged: "+newTag+")");
-
+        p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Successfully tagged spawned display entity group! "+ChatColor.WHITE+"(Tagged: "+newTag+")");
     }
 
     private void setPartTags(Player p, SpawnedPartSelection partSelection, String newTag){
@@ -503,7 +590,7 @@ class MainCommand implements CommandExecutor {
             clonedGroup.highlight(80);
         }
     }
-    private void addInteractions(Player p, SpawnedDisplayEntityGroup spawnedGroup, int interactionDistance){
+    /*private void addInteractions(Player p, SpawnedDisplayEntityGroup spawnedGroup, int interactionDistance){
         List<Interaction> interactions = spawnedGroup.getUnaddedInteractionEntitiesInRange(interactionDistance, true);
         if (interactions.isEmpty()){
             p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"There were no interaction entities to be added to the group!");
@@ -526,15 +613,14 @@ class MainCommand implements CommandExecutor {
                 i+=2;
             }
         }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, 2);
-    }
+    }*/
 
     private void removeInteractions(Player p ,SpawnedDisplayEntityGroup group){
         p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Removed any interactions entities attached to the spawned display entity group");
         group.removeInteractionEntities();
     }
 
-    private void getPartTag(Player p){
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
+    private void getPartTag(Player p, SpawnedDisplayEntityGroup group){
         if (group == null){
             noSelection(p);
             return;
@@ -552,39 +638,7 @@ class MainCommand implements CommandExecutor {
         p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.WHITE+"(Part(s) Tagged: "+partTag+")");
     }
 
-    private void spawnPartInteraction(Player p){
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
-        if (group == null){
-            noSelection(p);
-            return;
-        }
-        SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
-        if (partSelection == null){
-            noPartSelection(p);
-            return;
-        }
-        boolean spawned = false;
-        for (SpawnedDisplayEntityPart part : partSelection.getSelectedParts()){
-            if (part.getEntity() instanceof Interaction){
-                continue;
-            }
-            if (part.spawnInteractionAtDisplay() != null){
-                spawned = true;
-            }
-        }
-        if (spawned){
-            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Interaction entity(s) spawned!");
-            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GRAY+"If the interaction does not look correct, it is probably because it was spawned on a display entity with rotations");
-        }
-        else{
-            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Failed to create interaction entity(s)");
-            p.sendMessage(ChatColor.GRAY+"Make sure you are not attempting to spawn it at a text or interaction entity, nor any entity with a scale of 0");
-            p.sendMessage(ChatColor.GRAY+"If any parts were skipped it is because, one of the values for the part's scaling was 0, the x and z of the part's scale aren't the same, or the part is a text display or interaction entity");
-        }
-    }
-
-    private void removePart(Player p){
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
+    private void removePart(Player p, SpawnedDisplayEntityGroup group){
         if (group == null){
             noSelection(p);
             return;
@@ -610,11 +664,6 @@ class MainCommand implements CommandExecutor {
     }
 
     private void setInteractionCommand(Player p , String[] args){
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
-        if (group == null){
-            noSelection(p);
-            return;
-        }
         SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
         if (partSelection == null){
             noPartSelection(p);
@@ -630,7 +679,7 @@ class MainCommand implements CommandExecutor {
 
         Interaction interaction = (Interaction) partSelection.getSelectedParts().get(0).getEntity();
         StringBuilder builder = new StringBuilder();
-        for (int i = 1; i < args.length; i++){
+        for (int i = 2; i < args.length; i++){
             builder.append(args[i]);
             if (i+1 != args.length) builder.append(" ");
         }

@@ -12,70 +12,72 @@ class TabCompleter implements org.bukkit.command.TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         List<String> suggestions = new ArrayList<>();
-        if (args.length == 1){
+        if (args.length == 1) {
             suggestions.add("help");
-            suggestions.add("partshelp");
-            suggestions.add("selectnearest");
-            suggestions.add("spawnpartinteraction");
-            suggestions.add("addinteractions");
-            suggestions.add("removeinteractions");
-            suggestions.add("setinteractioncommand");
-            suggestions.add("removeinteractioncommand");
-            suggestions.add("settag");
-            suggestions.add("gettag");
-            suggestions.add("highlight");
-            suggestions.add("highlightpart");
-            suggestions.add("clone");
-            suggestions.add("movehere");
-            suggestions.add("move");
-            suggestions.add("translate");
-            suggestions.add("translatepart");
-            suggestions.add("setyaw");
-            suggestions.add("despawn");
-            suggestions.add("save");
-            suggestions.add("delete");
-            suggestions.add("spawn");
+            suggestions.add("parts");
+            suggestions.add("group");
             suggestions.add("list");
             suggestions.add("reload");
-            suggestions.add("cyclepart");
-            suggestions.add("setparttag");
-            suggestions.add("getparttag");
-            suggestions.add("selectpart");
-            suggestions.add("removepart");
-            return suggestions;
         }
         else if (args.length == 2){
-            if (args[0].equalsIgnoreCase("save") || args[0].equalsIgnoreCase("list")){
-                if (args[0].equals("save")){
-                    suggestions.add("all");
-                }
-                for (DisplayGroupManager.LoadMethod method : DisplayGroupManager.LoadMethod.values()){
-                    suggestions.add(method.name().toLowerCase());
-                }
-                return suggestions;
+            if (args[0].equalsIgnoreCase("parts")){
+                suggestions.add("cycle");
+                suggestions.add("settag");
+                suggestions.add("gettag");
+                suggestions.add("select");
+                suggestions.add("remove");
+                suggestions.add("glow");
+                suggestions.add("translate");
+                suggestions.add("setinteractioncommand");
+                suggestions.add("removeinteractioncommand");
             }
-            else if (args[0].equalsIgnoreCase("move") || args[0].equalsIgnoreCase("translate") || args[0].equalsIgnoreCase("translateparts")){
-                for (Direction direction : Direction.values()){
-                    suggestions.add(direction.name().toLowerCase());
-                }
-                return suggestions;
-            }
-            else if (args[0].equals("cyclepart")){
-                suggestions.add("first");
-                suggestions.add("prev");
-                suggestions.add("next");
-                return suggestions;
+            else if (args[0].equalsIgnoreCase("group")){
+                suggestions.add("selectnearest");
+                suggestions.add("spawn");
+                suggestions.add("despawn");
+                suggestions.add("save");
+                suggestions.add("delete");
+                suggestions.add("addinteractions");
+                suggestions.add("removeinteractions");
+                suggestions.add("settag");
+                suggestions.add("gettag");
+                suggestions.add("setyaw");
+                suggestions.add("clone");
+                suggestions.add("move");
+                suggestions.add("translate");
+                suggestions.add("movehere");
+                suggestions.add("glow");
             }
         }
         else if (args.length == 3){
-            if (args[0].equalsIgnoreCase("delete") || args[0].equalsIgnoreCase("spawn")){
-                suggestions.add("all");
-                for (DisplayGroupManager.LoadMethod method : DisplayGroupManager.LoadMethod.values()){
-                    suggestions.add(method.name().toLowerCase());
-                }
-                return suggestions;
+            if (args[1].equalsIgnoreCase("move") || args[1].equalsIgnoreCase("translate")){
+                addDirections(suggestions);
+            }
+            if (args[1].equalsIgnoreCase("cycle")){
+                suggestions.add("first");
+                suggestions.add("prev");
+                suggestions.add("next");
             }
         }
-        return null;
+        else if (args.length == 4){
+            if (args[1].equalsIgnoreCase("delete") || args[1].equalsIgnoreCase("spawn")){
+                addStorages(suggestions);
+            }
+        }
+        return suggestions;
     }
+
+    private void addDirections(List<String> suggestions){
+        for (Direction dir : Direction.values()){
+            suggestions.add(dir.name().toLowerCase());
+        }
+    }
+
+    private void addStorages(List<String> suggestions){
+        suggestions.add("all");
+        suggestions.add("local");
+        suggestions.add("mysql");
+        suggestions.add("mongodb");
+    }
+
 }

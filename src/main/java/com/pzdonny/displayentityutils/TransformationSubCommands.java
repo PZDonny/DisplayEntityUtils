@@ -9,14 +9,14 @@ import org.bukkit.entity.Player;
 
 public class TransformationSubCommands {
 
-    static void setYaw(Player p, String[] args){
+    static void setYaw(Player p, String yawString){
         try{
             SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
             if (group == null){
                 MainCommand.noSelection(p);
                 return;
             }
-            double yaw = Double.parseDouble(args[1].toUpperCase());
+            double yaw = Double.parseDouble(yawString);
             group.setYaw((float) yaw);
             p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Yaw set!");
         }
@@ -25,20 +25,15 @@ public class TransformationSubCommands {
         }
     }
 
-    static void move(Player p, String[] args){
+    static void move(Player p, String[] args, SpawnedDisplayEntityGroup group){
         try{
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
-            if (group == null){
-                MainCommand.noSelection(p);
-                return;
-            }
-            Direction direction = Direction.valueOf(args[1].toUpperCase());
-            double distance = Double.parseDouble(args[2]);
+            Direction direction = Direction.valueOf(args[2].toUpperCase());
+            double distance = Double.parseDouble(args[3]);
             if (distance <= 0){
                 p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a number greater than 0 for the distance!");
                 return;
             }
-            int duration = Integer.parseInt(args[3]);
+            int duration = Integer.parseInt(args[4]);
             if (duration <= 0){
                 p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a whole number greater than 0 for the duration!");
                 return;
@@ -57,14 +52,9 @@ public class TransformationSubCommands {
     }
 
 
-    static void translate(Player p, String[] args){
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
-        if (group == null){
-            MainCommand.noSelection(p);
-            return;
-        }
+    static void translate(Player p, String[] args, SpawnedDisplayEntityGroup group){
         try{
-            Direction direction = Direction.valueOf(args[1].toUpperCase());
+            Direction direction = Direction.valueOf(args[2].toUpperCase());
             double distance = Double.parseDouble(args[2]);
             if (distance <= 0){
                 p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a number greater than 0 for the distance!");
@@ -72,15 +62,14 @@ public class TransformationSubCommands {
             }
             int duration = Integer.parseInt(args[3]);
             if (duration <= 0){
-                p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a whole number greater than 0 for the duration!");
-                return;
+                duration = 0;
             }
             group.translate(direction, (float) distance, duration);
             p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Translating spawned display entity group!");
         }
         catch(IllegalArgumentException e){
             if (e instanceof NumberFormatException){
-                p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Please enter valid numbers!");
+                p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter valid integer numbers!");
             }
             else{
                 MainCommand.invalidDirection(p);
@@ -88,35 +77,24 @@ public class TransformationSubCommands {
         }
     }
 
-    static void translateParts(Player p, String[] args){
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
-        if (group == null){
-            MainCommand.noSelection(p);
-            return;
-        }
-        SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
-        if (partSelection == null){
-            MainCommand.noPartSelection(p);
-            return;
-        }
+    static void translateParts(Player p, String[] args, SpawnedPartSelection partSelection){
         try{
-            Direction direction = Direction.valueOf(args[1].toUpperCase());
-            double distance = Double.parseDouble(args[2]);
+            Direction direction = Direction.valueOf(args[2].toUpperCase());
+            double distance = Double.parseDouble(args[3]);
             if (distance <= 0){
                 p.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"Enter a number greater than 0 for the distance!");
                 return;
             }
-            int duration = Integer.parseInt(args[3]);
+            int duration = Integer.parseInt(args[4]);
             if (duration <= 0){
-                p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a whole number greater than 0 for the duration!");
-                return;
+                duration = 0;
             }
             partSelection.translate((float) distance, duration, direction);
-            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Translating spawned display entity group!");
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Translating selected parts!");
         }
         catch(IllegalArgumentException e){
             if (e instanceof NumberFormatException){
-                p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Please enter valid numbers!");
+                p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter valid integer numbers!");
             }
             else{
                 MainCommand.invalidDirection(p);
