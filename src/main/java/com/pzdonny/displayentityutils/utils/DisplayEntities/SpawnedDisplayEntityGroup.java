@@ -85,6 +85,9 @@ public final class SpawnedDisplayEntityGroup {
      * @return List of the found Interactions
      */
     public List<Interaction> getUnaddedInteractionEntitiesInRange(double distance, boolean addToGroup){
+        if (distance <= 0){
+            return new ArrayList<>();
+        }
         List<Interaction> interactions = new ArrayList<>();
         if (getMasterPart() != null){
             for(Entity e : getMasterPart().getEntity().getNearbyEntities(distance, distance, distance)) {
