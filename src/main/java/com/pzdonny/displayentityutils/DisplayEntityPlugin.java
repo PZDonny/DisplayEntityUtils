@@ -14,6 +14,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -37,7 +38,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         instance = this;
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
-        reloadPlugin();
+        reloadPlugin(true);
 
         getCommand("managedisplays").setExecutor(new MainCommand());
         getCommand("managedisplays").setTabCompleter(new TabCompleter());
@@ -150,9 +151,12 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     /**
      * Reload the plugin's config
      */
-    public void reloadPlugin(){
-        MongoManager.closeConnection();
-        MYSQLManager.closeConnection();
+    public void reloadPlugin(boolean isOnEnable){
+        if (!isOnEnable){
+            MongoManager.closeConnection();
+            MYSQLManager.closeConnection();
+        }
+
         reloadConfig();
         setConfigVariables();
         createLocalSaveFolder();
@@ -176,8 +180,13 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     private void callInteractionEvent(InteractionClickEvent event){
         Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) return;
+        if (event.isCancelled()){
+            return;
+        }
         String command = event.getCommand();
-        event.getPlayer().performCommand(command);
+        if (command != null){
+            event.getPlayer().performCommand(command);
+        }
+
     }
 }
