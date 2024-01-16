@@ -1,6 +1,6 @@
 package com.pzdonny.displayentityutils.utils.DisplayEntities;
 
-import com.pzdonny.displayentityutils.utils.DisplayEntities.DisplayEntitySpecifics;
+import org.bukkit.Color;
 import org.bukkit.entity.TextDisplay;
 
 import java.io.Serial;
@@ -13,7 +13,7 @@ public final class TextDisplaySpecifics extends DisplayEntitySpecifics implement
     private static final long serialVersionUID = 99L;
     private String text;
     private int lineWidth;
-    private int backgroundColorARGB = -1;
+    private int backgroundColorARGB = Color.BLACK.asARGB();
     private byte textOpacity;
     private boolean shadowed;
     private boolean seeThrough;
