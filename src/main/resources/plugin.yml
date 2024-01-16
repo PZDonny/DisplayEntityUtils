@@ -3,7 +3,7 @@ version: '${project.version}'
 main: com.pzdonny.displayentityutils.DisplayEntityPlugin
 api-version: '1.20'
 author: DonnyPZ
-#softdepend: [DisplayEntityEditor]
+load: POSTWORLD
 commands:
   managedisplays:
     aliases: [mdis, mdisplay]
