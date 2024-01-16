@@ -13,7 +13,7 @@ public final class TextDisplaySpecifics extends DisplayEntitySpecifics implement
     private static final long serialVersionUID = 99L;
     private String text;
     private int lineWidth;
-    private int backgroundColorRGB = -1;
+    private int backgroundColorARGB = -1;
     private byte textOpacity;
     private boolean shadowed;
     private boolean seeThrough;
@@ -25,7 +25,7 @@ public final class TextDisplaySpecifics extends DisplayEntitySpecifics implement
         this.text = textDisplay.getText();
         this.lineWidth = textDisplay.getLineWidth();
         if (textDisplay.getBackgroundColor() != null){
-            this.backgroundColorRGB = textDisplay.getBackgroundColor().asRGB();
+            this.backgroundColorARGB = textDisplay.getBackgroundColor().asARGB();
         }
         this.textOpacity = textDisplay.getTextOpacity();
         this.shadowed = textDisplay.isShadowed();
@@ -42,8 +42,8 @@ public final class TextDisplaySpecifics extends DisplayEntitySpecifics implement
         return lineWidth;
     }
 
-    int getBackgroundColorRGB() {
-        return backgroundColorRGB;
+    int getBackgroundColorARGB() {
+        return backgroundColorARGB;
     }
 
     byte getTextOpacity() {
