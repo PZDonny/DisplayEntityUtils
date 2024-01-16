@@ -283,7 +283,8 @@ public final class DisplayGroupManager {
      */
     public static DisplayEntityGroup retrieveDisplayEntityGroup(InputStream inputStream){
         try{
-            ObjectInputStream objIn = new ObjectInputStream(inputStream);
+            ByteArrayInputStream byteStream  = new ByteArrayInputStream(inputStream.readAllBytes());
+            ObjectInputStream objIn = new ObjectInputStream(byteStream);
             return (DisplayEntityGroup) objIn.readObject();
         }
         catch(IOException | ClassNotFoundException ex){
