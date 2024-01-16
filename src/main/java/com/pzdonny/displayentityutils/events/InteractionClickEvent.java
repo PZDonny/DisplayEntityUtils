@@ -18,43 +18,33 @@ public class InteractionClickEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
     Player player;
-    Entity entity;
+    Interaction interaction;
     ClickType clickType;
     String command;
-    Interaction.PreviousInteraction interaction;
 
     boolean cancelled = false;
 
     /**
      * Called when an Interaction Entity is Left or Right-clicked.
      */
-    public InteractionClickEvent(@Nonnull Player player, @Nonnull Interaction entity, ClickType clickType, String command){
+    public InteractionClickEvent(@Nonnull Player player, @Nonnull Interaction interaction, ClickType clickType, String command){
         this.player = player;
-        this.entity = entity;
+        this.interaction = interaction;
         this.clickType = clickType;
         this.command = command;
-        if (clickType == ClickType.LEFT){
-            this.interaction = entity.getLastAttack();
-        }
-        else{
-            this.interaction = entity.getLastInteraction();
-        }
     }
 
-    public Entity getEntity() {
-        return entity;
+    public Interaction getInteraction() {
+        return interaction;
     }
 
     public ClickType getClickType() {
         return clickType;
     }
 
-    public Interaction.PreviousInteraction getInteraction() {
-        return interaction;
-    }
 
     public String getPartTag(){
-        for (String existingTag : entity.getScoreboardTags()){
+        for (String existingTag : interaction.getScoreboardTags()){
             if (existingTag.contains(DisplayEntityPlugin.partTagPrefix)){
                 return existingTag.replace(DisplayEntityPlugin.partTagPrefix, "");
             }
@@ -63,7 +53,7 @@ public class InteractionClickEvent extends Event implements Cancellable {
     }
 
     public String getGroupTag(){
-        for (String existingTag : entity.getScoreboardTags()){
+        for (String existingTag : interaction.getScoreboardTags()){
             if (existingTag.contains(DisplayEntityPlugin.tagPrefix)){
                 return existingTag.replace(DisplayEntityPlugin.tagPrefix, "");
             }
