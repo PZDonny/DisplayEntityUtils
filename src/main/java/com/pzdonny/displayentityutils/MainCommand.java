@@ -5,8 +5,6 @@ import com.pzdonny.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import com.pzdonny.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import com.pzdonny.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,9 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 class MainCommand implements CommandExecutor {
@@ -28,8 +24,8 @@ class MainCommand implements CommandExecutor {
 
     static void noPartSelection(Player p){
         p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You have not selected a part!");
-        p.sendMessage(ChatColor.GRAY+"/mdis cyclepart <first | prev | next>");
-        p.sendMessage(ChatColor.GRAY+"/mdis selectparts <part-tag>");
+        p.sendMessage(ChatColor.GRAY+"/mdis parts cycle <first | prev | next>");
+        p.sendMessage(ChatColor.GRAY+"/mdis parts select <part-tag>");
     }
 
     static boolean hasPermission(Player p, String permission){
@@ -151,9 +147,9 @@ class MainCommand implements CommandExecutor {
                     if (partSelection == null){
                         partSelection = new SpawnedPartSelection(group);
                     }
-                    //DisplayGroupManager.setPartSelection(p, partSelection, false);
+                    DisplayGroupManager.setPartSelection(p, partSelection, false);
 
-                    switch(args[1]){
+                    switch(args[2]){
                         case "first" -> {
                             partSelection.setToFirstPart();
                             singlePartSelected(p, partSelection);
