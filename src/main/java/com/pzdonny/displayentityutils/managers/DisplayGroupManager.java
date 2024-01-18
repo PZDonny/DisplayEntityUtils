@@ -617,7 +617,10 @@ public final class DisplayGroupManager {
      * @param durationInTicks How long it should take for the translation to complete
      * @param direction The direction to translate the display entity
      */
-    public static void translate(Display display, float distance, int durationInTicks, Vector direction){
+    public static void translate(Display display, float distance, int durationInTicks, int delayInTicks, Vector direction){
+        if (delayInTicks <= 0){
+            delayInTicks = -1;
+        }
         Transformation oldTransformation = display.getTransformation();
         direction.normalize().multiply(distance);
 
@@ -638,7 +641,7 @@ public final class DisplayGroupManager {
         }
 
         display.setInterpolationDuration(durationInTicks);
-        display.setInterpolationDelay(-1);
+        display.setInterpolationDelay(delayInTicks);
         display.setTransformation(newTransformation);
 
     }
@@ -650,8 +653,8 @@ public final class DisplayGroupManager {
      * @param durationInTicks How long it should take for the translation to complete
      * @param direction The direction to translate the display entity
      */
-    public static void translate(Display display, float distance, int durationInTicks, Direction direction){
-        translate(display, distance, durationInTicks, direction.getDirection(display));
+    public static void translate(Display display, float distance, int durationInTicks, int delayInTicks, Direction direction){
+        translate(display, distance, durationInTicks, delayInTicks, direction.getDirection(display));
     }
 
     /**
@@ -715,12 +718,12 @@ public final class DisplayGroupManager {
      * @param durationInTicks How long it should take for the translation to complete
      * @param direction The direction to translate the part
      */
-    public static void translate(SpawnedDisplayEntityPart part, float distance, int durationInTicks, Vector direction){
+    public static void translate(SpawnedDisplayEntityPart part, float distance, int durationInTicks, int delayInTicks, Vector direction){
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
             translate((Interaction) part.getEntity(), distance, durationInTicks, direction);
             return;
         }
-        translate((Display) part.getEntity(), distance, durationInTicks, direction);
+        translate((Display) part.getEntity(), distance, durationInTicks, delayInTicks, direction);
     }
 
     /**
@@ -732,14 +735,14 @@ public final class DisplayGroupManager {
      * @param durationInTicks How long it should take for the translation to complete
      * @param direction The direction to translate the part
      */
-    public static void translate(SpawnedDisplayEntityPart part, float distance, int durationInTicks, Direction direction){
+    public static void translate(SpawnedDisplayEntityPart part, float distance, int durationInTicks, int delayInTicks, Direction direction){
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
             Interaction interaction = (Interaction) part.getEntity();
             translate((Interaction) part.getEntity(), distance, durationInTicks, direction.getDirection(interaction));
             return;
         }
         Display display = (Display) part.getEntity();
-        translate(display, distance, durationInTicks, direction.getDirection(display));
+        translate(display, distance, durationInTicks, delayInTicks, direction.getDirection(display));
     }
 
 

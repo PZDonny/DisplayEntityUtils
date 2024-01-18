@@ -64,7 +64,7 @@ public class TransformationSubCommands {
             if (duration <= 0){
                 duration = 0;
             }
-            group.translate(direction, (float) distance, duration);
+            group.translate(direction, (float) distance, duration, -1);
             p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Translating spawned display entity group!");
         }
         catch(IllegalArgumentException e){
@@ -89,7 +89,7 @@ public class TransformationSubCommands {
             if (duration <= 0){
                 duration = 0;
             }
-            partSelection.translate((float) distance, duration, direction);
+            partSelection.translate((float) distance, duration, -1, direction);
             p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Translating selected parts!");
         }
         catch(IllegalArgumentException e){

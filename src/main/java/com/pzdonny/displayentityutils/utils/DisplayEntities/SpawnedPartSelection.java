@@ -185,9 +185,9 @@ public final class SpawnedPartSelection {
      * @param durationInTicks How long it should take for the translation to complete
      * @param direction The direction to translate the parts
      */
-    public void translate(float distance, int durationInTicks, Vector direction){
+    public void translate(float distance, int durationInTicks, int delayInTicks, Vector direction){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            part.translate(distance, durationInTicks, direction);
+            part.translate(distance, durationInTicks, delayInTicks, direction);
         }
     }
 
@@ -199,9 +199,9 @@ public final class SpawnedPartSelection {
      * @param durationInTicks How long it should take for the translation to complete
      * @param direction The direction to translate the parts
      */
-    public void translate(float distance, int durationInTicks, Direction direction){
+    public void translate(float distance, int durationInTicks, int delayInTicks, Direction direction){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            part.translate(distance, durationInTicks, direction);
+            part.translate(distance, durationInTicks, delayInTicks, direction);
         }
     }
 

@@ -299,8 +299,8 @@ public final class SpawnedDisplayEntityPart {
      * @param durationInTicks How long it should take for the translation to complete
      * @param direction The direction to translate the part
      */
-    public void translate(float distance, int durationInTicks, Vector direction){
-        DisplayGroupManager.translate(this, distance, durationInTicks, direction);
+    public void translate(float distance, int durationInTicks, int delayInTicks, Vector direction){
+        DisplayGroupManager.translate(this, distance, durationInTicks, delayInTicks, direction);
     }
 
     /**
@@ -311,8 +311,8 @@ public final class SpawnedDisplayEntityPart {
      * @param durationInTicks How long it should take for the translation to complete
      * @param direction The direction to translate the part
      */
-    public void translate(float distance, int durationInTicks, Direction direction){
-        DisplayGroupManager.translate(this, distance, durationInTicks, direction);
+    public void translate(float distance, int durationInTicks, int delayInTicks, Direction direction){
+        DisplayGroupManager.translate(this, distance, durationInTicks, delayInTicks, direction);
     }
 
 
