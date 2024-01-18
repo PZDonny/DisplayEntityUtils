@@ -298,7 +298,7 @@ public final class SpawnedDisplayEntityGroup {
      * @param durationInTicks How long it should take for the translation to complete
      * @param direction The direction to translate the part
      */
-    public void translate(@Nonnull Vector direction, float distance, int durationInTicks){
+    public void translate(@Nonnull Vector direction, float distance, int durationInTicks, int delayInTicks){
         Location destination = masterPart.getEntity().getLocation().clone().add(direction.clone().normalize().multiply(distance));
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.VANILLATRANSLATE, destination);
         Bukkit.getPluginManager().callEvent(event);
@@ -306,7 +306,7 @@ public final class SpawnedDisplayEntityGroup {
             return;
         }
         for(SpawnedDisplayEntityPart part : spawnedParts){
-            part.translate(distance, durationInTicks, direction);
+            part.translate(distance, durationInTicks, delayInTicks, direction);
         }
     }
 
@@ -318,8 +318,8 @@ public final class SpawnedDisplayEntityGroup {
      * @param distance How far the part should be translated
      * @param durationInTicks How long it should take for the translation to complete
      */
-    public void translate(@Nonnull Direction direction, float distance, int durationInTicks){
-        translate(direction.getDirection(masterPart), distance, durationInTicks);
+    public void translate(@Nonnull Direction direction, float distance, int durationInTicks, int delayInTicks){
+        translate(direction.getDirection(masterPart), distance, durationInTicks, delayInTicks);
     }
 
     /**
@@ -353,6 +353,13 @@ public final class SpawnedDisplayEntityGroup {
      */
     public String getTag() {
         return tag;
+    }
+
+    /**
+    * Gets a more readable version of the group's tag
+     */
+    public String getCleanTag(){
+        return tag.replace(DisplayEntityPlugin.tagPrefix, "");
     }
 
 
