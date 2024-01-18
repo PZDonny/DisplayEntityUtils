@@ -37,7 +37,6 @@ class TabCompleter implements org.bukkit.command.TabCompleter {
                 suggestions.add("despawn");
                 suggestions.add("save");
                 suggestions.add("delete");
-                suggestions.add("addinteractions");
                 suggestions.add("removeinteractions");
                 suggestions.add("settag");
                 suggestions.add("gettag");
@@ -47,6 +46,9 @@ class TabCompleter implements org.bukkit.command.TabCompleter {
                 suggestions.add("translate");
                 suggestions.add("movehere");
                 suggestions.add("glow");
+            }
+            else if (args[0].equalsIgnoreCase("list")){
+                addStorages(suggestions);
             }
         }
         else if (args.length == 3){
@@ -60,7 +62,7 @@ class TabCompleter implements org.bukkit.command.TabCompleter {
             }
         }
         else if (args.length == 4){
-            if (args[1].equalsIgnoreCase("delete") || args[1].equalsIgnoreCase("spawn")){
+            if (args[1].equalsIgnoreCase("delete") || args[1].equalsIgnoreCase("spawn") || (args[2].equalsIgnoreCase("save") && args[1].equalsIgnoreCase("group"))){
                 addStorages(suggestions);
             }
         }
