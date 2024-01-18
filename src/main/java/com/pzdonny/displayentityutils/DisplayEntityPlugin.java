@@ -164,6 +164,9 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void rClick(PlayerInteractEntityEvent e){
+        if (e.isCancelled()){
+            return;
+        }
         if (e.getRightClicked() instanceof Interaction entity){
             String command = DisplayGroupManager.getInteractionCommand(entity);
             callInteractionEvent(new InteractionClickEvent(e.getPlayer(), entity, InteractionClickEvent.ClickType.RIGHT, command));
@@ -172,6 +175,9 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void lClick(EntityDamageByEntityEvent e){
+        if (e.isCancelled()){
+            return;
+        }
         if (e.getEntity() instanceof Interaction entity){
             String command = DisplayGroupManager.getInteractionCommand(entity);
             callInteractionEvent(new InteractionClickEvent((Player) e.getDamager(), entity, InteractionClickEvent.ClickType.LEFT, command));
