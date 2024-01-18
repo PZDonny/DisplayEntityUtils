@@ -112,10 +112,10 @@ public class DataSubCommands {
             return;
         }
         if (spawnedGroup.getTag() == null){
-            p.sendMessage(ChatColor.RED+"Failed to save display entity group, no tag provided! /mdis settag <tag>");
+            p.sendMessage(ChatColor.RED+"Failed to save display entity group, no tag provided! /mdis group settag <tag>");
             return;
         }
-        p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Attempting to save spawned display entity group "+ChatColor.WHITE+"(Tagged: "+spawnedGroup.getTag()+")");
+        p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Attempting to save spawned display entity group "+ChatColor.WHITE+"(Tagged: "+spawnedGroup.getCleanTag()+")");
         DisplayEntityGroup group = spawnedGroup.toDisplayEntityGroup();
         switch(storage){
             case "all" -> {
