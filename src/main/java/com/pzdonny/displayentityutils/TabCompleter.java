@@ -1,6 +1,5 @@
 package com.pzdonny.displayentityutils;
 
-import com.pzdonny.displayentityutils.managers.DisplayGroupManager;
 import com.pzdonny.displayentityutils.utils.Direction;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -41,6 +40,7 @@ class TabCompleter implements org.bukkit.command.TabCompleter {
                 suggestions.add("settag");
                 suggestions.add("gettag");
                 suggestions.add("setyaw");
+                suggestions.add("setpitch");
                 suggestions.add("clone");
                 suggestions.add("move");
                 suggestions.add("translate");
