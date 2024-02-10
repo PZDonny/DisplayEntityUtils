@@ -323,23 +323,6 @@ public final class DisplayGroupManager {
     }
 
 
-    /**
-     * Gets the nearest Spawned Display Entity Group near a location
-     * @param location Center of the search location
-     * @param radius The radius to check for a spawned display entity group
-     * @param getter Player who is getting the spawned group (Nullable)
-     * @return The found SpawnedDisplayEntityGroup. Null if not found.
-     */
-    public static SpawnedDisplayEntityGroup getGroupNearLocation(Location location, double radius, @Nullable Player getter){
-        Display master = getNearestDisplayEntity(location, radius, null);
-        if (master == null){
-            if (getter != null) {
-                getter.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "Could not find untagged display entities within "+radius+" blocks of you");
-            }
-            return null;
-        }
-        return getSpawnedGroup(master, radius, getter);
-    }
 
 
     /**
@@ -366,7 +349,7 @@ public final class DisplayGroupManager {
      * @param location Center of the search location
      * @param radius The radius to check for a spawned display entity group
      * @param getter Player who is getting the spawned group (Nullable)
-     * @return SpawnedDisplayEntityGroup. Null if not found.
+     * @return The found SpawnedDisplayEntityGroup. Null if not found.
      */
     public static SpawnedDisplayEntityGroup getSpawnedGroupNearLocation(Location location, double radius, @Nullable Player getter){
         Display master = getNearestDisplayEntity(location, radius);
@@ -385,7 +368,7 @@ public final class DisplayGroupManager {
         Display nearest = null;
         double lastDistance = Double.MAX_VALUE;
         for(Entity e : tempEntity.getNearbyEntities(radius, radius, radius)) {
-            if (!(e instanceof Display) || (tag != null && !e.getScoreboardTags().contains(DisplayEntityPlugin.tagPrefix+tag)) || e.equals(tempEntity)){
+            if (!(e instanceof Display) || !e.getScoreboardTags().contains(DisplayEntityPlugin.tagPrefix+tag) || e.equals(tempEntity)){
                 continue;
             }
 
