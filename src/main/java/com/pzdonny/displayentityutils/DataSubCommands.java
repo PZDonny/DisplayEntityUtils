@@ -7,7 +7,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class DataSubCommands {
+class DataSubCommands {
 
 
     static void spawn(Player p, String tag, String storage){
