@@ -139,7 +139,7 @@ public class DisplayEntityGroup implements Serializable{
     }
 
     /**
-     * Spawns this DisplayEntityGroup at a specififed location returning a SpawnedDisplayEntityGroup that represents this
+     * Spawns this DisplayEntityGroup at a specified location returning a SpawnedDisplayEntityGroup that represents this
      * @param location The location to spawn the group
      * @return A SpawnedDisplayEntityGroup representative of this DisplayEntityGroup
      */
