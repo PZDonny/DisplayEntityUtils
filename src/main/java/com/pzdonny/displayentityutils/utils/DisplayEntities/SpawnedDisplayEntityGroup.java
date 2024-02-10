@@ -4,6 +4,7 @@ import com.pzdonny.displayentityutils.DisplayEntityPlugin;
 import com.pzdonny.displayentityutils.events.EntityRideGroupEvent;
 import com.pzdonny.displayentityutils.events.GroupRideEntityEvent;
 import com.pzdonny.displayentityutils.events.GroupTranslateEvent;
+import com.pzdonny.displayentityutils.events.ScaleEvent;
 import com.pzdonny.displayentityutils.managers.DisplayGroupManager;
 import com.pzdonny.displayentityutils.utils.Direction;
 import org.bukkit.Bukkit;
@@ -322,6 +323,15 @@ public final class SpawnedDisplayEntityGroup {
         translate(direction.getDirection(masterPart), distance, durationInTicks, delayInTicks);
     }
 
+    /*public void scale(int scale, ScaleEvent.ScaleType scaleType){
+        if (scaleType == ScaleEvent.ScaleType.SET){
+
+        }
+        else if (scaleType == ScaleEvent.ScaleType.MULTIPLY){
+
+        }
+    }*/
+
     /**
      * Set this group's tag
      * @param tag What to set this group's tag to
@@ -388,13 +398,41 @@ public final class SpawnedDisplayEntityGroup {
 
 
     /**
-     * Highlights all the parts in this group
+     * Adds the glow effect to all the parts in this group
+     * @return this
+     */
+    public SpawnedDisplayEntityGroup glow(boolean ignoreInteractionAndText){
+        for (SpawnedDisplayEntityPart part : spawnedParts){
+            if (ignoreInteractionAndText && (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)){
+                continue;
+            }
+            part.glow();
+        }
+        return this;
+    }
+
+    /**
+     * Adds the glow effect to all the parts in this group
      * @param durationInTicks How long to highlight this selection
      * @return this
      */
-    public SpawnedDisplayEntityGroup highlight(int durationInTicks){
+    public SpawnedDisplayEntityGroup glow(long durationInTicks, boolean ignoreInteractionAndText){
         for (SpawnedDisplayEntityPart part : spawnedParts){
-            part.highlight(durationInTicks);
+            if (ignoreInteractionAndText && (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)){
+                continue;
+            }
+            part.glow(durationInTicks);
+        }
+        return this;
+    }
+
+    /**
+     * Removes the glow effect from all the parts in this group
+     * @return this
+     */
+    public SpawnedDisplayEntityGroup unglow(){
+        for (SpawnedDisplayEntityPart part : spawnedParts){
+            part.unglow();
         }
         return this;
     }

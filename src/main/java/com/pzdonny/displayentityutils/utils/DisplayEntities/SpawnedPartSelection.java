@@ -148,13 +148,41 @@ public final class SpawnedPartSelection {
     }
 
     /**
-     * Highlights the parts within this selection
+     * Adds the glow effect the parts within this selection
+     * @return this
+     */
+    public SpawnedPartSelection glow(boolean ignoreInteractionAndText){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            if (ignoreInteractionAndText && (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)){
+                continue;
+            }
+            part.glow();
+        }
+        return this;
+    }
+
+    /**
+     * Adds the glow effect to all the parts in this group
      * @param durationInTicks How long to highlight this selection
      * @return this
      */
-    public SpawnedPartSelection highlight(int durationInTicks){
+    public SpawnedPartSelection glow(int durationInTicks, boolean ignoreInteractionAndText){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            part.highlight(durationInTicks);
+            if (ignoreInteractionAndText && (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)){
+                continue;
+            }
+            part.glow(durationInTicks);
+        }
+        return this;
+    }
+
+    /**
+     * Removes the glow effect from all the parts in this selection
+     * @return this
+     */
+    public SpawnedPartSelection unglow(){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            part.unglow();
         }
         return this;
     }

@@ -24,6 +24,7 @@ public final class SpawnedDisplayEntityPart {
     PartType type;
     Entity entity;
     String partTag;
+    private boolean isInteractionOutlined;
 
 
     SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Display displayEntity){
@@ -156,10 +157,26 @@ public final class SpawnedDisplayEntityPart {
     }
 
     /**
-     * Highlights this SpawnDisplayEntityPart. It will glow if it's a Block/Item Display. Outlined with composter particles if Interaction. Flame Particle if it's the master part
+     * Adds the glow effect to this SpawnDisplayEntityPart. It will glow if it's a Block/Item Display. Outlined with soul fire flame particles if Interaction. Flame Particle if it's the master part
+     */
+
+    public void glow(){
+        if (type == PartType.INTERACTION) {
+            //temporaryParticles(entity, durationInTicks, Particle.COMPOSTER);
+            interactionOutline((Interaction) entity, Integer.MAX_VALUE);
+        }
+        else if (type != PartType.TEXT_DISPLAY){
+            if (!this.equals(group.getMasterPart())){
+                entity.setGlowing(true);
+            }
+        }
+    }
+
+    /**
+     * Adds the glow effect to SpawnDisplayEntityPart. It will glow if it's a Block/Item Display. Outlined with soul fire flame particles if Interaction. Flame Particle if it's the master part
      * @param durationInTicks How long to highlight this selection
      */
-    public void highlight(int durationInTicks){
+    public void glow(long durationInTicks){
         if (type == PartType.INTERACTION) {
             //temporaryParticles(entity, durationInTicks, Particle.COMPOSTER);
             interactionOutline((Interaction) entity, durationInTicks);
@@ -180,7 +197,23 @@ public final class SpawnedDisplayEntityPart {
         }
     }
 
-    private void interactionOutline(Interaction interaction, int durationInTicks){
+    /**
+     * Removes the glow effect from the part
+     */
+    public void unglow(){
+        if (type == PartType.INTERACTION) {
+            //temporaryParticles(entity, durationInTicks, Particle.COMPOSTER);
+            isInteractionOutlined = false;
+        }
+        else if (type != PartType.TEXT_DISPLAY){
+            if (!this.equals(group.getMasterPart())){
+                entity.setGlowing(false);
+            }
+        }
+    }
+
+    private void interactionOutline(Interaction interaction, long durationInTicks){
+        isInteractionOutlined = true;
         float height = interaction.getInteractionHeight();
         float width = interaction.getInteractionWidth();
         if (height == 0 || width == 0){
@@ -210,7 +243,7 @@ public final class SpawnedDisplayEntityPart {
                 particleLine(pointC.clone(), pointD.clone(), width, height);
                 particleLine(pointD.clone(), pointA.clone(), width, height);
                 currentTick+=tickIncrement;
-                if (currentTick >= durationInTicks || group.getSpawnedParts().isEmpty() || interaction.isDead()){
+                if (!isInteractionOutlined || currentTick >= durationInTicks || group.getSpawnedParts().isEmpty() || interaction.isDead()){
                     cancel();
                 }
             }
@@ -233,10 +266,10 @@ public final class SpawnedDisplayEntityPart {
         }
     }
 
-    private void temporaryParticles(Entity entity, int durationInTicks, Particle particle){
+    private void temporaryParticles(Entity entity, long durationInTicks, Particle particle){
         Location loc = entity.getLocation().clone();
         new BukkitRunnable(){
-            int i = 0;
+            long i = 0;
             @Override
             public void run() {
                 if (i >= durationInTicks || group.getSpawnedParts().isEmpty() || entity.isDead()){
