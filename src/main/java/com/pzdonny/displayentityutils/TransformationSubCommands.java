@@ -7,7 +7,7 @@ import com.pzdonny.displayentityutils.utils.DisplayEntities.SpawnedPartSelection
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
-public class TransformationSubCommands {
+class TransformationSubCommands {
 
     static void setYaw(Player p, String yawString){
         try{
@@ -19,6 +19,22 @@ public class TransformationSubCommands {
             double yaw = Double.parseDouble(yawString);
             group.setYaw((float) yaw);
             p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Yaw set!");
+        }
+        catch(NumberFormatException e){
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Please enter a valid number!");
+        }
+    }
+
+    static void setPitch(Player p, String yawString){
+        try{
+            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
+            if (group == null){
+                MainCommand.noSelection(p);
+                return;
+            }
+            double yaw = Double.parseDouble(yawString);
+            group.setPitch((float) yaw);
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Pitch set!");
         }
         catch(NumberFormatException e){
             p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Please enter a valid number!");

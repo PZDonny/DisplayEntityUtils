@@ -190,7 +190,7 @@ class MainCommand implements CommandExecutor {
                     }
                     p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Part(s) successfully selected! "+ChatColor.WHITE+"(Part(s) Tagged: "+args[1]+")");
                     DisplayGroupManager.setPartSelection(p, partSelection, false);
-                    partSelection.highlight(30);
+                    partSelection.glow(30, false);
                     return true;
                 }
 
@@ -256,7 +256,7 @@ class MainCommand implements CommandExecutor {
                         noPartSelection(p);
                         return true;
                     }
-                    partSelection.highlight(80);
+                    partSelection.glow(80, false);
                     p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Glowing selected part(s)!");
                 }
                 case "removeinteractioncommand" ->{
@@ -345,7 +345,7 @@ class MainCommand implements CommandExecutor {
                         DisplayGroupManager.removePartSelection(p);
 
                         group.getUnaddedInteractionEntitiesInRange(interactionDistance, true);
-                        group.highlight(100);
+                        group.glow(100, false);
                     }
                 }
 
@@ -402,6 +402,22 @@ class MainCommand implements CommandExecutor {
                     return true;
                 }
 
+                case "setpitch" -> {
+                    if (!hasPermission(p, "deu.translate")){
+                        return true;
+                    }
+                    if (group == null){
+                        noSelection(p);
+                        return true;
+                    }
+                    if (args.length < 3){
+                        sender.sendMessage(ChatColor.RED+"/mdis group setpitch <yaw>");
+                        return true;
+                    }
+                    TransformationSubCommands.setPitch(p, args[2]);
+                    return true;
+                }
+
                 case "removeinteractions" -> {
                     if (!hasPermission(p, "deu.group.removeinteractions")){
                         return true;
@@ -452,7 +468,7 @@ class MainCommand implements CommandExecutor {
                         return true;
                     }
                     p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Glowing selected spawned display entity group!");
-                    group.highlight(100);
+                    group.glow(100, false);
                     return true;
                 }
 
@@ -491,7 +507,6 @@ class MainCommand implements CommandExecutor {
     static void mainCommandList(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         sender.sendMessage(ChatColor.DARK_AQUA+"Valid storage is \"local\", \"mongodb\", \"mysql\", and \"all\"");
-        sender.sendMessage();
         sender.sendMessage(ChatColor.GRAY+"/mdis help");
         sender.sendMessage(ChatColor.GRAY+"/mdis parts");
         sender.sendMessage(ChatColor.GRAY+"/mdis group");
@@ -524,7 +539,6 @@ class MainCommand implements CommandExecutor {
         sender.sendMessage(ChatColor.AQUA+"Each part can be given a part tag to identify each individual part");
         sender.sendMessage(ChatColor.AQUA+"Parts can share the same part tag to create part selections");
         sender.sendMessage(ChatColor.GRAY+"This is mainly useful for API users / usage with addon plugins");
-        sender.sendMessage();
         sender.sendMessage(ChatColor.GRAY+"/mdis parts cycle <first | prev | next>");
         sender.sendMessage(ChatColor.GRAY+"/mdis parts settag <part-tag>");
         sender.sendMessage(ChatColor.GRAY+"/mdis parts gettag");
@@ -583,7 +597,7 @@ class MainCommand implements CommandExecutor {
         else{
             p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Successfully cloned spawned display entity group");
             DisplayGroupManager.setSelectedSpawnedGroup(p, clonedGroup);
-            clonedGroup.highlight(80);
+            clonedGroup.glow(80, false);
         }
     }
     /*private void addInteractions(Player p, SpawnedDisplayEntityGroup spawnedGroup, int interactionDistance){
@@ -730,7 +744,7 @@ class MainCommand implements CommandExecutor {
                 }
             }
         }
-        partSelection.highlight(30);
+        partSelection.glow(30, false);
         int index = partSelection.getGroup().getSpawnedParts().indexOf(partSelection.getSelectedParts().get(0))+1;
         int size = partSelection.getGroup().getSpawnedParts().size();
         String ratio = ChatColor.GOLD+"["+index+"/"+size+"] ";
