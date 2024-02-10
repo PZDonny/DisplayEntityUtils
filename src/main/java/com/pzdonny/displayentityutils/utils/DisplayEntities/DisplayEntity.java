@@ -89,8 +89,8 @@ public class DisplayEntity implements Serializable {
     Display spawnTextDisplay(Location location){
         TextDisplaySpecifics spec = (TextDisplaySpecifics) specifics;
         return location.getWorld().spawn(location, TextDisplay.class, display ->{
+            display.text(spec.getText());
             display.setAlignment(spec.getAlignment());
-            display.setText(spec.getText());
             display.setLineWidth(spec.getLineWidth());
             if (spec.getBackgroundColorARGB() != Color.BLACK.asARGB()){
                 display.setBackgroundColor(Color.fromARGB(spec.getBackgroundColorARGB()));

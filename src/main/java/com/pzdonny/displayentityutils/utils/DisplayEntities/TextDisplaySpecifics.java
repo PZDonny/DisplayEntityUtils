@@ -1,5 +1,8 @@
 package com.pzdonny.displayentityutils.utils.DisplayEntities;
 
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Color;
 import org.bukkit.entity.TextDisplay;
 
@@ -12,6 +15,7 @@ public final class TextDisplaySpecifics extends DisplayEntitySpecifics implement
     @Serial
     private static final long serialVersionUID = 99L;
     private String text;
+    private String font = "minecraft:uniform";
     private int lineWidth;
     private int backgroundColorARGB = Color.BLACK.asARGB();
     private byte textOpacity;
@@ -22,7 +26,14 @@ public final class TextDisplaySpecifics extends DisplayEntitySpecifics implement
 
     TextDisplaySpecifics(TextDisplay textDisplay) {
         super(textDisplay);
-        this.text = textDisplay.getText();
+
+        this.text = MiniMessage.miniMessage().serialize(textDisplay.text());
+        //this.text = textDisplay.getText();
+        try{
+            this.font = textDisplay.text().font().asString();
+        }
+        catch(NullPointerException ignored){}
+
         this.lineWidth = textDisplay.getLineWidth();
         if (textDisplay.getBackgroundColor() != null){
             this.backgroundColorARGB = textDisplay.getBackgroundColor().asARGB();
@@ -34,8 +45,10 @@ public final class TextDisplaySpecifics extends DisplayEntitySpecifics implement
         this.alignment = textDisplay.getAlignment();
     }
 
-    String getText() {
-        return text;
+    Component getText() {
+        Component comp = MiniMessage.miniMessage().deserialize(text);
+        //Component comp = Component.text(text);
+        return comp.font(Key.key(font));
     }
 
     int getLineWidth() {
