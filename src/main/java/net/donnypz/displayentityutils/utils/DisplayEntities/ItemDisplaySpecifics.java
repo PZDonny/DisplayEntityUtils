@@ -1,6 +1,5 @@
-package com.pzdonny.displayentityutils.utils.DisplayEntities;
+package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import com.pzdonny.displayentityutils.utils.DisplayEntities.DisplayEntitySpecifics;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
@@ -8,10 +7,10 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 
 import java.io.*;
 
-public final class ItemDisplaySpecifics extends DisplayEntitySpecifics implements Serializable {
+final class ItemDisplaySpecifics extends DisplayEntitySpecifics implements Serializable {
     @Serial
     private static final long serialVersionUID = 99L;
-    private ItemDisplay.ItemDisplayTransform itemDisplayTransform;
+    private final ItemDisplay.ItemDisplayTransform itemDisplayTransform;
     byte[] itemStack;
 
     ItemDisplaySpecifics(ItemDisplay itemDisplay) {
@@ -35,7 +34,9 @@ public final class ItemDisplaySpecifics extends DisplayEntitySpecifics implement
     }
 
     ItemStack getItemStack(){
-        if (itemStack == null) return null;
+        if (itemStack == null){
+            return null;
+        }
         try{
             ByteArrayInputStream byteIn = new ByteArrayInputStream(itemStack);
             BukkitObjectInputStream bukkitIn = new BukkitObjectInputStream(byteIn);

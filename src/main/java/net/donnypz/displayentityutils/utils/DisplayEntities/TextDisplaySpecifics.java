@@ -1,4 +1,4 @@
-package com.pzdonny.displayentityutils.utils.DisplayEntities;
+package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -9,7 +9,7 @@ import org.bukkit.entity.TextDisplay;
 import java.io.Serial;
 import java.io.Serializable;
 
-public final class TextDisplaySpecifics extends DisplayEntitySpecifics implements Serializable {
+final class TextDisplaySpecifics extends DisplayEntitySpecifics implements Serializable {
 
 
     @Serial

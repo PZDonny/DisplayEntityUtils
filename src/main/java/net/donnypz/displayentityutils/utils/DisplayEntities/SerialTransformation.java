@@ -1,14 +1,13 @@
-package com.pzdonny.displayentityutils.utils.DisplayEntities;
+package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import org.bukkit.util.Transformation;
-import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.io.Serial;
 import java.io.Serializable;
 
-public final class SerialTransformation implements Serializable {
+final class SerialTransformation implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 99L;

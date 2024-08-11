@@ -1,11 +1,11 @@
-package com.pzdonny.displayentityutils.utils.DisplayEntities;
+package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import org.bukkit.entity.BlockDisplay;
 
 import java.io.Serial;
 import java.io.Serializable;
 
-public final class BlockDisplaySpecifics extends DisplayEntitySpecifics implements Serializable {
+final class BlockDisplaySpecifics extends DisplayEntitySpecifics implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 99L;
