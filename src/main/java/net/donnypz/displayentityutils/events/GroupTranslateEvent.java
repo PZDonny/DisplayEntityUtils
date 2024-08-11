@@ -1,6 +1,6 @@
-package com.pzdonny.displayentityutils.events;
+package net.donnypz.displayentityutils.events;
 
-import com.pzdonny.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;

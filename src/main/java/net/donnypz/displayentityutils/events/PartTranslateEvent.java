@@ -1,13 +1,17 @@
-package com.pzdonny.displayentityutils.events;
+package net.donnypz.displayentityutils.events;
 
-import com.pzdonny.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Location;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Interaction;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+
 /**
  * Called when a Display Entity or Interaction Entity changes it's translation through the DisplayGroupManager.
  * Can be cancelled
@@ -44,22 +48,22 @@ public final class PartTranslateEvent extends Event implements Cancellable {
         return destination;
     }
 
-    public String getPartTag(){
-        for (String existingTag : entity.getScoreboardTags()){
-            if (existingTag.contains(DisplayEntityPlugin.partTagPrefix)){
-                return existingTag;
-            }
+    public ArrayList<String> getPartTags(){
+        if (entity instanceof Interaction i){
+            return DisplayUtils.getPartTags(i);
         }
-        return null;
+        else{
+            return DisplayUtils.getPartTags((Display) entity);
+        }
     }
 
     public String getGroupTag(){
-        for (String existingTag : entity.getScoreboardTags()){
-            if (existingTag.contains(DisplayEntityPlugin.tagPrefix)){
-                return existingTag;
-            }
+        if (entity instanceof Interaction i){
+            return DisplayUtils.getGroupTag(i);
         }
-        return null;
+        else{
+            return DisplayUtils.getGroupTag((Display) entity);
+        }
     }
 
     @Override

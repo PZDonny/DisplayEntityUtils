@@ -1,22 +1,22 @@
-package com.pzdonny.displayentityutils.events;
+package net.donnypz.displayentityutils.events;
 
-import com.pzdonny.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * Called when an Entity is mounted on top of a SpawnedDisplayEntityGroup.
+ * Called when a SpawnDisplayEntityGroup is mounted on top of an Entity.
  * Can be cancelled
  */
-public class EntityRideGroupEvent extends Event implements Cancellable {
+public class GroupRideEntityEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     SpawnedDisplayEntityGroup spawnedDisplayEntityGroup;
     Entity entity;
     private boolean isCancelled;
 
-    public EntityRideGroupEvent(SpawnedDisplayEntityGroup group, Entity entity){
+    public GroupRideEntityEvent(SpawnedDisplayEntityGroup group, Entity entity){
         this.spawnedDisplayEntityGroup = group;
         this.entity = entity;
         isCancelled = false;
