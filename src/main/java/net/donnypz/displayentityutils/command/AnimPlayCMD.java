@@ -17,15 +17,11 @@ class AnimPlayCMD implements SubCommand{
             return;
         }
 
-        if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis anim settag <anim-tag>", NamedTextColor.RED));
-            return;
-        }
 
 
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
-            player.sendMessage(ChatColor.RED + "You must have a group selected to do this animation command!");
+            player.sendMessage(Component.text("You must have a group selected to do this animation command!", NamedTextColor.RED));
             return;
         }
 
