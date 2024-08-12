@@ -13,7 +13,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public final class InteractionEntity implements Serializable {
+final class InteractionEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 99L;
 

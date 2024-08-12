@@ -123,7 +123,7 @@ public final class DisplayEntityGroup implements Serializable{
      * Get the DisplayEntities in this group
      * @return DisplayEntity List containing the ones in this group
      */
-    public List<DisplayEntity> getDisplayEntities() {
+    List<DisplayEntity> getDisplayEntities() {
         return new ArrayList<>(displayEntities);
     }
 
@@ -131,21 +131,21 @@ public final class DisplayEntityGroup implements Serializable{
      * Get the DisplayEntities in this group of the specified type
      * @return DisplayEntity List containing the ones in this group with the specified type
      */
-    public List<DisplayEntity> getDisplayEntities(DisplayEntity.Type type){
+    List<DisplayEntity> getDisplayEntities(DisplayEntity.Type type){
         ArrayList<DisplayEntity> displayEntities = new ArrayList<>();
         for (DisplayEntity entity : this.displayEntities){
             if (entity.getType() == type){
                 displayEntities.add(entity);
             }
         }
-        return new ArrayList<>(displayEntities);
+        return displayEntities;
     }
 
     /**
      * Get the InteractionEntities in this group
      * @return InteractionEntity List containing the ones in this group
      */
-    public List<InteractionEntity> getInteractionEntities() {
+    List<InteractionEntity> getInteractionEntities() {
         return new ArrayList<>(interactionEntities);
     }
 
