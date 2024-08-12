@@ -27,6 +27,10 @@ class ConvertCMD implements SubCommand{
 
     @Override
     public void execute(Player player, String[] args) {
+        if (args.length < 2){
+            conversionHelp(player);
+            return;
+        }
         String arg = args[1];
         SubCommand subCommand = subCommands.get(arg);
         if (subCommand == null){
@@ -43,7 +47,8 @@ class ConvertCMD implements SubCommand{
     static void conversionHelp(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         sender.sendMessage(Component.text("Convert files exported from BDEngine's website", NamedTextColor.AQUA));
-        sender.sendMessage(Component.text("Animations datapacks and \".bdengine\" model files can be converted", NamedTextColor.AQUA));
+        sender.sendMessage(Component.text("Animation datapacks can be converted", NamedTextColor.AQUA));
+        //sender.sendMessage(Component.text("Animation datapacks and \".bdengine\" model files can be converted", NamedTextColor.AQUA));
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Use <yellow>\"block-display.com\" <aqua>to create convertable models and animations"));
         DisplayEntityPluginCommand.sendCMD(sender,"/mdis convert datapack <datapack-name> <group-tag-to-set> <anim-tag-to-set>", "(Convert a animation datapack form \"block-display.com\" into a editable animation file)");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis convert bdengine <frame-id>");

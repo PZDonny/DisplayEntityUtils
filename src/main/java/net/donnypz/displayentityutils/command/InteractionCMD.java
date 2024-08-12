@@ -37,6 +37,10 @@ class InteractionCMD implements SubCommand{
 
     @Override
     public void execute(Player player, String[] args) {
+        if (args.length < 2){
+            interactionHelp(player);
+            return;
+        }
         String arg = args[1];
         SubCommand subCommand = subCommands.get(arg);
         if (subCommand == null){
@@ -54,7 +58,7 @@ class InteractionCMD implements SubCommand{
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         DisplayEntityPluginCommand.sendCMD(sender,"/mdis interaction setheight <height>");
         DisplayEntityPluginCommand.sendCMD(sender,"/mdis interaction setwidth <width>");
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis interaction addcmd <command>");
+        DisplayEntityPluginCommand.sendCMD(sender,"/mdis interaction addcmd <player | console> <left | right | both> <command>");
         DisplayEntityPluginCommand.sendCMD(sender,"/mdis interaction removecmd <command-id>");
         DisplayEntityPluginCommand.sendCMD(sender,"/mdis interaction listcmds");
         DisplayEntityPluginCommand.sendCMD(sender,"/mdis interaction pivot <angle>", " (Pivot the currently selected (cycled) Interaction in a part selection)");

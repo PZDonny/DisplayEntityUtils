@@ -43,6 +43,10 @@ class GroupCMD implements SubCommand{
 
     @Override
     public void execute(Player player, String[] args) {
+        if (args.length < 2){
+            groupHelp(player);
+            return;
+        }
         String arg = args[1];
         SubCommand subCommand = subCommands.get(arg);
         if (subCommand == null){
