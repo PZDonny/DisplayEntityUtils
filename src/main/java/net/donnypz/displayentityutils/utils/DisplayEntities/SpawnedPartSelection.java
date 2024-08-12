@@ -1,11 +1,13 @@
-package com.pzdonny.displayentityutils.utils.DisplayEntities;
+package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import com.pzdonny.displayentityutils.managers.DisplayGroupManager;
-import com.pzdonny.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.Direction;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 public final class SpawnedPartSelection {
     List<SpawnedDisplayEntityPart> selectedParts = new ArrayList<>();
@@ -13,15 +15,15 @@ public final class SpawnedPartSelection {
     SelectionType selectionType;
 
     /**
-     * Create a SpawnedPartSelection (GROUP Type) including the parts with the specified part tag from the specified group
+     * Create a SpawnedPartSelection (PARTTAG Type) including the parts with the specified part tag from the specified group
      * @param group The group to get the parts from
      * @param partTag The part tag of the desired parts
      */
     public SpawnedPartSelection(SpawnedDisplayEntityGroup group, String partTag){
         this.group = group;
-        this.selectionType = SelectionType.GROUP;
+        this.selectionType = SelectionType.PARTTAG;
         for (SpawnedDisplayEntityPart part : group.getSpawnedParts()){
-            if (part.getPartTag() != null && part.getPartTag().equals(partTag)){
+            if (part.hasPartTag(partTag)){
                 selectedParts.add(part);
             }
         }
@@ -51,33 +53,45 @@ public final class SpawnedPartSelection {
     }
 
     /**
-     * Set the part tag of the parts in this selection
+     * Adds a part tag to the parts in this selection
      * @param partTag The part tag to give the parts in this selection
      * @return this
      */
-    public SpawnedPartSelection setPartTags(String partTag){
+    public SpawnedPartSelection addPartTag(String partTag){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            part.setPartTag(partTag);
+            part.addPartTag(partTag);
+        }
+        return this;
+    }
+
+    /**
+     * Removes a part tag from the parts in this selection
+     * @param partTag The part tag to remove from the parts in this selection
+     * @return this
+     */
+    public SpawnedPartSelection removePartTag(String partTag){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            part.removePartTag(partTag);
         }
         return this;
     }
 
     /**
      * Cycles to the next part within this selection's group.
-     * If the Selection Type is "GROUP" then it will go to the first part in the group
+     * If the Selection Type is "PARTTAG" then it will go to the first part in the group
      * If it attempts to go past the last part, it will go back to the first part
      * @return this
      */
-    public SpawnedPartSelection setToNextPart(){
-        if (selectionType == SelectionType.GROUP){
+    public SpawnedPartSelection setToNextPart(int jump){
+        if (selectionType == SelectionType.PARTTAG){
             setToFirstPart();
             return this;
         }
         if (!group.spawnedParts.isEmpty()){
-            SpawnedDisplayEntityPart part = selectedParts.get(0);
-            int index = group.spawnedParts.indexOf(part)+1;
-            if (index >= group.spawnedParts.size()){
-                index = 0;
+            SpawnedDisplayEntityPart part = selectedParts.getFirst();
+            int index = group.spawnedParts.indexOf(part)+jump;
+            while (index >= group.spawnedParts.size()){
+                index-=group.spawnedParts.size();
             }
             selectedParts.set(0, group.spawnedParts.get(index));
         }
@@ -86,20 +100,20 @@ public final class SpawnedPartSelection {
 
     /**
      * Cycles to the previous part within this selection's group.
-     * If the Selection Type is "GROUP" then it will go to the first part in the group and be changed to "CYCLE".
+     * If the Selection Type is "PARTTAG" then it will go to the first part in the group and be changed to "CYCLE".
      * If it attempts to go past the first part, it will go back to the last part
      * @return this
      */
-    public SpawnedPartSelection setToPreviousPart(){
-        if (selectionType == SelectionType.GROUP){
+    public SpawnedPartSelection setToPreviousPart(int jump){
+        if (selectionType == SelectionType.PARTTAG){
             setToFirstPart();
             return this;
         }
         if (!group.spawnedParts.isEmpty()){
-            SpawnedDisplayEntityPart part = selectedParts.get(0);
-            int index = group.spawnedParts.indexOf(part)-1;
-            if (index < 0){
-                index = group.spawnedParts.size()-1;
+            SpawnedDisplayEntityPart part = selectedParts.getFirst();
+            int index = group.spawnedParts.indexOf(part)-jump;
+            while (index < 0){
+                index+=group.spawnedParts.size();
             }
             selectedParts.set(0, group.spawnedParts.get(index));
         }
@@ -114,7 +128,7 @@ public final class SpawnedPartSelection {
         selectedParts.clear();
         selectionType = SelectionType.CYCLE;
         if (!group.spawnedParts.isEmpty()){
-            selectedParts.add(group.spawnedParts.get(0));
+            selectedParts.add(group.spawnedParts.getFirst());
         }
         return this;
     }
@@ -122,13 +136,13 @@ public final class SpawnedPartSelection {
     /**
      * Adds a spawned part to this SpawnedPartSelection.
      * Only Spawned Parts in the selection's SpawnedDisplayEntityGroup can be added
-     * If the Selection Type is "CYCLE" it will be changed to "GROUP" if the part is successfully added.
+     * If the Selection Type is "CYCLE" it will be changed to "PARTTAG" if the part is successfully added.
      * @param spawnedPart Part to be added
      * @return this
      */
     private SpawnedPartSelection addSpawnedPart(SpawnedDisplayEntityPart spawnedPart){
         if (group.getSpawnedParts().contains(spawnedPart)){
-            selectionType = SelectionType.GROUP;
+            selectionType = SelectionType.PARTTAG;
             selectedParts.add(spawnedPart);
         }
         return this;
@@ -137,14 +151,29 @@ public final class SpawnedPartSelection {
     /**
      * Adds a spawned part to this SpawnedPartSelection.
      * Spawned Parts can be added to this selection regardless of the SpawnedDisplayEntityGroup they're in
-     * If the Selection Type is "CYCLE" it will be changed to "GROUP".
+     * If the Selection Type is "CYCLE" it will be changed to "PARTTAG".
      * @param spawnedPart Part to be added
      * @return this
      */
     private SpawnedPartSelection addSpawnedPartUnsafe(SpawnedDisplayEntityPart spawnedPart){
-        selectionType = SelectionType.GROUP;
+        selectionType = SelectionType.PARTTAG;
         selectedParts.add(spawnedPart);
         return this;
+    }
+
+    /**
+     * Randomize the part uuids of all parts in this SpawnedPartSelection
+     * Useful when wanting to use the same animation on similar SpawnedDisplayEntityGroups
+     * @param seed The seed to use for the part randomization
+     */
+    public void randomizePartUUIDs(long seed){
+        byte[] byteArray;
+        Random random = new Random(seed);
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            byteArray = new byte[16];
+            random.nextBytes(byteArray);
+            part.setPartUUID(UUID.nameUUIDFromBytes(byteArray));
+        }
     }
 
     /**
@@ -191,9 +220,22 @@ public final class SpawnedPartSelection {
      * Gets the part tag of the first part in the selection
      * @return The part tag. Null if the part does not have a part tag
      */
-    public String getPartTag(){
-        if (selectedParts.isEmpty()) return null;
-        return selectedParts.get(0).partTag;
+    public ArrayList<String> getCleanPartTags(){
+        if (selectedParts.isEmpty()){
+            return new ArrayList<>();
+        }
+        return selectedParts.get(0).getCleanPartTags();
+    }
+
+    /**
+     * Gets the part tag of the first part in the selection
+     * @return The part tag. Null if the part does not have a part tag
+     */
+    public ArrayList<String> getPartTags(){
+        if (selectedParts.isEmpty()){
+            return new ArrayList<>();
+        }
+        return selectedParts.get(0).getPartTags();
     }
 
 
@@ -233,9 +275,40 @@ public final class SpawnedPartSelection {
         }
     }
 
+    /**
+     * Pivot all Interaction parts in this group around the SpawnedDisplayEntityGroup's master part
+     * @param angle the pivot angle
+     */
+    public void pivot(double angle){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                part.pivot(angle);
+            }
+        }
+    }
+
+    /**
+     * Set the yaw of all parts in this selection
+     * @param yaw the yaw to set
+     */
+    public void setYaw(float yaw, boolean pivotInteractions){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            part.setYaw(yaw, pivotInteractions);
+        }
+    }
+
+    /**
+     * Set the pitch of all parts in this selection
+     * @param pitch the pitch to set
+     */
+    public void setPitch(float pitch){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            part.setPitch(pitch);
+        }
+    }
+
     void removeNoManager(){
         selectedParts.clear();
-        group.removeAllPartSelections();
         group.partSelections.remove(this);
         group = null;
         selectionType = null;
@@ -267,6 +340,6 @@ public final class SpawnedPartSelection {
 
     public enum SelectionType{
         CYCLE,
-        GROUP;
+        PARTTAG;
     }
 }
