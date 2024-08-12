@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.InteractionCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
@@ -24,9 +25,12 @@ class InteractionListCMD implements SubCommand{
         player.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         player.sendMessage(Component.text("Interaction Commands:", NamedTextColor.GRAY));
 
-        List<String> commands = DisplayUtils.getCleanInteractionCommands(interaction);
+        List<InteractionCommand> commands = DisplayUtils.getCleanInteractionCommandsWithData(interaction);
         for (int i = 0; i < commands.size(); i++){
-            player.sendMessage("ID: "+i+" | "+ChatColor.YELLOW+commands.get(i));
+            InteractionCommand cmd = commands.get(i);
+            String clickType = cmd.isLeftClick() ? "LEFT" : "RIGHT";
+            String execType = cmd.isConsoleCommand() ? "CONSOLE" : "PLAYER";
+            player.sendMessage("ID: "+i+" <"+clickType+" | "+execType+"> "+"| "+ChatColor.YELLOW+cmd.getCommand());
         }
     }
 }

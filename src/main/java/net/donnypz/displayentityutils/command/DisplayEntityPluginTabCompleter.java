@@ -91,12 +91,25 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                         }
                     }
                 }
+                case "interaction" -> {
+                    if (args[1].equalsIgnoreCase("addcmd")){
+                        suggestions.add("player");
+                        suggestions.add("console");
+                    }
+                }
             }
         }
         else if (args.length == 4) {
             if (args[0].equalsIgnoreCase("group") || args[0].equalsIgnoreCase("anim")){
                 if (args[1].equals("delete")){
                     addStorages(suggestions);
+                }
+            }
+            else if (args[0].equalsIgnoreCase("interaction")){
+                if (args[1].equalsIgnoreCase("addcmd")){
+                    suggestions.add("left");
+                    suggestions.add("right");
+                    suggestions.add("both");
                 }
             }
         }

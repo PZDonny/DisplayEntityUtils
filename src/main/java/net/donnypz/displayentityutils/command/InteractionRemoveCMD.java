@@ -18,7 +18,7 @@ class InteractionRemoveCMD implements SubCommand{
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("/mdis interaction removecommand <id>", NamedTextColor.RED));
+            player.sendMessage(Component.text("/mdis interaction removecmd <id>", NamedTextColor.RED));
             return;
         }
         try{
@@ -27,7 +27,7 @@ class InteractionRemoveCMD implements SubCommand{
             if (interaction == null){
                 return;
             }
-            ArrayList<String> commands = DisplayUtils.getInteractionCommands(interaction);
+            ArrayList<String> commands = DisplayUtils.getCleanInteractionCommands(interaction);
             if (commands.size() <= id){
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"That command ID does not exist on the selected interaction entity");
                 return;

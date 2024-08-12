@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils;
 
 import net.donnypz.displayentityutils.command.DisplayEntityPluginTabCompleter;
 import net.donnypz.displayentityutils.events.InteractionClickEvent;
+import net.donnypz.displayentityutils.events.PreInteractionClickEvent;
 import net.donnypz.displayentityutils.listeners.autoGroup.LoadingListeners;
 import net.donnypz.displayentityutils.listeners.autoGroup.datapackReader.DEUEntitySpawned;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
@@ -11,6 +12,7 @@ import net.donnypz.displayentityutils.managers.MongoManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
+import net.donnypz.displayentityutils.utils.InteractionCommand;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -269,7 +271,10 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             return;
         }
         if (e.getRightClicked() instanceof Interaction entity){
-            List<String> commands = DisplayUtils.getCleanInteractionCommands(entity);
+            if (!new PreInteractionClickEvent(e.getPlayer(), entity, InteractionClickEvent.ClickType.RIGHT).callEvent()){
+                return;
+            }
+            List<InteractionCommand> commands = DisplayUtils.getCleanInteractionCommandsWithData(entity);
             callInteractionEvent(new InteractionClickEvent(e.getPlayer(), entity, InteractionClickEvent.ClickType.RIGHT, commands));
         }
     }
@@ -280,7 +285,10 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             return;
         }
         if (e.getEntity() instanceof Interaction entity){
-            List<String> commands = DisplayUtils.getCleanInteractionCommands(entity);
+            if (!new PreInteractionClickEvent((Player) e.getDamager(), entity, InteractionClickEvent.ClickType.LEFT).callEvent()){
+                return;
+            }
+            List<InteractionCommand> commands = DisplayUtils.getCleanInteractionCommandsWithData(entity);
             callInteractionEvent(new InteractionClickEvent((Player) e.getDamager(), entity, InteractionClickEvent.ClickType.LEFT, commands));
         }
     }
@@ -290,9 +298,23 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             return;
         }
 
-        for (String command : event.getCommands()){
-            event.getPlayer().performCommand(command);
+        Player p = event.getPlayer();
+        for (InteractionCommand cmd : event.getCommands()){
+            if (cmd.isLeftClick() && event.getClickType() == InteractionClickEvent.ClickType.LEFT){
+                runCommand(cmd, p);
+            }
+            else if (!cmd.isLeftClick() && event.getClickType() == InteractionClickEvent.ClickType.RIGHT){
+                runCommand(cmd, p);
+            }
         }
+    }
 
+    private void runCommand(InteractionCommand command, Player player){
+        if (!command.isConsoleCommand()){
+            player.performCommand(command.getCommand());
+        }
+        else{
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.getCommand());
+        }
     }
 }

@@ -15,8 +15,42 @@ class InteractionAddCMD implements SubCommand{
             return;
         }
 
-        if (args.length < 3){
-            player.sendMessage(Component.text("/mdis interaction addcommand <command>", NamedTextColor.RED));
+        if (args.length < 5){
+            player.sendMessage(Component.text("/mdis interaction addcmd <player | console> <left | right | both> <command>", NamedTextColor.RED));
+            return;
+        }
+        String executor = args[2].toLowerCase();
+        boolean isConsole;
+        if (executor.equals("console")){
+            isConsole = true;
+        }
+        else if (executor.equals("player")){
+            isConsole = false;
+        }
+        else{
+            player.sendMessage(Component.text("Invalid Command Executor!", NamedTextColor.RED));
+            player.sendMessage(Component.text("Pick between \"player\" or \"console\"", NamedTextColor.GRAY));
+            return;
+        }
+
+        String click = args[3].toLowerCase();
+        boolean isLeftClick;
+        boolean isBoth;
+        if (click.equals("left")){
+            isLeftClick = true;
+            isBoth = false;
+        }
+        else if (click.equals("right")){
+            isLeftClick = false;
+            isBoth = false;
+        }
+        else if (click.equals("both")){
+            isBoth = true;
+            isLeftClick = false;
+        }
+        else{
+            player.sendMessage(Component.text("Invalid Click Type!", NamedTextColor.RED));
+            player.sendMessage(Component.text("Pick between \"left\", \"right\", or \"both\"", NamedTextColor.GRAY));
             return;
         }
 
@@ -26,13 +60,20 @@ class InteractionAddCMD implements SubCommand{
         }
 
         StringBuilder builder = new StringBuilder();
-        for (int i = 2; i < args.length; i++){
+        for (int i = 4; i < args.length; i++){
             builder.append(args[i]);
             if (i+1 != args.length) builder.append(" ");
         }
         String command = builder.toString();
-        DisplayUtils.addInteractionCommand(interaction, command);
-        int cmdID = DisplayUtils.getInteractionCommands(interaction).size()-1;
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Command Added! "+ChatColor.YELLOW+"(ID: "+cmdID+" | "+command+")");
+        if (isBoth){
+            DisplayUtils.addInteractionCommand(interaction, command, true, isConsole);
+            DisplayUtils.addInteractionCommand(interaction, command, false, isConsole);
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Command Added! "+ChatColor.YELLOW+"("+command+")");
+        }
+        else{
+            DisplayUtils.addInteractionCommand(interaction, command, isLeftClick, isConsole);
+            int cmdID = DisplayUtils.getInteractionCommands(interaction).size()-1;
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Command Added! "+ChatColor.YELLOW+"(ID: "+cmdID+" | "+command+")");
+        }
     }
 }

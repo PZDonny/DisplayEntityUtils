@@ -15,6 +15,8 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import javax.annotation.Nonnull;
@@ -24,7 +26,11 @@ import java.util.UUID;
 
 public final class DisplayUtils {
 
-    private static final String interactionCommandPrefix = "displayentityutilsinteractioncmd_";
+    private static final String interactionCommandPrefix = "deuinteractioncmd_";
+    private static final String leftClickConsole = "lcc_"+interactionCommandPrefix;
+    private static final String leftClickPlayer = "lcp_"+interactionCommandPrefix;
+    private static final String rightClickConsole = "rcc_"+interactionCommandPrefix;
+    private static final String rightClickPlayer = "rcp_"+interactionCommandPrefix;
     private DisplayUtils(){}
 
     /**
@@ -405,25 +411,11 @@ public final class DisplayUtils {
     }
 
     private static String shortenInteractionCommand(String interactionCommand) {
-        return interactionCommand.replace(interactionCommandPrefix, "");
+        return interactionCommand.split(interactionCommandPrefix)[1];
     }
 
 
-    /**
-     * Gets the set commands of an interaction entity, without any prefix set by this plugin.
-     * @param interaction
-     * @return List of commands stored on this interaction entity
-     */
-    public static ArrayList<String> getCleanInteractionCommands(Interaction interaction){
-        ArrayList<String> commands = new ArrayList<>();
-        for (String tag : interaction.getScoreboardTags()){
-            if (tag.contains(interactionCommandPrefix)){
-                String command = shortenInteractionCommand(tag);
-                commands.add(command);
-            }
-        }
-        return commands;
-    }
+
 
     /**
      * Gets the set commands of an interaction entity with the interaction command prefix.
@@ -441,14 +433,96 @@ public final class DisplayUtils {
     }
 
     /**
+     * Gets the set commands of an interaction entity, without any prefix set by this plugin.
+     * @param interaction
+     * @return List of commands stored on this interaction entity
+     */
+    public static ArrayList<String> getCleanInteractionCommands(Interaction interaction){
+        return getConditionedCommands(interaction, interactionCommandPrefix);
+    }
+
+    /**
+     * Gets the set commands of an interaction entity, without any prefix set by this plugin.
+     * @param interaction
+     * @return List of commands stored on this interaction entity
+     */
+    public static ArrayList<InteractionCommand> getCleanInteractionCommandsWithData(Interaction interaction){
+        ArrayList<InteractionCommand> cmd = new ArrayList<>();
+        for (String s : getInteractionCommands(interaction)){
+            if (s.startsWith(leftClickConsole)){
+                cmd.add(new InteractionCommand(shortenInteractionCommand(s), true, true));
+            }
+            else if (s.startsWith(leftClickPlayer)){
+                cmd.add(new InteractionCommand(shortenInteractionCommand(s), true, false));
+            }
+            else if (s.startsWith(rightClickConsole)){
+                cmd.add(new InteractionCommand(shortenInteractionCommand(s), false, true));
+            }
+            else{
+                cmd.add(new InteractionCommand(shortenInteractionCommand(s), false, false));
+            }
+        }
+        return cmd;
+    }
+
+    public static ArrayList<String> getCleanInteractionLeftConsoleCommands(Interaction interaction){
+        return getConditionedCommands(interaction, leftClickConsole);
+    }
+
+    public static ArrayList<String> getCleanInteractionLeftPlayerCommands(Interaction interaction){
+        return getConditionedCommands(interaction, leftClickPlayer);
+    }
+
+    public static ArrayList<String> getCleanInteractionRightConsoleCommands(Interaction interaction){
+        return getConditionedCommands(interaction, rightClickConsole);
+    }
+
+    public static ArrayList<String> getCleanInteractionRightPlayerCommands(Interaction interaction){
+        return getConditionedCommands(interaction, rightClickPlayer);
+    }
+
+    private static ArrayList<String> getConditionedCommands(Interaction interaction, String prefix){
+        ArrayList<String> commands = new ArrayList<>();
+        for (String tag : interaction.getScoreboardTags()){
+            if (tag.contains(prefix)){
+                String command = shortenInteractionCommand(tag);
+                commands.add(command);
+            }
+        }
+        return commands;
+    }
+
+    /**
+     * Adds a command to an interaction entity after deserialization
+     * @param interaction The entity to assign the command to
+     * @param command The command to assign
+     */
+    @ApiStatus.Internal
+    public static void addInteractionCommand(Interaction interaction, @NotNull String command){
+        if (command.isBlank()){
+            return;
+        }
+        interaction.addScoreboardTag(command);
+    }
+
+    /**
      * Adds a command to an interaction entity to execute when clicked
      * @param interaction The entity to assign the command to
      * @param command The command to assign
      */
-    public static void addInteractionCommand(Interaction interaction, String command){
-        if (command != null && !command.isBlank()){
-            interaction.addScoreboardTag(interactionCommandPrefix+command);
+    @ApiStatus.Internal
+    public static void addInteractionCommand(Interaction interaction, @NotNull String command, boolean isLeftClick, boolean isConsole){
+        if (command.isBlank()){
+            return;
         }
+        String prefix;
+        if (!isLeftClick){
+            prefix = isConsole ? rightClickConsole : rightClickPlayer;
+        }
+        else{
+            prefix = isConsole ? leftClickConsole : leftClickPlayer;
+        }
+        interaction.addScoreboardTag(prefix+command);
     }
 
     /**
@@ -456,10 +530,12 @@ public final class DisplayUtils {
      * @param interaction The entity to assign the command to
      * @param command The command to remove
      */
-    public static void removeInteractionCommand(Interaction interaction, String command){
-        if (command != null){
-            interaction.removeScoreboardTag(command);
+    @ApiStatus.Internal
+    public static void removeInteractionCommand(Interaction interaction, @NotNull String command){
+        if (command.isBlank()){
+            return;
         }
+        interaction.removeScoreboardTag(command);
     }
 
 

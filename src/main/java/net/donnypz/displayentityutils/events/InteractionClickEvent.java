@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.events;
 
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.InteractionCommand;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -21,13 +22,13 @@ public class InteractionClickEvent extends Event implements Cancellable {
     Player player;
     Interaction interaction;
     ClickType clickType;
-    List<String> commands;
+    List<InteractionCommand> commands;
     boolean cancelled = false;
 
     /**
      * Called when an Interaction Entity is Left or Right-clicked.
      */
-    public InteractionClickEvent(@Nonnull Player player, @Nonnull Interaction interaction, ClickType clickType, List<String> commands){
+    public InteractionClickEvent(@Nonnull Player player, @Nonnull Interaction interaction, ClickType clickType, List<InteractionCommand> commands){
         this.player = player;
         this.interaction = interaction;
         this.clickType = clickType;
@@ -79,7 +80,7 @@ public class InteractionClickEvent extends Event implements Cancellable {
      * Get the commands that will be performed by the player when this interaction entity is clicked
      * @return a list of commands
      */
-    public List<String> getCommands() {
+    public List<InteractionCommand> getCommands() {
         return commands;
     }
 
