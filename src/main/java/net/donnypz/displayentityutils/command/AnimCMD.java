@@ -20,7 +20,6 @@ class AnimCMD implements SubCommand{
         subCommands.put("new", new AnimNewCMD());
         subCommands.put("save", new AnimSaveCMD());
         subCommands.put("delete", new AnimDeleteCMD());
-        subCommands.put("fromdp", new ConvertDatapackCMD());
         subCommands.put("info", new AnimInfoCMD());
         subCommands.put("frameinfo", new AnimFrameInfoCMD());
         subCommands.put("addframe", new AnimAddFrameCMD());
@@ -66,7 +65,6 @@ class AnimCMD implements SubCommand{
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Use <yellow>\"block-display.com\" <aqua>to easier create animations and convert them "));
         sender.sendMessage(Component.text("Use "+ ChatColor.YELLOW+"\"block-display.com\""+ChatColor.AQUA+" to create models and keyframes", NamedTextColor.AQUA));
         DisplayEntityPluginCommand.sendCMD(sender,"/mdis anim new [part-tag] ", "(Animates only parts with a tag, if the tag is specified)");
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis anim fromdp <datapack-name> <group-tag-to-set> <anim-tag-to-set>", "(Convert a animation datapack form \"block-display.com\" into a editable animation file)");
         DisplayEntityPluginCommand.sendCMD(sender,"/mdis anim info");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim frameinfo <frame-id>");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim addframe <delay-in-ticks> <duration-in-ticks>");
