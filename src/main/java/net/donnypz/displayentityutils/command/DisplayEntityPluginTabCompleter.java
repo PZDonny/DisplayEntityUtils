@@ -45,36 +45,59 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
             }
         }
         else if (args.length == 3){
-            if (args[1].equalsIgnoreCase("setglowcolor") && (args[0].equalsIgnoreCase("group") || args[0].equalsIgnoreCase("parts"))){
-                addColors(suggestions);
-            }
-            else if (args[1].equalsIgnoreCase("move") || args[1].equalsIgnoreCase("translate")){
-                addDirections(suggestions);
-            }
-            else if (args[1].equalsIgnoreCase("cycle")){
-                suggestions.add("first");
-                suggestions.add("prev");
-                suggestions.add("next");
-            }
-            else if (args[1].equals("selectnearest")){
-                suggestions.add("<interaction-distance>");
-            }
-            else if (args[1].equalsIgnoreCase("seeduuids")){
-                suggestions.add("group");
-                suggestions.add("selection");
-            }
-            else if (args[1].equalsIgnoreCase("setblock")){
-                suggestions.add("-target");
-                suggestions.add("-held");
-                suggestions.add("block-id");
+            switch (args[0].toLowerCase()){
+                case "group" -> {
+                    switch (args[1].toLowerCase()){
+                        case "selectnearest" -> {
+                            suggestions.add("<interaction-distance>");
+                        }
+                        case "setglowcolor" -> {
+                            addColors(suggestions);
+                        }
+                        case "move", "translate" -> {
+                            addDirections(suggestions);
+                        }
+                        case "save" -> {
+                            addStorages(suggestions);
+                        }
+                    }
+                }
+                case "anim" -> {
+                    if (args[1].equalsIgnoreCase("save")) {
+                        addStorages(suggestions);
+                    }
+                }
+                case "parts" -> {
+                    switch (args[1].toLowerCase()){
+                        case "setglowcolor" -> {
+                            addColors(suggestions);
+                        }
+                        case "translate" -> {
+                            addDirections(suggestions);
+                        }
+                        case "cycle" -> {
+                            suggestions.add("first");
+                            suggestions.add("prev");
+                            suggestions.add("next");
+                        }
+                        case "seeduuids" -> {
+                            suggestions.add("group");
+                            suggestions.add("selection");
+                        }
+                        case "setblock" -> {
+                            suggestions.add("-target");
+                            suggestions.add("-held");
+                            suggestions.add("block-id");
+                        }
+                    }
+                }
             }
         }
         else if (args.length == 4) {
-            if (args[1].equalsIgnoreCase("delete")
-                    || args[1].equalsIgnoreCase("spawn")
-                    || (args[1].equals("select") && args[0].equalsIgnoreCase("anim"))
-                    || (args[1].equalsIgnoreCase("save") && (args[0].equalsIgnoreCase("group") || args[0].equalsIgnoreCase("anim")))){
-                addStorages(suggestions);
+            if (args[0].equalsIgnoreCase("group") || args[0].equalsIgnoreCase("anim")){
+                if (args[1].equals("delete")){
+                    addStorages(suggestions);
+                }
             }
         }
         return suggestions;
