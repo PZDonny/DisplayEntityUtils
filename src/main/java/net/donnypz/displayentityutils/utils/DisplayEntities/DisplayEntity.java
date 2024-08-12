@@ -1,4 +1,4 @@
-package com.pzdonny.displayentityutils.utils.DisplayEntities;
+package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -9,10 +9,12 @@ import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.TextDisplay;
 
+import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 
-public class DisplayEntity implements Serializable {
+final class DisplayEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 99L;
@@ -26,6 +28,7 @@ public class DisplayEntity implements Serializable {
     private DisplayEntitySpecifics specifics;
     private final Type type;
     private boolean isMaster;
+    byte[] persistentDataContainer = null;
 
     DisplayEntity(Display entity, Type type, DisplayEntityGroup group){
         this.type = type;
@@ -38,6 +41,12 @@ public class DisplayEntity implements Serializable {
         }
         else if (entity instanceof TextDisplay td) {
             specifics = new TextDisplaySpecifics(td);
+        }
+        try{
+            persistentDataContainer = entity.getPersistentDataContainer().serializeToBytes();
+        }
+        catch(IOException e){
+            e.printStackTrace();
         }
 
     }
@@ -52,16 +61,16 @@ public class DisplayEntity implements Serializable {
      * @param location The location to spawn the Display
      * @return The spawned Display
      */
-    public Display createEntity(Location location){
+    public Display createEntity(Location location, boolean isVisible){
         switch(type){
             case BLOCK ->{
-                return spawnBlockDisplay(location);
+                return spawnBlockDisplay(location, isVisible);
             }
             case ITEM ->{
-                return spawnItemDisplay(location);
+                return spawnItemDisplay(location, isVisible);
             }
             case TEXT ->{
-                return spawnTextDisplay(location);
+                return spawnTextDisplay(location, isVisible);
             }
             default ->{
                 return null;
@@ -69,24 +78,26 @@ public class DisplayEntity implements Serializable {
         }
     }
 
-    Display spawnBlockDisplay(Location location){
+    Display spawnBlockDisplay(Location location, boolean isVisible){
         BlockDisplaySpecifics spec = (BlockDisplaySpecifics) specifics;
         BlockData data = Bukkit.createBlockData(spec.getBlockData());
         return location.getWorld().spawn(location, BlockDisplay.class, display ->{
             display.setBlock(data);
-            specifics.updateDisplay(display);
+            display.setVisibleByDefault(isVisible);
+            specifics.updateDisplay(this, display);
         });
     }
 
-    Display spawnItemDisplay(Location location){
+    Display spawnItemDisplay(Location location, boolean isVisible){
         ItemDisplaySpecifics spec = (ItemDisplaySpecifics) specifics;
         return location.getWorld().spawn(location, ItemDisplay.class, display ->{
             display.setItemDisplayTransform(spec.getItemDisplayTransform());
             display.setItemStack(spec.getItemStack());
-            specifics.updateDisplay(display);
+            display.setVisibleByDefault(isVisible);
+            specifics.updateDisplay(this, display);
         });
     }
-    Display spawnTextDisplay(Location location){
+    Display spawnTextDisplay(Location location, boolean isVisible){
         TextDisplaySpecifics spec = (TextDisplaySpecifics) specifics;
         return location.getWorld().spawn(location, TextDisplay.class, display ->{
             display.text(spec.getText());
@@ -99,7 +110,8 @@ public class DisplayEntity implements Serializable {
             display.setShadowed(spec.isShadowed());
             display.setSeeThrough(spec.isSeeThrough());
             display.setDefaultBackground(spec.isDefaultBackground());
-            specifics.updateDisplay(display);
+            display.setVisibleByDefault(isVisible);
+            specifics.updateDisplay(this, display);
         });
     }
 
@@ -128,10 +140,10 @@ public class DisplayEntity implements Serializable {
     }
 
     /**
-     * Get this DisplayEntity's part tag
-     * @return This DisplayEntity's part tag. Null if it does not have one
+     * Get this DisplayEntity's part tags
+     * @return This DisplayEntity's part tags
      */
-    public String getPartTag(){
-        return specifics.getPartTag();
+    public ArrayList<String> getPartTags(){
+        return specifics.getPartTags();
     }
 }
