@@ -42,12 +42,12 @@ class AnimSelectCMD implements SubCommand{
             return;
         }
         if (!loadMethod.isEnabled()){
-            p.sendMessage(ChatColor.GRAY+"- Storage location is disabled and cannot be checked!");
+            p.sendMessage(Component.text("- Storage location is disabled and cannot be checked!", NamedTextColor.GRAY));
             return;
         }
         DisplayAnimation anim = DisplayAnimationManager.retrieve(loadMethod, tag);
         if (anim == null){
-            p.sendMessage(ChatColor.RED+"- Failed to find saved display animation in that storage location!");
+            p.sendMessage(Component.text("- Failed to find saved display animation in that storage location!", NamedTextColor.RED));
             return;
         }
         DisplayAnimationManager.setSelectedSpawnedAnimation(p, anim.toSpawnedDisplayAnimation());
