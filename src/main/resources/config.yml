@@ -5,12 +5,13 @@
 
 localStorageEnabled: true
 
-#The database and collection will automatically be created if it does not exist already
+#The database and collections will automatically be created if it does not exist already
 mongodb:
   enabled: false
   connectionString: ""
   database: "DisplayEntityUtils"
-  collection: "saved_displays"
+  groupCollection: "saved_displays"
+  animationCollection: "saved_animations"
 
 mysql:
   enabled: false
@@ -23,9 +24,52 @@ mysql:
 #Using connection url will override settings above
   connectionURL: ""
 
-#Despawns groups spawned during the current server session
-#If groups were created before the server's current session those will not be despawned automatically
+#Determine whether the seed used to generate random part uuids should stay consistent with every group
+#This is useful when wanting to use the same animation on different groups
+
+# Merging groups will change the partUUIDS of the parts from the group merging in
+# May potentially lead to unexpected outcomes when animating
+
+#This feature can also be disabled and the command "/mdis parts randomizeuuids <seed>" can be used instead
+seededPartUUIDs: true
+
+
+#Automatically select groups when using the command "/mdis group spawn"
+autoSelectGroups: false
+
+#Attempts to automatically detect Spawned Display Entity Groups on Server Start
+#Also attempts to asynchronously detect groups when a chunk loads
+#This feature will not work 100% work on worlds that keep spawn in memory, but will work after a world reload (unload -> laod)
+automaticGroupDetection:
+  enabled: true
+
+  #Maximum Range to Search for Interaction Entities in a Group
+  #High values may lead to lag spikes
+  #This will not work if (automaticGroupDetection is false)
+  #Setting this value to 0 will effectively disable this feature
+  maximumInteractionSearchRange: 7
+
+  #Re-search previously searched chunks for Spawned Display Entity Groups
+  #May cause lag when if many chunks are constantly being loaded and unloaded
+  readSameChunks: false
+
+  #Unregisters all groups in an unloaded world
+  #
+  #Keep this enabled unless another plugin requires this setting to be disabled, or
+  #if problems arise with this setting while using the API
+  unregisterOnUnload: true
+
+#Automatically Pivot Interaction Entity when a DisplayEntityGroup is spawned
+#in order to match the group's yaw
+autoPivotInteractionsOnSpawn: true
+
+
+#Despawns groups spawned and automatically detected during the current server session
+#  If groups were created before the server's current session those
+#  will not be despawned automatically (if automaticGroupDetection is false)
 despawnGroupsOnServerStop: false
 
-#If a storage location contains display A and display B is to be saved to that location while having the same tag as display A, display B will replace display A
-overrideExistingSaves: true
+#Enable this to allow overwriting of existing saved DisplayEntityGroups and Animations
+overwriteExistingSaves: true
+
+
