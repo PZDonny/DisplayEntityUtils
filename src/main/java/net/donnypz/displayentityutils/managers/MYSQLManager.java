@@ -67,13 +67,7 @@ public final class MYSQLManager {
             } catch (SQLException e) {
                 e.printStackTrace();
                 Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"There was an error connecting to the MYSQL database");
-                connected = false;
-            }
-            finally {
-                if (dataSource != null){
-                    dataSource.close();
-                    dataSource = null;
-                }
+                closeConnection();
             }
         });
     }
