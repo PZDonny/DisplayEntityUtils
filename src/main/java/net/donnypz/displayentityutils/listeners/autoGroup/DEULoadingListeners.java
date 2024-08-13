@@ -16,7 +16,7 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class LoadingListeners implements Listener {
+public class DEULoadingListeners implements Listener {
     @EventHandler(priority =  EventPriority.HIGHEST)
     public void onEntityLoad(EntitiesLoadEvent e){
         AutoGroup.detectGroups(e.getChunk(), e.getEntities());
