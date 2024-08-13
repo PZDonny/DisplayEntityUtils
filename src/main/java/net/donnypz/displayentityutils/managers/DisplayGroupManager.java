@@ -70,7 +70,6 @@ public final class DisplayGroupManager {
 
     /**
      * Gets the SpawnedDisplayEntityGroup a player has selected
-     *
      * @param player Player to get the group of
      * @return The SpawnedDisplayEntityGroup that the player has selected. Null if player does not have a selection.
      */
@@ -80,7 +79,6 @@ public final class DisplayGroupManager {
 
     /**
      * Remove a player's SpawnedDisplayEntityGroup selection
-     *
      * @param player Player to remove selection from
      */
     public static void deselectSpawnedGroup(Player player) {
