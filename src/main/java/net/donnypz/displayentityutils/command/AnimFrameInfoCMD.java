@@ -46,6 +46,7 @@ class AnimFrameInfoCMD implements SubCommand{
             player.sendMessage(MiniMessage.miniMessage().deserialize("Delay: <yellow>"+frame.getDelay()));
 
             sendSounds(player, "Start Sounds: ", frame.getFrameStartSounds());
+            player.sendMessage(Component.empty());
             sendSounds(player, "End Sounds: ", frame.getFrameEndSounds());
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid frame ID! Enter whole numbers >= 0", NamedTextColor.RED));
