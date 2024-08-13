@@ -36,7 +36,7 @@ class AnimShowFrameCMD implements SubCommand{
 
         if (args.length < 3) {
             player.sendMessage(Component.text("/mdis anim showframe <frame-id>", NamedTextColor.RED));
-            player.sendMessage(ChatColor.GRAY + "First frame is 0, Second frame is 1, and so on...");
+            player.sendMessage(Component.text("First frame is 0, Second frame is 1, and so on...", NamedTextColor.GRAY));
             return;
         }
         List<SpawnedDisplayAnimationFrame> frames = anim.getFrames();
@@ -50,13 +50,13 @@ class AnimShowFrameCMD implements SubCommand{
                 throw new NumberFormatException();
             }
             if (id >= anim.getFrames().size()) {
-                player.sendMessage(ChatColor.RED + "Invalid ID! The ID cannot be >= the amount of frames!");
+                player.sendMessage(Component.text("Invalid ID! The ID cannot be >= the amount of frames!", NamedTextColor.RED));
                 return;
             }
             group.setToFrame(frames.get(id));
             player.sendMessage(Component.text("Showing your selected display entity group as Frame #" + id, NamedTextColor.GREEN));
         } catch (NumberFormatException e) {
-            player.sendMessage(Component.text("Invalid ID! ID's must be 0 or larger", NamedTextColor.RED));
+            player.sendMessage(Component.text("Invalid ID! ID's must be >= 0", NamedTextColor.RED));
         }
     }
 }
