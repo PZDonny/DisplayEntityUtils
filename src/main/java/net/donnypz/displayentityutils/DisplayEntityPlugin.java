@@ -3,8 +3,9 @@ package net.donnypz.displayentityutils;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginTabCompleter;
 import net.donnypz.displayentityutils.events.InteractionClickEvent;
 import net.donnypz.displayentityutils.events.PreInteractionClickEvent;
-import net.donnypz.displayentityutils.listeners.autoGroup.LoadingListeners;
+import net.donnypz.displayentityutils.listeners.autoGroup.DEULoadingListeners;
 import net.donnypz.displayentityutils.listeners.autoGroup.datapackReader.DEUEntitySpawned;
+import net.donnypz.displayentityutils.listeners.player.DEUPlayerConnectionListener;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.managers.MYSQLManager;
@@ -65,8 +66,9 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(this, this);
         Bukkit.getPluginManager().registerEvents(new DEUEntitySpawned(), this);
         if (automaticGroupDetection){
-            Bukkit.getPluginManager().registerEvents(new LoadingListeners(), this);
+            Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
         }
+        Bukkit.getPluginManager().registerEvents(new DEUPlayerConnectionListener(), this);
 
 
 
