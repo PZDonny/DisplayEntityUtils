@@ -33,8 +33,8 @@ class AnimAddSoundCMD implements SubCommand{
             String soundString = args[3];
             soundString = soundString.replace(".", "_").toUpperCase();
             Sound sound = Sound.valueOf(soundString);
-            int volume = Integer.parseInt(args[4]);
-            int pitch = Integer.parseInt(args[5]);
+            float volume = Float.parseFloat(args[4]);
+            float pitch = Float.parseFloat(args[5]);
             String placement = args[6];
             SpawnedDisplayAnimationFrame frame = anim.getFrames().get(id);
             if (placement.equalsIgnoreCase("start")){
@@ -49,7 +49,7 @@ class AnimAddSoundCMD implements SubCommand{
 
             player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.GREEN + "Successfully added sound to frame's "+placement);
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
-            player.sendMessage(Component.text("Invalid value entered for frame-id, volume, or pitch! Enter a whole number >= 0", NamedTextColor.RED));
+            player.sendMessage(Component.text("Invalid value entered for frame-id, volume, or pitch! Enter a number >= 0", NamedTextColor.RED));
         }
         catch (IllegalArgumentException e){
             player.sendMessage(Component.text("Invalid Sound Name!", NamedTextColor.RED));
