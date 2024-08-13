@@ -86,13 +86,11 @@ public final class SpawnedDisplayEntityPart {
                 while(groupContainsUUID(partUUID)){
                     byteArray = new byte[16];
                     random.nextBytes(byteArray);
-                    partUUID = getRandomUUID();
+                    partUUID = UUID.nameUUIDFromBytes(byteArray);
                 }
             }
             else{
-                while (groupContainsUUID(partUUID)){
-                    partUUID = getRandomUUID();
-                }
+                partUUID = getRandomUUID();
             }
             pdc.set(DisplayEntityPlugin.partUUIDKey, PersistentDataType.STRING, partUUID.toString());
         }
@@ -118,7 +116,7 @@ public final class SpawnedDisplayEntityPart {
 
     private boolean groupContainsUUID(UUID uuid){
         for (SpawnedDisplayEntityPart part : group.spawnedParts){
-            if (part != this && part.partUUID.equals(uuid)){
+            if (part != this && uuid.equals(part.partUUID)){
                 return true;
             }
         }
