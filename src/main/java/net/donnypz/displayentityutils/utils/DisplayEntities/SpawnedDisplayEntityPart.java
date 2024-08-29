@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.*;
@@ -11,22 +12,19 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public final class SpawnedDisplayEntityPart {
 
-    static final HashMap<Entity, SpawnedDisplayEntityPart> allParts = new HashMap<>();
+    static final HashMap<UUID, SpawnedDisplayEntityPart> allParts = new HashMap<>();
     SpawnedDisplayEntityGroup group;
     PartType type;
     Entity entity;
-    ArrayList<String> partTags = new ArrayList<>();
     UUID partUUID;
     private boolean isInteractionOutlined;
 
@@ -44,10 +42,10 @@ public final class SpawnedDisplayEntityPart {
         else {
             this.type = PartType.TEXT_DISPLAY;
         }
-        setPartTagsFromScoreboard();
+        adaptLegacyPartTags();
         displayEntity.getPersistentDataContainer().set(new NamespacedKey(DisplayEntityPlugin.getInstance(), "creationtime"), PersistentDataType.LONG, group.getCreationTime());
         removeFromPreviousGroup(displayEntity);
-        allParts.put(entity, this);
+        allParts.put(entity.getUniqueId(), this);
         group.spawnedParts.add(this);
         if (isMaster()){
             group.masterPart = this;
@@ -60,10 +58,10 @@ public final class SpawnedDisplayEntityPart {
         this.group = group;
         this.entity = interactionEntity;
         this.type = PartType.INTERACTION;
-        setPartTagsFromScoreboard();
+        adaptLegacyPartTags();
         interactionEntity.getPersistentDataContainer().set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, group.getCreationTime());
         removeFromPreviousGroup(interactionEntity);
-        allParts.put(entity, this);
+        allParts.put(entity.getUniqueId(), this);
         group.spawnedParts.add(this);
         setPartUUID(random);
     }
@@ -71,12 +69,12 @@ public final class SpawnedDisplayEntityPart {
     public void setPartUUID(UUID uuid){
         this.partUUID = uuid;
         PersistentDataContainer pdc = entity.getPersistentDataContainer();
-        pdc.set(DisplayEntityPlugin.partUUIDKey, PersistentDataType.STRING, partUUID.toString());
+        pdc.set(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
     }
 
     private void setPartUUID(Random random){
         PersistentDataContainer pdc = entity.getPersistentDataContainer();
-        String value = pdc.get(DisplayEntityPlugin.partUUIDKey, PersistentDataType.STRING);
+        String value = pdc.get(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING);
     //New Part/Group
         if (value == null){
             if (DisplayEntityPlugin.seededPartUUIDS()){
@@ -92,7 +90,7 @@ public final class SpawnedDisplayEntityPart {
             else{
                 partUUID = getRandomUUID();
             }
-            pdc.set(DisplayEntityPlugin.partUUIDKey, PersistentDataType.STRING, partUUID.toString());
+            pdc.set(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
         }
     //Group/Part already exists
         else {
@@ -123,6 +121,9 @@ public final class SpawnedDisplayEntityPart {
         return false;
     }
 
+    /** Get this part's UUID, used for animations and identifying parts
+     * @return a uuid
+     */
     public UUID getPartUUID() {
         return partUUID;
     }
@@ -179,7 +180,7 @@ public final class SpawnedDisplayEntityPart {
      * @return The SpawnedDisplayEntityPart. Null if not created during play session or not a SpawnedDisplayEntityPart
      */
     public static SpawnedDisplayEntityPart getPart(Display display){
-        return allParts.get(display);
+        return allParts.get(display.getUniqueId());
     }
 
     /**
@@ -188,77 +189,72 @@ public final class SpawnedDisplayEntityPart {
      * @return The SpawnedDisplayEntityPart. Null if not created during play session or not a SpawnedDisplayEntityPart
      */
     public static SpawnedDisplayEntityPart getPart(Interaction interaction){
-        return allParts.get(interaction);
+        return allParts.get(interaction.getUniqueId());
     }
 
     /**
-     * Set the part tag of this SpawnedDisplayEntityPart
-     * @param partTag The part tag to give this part
+     * Add a tag to this SpawnedDisplayEntityPart
+     * @param tag The part tag to add to this part
      * @return this
      */
-    public SpawnedDisplayEntityPart addPartTag(@Nonnull String partTag){
-        if (!partTag.isBlank() && !hasPartTag(partTag)){
-            entity.addScoreboardTag(DisplayEntityPlugin.partTagPrefix+partTag);
-            //PersistentDataContainer pdc = entity.getPersistentDataContainer();
-            //pdc.set(DisplayEntityPlugin.partTagKey, PersistentDataType.STRING, partTag);
-            this.partTags.add(DisplayEntityPlugin.partTagPrefix+partTag);
+    public SpawnedDisplayEntityPart addTag(@NotNull String tag){
+        DisplayUtils.addTag(entity, tag);
+        return this;
+    }
 
+    /**
+     * Remove a tag from this SpawnedDisplayEntityPart
+     * @param tag the tag to remove from this part
+     * @return this
+     */
+    public SpawnedDisplayEntityPart removeTag(@NotNull String tag){
+        DisplayUtils.removeTag(entity, tag);
+        return this;
+    }
+
+    /**
+     * Gets the part tags of this SpawnedDisplayEntityPart
+     * @return This part's part tags.
+     */
+    public @NotNull List<String> getTags(){
+        return DisplayUtils.getTags(entity);
+    }
+
+    /**
+     * Adapt all scoreboard tags stored on this part's entity into tags usable by DisplayEntityUtils.
+     * @param removeFromScoreboard determine whether the tag will be removed from the scoreboard after being adapted.
+     * @return this
+     */
+    public SpawnedDisplayEntityPart adaptScoreboardTags(boolean removeFromScoreboard){
+        for (String tag : new HashSet<>(entity.getScoreboardTags())){
+            if (removeFromScoreboard){
+                entity.removeScoreboardTag(tag);
+            }
+            addTag(tag);
         }
         return this;
     }
 
-    public SpawnedDisplayEntityPart removePartTag(@Nonnull String partTag){
-        if (!partTag.isBlank() && !hasPartTag(partTag)){
-            entity.removeScoreboardTag(DisplayEntityPlugin.partTagPrefix+partTag);
-            //PersistentDataContainer pdc = entity.getPersistentDataContainer();
-            //pdc.set(DisplayEntityPlugin.partTagKey, PersistentDataType.STRING, partTag);
-            this.partTags.remove(DisplayEntityPlugin.partTagPrefix+partTag);
-
-        }
-        return this;
-    }
-
 
     /**
-     * Gets the part tags of this part
-     * @return This part's part tags.
+     * Determine whether this part has a tag
+     * @param tag the tag to check for
+     * @return true if this part has the tag
      */
-    public ArrayList<String> getPartTags(){
-        return new ArrayList<>(partTags);
-        //PersistentDataContainer pdc = entity.getPersistentDataContainer();
-        //return pdc.get(DisplayEntityPlugin.partTagKey, PersistentDataType.STRING);
+    public boolean hasTag(@NotNull String tag){
+        return DisplayUtils.hasTag(entity, tag);
     }
 
-    /**
-     * Gets the part tags of this part, without the plugin's prefix on each tag
-     * @return This part's part tags.
-     */
-    public ArrayList<String> getCleanPartTags(){
-        ArrayList<String> tags = new ArrayList<>();
-        for (String s : partTags){
-            tags.add(s.replace(DisplayEntityPlugin.partTagPrefix, ""));
-        }
-        return tags;
-    }
 
-    /**
-     * Determine whether this part has a specified part tag
-     * @return Whether this part has the part tag
-     */
-    public boolean hasPartTag(@NotNull String partTag){
-        String tag = partTag;
-        if (!partTag.contains(DisplayEntityPlugin.partTagPrefix)){
-            tag = DisplayEntityPlugin.partTagPrefix+tag;
-        }
-        return partTags.contains(tag);
-    }
-
-    private void setPartTagsFromScoreboard(){
-        for (String s : entity.getScoreboardTags()){
-            if (s.contains(DisplayEntityPlugin.partTagPrefix)){
-                partTags.add(s);
+    private void adaptLegacyPartTags(){
+        List<String> legacyTags = new ArrayList<>();
+        for (String s : new HashSet<>(entity.getScoreboardTags())){
+            if (s.contains(DisplayEntityPlugin.getLegacyPartTagPrefix())){
+                legacyTags.add(s.replace(DisplayEntityPlugin.getLegacyPartTagPrefix(), ""));
+                entity.removeScoreboardTag(s);
             }
         }
+        DisplayUtils.addTags(entity, legacyTags);
     }
 
     SpawnedDisplayEntityPart setTransformation(Transformation transformation){
@@ -270,11 +266,14 @@ public final class SpawnedDisplayEntityPart {
 
     SpawnedDisplayEntityPart setMaster(){
         group.masterPart = this;
-        entity.getPersistentDataContainer().set(new NamespacedKey(DisplayEntityPlugin.getInstance(), "ismaster"), PersistentDataType.BOOLEAN, true);
+        entity.getPersistentDataContainer().set(DisplayEntityPlugin.getMasterKey(), PersistentDataType.BOOLEAN, true);
         return this;
     }
 
     public SpawnedDisplayEntityPart setGroup(SpawnedDisplayEntityGroup group){
+        if (this.group == group){
+            return this;
+        }
         this.group.spawnedParts.remove(this);
         this.group = group;
 
@@ -306,6 +305,10 @@ public final class SpawnedDisplayEntityPart {
         return this.getEntity().getPersistentDataContainer().has(new NamespacedKey(DisplayEntityPlugin.getInstance(), "ismaster"), PersistentDataType.BOOLEAN);
     }
 
+    /**
+     * Reveal this part's entity to a player
+     * @param player
+     */
     public void showToPlayer(Player player){
         if (entity == null){
             return;
@@ -313,6 +316,10 @@ public final class SpawnedDisplayEntityPart {
         player.showEntity(DisplayEntityPlugin.getInstance(), entity);
     }
 
+    /**
+     * Hide this part's entity from a player
+     * @param player
+     */
     public void hideFromPlayer(Player player){
         if (entity == null){
             return;
@@ -320,7 +327,11 @@ public final class SpawnedDisplayEntityPart {
         player.hideEntity(DisplayEntityPlugin.getInstance(), entity);
     }
 
-    public Material getMaterial(){
+    /**
+     * Get the material that represents this part.
+     * @return a material or null if the part's type is {@link PartType#INTERACTION} or {@link PartType#TEXT_DISPLAY}
+     */
+    public @Nullable Material getMaterial(){
         if (type == PartType.BLOCK_DISPLAY){
             BlockDisplay d = (BlockDisplay) entity;
             return d.getBlock().getMaterial();
@@ -328,7 +339,7 @@ public final class SpawnedDisplayEntityPart {
         else if (type == PartType.ITEM_DISPLAY){
             ItemDisplay i = (ItemDisplay) entity;
             ItemStack item = i.getItemStack();
-            return item == null ? Material.AIR : item.getType();
+            return item.getType();
         }
         else{
             return null;
@@ -338,7 +349,10 @@ public final class SpawnedDisplayEntityPart {
 
 
     /**
-     * Adds the glow effect to this SpawnDisplayEntityPart. It will glow if it's a Block/Item Display. Outlined with soul fire flame particles if Interaction. Flame Particle if it's the master part
+     * Adds the glow effect to this SpawnDisplayEntityPart.
+     * It will glow if it's a Block/Item Display.
+     * Outlined with soul fire flame particles if Interaction.
+     * Cloud Particle if it's the master part
      */
 
     public void glow(){
@@ -363,7 +377,10 @@ public final class SpawnedDisplayEntityPart {
     }
 
     /**
-     * Adds the glow effect to SpawnDisplayEntityPart. It will glow if it's a Block/Item Display. Outlined with soul fire flame particles if Interaction. Flame Particle if it's the master part
+     * Adds the glow effect to SpawnDisplayEntityPart.
+     * It will glow if it's a Block/Item Display.
+     * Outlined with soul fire flame particles if Interaction.
+     * Cloud Particle if it's the master part
      * @param durationInTicks How long to highlight this selection
      */
     public void glow(long durationInTicks){
@@ -499,6 +516,11 @@ public final class SpawnedDisplayEntityPart {
         }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, 2);
     }
 
+    /**
+     * Change the yaw of this part
+     * @param yaw The yaw to set for this part
+     * @param pivotIfInteraction true if this part's type is {@link PartType#INTERACTION} and it should pivot around the group's
+     */
     public void setYaw(float yaw, boolean pivotIfInteraction){
         float oldYaw = entity.getYaw();
         entity.setRotation(yaw, entity.getLocation().getPitch());
@@ -507,10 +529,19 @@ public final class SpawnedDisplayEntityPart {
         }
     }
 
+    /**
+     * Change the pitch of this part
+     * @param pitch The pitch to set for this part
+     */
     public void setPitch(float pitch){
         entity.setRotation(entity.getLocation().getYaw(), pitch);
     }
 
+
+    /**
+     * Set the brightness of this part
+     * @param brightness the brightness to set
+     */
     public void setBrightness(Display.Brightness brightness){
         if (entity instanceof Interaction){
             return;
@@ -521,7 +552,7 @@ public final class SpawnedDisplayEntityPart {
 
 
     /**
-     * Set the view range of this Spawned Display Entity Part
+     * Set the view range of this part
      * @param range The color to set
      */
     public void setViewRange(float range){
@@ -532,8 +563,33 @@ public final class SpawnedDisplayEntityPart {
         display.setViewRange(range);
     }
 
+
+    @ApiStatus.Experimental
+    void cull(float width, float height){
+        if (entity instanceof Display display){
+            display.setDisplayHeight(height);
+            display.setDisplayWidth(width*2);
+        }
+    }
+
     /**
-     * Set the glow color of this Spawned Display Entity Part
+     * Attempt to automatically set the culling bounds for this part. This is similar to {@link SpawnedDisplayEntityGroup#autoSetCulling(CullOption)}
+     * with a CullSetting of {@link CullOption#LOCAL}.
+     * Results may not be 100% accurate due to the varying shapes of Minecraft blocks and variation is display entity transformations.
+     * The culling bounds will be representative of the part's scaling.
+     */
+    @ApiStatus.Experimental
+    public void autoCull(){
+        if (entity instanceof Display display){
+            Transformation transformation = display.getTransformation();
+            Vector3f scale = transformation.getScale();
+            display.setDisplayHeight(scale.y);
+            display.setDisplayWidth(Math.max(scale.x, scale.z)*2);
+        }
+    }
+
+    /**
+     * Set the glow color of this part
      * @param color The color to set
      */
     public void setGlowColor(Color color){
@@ -544,7 +600,16 @@ public final class SpawnedDisplayEntityPart {
         display.setGlowColorOverride(color);
     }
 
-
+    /**
+     * Get the glow color of this part
+     * @return a color, or null if not set or if this part's type is {@link PartType#INTERACTION}
+     */
+    public @Nullable Color getGlowColor(){
+        if (type == PartType.INTERACTION){
+            return null;
+        }
+        return ((Display) entity).getGlowColorOverride();
+    }
 
     /**
      * Change the translation of a SpawnedDisplayEntityPart.
@@ -553,8 +618,17 @@ public final class SpawnedDisplayEntityPart {
      * @param distance How far the part should be translated
      * @param durationInTicks How long it should take for the translation to complete
      * @param direction The direction to translate the part
+     * @return false if this part in an unloaded chunk
      */
-    public void translate(float distance, int durationInTicks, int delayInTicks, Vector direction){
+    public boolean translate(float distance, int durationInTicks, int delayInTicks, Vector direction){
+        if (!DisplayUtils.isInLoadedChunk(this)){
+            return false;
+        }
+        DisplayUtils.translate(this, distance, durationInTicks, delayInTicks, direction);
+        return true;
+    }
+
+    void translateForce(float distance, int durationInTicks, int delayInTicks, Vector direction){
         DisplayUtils.translate(this, distance, durationInTicks, delayInTicks, direction);
     }
 
@@ -565,11 +639,19 @@ public final class SpawnedDisplayEntityPart {
      * @param distance How far the part should be translated
      * @param durationInTicks How long it should take for the translation to complete
      * @param direction The direction to translate the part
+     * @return false if this part in an unloaded chunk
      */
-    public void translate(float distance, int durationInTicks, int delayInTicks, Direction direction){
+    public boolean translate(float distance, int durationInTicks, int delayInTicks, Direction direction){
+        if (!DisplayUtils.isInLoadedChunk(this)){
+            return false;
+        }
         DisplayUtils.translate(this, distance, durationInTicks, delayInTicks, direction);
+        return true;
     }
 
+    void translateForce(float distance, int durationInTicks, int delayInTicks, Direction direction){
+        DisplayUtils.translate(this, distance, durationInTicks, delayInTicks, direction);
+    }
 
     /**
      * Pivot an Interaction Entity around it's SpawnedDisplayEntityGroup's master part
@@ -620,7 +702,8 @@ public final class SpawnedDisplayEntityPart {
     }
 
     /**
-     * Removes this SpawnedDisplayEntityPart from it's SpawnedDisplayEntityGroup, without dismounting the part from the group. This makes the part invalid after removal
+     * Removes this SpawnedDisplayEntityPart from it's SpawnedDisplayEntityGroup, without dismounting the part from the group.
+     * This makes this part invalid and unusable after removal
      * @param kill Whether to kill this part when removed
      * @return Returns the part's entity. Null if the entity was killed
      */
@@ -638,10 +721,12 @@ public final class SpawnedDisplayEntityPart {
     }
 
     /**
-     * Removes this SpawnedDisplayEntityPart from it's SpawnedDisplayEntityGroup, without dismounting the part from the group. This part will still be valid and can be readded to a group
+     * Removes this SpawnedDisplayEntityPart from it's SpawnedDisplayEntityGroup, without dismounting the part from the group.
+     * This part will still be valid and can be readded to a group
      */
     public void removeFromGroup() {
-        allParts.remove(entity);
+        allParts.remove(entity.getUniqueId());
         group.spawnedParts.remove(this);
+        group = null;
     }
 }
