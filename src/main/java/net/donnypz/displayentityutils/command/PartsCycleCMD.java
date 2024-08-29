@@ -34,13 +34,13 @@ class PartsCycleCMD implements SubCommand{
         SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){
             partSelection = new SpawnedPartSelection(group);
+            DisplayGroupManager.setPartSelection(player, partSelection, false);
         }
-        DisplayGroupManager.setPartSelection(player, partSelection, false);
 
         int jump;
         if (args.length > 3){
             try{
-                jump = Integer.getInteger(args[3]);
+                jump = Integer.parseInt(args[3]);
                 if (jump <= 0){
                     throw new NumberFormatException();
                 }
