@@ -8,12 +8,12 @@ import org.bukkit.event.HandlerList;
 /**
  * Called when a Chunk loads a {@link SpawnedDisplayEntityGroup} and registers it
  */
-public class ChunkCreateGroupEvent extends Event {
+public class ChunkRegisterGroupEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
     SpawnedDisplayEntityGroup spawnedDisplayEntityGroup;
     Chunk chunk;
 
-    public ChunkCreateGroupEvent(SpawnedDisplayEntityGroup group, Chunk chunk){
+    public ChunkRegisterGroupEvent(SpawnedDisplayEntityGroup group, Chunk chunk){
         this.spawnedDisplayEntityGroup = group;
         this.chunk = chunk;
     }
