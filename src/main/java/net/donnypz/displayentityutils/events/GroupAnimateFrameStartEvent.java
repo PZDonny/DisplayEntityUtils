@@ -8,6 +8,10 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.Nullable;
 
+
+/**
+ * Called when an animation frame begins
+ */
 public class GroupAnimateFrameStartEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
