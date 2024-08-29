@@ -133,7 +133,7 @@ public final class SpawnedDisplayAnimationFrame {
         interactionTranslations.clear();
         for (SpawnedDisplayEntityPart part : group.spawnedParts){
         //Ignore if part does not have specified tag
-            if (!part.hasPartTag(partTag)){
+            if (!part.hasTag(partTag)){
                 continue;
             }
 
@@ -210,6 +210,9 @@ public final class SpawnedDisplayAnimationFrame {
      * @param location
      */
     public void playStartSounds(Location location){
+        if (!location.isChunkLoaded()){
+            return;
+        }
         for (Sound sound : frameStartSoundMap.keySet()){
             Float[] soundValues = frameStartSoundMap.get(sound);
             location.getWorld().playSound(location, sound, soundValues[0], soundValues[1]);
@@ -221,6 +224,9 @@ public final class SpawnedDisplayAnimationFrame {
      * @param location
      */
     public void playEndSounds(Location location){
+        if (!location.isChunkLoaded()){
+            return;
+        }
         for (Sound sound : frameEndSoundMap.keySet()){
             Float[] soundValues = frameEndSoundMap.get(sound);
             location.getWorld().playSound(location, sound, soundValues[0], soundValues[1]);
