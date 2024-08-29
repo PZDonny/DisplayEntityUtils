@@ -25,7 +25,7 @@ class AnimInfoCMD implements SubCommand{
         if (!animation.isPartAnimation()) {
             player.sendMessage("Animation Part Tag: " + ChatColor.RED + "NOT SET");
         } else {
-            player.sendMessage("Animation Part Tag: " + ChatColor.YELLOW + animation.getCleanPartTag());
+            player.sendMessage("Animation Part Tag: " + ChatColor.YELLOW + animation.getPartTag());
         }
         player.sendMessage("Total Frames: " + ChatColor.YELLOW + animation.getFrames().size());
         player.sendMessage("Respect Scale: " + ChatColor.YELLOW + animation.groupScaleRespect());
