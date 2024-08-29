@@ -27,6 +27,7 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
         subCommands.put("interaction", new InteractionCMD());
         subCommands.put("anim", new AnimCMD());
         subCommands.put("convert", new ConvertCMD());
+        subCommands.put("reload", new ReloadCMD());
 
     }
 
@@ -102,26 +103,12 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
             return true;
         }
         String arg = args[0];
-        if (arg.equals("reload")){
-            if (!hasPermission(p, Permission.RELOAD)) {
-                return true;
-            }
-            DisplayEntityPlugin.getInstance().reloadPlugin(false);
-            sender.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.YELLOW + "Plugin Reloaded!");
-        }
-        else if (arg.equals("help")){
-            if (hasPermission(p, Permission.HELP)){
-                mainCommandHelp(sender);
-            }
+        SubCommand subCommand = subCommands.get(arg);
+        if (subCommand == null){
+            mainCommandHelp(sender);
         }
         else{
-            SubCommand subCommand = subCommands.get(arg);
-            if (subCommand == null){
-                mainCommandHelp(sender);
-            }
-            else{
-                subCommand.execute(p, args);
-            }
+            subCommand.execute(p, args);
         }
         return true;
     }
@@ -135,9 +122,10 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
         sendCMD(sender, "/mdis text");
         sendCMD(sender, "/mdis interaction");
         sendCMD(sender, "/mdis anim");
+        sendCMD(sender, "/mdis convert");
         sendCMD(sender, "/mdis listgroups <storage> [page-number]");
         sendCMD(sender, "/mdis listanims <storage> [page-number]");
-        sendCMD(sender, "/mdis reload");
+        sendCMD(sender, "/mdis reload", " (To reload Local, MySQL or MongoDB config save options, the server must be restarted)");
     }
 
 
