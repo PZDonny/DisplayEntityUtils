@@ -4,10 +4,7 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.Direction;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public final class SpawnedPartSelection {
     List<SpawnedDisplayEntityPart> selectedParts = new ArrayList<>();
@@ -23,7 +20,7 @@ public final class SpawnedPartSelection {
         this.group = group;
         this.selectionType = SelectionType.PARTTAG;
         for (SpawnedDisplayEntityPart part : group.getSpawnedParts()){
-            if (part.hasPartTag(partTag)){
+            if (part.hasTag(partTag)){
                 selectedParts.add(part);
             }
         }
@@ -38,7 +35,7 @@ public final class SpawnedPartSelection {
         this.group = group;
         this.selectionType = SelectionType.CYCLE;
         if (!group.spawnedParts.isEmpty()){
-            selectedParts.add(group.spawnedParts.get(0));
+            selectedParts.add(group.spawnedParts.getFirst());
         }
         group.partSelections.add(this);
     }
@@ -57,9 +54,9 @@ public final class SpawnedPartSelection {
      * @param partTag The part tag to give the parts in this selection
      * @return this
      */
-    public SpawnedPartSelection addPartTag(String partTag){
+    public SpawnedPartSelection addTag(String partTag){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            part.addPartTag(partTag);
+            part.addTag(partTag);
         }
         return this;
     }
@@ -69,9 +66,9 @@ public final class SpawnedPartSelection {
      * @param partTag The part tag to remove from the parts in this selection
      * @return this
      */
-    public SpawnedPartSelection removePartTag(String partTag){
+    public SpawnedPartSelection removeTag(String partTag){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            part.removePartTag(partTag);
+            part.removeTag(partTag);
         }
         return this;
     }
@@ -216,26 +213,16 @@ public final class SpawnedPartSelection {
         return this;
     }
 
-    /**
-     * Gets the part tag of the first part in the selection
-     * @return The part tag. Null if the part does not have a part tag
-     */
-    public ArrayList<String> getCleanPartTags(){
-        if (selectedParts.isEmpty()){
-            return new ArrayList<>();
-        }
-        return selectedParts.get(0).getCleanPartTags();
-    }
 
     /**
-     * Gets the part tag of the first part in the selection
-     * @return The part tag. Null if the part does not have a part tag
+     * Gets the tags of the first part in the selection
+     * @return The part tags.
      */
-    public ArrayList<String> getPartTags(){
+    public List<String> getTags(){
         if (selectedParts.isEmpty()){
             return new ArrayList<>();
         }
-        return selectedParts.get(0).getPartTags();
+        return selectedParts.getFirst().getTags();
     }
 
 
