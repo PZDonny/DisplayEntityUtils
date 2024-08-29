@@ -4,7 +4,6 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.events.PreGroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
@@ -305,13 +304,13 @@ public final class DisplayEntityGroup implements Serializable{
         SpawnedDisplayEntityGroup spawnedGroup;
         Display blockDisplay;
         boolean isHideAll;
-        if (hiddenPartTags != null && !hiddenPartTags.isEmpty() && hiddenPartTags.get(0).equals(hideAllTag)){
-            spawnedGroup = new SpawnedDisplayEntityGroup(false, location.getWorld().getName());
+        if (hiddenPartTags != null && !hiddenPartTags.isEmpty() && hiddenPartTags.getFirst().equals(hideAllTag)){
+            spawnedGroup = new SpawnedDisplayEntityGroup(false);
             blockDisplay = masterEntity.createEntity(location, false);
             isHideAll = true;
         }
         else{
-            spawnedGroup = new SpawnedDisplayEntityGroup(true, location.getWorld().getName());
+            spawnedGroup = new SpawnedDisplayEntityGroup(true);
             blockDisplay = masterEntity.createEntity(location, true);
             isHideAll = false;
         }
@@ -322,23 +321,23 @@ public final class DisplayEntityGroup implements Serializable{
         for (DisplayEntity entity : displayEntities){
             if (!entity.equals(masterEntity)){
 
-                boolean visiblePart = true;
-                if (hiddenPartTags != null){
-                    if (hiddenPartTags.size() == 1 && hiddenPartTags.get(0).equals(hideAllTag)){
-                        visiblePart = false;
+                Display passenger;
+                if (isHideAll){
+                    passenger = entity.createEntity(location, false);
+                }
+                else{
+                    if (hiddenPartTags != null){
+                        passenger = entity.createEntity(location, hiddenPartTags);
                     }
                     else{
-                        for (String tag : entity.getPartTags()){
-                            if (hiddenPartTags.contains(tag.replace(DisplayEntityPlugin.partTagPrefix, ""))){
-                                visiblePart = false;
-                                break;
-                            }
-                        }
+                        passenger = entity.createEntity(location, true);
                     }
                 }
 
-                Display passengerDisplay = entity.createEntity(location, visiblePart);
-                spawnedGroup.addDisplayEntity(passengerDisplay);
+                SpawnedDisplayEntityPart part = spawnedGroup.addDisplayEntity(passenger);
+                if (!entity.getLegacyPartTags().isEmpty()){
+                    part.adaptScoreboardTags(true);
+                }
             }
         }
 
@@ -346,33 +345,24 @@ public final class DisplayEntityGroup implements Serializable{
             Vector v = entity.getVector();
             Location spawnLocation = spawnedGroup.getMasterPart().getEntity().getLocation().clone().subtract(v);
 
-            boolean visiblePart = true;
-            if (interactionsHidden){
-                visiblePart = false;
+            Interaction interaction;
+            if (interactionsHidden || isHideAll){
+                interaction = entity.createEntity(spawnLocation, false);
             }
             else{
                 if (hiddenPartTags != null){
-                    if (hiddenPartTags.size() == 1 && hiddenPartTags.get(0).equals(hideAllTag)){
-                        visiblePart = false;
-                    }
-                    else{
-                        for (String tag : entity.getPartTags()){
-                            if (hiddenPartTags.contains(tag.replace(DisplayEntityPlugin.partTagPrefix, ""))){
-                                visiblePart = false;
-                                break;
-                            }
-                        }
-                    }
+                    interaction = entity.createEntity(spawnLocation, hiddenPartTags);
+                }
+                else{
+                    interaction = entity.createEntity(spawnLocation, true);
                 }
             }
 
-
-            Interaction interaction = entity.createEntity(spawnLocation, visiblePart);
-            spawnedGroup.addInteractionEntity(interaction);
-
-            for (String cmd : entity.commands){
-                DisplayUtils.addInteractionCommand(interaction, cmd);
+            SpawnedDisplayEntityPart part = spawnedGroup.addInteractionEntity(interaction);
+            if (!entity.getLegacyPartTags().isEmpty()){
+                part.adaptScoreboardTags(true);
             }
+
         }
 
         if (tag != null){
@@ -410,6 +400,7 @@ public final class DisplayEntityGroup implements Serializable{
         }
 
         DisplayGroupManager.addSpawnedGroup(spawnedGroup.getMasterPart(), spawnedGroup);
+        spawnedGroup.autoSetCulling(DisplayEntityPlugin.autoCulling());
         Bukkit.getPluginManager().callEvent(new GroupSpawnedEvent(spawnedGroup, spawnReason));
         return spawnedGroup;
     }
