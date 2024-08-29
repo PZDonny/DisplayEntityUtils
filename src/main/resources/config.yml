@@ -44,7 +44,7 @@ automaticGroupDetection:
   enabled: true
 
   #Maximum Range to Search for Interaction Entities in a Group
-  #High values may lead to lag spikes
+  #High values with frequent searches may lead to lag spikes
   #This will not work if (automaticGroupDetection is false)
   #Setting this value to 0 will effectively disable this feature
   maximumInteractionSearchRange: 7
@@ -53,11 +53,19 @@ automaticGroupDetection:
   #May cause lag when if many chunks are constantly being loaded and unloaded
   readSameChunks: false
 
-  #Unregisters all groups in an unloaded world
+  #Unregisters all groups in unloaded worlds
   #
   #Keep this enabled unless another plugin requires this setting to be disabled, or
   #if problems arise with this setting while using the API
-  unregisterOnUnload: true
+  unregisterOnUnload:
+    enabled: true
+    worlds:
+      - world
+      - lobby
+
+  #If true, groups in the listed worlds will not be unregistered
+  #If false, groups in the listed worlds will be unregistered
+    blacklist: true
 
 #Automatically Pivot Interaction Entity when a DisplayEntityGroup is spawned
 #in order to match the group's yaw
@@ -71,5 +79,19 @@ despawnGroupsOnServerStop: false
 
 #Enable this to allow overwriting of existing saved DisplayEntityGroups and Animations
 overwriteExistingSaves: true
+
+#This setting attempts to automatically cull Spawned Display Entity Groups based on the following options:
+#
+#    NONE: No Display Entities will be culled (Default Vanilla Option)
+#    LOCAL: Display Entities will be culled individually based on their transformation's scale
+#    LARGEST: All Display Entities within a group will have the same culling size as the largest culled entity in the group
+#
+#Use this setting at your own risk and ONLY if you know what you are doing.
+#This may have client performance benefits for players when selecting the correct option for your server.
+#LARGEST is the safest option to reduce Display Entities being culled too early.
+# !KEEP IN MIND! it is NOT possible for the culling to be perfect.
+autoCulling: NONE
+
+
 
 
