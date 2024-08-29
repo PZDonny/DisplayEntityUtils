@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.GroupResult;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
@@ -23,15 +24,17 @@ class GroupSelectCMD implements SubCommand{
 
         try {
             double interactionDistance = Double.parseDouble(args[2]);
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSpawnedGroupNearLocation(player.getLocation(), 2.5f, player);
-            if (group != null) {
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.GREEN + "Selection made!");
-                DisplayGroupManager.setSelectedSpawnedGroup(player, group);
-                DisplayGroupManager.removePartSelection(player);
-
-                group.getUnaddedInteractionEntitiesInRange(interactionDistance, true);
-                group.glow(100, false);
+            GroupResult result = DisplayGroupManager.getSpawnedGroupNearLocation(player.getLocation(), 2.5f, player);
+            if (result == null || result.group() == null){
+                return;
             }
+            SpawnedDisplayEntityGroup group = result.group();
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.GREEN + "Selection made!");
+            DisplayGroupManager.setSelectedSpawnedGroup(player, group);
+            DisplayGroupManager.removePartSelection(player);
+
+            group.getUnaddedInteractionEntitiesInRange(interactionDistance, true);
+            group.glow(100, false);
         } catch (NumberFormatException e) {
             player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "Enter a number for the distance to select interaction entities");
         }

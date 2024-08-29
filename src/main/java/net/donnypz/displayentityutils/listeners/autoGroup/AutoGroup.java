@@ -1,11 +1,12 @@
 package net.donnypz.displayentityutils.listeners.autoGroup;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.events.ChunkCreateGroupEvent;
+import net.donnypz.displayentityutils.events.ChunkRegisterGroupEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.GroupResult;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -16,6 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 final class AutoGroup {
@@ -31,9 +33,7 @@ final class AutoGroup {
 
         World world = chunk.getWorld();
         String worldName = world.getName();
-        if (!readChunks.containsKey(worldName)){
-            readChunks.put(worldName, new ArrayList<>());
-        }
+        readChunks.putIfAbsent(worldName, new ArrayList<>());
 
         ArrayList<Long> chunks = readChunks.get(worldName);
         if (chunks.contains(chunk.getChunkKey())){
@@ -47,20 +47,23 @@ final class AutoGroup {
 
 
         Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
-            ArrayList<SpawnedDisplayEntityGroup> foundGroups = new ArrayList<>();
+            HashSet<SpawnedDisplayEntityGroup> foundGroups = new HashSet<>();
             for (Entity entity : entities) {
                 if (entity instanceof Display display) {
                     if (!DisplayUtils.isMaster(display)){
                         continue;
                     }
                     Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () ->{
-                        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSpawnedGroup(display, null);
-                        if (group == null || foundGroups.contains(group)){
+                        GroupResult result = DisplayGroupManager.getSpawnedGroup(display, null);
+                        if (result == null || foundGroups.contains(result.group())){
                             return;
                         }
+                        SpawnedDisplayEntityGroup group = result.group();
                         foundGroups.add(group);
                         group.addMissingInteractionEntities(DisplayEntityPlugin.getMaximumInteractionSearchRange());
-                        new ChunkCreateGroupEvent(group, chunk).callEvent();
+                        if (!result.alreadyLoaded()){
+                            new ChunkRegisterGroupEvent(group, chunk).callEvent();
+                        }
                     });
                 }
 
@@ -73,20 +76,25 @@ final class AutoGroup {
                     new BukkitRunnable(){
                         @Override
                         public void run() {
-                            List<SpawnedDisplayEntityGroup> groups = DisplayGroupManager.getSpawnedGroupsNearLocation(interaction.getLocation(), DisplayEntityPlugin.getMaximumInteractionSearchRange());
-                            if (groups.isEmpty()){
+                            List<GroupResult> results = DisplayGroupManager.getSpawnedGroupsNearLocation(interaction.getLocation(), DisplayEntityPlugin.getMaximumInteractionSearchRange());
+                            if (results.isEmpty()){
                                 return;
                             }
-                            for (SpawnedDisplayEntityGroup group : groups){
+                            for (GroupResult result : results){
+                                SpawnedDisplayEntityGroup group = result.group();
                                 if (group.getCreationTime() == DisplayUtils.getCreationTime(interaction)){
-                                    cancel();
-                                    return;
+                                    if (group.hasSameCreationTime(interaction)){
+                                        group.addInteractionEntity(interaction);
+                                    }
                                 }
 
                                 if (foundGroups.contains(group)){
                                     continue;
                                 }
-                                new ChunkCreateGroupEvent(group, chunk).callEvent();
+                                foundGroups.add(group);
+                                if (!result.alreadyLoaded()){
+                                    new ChunkRegisterGroupEvent(group, chunk).callEvent();
+                                }
                             }
                         }
                     }.runTaskLater(DisplayEntityPlugin.getInstance(), 1);

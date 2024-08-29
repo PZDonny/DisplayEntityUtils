@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.GroupResult;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
@@ -35,16 +36,16 @@ class GroupMergeCMD implements SubCommand{
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a valid number for the entity range!");
                 return;
             }
-            List<SpawnedDisplayEntityGroup> groups = DisplayGroupManager.getSpawnedGroupsNearLocation(group.getMasterPart().getEntity().getLocation(), radius);
-            if (groups.isEmpty() || groups.size() == 1){
+            List<GroupResult> results = DisplayGroupManager.getSpawnedGroupsNearLocation(group.getMasterPart().getEntity().getLocation(), radius);
+            if (results.isEmpty() || results.size() == 1){
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Your selected group is the only group within the set range!");
                 return;
             }
-            for (SpawnedDisplayEntityGroup g : groups){
-                if (group.equals(g)){
+            for (GroupResult result : results){
+                if (group.equals(result.group())){
                     continue;
                 }
-                group.merge(g);
+                group.merge(result.group());
             }
             player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Successfully merged nearby groups");
             group.glow(60, true);

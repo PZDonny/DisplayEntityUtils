@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupDespawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.GroupResult;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -337,11 +338,11 @@ public final class DisplayGroupManager {
     }
 
 
-    public static SpawnedDisplayEntityGroup getSpawnedGroup(Display displayEntity, @Nullable Player getter) {
+    public static GroupResult getSpawnedGroup(Display displayEntity, @Nullable Player getter) {
         //Check for existing group
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(displayEntity);
         if (part != null && part.getGroup() != null) {
-            return part.getGroup();
+            return new GroupResult(part.getGroup(), true);
         }
 
 
@@ -367,7 +368,7 @@ public final class DisplayGroupManager {
             return null;
         }
         group = new SpawnedDisplayEntityGroup(displayEntity);
-        return group;
+        return new GroupResult(group, false);
     }
 
     /**
@@ -386,23 +387,23 @@ public final class DisplayGroupManager {
      * Get a Spawned Display Entity Group through an interaction entity
      *
      * @param interaction The interaction entity part of a display entity group
-     * @param radius      The radius to check for a spawned display entity group
+     * @param radius The radius to check for a spawned display entity group
      * @return SpawnedDisplayEntityGroup containing the interaction entity. Null if not found.
      */
-    public static SpawnedDisplayEntityGroup getSpawnedGroup(Interaction interaction, int radius) {
+    public static SpawnedDisplayEntityGroup getSpawnedGroup(Interaction interaction, double radius) {
         //Check for existing group
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(interaction);
         if (part != null && part.getGroup() != null) {
             return part.getGroup();
         }
         //Get Nearby Group
-        SpawnedDisplayEntityGroup group = getSpawnedGroupNearLocation(interaction.getLocation(), radius);
-        if (group == null) {
+        GroupResult result = getSpawnedGroupNearLocation(interaction.getLocation(), radius);
+        if (result == null || result.group() == null) {
             return null;
         }
         //Check if Interaction is part of group
         part = SpawnedDisplayEntityPart.getPart(interaction);
-        return part == null ? null : group;
+        return part == null ? null : result.group();
 
     }
 
@@ -411,10 +412,10 @@ public final class DisplayGroupManager {
      * Gets the nearest Spawned Display Entity Group near a location
      *
      * @param location Center of the search location
-     * @param radius   The radius to check for a spawned display entity group
-     * @return SpawnedDisplayEntityGroup. Null if not found.
+     * @param radius The radius to check for a spawned display entity group
+     * @return A {@link GroupResult}. Null if not found.
      */
-    public static SpawnedDisplayEntityGroup getSpawnedGroupNearLocation(Location location, float radius) {
+    public static GroupResult getSpawnedGroupNearLocation(Location location, double radius) {
         Display master = getNearestDisplayEntity(location, radius);
         if (master == null) {
             return null;
@@ -426,12 +427,12 @@ public final class DisplayGroupManager {
      * Gets the nearest Spawned Display Entity Group near a location
      *
      * @param location Center of the search location
-     * @param radius   The radius to check for a spawned display entity group
-     * @param tag      Tag of the groups to searched for
-     * @param getter   Player who is getting the spawned group (Nullable)
-     * @return SpawnedDisplayEntityGroup. Null if not found.
+     * @param radius The radius to check for a spawned display entity group
+     * @param tag Tag of the groups to searched for
+     * @param getter Player who is getting the spawned group (Nullable)
+     * @return A {@link GroupResult}. Null if not found.
      */
-    public static SpawnedDisplayEntityGroup getSpawnedGroupNearLocation(Location location, float radius, String tag, @Nullable Player getter) {
+    public static GroupResult getSpawnedGroupNearLocation(Location location, double radius, String tag, @Nullable Player getter) {
         Display master = getNearestDisplayEntity(location, radius, tag);
         if (master == null) {
             if (getter != null) {
@@ -448,9 +449,9 @@ public final class DisplayGroupManager {
      * @param location Center of the search location
      * @param radius   The radius to check for a spawned display entity group
      * @param getter   Player who is getting the spawned group (Nullable)
-     * @return The found SpawnedDisplayEntityGroup. Null if not found.
+     * @return A {@link GroupResult}. Null if not found.
      */
-    public static SpawnedDisplayEntityGroup getSpawnedGroupNearLocation(Location location, float radius, @Nullable Player getter) {
+    public static GroupResult getSpawnedGroupNearLocation(Location location, float radius, @Nullable Player getter) {
         Display master = getNearestDisplayEntity(location, radius);
         if (master == null){
             if (getter != null) {
@@ -465,20 +466,20 @@ public final class DisplayGroupManager {
      * Gets all the Spawned Display Entity Groups near a location
      *
      * @param location Center of the search location
-     * @param radius   The radius to check for a spawned display entity group
-     * @return The found SpawnedDisplayEntityGroup. Null if not found.
+     * @param radius The radius to check for {@link SpawnedDisplayEntityGroup}s
+     * @return A list of {@link GroupResult}
      */
-    public static List<SpawnedDisplayEntityGroup> getSpawnedGroupsNearLocation(Location location, double radius) {
-        List<SpawnedDisplayEntityGroup> groups = new ArrayList<>();
+    public static List<GroupResult> getSpawnedGroupsNearLocation(Location location, double radius) {
+        List<GroupResult> results = new ArrayList<>();
         for (BlockDisplay display : location.getNearbyEntitiesByType(BlockDisplay.class, radius)) {
-            //Check if found display is a part of a group
-            SpawnedDisplayEntityGroup group = getSpawnedGroup(display, null);
-            if (group == null || groups.contains(group)) {
+        //Check if found display is a part of a group
+            GroupResult result = getSpawnedGroup(display, null);
+            if (result == null || results.stream().anyMatch(r -> r.group().equals(result.group()))) {
                 continue;
             }
-            groups.add(group);
+            results.add(result);
         }
-        return groups;
+        return results;
     }
 
     /**
