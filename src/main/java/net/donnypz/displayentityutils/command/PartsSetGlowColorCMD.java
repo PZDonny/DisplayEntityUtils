@@ -9,10 +9,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
-import org.bukkit.Material;
-import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 
 class PartsSetGlowColorCMD implements SubCommand{
     @Override
@@ -35,14 +32,14 @@ class PartsSetGlowColorCMD implements SubCommand{
 
         if (args.length < 3) {
             player.sendMessage(DisplayEntityPlugin.pluginPrefix + "Enter a valid color!");
-            player.sendMessage(Component.text("/mdis group setglowcolor <color | hex-code>", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("/mdis parts setglowcolor <color | hex-code>", NamedTextColor.GRAY));
             return;
         }
 
         Color c = GroupSetGlowColorCMD.getColorFromText(args[2]);
         if (c == null){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix+"Enter a valid color!");
-            player.sendMessage(Component.text("/mdis group setglowcolor <color | hex-code>", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("/mdis parts setglowcolor <color | hex-code>", NamedTextColor.GRAY));
             return;
         }
         for (SpawnedDisplayEntityPart part : selection.getSelectedParts()){
