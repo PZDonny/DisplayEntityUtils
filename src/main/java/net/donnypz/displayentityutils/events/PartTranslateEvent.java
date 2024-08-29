@@ -8,9 +8,9 @@ import org.bukkit.entity.Interaction;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Called when a Display Entity or Interaction Entity changes it's translation through the DisplayGroupManager.
@@ -21,17 +21,15 @@ public final class PartTranslateEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
     Entity entity;
-    EntityType type;
     Location destination;
     private boolean isCancelled;
 
     /**
-     * Called when a Display Entity or Interaction Entity changes it's translation through the DisplayGroupManager.
+     * Called when a Display Entity or Interaction Entity changes its translation through the DisplayGroupManager.
      * Can be cancelled
      */
-    public PartTranslateEvent(@Nonnull Entity entity, EntityType type, Location destination){
+    public PartTranslateEvent(@NotNull Entity entity, Location destination){
         this.entity = entity;
-        this.type = type;
         this.destination = destination;
         isCancelled = false;
     }
@@ -40,23 +38,23 @@ public final class PartTranslateEvent extends Event implements Cancellable {
         return entity;
     }
 
-    public EntityType getEntityType() {
-        return type;
-    }
 
+    /**
+     * Get the location where the part's translation will end
+     * @return a location
+     */
     public Location getDestination() {
         return destination;
     }
 
-    public ArrayList<String> getPartTags(){
-        if (entity instanceof Interaction i){
-            return DisplayUtils.getPartTags(i);
-        }
-        else{
-            return DisplayUtils.getPartTags((Display) entity);
-        }
+    public List<String> getTags(){
+        return DisplayUtils.getTags(entity);
     }
 
+    /**
+     * Get the tag of this entity's group.
+     * @return group tag, null if not grouped
+     */
     public String getGroupTag(){
         if (entity instanceof Interaction i){
             return DisplayUtils.getGroupTag(i);
@@ -85,11 +83,4 @@ public final class PartTranslateEvent extends Event implements Cancellable {
         this.isCancelled = cancelled;
     }
 
-    /**
-     * The type of entity in this event
-     */
-    public enum EntityType{
-        DISPLAY,
-        INTERACTION;
-    }
 }

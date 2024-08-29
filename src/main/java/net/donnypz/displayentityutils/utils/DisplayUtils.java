@@ -7,9 +7,11 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
+import org.bukkit.persistence.ListPersistentDataType;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -19,18 +21,17 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public final class DisplayUtils {
 
-    private static final String interactionCommandPrefix = "deuinteractioncmd_";
-    private static final String leftClickConsole = "lcc_"+interactionCommandPrefix;
-    private static final String leftClickPlayer = "lcp_"+interactionCommandPrefix;
-    private static final String rightClickConsole = "rcc_"+interactionCommandPrefix;
-    private static final String rightClickPlayer = "rcp_"+interactionCommandPrefix;
+    private static final NamespacedKey leftClickConsole = new NamespacedKey(DisplayEntityPlugin.getInstance(), "lcc");
+    private static final NamespacedKey leftClickPlayer = new NamespacedKey(DisplayEntityPlugin.getInstance(), "lcp");
+    private static final NamespacedKey rightClickConsole = new NamespacedKey(DisplayEntityPlugin.getInstance(), "rcc");
+    private static final NamespacedKey rightClickPlayer = new NamespacedKey(DisplayEntityPlugin.getInstance(), "rcp");
+    private static final ListPersistentDataType<String, String> tagPDCType = ListPersistentDataType.LIST.listTypeFrom(PersistentDataType.STRING);
     private DisplayUtils(){}
 
     /**
@@ -40,7 +41,7 @@ public final class DisplayUtils {
      * @param display The entity to get the location from
      * @return Model's World Location
      */
-    public static Location getModelLocation(@Nonnull Display display){
+    public static Location getModelLocation(@NotNull Display display){
         Transformation transformation = display.getTransformation();
         Location translationLoc = display.getLocation();
         translationLoc.add(Vector.fromJOML(transformation.getTranslation()));
@@ -52,19 +53,20 @@ public final class DisplayUtils {
      * @param interaction The interaction entity get the center of
      * @return The interaction's center location
      */
-    public static Location getInteractionCenter(@Nonnull Interaction interaction){
+    public static Location getInteractionCenter(@NotNull Interaction interaction){
         Location loc = interaction.getLocation().clone();
         double yCenter = interaction.getInteractionHeight()/2;
         loc.add(0, yCenter, 0);
         return loc;
     }
 
+
     /**
      * Get the translation vector from the group's master part to the interaction's location
      * @param interaction the interaction
      * @return a vector
      */
-    public static Vector getInteractionTranslation(@Nonnull Interaction interaction){
+    public static Vector getInteractionTranslation(@NotNull Interaction interaction){
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(interaction);
         if (part == null){
             return null;
@@ -84,8 +86,16 @@ public final class DisplayUtils {
      * @param interaction the interaction
      * @return a vector
      */
-    public static Vector getInteractionTranslation(@Nonnull Interaction interaction, @Nonnull Location location){
+    public static Vector getInteractionTranslation(@NotNull Interaction interaction, @NotNull Location location){
         return location.toVector().subtract(interaction.getLocation().toVector());
+    }
+
+    public static boolean isInLoadedChunk(SpawnedDisplayEntityPart part){
+        return isInLoadedChunk(part.getEntity());
+    }
+
+    public static boolean isInLoadedChunk(Entity entity){
+        return entity.getLocation().getChunk().isLoaded();
     }
 
     /**
@@ -93,16 +103,19 @@ public final class DisplayUtils {
      * @param vehicleEntity the entity
      * @return List of SpawnedDisplayEntityGroups riding the entity with the specified group tag
      */
-    public static List<SpawnedDisplayEntityGroup> getGroupPassengers(@Nonnull Entity vehicleEntity, @Nonnull String groupTag){
+    public static List<SpawnedDisplayEntityGroup> getGroupPassengers(@NotNull Entity vehicleEntity, @NotNull String groupTag){
         List<SpawnedDisplayEntityGroup> groups = new ArrayList<>();
         for (Entity e : vehicleEntity.getPassengers()){
             if (e instanceof Display display){
-                SpawnedDisplayEntityGroup g = DisplayGroupManager.getSpawnedGroup(display, null);
-                if (g == null || !g.getTag().equals(groupTag)){
+                GroupResult result = DisplayGroupManager.getSpawnedGroup(display, null);
+                if (result == null || result.group() == null){
                     continue;
                 }
-                if (!groups.contains(g)){
-                    groups.add(g);
+                if (!groupTag.equals(result.group().getTag())){
+                    continue;
+                }
+                if (!groups.contains(result.group())){
+                    groups.add(result.group());
                 }
             }
         }
@@ -114,16 +127,16 @@ public final class DisplayUtils {
      * @param vehicleEntity the entity
      * @return List of SpawnedDisplayEntityGroups riding the entity
      */
-    public static List<SpawnedDisplayEntityGroup> getGroupPassengers(@Nonnull Entity vehicleEntity){
+    public static List<SpawnedDisplayEntityGroup> getGroupPassengers(@NotNull Entity vehicleEntity){
         List<SpawnedDisplayEntityGroup> groups = new ArrayList<>();
         for (Entity e : vehicleEntity.getPassengers()){
             if (e instanceof Display display){
-                SpawnedDisplayEntityGroup g = DisplayGroupManager.getSpawnedGroup(display, null);
-                if (g == null){
+                GroupResult result = DisplayGroupManager.getSpawnedGroup(display, null);
+                if (result == null || result.group() == null){
                     continue;
                 }
-                if (!groups.contains(g)){
-                    groups.add(g);
+                if (!groups.contains(result.group())){
+                    groups.add(result.group());
                 }
             }
         }
@@ -135,7 +148,7 @@ public final class DisplayUtils {
      * @param group The group
      * @return Vehicle entity of group, or null if it doesn't exist
      */
-    public static Entity getGroupVehicle(@Nonnull SpawnedDisplayEntityGroup group){
+    public static Entity getGroupVehicle(@NotNull SpawnedDisplayEntityGroup group){
         if (!group.isSpawned()){
             return null;
         }
@@ -164,7 +177,7 @@ public final class DisplayUtils {
 
         Location destination = display.getLocation().clone().add(Vector.fromJOML(translation));
 
-        if (!new PartTranslateEvent(display, PartTranslateEvent.EntityType.DISPLAY, destination).callEvent()){
+        if (!new PartTranslateEvent(display, destination).callEvent()){
             return;
         }
 
@@ -202,7 +215,7 @@ public final class DisplayUtils {
      */
     public static void translate(Interaction interaction, double distance, int durationInTicks, int delayInTicks, Vector direction){
         Location destination = interaction.getLocation().clone().add(direction.clone().normalize().multiply(distance));
-        PartTranslateEvent event = new PartTranslateEvent(interaction, PartTranslateEvent.EntityType.INTERACTION, destination);
+        PartTranslateEvent event = new PartTranslateEvent(interaction, destination);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()){
             return;
@@ -326,59 +339,7 @@ public final class DisplayUtils {
 
     private static String getPDCGroupTag(Entity entity){
         PersistentDataContainer pdc = entity.getPersistentDataContainer();
-        return pdc.get(DisplayEntityPlugin.groupTagKey, PersistentDataType.STRING);
-    }
-
-    /**
-     * Gets the part tag of a Display Entity
-     * @param display Display Entity to retrieve the tag from
-     * @return Part tag of the entity. Null if the entity did not have a parttag.
-     */
-    public static ArrayList<String> getPartTags(Display display){
-        return getPartTag(display, false);
-    }
-
-    /**
-     * Gets the part tag of an Interaction Entity
-     * @param interaction Interaction Entity to retrieve the tag from
-     * @return Part tag of the entity. Null if the entity did not have a parttag.
-     */
-    public static ArrayList<String> getPartTags(Interaction interaction){
-        return getPartTag(interaction, false);
-    }
-
-    /**
-     * Gets the part tag of a Display Entity without the Part Tag Prefix
-     * @param display Display Entity to retrieve the tag from
-     * @return Part tag of the entity. Null if the entity did not have a parttag.
-     */
-    public static ArrayList<String> getCleanPartTags(Display display){
-        return getPartTag(display, true);
-    }
-
-    /**
-     * Gets the part tag of an Interaction Entity without the Part Tag Prefix
-     * @param interaction Interaction Entity to retrieve the tag from
-     * @return Part tag of the entity. Null if the entity did not have a parttag.
-     */
-    public static ArrayList<String> getCleanPartTags(Interaction interaction){
-        return getPartTag(interaction, true);
-    }
-
-    private static ArrayList<String> getPartTag(Entity entity, boolean clean){
-        ArrayList<String> tags = new ArrayList<>();
-        for (String s : entity.getScoreboardTags()){
-            if (s.contains(DisplayEntityPlugin.partTagPrefix)){
-                if (clean){
-                    tags.add(s.replace(DisplayEntityPlugin.partTagPrefix, ""));
-                }
-                else{
-                    tags.add(s);
-                }
-
-            }
-        }
-        return tags;
+        return pdc.get(DisplayEntityPlugin.getGroupTagKey(), PersistentDataType.STRING);
     }
 
     /**
@@ -403,106 +364,72 @@ public final class DisplayUtils {
 
     private static UUID getPDCPartUUID(Entity entity){
         PersistentDataContainer pdc = entity.getPersistentDataContainer();
-        String value = pdc.get(DisplayEntityPlugin.partUUIDKey, PersistentDataType.STRING);
+        String value = pdc.get(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING);
         if (value != null){
             return UUID.fromString(value);
         }
         return null;
     }
 
-    private static String shortenInteractionCommand(String interactionCommand) {
-        return interactionCommand.split(interactionCommandPrefix)[1];
-    }
-
-
-
-
     /**
      * Gets the set commands of an interaction entity with the interaction command prefix.
      * @param interaction
      * @return List of commands stored on this interaction entity
      */
-    public static ArrayList<String> getInteractionCommands(Interaction interaction){
-        ArrayList<String> raw = new ArrayList<>();
-        for (String tag : interaction.getScoreboardTags()){
-            if (tag.contains(interactionCommandPrefix)){
-                raw.add(tag);
-            }
-        }
-        return raw;
-    }
+    public static List<String> getInteractionCommands(Interaction interaction){
 
-    /**
-     * Gets the set commands of an interaction entity, without any prefix set by this plugin.
-     * @param interaction
-     * @return List of commands stored on this interaction entity
-     */
-    public static ArrayList<String> getCleanInteractionCommands(Interaction interaction){
-        return getConditionedCommands(interaction, interactionCommandPrefix);
-    }
-
-    /**
-     * Gets the set commands of an interaction entity, without any prefix set by this plugin.
-     * @param interaction
-     * @return List of commands stored on this interaction entity
-     */
-    public static ArrayList<InteractionCommand> getCleanInteractionCommandsWithData(Interaction interaction){
-        ArrayList<InteractionCommand> cmd = new ArrayList<>();
-        for (String s : getInteractionCommands(interaction)){
-            if (s.startsWith(leftClickConsole)){
-                cmd.add(new InteractionCommand(shortenInteractionCommand(s), true, true));
-            }
-            else if (s.startsWith(leftClickPlayer)){
-                cmd.add(new InteractionCommand(shortenInteractionCommand(s), true, false));
-            }
-            else if (s.startsWith(rightClickConsole)){
-                cmd.add(new InteractionCommand(shortenInteractionCommand(s), false, true));
-            }
-            else{
-                cmd.add(new InteractionCommand(shortenInteractionCommand(s), false, false));
-            }
-        }
-        return cmd;
-    }
-
-    public static ArrayList<String> getCleanInteractionLeftConsoleCommands(Interaction interaction){
-        return getConditionedCommands(interaction, leftClickConsole);
-    }
-
-    public static ArrayList<String> getCleanInteractionLeftPlayerCommands(Interaction interaction){
-        return getConditionedCommands(interaction, leftClickPlayer);
-    }
-
-    public static ArrayList<String> getCleanInteractionRightConsoleCommands(Interaction interaction){
-        return getConditionedCommands(interaction, rightClickConsole);
-    }
-
-    public static ArrayList<String> getCleanInteractionRightPlayerCommands(Interaction interaction){
-        return getConditionedCommands(interaction, rightClickPlayer);
-    }
-
-    private static ArrayList<String> getConditionedCommands(Interaction interaction, String prefix){
-        ArrayList<String> commands = new ArrayList<>();
-        for (String tag : interaction.getScoreboardTags()){
-            if (tag.contains(prefix)){
-                String command = shortenInteractionCommand(tag);
-                commands.add(command);
-            }
-        }
+        List<String> commands = new ArrayList<>();
+        commands.addAll(getInteractionLeftConsoleCommands(interaction));
+        commands.addAll(getInteractionLeftPlayerCommands(interaction));
+        commands.addAll(getInteractionRightConsoleCommands(interaction));
+        commands.addAll(getInteractionRightPlayerCommands(interaction));
         return commands;
     }
 
     /**
-     * Adds a command to an interaction entity after deserialization
-     * @param interaction The entity to assign the command to
-     * @param command The command to assign
+     * Gets the set commands of an interaction entity, without any prefix set by this plugin.
+     * @param interaction
+     * @return List of commands stored on this interaction entity
      */
-    @ApiStatus.Internal
-    public static void addInteractionCommand(Interaction interaction, @NotNull String command){
-        if (command.isBlank()){
-            return;
+    public static List<InteractionCommand> getInteractionCommandsWithData(Interaction interaction){
+        List<InteractionCommand> cmd = new ArrayList<>();
+        for (String s : getInteractionLeftConsoleCommands(interaction)){
+            cmd.add(new InteractionCommand(s, true, true, leftClickConsole));
         }
-        interaction.addScoreboardTag(command);
+        for (String s : getInteractionLeftPlayerCommands(interaction)){
+            cmd.add(new InteractionCommand(s, true, false, leftClickPlayer));
+        }
+        for (String s : getInteractionRightConsoleCommands(interaction)){
+            cmd.add(new InteractionCommand(s, false, true, rightClickConsole));
+        }
+        for (String s : getInteractionRightPlayerCommands(interaction)){
+            cmd.add(new InteractionCommand(s, false, false, rightClickPlayer));
+        }
+        return cmd;
+    }
+
+    public static List<String> getInteractionLeftConsoleCommands(Interaction interaction){
+        return getPDCList(interaction, leftClickConsole);
+    }
+
+    public static List<String> getInteractionLeftPlayerCommands(Interaction interaction){
+        return getPDCList(interaction, leftClickPlayer);
+    }
+
+    public static List<String> getInteractionRightConsoleCommands(Interaction interaction){
+        return getPDCList(interaction, rightClickConsole);
+    }
+
+    public static List<String> getInteractionRightPlayerCommands(Interaction interaction){
+        return getPDCList(interaction, rightClickPlayer);
+    }
+
+    /**
+     * Gets the part tags of this SpawnedDisplayEntityPart
+     * @return This part's part tags.
+     */
+    static @NotNull List<String> getInteractionCommand(@NotNull Entity entity){
+        return getPDCList(entity, DisplayEntityPlugin.getPartPDCTagKey());
     }
 
     /**
@@ -511,18 +438,18 @@ public final class DisplayUtils {
      * @param command The command to assign
      */
     @ApiStatus.Internal
-    public static void addInteractionCommand(Interaction interaction, @NotNull String command, boolean isLeftClick, boolean isConsole){
+    public static void addInteractionCommand(@NotNull Interaction interaction, @NotNull String command, boolean isLeftClick, boolean isConsole){
         if (command.isBlank()){
             return;
         }
-        String prefix;
+        NamespacedKey key;
         if (!isLeftClick){
-            prefix = isConsole ? rightClickConsole : rightClickPlayer;
+            key = isConsole ? rightClickConsole : rightClickPlayer;
         }
         else{
-            prefix = isConsole ? leftClickConsole : leftClickPlayer;
+            key = isConsole ? leftClickConsole : leftClickPlayer;
         }
-        interaction.addScoreboardTag(prefix+command);
+        addToPDCList(interaction, command, key);
     }
 
     /**
@@ -531,33 +458,159 @@ public final class DisplayUtils {
      * @param command The command to remove
      */
     @ApiStatus.Internal
-    public static void removeInteractionCommand(Interaction interaction, @NotNull String command){
+    public static void removeInteractionCommand(@NotNull Interaction interaction, @NotNull String command, NamespacedKey key){
         if (command.isBlank()){
             return;
         }
-        interaction.removeScoreboardTag(command);
+        removeFromPDCList(interaction, command, key);
+    }
+
+    /**
+     * Add a tag to a part entity
+     * @param entity The entity to add a tag to
+     * @param tag The tag to add to this part
+     * @return true if the tag was successfully added
+     */
+    public static void addTag(@NotNull Entity entity, @NotNull String tag){
+        addToPDCList(entity, tag, DisplayEntityPlugin.getPartPDCTagKey());
+    }
+
+    /**
+     * Add a tag to a part entity
+     * @param entity The entity to add a tag to
+     * @param tags The tags to add to this part
+     * @return true if the tag was successfully added
+     */
+    public static void addTags(@NotNull Entity entity, @NotNull List<String> tags){
+        addManyToPDCList(entity, tags, DisplayEntityPlugin.getPartPDCTagKey());
+    }
+
+    static void addToPDCList(@NotNull Entity entity, @NotNull String element, NamespacedKey key){
+        if (element.isBlank()){
+            return;
+        }
+        PersistentDataContainer container = entity.getPersistentDataContainer();
+        List<String> tags;
+        if (!container.has(key)){
+            tags = new ArrayList<>();
+        }
+        else{
+            tags = container.get(key, tagPDCType);
+        }
+
+        if (!tags.contains(element)){
+            tags.add(element);
+            container.set(key, tagPDCType, tags);
+        }
+    }
+
+    static void addManyToPDCList(@NotNull Entity entity, @NotNull List<String> elements, NamespacedKey key){
+        if (elements.isEmpty()){
+            return;
+        }
+        PersistentDataContainer container = entity.getPersistentDataContainer();
+        List<String> existing;
+        if (!container.has(key)){
+            existing = new ArrayList<>();
+        }
+        else{
+            existing = container.get(key, tagPDCType);
+        }
+        for (String element : elements){
+            if (!existing.contains(element)) {
+                existing.add(element);
+            }
+        }
+        container.set(key, tagPDCType, existing);
     }
 
 
     /**
-     * Checks if this display entity has the specified part tag
-     * @param display Display Entity to check for a part tag
-     * @param partTag The tag to check for
-     * @return boolean whether this display entity has a part tag
+     * Remove a tag from this SpawnedDisplayEntityPart
+     * @param tag the tag to remove from this part
+     * @return this
      */
-    public static boolean hasPartTag(Display display, @Nonnull String partTag){
-        return display.getScoreboardTags().contains(DisplayEntityPlugin.partTagPrefix+partTag);
+    public static void removeTag(@NotNull Entity entity, @NotNull String tag){
+        removeFromPDCList(entity, tag, DisplayEntityPlugin.getPartPDCTagKey());
     }
 
     /**
-     * Checks if this interaction entity has the specified part tag
-     * @param interaction Interaction Entity to check for a part tag
-     * @param partTag The tag to check for
-     * @return boolean whether this interaction entity has a part tag
+     * Remove a tag from this SpawnedDisplayEntityPart
+     * @param tags the tags to remove from this part
+     * @return this
      */
-    public static boolean hasPartTag(Interaction interaction, @Nonnull String partTag){
-        return interaction.getScoreboardTags().contains(DisplayEntityPlugin.partTagPrefix+partTag);
+    public static void removeTags(@NotNull Entity entity, @NotNull List<String> tags){
+        removeManyFromPDCList(entity, tags, DisplayEntityPlugin.getPartPDCTagKey());
     }
+
+    static void removeFromPDCList(@NotNull Entity entity, String element, NamespacedKey key){
+        if (element.isBlank()){
+            return;
+        }
+        PersistentDataContainer container = entity.getPersistentDataContainer();
+        if (!container.has(key, tagPDCType)){
+            return;
+        }
+
+        List<String> tags = container.get(key, tagPDCType);
+        if (tags == null){
+            return;
+        }
+        tags.remove(element);
+        container.set(key, tagPDCType, tags);
+    }
+
+    static void removeManyFromPDCList(@NotNull Entity entity, List<String> elements, NamespacedKey key){
+        if (elements.isEmpty()){
+            return;
+        }
+        PersistentDataContainer container = entity.getPersistentDataContainer();
+        if (!container.has(key, tagPDCType)){
+            return;
+        }
+
+        List<String> existing = container.get(key, tagPDCType);
+        if (existing == null){
+            return;
+        }
+
+        existing.removeAll(elements);
+        container.set(key, tagPDCType, existing);
+    }
+
+
+    /**
+     * Gets the part tags of this SpawnedDisplayEntityPart
+     * @return This part's part tags.
+     */
+    public static @NotNull List<String> getTags(@NotNull Entity entity){
+        return getPDCList(entity, DisplayEntityPlugin.getPartPDCTagKey());
+    }
+
+    static @NotNull List<String> getPDCList(@NotNull Entity entity, NamespacedKey key){
+        PersistentDataContainer container = entity.getPersistentDataContainer();
+        if (!container.has(key, tagPDCType)){
+            return new ArrayList<>();
+        }
+        return container.get(key, tagPDCType);
+    }
+
+
+    /**
+     * Determine whether this part has a tag
+     * @param tag the tag to check for
+     * @return true if this part has the tag
+     */
+    public static boolean hasTag(@NotNull Entity entity, @NotNull String tag){
+        PersistentDataContainer container = entity.getPersistentDataContainer();
+        if (!container.has(DisplayEntityPlugin.getPartPDCTagKey(), tagPDCType)){
+            return false;
+        }
+        List<String> pdcTags = container.get(DisplayEntityPlugin.getPartPDCTagKey(), tagPDCType);
+        return pdcTags != null && pdcTags.contains(tag);
+    }
+
+
 
     /**
      * Checks if this display entity has the specified part tag
@@ -565,8 +618,8 @@ public final class DisplayUtils {
      * @param tag The tag to check for
      * @return boolean whether this display entity has a part tag
      */
-    public static boolean isGroupTag(Display display, @Nonnull String tag){
-        String value = display.getPersistentDataContainer().get(DisplayEntityPlugin.groupTagKey, PersistentDataType.STRING);
+    public static boolean isGroupTag(Display display, @NotNull String tag){
+        String value = display.getPersistentDataContainer().get(DisplayEntityPlugin.getGroupTagKey(), PersistentDataType.STRING);
         if (value == null){
             return false;
         }
@@ -579,8 +632,8 @@ public final class DisplayUtils {
      * @param tag The tag to check for
      * @return boolean whether this interaction entity has a part tag
      */
-    public static boolean isGroupTag(Interaction interaction, @Nonnull String tag){
-        String value = interaction.getPersistentDataContainer().get(DisplayEntityPlugin.groupTagKey, PersistentDataType.STRING);
+    public static boolean isGroupTag(Interaction interaction, @NotNull String tag){
+        String value = interaction.getPersistentDataContainer().get(DisplayEntityPlugin.getGroupTagKey(), PersistentDataType.STRING);
         if (value == null){
             return false;
         }
@@ -624,7 +677,7 @@ public final class DisplayUtils {
      */
     public static boolean isMaster(Display display){
         PersistentDataContainer container = display.getPersistentDataContainer();
-        return container.has(DisplayEntityPlugin.masterKey, PersistentDataType.BOOLEAN);
+        return container.has(DisplayEntityPlugin.getMasterKey(), PersistentDataType.BOOLEAN);
     }
 
 }

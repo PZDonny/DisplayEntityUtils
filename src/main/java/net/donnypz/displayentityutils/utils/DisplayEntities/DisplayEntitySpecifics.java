@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 abstract class DisplayEntitySpecifics implements Serializable {
@@ -17,7 +18,7 @@ abstract class DisplayEntitySpecifics implements Serializable {
     @Serial
     private static final long serialVersionUID = 99L;
 
-    private final ArrayList<String> partTags;
+    private ArrayList<String> partTags = new ArrayList<>(); //Legacy Part Tags (Using Scoreboard Only)
     private final UUID partUUID;
     SerialTransformation serialTransformation;
     private final Display.Billboard billboard;
@@ -32,7 +33,7 @@ abstract class DisplayEntitySpecifics implements Serializable {
     private int glowColorOverride = Color.WHITE.asRGB();
 
     DisplayEntitySpecifics(Display displayEntity){
-        this.partTags = DisplayUtils.getPartTags(displayEntity);
+        //this.partTags = DisplayUtils.getPartTags(displayEntity);
         this.partUUID = DisplayUtils.getPartUUID(displayEntity);
         this.serialTransformation = new SerialTransformation(displayEntity.getTransformation());
         this.billboard = displayEntity.getBillboard();
@@ -51,7 +52,7 @@ abstract class DisplayEntitySpecifics implements Serializable {
         }
     }
 
-    public ArrayList<String> getPartTags() {
+    List<String> getLegacyPartTags() {
         return partTags;
     }
 
@@ -112,14 +113,16 @@ abstract class DisplayEntitySpecifics implements Serializable {
         for (String partTag : partTags){
             display.addScoreboardTag(partTag);
         }
-        if (partUUID != null){
-            display.getPersistentDataContainer().set(DisplayEntityPlugin.partUUIDKey, PersistentDataType.STRING, partUUID.toString());
-        }
+
         if (displayEntity.persistentDataContainer != null){
             try{
                 display.getPersistentDataContainer().readFromBytes(displayEntity.persistentDataContainer);
             }
             catch(IOException ignore){}
+        }
+
+        if (partUUID != null){
+            display.getPersistentDataContainer().set(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
         }
 
     }

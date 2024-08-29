@@ -6,12 +6,12 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
+import java.util.List;
 
 class PartsListTagsCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_TAG_LIST)){
+        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_TAG)){
             return;
         }
 
@@ -26,7 +26,7 @@ class PartsListTagsCMD implements SubCommand{
         }
 
         player.sendMessage(ChatColor.GOLD+"Part Tags: ");
-        ArrayList<String> tags = partSelection.getCleanPartTags();
+        List<String> tags = partSelection.getTags();
         if (tags.isEmpty()){
             player.sendMessage(ChatColor.GRAY+"Failed to find a part tag for your part selection!");
         }
@@ -35,7 +35,6 @@ class PartsListTagsCMD implements SubCommand{
                 player.sendMessage(ChatColor.GRAY+"- "+ChatColor.YELLOW+tag);
             }
         }
-
     }
 
 }

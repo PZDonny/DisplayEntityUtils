@@ -47,8 +47,11 @@ class PartsSeedUUIDsCMD implements SubCommand{
                 partSelection.randomizePartUUIDs(seed);
                 player.sendMessage(Component.text("Successfully randomized the part UUIDs of all parts in your part selection!", NamedTextColor.GREEN));
                 player.sendMessage(Component.text("Seed: "+seed, NamedTextColor.GRAY));
-                if (!partSelection.getPartTags().isEmpty()){
-                    player.sendMessage(Component.text("Part Tag: "+partSelection.getCleanPartTags().getFirst(), NamedTextColor.GRAY));
+                if (!partSelection.getTags().isEmpty()){
+                    player.sendMessage(Component.text("Part Tags: ", NamedTextColor.YELLOW));
+                    for (String tag : partSelection.getTags()){
+                        player.sendMessage(Component.text(" - "+tag, NamedTextColor.GRAY));
+                    }
                 }
             }
         }

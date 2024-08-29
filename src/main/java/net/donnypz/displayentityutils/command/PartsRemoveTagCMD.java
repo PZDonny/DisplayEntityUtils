@@ -2,7 +2,6 @@ package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
@@ -28,7 +27,7 @@ class PartsRemoveTagCMD implements SubCommand{
             return;
         }
         String tag  = args[2];
-        partSelection.removePartTag(tag);
+        partSelection.removeTag(tag);
         player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Removing part tag from selected part(s)! "+ChatColor.WHITE+"(Removed Tag: "+tag+")");
 
     }

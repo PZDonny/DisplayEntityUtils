@@ -28,7 +28,7 @@ class PartsAddTagCMD implements SubCommand{
             return;
         }
         String tag  = args[2];
-        partSelection.addPartTag(tag);
+        partSelection.addTag(tag);
         player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Adding part tag to selected part(s)! "+ChatColor.WHITE+"(Added Tag: "+tag+")");
 
     }

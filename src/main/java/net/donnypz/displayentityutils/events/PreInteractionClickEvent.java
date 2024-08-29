@@ -6,13 +6,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
+import java.util.Collection;
 
 /**
- * Called when an Interaction Entity is clicked.
+ * Called when an interaction entity is clicked, before {@link InteractionClickEvent}.
+ * Cancelling this event stops {@link InteractionClickEvent} from being called.
  */
 public class PreInteractionClickEvent extends Event implements Cancellable {
 
@@ -26,7 +27,7 @@ public class PreInteractionClickEvent extends Event implements Cancellable {
     /**
      * Called when an Interaction Entity is Left or Right-clicked.
      */
-    public PreInteractionClickEvent(@Nonnull Player player, @Nonnull Interaction interaction, InteractionClickEvent.ClickType clickType){
+    public PreInteractionClickEvent(@NotNull Player player, @NotNull Interaction interaction, InteractionClickEvent.ClickType clickType){
         this.player = player;
         this.interaction = interaction;
         this.clickType = clickType;
@@ -50,19 +51,12 @@ public class PreInteractionClickEvent extends Event implements Cancellable {
 
 
     /**
-     * Get a list of raw part tags on the interaction entity, with the plugin prefix appended.
-     * @return a list of raw part tags
+     * Get a list of tags on the interaction entity
+     * @oaram tagType the type of tags to get
+     * @return a collection of tags
      */
-    public List<String> getPartTags(){
-        return DisplayUtils.getPartTags(interaction);
-    }
-
-    /**
-     * Get a list of clean part tags on the interaction entity, without the plugin prefix appended.
-     * @return a list of clean part tags
-     */
-    public List<String> getCleanPartTags(){
-        return DisplayUtils.getCleanPartTags(interaction);
+    public Collection<String> getTags(){
+        return DisplayUtils.getTags(interaction);
     }
 
     /**

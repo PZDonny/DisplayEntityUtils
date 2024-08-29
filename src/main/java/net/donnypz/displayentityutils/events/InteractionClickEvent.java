@@ -7,9 +7,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ public class InteractionClickEvent extends Event implements Cancellable {
     /**
      * Called when an Interaction Entity is Left or Right-clicked.
      */
-    public InteractionClickEvent(@Nonnull Player player, @Nonnull Interaction interaction, ClickType clickType, List<InteractionCommand> commands){
+    public InteractionClickEvent(@NotNull Player player, @NotNull Interaction interaction, ClickType clickType, List<InteractionCommand> commands){
         this.player = player;
         this.interaction = interaction;
         this.clickType = clickType;
@@ -53,20 +54,14 @@ public class InteractionClickEvent extends Event implements Cancellable {
 
 
     /**
-     * Get a list of raw part tags on the interaction entity, with the plugin prefix appended.
-     * @return a list of raw part tags
+     * Get a list of tags on the interaction entity
+     * @oaram tagType the type of tags to get
+     * @return a collection of tags
      */
-    public List<String> getPartTags(){
-        return DisplayUtils.getPartTags(interaction);
+    public Collection<String> getTags(){
+        return DisplayUtils.getTags(interaction);
     }
 
-    /**
-     * Get a list of clean part tags on the interaction entity, without the plugin prefix appended.
-     * @return a list of clean part tags
-     */
-    public List<String> getCleanPartTags(){
-        return DisplayUtils.getCleanPartTags(interaction);
-    }
 
     /**
      * Get the tag of this entity's group.

@@ -18,7 +18,7 @@ public final class SpawnedDisplayAnimation {
     public SpawnedDisplayAnimation(){}
 
     public SpawnedDisplayAnimation(String partTag){
-        this.partTag = DisplayEntityPlugin.partTagPrefix+partTag;
+        this.partTag = partTag;
     }
 
     SpawnedDisplayAnimation(SpawnedDisplayEntityGroup group){
@@ -65,10 +65,6 @@ public final class SpawnedDisplayAnimation {
 
     public boolean isPartAnimation(){
         return partTag != null;
-    }
-
-    public String getCleanPartTag() {
-        return partTag.replace(DisplayEntityPlugin.partTagPrefix, "");
     }
 
     public String getPartTag() {

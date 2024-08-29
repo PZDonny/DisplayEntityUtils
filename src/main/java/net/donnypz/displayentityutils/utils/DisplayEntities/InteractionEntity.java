@@ -11,14 +11,14 @@ import org.joml.Vector3f;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 final class InteractionEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 99L;
 
-    ArrayList<String> partTags;
-    ArrayList<String> commands;
+    private ArrayList<String> partTags = new ArrayList<>(); //Legacy Part Tags (Using scoreboard Only)
     Vector3f vector;
     UUID partUUID;
     float height;
@@ -26,9 +26,7 @@ final class InteractionEntity implements Serializable {
     private byte[] persistentDataContainer = null;
 
     InteractionEntity(Interaction interaction){
-        this.partTags = DisplayUtils.getPartTags(interaction);
-
-        commands = DisplayUtils.getInteractionCommands(interaction);
+        //partTags = LegacyUtils.getLegacyPartTags(interaction);
 
         height = interaction.getInteractionHeight();
         width = interaction.getInteractionWidth();
@@ -51,14 +49,57 @@ final class InteractionEntity implements Serializable {
             for (String partTag : partTags){
                 spawn.addScoreboardTag(partTag);
             }
-            if (partUUID != null){
-                spawn.getPersistentDataContainer().set(DisplayEntityPlugin.partUUIDKey, PersistentDataType.STRING, partUUID.toString());
-            }
+
             if (persistentDataContainer != null){
                 try{
                     spawn.getPersistentDataContainer().readFromBytes(persistentDataContainer);
                 }
                 catch(IOException ignore){}
+            }
+
+            if (partUUID != null){
+                spawn.getPersistentDataContainer().set(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
+            }
+        });
+    }
+
+    Interaction createEntity(Location location, List<String> hiddenTags){
+        return location.getWorld().spawn(location, Interaction.class, spawn ->{
+            spawn.setInteractionHeight(height);
+            spawn.setInteractionWidth(width);
+
+            for (String partTag : partTags){
+                spawn.addScoreboardTag(partTag);
+            }
+
+            if (persistentDataContainer != null){
+                try{
+                    spawn.getPersistentDataContainer().readFromBytes(persistentDataContainer);
+                }
+                catch(IOException ignore){}
+            }
+
+            boolean visible = true;
+
+            for (String legacy : partTags){ //Legacy Tags (Scoreboard)
+                if (hiddenTags.contains(legacy)){
+                    visible = false;
+                }
+            }
+
+            if (visible){ //PDC Tags and not hidden from Legacy
+                for (String tag : hiddenTags){
+                    if (DisplayUtils.hasTag(spawn, tag)){
+                        visible = false;
+                        break;
+                    }
+                }
+            }
+
+            spawn.setVisibleByDefault(visible);
+
+            if (partUUID != null){
+                spawn.getPersistentDataContainer().set(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
             }
         });
     }
@@ -67,11 +108,7 @@ final class InteractionEntity implements Serializable {
         return Vector.fromJOML(vector);
     }
 
-    /**
-     * Get this InteractionEntity's part tag
-     * @return This InteractionEntity's part tag. Null if it does not have one
-     */
-    public ArrayList<String> getPartTags() {
+    ArrayList<String> getLegacyPartTags() {
         return partTags;
     }
 
@@ -79,7 +116,7 @@ final class InteractionEntity implements Serializable {
      * Get this InteractionEntity's height
      * @return InteractionEntity's height
      */
-    public float getHeight() {
+    float getHeight() {
         return height;
     }
 
@@ -87,7 +124,7 @@ final class InteractionEntity implements Serializable {
      * Get this InteractionEntity's width
      * @return InteractionEntity's width
      */
-    public float getWidth() {
+    float getWidth() {
         return width;
     }
 }
