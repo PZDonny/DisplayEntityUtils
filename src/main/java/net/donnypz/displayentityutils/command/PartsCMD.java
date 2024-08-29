@@ -21,6 +21,8 @@ class PartsCMD implements SubCommand{
         subCommands.put("glow", new PartsGlowCMD());
         subCommands.put("setglowcolor", new PartsSetGlowColorCMD());
         subCommands.put("select", new PartsSelectCMD());
+        subCommands.put("deselect", new PartsDeselectCMD());
+        subCommands.put("adapttags", new PartsAdaptTagsCMD());
         subCommands.put("addtag", new PartsAddTagCMD());
         subCommands.put("removetag", new PartsRemoveTagCMD());
         subCommands.put("listtags", new PartsListTagsCMD());
@@ -56,13 +58,17 @@ class PartsCMD implements SubCommand{
     static void partsHelp(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         sender.sendMessage(ChatColor.AQUA+"\"Parts\" are each individual display/interaction entity that is spawned within the group");
-        sender.sendMessage(ChatColor.AQUA+"Add part tags to parts to identify each part in a group");
+        sender.sendMessage(ChatColor.AQUA+"Add tags to parts to identify each part in a group");
         sender.sendMessage(ChatColor.YELLOW+" | Mainly useful for API users, creating animations, and usage with addon plugins");
         sender.sendMessage(ChatColor.GRAY+"/mdis parts cycle <first | prev | next>");
         sender.sendMessage(ChatColor.GRAY+"/mdis parts addtag <part-tag>");
         sender.sendMessage(ChatColor.GRAY+"/mdis parts removetag <part-tag>");
+        sender.sendMessage(Component.text("/mdis parts adapttags <part-tag> [-remove]", NamedTextColor.GRAY)
+                .append(Component.text(" Adapt existing scoreboard tags to tags usable by DisplayEntityUtils. This is done on selected parts or the group if there's no selection."+
+                        " \"-remove\" removes the tag from the scoreboard", NamedTextColor.YELLOW)));
         sender.sendMessage(ChatColor.GRAY+"/mdis parts listtags");
         sender.sendMessage(ChatColor.GRAY+"/mdis parts select <part-tag>");
+        sender.sendMessage(ChatColor.GRAY+"/mdis parts deselect");
         sender.sendMessage(ChatColor.GRAY+"/mdis parts remove");
         sender.sendMessage(ChatColor.GRAY+"/mdis parts glow");
         sender.sendMessage(ChatColor.GRAY+"/mdis parts setglowcolor <color | hex-code>");
