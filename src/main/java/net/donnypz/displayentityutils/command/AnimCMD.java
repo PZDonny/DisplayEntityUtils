@@ -68,7 +68,7 @@ class AnimCMD implements SubCommand{
         sender.sendMessage(Component.text("If using animations, use \"move\" on groups instead of \"translate\"", NamedTextColor.AQUA));
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Use <yellow>\"block-display.com\" <aqua>to easier create animations and convert them "));
         sender.sendMessage(Component.text("Use "+ ChatColor.YELLOW+"\"block-display.com\""+ChatColor.AQUA+" to create models and keyframes", NamedTextColor.AQUA));
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis anim new [part-tag] ", "(Animates only parts with a tag, if the tag is specified)");
+        DisplayEntityPluginCommand.sendCMD(sender,"/mdis anim new [part-tag]", " (Animates only parts with a tag, if the tag is specified)");
         DisplayEntityPluginCommand.sendCMD(sender,"/mdis anim info");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim frameinfo <frame-id>");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim addframe <delay-in-ticks> <duration-in-ticks>");
