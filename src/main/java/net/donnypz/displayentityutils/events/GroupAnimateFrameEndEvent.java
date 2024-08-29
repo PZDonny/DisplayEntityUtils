@@ -8,10 +8,9 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-
 /**
- * Called when an animation frame ends. If the frame's delay is greater than 0,
+ * Called when an animation frame ends.
+ * This ignores the frame's delay and is called after translation of parts in the group.
  */
 public class GroupAnimateFrameEndEvent extends Event {
     private static final HandlerList handlers = new HandlerList();

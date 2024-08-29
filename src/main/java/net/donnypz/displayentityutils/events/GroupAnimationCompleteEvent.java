@@ -5,9 +5,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.annotation.Nonnull;
 
 /**
  * Called at the completion of a {@link SpawnedDisplayAnimation}.
@@ -20,7 +19,7 @@ public class GroupAnimationCompleteEvent extends Event {
     SpawnedDisplayAnimation animation;
     DisplayAnimator animator;
 
-    public GroupAnimationCompleteEvent(SpawnedDisplayEntityGroup group, @Nonnull DisplayAnimator animator, SpawnedDisplayAnimation animation){
+    public GroupAnimationCompleteEvent(SpawnedDisplayEntityGroup group, @NotNull DisplayAnimator animator, SpawnedDisplayAnimation animation){
         this.spawnedDisplayEntityGroup = group;
         this.animation = animation;
         this.animator = animator;

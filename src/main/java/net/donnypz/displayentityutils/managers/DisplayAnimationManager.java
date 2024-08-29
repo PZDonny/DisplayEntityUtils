@@ -2,13 +2,12 @@ package net.donnypz.displayentityutils.managers;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -228,7 +227,7 @@ public final class DisplayAnimationManager {
      * @param loadMethod of the search location
      * @return String list of the tags of saved display animations in the specified storage location. Returns an empty list if nothing was found
      */
-    public static List<String> getDisplayAnimationTags(@Nonnull LoadMethod loadMethod){
+    public static List<String> getDisplayAnimationTags(@NotNull LoadMethod loadMethod){
         switch(loadMethod){
             case LOCAL -> {
                 return LocalManager.getDisplayAnimationTags();
