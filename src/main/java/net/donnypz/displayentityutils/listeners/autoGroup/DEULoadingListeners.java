@@ -12,11 +12,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class DEULoadingListeners implements Listener {
+@ApiStatus.Internal
+public final class DEULoadingListeners implements Listener {
     @EventHandler(priority =  EventPriority.HIGHEST)
     public void onEntityLoad(EntitiesLoadEvent e){
         AutoGroup.detectGroups(e.getChunk(), e.getEntities());
@@ -34,13 +36,11 @@ public class DEULoadingListeners implements Listener {
             storedChunks.clear();
         }
 
-        if (DisplayEntityPlugin.unregisterOnUnload()){
+        if (DisplayEntityPlugin.shouldUnregisterWorld(worldName)){
             for (SpawnedDisplayEntityGroup group : DisplayGroupManager.getSpawnedGroups(worldName)){
                 group.unregister(false);
             }
         }
-
-
     }
 
     @EventHandler
