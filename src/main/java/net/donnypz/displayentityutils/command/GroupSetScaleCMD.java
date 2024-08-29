@@ -22,7 +22,7 @@ class GroupSetScaleCMD implements SubCommand{
         }
 
         if (args.length < 4) {
-            player.sendMessage(Component.text("/mdis group scale <scale-multiplier> <tick-duration>", NamedTextColor.RED));
+            player.sendMessage(Component.text("/mdis group setscale <scale-multiplier> <tick-duration>", NamedTextColor.RED));
             return;
         }
 

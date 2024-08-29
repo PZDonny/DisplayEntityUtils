@@ -14,6 +14,7 @@ class GroupCMD implements SubCommand{
 
     GroupCMD(){
         subCommands.put("selectnearest", new GroupSelectCMD());
+        subCommands.put("deselect", new GroupDeselectCMD());
         subCommands.put("save", new GroupSaveCMD());
         subCommands.put("delete", new GroupDeleteCMD());
         subCommands.put("spawn", new GroupSpawnCMD());
@@ -64,6 +65,7 @@ class GroupCMD implements SubCommand{
     static void groupHelp(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis group selectnearest <interaction-distance>");
+        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group deselect");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis group info");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis group spawn <group-tag> <storage>");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis group despawn");
@@ -74,11 +76,11 @@ class GroupCMD implements SubCommand{
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis group settag <group-tag>");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis group setyaw <yaw> [-pivot]"," (Put \"-pivot\" at the end of the command to pivot interaction entities)");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis group setpitch <pitch>");
+        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group setscale <scale-multiplier> <tick-duration>");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis group clone", " (Spawn a cloned group at your selected group's location)");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis group clonehere", " (Spawn a cloned group at your location)");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis group move <direction> <distance> <tick-duration>");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis group translate <direction> <distance> <tick-duration>"," (Changes this group's translation and not it's actual location, use \"move\" instead if this group uses animations)");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group scale <scale-multiplier> <tick-duration>");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis group movehere");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis group merge"," (Merges groups at the same position)");
         DisplayEntityPluginCommand.sendCMD(sender, "/mdis group copypose", " (Copies transformation of one group to another, despawning the copied group)");
