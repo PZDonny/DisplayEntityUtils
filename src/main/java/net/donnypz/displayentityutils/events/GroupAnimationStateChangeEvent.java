@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.events;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayStateAnimator;
+import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimatorStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -12,15 +12,15 @@ public class GroupAnimationStateChangeEvent extends Event implements Cancellable
     private static final HandlerList handlers = new HandlerList();
     private boolean isCancelled = false;
     SpawnedDisplayEntityGroup group;
-    DisplayStateAnimator stateAnimator;
+    DisplayAnimatorStateMachine stateMachine;
     String newStateName;
     DisplayAnimator newDisplayAnimator;
     String oldStateName;
     DisplayAnimator oldDisplayAnimator;
     
-    public GroupAnimationStateChangeEvent(SpawnedDisplayEntityGroup group, DisplayStateAnimator stateAnimator, String newStateName, DisplayAnimator newDisplayAnimator, String oldStateName, @Nullable DisplayAnimator oldDisplayAnimator){
+    public GroupAnimationStateChangeEvent(SpawnedDisplayEntityGroup group, DisplayAnimatorStateMachine stateMachine, String newStateName, DisplayAnimator newDisplayAnimator, String oldStateName, @Nullable DisplayAnimator oldDisplayAnimator){
         this.group = group;
-        this.stateAnimator = stateAnimator;
+        this.stateMachine = stateMachine;
         this.newStateName = newStateName;
         this.newDisplayAnimator = newDisplayAnimator;
         this.oldStateName = oldStateName;
@@ -31,8 +31,8 @@ public class GroupAnimationStateChangeEvent extends Event implements Cancellable
         return group;
     }
 
-    public DisplayStateAnimator getDisplayStateAnimator() {
-        return stateAnimator;
+    public DisplayAnimatorStateMachine getDisplayAnimatorStateMachine() {
+        return stateMachine;
     }
 
     public String getNewStateName() {
@@ -43,7 +43,7 @@ public class GroupAnimationStateChangeEvent extends Event implements Cancellable
         return newDisplayAnimator;
     }
 
-    public String getOldStateName() {
+    public @Nullable String getOldStateName() {
         return oldStateName;
     }
 
