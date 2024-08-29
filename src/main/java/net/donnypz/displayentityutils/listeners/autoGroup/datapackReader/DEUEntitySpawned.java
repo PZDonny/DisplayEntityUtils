@@ -8,13 +8,15 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-public class DEUEntitySpawned implements Listener {
+@ApiStatus.Internal
+public final class DEUEntitySpawned implements Listener {
     private static final HashMap<Long, SpawnedDisplayEntityGroup> groups = new HashMap<>();
     private static final HashSet<Long> incomingTimestamps = new HashSet<>();
 
