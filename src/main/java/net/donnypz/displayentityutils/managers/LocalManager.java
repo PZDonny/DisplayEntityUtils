@@ -11,9 +11,9 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -151,7 +151,7 @@ public final class LocalManager {
         }
     }
 
-    public static void saveDatapackAnimation(Player player, String datapackName, @Nonnull String groupSaveTag, @Nonnull String animationSaveTag){
+    public static void saveDatapackAnimation(Player player, String datapackName, @NotNull String groupSaveTag, @NotNull String animationSaveTag){
         if (!datapackName.endsWith(".zip")){
             datapackName = datapackName+".zip";
         }
@@ -193,7 +193,7 @@ public final class LocalManager {
         }
     }
 
-    private static void readAnimationFiles(long timeStamp, int totalGroups, ZipFile zipFile, List<ZipEntry> frames, String datapackName, @Nonnull Player player, @Nonnull String groupSaveTag, @Nonnull String animationSaveTag){
+    private static void readAnimationFiles(long timeStamp, int totalGroups, ZipFile zipFile, List<ZipEntry> frames, String datapackName, @NotNull Player player, @NotNull String groupSaveTag, @NotNull String animationSaveTag){
         SpawnedDisplayEntityGroup createdGroup = DEUEntitySpawned.getTimestampGroup(timeStamp);
         if (createdGroup == null){
             throw new RuntimeException("Failed to fetch group from timestamp");
@@ -212,7 +212,7 @@ public final class LocalManager {
                     if (!frame.isEmptyFrame()){
                         anim.addFrame(frame);
                     }
-                    createdGroup.setToFrame(anim.getFrames().get(0));
+                    createdGroup.setToFrame(anim.getFrames().getFirst());
 
                     //Save with first frame applied to group
                     Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
@@ -225,21 +225,39 @@ public final class LocalManager {
                         boolean animationSuccess = DisplayAnimationManager.saveDisplayAnimation(LoadMethod.LOCAL, anim.toDisplayAnimation(), player);
                         anim.remove();
 
-                        if (groupSaveTag.isBlank()){
-                            createdGroup.setTag(datapackName.replace(".zip", "")+"_autoconvert");
+                        boolean groupSuccess;
+                        if (!groupSaveTag.equals("-")){
+                            if (groupSaveTag.isBlank()){
+                                createdGroup.setTag(datapackName.replace(".zip", "")+"_autoconvert");
+                            }
+                            else{
+                                createdGroup.setTag(groupSaveTag);
+                            }
+                            groupSuccess = DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.LOCAL, createdGroup.toDisplayEntityGroup(), player);
                         }
                         else{
-                            createdGroup.setTag(groupSaveTag);
+                            groupSuccess = false;
                         }
-                        boolean groupSuccess = DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.LOCAL, createdGroup.toDisplayEntityGroup(), player);
+
                         createdGroup.unregister(true);
 
-                        if (animationSuccess && groupSuccess){
-                            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ net.md_5.bungee.api.ChatColor.GREEN+"Successfully converted BDEngine animation to DisplayAnimation.");
-                            player.sendMessage(Component.text(" | Both the group and animation have been saved locally", NamedTextColor.GRAY));
-                            player.sendMessage(Component.text(" | Group Tag: "+createdGroup.getTag(), NamedTextColor.GRAY));
+                        if (animationSuccess){
+                            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.GREEN+"Successfully converted BDEngine animation to DisplayAnimation.");
                             player.sendMessage(Component.text(" | Animation Tag: "+anim.getAnimationTag(), NamedTextColor.GRAY));
                             player.playSound(player, Sound.ENTITY_SHEEP_SHEAR, 1, 0.75f);
+                        }
+
+
+                        if (groupSuccess){
+                            player.sendMessage(Component.text(" | Group Tag: "+createdGroup.getTag(), NamedTextColor.GRAY));
+                        }
+                        else{
+                            if (groupSaveTag.equals("-")){
+                                player.sendMessage(Component.text("A group was not created during this conversion due to setting the group tag to \"-\"", NamedTextColor.GRAY));
+                            }
+                            else{
+                                player.sendMessage(Component.text("An error occured when saving the group created from BDEngine conversion, refer to console and report errors if necessary", NamedTextColor.RED));
+                            }
                         }
 
                         try{

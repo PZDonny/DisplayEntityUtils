@@ -15,6 +15,7 @@ class ConvertDatapackCMD implements SubCommand{
         }
         if (args.length < 5) {
             player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "Incorrect Usage! /mdis convert datapack <datapack-name> <group-tag-to-set> <anim-tag-to-set>");
+            player.sendMessage(Component.text("Use \"-\" for the group tag if you do not want to save the group", NamedTextColor.GRAY));
             return;
         }
 
