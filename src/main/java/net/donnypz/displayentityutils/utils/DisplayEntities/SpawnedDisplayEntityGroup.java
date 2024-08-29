@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.FollowType;
@@ -19,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 
 public final class SpawnedDisplayEntityGroup {
@@ -32,17 +32,17 @@ public final class SpawnedDisplayEntityGroup {
     long creationTime = System.currentTimeMillis();
     public static final NamespacedKey creationTimeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "creationtime");
     static final NamespacedKey scaleKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "scale");
+    static final NamespacedKey lastAnimationTimestampKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "lastAnimation");
     final Random partUUIDRandom = new Random(defaultPartUUIDSeed);
     boolean isVisibleByDefault;
-    private String worldName;
     private float scaleMultiplier = 1;
     private UUID followedEntity = null;
+    private long lastAnimationTimeStamp = -1;
 
 
 
-    SpawnedDisplayEntityGroup(boolean isVisible, String worldName) {
+    SpawnedDisplayEntityGroup(boolean isVisible) {
         this.isVisibleByDefault = isVisible;
-        this.worldName = worldName;
     }
 
     /**
@@ -53,7 +53,6 @@ public final class SpawnedDisplayEntityGroup {
     @ApiStatus.Internal
     public SpawnedDisplayEntityGroup(Display masterDisplay){
         this.isVisibleByDefault = masterDisplay.isVisibleByDefault();
-        this.worldName = masterDisplay.getWorld().getName();
         PersistentDataContainer c = masterDisplay.getPersistentDataContainer();
         if (c.has(creationTimeKey)){
             creationTime = c.get(creationTimeKey, PersistentDataType.LONG);
@@ -61,6 +60,10 @@ public final class SpawnedDisplayEntityGroup {
         if (c.has(scaleKey)){
             scaleMultiplier = c.get(scaleKey, PersistentDataType.FLOAT);
         }
+        /*if (c.has(lastAnimationTimestampKey)) {
+            lastAnimationTimeStamp = c.get(lastAnimationTimestampKey, PersistentDataType.LONG);
+        }*/
+
         //String tag1;
         /*for (String tag: masterDisplay.getScoreboardTags()){
             if (tag != null && tag.contains(DisplayEntityPlugin.tagPrefix)){
@@ -76,11 +79,31 @@ public final class SpawnedDisplayEntityGroup {
             }
         }
         DisplayGroupManager.storeNewSpawnedGroup(this);
+        autoSetCulling(DisplayEntityPlugin.autoCulling());
     }
 
+    /**
+     * Get the unix timestamp that this group was initially created. This is created when a group is selected/grouped for the first time
+     * @return a long
+     */
     public long getCreationTime() {
         return creationTime;
     }
+
+    long getLastAnimationTimeStamp(){
+        return lastAnimationTimeStamp;
+    }
+
+    void setLastAnimationTimeStamp(long timestamp){
+        this.lastAnimationTimeStamp = timestamp;
+        //PersistentDataContainer container = getMasterPart().getEntity().getPersistentDataContainer();
+        //container.set(lastAnimationTimestampKey, PersistentDataType.LONG, timestamp);
+    }
+
+    public boolean isInLoadedChunk(){
+        return DisplayUtils.isInLoadedChunk(masterPart);
+    }
+
 
     public SpawnedDisplayEntityGroup addSpawnedDisplayEntityPart(SpawnedDisplayEntityPart part){
         part.setGroup(this);
@@ -88,7 +111,13 @@ public final class SpawnedDisplayEntityGroup {
     }
 
 
-    public SpawnedDisplayEntityPart addDisplayEntity(@Nonnull Display displayEntity){
+    /**
+     * Add an display entity to this group. If this group already contains this display entity as a registered part it will return the existing
+     * {@link SpawnedDisplayEntityPart}. If it doesn't then it will return a new {@link SpawnedDisplayEntityPart}
+     * @param displayEntity
+     * @return a {@link SpawnedDisplayEntityPart} representing the Display entity
+     */
+    public SpawnedDisplayEntityPart addDisplayEntity(@NotNull Display displayEntity){
         SpawnedDisplayEntityPart existing = SpawnedDisplayEntityPart.getPart(displayEntity);
         if (existing != null && existing.group != this){
             return existing.setGroup(this);
@@ -97,6 +126,8 @@ public final class SpawnedDisplayEntityGroup {
         SpawnedDisplayEntityPart part = new SpawnedDisplayEntityPart(this, displayEntity, partUUIDRandom);
         if (masterPart != null){
             if (!part.isMaster()){
+                Display masterEntity = (Display) masterPart.entity;
+                displayEntity.setTeleportDuration(masterEntity.getTeleportDuration());
                 masterPart.getEntity().addPassenger(displayEntity);
             }
             else if (!spawnedParts.isEmpty()){
@@ -112,9 +143,13 @@ public final class SpawnedDisplayEntityGroup {
     }
 
 
-
-
-    public SpawnedDisplayEntityPart addInteractionEntity(@Nonnull Interaction interactionEntity){
+    /**
+     * Add an interaction entity to this group. If this group already contains this interaction entity as a registered part it will return the existing
+     * {@link SpawnedDisplayEntityPart}. If it doesn't then it will return a new {@link SpawnedDisplayEntityPart}
+     * @param interactionEntity
+     * @return a {@link SpawnedDisplayEntityPart} representing the Interaction entity
+     */
+    public SpawnedDisplayEntityPart addInteractionEntity(@NotNull Interaction interactionEntity){
         SpawnedDisplayEntityPart existing = SpawnedDisplayEntityPart.getPart(interactionEntity);
         if (existing == null){
             return new SpawnedDisplayEntityPart(this, interactionEntity, partUUIDRandom);
@@ -125,7 +160,7 @@ public final class SpawnedDisplayEntityGroup {
         }
     }
 
-    public SpawnedDisplayEntityPart addPartEntity(@Nonnull Entity entity){
+    public SpawnedDisplayEntityPart addPartEntity(@NotNull Entity entity){
         if (entity instanceof Interaction interaction){
             return addInteractionEntity(interaction);
         }
@@ -137,17 +172,32 @@ public final class SpawnedDisplayEntityGroup {
         }
     }
 
-    public boolean isPartOfGroup(Display display){
-        PersistentDataContainer container = display.getPersistentDataContainer();
-        if (!container.has(creationTimeKey, PersistentDataType.LONG)){
-            return false;
-        }
-
-        return container.get(creationTimeKey, PersistentDataType.LONG) == creationTime;
+    /**
+     * Check if this group and a Display entity share the same creation time. If this returns true this does not guarantee
+     * that the part is registered to this group. Using {@link SpawnedDisplayEntityGroup#addDisplayEntity(Display)} will
+     * add the display entity to the group if it is not added already
+     * @param display
+     * @return a boolean
+     */
+    public boolean hasSameCreationTime(Display display){
+        return sameCreationTime(display);
     }
 
-    public boolean isPartOfGroup(Interaction interaction){
-        PersistentDataContainer container = interaction.getPersistentDataContainer();
+    /**
+     * Check if this group and an Interaction entity share the same creation time. If this returns true this does not guarantee
+     * that the part is registered to this group. Using {@link SpawnedDisplayEntityGroup#addInteractionEntity(Interaction)} will
+     * add the interaction entity to the group if it is not added already
+     * @param interaction
+     * @return a boolean
+     */
+    public boolean hasSameCreationTime(Interaction interaction){
+        return sameCreationTime(interaction);
+    }
+    
+    
+
+    private boolean sameCreationTime(Entity entity){
+        PersistentDataContainer container = entity.getPersistentDataContainer();
         if (!container.has(creationTimeKey, PersistentDataType.LONG)){
             return false;
         }
@@ -165,17 +215,18 @@ public final class SpawnedDisplayEntityGroup {
         List<Entity> existingInteractions = getSpawnedPartEntities(SpawnedDisplayEntityPart.PartType.INTERACTION);
 
         for(Entity e : getMasterPart().getEntity().getNearbyEntities(distance, distance, distance)) {
-            if ((e instanceof Interaction i)){
-                if (!existingInteractions.contains(i) && isPartOfGroup(i)){
-                    SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(i);
-                    if (part == null){
-                        new SpawnedDisplayEntityPart(this, (Interaction) e, partUUIDRandom);
-                    }
-                    else{
-                        part.setGroup(this);
-                    }
-                    interactions.add((Interaction) e);
+            if (!(e instanceof Interaction i)){
+                continue;
+            }
+            if (!existingInteractions.contains(i) && sameCreationTime(i)){
+                SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(i);
+                if (part == null){
+                    new SpawnedDisplayEntityPart(this, (Interaction) e, partUUIDRandom);
                 }
+                else{
+                    part.setGroup(this);
+                }
+                interactions.add((Interaction) e);
             }
         }
         return interactions;
@@ -227,8 +278,6 @@ public final class SpawnedDisplayEntityGroup {
     public boolean isVisibleByDefault(){
         return isVisibleByDefault;
     }
-
-
 
 
     /**
@@ -320,13 +369,13 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Get a list of all display entity parts within this group
+     * Get a list of all display entity parts within this group with a specified scoreboard tag
      * @return a list of all {@link SpawnedDisplayEntityPart} with a specified tag
      */
-    public List<SpawnedDisplayEntityPart> getSpawnedParts(@NotNull String partTag){
+    public List<SpawnedDisplayEntityPart> getSpawnedParts(@NotNull String tag){
         List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
         for (SpawnedDisplayEntityPart part : spawnedParts){
-            if (part.hasPartTag(partTag)){
+            if (part.hasTag(tag)){
                 partList.add(part);
             }
         }
@@ -359,13 +408,26 @@ public final class SpawnedDisplayEntityGroup {
         return this;
     }
 
+    /**
+     * Get this group's scale multiplier set after using {@link SpawnedDisplayEntityGroup#scale(float, int)}
+     * @return the group's scale multiplier
+     */
     public float getScaleMultiplier(){
         return scaleMultiplier;
     }
 
+    /**
+     * Set the scale for all parts within this group
+     * @param newScaleMultiplier the scale multiplier to apply to this group
+     * @param durationInTicks how long it should take for the group to scale
+     * @return false if the {@link GroupScaleEvent} was cancelled or if the group is in an unloaded chunk
+     */
     public boolean scale(float newScaleMultiplier, int durationInTicks){
         if (newScaleMultiplier <= 0){
             throw new IllegalArgumentException("New Scale Multiplier cannot be <= 0");
+        }
+        if (!isInLoadedChunk()){
+            return false;
         }
         GroupScaleEvent event = new GroupScaleEvent(this, newScaleMultiplier, this.scaleMultiplier);
         Bukkit.getPluginManager().callEvent(event);
@@ -376,6 +438,9 @@ public final class SpawnedDisplayEntityGroup {
         //Displays
             if (part.type != SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Display d = (Display) part.entity;
+                if (d.getLocation().getChunk().isLoaded()){
+                    return false;
+                }
                 Transformation transformation = d.getTransformation();
 
                 //Reset Scale then multiply by newScaleMultiplier
@@ -401,7 +466,6 @@ public final class SpawnedDisplayEntityGroup {
             else{
                 Interaction i = (Interaction) part.entity;
 
-
                 //Reset Scale then multiply by newScaleMultiplier
                 i.setInteractionHeight((i.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier);
                 i.setInteractionWidth((i.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier);
@@ -417,7 +481,7 @@ public final class SpawnedDisplayEntityGroup {
                 translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
 
                 Vector moveVector = oldVector.subtract(translationVector);
-                part.translate((float) moveVector.length(), durationInTicks, 0, moveVector);
+                part.translateForce((float) moveVector.length(), durationInTicks, 0, moveVector);
             }
 
         }
@@ -465,7 +529,6 @@ public final class SpawnedDisplayEntityGroup {
             }
 
         }
-        worldName = location.getWorld().getName();
     }
 
     /**
@@ -512,7 +575,7 @@ public final class SpawnedDisplayEntityGroup {
      * @param distance How far the group should be translated
      * @param durationInTicks How long it should take for the translation to complete
      */
-    public void teleportMove(@Nonnull Direction direction, double distance, int durationInTicks){
+    public void teleportMove(@NotNull Direction direction, double distance, int durationInTicks){
         teleportMove(direction.getVector(masterPart), distance, durationInTicks);
     }
 
@@ -587,6 +650,7 @@ public final class SpawnedDisplayEntityGroup {
     /**
      * Change the yaw of this group
      * @param yaw The yaw to set for this group
+     * @param pivotInteractions true if interactions should pivot around the group with the yaw change
      */
     public void setYaw(float yaw, boolean pivotInteractions){
         for (SpawnedDisplayEntityPart part : spawnedParts){
@@ -615,7 +679,7 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Set the view range of this Spawned Display Entity Group
+     * Set the view range of this group
      * @param range The color to set
      */
     public void setViewRange(float range){
@@ -625,7 +689,56 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Set the glow color of this Spawned Display Entity Group
+     * Attempt to automatically set the culling bounds for all parts within this group.
+     * Results may not be 100% accurate due to the varying shapes of Minecraft blocks.
+     * The culling bounds will be representative of the part's scaling.
+     */
+    @ApiStatus.Experimental
+    public void autoSetCulling(CullOption cullOption){
+        if (cullOption == CullOption.LARGEST){
+            largestCulling();
+        }
+        else if (cullOption == CullOption.LOCAL){
+            localCulling();
+        }
+        else if (cullOption == CullOption.NONE){
+            noneCulling();
+        }
+    }
+
+    private void largestCulling(){
+        float maxWidth = 0;
+        float maxHeight = 0;
+        for (SpawnedDisplayEntityPart part : spawnedParts) {
+            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION) {
+                continue;
+            }
+            Transformation transformation = ((Display) part.getEntity()).getTransformation();
+            Vector3f scale = transformation.getScale();
+
+            maxWidth = Math.max(maxWidth, Math.max(scale.x, scale.z));
+            maxHeight = Math.max(maxHeight, scale.y);
+        }
+
+        for (SpawnedDisplayEntityPart part : spawnedParts){
+            part.cull(maxWidth, maxHeight);
+        }
+    }
+
+    private void localCulling(){
+        for (SpawnedDisplayEntityPart part : spawnedParts){
+            part.autoCull();
+        }
+    }
+
+    private void noneCulling(){
+        for (SpawnedDisplayEntityPart part : spawnedParts){
+            part.cull(0, 0);
+        }
+    }
+
+    /**
+     * Set the glow color of this group
      * @param color The color to set
      */
     public void setGlowColor(Color color){
@@ -635,13 +748,12 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Get the glow color of this Spawned Display Entity Group
+     * Get the glow color of this group
+     * @return a color or null if not set
      */
-    public Color getGlowColor(){
+    public @Nullable Color getGlowColor(){
         return ((Display) masterPart.getEntity()).getGlowColorOverride();
     }
-
-
 
     /**
      * Change the translation of all the SpawnedDisplayEntityParts in this group.
@@ -650,17 +762,22 @@ public final class SpawnedDisplayEntityGroup {
      * @param distance How far the part should be translated
      * @param durationInTicks How long it should take for the translation to complete
      * @param direction The direction to translate the part
+     * @return false if the {@link GroupTranslateEvent} is cancelled or if the group is in an unloaded chunk
      */
-    public void translate(@Nonnull Vector direction, float distance, int durationInTicks, int delayInTicks){
+    public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks){
+        if (!isInLoadedChunk()){
+            return false;
+        }
         Location destination = masterPart.getEntity().getLocation().clone().add(direction.clone().normalize().multiply(distance));
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.VANILLATRANSLATE, destination);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()){
-            return;
+            return false;
         }
-        for(SpawnedDisplayEntityPart part : spawnedParts){
-            part.translate(distance, durationInTicks, delayInTicks, direction);
+        for (SpawnedDisplayEntityPart part : spawnedParts){
+            part.translateForce(distance, durationInTicks, delayInTicks, direction);
         }
+        return true;
     }
 
     /**
@@ -670,17 +787,22 @@ public final class SpawnedDisplayEntityGroup {
      * @param direction The direction to translate the part
      * @param distance How far the part should be translated
      * @param durationInTicks How long it should take for the translation to complete
+     * @return false if the {@link GroupTranslateEvent} is cancelled or if the group is in an unloaded chunk
      */
-    public void translate(@Nonnull Direction direction, float distance, int durationInTicks, int delayInTicks){
+    public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks){
+        if (!isInLoadedChunk()){
+            return false;
+        }
         Location destination = masterPart.getEntity().getLocation().clone().add(direction.getVector(masterPart.getEntity()).normalize().multiply(distance));
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.VANILLATRANSLATE, destination);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()){
-            return;
+            return false;
         }
         for(SpawnedDisplayEntityPart part : spawnedParts){
-            part.translate(distance, durationInTicks, delayInTicks, direction);
+            part.translateForce(distance, durationInTicks, delayInTicks, direction);
         }
+        return true;
     }
 
     /**
@@ -695,7 +817,7 @@ public final class SpawnedDisplayEntityGroup {
         for (SpawnedDisplayEntityPart part : spawnedParts){
             Entity entity = part.getEntity();
             PersistentDataContainer pdc = entity.getPersistentDataContainer();
-            pdc.set(DisplayEntityPlugin.groupTagKey, PersistentDataType.STRING, tag);
+            pdc.set(DisplayEntityPlugin.getGroupTagKey(), PersistentDataType.STRING, tag);
         }
         this.tag = tag;
         return this;
@@ -707,7 +829,7 @@ public final class SpawnedDisplayEntityGroup {
      * @return name of group's world
      */
     public String getWorldName(){
-        return worldName;
+        return masterPart.getEntity().getWorld().getName();
     }
 
     /**
@@ -746,11 +868,9 @@ public final class SpawnedDisplayEntityGroup {
      * @param display The Display to check
      * @return Whether the display is the master part
      */
-    public boolean isMasterPart(@Nonnull Display display){
+    public boolean isMasterPart(@NotNull Display display){
         return display.getPersistentDataContainer().has(new NamespacedKey(DisplayEntityPlugin.getInstance(), "ismaster"), PersistentDataType.BOOLEAN);
     }
-
-
 
     /**
      * Adds the glow effect to all the parts in this group
@@ -817,13 +937,17 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Force the SpawnedDisplayEntityGroup to look in the same direction as a specified entity
-     * @param entity The entity with the directions to follow
-     * @param followType The follow type
-     * @param unregisterOnEntityDeath Determines if this group should be despawned after the entity's death
+     * Get the entity this SpawnedDisplayEntityGroup is riding
+     * @return an entity. null if this group is not riding an entity
      */
-    public void followEntityDirection(@Nonnull Entity entity, @Nonnull FollowType followType, boolean unregisterOnEntityDeath, boolean pivotInteractions){
-        followEntityDirection(entity, followType, unregisterOnEntityDeath, pivotInteractions, getTeleportDuration());
+    public Entity getVehicle(){
+        try{
+            return masterPart.getEntity().getVehicle();
+        }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -831,9 +955,50 @@ public final class SpawnedDisplayEntityGroup {
      * @param entity The entity with the directions to follow
      * @param followType The follow type
      * @param unregisterOnEntityDeath Determines if this group should be despawned after the entity's death
-     * @param teleportationDuration Set the teleportationDuration of all parts within this group
+     * @throws IllegalArgumentException If the {@link FollowType} is set to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
      */
-    public void followEntityDirection(@Nonnull Entity entity, @Nonnull FollowType followType, boolean unregisterOnEntityDeath, boolean pivotInteractions, int teleportationDuration){
+    public void followEntityDirection(@NotNull Entity entity, @NotNull FollowType followType, boolean unregisterOnEntityDeath, boolean pivotInteractions){
+        followEntityDirection(entity, followType, unregisterOnEntityDeath, pivotInteractions, getTeleportDuration());
+    }
+
+    /**
+     * Force the SpawnedDisplayEntityGroup to look in the same direction as a specified entity
+     * @param entity The entity with the directions to follow
+     * @param followType The follow type
+     * @param unregisterAfterEntityDeathDelay How long after an entity dies to despawn the group, in ticks
+     * @throws IllegalArgumentException If the {@link FollowType} is set to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
+     */
+    public void followEntityDirection(@NotNull Entity entity, @NotNull FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions){
+        followEntityDirection(entity, followType, unregisterAfterEntityDeathDelay, pivotInteractions, getTeleportDuration());
+    }
+
+    /**
+     * Force the SpawnedDisplayEntityGroup to look in the same direction as a specified entity
+     * @param entity The entity with the directions to follow
+     * @param followType The follow type
+     * @param unregisterOnEntityDeath Determines if this group should be despawned after the entity's death
+     * @param teleportationDuration Set the teleportationDuration (rotation smoothness) of all parts within this group
+     * @throws IllegalArgumentException If the {@link FollowType} is set to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
+     */
+    public void followEntityDirection(@NotNull Entity entity, @NotNull FollowType followType, boolean unregisterOnEntityDeath, boolean pivotInteractions, int teleportationDuration){
+        if (unregisterOnEntityDeath){
+            followEntityDirection(entity, followType, 0, pivotInteractions, teleportationDuration);
+        }
+        else{
+            followEntityDirection(entity, followType, -1, pivotInteractions, teleportationDuration);
+        }
+
+    }
+
+    /**
+     * Force the SpawnedDisplayEntityGroup to look in the same direction as a specified entity
+     * @param entity The entity with the directions to follow
+     * @param followType The follow type
+     * @param unregisterAfterEntityDeathDelay How long after an entity dies to despawn the group, in ticks.
+     * @param teleportationDuration Set the teleportationDuration (rotation smoothness) of all parts within this group
+     * @throws IllegalArgumentException If the {@link FollowType} is set to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
+     */
+    public void followEntityDirection(@NotNull Entity entity, @NotNull FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions, int teleportationDuration){
         if (!(entity instanceof LivingEntity) && followType == FollowType.BODY){
             throw new IllegalArgumentException("Only living entities can have a follow type of \"BODY\"");
         }
@@ -849,8 +1014,11 @@ public final class SpawnedDisplayEntityGroup {
             @Override
             public void run() {
                 if (!group.isSpawned() || followedEntity != entity.getUniqueId() || entity.isDead()){
-                    if (entity.isDead() && unregisterOnEntityDeath){
-                        group.unregister(true);
+                    if (entity.isDead() && unregisterAfterEntityDeathDelay > -1){
+                        Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                            group.unregister(true);
+                        }, unregisterAfterEntityDeathDelay);
+
                     }
                     cancel();
                     return;
@@ -890,26 +1058,6 @@ public final class SpawnedDisplayEntityGroup {
         return followedEntity != null ? Bukkit.getEntity(followedEntity) : null;
     }
 
-    /**
-     * Set the teleportation Duration of all SpawnedDisplayEntityParts in this SpawnedDisplayEntityGroup
-     * Useful when using methods such as {@link #teleportMove(Vector, double, int)}, {@link #teleportMove(Direction, double, int)}, {@link #teleport(Location, boolean)}
-     * , or {@link #followEntityDirection(Entity, FollowType, boolean, boolean, int)}
-     * This makes the teleportation of the group visually smoother
-     */
-    public void setTeleportDuration(int teleportDuration){
-        for (SpawnedDisplayEntityPart part : getSpawnedDisplayParts()){
-            ((Display) part.getEntity()).setTeleportDuration(teleportDuration);
-        }
-    }
-
-    /**
-     * Get the teleport duration of this SpawnedDisplayEntityGroup
-     * @return the group's teleport duration value
-     */
-    public int getTeleportDuration(){
-        return ((Display) masterPart.getEntity()).getTeleportDuration();
-    }
-
 
     /**
      * Put an Entity on top of an SpawnedDisplayEntityGroup
@@ -944,6 +1092,27 @@ public final class SpawnedDisplayEntityGroup {
         return entity.getPassengers().contains(masterPart.getEntity());
     }
 
+
+    /**
+     * Set the teleportation Duration of all SpawnedDisplayEntityParts in this SpawnedDisplayEntityGroup
+     * Useful when using methods such as {@link #teleportMove(Vector, double, int)}, {@link #teleportMove(Direction, double, int)}, {@link #teleport(Location, boolean)}
+     * , or {@link #followEntityDirection(Entity, FollowType, boolean, boolean, int)}
+     * This makes the teleportation of the group visually smoother
+     */
+    public void setTeleportDuration(int teleportDuration){
+        for (SpawnedDisplayEntityPart part : getSpawnedDisplayParts()){
+            ((Display) part.getEntity()).setTeleportDuration(teleportDuration);
+        }
+    }
+
+    /**
+     * Get the teleport duration of this SpawnedDisplayEntityGroup
+     * @return the group's teleport duration value
+     */
+    public int getTeleportDuration(){
+        return ((Display) masterPart.getEntity()).getTeleportDuration();
+    }
+
     /**
      * Merge the parts of two groups together into one group
      * @param mergingGroup the group to merge
@@ -957,6 +1126,7 @@ public final class SpawnedDisplayEntityGroup {
         mergingGroup.removeAllPartSelections();
         mergingGroup.spawnedParts.clear();
         mergingGroup.unregister(false);
+        autoSetCulling(DisplayEntityPlugin.autoCulling());
         return this;
     }
 
@@ -978,16 +1148,34 @@ public final class SpawnedDisplayEntityGroup {
         }
     }
 
-    public void animate(@Nonnull SpawnedDisplayAnimation animation){
+    /**
+     * Make a group perform an animation
+     * @param animation the animation this group should play
+     */
+    public void animate(@NotNull SpawnedDisplayAnimation animation){
         DisplayAnimator.play(this, animation);
     }
 
-    public void animateLooping(@Nonnull SpawnedDisplayAnimation animation){
+    /**
+     * Make a group perform a looping animation. There is not a way to manually stop the looped animation, other than by using
+     * a {@link DisplayAnimator}. This is recommended only for debug use or in cases where looped animations don't need to stop.
+     * @param animation the animation this group should play
+     */
+    public void animateLooping(@NotNull SpawnedDisplayAnimation animation){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
         animator.play(this);
+
     }
 
-    public void setToFrame(SpawnedDisplayAnimationFrame frame) {
+    /**
+     * Display the translation of a {@link SpawnedDisplayAnimationFrame}
+     * @param frame the frame to display
+     * @return false if this group is in an unloaded chunk
+     */
+    public boolean setToFrame(SpawnedDisplayAnimationFrame frame) {
+        if (!isInLoadedChunk()){
+            return false;
+        }
         for (SpawnedDisplayEntityPart part : spawnedParts){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Vector oldVector = DisplayUtils.getInteractionTranslation((Interaction) part.getEntity());
@@ -1005,7 +1193,7 @@ public final class SpawnedDisplayEntityGroup {
                 }
 
                 Vector moveVector = oldVector.subtract(translationVector);
-                part.translate((float) moveVector.length(), frame.duration, 0, moveVector);
+                part.translateForce((float) moveVector.length(), frame.duration, 0, moveVector);
 
             }
             else{
@@ -1025,9 +1213,21 @@ public final class SpawnedDisplayEntityGroup {
                 display.setTransformation(transformation);
             }
         }
+        return true;
     }
 
-
+    /**
+     * Set this group's animation state if it has been added to a {@link DisplayAnimatorStateMachine}.
+     * @param stateName The name of the state to set for this SpawnedDisplayEntityGroup
+     * @return true if this group's state was changed. false if this group has not been added to a DisplayAnimatorStateMachine
+     */
+    public boolean setAnimationState(@NotNull String stateName){
+        DisplayAnimatorStateMachine stateMachine = DisplayAnimatorStateMachine.getStateMachine(this);
+        if (stateMachine == null){
+            return false;
+        }
+        return stateMachine.setState(stateName, this);
+    }
 
 
     /**
@@ -1081,13 +1281,17 @@ public final class SpawnedDisplayEntityGroup {
         if (masterPart == null){
             return;
         }
-        DisplayStateAnimator.unregisterStateAnimator(this);
+        DisplayAnimatorStateMachine.unregisterStateMachine(this);
         DisplayGroupManager.removeSpawnedGroup(this, despawnParts);
 
         masterPart = null;
         followedEntity = null;
     }
 
+    /**
+     * Check if this group is spawned in a world. This will return true even in unloaded chunks.
+     * @return false if this group has been unregistered.
+     */
     public boolean isSpawned(){
         return DisplayGroupManager.isGroupSpawned(this);
     }
