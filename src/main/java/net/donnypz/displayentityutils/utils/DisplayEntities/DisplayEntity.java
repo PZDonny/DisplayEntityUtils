@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -8,11 +9,12 @@ import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.TextDisplay;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
 final class DisplayEntity implements Serializable {
 
@@ -59,6 +61,7 @@ final class DisplayEntity implements Serializable {
     /**
      * Spawn a Display representative of this
      * @param location The location to spawn the Display
+     * @param isVisible Determines if the part will be visible
      * @return The spawned Display
      */
     public Display createEntity(Location location, boolean isVisible){
@@ -78,13 +81,46 @@ final class DisplayEntity implements Serializable {
         }
     }
 
+    /**
+     * Spawn a Display representative of this
+     * @param location The location to spawn the Display
+     * @param hiddenTags A list of tags that will hide the part if the part has any of these tags
+     * @return The spawned Display
+     */
+    public Display createEntity(Location location, @NotNull List<String> hiddenTags){
+        switch(type){
+            case BLOCK ->{
+                return spawnBlockDisplay(location, hiddenTags);
+            }
+            case ITEM ->{
+                return spawnItemDisplay(location, hiddenTags);
+            }
+            case TEXT ->{
+                return spawnTextDisplay(location, hiddenTags);
+            }
+            default ->{
+                return null;
+            }
+        }
+    }
+
     Display spawnBlockDisplay(Location location, boolean isVisible){
         BlockDisplaySpecifics spec = (BlockDisplaySpecifics) specifics;
         BlockData data = Bukkit.createBlockData(spec.getBlockData());
         return location.getWorld().spawn(location, BlockDisplay.class, display ->{
             display.setBlock(data);
-            display.setVisibleByDefault(isVisible);
             specifics.updateDisplay(this, display);
+            display.setVisibleByDefault(isVisible);
+        });
+    }
+
+    Display spawnBlockDisplay(Location location, List<String> hiddenTags){
+        BlockDisplaySpecifics spec = (BlockDisplaySpecifics) specifics;
+        BlockData data = Bukkit.createBlockData(spec.getBlockData());
+        return location.getWorld().spawn(location, BlockDisplay.class, display ->{
+            display.setBlock(data);
+            specifics.updateDisplay(this, display);
+            determineVisibleByDefault(display, hiddenTags);
         });
     }
 
@@ -93,10 +129,21 @@ final class DisplayEntity implements Serializable {
         return location.getWorld().spawn(location, ItemDisplay.class, display ->{
             display.setItemDisplayTransform(spec.getItemDisplayTransform());
             display.setItemStack(spec.getItemStack());
-            display.setVisibleByDefault(isVisible);
             specifics.updateDisplay(this, display);
+            display.setVisibleByDefault(isVisible);
         });
     }
+
+    Display spawnItemDisplay(Location location, List<String> hiddenTags){
+        ItemDisplaySpecifics spec = (ItemDisplaySpecifics) specifics;
+        return location.getWorld().spawn(location, ItemDisplay.class, display ->{
+            display.setItemDisplayTransform(spec.getItemDisplayTransform());
+            display.setItemStack(spec.getItemStack());
+            specifics.updateDisplay(this, display);
+            determineVisibleByDefault(display, hiddenTags);
+        });
+    }
+
     Display spawnTextDisplay(Location location, boolean isVisible){
         TextDisplaySpecifics spec = (TextDisplaySpecifics) specifics;
         return location.getWorld().spawn(location, TextDisplay.class, display ->{
@@ -110,9 +157,48 @@ final class DisplayEntity implements Serializable {
             display.setShadowed(spec.isShadowed());
             display.setSeeThrough(spec.isSeeThrough());
             display.setDefaultBackground(spec.isDefaultBackground());
-            display.setVisibleByDefault(isVisible);
             specifics.updateDisplay(this, display);
+            display.setVisibleByDefault(isVisible);
         });
+    }
+
+    Display spawnTextDisplay(Location location, List<String> hiddenTags){
+        TextDisplaySpecifics spec = (TextDisplaySpecifics) specifics;
+        return location.getWorld().spawn(location, TextDisplay.class, display ->{
+            display.text(spec.getText());
+            display.setAlignment(spec.getAlignment());
+            display.setLineWidth(spec.getLineWidth());
+            if (spec.getBackgroundColorARGB() != Color.BLACK.asARGB()){
+                display.setBackgroundColor(Color.fromARGB(spec.getBackgroundColorARGB()));
+            }
+            display.setTextOpacity(spec.getTextOpacity());
+            display.setShadowed(spec.isShadowed());
+            display.setSeeThrough(spec.isSeeThrough());
+            display.setDefaultBackground(spec.isDefaultBackground());
+            specifics.updateDisplay(this, display);
+            determineVisibleByDefault(display, hiddenTags);
+        });
+    }
+
+    private void determineVisibleByDefault(Display display, List<String> hiddenTags){
+        boolean visible = true;
+
+        for (String legacy : getLegacyPartTags()){ //Legacy Tags (Scoreboard)
+            if (hiddenTags.contains(legacy)){
+                visible = false;
+            }
+        }
+
+        if (visible){ //PDC Tags and not hidden from Legacy
+            for (String tag : hiddenTags){
+                if (DisplayUtils.hasTag(display, tag)){
+                    visible = false;
+                    break;
+                }
+            }
+        }
+
+        display.setVisibleByDefault(visible);
     }
 
     /**
@@ -139,11 +225,7 @@ final class DisplayEntity implements Serializable {
         return isMaster;
     }
 
-    /**
-     * Get this DisplayEntity's part tags
-     * @return This DisplayEntity's part tags
-     */
-    public ArrayList<String> getPartTags(){
-        return specifics.getPartTags();
+    List<String> getLegacyPartTags(){
+        return specifics.getLegacyPartTags();
     }
 }
