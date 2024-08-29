@@ -4,6 +4,10 @@ import com.zaxxer.hikari.HikariDataSource;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.dbutils.DbUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -137,7 +141,7 @@ public final class MYSQLManager {
                 else{
                     if (saver != null) {
                         saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display entity group to MYSQL!");
-                        saver.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Save with tag already exists!");
+                        saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
                     }
                     return false;
                 }
@@ -181,7 +185,7 @@ public final class MYSQLManager {
             DbUtils.closeQuietly(statement);
             DbUtils.closeQuietly(connection);
             if (deleter != null){
-                deleter.sendMessage(ChatColor.WHITE+"- "+ChatColor.LIGHT_PURPLE+"Successfully deleted from MYSQL!");
+                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted from MYSQL"));
             }
         }
         catch(SQLException ignored){
@@ -245,7 +249,7 @@ public final class MYSQLManager {
                 else{
                     if (saver != null) {
                         saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display animation to MYSQL!");
-                        saver.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Save with tag already exists!");
+                        saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
                     }
                     return false;
                 }
