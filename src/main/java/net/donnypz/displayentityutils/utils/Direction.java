@@ -5,8 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 public enum Direction {
     UP,
@@ -20,7 +19,8 @@ public enum Direction {
     WEST,
     EAST;
 
-    //X and Z Enums for translation are relative to a display entity's local axes, whereas  move/teleport it uses world axes
+    //X and Z Enums for translation are relative to a display entity's local axes,
+    // whereas move/teleport it uses world axes
 
 
 
@@ -30,7 +30,7 @@ public enum Direction {
      * @return A vector
      */
     @ApiStatus.Internal
-    public Vector getVector(@Nonnull Location location){
+    public Vector getVector(@NotNull Location location){
         Vector vector;
         Vector locVector = location.getDirection();
         switch(this){
