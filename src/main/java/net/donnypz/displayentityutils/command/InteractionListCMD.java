@@ -4,11 +4,14 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickCallback;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
 import java.util.List;
 
 class InteractionListCMD implements SubCommand{
@@ -25,12 +28,18 @@ class InteractionListCMD implements SubCommand{
         player.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         player.sendMessage(Component.text("Interaction Commands:", NamedTextColor.GRAY));
 
-        List<InteractionCommand> commands = DisplayUtils.getCleanInteractionCommandsWithData(interaction);
+        List<InteractionCommand> commands = DisplayUtils.getInteractionCommandsWithData(interaction);
         for (int i = 0; i < commands.size(); i++){
             InteractionCommand cmd = commands.get(i);
             String clickType = cmd.isLeftClick() ? "LEFT" : "RIGHT";
             String execType = cmd.isConsoleCommand() ? "CONSOLE" : "PLAYER";
-            player.sendMessage("ID: "+i+" <"+clickType+" | "+execType+"> "+"| "+ChatColor.YELLOW+cmd.getCommand());
+            Component preInfo = Component.text("- <"+clickType+" | "+execType+"> ");
+            Component command = Component.text(cmd.getCommand()+" ", NamedTextColor.YELLOW);
+            Component remove  = Component.text("Click to REMOVE", NamedTextColor.RED, TextDecoration.UNDERLINED).clickEvent(ClickEvent.callback(click -> {
+                click.sendMessage(Component.text("Command Removed! ", NamedTextColor.RED).append(Component.text(cmd.getCommand(), NamedTextColor.GRAY)));;
+                DisplayUtils.removeInteractionCommand(interaction, cmd.getCommand(), cmd.getKey());
+            }, ClickCallback.Options.builder().lifetime(Duration.ofMinutes(5)).build()));
+            player.sendMessage(preInfo.append(command).append(remove));
         }
     }
 }
