@@ -10,6 +10,7 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
+import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
@@ -25,18 +26,24 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 
 public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
-    static DisplayEntityPlugin instance;
+    private static DisplayEntityPlugin instance;
+
+    @ApiStatus.Internal
     public static final String pluginPrefix = ChatColor.YELLOW+"[DisplayEntityUtils] ";
+    @ApiStatus.Internal
     public static final String pluginPrefixLong = ChatColor.WHITE+"-----"+ChatColor.YELLOW+"DisplayEntityUtils"+ChatColor.WHITE+"-----";
-    public static NamespacedKey partUUIDKey;
-    public static NamespacedKey groupTagKey;
-    public static final String partTagPrefix = "deu.parttag_";
-    public static NamespacedKey masterKey;
+    private static NamespacedKey partUUIDKey;
+    private static NamespacedKey partPDCTagKey;
+    private static NamespacedKey groupTagKey;
+    private static NamespacedKey masterKey;
+
+    private static final String legacyPartTagPrefix = "deu.parttag_";
     private static boolean isMongoEnabled = false;
     private static boolean isMYSQLEnabled = false;
     private static boolean isLocalEnabled;
@@ -49,7 +56,10 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     private static boolean despawnGroupsOnServerStop;
     private static boolean overwriteExistingSaves;
     private static boolean unregisterOnUnload;
+    private static boolean isUnregisterOnUnloadBlacklist;
+    private static List<String> unregisterUnloadWorlds;
     private static boolean autoSelectGroups;
+    private static CullOption cullOption;
 
     @Override
     public void onEnable() {
@@ -73,10 +83,9 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
 
         partUUIDKey = new NamespacedKey(this, "partUUID");
+        partPDCTagKey = new NamespacedKey(this, "pdcTag");
         groupTagKey = new NamespacedKey(this, "groupTag");
         masterKey = new NamespacedKey(this, "isMaster"); //DO NOT CHANGE
-
-
     }
 
     @Override
@@ -127,13 +136,28 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
                 maximumInteractionSearchRange = 0;
             }
             readSameChunks = getConfig().getBoolean("automaticGroupDetection.readSameChunks");
-            unregisterOnUnload = getConfig().getBoolean("automaticGroupDetection.unregisterOnUnload");
+            unregisterOnUnload = getConfig().getBoolean("automaticGroupDetection.unregisterOnUnload.enabled");
+            isUnregisterOnUnloadBlacklist = getConfig().getBoolean("automaticGroupDetection.unregisterOnUnload.blacklist");
+            unregisterUnloadWorlds = getConfig().getStringList("automaticGroupDetection.unregisterOnUnload.worlds");
+
         }
 
         autoPivotInteractions = getConfig().getBoolean("autoPivotInteractionsOnSpawn");
         despawnGroupsOnServerStop = getConfig().getBoolean("despawnGroupsOnServerStop");
         overwriteExistingSaves = getConfig().getBoolean("overwriteExistingSaves");
         autoSelectGroups = getConfig().getBoolean("autoSelectGroups");
+        String cullConfig = getConfig().getString("cullOption");
+        try{
+            if (cullConfig != null){
+                cullOption = CullOption.valueOf(cullConfig.toUpperCase());
+            }
+            else{
+                cullOption = CullOption.NONE;
+            }
+        }
+        catch(IllegalArgumentException illegalArgumentException){
+            cullOption = CullOption.NONE;
+        }
 
     }
 
@@ -149,6 +173,21 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         }
     }
 
+    public static NamespacedKey getPartUUIDKey() {
+        return partUUIDKey;
+    }
+
+    public static NamespacedKey getPartPDCTagKey() {
+        return partPDCTagKey;
+    }
+
+    public static NamespacedKey getGroupTagKey() {
+        return groupTagKey;
+    }
+
+    public static NamespacedKey getMasterKey() {
+        return masterKey;
+    }
 
     public static DisplayEntityPlugin getInstance(){
         return instance;
@@ -244,6 +283,14 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         return autoSelectGroups;
     }
 
+    /**
+     * Gets the value of "autoCulling" in the config
+     * @return {@link CullOption} set in the config, null if not set or {@link CullOption#NONE} if an incorrect option was entered.
+     */
+    public static CullOption autoCulling(){
+        return cullOption;
+    }
+
 
     /**
      * Gets the value of "despawnGroupsOnServerStop" in the config
@@ -251,6 +298,29 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
      */
     public static boolean despawnGroupsOnServerStop() {
         return despawnGroupsOnServerStop;
+    }
+
+    /**
+     * Determines whether {@link SpawnedDisplayEntityGroup}s should be unregistered in a world based
+     * on config settings
+     * @return the boolean value set in config
+     */
+    @ApiStatus.Internal
+    public static boolean shouldUnregisterWorld(String worldName){
+        if (!unregisterOnUnload){
+            return false;
+        }
+        boolean containsWorld = unregisterUnloadWorlds.stream().anyMatch(entry -> entry.equalsIgnoreCase(worldName));
+        return isUnregisterOnUnloadBlacklist != containsWorld;
+    }
+
+    /**
+     * Used for older versions of DisplayEntityUtils Plugin
+     * This will NEVER have to be called manually
+     */
+    @ApiStatus.Internal
+    public static String getLegacyPartTagPrefix(){
+        return legacyPartTagPrefix;
     }
 
     /**
@@ -276,7 +346,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             if (!new PreInteractionClickEvent(e.getPlayer(), entity, InteractionClickEvent.ClickType.RIGHT).callEvent()){
                 return;
             }
-            List<InteractionCommand> commands = DisplayUtils.getCleanInteractionCommandsWithData(entity);
+            List<InteractionCommand> commands = DisplayUtils.getInteractionCommandsWithData(entity);
             callInteractionEvent(new InteractionClickEvent(e.getPlayer(), entity, InteractionClickEvent.ClickType.RIGHT, commands));
         }
     }
@@ -290,7 +360,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             if (!new PreInteractionClickEvent((Player) e.getDamager(), entity, InteractionClickEvent.ClickType.LEFT).callEvent()){
                 return;
             }
-            List<InteractionCommand> commands = DisplayUtils.getCleanInteractionCommandsWithData(entity);
+            List<InteractionCommand> commands = DisplayUtils.getInteractionCommandsWithData(entity);
             callInteractionEvent(new InteractionClickEvent((Player) e.getDamager(), entity, InteractionClickEvent.ClickType.LEFT, commands));
         }
     }

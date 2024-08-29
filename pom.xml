@@ -6,7 +6,7 @@
 
     <groupId>net.donnypz</groupId>
     <artifactId>displayentityutils</artifactId>
-    <version>2.1.2</version>
+    <version>2.2.0</version>
     <packaging>jar</packaging>
 
     <name>DisplayEntityUtils</name>
@@ -48,12 +48,18 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
 
-                        <!--Allows MongoDB driver to work in other plugins-->
+                        <!--Allows Dependencies to work in other plugins-->
                             <relocations>
                                 <relocation>
                                     <pattern>org.mongodb</pattern>
                                     <shadedPattern>net.donnypz.displayentityutils.mongodb</shadedPattern>
                                 </relocation>
+
+                                <relocation>
+                                    <pattern>com.zaxxer</pattern>
+                                    <shadedPattern>net.donnypz.displayentityutils.hikaricp</shadedPattern>
+                                </relocation>
+
                             </relocations>
 
                         </configuration>
