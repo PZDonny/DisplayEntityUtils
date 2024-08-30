@@ -1,94 +1,24 @@
 
-## About DisplayEntityUtils
-This plugin was created to easy save and manipulate display entities and interactions without hassle.
+# DisplayEntityUtils
+This plugin was created to easily save and manipulate display entities and interactions without hassle.
 
-This is the first spigot plugin I have made publicly avaliabele so expect for there to potentially be issues
-## **How do I make my own Models**
-[Use this tool to create your own Models.](https://eszesbalint.github.io/bdstudio/editor)
-> ***UNDERSTAND, I DO NOT OWN THIS TOOL! IT IS CREATED BY [eszesbalint](https://github.com/eszesbalint), AND THE REPO FOR THIS PROJECT CAN BE FOUND [HERE](https://github.com/eszesbalint/bdstudio)***
+This is the first paper plugin I have made publicly available. Expect the possibility of issues to occur.
 
-## **What are the commands?**
+## How do I make my own Models
+[Use this tool to create your own Models.](block-display.com)
+> ***UNDERSTAND, I DO NOT OWN THIS TOOL! IT IS CREATED BY [illystray]([https://github.com/eszesbalint](https://illystray.com)), ANY ERRORS RELATED TO THAT PROJECT SHOULD BE BROUGHT TO ILLYSTRAY in the [BDEngine Discord](https://discord.com/invite/VCeHfSd6Xa)***
+
+## What are the commands?
 
 **/mdis help** *(Permission: deu.help)*
-- Opens the help page to list all commands
+- Opens a list of all commands for this plugin
 
-**/mdis partshelp** *(Permission: deu.help)*
-- Opens the help page for commands that manipulate parts
+<br>
 
-**/mdis selectnearest [interaction-distance]** *(Permission: deu.select)*
-- Selects the nearest Spawned DisplayEntityGroup from the player's location
+## Where's the wiki?
+[DisplayEntityUtils' wiki can be found here!](https://github.com/PZDonny/DisplayEntityUtils/wiki)
 
-**/mdis addinteractions [interaction-distance]** *(Permission: deu.addinteractions)*
-- Add all interaction entities in the set distance, to the player's selected display entity group
-
-**/mdis removeinteractions** *(Permission: deu.removeinteractions)*
-- Remove all interaction entities in the player's selected display entity group
-
-**/mdis settag [tag]** *(Permission: deu.settag)*
-- Set the tag of the player's selected group to the specified tag
-
-**/mdis gettag** *(Permission: deu.gettag)*
-- Get the tag of the player's selected group
-
-**/mdis highlight** *(Permission: deu.hightlight)*
-- Highlight each individual entity in the player's selected display entity group
-
-**/mdis clone** *(Permission: deu.clone)*
-- Creates an identical copy of the player's selected display entity group at the player's location, respecting the pitch and yaw of the display entity group
-
-**/mdis movehere** *(Permission: deu.movehere)*
-- Teleports the player's selected display entity group to their location
-
-**/mdis move [direction] [distance] [tick-duration]** *(Permission: deu.move)*
-- Smoothly teleports the player's selected display entity group in the direction specified, stopping when its reached the distance, and takes the set amount of ticks to complete
-
-**/mdis translate [direction] [distance] [tick-duration]** *(Permission: deu.translate)*
-- Uses the translation of display entities to translate each display entity within the group in a direciton, stopping when the distance is reached, taking the set amount of ticks to complete. Interaction entities in the group are smoothly teleported with the same logic
-
-**/mdis setyaw [yaw] ** *(Permission: deu.translate)*
-- Set's the yaw of the player's selected display entity group to the yaw specified
-
-**/mdis save [storage]** *(Permission: deu.save)*
-- Save the player's selected display entity group to a storage location
-
-**/mdis delete [tag] [storage]** *(Permission: deu.delete)*
-- Delete a display entity group from a storage location
-
-**/mdis spawn [tag] [storage]** *(Permission: deu.spawn)*
-- Spawn a display entity group from a storage location
-
-**/mdis despawn** *(Permission: deu.despawn)*
-- Despawn the player's selected display entity group
-
-**/mdis list [storage] [page-number]** *(Permission: deu.list)*
-- List all of the saved display entity group from a storage location
-
-**/mdis reload** *(Permission: deu.reload)*
-- Reloads the plugin's config
-
-**/mdis cyclepart [first | prev | next]** *(Permission: deu.cyclepart)*
-- Cycle through the parts the player's selected display entity group
-
-**/mdis setparttag [part-tag]** *(Permission: deu.setparttag)*
-- Sets the part tag of a player's selected part
-
-**/mdis getparttag** *(Permission: deu.getparttag)*
-- Gets the part tag of a player's selected part
-
-**/mdis selectpart [part-tag]** *(Permission: deu.selectpart)*
-- Creates a part selection for a player, selecting only the parts in a player's selected display entity group with the part tag specified
-
-**/mdis removepart** *(Permission: deu.removepart)*
-- Remove the player's part selection from the player's selected group
-
-**/mdis highlightparts** *(Permission: deu.highlight)*
-- Highlights all the parts in a player's part selection
-
-**/mdis translatepart [direction]** *(Permission: deu.translate)*
-- Uses the translation of display entities to translate each display entity in a player's part selection in a direciton, stopping when the distance is reached, taking the set amount of ticks to complete. Interaction entities in the group are smoothly teleported with the same logic
-
-**/mdis spawnpartinteraction** *(Permission: deu.partinteraction)*
-- Spawns an interaction entity at the center of the player's selected display entity part(s)
+<br>
 
 ## **How do I access the API?**
 
