@@ -17,6 +17,7 @@ This is the first paper plugin I have made publicly available. Expect the possib
 
 ## Where's the wiki?
 [DisplayEntityUtils' wiki can be found here!](https://github.com/PZDonny/DisplayEntityUtils/wiki)
+> Note: This wiki is still a WIP (Work in progress)
 
 <br>
 
