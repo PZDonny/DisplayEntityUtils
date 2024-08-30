@@ -46,12 +46,12 @@ class TextCMD implements SubCommand{
 
     static void textHelp(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis text set <text>");
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis text font <default | alt | uniform | illageralt>");
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis text shadow", " (Toggle shadows visibility in text display)");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis text seethrough", " (Toggle see through setting of text display)");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis text align <left | right | center>", " (Set the text display's text alignment)");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis text linewidth <width>", " (Set the line width of text display)");
+        CMDUtils.sendCMD(sender,"/mdis text set <text>", "(Set this text for your selected text display)");
+        CMDUtils.sendCMD(sender,"/mdis text font <default | alt | uniform | illageralt>", " (Set the text font for your selected text display)");
+        CMDUtils.sendCMD(sender,"/mdis text shadow", " (Toggle shadows visibility in your selected text display)");
+        CMDUtils.sendCMD(sender, "/mdis text seethrough", " (Toggle see through setting of your selected text display)");
+        CMDUtils.sendCMD(sender, "/mdis text align <left | right | center>", " (Set your selected text display's text alignment)");
+        CMDUtils.sendCMD(sender, "/mdis text linewidth <width>", " (Set the line width of your selected text display)");
     }
 
 }

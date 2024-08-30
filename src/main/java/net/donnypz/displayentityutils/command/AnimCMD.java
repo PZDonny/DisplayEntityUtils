@@ -68,25 +68,24 @@ class AnimCMD implements SubCommand{
         sender.sendMessage(Component.text("If using animations, use \"move\" on groups instead of \"translate\"", NamedTextColor.AQUA));
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Use <yellow>\"block-display.com\" <aqua>to easier create animations and convert them "));
         sender.sendMessage(Component.text("Use "+ ChatColor.YELLOW+"\"block-display.com\""+ChatColor.AQUA+" to create models and keyframes", NamedTextColor.AQUA));
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis anim new [part-tag]", " (Animates only parts with a tag, if the tag is specified)");
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis anim info");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim frameinfo <frame-id>");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim addframe <delay-in-ticks> <duration-in-ticks>");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim addframeafter <frame-id> <delay-in-ticks> <duration-in-ticks>");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim removeframe <frame-id>");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim showframe <frame-id>", " (Displays a frame on the group)");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim editframe <frame-id> <delay-in-ticks> <duration-in-ticks>");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim editallframes <delay-in-ticks> <duration-in-ticks>");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim addsound <frame-id> <sound> <volume> <pitch> <start | end>");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim removesound <frame-id> <sound> <start | end>");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim overwriteframe <frame-id>", " (Overwrite the transformation data of a frame)");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim reverse", "(Reverse the order of frames in this animation)");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim reset");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim togglescalerespect", " (Toggle whether this animation should respect the group's scale)");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim play");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis anim select <anim-tag>");
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis anim save <storage-location>");
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis anim delete <anim-tag> <storage-location>");
+        CMDUtils.sendCMD(sender,"/mdis anim new [part-tag]", " (Manually create a new animation. Animates only parts with a tag, if the tag is specified)");
+        CMDUtils.sendCMD(sender,"/mdis anim info", " (List information about your selected animation)");
+        CMDUtils.sendCMD(sender, "/mdis anim frameinfo <frame-id>", " (List information about a frame in your animation)");
+        CMDUtils.sendCMD(sender, "/mdis anim addframe <delay-in-ticks> <duration-in-ticks>", " (Add a frame to your selected animation)");
+        CMDUtils.sendCMD(sender, "/mdis anim addframeafter <frame-id> <delay-in-ticks> <duration-in-ticks>", " (Add a frame after another frame to your selected animation)");
+        CMDUtils.sendCMD(sender, "/mdis anim removeframe <frame-id>", " (Remove a frame from your selected animation)");
+        CMDUtils.sendCMD(sender, "/mdis anim showframe <frame-id>", " (Displays a frame on your selected group)");
+        CMDUtils.sendCMD(sender, "/mdis anim editframe <frame-id> <delay-in-ticks> <duration-in-ticks>", " (Edit properties of a single frame)");
+        CMDUtils.sendCMD(sender, "/mdis anim editallframes <delay-in-ticks> <duration-in-ticks>", " (Edit properties of all frames)");
+        CMDUtils.sendCMD(sender, "/mdis anim addsound <frame-id> <sound> <volume> <pitch> <start | end>", " (Add a sound to a frame)");
+        CMDUtils.sendCMD(sender, "/mdis anim removesound <frame-id> <sound> <start | end>", " (Remove a sound from a frame)");
+        CMDUtils.sendCMD(sender, "/mdis anim overwriteframe <frame-id>", " (Overwrite the transformation data of a frame)");
+        CMDUtils.sendCMD(sender, "/mdis anim reverse", "(Reverse the order of frames in your selected animation)");
+        CMDUtils.sendCMD(sender, "/mdis anim togglescalerespect", " (Toggle whether your selected animation should respect the group's scale)");
+        CMDUtils.sendCMD(sender, "/mdis anim play", " (Play your selected animation on your selected group)");
+        CMDUtils.sendCMD(sender, "/mdis anim select <anim-tag>", "Select a saved DisplayAnimation from a storage location");
+        CMDUtils.sendCMD(sender,"/mdis anim save <storage-location>", " (Save your selected animation)");
+        CMDUtils.sendCMD(sender,"/mdis anim delete <anim-tag> <storage-location>", " (Delete a saved animation from a storage location)");
 
     }
 

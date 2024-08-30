@@ -3,7 +3,6 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -57,30 +56,30 @@ class PartsCMD implements SubCommand{
 
     static void partsHelp(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-        sender.sendMessage(ChatColor.AQUA+"\"Parts\" are each individual display/interaction entity that is spawned within the group");
-        sender.sendMessage(ChatColor.AQUA+"Add tags to parts to identify each part in a group");
-        sender.sendMessage(ChatColor.YELLOW+" | Mainly useful for API users, creating animations, and usage with addon plugins");
-        sender.sendMessage(ChatColor.GRAY+"/mdis parts cycle <first | prev | next>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis parts addtag <part-tag>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis parts removetag <part-tag>");
-        sender.sendMessage(Component.text("/mdis parts adapttags <part-tag> [-remove]", NamedTextColor.GRAY)
-                .append(Component.text(" Adapt existing scoreboard tags to tags usable by DisplayEntityUtils. This is done on selected parts or the group if there's no selection."+
-                        " \"-remove\" removes the tag from the scoreboard", NamedTextColor.YELLOW)));
-        sender.sendMessage(ChatColor.GRAY+"/mdis parts listtags");
-        sender.sendMessage(ChatColor.GRAY+"/mdis parts select <part-tag>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis parts deselect");
-        sender.sendMessage(ChatColor.GRAY+"/mdis parts remove");
-        sender.sendMessage(ChatColor.GRAY+"/mdis parts glow");
-        sender.sendMessage(ChatColor.GRAY+"/mdis parts setglowcolor <color | hex-code>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis parts translate <direction> <distance> <tick-duration>");
-        sender.sendMessage(ChatColor.GRAY+"/mdis parts seeduuids <group | selection> <seed>"+ChatColor.YELLOW+" (Useful when wanting to use the same animation on similar groups)");
-        sender.sendMessage(ChatColor.GRAY+"/mdis parts setblock <\"-held\" | \"-target\" | block-id>");
+        sender.sendMessage(Component.text("\"Parts\" are each individual display/interaction entity that is spawned within the group", NamedTextColor.AQUA));
+        sender.sendMessage(Component.text("Add tags to parts to identify each part in a group", NamedTextColor.AQUA));
+        sender.sendMessage(Component.text(" | Mainly useful for API users, creating animations, and usage with addon plugins", NamedTextColor.YELLOW));
+        CMDUtils.sendCMD(sender, "/mdis parts cycle <first | prev | next>", " (Cycle between selected parts or all parts in your group)");
+        CMDUtils.sendCMD(sender, "/mdis parts addtag <part-tag>", " (Add a tag to a part)");
+        CMDUtils.sendCMD(sender, "/mdis parts removetag <part-tag>", " (Remove a tag from a part)");
+        CMDUtils.sendCMD(sender, "/mdis parts adapttags <part-tag> [-remove]",
+                " Adapt existing scoreboard tags to tags usable by DisplayEntityUtils. This is done on selected parts or the group if there's no selection."+
+                        " \"-remove\" removes the tag from the scoreboard");
+        CMDUtils.sendCMD(sender, "/mdis parts listtags", " (List all tags a part has)");
+        CMDUtils.sendCMD(sender, "/mdis parts select <part-tag>", " (Select multiple parts by a part tag they contain)");
+        CMDUtils.sendCMD(sender, "/mdis parts deselect", " (Clear your part selection)");
+        CMDUtils.sendCMD(sender,"/mdis parts remove", " (Despawn and remove a part from a group)");
+        CMDUtils.sendCMD(sender, "/mdis parts glow", " (Make selected parts glow temporarily)");
+        CMDUtils.sendCMD(sender, "/mdis parts setglowcolor <color | hex-code>", " (Set the glow color for selected parts)");
+        CMDUtils.sendCMD(sender, "/mdis parts translate <direction> <distance> <tick-duration>", " (Translate a selected part)");
+        CMDUtils.sendCMD(sender, "/mdis parts seeduuids <group | selection> <seed>"," (Useful when wanting to use the same animation on similar groups)");
+        CMDUtils.sendCMD(sender, "/mdis parts setblock <\"-held\" | \"-target\" | block-id>", " (Easily change the block of a block display part)");
     }
 
     static void noPartSelection(Player player){
         player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You have not selected a part!");
-        player.sendMessage(ChatColor.GRAY+"/mdis parts cycle <first | prev | next>");
-        player.sendMessage(ChatColor.GRAY+"/mdis parts select <part-tag>");
+        player.sendMessage(Component.text("/mdis parts cycle <first | prev | next>", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("/mdis parts select <part-tag>", NamedTextColor.GRAY));
     }
 
 

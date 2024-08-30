@@ -64,28 +64,28 @@ class GroupCMD implements SubCommand{
 
     static void groupHelp(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group selectnearest <interaction-distance>");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group deselect");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group info");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group spawn <group-tag> <storage>");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group despawn");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group save <storage-location>");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group delete <group-tag> <storage-location>");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group addtarget", " (Add a targeted interaction entity to your group)");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group removeinteractions");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group settag <group-tag>");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group setyaw <yaw> [-pivot]"," (Put \"-pivot\" at the end of the command to pivot interaction entities)");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group setpitch <pitch>");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group setscale <scale-multiplier> <tick-duration>");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group clone", " (Spawn a cloned group at your selected group's location)");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group clonehere", " (Spawn a cloned group at your location)");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group move <direction> <distance> <tick-duration>");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group translate <direction> <distance> <tick-duration>"," (Changes this group's translation and not it's actual location, use \"move\" instead if this group uses animations)");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group movehere");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group merge"," (Merges groups at the same position)");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group copypose", " (Copies transformation of one group to another, despawning the copied group)");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group glow");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis group setglowcolor <color | hex-code>");
+        CMDUtils.sendCMD(sender, "/mdis group selectnearest <interaction-distance>", " (Select the nearest model group and distance to search for interactions)");
+        CMDUtils.sendCMD(sender, "/mdis group deselect", " (Clear your group selection)");
+        CMDUtils.sendCMD(sender, "/mdis group info", " (List information about your selected group)");
+        CMDUtils.sendCMD(sender, "/mdis group spawn <group-tag> <storage>", " (Spawn a saved DisplayEntityGroup from a storage location)");
+        CMDUtils.sendCMD(sender, "/mdis group despawn", " (Despawn your selected group)");
+        CMDUtils.sendCMD(sender, "/mdis group save <storage-location>", " (Save your selected group)");
+        CMDUtils.sendCMD(sender, "/mdis group delete <group-tag> <storage-location>", " (Delete a saved group from a storage location)");
+        CMDUtils.sendCMD(sender, "/mdis group addtarget", " (Add a targeted interaction entity to your group)");
+        CMDUtils.sendCMD(sender, "/mdis group ungroupinteractions", " (Remove all interactions from your group)");
+        CMDUtils.sendCMD(sender, "/mdis group settag <group-tag>", " (Set this group's tag, or identifier)");
+        CMDUtils.sendCMD(sender, "/mdis group setyaw <yaw> [-pivot]"," (Set your selected group's yaw, \"-pivot\" pivots interaction entities around the group)");
+        CMDUtils.sendCMD(sender, "/mdis group setpitch <pitch>", " (Set your selected group's pitch)");
+        CMDUtils.sendCMD(sender, "/mdis group setscale <scale-multiplier> <tick-duration>", "(Scale all parts of your selected group)");
+        CMDUtils.sendCMD(sender, "/mdis group clone", " (Spawn a cloned group at your selected group's location)");
+        CMDUtils.sendCMD(sender, "/mdis group clonehere", " (Spawn a cloned group at your location)");
+        CMDUtils.sendCMD(sender, "/mdis group move <direction> <distance> <tick-duration>", " (Change the actual location of your selected group)");
+        CMDUtils.sendCMD(sender, "/mdis group translate <direction> <distance> <tick-duration>"," (Changes your selected group's translation and not it's actual location, use \"move\" instead if this group uses animations)");
+        CMDUtils.sendCMD(sender, "/mdis group movehere", " (Change your selected group's actual location to your location)");
+        CMDUtils.sendCMD(sender, "/mdis group merge <distance>"," (Merges groups with your selected group)");
+        CMDUtils.sendCMD(sender, "/mdis group copypose", " (Copies the transformations of the group you're closest to, to your selected group)");
+        CMDUtils.sendCMD(sender, "/mdis group glow", " (Make all parts in this group glow)");
+        CMDUtils.sendCMD(sender, "/mdis group setglowcolor <color | hex-code>", "(Set the glow color for all parts in this group)");
     }
     
 }

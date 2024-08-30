@@ -4,7 +4,6 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -50,8 +49,8 @@ class ConvertCMD implements SubCommand{
         sender.sendMessage(Component.text("Animation datapacks can be converted", NamedTextColor.AQUA));
         //sender.sendMessage(Component.text("Animation datapacks and \".bdengine\" model files can be converted", NamedTextColor.AQUA));
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Use <yellow>\"block-display.com\" <aqua>to create convertable models and animations"));
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis convert datapack <datapack-name> <group-tag-to-set> <anim-tag-to-set>", "(Convert a animation datapack form \"block-display.com\" into a editable animation file)");
-        DisplayEntityPluginCommand.sendCMD(sender, "/mdis convert bdengine <frame-id>");
+        CMDUtils.sendCMD(sender,"/mdis convert datapack <datapack-name> <group-tag-to-set> <anim-tag-to-set>", "(Convert a animation datapack from \"block-display.com\" into a animation file usable for DisplayEntityUtils)");
+        //CMDUtils.sendCMD(sender, "/mdis convert bdengine <frame-id>");
 
 
     }

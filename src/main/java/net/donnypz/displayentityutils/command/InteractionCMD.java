@@ -54,12 +54,13 @@ class InteractionCMD implements SubCommand{
 
     static void interactionHelp(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis interaction setheight <height>");
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis interaction setwidth <width>");
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis interaction addcmd <player | console> <left | right | both> <command>");
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis interaction listcmds");
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis interaction pivot <angle>", " (Pivot the currently selected (cycled) Interaction in a part selection)");
-        DisplayEntityPluginCommand.sendCMD(sender,"/mdis interaction pivotselection <angle>", " (Pivot all Interactions in a part selection)");
+        sender.sendMessage(Component.text("| These commands prioritize the interaction entity you're looking at over the one you may have selected"));
+        CMDUtils.sendCMD(sender,"/mdis interaction setheight <height>", " (Set the height of an interaction)");
+        CMDUtils.sendCMD(sender,"/mdis interaction setwidth <width>", " (Set the width of an interaction)");
+        CMDUtils.sendCMD(sender,"/mdis interaction addcmd <player | console> <left | right | both> <command>", " (Add a command to an interaction)");
+        CMDUtils.sendCMD(sender,"/mdis interaction listcmds", "(List all commands stored on an interaction)");
+        CMDUtils.sendCMD(sender,"/mdis interaction pivot <angle>", " (Pivot an interaction around it's group's actual location center)");
+        CMDUtils.sendCMD(sender,"/mdis interaction pivotselection <angle>", " (Pivot all Interactions in a part selection)");
     }
 
     static Interaction getInteraction(Player p, boolean allowTargeted){
