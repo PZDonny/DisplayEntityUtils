@@ -29,8 +29,9 @@ public enum Permission {
     PARTS_GLOW_SET_COLOR("deu.parts.glow.set"),
     PARTS_SELECT("deu.parts.select"),
     PARTS_TAG("deu.parts.tag"),
+    PARTS_LIST_TAGS("deu.parts.tag.list"),
     PARTS_REMOVE("deu.parts.remove"),
-    PARTS_TRANSLATE("deu.parts.transform"),
+    PARTS_TRANSLATE("deu.parts.translate"),
     PARTS_SEED_UUIDS("deu.parts.seed"),
     PARTS_SET_BLOCK("deu.parts.setblock"),
 
@@ -39,7 +40,7 @@ public enum Permission {
     TEXT_SET_FONT("deu.text.setfont"),
     TEXT_TOGGLE_SHADOW("deu.text.shadow"),
     TEXT_TOGGLE_SEE_THROUGH("deu.text.seethrough"),
-    TEXT_SET_ALIGNMENT("deu.text.alignment"),
+    TEXT_SET_ALIGNMENT("deu.text.align"),
     TEXT_SET_LINE_WIDTH("deu.text.linewidth"),
 
     INTERACTION_ADD_CMD("deu.interaction.addcmd"),
@@ -63,7 +64,7 @@ public enum Permission {
     ANIM_REVERSE("deu.anim.reverse"),
     ANIM_TOGGLE_SCALE("deu.anim.scale"),
     ANIM_SET_TAG("deu.anim.settag"),
-    ANIM_SET_FRAME_TAG("deu.anim.settag.frame"),
+    ANIM_SET_FRAME_TAG("deu.anim.setframetag"),
     ANIM_PLAY("deu.anim.play"),
     ANIM_SELECT("deu.anim.select"),
 

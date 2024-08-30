@@ -11,7 +11,7 @@ import java.util.List;
 class PartsListTagsCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_TAG)){
+        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_LIST_TAGS)){
             return;
         }
 
