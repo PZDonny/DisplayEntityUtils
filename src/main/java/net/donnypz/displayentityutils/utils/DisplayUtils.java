@@ -90,10 +90,20 @@ public final class DisplayUtils {
         return location.toVector().subtract(interaction.getLocation().toVector());
     }
 
+    /**
+     * Determine whether a part's entity is in a loaded chunk
+     * @param part
+     * @return a boolean
+     */
     public static boolean isInLoadedChunk(SpawnedDisplayEntityPart part){
         return isInLoadedChunk(part.getEntity());
     }
 
+    /**
+     * Determine whether an entity is in a loaded chunk
+     * @param entity
+     * @return a boolean
+     */
     public static boolean isInLoadedChunk(Entity entity){
         return entity.getLocation().getChunk().isLoaded();
     }
@@ -389,7 +399,7 @@ public final class DisplayUtils {
     /**
      * Gets the set commands of an interaction entity, without any prefix set by this plugin.
      * @param interaction
-     * @return List of commands stored on this interaction entity
+     * @return List of commands stored on this interaction entity as {@link InteractionCommand}
      */
     public static List<InteractionCommand> getInteractionCommandsWithData(Interaction interaction){
         List<InteractionCommand> cmd = new ArrayList<>();
