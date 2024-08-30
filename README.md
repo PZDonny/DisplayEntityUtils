@@ -26,7 +26,7 @@ This is the first paper plugin I have made publicly available. Expect the possib
 *Maven*
 ```
 <dependency>
-  <groupId>com.pzdonny</groupId>
+  <groupId>net.donnypz</groupId>
   <artifactId>displayentityutils</artifactId>
   <version>VERSION</version>
   <scope>provided</scope>
