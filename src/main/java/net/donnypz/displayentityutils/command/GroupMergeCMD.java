@@ -31,7 +31,7 @@ class GroupMergeCMD implements SubCommand{
         }
 
         try{
-            float radius = Float.parseFloat(args[2]);
+            double radius = Double.parseDouble(args[2]);
             if (radius <= 0){
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a valid number for the entity range!");
                 return;
