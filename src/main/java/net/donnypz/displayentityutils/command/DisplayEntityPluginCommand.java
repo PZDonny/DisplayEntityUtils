@@ -73,14 +73,14 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
 
     static void noPartSelection(Player player){
         player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You have not selected a part!");
-        player.sendMessage(ChatColor.GRAY+"/mdis parts cycle <first | prev | next>");
-        player.sendMessage(ChatColor.GRAY+"/mdis parts select <part-tag>");
+        player.sendMessage(Component.text("/mdis parts cycle <first | prev | next>", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("/mdis parts select <part-tag>", NamedTextColor.GRAY));
     }
 
     static void noPartSelectionInteraction(Player player){
         player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You must look at the interaction you wish to add the command to, or select a part!");
-        player.sendMessage(ChatColor.GRAY+"/mdis parts cycle <first | prev | next>");
-        player.sendMessage(ChatColor.GRAY+"/mdis parts select <part-tag>");
+        player.sendMessage(Component.text("/mdis parts cycle <first | prev | next>", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("/mdis parts select <part-tag>", NamedTextColor.GRAY));
     }
 
     static boolean hasPermission(Player player, Permission permission){
@@ -94,7 +94,7 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player p)) {
-            sender.sendMessage(ChatColor.RED + "You cannot use this command in the console!");
+            sender.sendMessage(Component.text("You cannot use this command in the console!", NamedTextColor.RED));
             return true;
         }
 
@@ -117,27 +117,20 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
     static void mainCommandHelp(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         sender.sendMessage(Component.text("Valid storage is \"local\", \"mongodb\", \"mysql\", and \"all\"", NamedTextColor.DARK_AQUA));
-        sendCMD(sender, "/mdis group");
-        sendCMD(sender, "/mdis parts");
-        sendCMD(sender, "/mdis text");
-        sendCMD(sender, "/mdis interaction");
-        sendCMD(sender, "/mdis anim");
-        sendCMD(sender, "/mdis convert");
-        sendCMD(sender, "/mdis listgroups <storage> [page-number]");
-        sendCMD(sender, "/mdis listanims <storage> [page-number]");
-        sendCMD(sender, "/mdis reload", " (To reload Local, MySQL or MongoDB config save options, the server must be restarted)");
+        CMDUtils.sendCMD(sender, "/mdis group");
+        CMDUtils.sendCMD(sender, "/mdis parts");
+        CMDUtils.sendCMD(sender, "/mdis text");
+        CMDUtils.sendCMD(sender, "/mdis interaction");
+        CMDUtils.sendCMD(sender, "/mdis anim");
+        CMDUtils.sendCMD(sender, "/mdis convert");
+        CMDUtils.sendCMD(sender, "/mdis listgroups <storage> [page-number]");
+        CMDUtils.sendCMD(sender, "/mdis listanims <storage> [page-number]");
+        CMDUtils.sendCMD(sender, "/mdis reload", " (To reload Local, MySQL or MongoDB config save options, the server must be restarted)");
     }
 
 
 
 
-    static void sendCMD(CommandSender sender, String command){
-        sendCMD(sender, command, "");
-    }
 
-    static void sendCMD(CommandSender sender, String command, String description){
-        sender.sendMessage(Component.text(command, NamedTextColor.GRAY)
-                .append(Component.text(description, NamedTextColor.YELLOW)));
-    }
 
 }
