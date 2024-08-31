@@ -154,7 +154,7 @@ public class DisplayAnimatorStateMachine {
      * @param stateName The name to identify this state with
      * @param spawnedDisplayAnimation The SpawnedDisplayAnimation to use for the added state
      * @return this
-     * * @throws IllegalArgumentException if the state name is blank or a state with that name exists
+     * @throws IllegalArgumentException if the state name is blank or a state with that name exists
      */
     public @NotNull DisplayAnimatorStateMachine addState(@NotNull String stateName, @NotNull SpawnedDisplayAnimation spawnedDisplayAnimation, boolean looping){
         DisplayAnimator.AnimationType type = looping ? DisplayAnimator.AnimationType.LOOP : DisplayAnimator.AnimationType.LINEAR;
