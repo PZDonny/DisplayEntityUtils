@@ -498,11 +498,7 @@ public final class SpawnedDisplayEntityPart {
             long i = 0;
             @Override
             public void run() {
-                if (durationInTicks != -1 && i >= durationInTicks){
-                    cancel();
-                    return;
-                }
-                else if (group.getSpawnedParts().isEmpty() || entity.isDead()){
+                if (entity.isDead() || (durationInTicks != -1 && i >= durationInTicks) || group == null || !group.isSpawned() || group.spawnedParts.isEmpty()){
                     cancel();
                     return;
                 }

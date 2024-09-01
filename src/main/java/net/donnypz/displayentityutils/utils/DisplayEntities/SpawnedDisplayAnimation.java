@@ -1,9 +1,9 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Interaction;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,13 +13,16 @@ public final class SpawnedDisplayAnimation {
     String animationTag;
     ArrayList<SpawnedDisplayAnimationFrame> frames = new ArrayList<>();
     String partTag = null;
-    boolean respectGroupScale = false;
+    boolean respectGroupScale = true;
 
+    @ApiStatus.Internal
     public SpawnedDisplayAnimation(){}
 
+    @ApiStatus.Internal
     public SpawnedDisplayAnimation(String partTag){
         this.partTag = partTag;
     }
+
 
     SpawnedDisplayAnimation(SpawnedDisplayEntityGroup group){
         SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(0, 0);
