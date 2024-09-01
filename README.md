@@ -28,7 +28,7 @@ This is the first paper plugin I have made publicly available. Expect the possib
 <dependency>
   <groupId>net.donnypz</groupId>
   <artifactId>displayentityutils</artifactId>
-  <version>VERSION</version>
+  <version>2.2.1</version>
   <scope>provided</scope>
 </dependency>
 ```
