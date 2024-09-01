@@ -7,7 +7,7 @@ public final class DisplayAnimation implements Serializable {
     String animationTag;
     ArrayList<DisplayAnimationFrame> frames = new ArrayList<>();
     String partTag;
-    boolean respectGroupScale = false;
+    boolean respectGroupScale = true;
 
     DisplayAnimation(){}
 
