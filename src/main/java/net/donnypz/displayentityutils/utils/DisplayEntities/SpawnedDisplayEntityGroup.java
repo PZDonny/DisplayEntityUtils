@@ -438,7 +438,7 @@ public final class SpawnedDisplayEntityGroup {
         //Displays
             if (part.type != SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Display d = (Display) part.entity;
-                if (d.getLocation().getChunk().isLoaded()){
+                if (!d.getLocation().getChunk().isLoaded()){
                     return false;
                 }
                 Transformation transformation = d.getTransformation();
