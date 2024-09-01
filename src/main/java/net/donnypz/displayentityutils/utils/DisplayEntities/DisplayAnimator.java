@@ -46,7 +46,6 @@ public class DisplayAnimator {
     public boolean play(SpawnedDisplayEntityGroup group, int frameIndex){
         if (!new GroupAnimationStartEvent(group, this, animation).callEvent()) {
             return false;
-            //local commit
         }
 
         SpawnedDisplayAnimationFrame frame = animation.frames.get(frameIndex);
