@@ -25,7 +25,7 @@ class GroupMergeCMD implements SubCommand{
         }
 
         if (args.length < 3) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "Enter a number for the distance to attempt to merge entities");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "Enter a number for the distance from your group to attempt to merge other groups");
             player.sendMessage(Component.text("/mdis group merge <distance>", NamedTextColor.GRAY));
             return;
         }
@@ -33,12 +33,12 @@ class GroupMergeCMD implements SubCommand{
         try{
             double radius = Double.parseDouble(args[2]);
             if (radius <= 0){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a valid number for the entity range!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a number greater than 0 for the merging distance!");
                 return;
             }
             List<GroupResult> results = DisplayGroupManager.getSpawnedGroupsNearLocation(group.getMasterPart().getEntity().getLocation(), radius);
             if (results.isEmpty() || results.size() == 1){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Your selected group is the only group within the set range!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Your selected group is the only group within the set merging distance!");
                 return;
             }
             for (GroupResult result : results){
@@ -51,7 +51,7 @@ class GroupMergeCMD implements SubCommand{
             group.glow(60, true);
         }
         catch(NumberFormatException e){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a valid number for the entity range!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a valid number for the merging distance!");
         }
     }
 }
