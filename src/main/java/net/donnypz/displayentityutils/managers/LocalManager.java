@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.managers;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.listeners.autoGroup.datapackReader.DEUEntitySpawned;
+import net.donnypz.displayentityutils.listeners.bdengine.DEUEntitySpawned;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -9,6 +9,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +29,7 @@ public final class LocalManager {
     static File animDatapackFolder = new File(DisplayEntityPlugin.getInstance().getDataFolder(), "/bdenginedatapacks/");
     public static final String datapackConvertDeleteSubParentTag = "deu_delete_sub_parent";
     public static final String datapackUngroupedAddLaterTag = "deu_add_later";
+    private static final CommandSender silentSender = Bukkit.createCommandSender(feedback -> {});
 
     private LocalManager(){}
 
@@ -359,7 +361,7 @@ public final class LocalManager {
                     continue;
                 }
 
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), line);
+                Bukkit.dispatchCommand(silentSender, line);
 
             }
             br.close();
