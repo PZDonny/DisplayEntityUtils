@@ -2,7 +2,6 @@ package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -10,14 +9,14 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.List;
 
-class ConvertCMD implements SubCommand{
+class BDEngineCMD implements SubCommand{
 
     private static final HashMap<String, SubCommand> subCommands = new HashMap<>();
 
 
-    ConvertCMD(){
-        subCommands.put("datapack", new ConvertDatapackCMD());
-        //subCommands.put("bdengine", new ConvertBDEngineCMD());
+    BDEngineCMD(){
+        subCommands.put("convertanim", new BDEngineConvertAnimCMD());
+        subCommands.put("importmodel", new BDEngineImportModelCMD());
     }
 
     static List<String> getTabComplete(){
@@ -45,12 +44,12 @@ class ConvertCMD implements SubCommand{
 
     static void conversionHelp(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-        sender.sendMessage(Component.text("Convert files exported from BDEngine's website", NamedTextColor.AQUA));
-        sender.sendMessage(Component.text("Animation datapacks can be converted", NamedTextColor.AQUA));
-        //sender.sendMessage(Component.text("Animation datapacks and \".bdengine\" model files can be converted", NamedTextColor.AQUA));
-        sender.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Use <yellow>\"block-display.com\" <aqua>to create convertable models and animations"));
-        CMDUtils.sendCMD(sender,"/mdis convert datapack <datapack-name> <group-tag-to-set> <anim-tag-to-set>", "(Convert a animation datapack from \"block-display.com\" into a animation file usable for DisplayEntityUtils)");
-        //CMDUtils.sendCMD(sender, "/mdis convert bdengine <frame-id>");
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Use <yellow>\"block-display.com\" (BDEngine) <aqua>to create convertable models and animations"));
+        sender.sendMessage(Component.empty());
+        CMDUtils.sendCMD(sender,"/mdis bdengine convertanim <datapack-name> <group-tag-to-set> <anim-tag-to-set>",
+                " (Convert an animation datapack from \"block-display.com\" into a animation file usable for DisplayEntityUtils)");
+        sender.sendMessage(Component.empty());
+        CMDUtils.sendCMD(sender, "/mdis bdengine importmodel <model-id>");
 
 
     }
