@@ -7,14 +7,14 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
-class ConvertDatapackCMD implements SubCommand{
+class BDEngineConvertAnimCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.CONVERT_DATAPACK)){
+        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.BDENGINE_CONVERT_ANIM)){
             return;
         }
         if (args.length < 5) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "Incorrect Usage! /mdis convert datapack <datapack-name> <group-tag-to-set> <anim-tag-to-set>");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "Incorrect Usage! /mdis bdengine convertanim <datapack-name> <group-tag-to-set> <anim-tag-to-set>");
             player.sendMessage(Component.text("Use \"-\" for the group tag if you do not want to save the group", NamedTextColor.GRAY));
             return;
         }
