@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -16,6 +17,7 @@ class PartsCMD implements SubCommand{
 
 
     PartsCMD(){
+        subCommands.put("help", new PartsHelpCMD());
         subCommands.put("cycle", new PartsCycleCMD());
         subCommands.put("glow", new PartsGlowCMD());
         subCommands.put("setglowcolor", new PartsSetGlowColorCMD());
@@ -38,7 +40,7 @@ class PartsCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 2){
-            partsHelp(player);
+            partsHelp(player, 1);
             return;
         }
         String arg = args[1];
@@ -47,33 +49,40 @@ class PartsCMD implements SubCommand{
             if (!DisplayEntityPluginCommand.hasPermission(player, Permission.HELP)){
                 return;
             }
-            partsHelp(player);
+            partsHelp(player, 1);
         }
         else{
             subCommand.execute(player, args);
         }
     }
 
-    static void partsHelp(CommandSender sender){
+    static void partsHelp(CommandSender sender, int page){
+        sender.sendMessage(Component.empty());
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-        sender.sendMessage(Component.text("\"Parts\" are each individual display/interaction entity that is spawned within the group", NamedTextColor.AQUA));
-        sender.sendMessage(Component.text("Add tags to parts to identify each part in a group", NamedTextColor.AQUA));
-        sender.sendMessage(Component.text(" | Mainly useful for API users, creating animations, and usage with addon plugins", NamedTextColor.YELLOW));
-        CMDUtils.sendCMD(sender, "/mdis parts cycle <first | prev | next>", " (Cycle between selected parts or all parts in your group)");
-        CMDUtils.sendCMD(sender, "/mdis parts addtag <part-tag>", " (Add a tag to a part)");
-        CMDUtils.sendCMD(sender, "/mdis parts removetag <part-tag>", " (Remove a tag from a part)");
-        CMDUtils.sendCMD(sender, "/mdis parts adapttags <part-tag> [-remove]",
-                " Adapt existing scoreboard tags to tags usable by DisplayEntityUtils. This is done on selected parts or the group if there's no selection."+
-                        " \"-remove\" removes the tag from the scoreboard");
-        CMDUtils.sendCMD(sender, "/mdis parts listtags", " (List all tags a part has)");
-        CMDUtils.sendCMD(sender, "/mdis parts select <part-tag>", " (Select multiple parts by a part tag they contain)");
-        CMDUtils.sendCMD(sender, "/mdis parts deselect", " (Clear your part selection)");
-        CMDUtils.sendCMD(sender,"/mdis parts remove", " (Despawn and remove a part from a group)");
-        CMDUtils.sendCMD(sender, "/mdis parts glow", " (Make selected parts glow temporarily)");
-        CMDUtils.sendCMD(sender, "/mdis parts setglowcolor <color | hex-code>", " (Set the glow color for selected parts)");
-        CMDUtils.sendCMD(sender, "/mdis parts translate <direction> <distance> <tick-duration>", " (Translate a selected part)");
-        CMDUtils.sendCMD(sender, "/mdis parts seeduuids <group | selection> <seed>"," (Useful when wanting to use the same animation on similar groups)");
-        CMDUtils.sendCMD(sender, "/mdis parts setblock <\"-held\" | \"-target\" | block-id>", " (Easily change the block of a block display part)");
+        if (page <= 1){
+            sender.sendMessage(Component.text("\"Parts\" are each individual display/interaction entity that is spawned within the group", NamedTextColor.AQUA));
+            sender.sendMessage(Component.text("Add tags to parts to identify each part in a group", NamedTextColor.AQUA));
+            sender.sendMessage(Component.text(" | Mainly useful for API users, creating animations, and usage with addon plugins", NamedTextColor.GRAY));
+            CMDUtils.sendCMD(sender, "/mdis parts help <page-number>", " (Get help for parats)");
+            CMDUtils.sendCMD(sender, "/mdis parts cycle <first | prev | next>", " (Cycle between selected parts or all parts in your group)");
+            CMDUtils.sendCMD(sender, "/mdis parts addtag <part-tag>", " (Add a tag to a part)");
+            CMDUtils.sendCMD(sender, "/mdis parts removetag <part-tag>", " (Remove a tag from a part)");
+            CMDUtils.sendCMD(sender, "/mdis parts adapttags <part-tag> [-remove]",
+                    " (Adapt existing scoreboard tags to tags usable by DisplayEntityUtils. Done on selected parts or the group if there's no selection."+
+                            " \"-remove\" removes the tag from the scoreboard)");
+        }
+        else{
+            CMDUtils.sendCMD(sender, "/mdis parts listtags", " (List all tags a part has)");
+            CMDUtils.sendCMD(sender, "/mdis parts select <part-tag>", " (Select multiple parts by a part tag they contain)");
+            CMDUtils.sendCMD(sender, "/mdis parts deselect", " (Clear your part selection)");
+            CMDUtils.sendCMD(sender, "/mdis parts remove", " (Despawn and remove a part from a group)");
+            CMDUtils.sendCMD(sender, "/mdis parts glow", " (Make selected parts glow temporarily)");
+            CMDUtils.sendCMD(sender, "/mdis parts setglowcolor <color | hex-code>", " (Set the glow color for selected parts)");
+            CMDUtils.sendCMD(sender, "/mdis parts translate <direction> <distance> <tick-duration>", " (Translate a selected part)");
+            CMDUtils.sendCMD(sender, "/mdis parts seeduuids <group | selection> <seed>"," (Useful when wanting to use the same animation on similar groups)");
+            CMDUtils.sendCMD(sender, "/mdis parts setblock <\"-held\" | \"-target\" | block-id>", " (Easily change the block of a block display part)");
+        }
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }
 
     static void noPartSelection(Player player){

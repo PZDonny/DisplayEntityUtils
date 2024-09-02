@@ -35,8 +35,8 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                 case "parts" -> {
                     return DisplayEntityPluginCommand.getPartsTabComplete();
                 }
-                case "convert" -> {
-                    return DisplayEntityPluginCommand.getConvertTabComplete();
+                case "bdengine" -> {
+                    return DisplayEntityPluginCommand.getBDEngineTabComplete();
                 }
                 case "text" -> {
                     return DisplayEntityPluginCommand.getTextTabComplete();

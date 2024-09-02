@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.listeners.autoGroup.datapackReader;
+package net.donnypz.displayentityutils.listeners.bdengine;
 
 import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -18,7 +18,7 @@ import java.util.List;
 @ApiStatus.Internal
 public final class DEUEntitySpawned implements Listener {
     private static final HashMap<Long, SpawnedDisplayEntityGroup> groups = new HashMap<>();
-    private static final HashSet<Long> incomingTimestamps = new HashSet<>();
+    private static final HashSet<Long> incomingAnimationTimestamps = new HashSet<>();
 
     @EventHandler
     public void onSpawn(EntitySpawnEvent e){
@@ -26,7 +26,7 @@ public final class DEUEntitySpawned implements Listener {
             return;
         }
 
-        for (Long timestamp : incomingTimestamps){
+        for (Long timestamp : incomingAnimationTimestamps){
             applyToEntity(display, timestamp);
         }
     }
@@ -37,7 +37,7 @@ public final class DEUEntitySpawned implements Listener {
     }
 
     public static void prepareAnimationMaster(long timestamp){
-        incomingTimestamps.add(timestamp);
+        incomingAnimationTimestamps.add(timestamp);
     }
 
     private static void applyToEntity(Display display, long timestamp){
@@ -47,6 +47,7 @@ public final class DEUEntitySpawned implements Listener {
                 if (group == null){
                     storeTimestampedGroupAnimation(timestamp, display);
                 }
+
                 //Add parts that aren't grouped/animated later to the group, so the animation can be used
                 //for other display entities, not created through the animator, (or spawned later, after conversion)
                 //DisplayEntityGroups created outside the animator spawn ungrouped parts last,
@@ -100,8 +101,7 @@ public final class DEUEntitySpawned implements Listener {
             }
         }
 
-
         groups.remove(timestamp);
-        incomingTimestamps.remove(timestamp);
+        incomingAnimationTimestamps.remove(timestamp);
     }
 }

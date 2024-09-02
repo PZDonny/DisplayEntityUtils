@@ -26,7 +26,7 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
         subCommands.put("text", new TextCMD());
         subCommands.put("interaction", new InteractionCMD());
         subCommands.put("anim", new AnimCMD());
-        subCommands.put("convert", new ConvertCMD());
+        subCommands.put("bdengine", new BDEngineCMD());
         subCommands.put("reload", new ReloadCMD());
 
     }
@@ -51,8 +51,8 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
         return PartsCMD.getTabComplete();
     }
 
-    public static List<String> getConvertTabComplete(){
-        return ConvertCMD.getTabComplete();
+    public static List<String> getBDEngineTabComplete(){
+        return BDEngineCMD.getTabComplete();
     }
 
     public static List<String> getTextTabComplete(){
@@ -122,9 +122,9 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
         CMDUtils.sendCMD(sender, "/mdis text");
         CMDUtils.sendCMD(sender, "/mdis interaction");
         CMDUtils.sendCMD(sender, "/mdis anim");
-        CMDUtils.sendCMD(sender, "/mdis convert");
         CMDUtils.sendCMD(sender, "/mdis listgroups <storage> [page-number]");
         CMDUtils.sendCMD(sender, "/mdis listanims <storage> [page-number]");
+        CMDUtils.sendCMD(sender, "/mdis bdengine", "(Import models from BDEngine or convert animations)");
         CMDUtils.sendCMD(sender, "/mdis reload", " (To reload Local, MySQL or MongoDB config save options, the server must be restarted)");
     }
 
