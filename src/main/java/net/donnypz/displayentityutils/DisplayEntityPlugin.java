@@ -4,7 +4,7 @@ import net.donnypz.displayentityutils.command.DisplayEntityPluginTabCompleter;
 import net.donnypz.displayentityutils.events.InteractionClickEvent;
 import net.donnypz.displayentityutils.events.PreInteractionClickEvent;
 import net.donnypz.displayentityutils.listeners.autoGroup.DEULoadingListeners;
-import net.donnypz.displayentityutils.listeners.autoGroup.datapackReader.DEUEntitySpawned;
+import net.donnypz.displayentityutils.listeners.bdengine.DEUEntitySpawned;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerConnectionListener;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LocalManager;
@@ -37,7 +37,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     @ApiStatus.Internal
     public static final String pluginPrefix = ChatColor.YELLOW+"[DisplayEntityUtils] ";
     @ApiStatus.Internal
-    public static final String pluginPrefixLong = ChatColor.WHITE+"-----"+ChatColor.YELLOW+"DisplayEntityUtils"+ChatColor.WHITE+"-----";
+    public static final String pluginPrefixLong = ChatColor.GRAY+"-------["+ChatColor.YELLOW+"DisplayEntityUtils"+ChatColor.GRAY+"]-------";
     private static NamespacedKey partUUIDKey;
     private static NamespacedKey partPDCTagKey;
     private static NamespacedKey groupTagKey;
