@@ -21,6 +21,7 @@ class InteractionCMD implements SubCommand{
 
 
     InteractionCMD(){
+        subCommands.put("help", null);
         subCommands.put("addcmd", new InteractionAddCMD());
         subCommands.put("listcmd", new InteractionListCMD());
         subCommands.put("setheight", new InteractionSetHeightCMD());
@@ -54,7 +55,8 @@ class InteractionCMD implements SubCommand{
 
     static void interactionHelp(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-        sender.sendMessage(Component.text("| These commands prioritize the interaction entity you're looking at over the one you may have selected"));
+        sender.sendMessage(Component.text("These commands prioritize the interaction entity you're looking at over the one you may have selected", NamedTextColor.GRAY));
+        CMDUtils.sendCMD(sender, "/mdis interaction help", " (Get help for interactions)");
         CMDUtils.sendCMD(sender,"/mdis interaction setheight <height>", " (Set the height of an interaction)");
         CMDUtils.sendCMD(sender,"/mdis interaction setwidth <width>", " (Set the width of an interaction)");
         CMDUtils.sendCMD(sender,"/mdis interaction addcmd <player | console> <left | right | both> <command>", " (Add a command to an interaction)");
