@@ -1,8 +1,6 @@
 # DisplayEntityUtils  
 DisplayEntityUtils is a extensive plugin designed for use with BDEngine, a modeling/animation engine designed for display entities without the need for resource packs or mods.
 
-<hr>
-
 ## What you'll need: BDEngine
 BDEngine is what you'll use to create models and animations that can be transferred into your game world. Info on BDEngine and the BDCatalog, collection of BDEngine models and animations, can be found [HERE](block-display.com)
 > DISCLAIMER: I DO NOT OWN BDENGINE! ALL ISSUES AND SUGGESTIONS RELATED TO THAT PROJECT SHOULD BE BROUGHT TO THE OWNER, [ILLYSTRAY](https://illystray.com), IN THE BDENGINE DISCORD FOUND [HERE](https://discord.com/invite/VCeHfSd6Xa)
@@ -25,6 +23,13 @@ BDEngine is what you'll use to create models and animations that can be transfer
 - Create animation state machines
 - Mount groups on entities (or vice-versa)
 - Theres too many things to list!
+
+## Video Showcases
+> [Conversion of Datapack Animations into Animations usable for the plugin](https://streamable.com/6ly7r8)
+
+> [API: Display Entities rotating smoothly with yaw changes, and Interaction entities pivoting around the center.](https://streamable.com/jqun87)
+
+> [API: Animation State Machines](https://streamable.com/m2jagj)
 
 
 ## WIKI [WIP]
