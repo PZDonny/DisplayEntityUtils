@@ -40,7 +40,7 @@ Access the wiki [HERE](https://github.com/PZDonny/DisplayEntityUtils/wiki)
 <dependency>
   <groupId>net.donnypz</groupId>
   <artifactId>displayentityutils</artifactId>
-  <version>2.3.0</version>
+  <version>2.3.1</version>
   <scope>provided</scope>
 </dependency>
 ```
