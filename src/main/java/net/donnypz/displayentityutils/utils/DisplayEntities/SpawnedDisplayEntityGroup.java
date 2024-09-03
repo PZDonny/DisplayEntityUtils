@@ -369,8 +369,8 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Get a list of all display entity parts within this group with a specified scoreboard tag
-     * @return a list of all {@link SpawnedDisplayEntityPart} with a specified tag
+     * Get a list of all display entity parts within this group with a tag
+     * @return a list
      */
     public List<SpawnedDisplayEntityPart> getSpawnedParts(@NotNull String tag){
         List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
@@ -383,14 +383,50 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
+     * Get a list of all display entity parts within this group with at least one of the provided tags
+     * @return a list
+     */
+    public List<SpawnedDisplayEntityPart> getSpawnedParts(@NotNull Collection<String> tags){
+        List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
+        for (SpawnedDisplayEntityPart part : spawnedParts){
+            for (String tag : tags){
+                if (part.hasTag(tag)){
+                    partList.add(part);
+                    break;
+                }
+            }
+
+        }
+        return partList;
+    }
+
+    /**
      * Get a list of parts specified by a part type as entities
-     * @return a list of entities
+     * @param partType the type of part to get
+     * @return a list
      */
     public List<Entity> getSpawnedPartEntities(SpawnedDisplayEntityPart.PartType partType){
         List<Entity> partList = new ArrayList<>();
         for (SpawnedDisplayEntityPart part : spawnedParts){
             if (partType == part.getType()){
                 partList.add(part.getEntity());
+            }
+        }
+        return partList;
+    }
+
+    /**
+     * Get a list of parts specified by a entity class as entities
+     * @param entityClazz the entity class to cast all entities to
+     * @return a list
+     */
+    public <T> List<T> getSpawnedPartEntities(Class<T> entityClazz){
+        List<T> partList = new ArrayList<>();
+        for (SpawnedDisplayEntityPart part : spawnedParts){
+            Entity partEntity = part.getEntity();
+            if (entityClazz.isInstance(partEntity)){
+                T entity = entityClazz.cast(partEntity);
+                partList.add(entity);
             }
         }
         return partList;
@@ -695,14 +731,10 @@ public final class SpawnedDisplayEntityGroup {
      */
     @ApiStatus.Experimental
     public void autoSetCulling(CullOption cullOption){
-        if (cullOption == CullOption.LARGEST){
-            largestCulling();
-        }
-        else if (cullOption == CullOption.LOCAL){
-            localCulling();
-        }
-        else if (cullOption == CullOption.NONE){
-            noneCulling();
+        switch (cullOption){
+            case LARGEST -> largestCulling();
+            case LOCAL -> localCulling();
+            case NONE -> noneCulling();
         }
     }
 

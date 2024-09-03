@@ -381,7 +381,7 @@ public final class SpawnedDisplayEntityPart {
      * It will glow if it's a Block/Item Display.
      * Outlined with soul fire flame particles if Interaction.
      * Cloud Particle if it's the master part
-     * @param durationInTicks How long to highlight this selection
+     * @param durationInTicks How long to glow this selection
      */
     public void glow(long durationInTicks){
         if (type == PartType.INTERACTION) {
@@ -515,7 +515,7 @@ public final class SpawnedDisplayEntityPart {
     /**
      * Change the yaw of this part
      * @param yaw The yaw to set for this part
-     * @param pivotIfInteraction true if this part's type is {@link PartType#INTERACTION} and it should pivot around the group's
+     * @param pivotIfInteraction true if this part's type is {@link PartType#INTERACTION} and it should pivot around the group's location
      */
     public void setYaw(float yaw, boolean pivotIfInteraction){
         float oldYaw = entity.getYaw();

@@ -3,10 +3,12 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.util.List;
+import java.util.Collection;
 
 class PartsListTagsCMD implements SubCommand{
     @Override
@@ -20,15 +22,16 @@ class PartsListTagsCMD implements SubCommand{
             PartsCMD.noPartSelection(player);
             return;
         }
+
         if (!partSelection.isValid()){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Invalid part selection! Please try again!");
             return;
         }
 
-        player.sendMessage(ChatColor.GOLD+"Part Tags: ");
-        List<String> tags = partSelection.getTags();
-        if (tags.isEmpty()){
-            player.sendMessage(ChatColor.GRAY+"Failed to find a part tag for your part selection!");
+        player.sendMessage(Component.text("Part Tags: ", NamedTextColor.GOLD));
+        Collection<String> tags = partSelection.getPartTags();
+        if (tags == null || tags.isEmpty()){
+            player.sendMessage(Component.text("Failed to find a part tag for your part selection!", NamedTextColor.GRAY));
         }
         else{
             for (String tag : tags){
