@@ -57,15 +57,15 @@ class PartsCycleCMD implements SubCommand{
         switch(args[2]){
             case "first" -> {
                 partSelection.setToFirstPart();
-                singlePartSelected(player, partSelection);
+                displayPartInfo(player, partSelection);
             }
             case "prev", "previous" -> {
                 partSelection.setToPreviousPart(jump);
-                singlePartSelected(player, partSelection);
+                displayPartInfo(player, partSelection);
             }
             case "next" -> {
                 partSelection.setToNextPart(jump);
-                singlePartSelected(player, partSelection);
+                displayPartInfo(player, partSelection);
             }
             default ->{
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"Invalid Option! /mdis parts cycle <first | prev | next>");
@@ -73,14 +73,15 @@ class PartsCycleCMD implements SubCommand{
         }
     }
 
-    private void singlePartSelected(Player p, SpawnedPartSelection partSelection){
-        SpawnedDisplayEntityPart part = partSelection.getSelectedParts().getFirst();
+    private void displayPartInfo(Player p, SpawnedPartSelection partSelection){
+        SpawnedDisplayEntityPart part = partSelection.getSelectedPart();
         String desc = "";
         switch(part.getType()){
             case INTERACTION -> {
                 Interaction i = (Interaction) part.getEntity();
                 desc = ChatColor.YELLOW+"(Interaction, H:"+i.getInteractionHeight()+" W:"+i.getInteractionWidth()+")";
             }
+
             case TEXT_DISPLAY -> {
                 TextDisplay display = (TextDisplay) part.getEntity();
                 if (!display.getText().isBlank()) {
@@ -97,15 +98,16 @@ class PartsCycleCMD implements SubCommand{
                     desc = ChatColor.GRAY+"(Invisible Block Display | AIR, CAVE_AIR, or VOID_AIR)";
                 }
             }
+
             case ITEM_DISPLAY -> {
                 if (part.getMaterial() == Material.AIR){
                     desc = ChatColor.GRAY+"(Invisible Item Display | AIR, CAVE_AIR, or VOID_AIR)";
                 }
             }
         }
-        partSelection.glow(30, false);
-        int index = partSelection.getGroup().getSpawnedParts().indexOf(partSelection.getSelectedParts().getFirst())+1;
-        int size = partSelection.getGroup().getSpawnedParts().size();
+        part.glow(30);
+        int index = partSelection.indexOf(part)+1;
+        int size = partSelection.getSize();
         String ratio = ChatColor.GOLD+"["+index+"/"+size+"] ";
         p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Selected Part! "+ratio+desc);
     }
