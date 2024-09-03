@@ -7,6 +7,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
 
+/**
+ * The result of a BDEngine Request after using {@link BDEngineUtils#requestModel(int)}
+ */
 public final class BDEngineModelResult {
     private static final CommandSender silentSender = Bukkit.createCommandSender(feedback -> {});
     private String name;
@@ -21,7 +24,8 @@ public final class BDEngineModelResult {
 
 
     /**
-     * Spawn the model stored within the result at a location
+     * Spawn the model stored within the result at a location.
+     * This method should be run synchronously.
      * @param location the location to spawn the model
      * @return false if the location's chunk is not loaded
      */

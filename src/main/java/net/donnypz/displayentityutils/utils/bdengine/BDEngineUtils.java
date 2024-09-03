@@ -16,7 +16,8 @@ public final class BDEngineUtils {
     private BDEngineUtils(){}
 
     /**
-     * Request a model from BDEngine's website
+     * Request a model from BDEngine's website.
+     * This method is blocking and should be run asynchronously.
      * @param modelID the model ID from BDEngine
      * @return a {@link BDEngineModelResult}
      *
