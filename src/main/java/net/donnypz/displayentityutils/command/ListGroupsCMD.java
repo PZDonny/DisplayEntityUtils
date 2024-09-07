@@ -1,11 +1,12 @@
 package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -38,16 +39,23 @@ class ListGroupsCMD implements SubCommand{
             return;
         }
 
-        list(player, method, args);
+        list(player, method, args, true);
 
 
 
     }
 
-    static void list(Player player, LoadMethod method, String[] args){
-        List<String> tags = DisplayGroupManager.getDisplayEntityTags(method);
+    static void list(Player player, LoadMethod method, String[] args, boolean isListingGroups){
+        List<String> tags;
+        if (isListingGroups){
+            tags = DisplayGroupManager.getSavedDisplayEntityGroups(method);
+        }
+        else{
+            tags = DisplayAnimationManager.getSavedDisplayAnimations(method);
+        }
+
         player.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-        player.sendMessage(ChatColor.WHITE+"Storage Location: "+ChatColor.YELLOW+method.getDisplayName());
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Storage Location: <yellow>"+method.getDisplayName()));
         if (tags.isEmpty()){
             player.sendMessage(Component.text("That storage location is empty!", NamedTextColor.RED));
             return;
@@ -68,7 +76,7 @@ class ListGroupsCMD implements SubCommand{
             if (i >= tags.size()){
                 break;
             }
-            player.sendMessage(ChatColor.WHITE+"- "+ChatColor.YELLOW+tags.get(i));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("- <yellow>"+tags.get(i)));
         }
         player.sendMessage("------------------------");
     }

@@ -223,11 +223,11 @@ public final class DisplayAnimationManager {
 
 
     /**
-     * Gets a String List of the tag of display animations in a storage location
+     * Get the animation tags of all saved {@link DisplayAnimation}s in a storage location.
      * @param loadMethod of the search location
-     * @return String list of the tags of saved display animations in the specified storage location. Returns an empty list if nothing was found
+     * @return a list of all animations by their group tag
      */
-    public static List<String> getDisplayAnimationTags(@NotNull LoadMethod loadMethod){
+    public static List<String> getSavedDisplayAnimations(@NotNull LoadMethod loadMethod){
         switch(loadMethod){
             case LOCAL -> {
                 return LocalManager.getDisplayAnimationTags();
