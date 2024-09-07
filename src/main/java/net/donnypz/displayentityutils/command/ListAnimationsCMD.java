@@ -1,14 +1,10 @@
 package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
-
-import java.util.List;
 
 class ListAnimationsCMD implements SubCommand{
     @Override
@@ -38,7 +34,7 @@ class ListAnimationsCMD implements SubCommand{
             return;
         }
 
-        ListGroupsCMD.list(player, method, args);
+        ListGroupsCMD.list(player, method, args, false);
 
     }
 }

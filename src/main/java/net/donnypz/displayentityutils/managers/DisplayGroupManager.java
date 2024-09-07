@@ -429,7 +429,7 @@ public final class DisplayGroupManager {
      * @param location Center of the search location
      * @param radius The radius to check for a spawned display entity group
      * @param tag Tag of the groups to searched for
-     * @param getter Player who is getting the spawned group (Nullable)
+     * @param getter Player who is getting the spawned group
      * @return A {@link GroupResult}. Null if not found.
      */
     public static GroupResult getSpawnedGroupNearLocation(Location location, double radius, String tag, @Nullable Player getter) {
@@ -448,7 +448,7 @@ public final class DisplayGroupManager {
      *
      * @param location Center of the search location
      * @param radius   The radius to check for a spawned display entity group
-     * @param getter   Player who is getting the spawned group (Nullable)
+     * @param getter   Player who is getting the spawned group
      * @return A {@link GroupResult}. Null if not found.
      */
     public static GroupResult getSpawnedGroupNearLocation(Location location, float radius, @Nullable Player getter) {
@@ -547,13 +547,12 @@ public final class DisplayGroupManager {
     }
 
     /**
-     * Gets a String List of the tag of display entities in a storage location
-     *
+     * Get the group tags of all saved {@link DisplayEntityGroup}s in a storage location.
      * @param loadMethod of the search location
-     * @return String list of the tags of saved display entity groups in the specified storage location. Returns an empty list if nothing was found
+     * @return a list of all groups by their group tag
      */
     @ApiStatus.Internal
-    public static List<String> getDisplayEntityTags(LoadMethod loadMethod) {
+    public static List<String> getSavedDisplayEntityGroups(LoadMethod loadMethod) {
         switch (loadMethod) {
             case LOCAL -> {
                 return LocalManager.getDisplayEntityTags();

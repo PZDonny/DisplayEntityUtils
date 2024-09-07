@@ -177,7 +177,7 @@ public final class SpawnedPartSelection {
      */
     public SpawnedPartSelection glow(boolean ignoreInteractionAndText){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            if (ignoreInteractionAndText && (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)){
+            if (ignoreInteractionAndText && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)){
                 continue;
             }
             part.glow();
@@ -192,7 +192,7 @@ public final class SpawnedPartSelection {
      */
     public SpawnedPartSelection glow(int durationInTicks, boolean ignoreInteractionAndText){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            if (ignoreInteractionAndText && (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)){
+            if (ignoreInteractionAndText && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)){
                 continue;
             }
             part.glow(durationInTicks);
@@ -266,7 +266,7 @@ public final class SpawnedPartSelection {
      */
     public void pivot(double angle){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 part.pivot(angle);
             }
         }
