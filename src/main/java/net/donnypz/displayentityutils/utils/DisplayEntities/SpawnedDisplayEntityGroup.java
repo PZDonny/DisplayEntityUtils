@@ -119,14 +119,14 @@ public final class SpawnedDisplayEntityGroup {
      */
     public SpawnedDisplayEntityPart addDisplayEntity(@NotNull Display displayEntity){
         SpawnedDisplayEntityPart existing = SpawnedDisplayEntityPart.getPart(displayEntity);
-        if (existing != null && existing.group != this){
+        if (existing != null && existing.getGroup() != this){
             return existing.setGroup(this);
         }
 
         SpawnedDisplayEntityPart part = new SpawnedDisplayEntityPart(this, displayEntity, partUUIDRandom);
         if (masterPart != null){
             if (!part.isMaster()){
-                Display masterEntity = (Display) masterPart.entity;
+                Display masterEntity = (Display) masterPart.getEntity();
                 displayEntity.setTeleportDuration(masterEntity.getTeleportDuration());
                 masterPart.getEntity().addPassenger(displayEntity);
             }
@@ -328,7 +328,7 @@ public final class SpawnedDisplayEntityGroup {
         if (!this.isSpawned()){
             return null;
         }
-        return masterPart.entity.getLocation();
+        return masterPart.getEntity().getLocation();
     }
 
     /**
@@ -472,8 +472,8 @@ public final class SpawnedDisplayEntityGroup {
         }
         for (SpawnedDisplayEntityPart part : spawnedParts){
         //Displays
-            if (part.type != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                Display d = (Display) part.entity;
+            if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
+                Display d = (Display) part.getEntity();
                 if (!d.getLocation().getChunk().isLoaded()){
                     return false;
                 }
@@ -500,7 +500,7 @@ public final class SpawnedDisplayEntityGroup {
             }
         //Interactions
             else{
-                Interaction i = (Interaction) part.entity;
+                Interaction i = (Interaction) part.getEntity();
 
                 //Reset Scale then multiply by newScaleMultiplier
                 i.setInteractionHeight((i.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier);
@@ -523,7 +523,7 @@ public final class SpawnedDisplayEntityGroup {
         }
 
 
-        PersistentDataContainer pdc = masterPart.entity.getPersistentDataContainer();
+        PersistentDataContainer pdc = masterPart.getEntity().getPersistentDataContainer();
         pdc.set(scaleKey, PersistentDataType.FLOAT, newScaleMultiplier);
         scaleMultiplier = newScaleMultiplier;
         return true;
@@ -541,6 +541,7 @@ public final class SpawnedDisplayEntityGroup {
         if (event.isCancelled()){
             return false;
         }
+
         teleportWithoutEvent(location, respectGroupDirection);
         return true;
     }
@@ -554,9 +555,13 @@ public final class SpawnedDisplayEntityGroup {
         }
 
         master.teleport(location, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+        World w = location.getWorld();
+
 
         for (SpawnedDisplayEntityPart part : getSpawnedParts()){
             part.getEntity().setRotation(location.getYaw(), location.getPitch());
+
+        //Interaction Entity TP
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Interaction interaction = (Interaction) part.getEntity();
                 Vector vector = oldMasterLoc.toVector().subtract(interaction.getLocation().toVector());
@@ -564,6 +569,9 @@ public final class SpawnedDisplayEntityGroup {
                 part.getEntity().teleport(tpLocation, TeleportFlag.EntityState.RETAIN_PASSENGERS);
             }
 
+            if (w != null && part.getEntity().getWorld() != w){ //Keep world name consistent within part's data
+                part.getPartData().setWorldName(w.getName());
+            }
         }
     }
 
@@ -658,7 +666,7 @@ public final class SpawnedDisplayEntityGroup {
      * @return whether this group has the specified tag
      */
     public boolean hasScoreboardTag(String tag){
-        return masterPart.entity.getScoreboardTags().contains(tag);
+        return masterPart.getEntity().getScoreboardTags().contains(tag);
     }
 
     /**
@@ -669,7 +677,7 @@ public final class SpawnedDisplayEntityGroup {
         if (hasScoreboardTag(tag)){
             return;
         }
-        masterPart.entity.addScoreboardTag(tag);
+        masterPart.getEntity().addScoreboardTag(tag);
     }
 
     /**
@@ -680,7 +688,7 @@ public final class SpawnedDisplayEntityGroup {
         if (!hasScoreboardTag(tag)){
             return;
         }
-        masterPart.entity.removeScoreboardTag(tag);
+        masterPart.getEntity().removeScoreboardTag(tag);
     }
 
     /**
@@ -706,9 +714,9 @@ public final class SpawnedDisplayEntityGroup {
 
     /**
      * Set the brightness of this group
-     * @param brightness the brightness to set
+     * @param brightness the brightness to set, null to use brightness based on position
      */
-    public void setBrightness(Display.Brightness brightness){
+    public void setBrightness(@Nullable Display.Brightness brightness){
         for (SpawnedDisplayEntityPart part : spawnedParts){
             part.setBrightness(brightness);
         }
@@ -742,7 +750,7 @@ public final class SpawnedDisplayEntityGroup {
         float maxWidth = 0;
         float maxHeight = 0;
         for (SpawnedDisplayEntityPart part : spawnedParts) {
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION) {
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
                 continue;
             }
             Transformation transformation = ((Display) part.getEntity()).getTransformation();
@@ -910,7 +918,7 @@ public final class SpawnedDisplayEntityGroup {
      */
     public SpawnedDisplayEntityGroup glow(boolean ignoreUnglowable){
         for (SpawnedDisplayEntityPart part : spawnedParts){
-            if (ignoreUnglowable && (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY || part.getMaterial() == Material.AIR)){
+            if (ignoreUnglowable && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY || part.getMaterial() == Material.AIR)){
                 continue;
             }
             part.glow();
@@ -925,7 +933,7 @@ public final class SpawnedDisplayEntityGroup {
      */
     public SpawnedDisplayEntityGroup glow(long durationInTicks, boolean ignoreUnglowable){
         for (SpawnedDisplayEntityPart part : spawnedParts){
-            if (ignoreUnglowable && (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY || part.getMaterial() == Material.AIR)){
+            if (ignoreUnglowable && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY || part.getMaterial() == Material.AIR)){
                 continue;
             }
             part.glow(durationInTicks);

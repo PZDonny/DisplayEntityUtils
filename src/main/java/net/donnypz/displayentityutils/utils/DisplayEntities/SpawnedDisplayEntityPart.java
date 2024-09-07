@@ -21,11 +21,12 @@ import java.util.*;
 
 public final class SpawnedDisplayEntityPart {
 
-    static final HashMap<UUID, SpawnedDisplayEntityPart> allParts = new HashMap<>();
-    SpawnedDisplayEntityGroup group;
-    PartType type;
-    Entity entity;
-    UUID partUUID;
+    private static final HashMap<PartData, SpawnedDisplayEntityPart> allParts = new HashMap<>();
+    private SpawnedDisplayEntityGroup group;
+    private final PartType type;
+    private Entity entity;
+    private PartData partData;
+    private UUID partUUID;
     private boolean isInteractionOutlined;
 
 
@@ -42,10 +43,14 @@ public final class SpawnedDisplayEntityPart {
         else {
             this.type = PartType.TEXT_DISPLAY;
         }
+
         adaptLegacyPartTags();
-        displayEntity.getPersistentDataContainer().set(new NamespacedKey(DisplayEntityPlugin.getInstance(), "creationtime"), PersistentDataType.LONG, group.getCreationTime());
+        displayEntity.getPersistentDataContainer().set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, group.getCreationTime());
         removeFromPreviousGroup(displayEntity);
-        allParts.put(entity.getUniqueId(), this);
+
+        this.partData = new PartData(entity);
+        allParts.put(partData, this);
+
         group.spawnedParts.add(this);
         if (isMaster()){
             group.masterPart = this;
@@ -58,10 +63,14 @@ public final class SpawnedDisplayEntityPart {
         this.group = group;
         this.entity = interactionEntity;
         this.type = PartType.INTERACTION;
+
         adaptLegacyPartTags();
         interactionEntity.getPersistentDataContainer().set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, group.getCreationTime());
         removeFromPreviousGroup(interactionEntity);
-        allParts.put(entity.getUniqueId(), this);
+
+        this.partData = new PartData(entity);
+        allParts.put(partData, this);
+
         group.spawnedParts.add(this);
         setPartUUID(random);
     }
@@ -173,6 +182,13 @@ public final class SpawnedDisplayEntityPart {
         return entity;
     }
 
+    PartData getPartData() {
+        return partData;
+    }
+
+    private static SpawnedDisplayEntityPart getPart(Entity entity){
+        return allParts.get(new PartData(entity));
+    }
 
     /**
      * Get the SpawnedDisplayEntityPart of the Display during this play session
@@ -180,7 +196,7 @@ public final class SpawnedDisplayEntityPart {
      * @return The SpawnedDisplayEntityPart. Null if not created during play session or not a SpawnedDisplayEntityPart
      */
     public static SpawnedDisplayEntityPart getPart(Display display){
-        return allParts.get(display.getUniqueId());
+        return getPart((Entity) display);
     }
 
     /**
@@ -189,7 +205,7 @@ public final class SpawnedDisplayEntityPart {
      * @return The SpawnedDisplayEntityPart. Null if not created during play session or not a SpawnedDisplayEntityPart
      */
     public static SpawnedDisplayEntityPart getPart(Interaction interaction){
-        return allParts.get(interaction.getUniqueId());
+        return getPart((Entity) interaction);
     }
 
     /**
@@ -536,9 +552,9 @@ public final class SpawnedDisplayEntityPart {
 
     /**
      * Set the brightness of this part
-     * @param brightness the brightness to set
+     * @param brightness the brightness to set, null to use brightness based on position
      */
-    public void setBrightness(Display.Brightness brightness){
+    public void setBrightness(@Nullable Display.Brightness brightness){
         if (entity instanceof Interaction){
             return;
         }
@@ -713,6 +729,7 @@ public final class SpawnedDisplayEntityPart {
         }
         Entity e = entity;
         entity = null;
+        partData = null;
         return e;
     }
 
@@ -721,7 +738,7 @@ public final class SpawnedDisplayEntityPart {
      * This part will still be valid and can be readded to a group
      */
     public void removeFromGroup() {
-        allParts.remove(entity.getUniqueId());
+        allParts.remove(partData);
         group.spawnedParts.remove(this);
         group = null;
     }
