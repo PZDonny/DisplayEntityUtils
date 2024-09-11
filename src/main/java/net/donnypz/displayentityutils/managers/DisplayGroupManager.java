@@ -204,8 +204,8 @@ public final class DisplayGroupManager {
      * Delete a Display Entity Group from a Data Location
      *
      * @param loadMethod Storage where the Display Entity Group is located
-     * @param tag        Tag of the group to be deleted
-     * @param deleter    Player who is deleting the group (Nullable)
+     * @param tag Tag of the group to be deleted
+     * @param deleter Player who is deleting the group (Nullable)
      */
     public static void deleteDisplayEntityGroup(LoadMethod loadMethod, String tag, @Nullable Player deleter) {
         switch (loadMethod) {
@@ -223,13 +223,32 @@ public final class DisplayGroupManager {
 
 
     /**
-     * Get a Display Entity Group from a Data Location
-     *
-     * @param loadMethod Where the Display Entity Group is located
-     * @param tag        The tag of the display entity group to be retrieved
-     * @return The found DisplayEntityGroup. Null if not found.
+     * Attempt to get a {@link DisplayEntityGroup} from all storage locations.
+     * Storage locations in the order of {@link LoadMethod#LOCAL}, {@link LoadMethod#MONGODB}, {@link LoadMethod#MYSQL}.
+     * If a load method is disabled then it is skipped.
+     * @param tag The tag of the {@link DisplayEntityGroup} to be retrieved
+     * @return The found {@link DisplayEntityGroup}. Null if not found.
      */
-    public static DisplayEntityGroup retrieve(LoadMethod loadMethod, String tag) {
+    public DisplayEntityGroup getGroup(String tag){
+        DisplayEntityGroup group = getGroup(LoadMethod.LOCAL, tag);
+        if (group == null){
+            group = getGroup(LoadMethod.MONGODB, tag);
+        }
+        if (group == null){
+            group = getGroup(LoadMethod.MYSQL, tag);
+        }
+        return group;
+    }
+
+
+    /**
+     * Get a {@link DisplayEntityGroup} from a storage location
+     *
+     * @param loadMethod Where the {@link DisplayEntityGroup} is located
+     * @param tag The tag of the {@link DisplayEntityGroup} to be retrieved
+     * @return The found {@link DisplayEntityGroup}. Null if not found.
+     */
+    public static DisplayEntityGroup getGroup(LoadMethod loadMethod, String tag) {
         switch (loadMethod) {
             case LOCAL -> {
                 return LocalManager.retrieveDisplayEntityGroup(tag);
@@ -245,14 +264,14 @@ public final class DisplayGroupManager {
     }
 
     /**
-     * Get a Display Entity Group from a saved file
+     * Get a {@link DisplayEntityGroup} from a saved file
      *
-     * @param file File of a saved Display Entity Group
-     * @return The found DisplayEntityGroup. Null if not found.
+     * @param file File of a saved {@link DisplayEntityGroup}
+     * @return The found {@link DisplayEntityGroup}. Null if not found.
      */
-    public static DisplayEntityGroup retrieve(File file) {
+    public static DisplayEntityGroup getGroup(File file) {
         try {
-            return retrieve(new FileInputStream(file));
+            return getGroup(new FileInputStream(file));
         } catch (IOException ex) {
             ex.printStackTrace();
             return null;
@@ -265,7 +284,7 @@ public final class DisplayGroupManager {
      * @param inputStream InputStream containing a saved Display Entity Group
      * @return The found DisplayEntityGroup. Null if not found.
      */
-    public static DisplayEntityGroup retrieve(InputStream inputStream) {
+    public static DisplayEntityGroup getGroup(InputStream inputStream) {
         byte[] bytes;
         try{
             bytes = inputStream.readAllBytes();
@@ -312,20 +331,20 @@ public final class DisplayGroupManager {
 
 
     /**
-     * Get a DisplayEntityGroup from a plugin's resources
+     * Get a {@link DisplayEntityGroup} from a plugin's resources
      *
-     * @param plugin       The plugin to get the DisplayEntityGroup from
+     * @param plugin The plugin to get the DisplayEntityGroup from
      * @param resourcePath The path of the DisplayEntityGroup
      * @return The found DisplayEntityGroup. Null if not found.
      */
-    public static DisplayEntityGroup retrieveFromResources(JavaPlugin plugin, String resourcePath) {
+    public static DisplayEntityGroup getGroup(JavaPlugin plugin, String resourcePath) {
         InputStream modelStream;
         if (resourcePath.contains(DisplayEntityGroup.fileExtension)) {
             modelStream = plugin.getResource(resourcePath);
         } else {
             modelStream = plugin.getResource(resourcePath + DisplayEntityGroup.fileExtension);
         }
-        return retrieve(modelStream);
+        return getGroup(modelStream);
     }
 
     public static SpawnedDisplayEntityGroup getExistingSpawnedGroup(Display displayEntity) {
