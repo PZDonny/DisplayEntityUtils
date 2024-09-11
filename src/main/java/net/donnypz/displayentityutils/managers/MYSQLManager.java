@@ -77,11 +77,10 @@ public final class MYSQLManager {
     }
 
     public static void closeConnection(){
-        if (dataSource == null || !connected){
-            return;
-        }
         try{
-            dataSource.close();
+            if (dataSource != null){
+                dataSource.close();
+            }
         }
         /*catch(SQLException e){
             e.printStackTrace();
@@ -209,7 +208,7 @@ public final class MYSQLManager {
                 return null;
             }
             Blob blob = results.getBlob("display_group");
-            return DisplayGroupManager.retrieve(blob.getBinaryStream());
+            return DisplayGroupManager.getGroup(blob.getBinaryStream());
         }
         catch(SQLException e){
             return null;
@@ -317,7 +316,7 @@ public final class MYSQLManager {
                 return null;
             }
             Blob blob = results.getBlob("display_anim");
-            return DisplayAnimationManager.retrieve(blob.getBinaryStream());
+            return DisplayAnimationManager.getAnimation(blob.getBinaryStream());
         } catch (SQLException e) {
             return null;
         }

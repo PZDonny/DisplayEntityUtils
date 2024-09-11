@@ -53,7 +53,7 @@ class GroupSpawnCMD implements SubCommand{
             p.sendMessage(Component.text("- Storage location is disabled and cannot be checked!", NamedTextColor.GRAY));
             return;
         }
-        DisplayEntityGroup group = DisplayGroupManager.retrieve(loadMethod, tag);
+        DisplayEntityGroup group = DisplayGroupManager.getGroup(loadMethod, tag);
         if (group == null){
             p.sendMessage(Component.text("- Failed to find saved display entity group in that storage location!", NamedTextColor.RED));
             return;
@@ -101,7 +101,7 @@ class GroupSpawnCMD implements SubCommand{
 
         Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
             if (isGroup) {
-                DisplayEntityGroup group = DisplayGroupManager.retrieve(storage, tag);
+                DisplayEntityGroup group = DisplayGroupManager.getGroup(storage, tag);
                 if (group == null){
                     if (nextStorage != null){
                         p.sendMessage(Component.text("- Failed to find saved display entity group in "+storage.getDisplayName()+" database! Checking "+nextStorage.getDisplayName()+"...", NamedTextColor.RED));
@@ -127,7 +127,7 @@ class GroupSpawnCMD implements SubCommand{
                 });
             }
             else{
-                DisplayAnimation anim = DisplayAnimationManager.retrieve(LoadMethod.LOCAL, tag);
+                DisplayAnimation anim = DisplayAnimationManager.getAnimation(LoadMethod.LOCAL, tag);
                 if (anim == null){
                     if (nextStorage != null){
                         p.sendMessage(Component.text("- Failed to find saved display animation in "+storage.getDisplayName()+" database! Checking "+nextStorage.getDisplayName()+"...", NamedTextColor.RED));
