@@ -31,12 +31,5 @@ class AnimStopCMD implements SubCommand{
 
         group.stopAnimation(true);
         player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.YELLOW + "Stopping a animation played on group!");
-
-
-
-
-
-
-
     }
 }
