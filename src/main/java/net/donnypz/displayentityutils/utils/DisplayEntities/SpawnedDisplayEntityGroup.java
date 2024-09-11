@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.*;
+import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.Direction;
@@ -32,7 +33,8 @@ public final class SpawnedDisplayEntityGroup {
     long creationTime = System.currentTimeMillis();
     public static final NamespacedKey creationTimeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "creationtime");
     static final NamespacedKey scaleKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "scale");
-    static final NamespacedKey lastAnimationTimestampKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "lastAnimation");
+    static final NamespacedKey spawnAnimationKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimation");
+    static final NamespacedKey spawnAnimationTypeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimationtype");
     final Random partUUIDRandom = new Random(defaultPartUUIDSeed);
     boolean isVisibleByDefault;
     private float scaleMultiplier = 1;
@@ -83,16 +85,24 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Get the unix timestamp that this group was initially created. This is created when a group is selected/grouped for the first time
+     * Get the unix timestamp that this group was initially created.
+     * This is created when a group is selected/grouped for the first time.
      * @return a long
      */
     public long getCreationTime() {
         return creationTime;
     }
 
-    long getLastAnimationTimeStamp(){
-        return lastAnimationTimeStamp;
+    /**
+     * Get whether this group is within a loaded chunk
+     * @return a boolean
+     */
+    public boolean isInLoadedChunk(){
+        return DisplayUtils.isInLoadedChunk(masterPart);
     }
+
+
+
 
     void setLastAnimationTimeStamp(long timestamp){
         this.lastAnimationTimeStamp = timestamp;
@@ -100,8 +110,15 @@ public final class SpawnedDisplayEntityGroup {
         //container.set(lastAnimationTimestampKey, PersistentDataType.LONG, timestamp);
     }
 
-    public boolean isInLoadedChunk(){
-        return DisplayUtils.isInLoadedChunk(masterPart);
+    /**
+     * Manually stop an animation from playing on a group
+     * @param removeFromStateMachine removes this animation from its state machine if true
+     */
+    public void stopAnimation(boolean removeFromStateMachine){
+        this.lastAnimationTimeStamp = -1;
+        if (removeFromStateMachine){
+            DisplayAnimatorStateMachine.unregisterStateMachine(this);
+        }
     }
 
 
@@ -112,7 +129,7 @@ public final class SpawnedDisplayEntityGroup {
 
 
     /**
-     * Add an display entity to this group. If this group already contains this display entity as a registered part it will return the existing
+     * Add a display entity to this group. If this group already contains this display entity as a registered part it will return the existing
      * {@link SpawnedDisplayEntityPart}. If it doesn't then it will return a new {@link SpawnedDisplayEntityPart}
      * @param displayEntity
      * @return a {@link SpawnedDisplayEntityPart} representing the Display entity
@@ -193,8 +210,8 @@ public final class SpawnedDisplayEntityGroup {
     public boolean hasSameCreationTime(Interaction interaction){
         return sameCreationTime(interaction);
     }
-    
-    
+
+
 
     private boolean sameCreationTime(Entity entity){
         PersistentDataContainer container = entity.getPersistentDataContainer();
@@ -1185,6 +1202,82 @@ public final class SpawnedDisplayEntityGroup {
             SpawnedDisplayEntityPart part = displayParts.get(i);
             SpawnedDisplayEntityPart copyPart = copyParts.get(i);
             part.setTransformation(((Display)copyPart.getEntity()).getTransformation());
+        }
+    }
+
+
+    long getLastAnimationTimeStamp(){
+        return lastAnimationTimeStamp;
+    }
+
+    /**
+     * Get the tag of the animation to be applied to this group when it's spawned/loaded
+     * @return a string or null if not set;
+     */
+    public @Nullable String getSpawnAnimationTag(){
+        PersistentDataContainer c = masterPart.getEntity().getPersistentDataContainer();
+        return c.get(spawnAnimationKey, PersistentDataType.STRING);
+    }
+
+    /**
+     * Get the {@link DisplayAnimator.AnimationType} to be applied to this group's spawn animation
+     * @return a {@link  DisplayAnimator.AnimationType} or null if not set;
+     */
+    public @Nullable DisplayAnimator.AnimationType getSpawnAnimationType(){
+        PersistentDataContainer c = masterPart.getEntity().getPersistentDataContainer();
+        String type = c.get(spawnAnimationTypeKey, PersistentDataType.STRING);
+        if (type == null){
+            return null;
+        }
+        try{
+            return DisplayAnimator.AnimationType.valueOf(type);
+        }
+        catch(IllegalArgumentException e){
+            return null;
+        }
+    }
+
+    /**
+     * Set the animation to apply to a group when it is spawned, by its tag.
+     * A null animation tag will remove any existing spawn animation from this group.
+     * @param animationTag tag of animation to apply whenever this group is spawned/loaded
+     * @param animationType type of animation to be applied
+     */
+    public void setSpawnAnimationTag(@Nullable String animationTag, DisplayAnimator.AnimationType animationType){
+        PersistentDataContainer c = masterPart.getEntity().getPersistentDataContainer();
+        if (animationTag == null){
+            c.remove(spawnAnimationKey);
+            c.remove(spawnAnimationTypeKey);
+        }
+        else{
+            c.set(spawnAnimationKey, PersistentDataType.STRING, animationTag);
+            c.set(spawnAnimationTypeKey, PersistentDataType.STRING, animationType.name());
+        }
+    }
+
+
+    /**
+     * Start playing this group's looping spawn animation. This will do nothing if the spawn animation was never set with {@link #setSpawnAnimationTag(String, DisplayAnimator.AnimationType)}
+     * or through plugin commands.
+     */
+    public void playSpawnAnimation(){
+        PersistentDataContainer c = masterPart.getEntity().getPersistentDataContainer();
+        String spawnAnimationTag = c.get(spawnAnimationKey, PersistentDataType.STRING);
+        if (spawnAnimationTag == null){
+            return;
+        }
+
+        SpawnedDisplayAnimation anim = DisplayAnimationManager.getSpawnAnimation(spawnAnimationTag);
+        if (anim != null){
+            DisplayAnimator.AnimationType type = getSpawnAnimationType();
+            if (type == null){
+                return;
+            }
+            switch(type){
+                case LINEAR -> animate(anim);
+                case LOOP -> animateLooping(anim);
+                //case PING_PONG -> animatePingPong(anim);
+            }
         }
     }
 

@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.managers;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -20,9 +21,10 @@ public final class DisplayAnimationManager {
 
     private DisplayAnimationManager(){}
     private static final HashMap<UUID, SpawnedDisplayAnimation> selectedAnimation = new HashMap<>();
+    private static final HashMap<String, SpawnedDisplayAnimation> cachedAnimations = new HashMap<>();
 
     /**
-     * Set the selected SpawnedDisplayAnimation of a player to the specified group
+     * Set the selected SpawnedDisplayAnimation of a player to the specified animation
      * @param player Player to set the selection to
      * @param spawnedDisplayAnimation SpawnedDisplayAnimation to be set to the player
      */
@@ -33,23 +35,23 @@ public final class DisplayAnimationManager {
                 return;
             }
 
-            boolean otherPlayersHaveSelected = false;
+            //boolean otherPlayersHaveSelected = false;
             for (UUID uuid : selectedAnimation.keySet()){
                 if (uuid != player.getUniqueId() && selectedAnimation.get(uuid) == lastAnim){
-                    otherPlayersHaveSelected = true;
+                    //otherPlayersHaveSelected = true;
                     break;
                 }
             }
 
-            if (!otherPlayersHaveSelected){
+            /*if (!otherPlayersHaveSelected){
                 lastAnim.remove();
-            }
+            }*/
         }
         selectedAnimation.put(player.getUniqueId(), spawnedDisplayAnimation);
     }
 
     /**
-     * Gets the SpawnedDisplayAnimation a player has selected
+     * Get the SpawnedDisplayAnimation a player has selected
      * @param player Player to get the animation of
      * @return The SpawnedDisplayAnimation that the player has selected. Null if player does not have a selection.
      */
@@ -70,7 +72,7 @@ public final class DisplayAnimationManager {
      * Save a DisplayAnimation to a Data Location
      * @param loadMethod Storage where to save the DisplayAnimation
      * @param displayAnimation The group to be saved
-     * @param saver Player who is saving the animation (Nullable)
+     * @param saver Player who is saving the animation
      * @return boolean whether the save was successful
      */
     public static boolean saveDisplayAnimation(LoadMethod loadMethod, DisplayAnimation displayAnimation, @Nullable Player saver){
@@ -103,12 +105,12 @@ public final class DisplayAnimationManager {
      * @param tag Tag of the animation to be deleted
      * @param deleter Player who is deleting the animation (Nullable)
      */
-    public static void deleteDisplayAnimation(LoadMethod loadMethod, String tag, @Nullable Player deleter){
-        switch(loadMethod){
+    public static void deleteDisplayAnimation(LoadMethod loadMethod, String tag, @Nullable Player deleter) {
+        switch (loadMethod) {
             case LOCAL -> {
                 LocalManager.deleteDisplayAnimation(tag, deleter);
             }
-            case MONGODB ->{
+            case MONGODB -> {
                 MongoManager.deleteDisplayAnimation(tag, deleter);
             }
             case MYSQL -> {
@@ -119,12 +121,57 @@ public final class DisplayAnimationManager {
 
 
     /**
-     * Get a Display Entity Group from a Data Location
-     * @param loadMethod Where the DisplayAnimation is located
-     * @param tag The tag of the DisplayAnimation to be retrieved
-     * @return The found DisplayAnimation. Null if not found.
+     * Get a {@link SpawnedDisplayAnimation} that is applied to a {@link SpawnedDisplayEntityGroup} when spawned, if
+     * the group has a spawn animation set, and if {@link DisplayEntityPlugin#cacheAnimations()} is true.
+     * <br><br>
+     * If an animation is not already cached, an attempt will be made to retrieve it from all storage locations, and will cache it if found.
+     * @return a {@link SpawnedDisplayAnimation}, or null if the animation is not cached and does not exist in any storage location.
      */
-    public static DisplayAnimation retrieve(LoadMethod loadMethod, String tag){
+    public static SpawnedDisplayAnimation getSpawnAnimation(String tag){
+        SpawnedDisplayAnimation cachedAnim = cachedAnimations.get(tag);
+        if (cachedAnim != null){
+            return cachedAnim;
+        }
+
+        DisplayAnimation anim = getAnimation(tag);
+        if (anim == null){
+            return null;
+        }
+
+        cachedAnim = anim.toSpawnedDisplayAnimation();
+        if (DisplayEntityPlugin.cacheAnimations()){
+            cachedAnimations.put(tag, cachedAnim);
+        }
+
+        return cachedAnim;
+    }
+
+    /**
+     * Attempt to get a {@link DisplayAnimation} from all storage locations.
+     * Storage locations in the order of {@link LoadMethod#LOCAL}, {@link LoadMethod#MONGODB}, {@link LoadMethod#MYSQL}.
+     * If a load method is disabled then it is skipped.
+     * @param tag The tag of the {@link DisplayAnimation} to be retrieved
+     * @return The found {@link DisplayAnimation}. Null if not found.
+     */
+    public static DisplayAnimation getAnimation(String tag){
+        DisplayAnimation anim = getAnimation(LoadMethod.LOCAL, tag);
+        if (anim == null){
+            anim = getAnimation(LoadMethod.MONGODB, tag);
+        }
+        if (anim == null){
+            anim = getAnimation(LoadMethod.MYSQL, tag);
+        }
+        return anim;
+    }
+
+
+    /**
+     * Get a {@link DisplayAnimation} from a storage location.
+     * @param loadMethod Where the {@link DisplayAnimation} is located
+     * @param tag The tag of the {@link DisplayAnimation} to be retrieved
+     * @return The found {@link DisplayAnimation}. Null if not found.
+     */
+    public static DisplayAnimation getAnimation(LoadMethod loadMethod, String tag){
         switch(loadMethod){
             case LOCAL ->{
                 return LocalManager.retrieveDisplayAnimation(tag);
@@ -140,13 +187,13 @@ public final class DisplayAnimationManager {
     }
 
     /**
-     * Get a DisplayAnimation from a saved file
-     * @param file File of a saved DisplayAnimation
-     * @return The found DisplayAnimation. Null if not found.
+     * Get a {@link DisplayAnimation} from a saved file
+     * @param file File of a saved {@link DisplayAnimation}
+     * @return The found {@link DisplayAnimation}. Null if not found.
      */
-    public static DisplayAnimation retrieve(File file){
+    public static DisplayAnimation getAnimation(File file){
         try{
-            return retrieve(new FileInputStream(file));
+            return getAnimation(new FileInputStream(file));
         }
         catch(IOException ex){
             ex.printStackTrace();
@@ -155,11 +202,11 @@ public final class DisplayAnimationManager {
     }
 
     /**
-     * Get a Display Entity Group from an input stream
-     * @param inputStream InputStream containing a saved DisplayAnimation
-     * @return The found DisplayAnimation. Null if not found.
+     * Get a {@link DisplayAnimation} from an input stream
+     * @param inputStream InputStream containing a saved {@link DisplayAnimation}.
+     * @return The found {@link DisplayAnimation}. Null if not found.
      */
-    public static DisplayAnimation retrieve(InputStream inputStream){
+    public static DisplayAnimation getAnimation(InputStream inputStream){
         byte[] bytes;
         try{
             bytes = inputStream.readAllBytes();
@@ -205,12 +252,12 @@ public final class DisplayAnimationManager {
     }
 
     /**
-     * Get a DisplayAnimation from a plugin's resources
-     * @param plugin The plugin to get the DisplayAnimation from
-     * @param resourcePath The path of the DisplayAnimation
-     * @return The found DisplayAnimation. Null if not found.
+     * Get a {@link DisplayAnimation} from a plugin's resources
+     * @param plugin The plugin to get the {@link DisplayAnimation} from
+     * @param resourcePath The path of the {@link DisplayAnimation}
+     * @return The found {@link DisplayAnimation}. Null if not found.
      */
-    public static DisplayAnimation retrieveFromResources(JavaPlugin plugin, String resourcePath){
+    public static DisplayAnimation getAnimation(JavaPlugin plugin, String resourcePath){
         InputStream modelStream;
         if (resourcePath.contains(DisplayAnimation.fileExtension)){
             modelStream = plugin.getResource(resourcePath);
@@ -218,7 +265,7 @@ public final class DisplayAnimationManager {
         else{
             modelStream = plugin.getResource(resourcePath+DisplayAnimation.fileExtension);
         }
-        return retrieve(modelStream);
+        return getAnimation(modelStream);
     }
 
 

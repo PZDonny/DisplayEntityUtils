@@ -38,6 +38,7 @@ class GroupCMD implements SubCommand{
         subCommands.put("glow", new GroupGlowCMD());
         subCommands.put("setglowcolor", new GroupSetGlowColorCMD());
         subCommands.put("copypose", new GroupCopyPoseCMD());
+        subCommands.put("setspawnanim", new GroupSetSpawnAnimationCMD());
     }
 
     static List<String> getTabComplete(){
@@ -96,6 +97,7 @@ class GroupCMD implements SubCommand{
             CMDUtils.sendCMD(sender, "/mdis group copypose", " (Copies the transformations of the group you're closest to, to your selected group)");
             CMDUtils.sendCMD(sender, "/mdis group glow", " (Make all parts in this group glow)");
             CMDUtils.sendCMD(sender, "/mdis group setglowcolor <color | hex-code>", " (Set the glow color for all parts in this group)");
+            CMDUtils.sendCMD(sender, "/mdis group setspawnanim <anim-tag> <linear | loop>", " (Set a looping animation to play when this group is spawned/loaded)");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }

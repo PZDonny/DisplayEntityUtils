@@ -113,7 +113,7 @@ public final class MongoManager{
         }
         byte[] bytes = ((Binary) doc.get("displayGroup")).getData();
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        return DisplayGroupManager.retrieve(in);
+        return DisplayGroupManager.getGroup(in);
     }
 
 
@@ -198,7 +198,7 @@ public final class MongoManager{
         }
         byte[] bytes = ((Binary) doc.get("displayAnimation")).getData();
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        return DisplayAnimationManager.retrieve(in);
+        return DisplayAnimationManager.getAnimation(in);
     }
 
 

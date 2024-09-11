@@ -22,6 +22,7 @@ public enum Permission {
     GROUP_GLOW("deu.group.glow"),
     GROUP_GLOW_COLOR_SET("deu.group.glow.set"),
     GROUP_COPY_POSE("deu.group.copy"),
+    GROUP_SET_SPAWN_ANIM("deu.group.spawnanim"),
 
 
     PARTS_CYCLE("deu.parts.cycle"),
@@ -66,6 +67,7 @@ public enum Permission {
     ANIM_SET_TAG("deu.anim.settag"),
     ANIM_SET_FRAME_TAG("deu.anim.setframetag"),
     ANIM_PLAY("deu.anim.play"),
+    ANIM_STOP("deu.anim.stop"),
     ANIM_SELECT("deu.anim.select"),
 
     BDENGINE_CONVERT_ANIM("deu.bdengine.convertanim"),

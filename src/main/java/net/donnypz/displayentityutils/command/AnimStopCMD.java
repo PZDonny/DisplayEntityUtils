@@ -10,10 +10,10 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
-class AnimPlayCMD implements SubCommand{
+class AnimStopCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_PLAY)){
+        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_STOP)){
             return;
         }
 
@@ -29,13 +29,7 @@ class AnimPlayCMD implements SubCommand{
             return;
         }
 
-        if (args.length >= 3 && args[2].equalsIgnoreCase("-loop")){
-            group.animateLooping(anim);
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.GREEN + "Playing Animation! " + ChatColor.YELLOW+"(LOOPING)");
-        }
-        else{
-            group.animate(anim);
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.GREEN + "Playing Animation!");
-        }
+        group.stopAnimation(true);
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.YELLOW + "Stopping a animation played on group!");
     }
 }

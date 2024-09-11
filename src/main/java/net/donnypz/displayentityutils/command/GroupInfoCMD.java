@@ -2,14 +2,14 @@ package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
-import org.bukkit.entity.Interaction;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 class GroupInfoCMD implements SubCommand{
@@ -26,13 +26,26 @@ class GroupInfoCMD implements SubCommand{
         }
 
         player.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-        String groupTag = group.getTag() == null ? ChatColor.RED + "NOT SET" : ChatColor.YELLOW + group.getTag();
+        String groupTag = group.getTag();
+        groupTag = groupTag == null ? "<red>NOT SET" : "<yellow>"+groupTag;
 
-        player.sendMessage("Group Tag: " + ChatColor.YELLOW + groupTag);
-        player.sendMessage("Total Parts: " + (group.getSpawnedParts().size() - 1));
-        player.sendMessage("Pitch: " + group.getLocation().getPitch());
-        player.sendMessage("Yaw: " + group.getLocation().getYaw());
-        player.sendMessage("Group's Scale Multiplier: " + ChatColor.YELLOW + group.getScaleMultiplier() + "x");
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: "+groupTag));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Total Parts: <yellow>"+(group.getSpawnedParts().size() - 1)));
+
+        Location loc = group.getLocation();
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Pitch: <yellow>"+loc.getPitch()));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Yaw: <yellow>"+loc.getYaw()));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Scale Multiplier: <yellow>"+group.getScaleMultiplier()));
+
+        String animTag = group.getSpawnAnimationTag();
+        animTag = animTag == null ? "<red>NOT SET" : "<yellow>"+animTag;
+
+        DisplayAnimator.AnimationType type = group.getSpawnAnimationType();
+        String animType = type == null ? "<red>NOT SET" : "<yellow>"+type.name();
+
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Spawn/Load Animation Tag: "+animTag));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Spawn/Load Animation Type: "+animType));
+        player.sendMessage("");
         Color color = group.getGlowColor();
         if (color != null) {
             player.sendMessage(Component.text("Glow Color: ").append(Component.text("COLOR", TextColor.color(color.getRed(), color.getGreen(), color.getBlue()))));
@@ -53,7 +66,8 @@ class GroupInfoCMD implements SubCommand{
                 blueString += "0";
             }
             player.sendMessage("| " + ChatColor.YELLOW + "HEX: #" + redString + greenString + blueString);
-        } else {
+        }
+        else {
             player.sendMessage("Glow Color: " + ChatColor.RED + "NOT SET");
         }
     }

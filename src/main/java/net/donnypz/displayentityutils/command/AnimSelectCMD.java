@@ -45,7 +45,7 @@ class AnimSelectCMD implements SubCommand{
             p.sendMessage(Component.text("- Storage location is disabled and cannot be checked!", NamedTextColor.GRAY));
             return;
         }
-        DisplayAnimation anim = DisplayAnimationManager.retrieve(loadMethod, tag);
+        DisplayAnimation anim = DisplayAnimationManager.getAnimation(loadMethod, tag);
         if (anim == null){
             p.sendMessage(Component.text("- Failed to find saved display animation in that storage location!", NamedTextColor.RED));
             return;

@@ -63,6 +63,7 @@ final class AutoGroup {
                         group.addMissingInteractionEntities(DisplayEntityPlugin.getMaximumInteractionSearchRange());
                         if (!result.alreadyLoaded()){
                             new ChunkRegisterGroupEvent(group, chunk).callEvent();
+                            group.playSpawnAnimation();
                         }
                     });
                 }
@@ -94,6 +95,7 @@ final class AutoGroup {
                                 foundGroups.add(group);
                                 if (!result.alreadyLoaded()){
                                     new ChunkRegisterGroupEvent(group, chunk).callEvent();
+                                    group.playSpawnAnimation();
                                 }
                             }
                         }

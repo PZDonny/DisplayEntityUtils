@@ -103,7 +103,7 @@ public final class LocalManager {
         if (!saveFile.exists()){
             return null;
         }
-        return DisplayGroupManager.retrieve(saveFile);
+        return DisplayGroupManager.getGroup(saveFile);
     }
 
     static boolean saveDisplayAnimation(DisplayAnimation displayAnimation, @Nullable Player saver){
@@ -406,7 +406,7 @@ public final class LocalManager {
         if (!saveFile.exists()){
             return null;
         }
-        return DisplayAnimationManager.retrieve(saveFile);
+        return DisplayAnimationManager.getAnimation(saveFile);
     }
 
     static List<String> getDisplayEntityTags(){
