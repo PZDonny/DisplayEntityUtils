@@ -37,6 +37,7 @@ class AnimCMD implements SubCommand{
         subCommands.put("settag", new AnimSetTagCMD());
         subCommands.put("setframetag", new AnimSetFrameTagCMD());
         subCommands.put("play", new AnimPlayCMD());
+        subCommands.put("stop", new AnimStopCMD());
         subCommands.put("select", new AnimSelectCMD());
     }
 
@@ -91,7 +92,8 @@ class AnimCMD implements SubCommand{
         else{
             CMDUtils.sendCMD(sender, "/mdis anim reverse", " (Reverse the order of frames in your selected animation)");
             CMDUtils.sendCMD(sender, "/mdis anim togglescalerespect", " (Toggle whether your selected animation should respect the group's scale)");
-            CMDUtils.sendCMD(sender, "/mdis anim play", " (Play your selected animation on your selected group)");
+            CMDUtils.sendCMD(sender, "/mdis anim play [-loop]", " (Play your selected animation on your selected group. Include \"-loop\" to loop the animation)");
+            CMDUtils.sendCMD(sender, "/mdis anim stop", " (Stop an animation playing on a group)");
             CMDUtils.sendCMD(sender, "/mdis anim select <anim-tag>", " (Select a saved DisplayAnimation from a storage location)");
             CMDUtils.sendCMD(sender,"/mdis anim save <storage-location>", " (Save your selected animation)");
             CMDUtils.sendCMD(sender,"/mdis anim delete <anim-tag> <storage-location>", " (Delete a saved animation from a storage location)");
