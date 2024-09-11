@@ -19,9 +19,9 @@ class AnimInfoCMD implements SubCommand{
         }
 
         player.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-        String groupTag = animation.getAnimationTag() == null ? ChatColor.RED + "NOT SET" : ChatColor.YELLOW + animation.getAnimationTag();
+        String animTag = animation.getAnimationTag() == null ? ChatColor.RED + "NOT SET" : ChatColor.YELLOW + animation.getAnimationTag();
 
-        player.sendMessage("Group Tag: " + ChatColor.YELLOW + groupTag);
+        player.sendMessage("Animation Tag: " + ChatColor.YELLOW + animTag);
         if (!animation.isPartAnimation()) {
             player.sendMessage("Animation Part Tag: " + ChatColor.RED + "NOT SET");
         } else {
