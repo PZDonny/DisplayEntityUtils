@@ -80,6 +80,7 @@ despawnGroupsOnServerStop: false
 #Enable this to allow overwriting of existing saved DisplayEntityGroups and Animations
 overwriteExistingSaves: true
 
+
 #This setting attempts to automatically cull Spawned Display Entity Groups based on the following options:
 #
 #    NONE: No Display Entities will be culled (Default Vanilla Option)
@@ -91,6 +92,12 @@ overwriteExistingSaves: true
 #LARGEST is the safest option to reduce Display Entities being culled too early.
 # !KEEP IN MIND! it is NOT possible for the culling to be perfect.
 autoCulling: NONE
+
+
+#This setting automatically caches animations. Keep this enabled if SpawnedEntityGroups use animations when they spawn and
+#those animations are saved on a database like MongoDB or MySQL. This will help prevent server lag/freezes, but also takes up
+#more memory.
+cacheAnimations: true
 
 
 

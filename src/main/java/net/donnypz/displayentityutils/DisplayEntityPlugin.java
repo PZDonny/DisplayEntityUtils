@@ -44,28 +44,29 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     private static NamespacedKey masterKey;
 
     private static final String legacyPartTagPrefix = "deu.parttag_";
-    private static boolean isMongoEnabled = false;
-    private static boolean isMYSQLEnabled = false;
-    private static boolean isLocalEnabled;
+    static boolean isMongoEnabled = false;
+    static boolean isMYSQLEnabled = false;
+    static boolean isLocalEnabled;
 
-    private static boolean seededPartUUIDs;
-    private static boolean automaticGroupDetection;
-    private static double maximumInteractionSearchRange;
-    private static boolean readSameChunks = true;
-    private static boolean autoPivotInteractions;
-    private static boolean despawnGroupsOnServerStop;
-    private static boolean overwriteExistingSaves;
-    private static boolean unregisterOnUnload;
-    private static boolean isUnregisterOnUnloadBlacklist;
-    private static List<String> unregisterUnloadWorlds;
-    private static boolean autoSelectGroups;
-    private static CullOption cullOption;
+    static boolean seededPartUUIDs;
+    static boolean automaticGroupDetection;
+    static double maximumInteractionSearchRange;
+    static boolean readSameChunks = true;
+    static boolean autoPivotInteractions;
+    static boolean despawnGroupsOnServerStop;
+    static boolean overwriteExistingSaves;
+    static boolean unregisterOnUnload;
+    static boolean isUnregisterOnUnloadBlacklist;
+    static List<String> unregisterUnloadWorlds;
+    static boolean autoSelectGroups;
+    static CullOption cullOption;
+    static boolean cacheAnimations;
 
     @Override
     public void onEnable() {
         instance = this;
         getConfig().options().copyDefaults(true);
-        saveDefaultConfig();
+
         reloadPlugin(true);
 
         getCommand("managedisplays").setExecutor(new DisplayEntityPluginCommand());
@@ -96,67 +97,6 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             for (SpawnedDisplayEntityGroup group : DisplayGroupManager.getAllSpawnedGroups()){
                 group.unregister(true);
             }
-        }
-
-    }
-
-    private void setConfigVariables(){
-        isLocalEnabled = getConfig().getBoolean("localStorageEnabled");
-        if (getConfig().getBoolean("mongodb.enabled")){
-            isMongoEnabled = true;
-            String cString = getConfig().getString("mongodb.connectionString");
-            String databaseName = getConfig().getString("mongodb.database");
-            String groupCollection = getConfig().getString("mongodb.groupCollection");
-            String animationCollection = getConfig().getString("mongodb.animationCollection");
-            MongoManager.createConnection(cString, databaseName, groupCollection, animationCollection);
-        }
-
-        if (getConfig().getBoolean("mysql.enabled")){
-            isMYSQLEnabled = true;
-            String username = getConfig().getString("mysql.username");
-            String password = getConfig().getString("mysql.password");
-            if (!getConfig().getString("mysql.connectionURL").isBlank()){
-                MYSQLManager.createConnection(getConfig().getString("mysql.connectionURL"), username, password);
-            }
-            else{
-                String database = getConfig().getString("mysql.database");
-                String host = getConfig().getString("mysql.host");
-                int port = getConfig().getInt("mysql.port");
-                boolean useSSL = getConfig().getBoolean("mysql.useSSL");
-                MYSQLManager.createConnection(host, port, database, username, password, useSSL);
-            }
-        }
-
-        seededPartUUIDs = getConfig().getBoolean("seededPartUUIDs");
-
-        automaticGroupDetection = getConfig().getBoolean("automaticGroupDetection.enabled");
-        if (automaticGroupDetection){
-            maximumInteractionSearchRange = getConfig().getDouble("automaticGroupDetection.maximumInteractionSearchRange");
-            if (maximumInteractionSearchRange < 0){
-                maximumInteractionSearchRange = 0;
-            }
-            readSameChunks = getConfig().getBoolean("automaticGroupDetection.readSameChunks");
-            unregisterOnUnload = getConfig().getBoolean("automaticGroupDetection.unregisterOnUnload.enabled");
-            isUnregisterOnUnloadBlacklist = getConfig().getBoolean("automaticGroupDetection.unregisterOnUnload.blacklist");
-            unregisterUnloadWorlds = getConfig().getStringList("automaticGroupDetection.unregisterOnUnload.worlds");
-
-        }
-
-        autoPivotInteractions = getConfig().getBoolean("autoPivotInteractionsOnSpawn");
-        despawnGroupsOnServerStop = getConfig().getBoolean("despawnGroupsOnServerStop");
-        overwriteExistingSaves = getConfig().getBoolean("overwriteExistingSaves");
-        autoSelectGroups = getConfig().getBoolean("autoSelectGroups");
-        String cullConfig = getConfig().getString("cullOption");
-        try{
-            if (cullConfig != null){
-                cullOption = CullOption.valueOf(cullConfig.toUpperCase());
-            }
-            else{
-                cullOption = CullOption.NONE;
-            }
-        }
-        catch(IllegalArgumentException illegalArgumentException){
-            cullOption = CullOption.NONE;
         }
 
     }
@@ -291,6 +231,13 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         return cullOption;
     }
 
+    /**
+     * Gets the value of "cacheAnimations" in the config
+     * @return the boolean value set in config
+     */
+    public static boolean cacheAnimations() {
+        return cacheAnimations;
+    }
 
     /**
      * Gets the value of "despawnGroupsOnServerStop" in the config
@@ -331,9 +278,13 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             MongoManager.closeConnection();
             MYSQLManager.closeConnection();
         }
+        else{
+            saveDefaultConfig();
+            ConfigUtils.updateConfig();
+        }
 
         reloadConfig();
-        setConfigVariables();
+        ConfigUtils.setConfigVariables(getConfig());
         createLocalSaveFolders();
     }
 
