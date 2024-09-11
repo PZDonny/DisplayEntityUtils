@@ -18,7 +18,7 @@ public class DisplayAnimator {
     }
 
     /**
-     * Plays an animation once for a SpawnedDisplayEntityGroup without the use of a DisplayAnimator object.
+     * Plays an animation once for a {@link SpawnedDisplayEntityGroup} without the use of a {@link DisplayAnimator} instance.
      * To control an animation, pausing/playing/looping, create a new {@link DisplayAnimator}.
      * @param group The group to play the animation
      * @param animation The animation to play
@@ -37,7 +37,7 @@ public class DisplayAnimator {
     }
 
     /**
-     * Plays an animation for a SpawnedDisplayEntityGroup.
+     * Plays an animation for a {@link SpawnedDisplayEntityGroup}.
      * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(SpawnedDisplayEntityGroup)} is called.
      * If a group was paused then this is called, the group will play the animation from the last frame before the pause.
      * @param group The group to play the animation
@@ -58,7 +58,7 @@ public class DisplayAnimator {
     }
 
     /**
-     * Plays an animation for a SpawnedDisplayEntityGroup.
+     * Plays an animation for a {@link SpawnedDisplayEntityGroup}.
      * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(SpawnedDisplayEntityGroup)} is called.
      * Plays the animation from the first frame regardless of the frame the group showed when it was paused.
      * @param group The group to play the animation
@@ -69,8 +69,13 @@ public class DisplayAnimator {
     }
 
 
+    /**
+     * Stop the animation that is being played on a {@link SpawnedDisplayEntityGroup}.
+     * The group's translation will be representative of the frame the animation was stopped at.
+     * @param group the group to stop animating
+     */
     public void stop(SpawnedDisplayEntityGroup group){
-        group.setLastAnimationTimeStamp(-1);
+        group.stopAnimation(false);
     }
 
 
@@ -82,6 +87,6 @@ public class DisplayAnimator {
     public enum AnimationType{
         LINEAR,
         LOOP,
-        //FLIP //(loop going forward then backwards idk what to name it)
+        //PING_PONG
     }
 }
