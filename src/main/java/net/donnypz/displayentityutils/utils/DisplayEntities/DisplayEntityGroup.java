@@ -401,6 +401,7 @@ public final class DisplayEntityGroup implements Serializable{
 
         DisplayGroupManager.addSpawnedGroup(spawnedGroup.getMasterPart(), spawnedGroup);
         spawnedGroup.autoSetCulling(DisplayEntityPlugin.autoCulling());
+        spawnedGroup.playSpawnAnimation();
         Bukkit.getPluginManager().callEvent(new GroupSpawnedEvent(spawnedGroup, spawnReason));
         return spawnedGroup;
     }
