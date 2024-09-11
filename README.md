@@ -1,4 +1,5 @@
-# DisplayEntityUtils  
+# DisplayEntityUtils (LAST UPDATE | 9/10/2024) 
+
 DisplayEntityUtils is a extensive plugin designed for use with BDEngine, a modeling/animation engine designed for display entities without the need for resource packs or mods.
 
 ## What you'll need: BDEngine
@@ -40,7 +41,7 @@ Access the wiki [HERE](https://github.com/PZDonny/DisplayEntityUtils/wiki)
 <dependency>
   <groupId>net.donnypz</groupId>
   <artifactId>displayentityutils</artifactId>
-  <version>2.3.2</version>
+  <version>2.4.0</version>
   <scope>provided</scope>
 </dependency>
 ```
