@@ -31,9 +31,6 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-
-                        <!--Allows Dependencies to work in other plugins-->
                             <relocations>
                                 <relocation>
                                     <pattern>org.mongodb</pattern>

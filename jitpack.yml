@@ -1,3 +1,6 @@
 install:
-  - MAVEN_VERSION=3.8.5
-  - /usr/share/maven/bin/mvn --version
+  - sdk install maven 3.8.5
+  - mvn install -DskipTests=true
+
+build:
+  - mvn package
