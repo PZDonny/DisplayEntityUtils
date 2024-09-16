@@ -1,4 +1,5 @@
 # DisplayEntityUtils (LAST UPDATE | 9/10/2024) 
+[![](https://jitpack.io/v/PZDonny/DisplayEntityUtils.svg)](https://jitpack.io/#PZDonny/DisplayEntityUtils)
 
 DisplayEntityUtils is a extensive plugin designed for use with BDEngine, a modeling/animation engine designed for display entities without the need for resource packs or mods.
 
@@ -38,10 +39,17 @@ Access the wiki [HERE](https://github.com/PZDonny/DisplayEntityUtils/wiki)
 
 ## How can you access the API?
 ```xml
+<repositories>
+  <repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+  </repository>
+</repositories>
+
 <dependency>
   <groupId>net.donnypz</groupId>
   <artifactId>displayentityutils</artifactId>
-  <version>2.4.0</version>
+  <version>2.4.1</version>
   <scope>provided</scope>
 </dependency>
 ```
