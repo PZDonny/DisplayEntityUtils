@@ -47,8 +47,8 @@ Access the wiki [HERE](https://github.com/PZDonny/DisplayEntityUtils/wiki)
 </repositories>
 
 <dependency>
-  <groupId>net.donnypz</groupId>
-  <artifactId>displayentityutils</artifactId>
+  <groupId>com.github.PZDonny</groupId>
+  <artifactId>DisplayEntityUtils</artifactId>
   <version>2.4.1</version>
   <scope>provided</scope>
 </dependency>
