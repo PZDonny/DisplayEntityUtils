@@ -9,7 +9,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
+import java.util.List;
 
 class AnimSetFrameTagCMD implements SubCommand{
     @Override
@@ -28,7 +28,7 @@ class AnimSetFrameTagCMD implements SubCommand{
             return;
         }
 
-        ArrayList<SpawnedDisplayAnimationFrame> frames = anim.getFrames();
+        List<SpawnedDisplayAnimationFrame> frames = anim.getFrames();
         if (frames.isEmpty()) {
             AnimCMD.hasNoFrames(player);
             return;

@@ -7,10 +7,9 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
+import java.util.List;
 
 class AnimEditAllFramesCMD implements SubCommand{
     @Override
@@ -18,7 +17,6 @@ class AnimEditAllFramesCMD implements SubCommand{
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_EDIT_FRAME)){
             return;
         }
-
 
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
@@ -37,7 +35,7 @@ class AnimEditAllFramesCMD implements SubCommand{
             return;
         }
 
-        ArrayList<SpawnedDisplayAnimationFrame> frames = anim.getFrames();
+        List<SpawnedDisplayAnimationFrame> frames = anim.getFrames();
         if (frames.isEmpty()) {
             AnimCMD.hasNoFrames(player);
             return ;

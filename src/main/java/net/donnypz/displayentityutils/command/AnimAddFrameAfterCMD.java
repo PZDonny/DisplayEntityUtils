@@ -10,7 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
+import java.util.List;
 
 class AnimAddFrameAfterCMD implements SubCommand{
     @Override
@@ -18,7 +18,6 @@ class AnimAddFrameAfterCMD implements SubCommand{
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_ADD_FRAME)){
             return;
         }
-
 
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
@@ -36,7 +35,8 @@ class AnimAddFrameAfterCMD implements SubCommand{
             player.sendMessage(Component.text("First frame is 0, Second frame is 1, and so on...", NamedTextColor.GRAY));
             return;
         }
-        ArrayList<SpawnedDisplayAnimationFrame> frames = anim.getFrames();
+
+        List<SpawnedDisplayAnimationFrame> frames = anim.getFrames();
         if (frames.isEmpty()) {
             AnimCMD.hasNoFrames(player);
             return;
