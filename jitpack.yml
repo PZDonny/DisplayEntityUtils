@@ -1,0 +1,3 @@
+install:
+  - MAVEN_VERSION=3.8.5
+  - /usr/share/maven/bin/mvn --version
