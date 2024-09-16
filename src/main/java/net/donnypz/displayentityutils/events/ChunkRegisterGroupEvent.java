@@ -18,10 +18,18 @@ public class ChunkRegisterGroupEvent extends Event {
         this.chunk = chunk;
     }
 
+    /**
+     * Get the {@link SpawnedDisplayEntityGroup} involved in this event
+     * @return a group
+     */
     public SpawnedDisplayEntityGroup getGroup() {
         return spawnedDisplayEntityGroup;
     }
 
+    /**
+     * Get the chunk involved in this event
+     * @return a chunk
+     */
     public Chunk getChunk() {
         return chunk;
     }

@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.events;
 
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
 import org.bukkit.entity.Interaction;
@@ -27,7 +28,7 @@ public class InteractionClickEvent extends Event implements Cancellable {
     boolean cancelled = false;
 
     /**
-     * Called when an Interaction Entity is Left or Right-clicked.
+     * Called when an {@link Interaction} is Left or Right-clicked.
      */
     public InteractionClickEvent(@NotNull Player player, @NotNull Interaction interaction, ClickType clickType, List<InteractionCommand> commands){
         this.player = player;
@@ -37,7 +38,7 @@ public class InteractionClickEvent extends Event implements Cancellable {
     }
 
     /**
-     * Get the interaction entity involved in this event
+     * Get the {@link Interaction} involved in this event
      * @return interaction
      */
     public Interaction getInteraction() {
@@ -45,8 +46,8 @@ public class InteractionClickEvent extends Event implements Cancellable {
     }
 
     /**
-     * Get the type of click performed on the interaction entity.
-     * @return LEFT or RIGHT {@link ClickType}
+     * Get the type of click performed on the {@link Interaction}
+     * @return a {@link ClickType}
      */
     public ClickType getClickType() {
         return clickType;
@@ -54,7 +55,7 @@ public class InteractionClickEvent extends Event implements Cancellable {
 
 
     /**
-     * Get a list of tags on the interaction entity
+     * Get a list of tags on the {@link Interaction}
      * @oaram tagType the type of tags to get
      * @return a collection of tags
      */
@@ -64,7 +65,7 @@ public class InteractionClickEvent extends Event implements Cancellable {
 
 
     /**
-     * Get the tag of this entity's group.
+     * Get the tag of the {@link Interaction}'s {@link SpawnedDisplayEntityGroup}.
      * @return group tag, null if not grouped
      */
     public @Nullable String getGroupTag(){
@@ -72,7 +73,7 @@ public class InteractionClickEvent extends Event implements Cancellable {
     }
 
     /**
-     * Get the commands that will be performed by the player when this interaction entity is clicked
+     * Get the commands that will be performed by the player when the {@link Interaction} is clicked
      * @return a list of commands
      */
     public List<InteractionCommand> getCommands() {
@@ -107,7 +108,7 @@ public class InteractionClickEvent extends Event implements Cancellable {
     }
 
     /**
-     * The type of click done in this event
+     * The type of click done in the {@link InteractionClickEvent}
      */
     public enum ClickType {
         LEFT,

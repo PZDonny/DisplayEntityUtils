@@ -27,30 +27,58 @@ public class GroupAnimationStateChangeEvent extends Event implements Cancellable
         this.oldDisplayAnimator = oldDisplayAnimator;
     }
 
+    /**
+     * Get the {@link SpawnedDisplayEntityGroup} involved in this event
+     * @return a group
+     */
     public SpawnedDisplayEntityGroup getGroup() {
         return group;
     }
 
+    /**
+     * Get the {@link DisplayAnimatorStateMachine} involved in this event
+     * @return a {@link DisplayAnimatorStateMachine}
+     */
     public DisplayAnimatorStateMachine getDisplayAnimatorStateMachine() {
         return stateMachine;
     }
 
+    /**
+     * Get the state name of the new animation state
+     * @return a string. Null if the state machine did not have a group state for the group previously
+     */
     public String getNewStateName() {
         return newStateName;
     }
 
+    /**
+     * Get the {@link DisplayAnimator} used for the new animation state
+     * @return a DisplayAnimator.
+     */
     public DisplayAnimator getNewDisplayAnimator() {
         return newDisplayAnimator;
     }
 
+    /**
+     * Get the state name of the previous animation state
+     * @return a string. Null if the state machine did not have a group state for the group previously
+     */
     public @Nullable String getOldStateName() {
         return oldStateName;
     }
 
+    /**
+     * Get the {@link DisplayAnimator} used for the old animation state
+     * @return a DisplayAnimator. Null if the state machine did not have a group state for the group previously
+     */
     public @Nullable DisplayAnimator getOldDisplayAnimator() {
         return oldDisplayAnimator;
     }
 
+    /**
+     * Get whether the state machine had a previous state for the group
+     * @return a boolean
+     */
     public boolean hasPreviousState(){
         return oldDisplayAnimator != null;
     }

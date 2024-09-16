@@ -25,7 +25,7 @@ public class PreInteractionClickEvent extends Event implements Cancellable {
     boolean cancelled = false;
 
     /**
-     * Called when an Interaction Entity is Left or Right-clicked.
+     * Called when an Interaction Entity is clicked
      */
     public PreInteractionClickEvent(@NotNull Player player, @NotNull Interaction interaction, InteractionClickEvent.ClickType clickType){
         this.player = player;
@@ -34,16 +34,16 @@ public class PreInteractionClickEvent extends Event implements Cancellable {
     }
 
     /**
-     * Get the interaction entity involved in this event
-     * @return interaction
+     * Get the {@link Interaction} involved in this event
+     * @return an interaction
      */
     public Interaction getInteraction() {
         return interaction;
     }
 
     /**
-     * Get the type of click performed on the interaction entity.
-     * @return LEFT or RIGHT {@link net.donnypz.displayentityutils.events.InteractionClickEvent.ClickType}
+     * Get the type of click performed on the {@link Interaction}.
+     * @return a {@link net.donnypz.displayentityutils.events.InteractionClickEvent.ClickType}
      */
     public InteractionClickEvent.ClickType getClickType() {
         return clickType;
@@ -51,8 +51,7 @@ public class PreInteractionClickEvent extends Event implements Cancellable {
 
 
     /**
-     * Get a list of tags on the interaction entity
-     * @oaram tagType the type of tags to get
+     * Get a list of tags on the {@link Interaction}
      * @return a collection of tags
      */
     public Collection<String> getTags(){
@@ -60,7 +59,7 @@ public class PreInteractionClickEvent extends Event implements Cancellable {
     }
 
     /**
-     * Get the tag of this entity's group.
+     * Get the tag of the entity's group.
      * @return group tag, null if not grouped
      */
     public @Nullable String getGroupTag(){

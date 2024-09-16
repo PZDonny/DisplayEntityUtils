@@ -62,9 +62,6 @@ public final class SpawnedDisplayEntityGroup {
         if (c.has(scaleKey)){
             scaleMultiplier = c.get(scaleKey, PersistentDataType.FLOAT);
         }
-        /*if (c.has(lastAnimationTimestampKey)) {
-            lastAnimationTimeStamp = c.get(lastAnimationTimestampKey, PersistentDataType.LONG);
-        }*/
 
         //String tag1;
         /*for (String tag: masterDisplay.getScoreboardTags()){
@@ -101,13 +98,8 @@ public final class SpawnedDisplayEntityGroup {
         return DisplayUtils.isInLoadedChunk(masterPart);
     }
 
-
-
-
     void setLastAnimationTimeStamp(long timestamp){
         this.lastAnimationTimeStamp = timestamp;
-        //PersistentDataContainer container = getMasterPart().getEntity().getPersistentDataContainer();
-        //container.set(lastAnimationTimestampKey, PersistentDataType.LONG, timestamp);
     }
 
     /**
@@ -117,7 +109,7 @@ public final class SpawnedDisplayEntityGroup {
     public void stopAnimation(boolean removeFromStateMachine){
         this.lastAnimationTimeStamp = -1;
         if (removeFromStateMachine){
-            DisplayAnimatorStateMachine.unregisterStateMachine(this);
+            DisplayAnimatorStateMachine.unregisterFromStateMachine(this);
         }
     }
 
@@ -177,6 +169,11 @@ public final class SpawnedDisplayEntityGroup {
         }
     }
 
+    /**
+     * Add a valid part entity (Display or Interaction) to this group, when you don't know the type of entity you're dealing with
+     * @param entity the part entity to add
+     * @return a corresponding {@link SpawnedDisplayEntityPart} or null if the entity is not a part entity
+     */
     public SpawnedDisplayEntityPart addPartEntity(@NotNull Entity entity){
         if (entity instanceof Interaction interaction){
             return addInteractionEntity(interaction);
@@ -219,7 +216,7 @@ public final class SpawnedDisplayEntityGroup {
             return false;
         }
 
-        return container.get(creationTimeKey, PersistentDataType.LONG) == creationTime;
+        return creationTime == container.get(creationTimeKey, PersistentDataType.LONG);
     }
 
     /**
@@ -1408,13 +1405,13 @@ public final class SpawnedDisplayEntityGroup {
      * Removes all stored SpawnedPartSelections and SpawnedDisplayEntityParts
      * @param despawnParts Decides whether the parts should be despawned or not
      * This unregisters anything related to the group within the DisplayEntityUtils Plugin
-     * This will be unusable as a SpawnedDisplayEntityGroup afterwards
+     * This group will be unusable afterwards
      */
     public void unregister(boolean despawnParts){
         if (masterPart == null){
             return;
         }
-        DisplayAnimatorStateMachine.unregisterStateMachine(this);
+        DisplayAnimatorStateMachine.unregisterFromStateMachine(this);
         DisplayGroupManager.removeSpawnedGroup(this, despawnParts);
 
         masterPart = null;

@@ -19,6 +19,10 @@ public class GroupDespawnedEvent extends Event implements Cancellable {
         this.spawnedDisplayEntityGroup = group;
     }
 
+    /**
+     * Get the {@link SpawnedDisplayEntityGroup} involved in this event
+     * @return
+     */
     public SpawnedDisplayEntityGroup getGroup() {
         return spawnedDisplayEntityGroup;
     }
