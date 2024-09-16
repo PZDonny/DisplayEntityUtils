@@ -31,14 +31,26 @@ public class GroupAnimationCompleteEvent extends Event {
         this.animator = null;
     }
 
+    /**
+     * Get the {@link SpawnedDisplayEntityGroup} involved in this event
+     * @return a group
+     */
     public SpawnedDisplayEntityGroup getGroup() {
         return spawnedDisplayEntityGroup;
     }
 
+    /**
+     * Get the {@link SpawnedDisplayAnimation} involved in this event
+     * @return a SpawnedDisplayAnimation
+     */
     public SpawnedDisplayAnimation getAnimation() {
         return animation;
     }
 
+    /**
+     * Get the {@link DisplayAnimator} involved in this event
+     * @return a DisplayAnimator. Null if the group animated without creating a DisplayAnimator
+     */
     public @Nullable DisplayAnimator getAnimator() {
         return animator;
     }

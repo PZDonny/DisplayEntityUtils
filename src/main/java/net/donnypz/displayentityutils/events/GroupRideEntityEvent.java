@@ -22,10 +22,18 @@ public class GroupRideEntityEvent extends Event implements Cancellable {
         isCancelled = false;
     }
 
+    /**
+     * Get the {@link SpawnedDisplayEntityGroup} involved in this event
+     * @return a {@link SpawnedDisplayEntityGroup}
+     */
     public SpawnedDisplayEntityGroup getGroup() {
         return spawnedDisplayEntityGroup;
     }
 
+    /**
+     * Get the entity the {@link SpawnedDisplayEntityGroup} will ride in this event
+     * @return an entity
+     */
     public Entity getEntity(){
         return entity;
     }

@@ -1,12 +1,15 @@
 package net.donnypz.displayentityutils.events;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * Called when a SpawnDisplayEntityGroup is mounted on top of an Entity.
+ * Called before a {@link SpawnedDisplayEntityGroup} is created through {@link DisplayEntityGroup#spawn(Location, GroupSpawnedEvent.SpawnReason)} or any variation.
+ * <p>
  * Can be cancelled
  */
 public class PreGroupSpawnedEvent extends Event implements Cancellable {
@@ -19,6 +22,10 @@ public class PreGroupSpawnedEvent extends Event implements Cancellable {
         this.displayEntityGroup = group;
     }
 
+    /**
+     * Get the {@link DisplayEntityGroup} attempting to spawn a {@link SpawnedDisplayEntityGroup}
+     * @return a DisplayEntityGroup
+     */
     public DisplayEntityGroup getGroup() {
         return displayEntityGroup;
     }

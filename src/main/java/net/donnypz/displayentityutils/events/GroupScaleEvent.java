@@ -22,14 +22,26 @@ public class GroupScaleEvent extends Event implements Cancellable {
         this.lastScale = lastScale;
     }
 
+    /**
+     * Get the {@link SpawnedDisplayEntityGroup} involved in this event
+     * @return a {@link SpawnedDisplayEntityGroup}
+     */
     public SpawnedDisplayEntityGroup getGroup(){
         return group;
     }
 
+    /**
+     * Get the scale the {@link SpawnedDisplayEntityGroup} will have
+     * @return a float
+     */
     public float getNewScale(){
         return newScale;
     }
 
+    /**
+     * Get the scale the {@link SpawnedDisplayEntityGroup} had before this event was called
+     * @return a float
+     */
     public float getLastScale() {
         return lastScale;
     }

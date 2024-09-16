@@ -4,14 +4,16 @@ import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Interaction;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 public final class SpawnedDisplayAnimation {
     String animationTag;
-    ArrayList<SpawnedDisplayAnimationFrame> frames = new ArrayList<>();
+    List<SpawnedDisplayAnimationFrame> frames = new ArrayList<>();
     String partTag = null;
     boolean respectGroupScale = true;
 
@@ -40,6 +42,7 @@ public final class SpawnedDisplayAnimation {
         addFrame(frame);
     }
 
+    @ApiStatus.Experimental
     SpawnedDisplayAnimation(SpawnedDisplayEntityGroup group, String partTag){
         this.partTag = partTag;
         SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(0, 0);
@@ -58,37 +61,63 @@ public final class SpawnedDisplayAnimation {
     }
 
 
-    public String getAnimationTag() {
+    /**
+     * Get the tag that represents this animation
+     * @return a string, null if not set
+     */
+    public @Nullable String getAnimationTag() {
         return animationTag;
     }
 
+    /**
+     * Set the tag that should represent this animation
+     * @param animationTag the tag to represent this animation
+     */
     public void setAnimationTag(String animationTag) {
         this.animationTag = animationTag;
     }
 
+    /**
+     * Get whether this animation is a part animation, and will only animate parts in a group with a certain part tag.
+     * @return a boolean
+     */
+    @ApiStatus.Experimental
     public boolean isPartAnimation(){
         return partTag != null;
     }
 
-    public String getPartTag() {
+    /**
+     * Get the part tag this animation will animate
+     * @return a string, null if not set and this is not a part animation
+     */
+    @ApiStatus.Experimental
+    public @Nullable String getPartTag() {
         return partTag;
     }
 
-    public ArrayList<SpawnedDisplayAnimationFrame> getFrames() {
+    /**
+     * Get a list of all the {@link SpawnedDisplayAnimationFrame}s within this animation
+     * @return a list of {@link SpawnedDisplayAnimationFrame}
+     */
+    public List<SpawnedDisplayAnimationFrame> getFrames() {
         return new ArrayList<>(frames);
     }
 
-    public void setFrames(ArrayList<SpawnedDisplayAnimationFrame> frames) {
+    /**
+     * Set the frames that should be contained within this animation
+     * @param frames the frames this animation should contain
+     */
+    public void setFrames(List<SpawnedDisplayAnimationFrame> frames) {
         this.frames = frames;
     }
 
     /**
-     * Add a frame to a SpawnedDisplayAnimation
+     * Add a frame to this SpawnedDisplayAnimation
      * @param frame the frame to add
      * @return An empty frame if the passed in frame is identical to the frame before it, else the passed in frame
      */
     public SpawnedDisplayAnimationFrame addFrame(SpawnedDisplayAnimationFrame frame){
-        if (!frames.isEmpty() && frames.get(frames.size()-1).equals(frame)){
+        if (!frames.isEmpty() && frames.getLast().equals(frame)){
             SpawnedDisplayAnimationFrame newFrame = new SpawnedDisplayAnimationFrame(frame.delay, frame.duration);
             frames.add(newFrame);
             return newFrame;
@@ -98,7 +127,7 @@ public final class SpawnedDisplayAnimation {
     }
 
     /**
-     * Add a frame to a SpawnedDisplayAnimation regardless of if it's identical to the frame before it
+     * Add a frame to this {@link SpawnedDisplayAnimation} even if the previous frame is identical
      * @param frame the frame to add
      */
     public void forceAddFrame(SpawnedDisplayAnimationFrame frame){
@@ -106,20 +135,35 @@ public final class SpawnedDisplayAnimation {
     }
 
 
-
-    public void removeFrame(SpawnedDisplayAnimationFrame frame){
-        frames.remove(frame);
+    /**
+     * Remove a frame from this {@link SpawnedDisplayAnimation}
+     * @param frame the frame to remove
+     * @return true if the animation contained the provided frame
+     */
+    public boolean removeFrame(SpawnedDisplayAnimationFrame frame){
+        return frames.remove(frame);
     }
 
+    /**
+     * Set whether this {@link SpawnedDisplayAnimation} should respect a {@link SpawnedDisplayEntityGroup}'s scale when animating
+     * @param respect
+     */
     public void groupScaleRespect(boolean respect){
         respectGroupScale = respect;
     }
 
+    /**
+     * Get whether this {@link SpawnedDisplayAnimation} respects a {@link SpawnedDisplayEntityGroup}'s scale
+     * @return a boolean
+     */
     public boolean groupScaleRespect(){
         return respectGroupScale;
     }
 
 
+    /**
+     * Remove all frames from the animation and make it essentially unusable.
+     */
     public void remove(){
         for (SpawnedDisplayAnimationFrame frame : frames){
             frame.displayTransformations.clear();
@@ -128,6 +172,10 @@ public final class SpawnedDisplayAnimation {
         frames.clear();
     }
 
+    /**
+     * Convert this animation to a serializable {@link DisplayAnimation}
+     * @return a {@link DisplayAnimation}
+     */
     public DisplayAnimation toDisplayAnimation(){
         DisplayAnimation anim = new DisplayAnimation();
 
@@ -140,13 +188,14 @@ public final class SpawnedDisplayAnimation {
         return anim;
     }
 
-    /** Reverses the order of all frames in this SpawnedDisplayAnimation
+    /**
+     * Reverse the order of all frames in this {@link SpawnedDisplayAnimation}
      */
     public void reverse(){
         Collections.reverse(frames);
     }
 
-    /** Creates a SpawnedDisplayAnimation with the same frames as
+    /** Creates an animation with the same frames as
      * this one in a reversed order
      * @return The reversed SpawnedDisplayAnimation
      */

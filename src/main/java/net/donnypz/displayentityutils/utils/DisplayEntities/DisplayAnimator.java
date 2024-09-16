@@ -79,6 +79,10 @@ public class DisplayAnimator {
     }
 
 
+    /**
+     * Get the {@link SpawnedDisplayAnimation} that this animator uses on groups
+     * @return a {@link SpawnedDisplayAnimation}
+     */
     public SpawnedDisplayAnimation getAnimation() {
         return animation;
     }

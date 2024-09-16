@@ -6,35 +6,20 @@
 
     <groupId>net.donnypz</groupId>
     <artifactId>displayentityutils</artifactId>
-    <version>2.4.0</version>
+    <version>2.4.1</version>
     <packaging>jar</packaging>
 
     <name>DisplayEntityUtils</name>
 
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub PZDonny Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/pzdonny/displayentityutils</url>
-        </repository>
-    </distributionManagement>
-
     <properties>
         <java.version>21</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>

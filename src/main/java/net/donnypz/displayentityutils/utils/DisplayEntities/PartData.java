@@ -24,10 +24,18 @@ public class PartData {
         this.worldName = worldName;
     }
 
+    /**
+     * Get the UUID of the entity this PartData represents
+     * @return a UUID
+     */
     public UUID getUUID() {
         return uuid;
     }
 
+    /**
+     * Get the world name of the entity this PartData represents
+     * @return a string
+     */
     public String getWorldName() {
         return worldName;
     }

@@ -7,7 +7,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
+import java.util.List;
 
 class AnimReverseCMD implements SubCommand{
     @Override
@@ -16,14 +16,13 @@ class AnimReverseCMD implements SubCommand{
             return;
         }
 
-
         SpawnedDisplayAnimation anim = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
         if (anim == null) {
             AnimCMD.noAnimationSelection(player);
             return;
         }
 
-        ArrayList<SpawnedDisplayAnimationFrame> frames = anim.getFrames();
+        List<SpawnedDisplayAnimationFrame> frames = anim.getFrames();
         if (frames.isEmpty()) {
             player.sendMessage(Component.text("Your currently selected animation has no frames!", NamedTextColor.RED));
             player.sendMessage(Component.text("Use \"/mdis anim addframe\" instead", NamedTextColor.GRAY));

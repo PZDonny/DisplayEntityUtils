@@ -20,7 +20,7 @@ public class GroupTranslateEvent extends Event implements Cancellable {
     private boolean isCancelled;
 
     /**
-     * Called when a SpawnDisplayEntityGroup translates it's parts, including both display and interaction entities.
+     * Called when a {@link SpawnedDisplayEntityGroup} translates its parts, including both display and interaction entities.
      * Can be cancelled
      */
     public GroupTranslateEvent(SpawnedDisplayEntityGroup group, GroupTranslateEvent.GroupTranslateType type, Location destination){
@@ -30,14 +30,26 @@ public class GroupTranslateEvent extends Event implements Cancellable {
         isCancelled = false;
     }
 
+    /**
+     * Get the {@link SpawnedDisplayEntityGroup} involved in this event
+     * @return a group
+     */
     public SpawnedDisplayEntityGroup getGroup() {
         return spawnedDisplayEntityGroup;
     }
 
+    /**
+     * Get the type of translation used in for this event
+     * @return a {@link GroupTranslateType}
+     */
     public GroupTranslateEvent.GroupTranslateType getType() {
         return type;
     }
 
+    /**
+     * Get the translation destination for the {@link SpawnedDisplayEntityGroup}
+     * @return a Location
+     */
     public Location getDestination() {
         return destination;
     }
