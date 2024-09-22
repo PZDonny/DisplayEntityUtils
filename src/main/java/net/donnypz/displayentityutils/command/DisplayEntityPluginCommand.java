@@ -124,13 +124,7 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
         CMDUtils.sendCMD(sender, "/mdis anim");
         CMDUtils.sendCMD(sender, "/mdis listgroups <storage> [page-number]");
         CMDUtils.sendCMD(sender, "/mdis listanims <storage> [page-number]");
-        CMDUtils.sendCMD(sender, "/mdis bdengine", "(Import models from BDEngine or convert animations)");
+        CMDUtils.sendCMD(sender, "/mdis bdengine", " (Import models from BDEngine or convert animations)");
         CMDUtils.sendCMD(sender, "/mdis reload", " (To reload Local, MySQL or MongoDB config save options, the server must be restarted)");
     }
-
-
-
-
-
-
 }
