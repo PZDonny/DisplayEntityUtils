@@ -91,5 +91,9 @@ class PartsCMD implements SubCommand{
         player.sendMessage(Component.text("/mdis parts select <part-tag>", NamedTextColor.GRAY));
     }
 
+    static void invalidPartSelection(CommandSender sender){
+        sender.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"Your part selection is invalid!");
+    }
+
 
 }

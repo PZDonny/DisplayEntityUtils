@@ -21,13 +21,15 @@ class TextFontCMD implements SubCommand{
             DisplayEntityPluginCommand.noPartSelection(player);
             return;
         }
-        if (partSelection.getSelectedParts().size() > 1){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You can only do this with one part selected");
+
+        if (partSelection.getSelectedParts().isEmpty()){
+            PartsCMD.invalidPartSelection(player);
             return;
         }
 
-        if (partSelection.getSelectedParts().get(0).getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You can only do this with text display entities");
+        SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
+        if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "You can only do this with text display entities");
             return;
         }
 
@@ -36,7 +38,7 @@ class TextFontCMD implements SubCommand{
             return;
         }
 
-        TextDisplay display = (TextDisplay) partSelection.getSelectedParts().get(0).getEntity();
+        TextDisplay display = (TextDisplay) selected.getEntity();
         String font = args[2];
         switch(font){
             case "default", "alt", "uniform", "illageralt" -> {

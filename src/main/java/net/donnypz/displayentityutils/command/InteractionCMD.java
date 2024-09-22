@@ -77,15 +77,17 @@ class InteractionCMD implements SubCommand{
                 return null;
             }
             else{
-                if (partSelection.getSelectedParts().size() > 1){
-                    p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You can only do this with one part selected");
+                if (partSelection.getSelectedParts().isEmpty()){
+                    PartsCMD.invalidPartSelection(p);
                     return null;
                 }
-                if (partSelection.getSelectedParts().getFirst().getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                    p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You can only do this with interaction entities");
+
+                SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
+                if (selected.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION) {
+                    p.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "You can only do this with interaction entities");
                     return null;
                 }
-                return (Interaction) partSelection.getSelectedParts().getFirst().getEntity();
+                return (Interaction) selected.getEntity();
             }
         }
     }

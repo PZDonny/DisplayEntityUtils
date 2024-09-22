@@ -25,12 +25,14 @@ class TextShadowCMD implements SubCommand{
             DisplayEntityPluginCommand.noPartSelection(player);
             return;
         }
-        if (partSelection.getSelectedParts().size() > 1){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You can only do this with one part selected");
+
+        if (partSelection.getSelectedParts().isEmpty()){
+            PartsCMD.invalidPartSelection(player);
             return;
         }
 
-        if (partSelection.getSelectedParts().getFirst().getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
+        SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
+        if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "You can only do this with text display entities");
             return;
         }
