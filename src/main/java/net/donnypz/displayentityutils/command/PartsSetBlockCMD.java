@@ -40,16 +40,19 @@ class PartsSetBlockCMD implements SubCommand{
         }
         
         String block = args[2];
-        if (partSelection.getSelectedParts().size() > 1){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You can only do this with one part selected");
-            return;
-        }
-        if (partSelection.getSelectedParts().getFirst().getType() != SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You can only do this with block display entities");
+
+        if (partSelection.getSelectedParts().isEmpty()){
+            PartsCMD.invalidPartSelection(player);
             return;
         }
 
-        BlockDisplay display = (BlockDisplay) partSelection.getSelectedParts().getFirst().getEntity();
+        SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
+        if (selected.getType() != SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY) {
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "You can only do this with block display entities");
+            return;
+        }
+
+        BlockDisplay display = (BlockDisplay) selected.getEntity();
         BlockData blockData;
 
         //Held Block
@@ -82,7 +85,7 @@ class PartsSetBlockCMD implements SubCommand{
         else{
             Material material = Material.matchMaterial(block.toLowerCase());
             if (material == null || !material.isBlock()){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Block not recognized, an item's name might have been entered or the block doesn't exist");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Block not recognized! The block's name might have been entered or the block doesn't exist");
                 return;
             }
             blockData = material.createBlockData();
