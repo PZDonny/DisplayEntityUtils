@@ -1,4 +1,4 @@
-# DisplayEntityUtils (LAST UPDATE | 9/16/2024) 
+# DisplayEntityUtils
 [![](https://jitpack.io/v/PZDonny/DisplayEntityUtils.svg)](https://jitpack.io/#PZDonny/DisplayEntityUtils)
 
 DisplayEntityUtils is a extensive plugin designed for use with BDEngine, a modeling/animation engine designed for display entities without the need for resource packs or mods.
