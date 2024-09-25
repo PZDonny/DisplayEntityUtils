@@ -585,18 +585,21 @@ public final class SpawnedDisplayEntityPart {
     }
 
     /**
-     * Attempt to automatically set the culling bounds for this part. This is similar to {@link SpawnedDisplayEntityGroup#autoSetCulling(CullOption)}
+     * Attempt to automatically set the culling bounds for this part. This is the same as {@link SpawnedDisplayEntityGroup#autoSetCulling(CullOption, float, float)}
      * with a CullSetting of {@link CullOption#LOCAL}.
      * Results may not be 100% accurate due to the varying shapes of Minecraft blocks and variation is display entity transformations.
      * The culling bounds will be representative of the part's scaling.
+     * @param widthAdder The amount of width to be added to the culling range
+     * @param heightAdder The amount of height to be added to the culling range
+     * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
      */
     @ApiStatus.Experimental
-    public void autoCull(){
+    public void autoCull(float widthAdder, float heightAdder){
         if (entity instanceof Display display){
             Transformation transformation = display.getTransformation();
             Vector3f scale = transformation.getScale();
-            display.setDisplayHeight(scale.y);
-            display.setDisplayWidth(Math.max(scale.x, scale.z)*2);
+            display.setDisplayHeight(scale.y+heightAdder);
+            display.setDisplayWidth((Math.max(scale.x, scale.z)*2)+widthAdder);
         }
     }
 

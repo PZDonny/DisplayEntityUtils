@@ -78,7 +78,10 @@ public final class SpawnedDisplayEntityGroup {
             }
         }
         DisplayGroupManager.storeNewSpawnedGroup(this);
-        autoSetCulling(DisplayEntityPlugin.autoCulling());
+
+        float widthCullingAdder = DisplayEntityPlugin.widthCullingAdder();
+        float heightCullingAdder = DisplayEntityPlugin.heightCullingAdder();
+        autoSetCulling(DisplayEntityPlugin.autoCulling(), widthCullingAdder, heightCullingAdder);
     }
 
     /**
@@ -750,17 +753,21 @@ public final class SpawnedDisplayEntityGroup {
      * Attempt to automatically set the culling bounds for all parts within this group.
      * Results may not be 100% accurate due to the varying shapes of Minecraft blocks.
      * The culling bounds will be representative of the part's scaling.
+     * @param cullOption The {@link CullOption} to use
+     * @param widthAdder The amount of width to be added to the culling range
+     * @param heightAdder The amount of height to be added to the culling range
+     * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
      */
     @ApiStatus.Experimental
-    public void autoSetCulling(CullOption cullOption){
+    public void autoSetCulling(CullOption cullOption, float widthAdder, float heightAdder){
         switch (cullOption){
-            case LARGEST -> largestCulling();
-            case LOCAL -> localCulling();
+            case LARGEST -> largestCulling(widthAdder, heightAdder);
+            case LOCAL -> localCulling(widthAdder, heightAdder);
             case NONE -> noneCulling();
         }
     }
 
-    private void largestCulling(){
+    private void largestCulling(float widthAdder, float heightAdder){
         float maxWidth = 0;
         float maxHeight = 0;
         for (SpawnedDisplayEntityPart part : spawnedParts) {
@@ -775,13 +782,13 @@ public final class SpawnedDisplayEntityGroup {
         }
 
         for (SpawnedDisplayEntityPart part : spawnedParts){
-            part.cull(maxWidth, maxHeight);
+            part.cull(maxWidth + widthAdder, maxHeight + heightAdder);
         }
     }
 
-    private void localCulling(){
+    private void localCulling(float widthAdder, float heightAdder){
         for (SpawnedDisplayEntityPart part : spawnedParts){
-            part.autoCull();
+            part.autoCull(widthAdder, heightAdder);
         }
     }
 
@@ -1180,7 +1187,10 @@ public final class SpawnedDisplayEntityGroup {
         mergingGroup.removeAllPartSelections();
         mergingGroup.spawnedParts.clear();
         mergingGroup.unregister(false);
-        autoSetCulling(DisplayEntityPlugin.autoCulling());
+
+        float widthCullingAdder = DisplayEntityPlugin.widthCullingAdder();
+        float heightCullingAdder = DisplayEntityPlugin.heightCullingAdder();
+        autoSetCulling(DisplayEntityPlugin.autoCulling(), widthCullingAdder, heightCullingAdder);
         return this;
     }
 

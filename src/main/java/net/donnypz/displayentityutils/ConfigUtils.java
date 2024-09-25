@@ -74,7 +74,14 @@ final class ConfigUtils {
         catch(IllegalArgumentException illegalArgumentException){
             DisplayEntityPlugin.cullOption = CullOption.NONE;
         }
-
+        if (DisplayEntityPlugin.cullOption != CullOption.NONE){
+            DisplayEntityPlugin.widthCullingAdder = (float) config.getDouble("widthCullingAdder");
+            DisplayEntityPlugin.heightCullingAdder = (float) config.getDouble("heightCullingAdder");;
+        }
+        else{
+            DisplayEntityPlugin.widthCullingAdder = 0;
+            DisplayEntityPlugin.heightCullingAdder = 0;
+        }
     }
     
     

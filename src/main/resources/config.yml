@@ -73,8 +73,8 @@ autoPivotInteractionsOnSpawn: true
 
 
 #Despawns groups spawned and automatically detected during the current server session
-#  If groups were created before the server's current session those
-#  will not be despawned automatically (if automaticGroupDetection is false)
+#  If groups were created before the server's current session those groups
+#  will not be automatically despawned, if automaticGroupDetection is false
 despawnGroupsOnServerStop: false
 
 #Enable this to allow overwriting of existing saved DisplayEntityGroups and Animations
@@ -92,6 +92,15 @@ overwriteExistingSaves: true
 #LARGEST is the safest option to reduce Display Entities being culled too early.
 # !KEEP IN MIND! it is NOT possible for the culling to be perfect.
 autoCulling: NONE
+
+#The two settings below will add X amount of blocks to the culling range of all SpawnedDisplayEntityGroups
+#If a group's culling width/height is 0 on the width and height, the group's culling width/height will become whatever value you set below
+#Essentially, the value set below will be added to the group's culling width/height
+#
+#These settings will do nothing if "autoCulling" is set to NONE
+#ONLY CHANGE THESE SETTINGS IF YOU KNOW WHAT YOU ARE DOING
+widthCullingAdder: 1.5
+heightCullingAdder: 1.5
 
 
 #This setting automatically caches animations. Keep this enabled if SpawnedEntityGroups use animations when they spawn and

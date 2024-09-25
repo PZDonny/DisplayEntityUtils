@@ -61,6 +61,8 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     static boolean autoSelectGroups;
     static CullOption cullOption;
     static boolean cacheAnimations;
+    static float widthCullingAdder;
+    static float heightCullingAdder;
 
     @Override
     public void onEnable() {
@@ -237,6 +239,22 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
      */
     public static boolean cacheAnimations() {
         return cacheAnimations;
+    }
+
+    /**
+     * Gets the value of "widthCullingAdder" in the config
+     * @return the boolean value set in config
+     */
+    public static float widthCullingAdder() {
+        return widthCullingAdder;
+    }
+
+    /**
+     * Gets the value of "heightCullingAdder" in the config
+     * @return the boolean value set in config
+     */
+    public static float heightCullingAdder() {
+        return heightCullingAdder;
     }
 
     /**
