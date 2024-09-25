@@ -31,7 +31,8 @@ public final class DisplayUtils {
     private static final NamespacedKey leftClickPlayer = new NamespacedKey(DisplayEntityPlugin.getInstance(), "lcp");
     private static final NamespacedKey rightClickConsole = new NamespacedKey(DisplayEntityPlugin.getInstance(), "rcc");
     private static final NamespacedKey rightClickPlayer = new NamespacedKey(DisplayEntityPlugin.getInstance(), "rcp");
-    private static final ListPersistentDataType<String, String> tagPDCType = ListPersistentDataType.LIST.listTypeFrom(PersistentDataType.STRING);
+
+    private static final ListPersistentDataType<String, String> tagPDCType = PersistentDataType.LIST.strings();
     private DisplayUtils(){}
 
     /**
@@ -479,7 +480,6 @@ public final class DisplayUtils {
      * Add a tag to a part entity
      * @param entity The entity to add a tag to
      * @param tag The tag to add to this part
-     * @return true if the tag was successfully added
      */
     public static void addTag(@NotNull Entity entity, @NotNull String tag){
         addToPDCList(entity, tag, DisplayEntityPlugin.getPartPDCTagKey());
@@ -489,7 +489,6 @@ public final class DisplayUtils {
      * Add a tag to a part entity
      * @param entity The entity to add a tag to
      * @param tags The tags to add to this part
-     * @return true if the tag was successfully added
      */
     public static void addTags(@NotNull Entity entity, @NotNull List<String> tags){
         addManyToPDCList(entity, tags, DisplayEntityPlugin.getPartPDCTagKey());
@@ -505,7 +504,7 @@ public final class DisplayUtils {
             tags = new ArrayList<>();
         }
         else{
-            tags = container.get(key, tagPDCType);
+            tags = new ArrayList<>(container.get(key, tagPDCType));
         }
 
         if (!tags.contains(element)){
@@ -524,7 +523,7 @@ public final class DisplayUtils {
             existing = new ArrayList<>();
         }
         else{
-            existing = container.get(key, tagPDCType);
+            existing = new ArrayList<>(container.get(key, tagPDCType));
         }
         for (String element : elements){
             if (!existing.contains(element)) {
@@ -538,7 +537,6 @@ public final class DisplayUtils {
     /**
      * Remove a tag from this SpawnedDisplayEntityPart
      * @param tag the tag to remove from this part
-     * @return this
      */
     public static void removeTag(@NotNull Entity entity, @NotNull String tag){
         removeFromPDCList(entity, tag, DisplayEntityPlugin.getPartPDCTagKey());
@@ -547,7 +545,6 @@ public final class DisplayUtils {
     /**
      * Remove a tag from this SpawnedDisplayEntityPart
      * @param tags the tags to remove from this part
-     * @return this
      */
     public static void removeTags(@NotNull Entity entity, @NotNull List<String> tags){
         removeManyFromPDCList(entity, tags, DisplayEntityPlugin.getPartPDCTagKey());
@@ -563,9 +560,6 @@ public final class DisplayUtils {
         }
 
         List<String> tags = container.get(key, tagPDCType);
-        if (tags == null){
-            return;
-        }
         tags.remove(element);
         container.set(key, tagPDCType, tags);
     }
@@ -580,9 +574,6 @@ public final class DisplayUtils {
         }
 
         List<String> existing = container.get(key, tagPDCType);
-        if (existing == null){
-            return;
-        }
 
         existing.removeAll(elements);
         container.set(key, tagPDCType, existing);
@@ -591,7 +582,7 @@ public final class DisplayUtils {
 
     /**
      * Gets the part tags of this SpawnedDisplayEntityPart
-     * @return This part's part tags.
+     * @return The part's part tags.
      */
     public static @NotNull List<String> getTags(@NotNull Entity entity){
         return getPDCList(entity, DisplayEntityPlugin.getPartPDCTagKey());
