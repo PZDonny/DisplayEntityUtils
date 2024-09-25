@@ -117,6 +117,7 @@ public final class SpawnedPartSelection {
     /**
      * Cycles to a next part within this selection's group.
      * If it attempts to go past the last part, it will wrap from the first part
+     * The selected part of this SpawnedPartSelection will be set to the resulting part
      * @return this
      */
     public SpawnedPartSelection setToNextPart(int jump){
@@ -133,6 +134,7 @@ public final class SpawnedPartSelection {
     /**
      * Cycles to a previous part within this selection's group.
      * If it attempts to go past the first part, it will wrap from the last part
+     * The selected part of this SpawnedPartSelection will be set to the resulting part
      * @return this
      */
     public SpawnedPartSelection setToPreviousPart(int jump){
@@ -147,11 +149,20 @@ public final class SpawnedPartSelection {
     }
 
     /**
-     * Set's this selection to the first part of the selection's group, which will be the master entity.
+     * Set's the selected part of this SpawnedPartSelection to the first part within this selection.
      * @return this
      */
     public SpawnedPartSelection setToFirstPart(){
         selectedPart = selectedParts.getFirst();
+        return this;
+    }
+
+    /**
+     * Set's the selected part of this SpawnedPartSelection to the last part within this selection.
+     * @return this
+     */
+    public SpawnedPartSelection setToLastPart(){
+        selectedPart = selectedParts.getLast();
         return this;
     }
 
@@ -213,7 +224,7 @@ public final class SpawnedPartSelection {
 
 
     /**
-     * Gets the tags of the first part in the selection
+     * Gets the tags of this part selection
      * @return The part tags.
      */
     public @Nullable Collection<String> getPartTags(){
@@ -225,7 +236,8 @@ public final class SpawnedPartSelection {
 
 
     /**
-     * Remove this part selection. Players with this SpawnedPartSelection selection will have it deselected, and this selection will become invalid and unusable.
+     * Remove this part selection.
+     * Players with this SpawnedPartSelection selection will have it deselected, and this selection will become invalid and unusable.
      */
     public void remove(){
         DisplayGroupManager.removePartSelection(this);
