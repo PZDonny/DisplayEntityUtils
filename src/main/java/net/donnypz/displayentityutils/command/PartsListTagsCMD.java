@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -23,19 +24,38 @@ class PartsListTagsCMD implements SubCommand{
             return;
         }
 
-        if (!partSelection.isValid()){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Invalid part selection! Please try again!");
+        if (args.length < 3){
+            player.sendMessage(Component.text("Incorrect Usage! /mdis parts listtags <part | selection>", NamedTextColor.RED));
             return;
         }
 
-        player.sendMessage(Component.text("Part Tags: ", NamedTextColor.GOLD));
-        Collection<String> tags = partSelection.getPartTags();
+        if (!partSelection.isValid()){
+            PartsCMD.invalidPartSelection(player);
+            return;
+        }
+
+        String type = args[2];
+        Collection<String> tags;
+        if (type.equalsIgnoreCase("part")){
+            player.sendMessage(Component.text("Individual Part Tag(s): ", NamedTextColor.YELLOW));
+            tags = partSelection.getSelectedPart().getTags();
+        }
+        else if (type.equalsIgnoreCase("selection")){
+            player.sendMessage(Component.text("Selection Part Tag(s): ", NamedTextColor.BLUE));
+            tags = partSelection.getPartTags();
+        }
+        else{
+            player.sendMessage(Component.text("Incorrect Usage! /mdis parts listtags <part | selection>", NamedTextColor.RED));
+            return;
+        }
+
+
         if (tags == null || tags.isEmpty()){
-            player.sendMessage(Component.text("Failed to find a part tag for your part selection!", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("- Failed to find part tags!", NamedTextColor.GRAY));
         }
         else{
             for (String tag : tags){
-                player.sendMessage(ChatColor.GRAY+"- "+ChatColor.YELLOW+tag);
+                player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>- <yellow>"+tag));
             }
         }
     }

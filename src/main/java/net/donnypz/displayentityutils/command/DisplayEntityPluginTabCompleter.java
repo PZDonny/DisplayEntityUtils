@@ -79,6 +79,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                             suggestions.add("first");
                             suggestions.add("prev");
                             suggestions.add("next");
+                            suggestions.add("last");
                         }
                         case "seeduuids" -> {
                             suggestions.add("group");
@@ -88,6 +89,10 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                             suggestions.add("-target");
                             suggestions.add("-held");
                             suggestions.add("block-id");
+                        }
+                        case "listtags" -> {
+                            suggestions.add("part");
+                            suggestions.add("selection");
                         }
                     }
                 }

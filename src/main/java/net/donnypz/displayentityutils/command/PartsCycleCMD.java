@@ -27,7 +27,7 @@ class PartsCycleCMD implements SubCommand{
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("/mdis parts cycle <first | prev | next> [jump]", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("/mdis parts cycle <first | prev | next | last> [jump]", NamedTextColor.GRAY));
             return;
         }
 
@@ -59,6 +59,10 @@ class PartsCycleCMD implements SubCommand{
                 partSelection.setToFirstPart();
                 displayPartInfo(player, partSelection);
             }
+            case "last" -> {
+                partSelection.setToLastPart();
+                displayPartInfo(player, partSelection);
+            }
             case "prev", "previous" -> {
                 partSelection.setToPreviousPart(jump);
                 displayPartInfo(player, partSelection);
@@ -68,7 +72,7 @@ class PartsCycleCMD implements SubCommand{
                 displayPartInfo(player, partSelection);
             }
             default ->{
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"Invalid Option! /mdis parts cycle <first | prev | next>");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"Invalid Option! /mdis parts cycle <first | prev | next | last>");
             }
         }
     }
