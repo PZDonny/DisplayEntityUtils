@@ -48,9 +48,9 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Creates a SpawnedDisplayEntityGroup
-     * @param masterDisplay
-     * @apiNote This should NEVER have to be called manually, only do so if you know what you're doing
+     * Creates a group that will represent a collection of display and interaction entities as a single object.
+     * @param masterDisplay the master entity that will be the vehicle for display entity parts and the pivot/origin point for interaction entities
+     * @apiNote This should NEVER have to be called! Only do so if you truly know what you're doing
      */
     @ApiStatus.Internal
     public SpawnedDisplayEntityGroup(Display masterDisplay){
@@ -95,7 +95,7 @@ public final class SpawnedDisplayEntityGroup {
 
     /**
      * Get whether this group is within a loaded chunk
-     * @return a boolean
+     * @return true if the group is in a loaded chunk
      */
     public boolean isInLoadedChunk(){
         return DisplayUtils.isInLoadedChunk(masterPart);
@@ -117,6 +117,12 @@ public final class SpawnedDisplayEntityGroup {
     }
 
 
+    /**
+     * Add a {@link SpawnedDisplayEntityPart} to this group. If the part was not previously part of this group AND it is a display entity, it will be mounted on top of
+     * the master entity of this group.
+     * @param part the part to add
+     * @return this
+     */
     public SpawnedDisplayEntityGroup addSpawnedDisplayEntityPart(SpawnedDisplayEntityPart part){
         part.setGroup(this);
         return this;
@@ -433,7 +439,7 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Get a list of parts specified by a entity class as entities
+     * Get a list of parts specified by an entity class as entities
      * @param entityClazz the entity class to cast all entities to
      * @return a list
      */
@@ -462,7 +468,7 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Get this group's scale multiplier set after using {@link SpawnedDisplayEntityGroup#scale(float, int)}
+     * Get this group's scale multiplier set after using {@link SpawnedDisplayEntityGroup#scale(float, int, boolean)}
      * @return the group's scale multiplier
      */
     public float getScaleMultiplier(){
@@ -473,22 +479,23 @@ public final class SpawnedDisplayEntityGroup {
      * Set the scale for all parts within this group
      * @param newScaleMultiplier the scale multiplier to apply to this group
      * @param durationInTicks how long it should take for the group to scale
+     * @param scaleInteractions whether interaction entities should be scales
      * @return false if the {@link GroupScaleEvent} was cancelled or if the group is in an unloaded chunk
      */
-    public boolean scale(float newScaleMultiplier, int durationInTicks){
+    public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions){
         if (newScaleMultiplier <= 0){
             throw new IllegalArgumentException("New Scale Multiplier cannot be <= 0");
         }
         if (!isInLoadedChunk()){
             return false;
         }
-        GroupScaleEvent event = new GroupScaleEvent(this, newScaleMultiplier, this.scaleMultiplier);
-        Bukkit.getPluginManager().callEvent(event);
+        GroupScaleEvent event = new GroupScaleEvent(this, newScaleMultiplier, this.scaleMultiplier, durationInTicks);
+        event.callEvent();
         if (event.isCancelled()){
             return false;
         }
         for (SpawnedDisplayEntityPart part : spawnedParts){
-        //Displays
+            //Displays
             if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Display d = (Display) part.getEntity();
                 if (!d.getLocation().getChunk().isLoaded()){
@@ -515,15 +522,16 @@ public final class SpawnedDisplayEntityGroup {
                     d.setTransformation(transformation);
                 }
             }
-        //Interactions
-            else{
+            //Interactions
+            else if (scaleInteractions){
                 Interaction i = (Interaction) part.getEntity();
 
                 //Reset Scale then multiply by newScaleMultiplier
-                i.setInteractionHeight((i.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier);
-                i.setInteractionWidth((i.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier);
+                float newHeight = (i.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier;
+                float newWidth = (i.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier;
+                DisplayUtils.scaleInteraction(i, newHeight, newWidth, durationInTicks, 0);
 
-                //Reset Translation then multiply by newScaleMultiplier
+            //Reset Translation then multiply by newScaleMultiplier
                 Vector translationVector = DisplayUtils.getInteractionTranslation(i);
                 if (translationVector == null){
                     continue;
@@ -536,7 +544,6 @@ public final class SpawnedDisplayEntityGroup {
                 Vector moveVector = oldVector.subtract(translationVector);
                 part.translateForce((float) moveVector.length(), durationInTicks, 0, moveVector);
             }
-
         }
 
 
@@ -618,6 +625,10 @@ public final class SpawnedDisplayEntityGroup {
             double currentDistance = 0;
             @Override
             public void run() {
+                if (!isSpawned()){
+                    cancel();
+                    return;
+                }
                 currentDistance+=Math.abs(movementIncrement);
                 Location tpLoc = master.getLocation().clone().add(direction);
                 teleportWithoutEvent(tpLoc, false);
@@ -736,6 +747,16 @@ public final class SpawnedDisplayEntityGroup {
     public void setBrightness(@Nullable Display.Brightness brightness){
         for (SpawnedDisplayEntityPart part : spawnedParts){
             part.setBrightness(brightness);
+        }
+    }
+
+    /**
+     * Set the billboard of this group
+     * @param billboard the billboard to set
+     */
+    public void setBillboard(Display.Billboard billboard){
+        for (SpawnedDisplayEntityPart part : spawnedParts){
+            part.setBillboard(billboard);
         }
     }
 
@@ -1055,7 +1076,7 @@ public final class SpawnedDisplayEntityGroup {
      * Force the SpawnedDisplayEntityGroup to look in the same direction as a specified entity
      * @param entity The entity with the directions to follow
      * @param followType The follow type
-     * @param unregisterAfterEntityDeathDelay How long after an entity dies to despawn the group, in ticks.
+     * @param unregisterAfterEntityDeathDelay How long after an entity dies to despawn the group, in ticks. A value of -1 will not despawn the group.
      * @param teleportationDuration Set the teleportationDuration (rotation smoothness) of all parts within this group
      * @throws IllegalArgumentException If the {@link FollowType} is set to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
      */
@@ -1074,12 +1095,11 @@ public final class SpawnedDisplayEntityGroup {
         new BukkitRunnable(){
             @Override
             public void run() {
-                if (!group.isSpawned() || followedEntity != entity.getUniqueId() || entity.isDead()){
-                    if (entity.isDead() && unregisterAfterEntityDeathDelay > -1){
+                if (!group.isSpawned() || followedEntity != entity.getUniqueId() || !entity.isValid()){
+                    if (!entity.isValid() && unregisterAfterEntityDeathDelay > -1){
                         Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                             group.unregister(true);
                         }, unregisterAfterEntityDeathDelay);
-
                     }
                     cancel();
                     return;
@@ -1104,16 +1124,18 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Stop following an entity's direction after using {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)}
-     * or {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean, int)}
+     * Stop following an entity's direction after using {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)},
+     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean, int)},
+     * or any other variation
      */
     public void stopFollowingEntity(){
         followedEntity = null;
     }
 
     /**
-     * Get the entity being followed after using {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)}
-     * or {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean, int)}
+     * Get the entity being followed after using {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)},
+     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean, int)},
+     * or any other variation
      */
     public Entity getFollowedEntity(){
         return followedEntity != null ? Bukkit.getEntity(followedEntity) : null;
@@ -1213,7 +1235,12 @@ public final class SpawnedDisplayEntityGroup {
     }
 
 
-    long getLastAnimationTimeStamp(){
+    /**
+     * Get the UNIX timestamp when this group last began animating
+     * @return a long
+     */
+    @ApiStatus.Internal
+    public long getLastAnimationTimeStamp(){
         return lastAnimationTimeStamp;
     }
 
@@ -1308,51 +1335,16 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Display the translation of a {@link SpawnedDisplayAnimationFrame}
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}
+     * @param animation the animation the frame is from
      * @param frame the frame to display
      * @return false if this group is in an unloaded chunk
      */
-    public boolean setToFrame(SpawnedDisplayAnimationFrame frame) {
+    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
         if (!isInLoadedChunk()){
             return false;
         }
-        for (SpawnedDisplayEntityPart part : spawnedParts){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                Vector oldVector = DisplayUtils.getInteractionTranslation((Interaction) part.getEntity());
-                if (oldVector == null){
-                    continue;
-                }
-
-                Vector translationVector = frame.interactionTranslations.get(part.getPartUUID());
-                if (translationVector == null){
-                    continue;
-                }
-
-                if (oldVector.equals(translationVector)) {
-                    continue;
-                }
-
-                Vector moveVector = oldVector.subtract(translationVector);
-                part.translateForce((float) moveVector.length(), frame.duration, 0, moveVector);
-
-            }
-            else{
-                Transformation transformation = frame.displayTransformations.get(part.getPartUUID());
-                if (transformation == null){
-                    continue;
-                }
-
-                Display display = ((Display) part.getEntity());
-
-                if (display.getTransformation().equals(transformation)){ //Prevents jittering of parts
-                    continue;
-                }
-
-                display.setInterpolationDelay(-1);
-                display.setInterpolationDuration(frame.duration);
-                display.setTransformation(transformation);
-            }
-        }
+        DisplayAnimatorExecutor.setGroupToFrame(this, animation, frame);
         return true;
     }
 
@@ -1423,7 +1415,6 @@ public final class SpawnedDisplayEntityGroup {
         }
         DisplayAnimatorStateMachine.unregisterFromStateMachine(this);
         DisplayGroupManager.removeSpawnedGroup(this, despawnParts);
-
         masterPart = null;
         followedEntity = null;
     }

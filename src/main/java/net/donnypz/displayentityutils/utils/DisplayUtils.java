@@ -94,16 +94,19 @@ public final class DisplayUtils {
     /**
      * Determine whether a part's entity is in a loaded chunk
      * @param part
-     * @return a boolean
+     * @return true if the part is in a loaded chunk
      */
     public static boolean isInLoadedChunk(SpawnedDisplayEntityPart part){
+        if (part == null){
+            return false;
+        }
         return isInLoadedChunk(part.getEntity());
     }
 
     /**
      * Determine whether an entity is in a loaded chunk
      * @param entity
-     * @return a boolean
+     * @return true if the entity is in a loaded chunk
      */
     public static boolean isInLoadedChunk(Entity entity){
         return entity.getLocation().getChunk().isLoaded();
@@ -327,6 +330,37 @@ public final class DisplayUtils {
         translationVector.rotateAroundY(Math.toRadians(angle));
         Location newLoc = center.clone().subtract(translationVector);
         interaction.teleport(newLoc);
+    }
+
+    /**
+     * Scale an Interaction entity over a period of time
+     * @param interaction the interaction entity
+     * @param height the height to set
+     * @param width the width to set
+     * @param durationInTicks how long the scaling should take
+     * @param delayInTicks how long before the scaling should start
+     */
+    public static void scaleInteraction(Interaction interaction, float height, float width, int durationInTicks, int delayInTicks){
+        if (durationInTicks == 0 && delayInTicks == 0){
+            interaction.setInteractionHeight(height);
+            interaction.setInteractionWidth(width);
+            return;
+        }
+        float heightChange = (interaction.getInteractionHeight()-height)/durationInTicks;
+        float widthChange = (interaction.getInteractionWidth()-width)/durationInTicks;
+        new BukkitRunnable(){
+            int timeRan = 0;
+            @Override
+            public void run() {
+                if (timeRan == durationInTicks){
+                    cancel();
+                    return;
+                }
+                interaction.setInteractionWidth(interaction.getInteractionWidth()-widthChange);
+                interaction.setInteractionHeight(interaction.getInteractionHeight()-heightChange);
+                timeRan++;
+            }
+        }.runTaskTimer(DisplayEntityPlugin.getInstance(), delayInTicks, 1);
     }
 
 
@@ -598,7 +632,7 @@ public final class DisplayUtils {
 
 
     /**
-     * Determine whether this part has a tag
+     * Determine whether a part entity has a part tag
      * @param tag the tag to check for
      * @return true if this part has the tag
      */
