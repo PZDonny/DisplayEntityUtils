@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 class GroupBrightnessCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_TRANSFORM)){
+        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_BRIGHTNESS)){
             return;
         }
 
