@@ -12,9 +12,9 @@ import java.util.function.Consumer;
 
 @ApiStatus.Experimental
 public class DisplayAnimatorStateMachine {
-    private static final HashMap<SpawnedDisplayEntityGroup, DisplayAnimatorStateMachine> allStateMachines = new HashMap<>();
-    private final HashMap<String, DisplayAnimator> displayAnimators = new HashMap<>();
-    private final HashMap<SpawnedDisplayEntityGroup, String> groupStates = new HashMap<>();
+    private static final Map<SpawnedDisplayEntityGroup, DisplayAnimatorStateMachine> allStateMachines = new HashMap<>();
+    private final Map<String, DisplayAnimator> displayAnimators = new HashMap<>();
+    private final Map<SpawnedDisplayEntityGroup, String> groupStates = new HashMap<>();
     private Consumer<SpawnedDisplayEntityGroup> stateTransitionTask = null;
     private int stateTransitionTaskDelay;
 
