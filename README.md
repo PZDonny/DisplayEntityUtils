@@ -31,7 +31,7 @@ BDEngine is what you'll use to create models and animations that can be transfer
 
 > [API: Display Entities rotating smoothly with yaw changes, and Interaction entities pivoting around the center.](https://streamable.com/jqun87)
 
-> [API: Animation State Machines](https://streamable.com/m2jagj)
+> [API: Animation State Machines](https://streamable.com/m2jagj) (Credit goes to [Yegor_Mechanic](https://block-display.com/author/yegor_mechanic/) for all Dodo Bird Models/Animations)
 
 
 ## WIKI [WIP]
