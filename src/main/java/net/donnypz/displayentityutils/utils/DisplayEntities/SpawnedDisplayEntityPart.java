@@ -55,6 +55,8 @@ public final class SpawnedDisplayEntityPart {
         if (isMaster()){
             group.masterPart = this;
         }
+
+        //Transformation instantly updates if a Display Entity hasn't existed for 2 more than ticks
         setPartUUID(random);
     }
 
@@ -290,7 +292,11 @@ public final class SpawnedDisplayEntityPart {
         if (this.group == group){
             return this;
         }
-        this.group.spawnedParts.remove(this);
+
+        if (this.group != null){
+            this.group.spawnedParts.remove(this);
+        }
+
         this.group = group;
 
         if (!group.spawnedParts.contains(this)) {
@@ -425,8 +431,8 @@ public final class SpawnedDisplayEntityPart {
                     if (entity != null){
                         entity.setGlowing(false);
                     }
-                    else{
-                        entity.setGlowing(false);
+                    else if (e.isValid()){
+                        e.setGlowing(false);
                     }
                 }
             }.runTaskLater(DisplayEntityPlugin.getInstance(), durationInTicks);
@@ -434,7 +440,7 @@ public final class SpawnedDisplayEntityPart {
     }
 
     /**
-     * Removes the glow effect from the part
+     * Stops this part from glowing
      */
     public void unglow(){
         if (type == PartType.INTERACTION) {
@@ -472,14 +478,20 @@ public final class SpawnedDisplayEntityPart {
             int currentTick = 0;
             @Override
             public void run() {
+                if (group == null || !group.isSpawned() || group.getSpawnedParts().isEmpty() || !interaction.isValid()){
+                    cancel();
+                    return;
+                }
+                if (!isInteractionOutlined || currentTick >= durationInTicks){
+                    cancel();
+                    return;
+                }
                 particleLine(pointA.clone(), pointB.clone(), width, height);
                 particleLine(pointB.clone(), pointC.clone(), width, height);
                 particleLine(pointC.clone(), pointD.clone(), width, height);
                 particleLine(pointD.clone(), pointA.clone(), width, height);
                 currentTick+=tickIncrement;
-                if (!isInteractionOutlined || currentTick >= durationInTicks || group.getSpawnedParts().isEmpty() || interaction.isDead()){
-                    cancel();
-                }
+
             }
         }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, tickIncrement);
     }
@@ -514,7 +526,7 @@ public final class SpawnedDisplayEntityPart {
             long i = 0;
             @Override
             public void run() {
-                if (entity.isDead() || (durationInTicks != -1 && i >= durationInTicks) || group == null || !group.isSpawned() || group.spawnedParts.isEmpty()){
+                if (!entity.isValid() || (durationInTicks != -1 && i >= durationInTicks) || group == null || !group.isSpawned() || group.spawnedParts.isEmpty()){
                     cancel();
                     return;
                 }
@@ -560,6 +572,18 @@ public final class SpawnedDisplayEntityPart {
         }
         Display display = (Display) entity;
         display.setBrightness(brightness);
+    }
+
+    /**
+     * Set the billboard of this part
+     * @param billboard the billboard to set
+     */
+    public void setBillboard(@NotNull Display.Billboard billboard){
+        if (entity instanceof Interaction){
+            return;
+        }
+        Display display = (Display) entity;
+        display.setBillboard(billboard);
     }
 
 
@@ -669,7 +693,7 @@ public final class SpawnedDisplayEntityPart {
     }
 
     /**
-     * Pivot an Interaction Entity around it's SpawnedDisplayEntityGroup's master part
+     * Pivot an Interaction Entity around its group's master part
      * @param angle the pivot angle
      */
     public void pivot(double angle){
@@ -686,6 +710,7 @@ public final class SpawnedDisplayEntityPart {
      * Attempts to spawn an Interaction entity based upon the scaling of the part. May not work 100% of the time
      * @return the spawned interaction. Null if any part of the scale is 0, the x and z of the scale aren't the same, or the part is a text display
      */
+    @ApiStatus.Experimental
     public Interaction spawnInteractionAtDisplay(){
         if (entity instanceof TextDisplay){
             return null;
@@ -718,14 +743,14 @@ public final class SpawnedDisplayEntityPart {
 
     /**
      * Removes this SpawnedDisplayEntityPart from it's SpawnedDisplayEntityGroup, without dismounting the part from the group.
-     * This makes this part invalid and unusable after removal
+     * This makes this part invalid and unusable after removal. If the part needs to be reused, see {@link #removeFromGroup()}
      * @param kill Whether to kill this part when removed
      * @return Returns the part's entity. Null if the entity was killed
      */
     public Entity remove(boolean kill) {
         removeFromGroup();
         if (kill) {
-            if (!entity.isDead()){
+            if (entity.isValid()){
                 entity.remove();
             }
             return null;
@@ -738,7 +763,7 @@ public final class SpawnedDisplayEntityPart {
 
     /**
      * Removes this SpawnedDisplayEntityPart from it's SpawnedDisplayEntityGroup, without dismounting the part from the group.
-     * This part will still be valid and can be readded to a group
+     * This part will still be valid and can be readded to a group through {@link SpawnedDisplayEntityGroup#addSpawnedDisplayEntityPart(SpawnedDisplayEntityPart)}
      */
     public void removeFromGroup() {
         allParts.remove(partData);
