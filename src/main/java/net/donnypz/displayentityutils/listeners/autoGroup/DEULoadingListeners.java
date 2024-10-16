@@ -16,12 +16,22 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 
 @ApiStatus.Internal
 public final class DEULoadingListeners implements Listener {
     @EventHandler(priority =  EventPriority.HIGHEST)
     public void onEntityLoad(EntitiesLoadEvent e){
-        AutoGroup.detectGroups(e.getChunk(), e.getEntities());
+        Chunk chunk = e.getChunk();
+        if (e.getChunk().isLoaded()){
+            AutoGroup.detectGroups(chunk, e.getEntities());
+        }
+        else{
+            CompletableFuture<Chunk> futureChunk = e.getWorld().getChunkAtAsync(chunk.getX(), chunk.getZ());
+            futureChunk.thenAccept(c -> {
+                Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> AutoGroup.detectGroups(c, e.getEntities()));
+            });
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
