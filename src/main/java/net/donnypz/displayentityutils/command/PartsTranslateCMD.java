@@ -32,13 +32,13 @@ class PartsTranslateCMD implements SubCommand{
         }
 
         if (args.length < 5){
-            player.sendMessage(Component.text("/mdis parts translate <direction> <distance> <tick-duration>", NamedTextColor.RED));
+            player.sendMessage(Component.text("/mdis parts translate <direction> <distance> <tick-duration> [-all]", NamedTextColor.RED));
             return;
         }
 
         try{
             Direction direction = Direction.valueOf(args[2].toUpperCase());
-            double distance = Double.parseDouble(args[3]);
+            float distance = Float.parseFloat(args[3]);
             if (distance <= 0){
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"Enter a number greater than 0 for the distance!");
                 return;
@@ -47,8 +47,16 @@ class PartsTranslateCMD implements SubCommand{
             if (duration <= 0){
                 duration = 0;
             }
-            partSelection.translate((float) distance, duration, -1, direction);
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Translating selected parts!");
+            if (args.length >= 6 && args[5].equalsIgnoreCase("-all")){
+                partSelection.translate(distance, duration, -1, direction);
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Translating all selected parts!");
+            }
+            else{
+                SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
+                selected.translate(distance, duration, -1, direction);
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Translating your selected part!");
+            }
+
         }
         catch(IllegalArgumentException e){
             if (e instanceof NumberFormatException){

@@ -5,15 +5,12 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.RayTraceResult;
 
 class PartsSetBlockCMD implements SubCommand{
     @Override
@@ -35,7 +32,7 @@ class PartsSetBlockCMD implements SubCommand{
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /mdis parts setblock <\"-held\" | \"-target\" | block-id>"));
+            player.sendMessage(Component.text("Incorrect Usage! /mdis parts setblock <\"-held\" | \"-target\" | block-id> [-all]"));
             return;
         }
         
@@ -46,53 +43,31 @@ class PartsSetBlockCMD implements SubCommand{
             return;
         }
 
-        SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
-        if (selected.getType() != SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "You can only do this with block display entities");
-            return;
-        }
+        BlockData blockData = DEUCommandUtils.getBlockFromText(block, player);
+        if (blockData == null) return;
 
-        BlockDisplay display = (BlockDisplay) selected.getEntity();
-        BlockData blockData;
-
-        //Held Block
-        if (block.equals("-held")){
-            ItemStack mainHand = player.getInventory().getItemInMainHand();
-            if (!mainHand.getType().isBlock()){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You must be holding a block to do that!");
-                return;
+        if (args.length >= 4 && args[3].equalsIgnoreCase("-all")){
+            for (SpawnedDisplayEntityPart part : partSelection.getSelectedParts()){
+                if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY) {
+                    setBlock(part, blockData);
+                    return;
+                }
             }
-            blockData = mainHand.getType().createBlockData();
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Successfully set block of ALL selected block displays!");
         }
-
-        //Target Block
-        else if (block.equals("-target")){
-            int targetDistance = 30;
-            RayTraceResult result = player.rayTraceBlocks(targetDistance);
-            Block b = null;
-            if (result != null){
-                b = result.getHitBlock();
-            }
-            if (result == null || b == null){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Block not found, target a block within "+targetDistance+" of you");
-                return;
-            }
-            b = result.getHitBlock();
-            blockData = b.getBlockData();
-        }
-
-        //Block-ID
         else{
-            Material material = Material.matchMaterial(block.toLowerCase());
-            if (material == null || !material.isBlock()){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Block not recognized! The block's name might have been entered or the block doesn't exist");
+            SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
+            if (selected.getType() != SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY) {
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "You can only do this with block display entities");
                 return;
             }
-            blockData = material.createBlockData();
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Successfully set block of selected block display!");
         }
+    }
 
+    private void setBlock(SpawnedDisplayEntityPart part, BlockData blockData){
+        BlockDisplay display = (BlockDisplay) part.getEntity();
         display.setBlock(blockData);
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Successfully set block of block display!");
     }
 
 }
