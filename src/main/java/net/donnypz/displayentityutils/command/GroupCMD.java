@@ -24,9 +24,10 @@ class GroupCMD implements SubCommand{
         subCommands.put("despawn", new GroupDespawnCMD());
         subCommands.put("info", new GroupInfoCMD());
         subCommands.put("settag", new GroupSetTagCMD());
-        subCommands.put("setyaw", new GroupSetYawCMD());
-        subCommands.put("setpitch", new GroupSetPitchCMD());
-        subCommands.put("setscale", new GroupSetScaleCMD());
+        subCommands.put("yaw", new GroupYawCMD());
+        subCommands.put("pitch", new GroupPitchCMD());
+        subCommands.put("scale", new GroupScaleCMD());
+        subCommands.put("brightness", new GroupBrightnessCMD());
         subCommands.put("movehere", new GroupMoveHereCMD());
         subCommands.put("move", new GroupMoveCMD());
         subCommands.put("translate", new GroupTranslateCMD());
@@ -83,9 +84,10 @@ class GroupCMD implements SubCommand{
             CMDUtils.sendCMD(sender, "/mdis group addtarget", " (Add a targeted interaction entity to your group)");
             CMDUtils.sendCMD(sender, "/mdis group ungroupinteractions", " (Remove all interactions from your group)");
             CMDUtils.sendCMD(sender, "/mdis group settag <group-tag>", " (Set this group's tag, or identifier)");
-            CMDUtils.sendCMD(sender, "/mdis group setyaw <yaw> [-pivot]"," (Set your selected group's yaw, \"-pivot\" pivots interaction entities around the group)");
-            CMDUtils.sendCMD(sender, "/mdis group setpitch <pitch>", " (Set your selected group's pitch)");
-            CMDUtils.sendCMD(sender, "/mdis group setscale <scale-multiplier> <tick-duration>", "(Scale all parts of your selected group)");
+            CMDUtils.sendCMD(sender, "/mdis group yaw <yaw> [-pivot]"," (Set your selected group's yaw, \"-pivot\" pivots interaction entities around the group)");
+            CMDUtils.sendCMD(sender, "/mdis group pitch <pitch>", " (Set your selected group's pitch)");
+            CMDUtils.sendCMD(sender, "/mdis group scale <scale-multiplier> <tick-duration>", "(Scale your selected group)");
+            CMDUtils.sendCMD(sender, "/mdis group brightness <block> <sky>", "(Set your selected group's brightness. Enter values between 0-15. -1 resets)");
             CMDUtils.sendCMD(sender, "/mdis group clone", " (Spawn a cloned group at your selected group's location)");
             CMDUtils.sendCMD(sender, "/mdis group clonehere", " (Spawn a cloned group at your location)");
         }

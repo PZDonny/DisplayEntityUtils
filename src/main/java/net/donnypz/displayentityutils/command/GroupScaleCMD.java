@@ -8,7 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
-class GroupSetScaleCMD implements SubCommand{
+class GroupScaleCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_TRANSFORM)){
@@ -22,7 +22,7 @@ class GroupSetScaleCMD implements SubCommand{
         }
 
         if (args.length < 4) {
-            player.sendMessage(Component.text("/mdis group setscale <scale-multiplier> <tick-duration>", NamedTextColor.RED));
+            player.sendMessage(Component.text("/mdis group scale <scale-multiplier> <tick-duration>", NamedTextColor.RED));
             return;
         }
 
@@ -40,7 +40,7 @@ class GroupSetScaleCMD implements SubCommand{
             player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Scaling spawned display entity group!");
             player.sendMessage(Component.text("Old Scale: "+group.getScaleMultiplier()+"x", NamedTextColor.GRAY));
             player.sendMessage(Component.text("New Scale: "+multiplier+"x", NamedTextColor.YELLOW));
-            group.scale(multiplier, duration);
+            group.scale(multiplier, duration, true);
         }
         catch(IllegalArgumentException e){
             if (e instanceof NumberFormatException){

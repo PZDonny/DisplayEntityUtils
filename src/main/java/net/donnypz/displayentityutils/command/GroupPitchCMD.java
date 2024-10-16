@@ -8,7 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
-class GroupSetPitchCMD implements SubCommand{
+class GroupPitchCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_TRANSFORM)){
@@ -22,14 +22,16 @@ class GroupSetPitchCMD implements SubCommand{
         }
 
         if (args.length < 3) {
-            player.sendMessage(ChatColor.RED + "/mdis group setpitch <pitch>");
+            player.sendMessage(ChatColor.RED + "/mdis group pitch <pitch>");
             return;
         }
 
         try{
-            double pitch = Double.parseDouble(args[2]);
-            group.setPitch((float) pitch);
+            double oldPitch = group.getLocation().getPitch();
+            float pitch = Float.parseFloat(args[2]);
+            group.setPitch(pitch);
             player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Pitch set!");
+            player.sendMessage(Component.text("| Old Pitch: "+oldPitch, NamedTextColor.GRAY));
         }
         catch(NumberFormatException e){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Please enter a valid number!");
