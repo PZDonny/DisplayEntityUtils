@@ -1,9 +1,8 @@
 package net.donnypz.displayentityutils.managers;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticle;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -226,6 +225,14 @@ public final class DisplayAnimationManager {
             gzipInputStream.close();
             byteStream.close();
             inputStream.close();
+            for (DisplayAnimationFrame f : anim.getFrames()){
+                for (AnimationParticle p : f.getFrameStartParticles()){
+                    p.repair();
+                }
+                for (AnimationParticle p : f.getFrameEndParticles()){
+                    p.repair();
+                }
+            }
             return anim;
         }
     //Not Compressed (Will typically be old file version)
