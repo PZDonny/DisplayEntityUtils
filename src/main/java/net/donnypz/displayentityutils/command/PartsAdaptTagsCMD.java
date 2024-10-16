@@ -21,12 +21,11 @@ class PartsAdaptTagsCMD implements SubCommand{
             return;
         }
 
-
         boolean removeFromSB;
-        if (args.length < 3){
+        if (args.length < 2){
             removeFromSB = false;
         }
-        else removeFromSB = args[2].equals("-remove");
+        else removeFromSB = args[1].equals("-remove");
 
         SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){ //Adapt for all parts

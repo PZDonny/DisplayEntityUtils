@@ -61,26 +61,27 @@ class PartsCMD implements SubCommand{
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         if (page <= 1){
             sender.sendMessage(Component.text("\"Parts\" are each individual display/interaction entity that is contained within a group", NamedTextColor.AQUA));
-            sender.sendMessage(Component.text("Add tags to parts to identify each part in a group", NamedTextColor.AQUA));
-            sender.sendMessage(Component.text(" | Mainly useful for API users, manually creating animations, and usage with addon plugins", NamedTextColor.GRAY));
+            sender.sendMessage(Component.text("| Add tags to parts to identify each part in a group", NamedTextColor.AQUA));
+            sender.sendMessage(Component.text("| Commands with \"-all\" will apply the command to all parts within a part selection", NamedTextColor.GOLD));
+            sender.sendMessage(Component.empty());
             CMDUtils.sendCMD(sender, "/mdis parts help <page-number>", " (Get help for parts)");
             CMDUtils.sendCMD(sender, "/mdis parts cycle <first | prev | next | last> [jump]", " (Cycle between selected parts or all parts in your group)");
-            CMDUtils.sendCMD(sender, "/mdis parts addtag <part-tag> [-all]", " (Add a tag to a part. The \"-all\" parameter adds to all selected parts)");
-            CMDUtils.sendCMD(sender, "/mdis parts removetag <part-tag> [-all]", " (Remove a tag from a part. The \"-all\" parameter removes from all selected parts)");
-            CMDUtils.sendCMD(sender, "/mdis parts adapttags <part-tag> [-remove]",
+            CMDUtils.sendCMD(sender, "/mdis parts addtag <part-tag> [-all]", " (Add a tag to a part)");
+            CMDUtils.sendCMD(sender, "/mdis parts removetag <part-tag> [-all]", " (Remove a tag from a part)");
+            CMDUtils.sendCMD(sender, "/mdis parts adapttags [-remove]",
                     " (Adapt scoreboard tags to tags usable by DisplayEntityUtils. Done to selected parts or group if there's no selection."+
-                            " \"-remove\" removes the tag from the scoreboard)");
+                            " \"-remove\" removes tag from scoreboard)");
         }
         else{
-            CMDUtils.sendCMD(sender, "/mdis parts listtags <part | selection>", " (List tags a selected part or an entire part selection has)");
+            CMDUtils.sendCMD(sender, "/mdis parts listtags <part | selection>", " (List tags of selected part or entire part selection)");
             CMDUtils.sendCMD(sender, "/mdis parts select <part-tag>", " (Select multiple parts by their part tag)");
             CMDUtils.sendCMD(sender, "/mdis parts deselect", " (Clear your part selection)");
-            CMDUtils.sendCMD(sender, "/mdis parts remove", " (Despawn and remove a part from a group)");
+            CMDUtils.sendCMD(sender, "/mdis parts remove [-all]", " (Despawn and remove your selected part from a group)");
             CMDUtils.sendCMD(sender, "/mdis parts glow", " (Make selected parts glow temporarily)");
-            CMDUtils.sendCMD(sender, "/mdis parts setglowcolor <color | hex-code>", " (Set the glow color for selected parts)");
-            CMDUtils.sendCMD(sender, "/mdis parts translate <direction> <distance> <tick-duration>", " (Translate a selected part)");
-            CMDUtils.sendCMD(sender, "/mdis parts seeduuids <group | selection> <seed>"," (Useful when wanting to use the same animation on similar groups. THIS SHOULD ALMOST NEVER BE USED)");
-            CMDUtils.sendCMD(sender, "/mdis parts setblock <\"-held\" | \"-target\" | block-id>", " (Change the block of a block display part)");
+            CMDUtils.sendCMD(sender, "/mdis parts setglowcolor <color | hex-code> [-all]", " (Set your selected part's glow color)");
+            CMDUtils.sendCMD(sender, "/mdis parts translate <direction> <distance> <tick-duration> [-all]", " (Translate your selected part)");
+            CMDUtils.sendCMD(sender, "/mdis parts seeduuids <group | selection> <seed>"," (Useful when wanting to use the same animation on similar groups.)");
+            CMDUtils.sendCMD(sender, "/mdis parts setblock <\"-held\" | \"-target\" | block-id> [-all]", " (Change the block of a block display part)");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }

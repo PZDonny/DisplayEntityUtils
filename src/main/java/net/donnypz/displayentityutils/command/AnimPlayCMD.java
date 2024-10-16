@@ -29,6 +29,11 @@ class AnimPlayCMD implements SubCommand{
             return;
         }
 
+        if (!anim.hasFrames()) {
+            AnimCMD.hasNoFrames(player);
+            return;
+        }
+
         if (args.length >= 3 && args[2].equalsIgnoreCase("-loop")){
             group.animateLooping(anim);
             player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.GREEN + "Playing Animation! " + ChatColor.YELLOW+"(LOOPING)");

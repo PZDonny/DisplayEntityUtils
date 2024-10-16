@@ -4,13 +4,13 @@ import net.donnypz.displayentityutils.utils.Direction;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@ApiStatus.Internal
 public final class DisplayEntityPluginTabCompleter implements TabCompleter {
-
-    public DisplayEntityPluginTabCompleter(){}
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {

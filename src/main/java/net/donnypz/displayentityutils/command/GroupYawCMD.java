@@ -8,7 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
-class GroupSetYawCMD implements SubCommand{
+class GroupYawCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_TRANSFORM)){
@@ -22,12 +22,12 @@ class GroupSetYawCMD implements SubCommand{
         }
 
         if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis group setyaw <yaw> [-pivot]", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /mdis group yaw <yaw> [-pivot]", NamedTextColor.RED));
             return;
         }
 
         try{
-            double yaw = Double.parseDouble(args[2]);
+            float yaw = Float.parseFloat(args[2]);
             boolean pivot = false;
             if (args.length > 3){
                 if (args[3].equalsIgnoreCase("-pivot")){
@@ -35,9 +35,9 @@ class GroupSetYawCMD implements SubCommand{
                 }
             }
             double oldYaw = group.getLocation().getYaw();
-            group.setYaw((float) yaw, pivot);
+            group.setYaw(yaw, pivot);
             player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Yaw set!");
-            player.sendMessage(Component.text("Old Yaw: "+oldYaw, NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Old Yaw: "+oldYaw, NamedTextColor.GRAY));
         }
         catch(NumberFormatException e){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Please enter a valid number!");

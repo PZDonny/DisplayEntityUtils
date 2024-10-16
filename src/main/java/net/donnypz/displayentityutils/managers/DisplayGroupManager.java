@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.events.GroupDespawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.GroupResult;
+import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -84,6 +85,7 @@ public final class DisplayGroupManager {
      */
     public static void deselectSpawnedGroup(Player player) {
         selectedGroup.remove(player.getUniqueId());
+        DEUCommandUtils.removeParticleDisplays(player);
     }
 
 

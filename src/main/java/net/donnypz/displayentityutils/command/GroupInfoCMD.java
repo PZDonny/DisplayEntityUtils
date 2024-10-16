@@ -29,7 +29,8 @@ class GroupInfoCMD implements SubCommand{
         String groupTag = group.getTag();
         groupTag = groupTag == null ? "<red>NOT SET" : "<yellow>"+groupTag;
 
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: "+groupTag));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: <yellow>"+groupTag));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("World: <yellow>"+group.getWorldName()));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Total Parts: <yellow>"+(group.getSpawnedParts().size() - 1)));
 
         Location loc = group.getLocation();

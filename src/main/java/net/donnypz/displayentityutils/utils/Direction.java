@@ -22,8 +22,6 @@ public enum Direction {
     //X and Z Enums for translation are relative to a display entity's local axes,
     // whereas move/teleport it uses world axes
 
-
-
     /**
      * Get the vector based on the Direction selection
      * @param location The location to base this vector upon

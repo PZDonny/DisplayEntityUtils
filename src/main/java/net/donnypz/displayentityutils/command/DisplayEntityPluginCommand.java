@@ -9,10 +9,12 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
 import java.util.List;
 
+@ApiStatus.Internal
 public class DisplayEntityPluginCommand implements CommandExecutor {
 
     private static final HashMap<String, SubCommand> subCommands = new HashMap<>();
@@ -83,7 +85,7 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
         player.sendMessage(Component.text("/mdis parts select <part-tag>", NamedTextColor.GRAY));
     }
 
-    static boolean hasPermission(Player player, Permission permission){
+    public static boolean hasPermission(Player player, Permission permission){
         if (!player.hasPermission(permission.getPermission())){
             player.sendMessage(Component.text("You do not have permission to do that!", NamedTextColor.RED));
             return false;

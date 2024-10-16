@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Interaction;
 import org.jetbrains.annotations.ApiStatus;
@@ -28,12 +29,16 @@ public final class SpawnedDisplayAnimation {
 
     SpawnedDisplayAnimation(SpawnedDisplayEntityGroup group){
         SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(0, 0);
+        Location gLoc = group.getLocation();
         for (SpawnedDisplayEntityPart part : group.spawnedParts){
             if (part.isMaster()){
                 continue;
             }
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                frame.setInteractionTranslation(part, DisplayUtils.getInteractionTranslation((Interaction) part.getEntity()));
+                Interaction i = (Interaction) part.getEntity();
+
+                InteractionTransformation transform = new InteractionTransformation(DisplayUtils.getInteractionTranslation(i).toVector3f(), gLoc.getYaw(), gLoc.getPitch(), i.getInteractionHeight(), i.getInteractionWidth());
+                frame.setInteractionTransformation(part, transform);
             }
             else{
                 frame.setDisplayEntityTransformation(part, ((Display) part.getEntity()).getTransformation());
@@ -45,13 +50,19 @@ public final class SpawnedDisplayAnimation {
     @ApiStatus.Experimental
     SpawnedDisplayAnimation(SpawnedDisplayEntityGroup group, String partTag){
         this.partTag = partTag;
+        Location gLoc = group.getLocation();
         SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(0, 0);
         for (SpawnedDisplayEntityPart part : group.spawnedParts){
             if (part.isMaster()){
                 continue;
             }
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                frame.setInteractionTranslation(part, DisplayUtils.getInteractionTranslation((Interaction) part.getEntity()));
+                Interaction i = (Interaction) part.getEntity();
+
+
+
+                InteractionTransformation transform = new InteractionTransformation(DisplayUtils.getInteractionTranslation(i).toVector3f(), gLoc.getYaw(), gLoc.getPitch(), i.getInteractionHeight(), i.getInteractionWidth());
+                frame.setInteractionTransformation(part, transform);
             }
             else{
                 frame.setDisplayEntityTransformation(part, ((Display) part.getEntity()).getTransformation());
@@ -59,7 +70,6 @@ public final class SpawnedDisplayAnimation {
         }
         addFrame(frame);
     }
-
 
     /**
      * Get the tag that represents this animation
@@ -160,14 +170,13 @@ public final class SpawnedDisplayAnimation {
         return respectGroupScale;
     }
 
-
     /**
      * Remove all frames from the animation and make it essentially unusable.
      */
     public void remove(){
         for (SpawnedDisplayAnimationFrame frame : frames){
             frame.displayTransformations.clear();
-            frame.interactionTranslations.clear();
+            frame.interactionTransformations.clear();
         }
         frames.clear();
     }
@@ -201,14 +210,24 @@ public final class SpawnedDisplayAnimation {
      */
     public SpawnedDisplayAnimation getReversedAnimation(){
         SpawnedDisplayAnimation reversed = new SpawnedDisplayAnimation();
-        for (int i = frames.size()-1; i < 0; i--){
+        for (int i = frames.size()-1; i > 0; i--){
             SpawnedDisplayAnimationFrame frame = frames.get(i);
             SpawnedDisplayAnimationFrame newFrame = new SpawnedDisplayAnimationFrame(frame.delay, frame.duration);
             newFrame.displayTransformations = new HashMap<>(frame.displayTransformations);
-            newFrame.interactionTranslations = new HashMap<>(frame.interactionTranslations);
+            newFrame.interactionTransformations = new HashMap<>(frame.interactionTransformations);
             reversed.addFrame(newFrame);
         }
+        reversed.partTag = partTag;
+        reversed.respectGroupScale = respectGroupScale;
         return reversed;
+    }
+
+    /**
+     * Check if this animation has frames
+     * @return true if this animation has frames
+     */
+    public boolean hasFrames(){
+        return !frames.isEmpty();
     }
 
 }

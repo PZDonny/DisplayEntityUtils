@@ -1,10 +1,12 @@
 package net.donnypz.displayentityutils;
 
 import net.donnypz.displayentityutils.command.DisplayEntityPluginTabCompleter;
+import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.events.InteractionClickEvent;
 import net.donnypz.displayentityutils.events.PreInteractionClickEvent;
 import net.donnypz.displayentityutils.listeners.autoGroup.DEULoadingListeners;
 import net.donnypz.displayentityutils.listeners.bdengine.DEUEntitySpawned;
+import net.donnypz.displayentityutils.listeners.player.DEUPlayerChatListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerConnectionListener;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LocalManager;
@@ -15,6 +17,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
+import net.donnypz.displayentityutils.utils.deu.ParticleDisplay;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -82,6 +85,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
         }
         Bukkit.getPluginManager().registerEvents(new DEUPlayerConnectionListener(), this);
+        Bukkit.getPluginManager().registerEvents(new DEUPlayerChatListener(), this);
 
 
 
@@ -335,6 +339,29 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     }
 
     private void callInteractionEvent(InteractionClickEvent event){
+        Interaction i = event.getInteraction();
+
+    //Particle Displays
+        if (DisplayUtils.hasTag(i, "deu_particle_display")){
+            Player p = event.getPlayer();
+            if (p.isSneaking() && event.getClickType() == InteractionClickEvent.ClickType.RIGHT){
+                if (!DisplayEntityPluginCommand.hasPermission(p, Permission.ANIM_REMOVE_PARTICLE)){
+                    return;
+                }
+                boolean result = ParticleDisplay.delete(i.getUniqueId());
+                if (result){
+                    p.sendMessage(pluginPrefix+ChatColor.YELLOW+"Successfully removed particle from frame!");
+                }
+                else{
+                    p.sendMessage(pluginPrefix+ChatColor.RED+"This particle has already been removed by another player or other methods!");
+                }
+            }
+            else{
+                ParticleDisplay.sendInfo(i.getUniqueId(), p);
+            }
+            return;
+        }
+
         if (!event.callEvent()){
             return;
         }

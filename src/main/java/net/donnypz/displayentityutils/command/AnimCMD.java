@@ -32,6 +32,8 @@ class AnimCMD implements SubCommand{
         subCommands.put("showframe", new AnimShowFrameCMD());
         subCommands.put("addsound", new AnimAddSoundCMD());
         subCommands.put("removesound", new AnimRemoveSoundCMD());
+        subCommands.put("addparticle", new AnimAddParticleCMD());
+        subCommands.put("cancelparticles", new AnimCancelParticlesCMD());
         subCommands.put("reverse", new AnimReverseCMD());
         subCommands.put("togglescalerespect", new AnimScaleRespectCMD());
         subCommands.put("settag", new AnimSetTagCMD());
@@ -76,27 +78,28 @@ class AnimCMD implements SubCommand{
             CMDUtils.sendCMD(sender,"/mdis anim new [part-tag]", " (Manually create a new animation. Animates only parts with a tag, if the tag is specified)");
             CMDUtils.sendCMD(sender,"/mdis anim info", " (List information about your selected animation)");
             CMDUtils.sendCMD(sender, "/mdis anim frameinfo <frame-id>", " (List information about a frame in your animation)");
-            CMDUtils.sendCMD(sender, "/mdis anim addframe <delay-in-ticks> <duration-in-ticks>", " (Add a frame to your selected animation)");
+            CMDUtils.sendCMD(sender, "/mdis anim addframe <tick-delay> <tick-duration>", " (Add a frame to your selected animation)");
 
         }
         else if (page == 2){
-            CMDUtils.sendCMD(sender, "/mdis anim addframeafter <frame-id> <delay-in-ticks> <duration-in-ticks>", " (Add a frame after another frame to your selected animation)");
+            CMDUtils.sendCMD(sender, "/mdis anim addframeafter <frame-id> <tick-delay> <tick-duration>", " (Add a frame after another frame to your selected animation)");
             CMDUtils.sendCMD(sender, "/mdis anim removeframe <frame-id>", " (Remove a frame from your selected animation)");
-            CMDUtils.sendCMD(sender, "/mdis anim showframe <frame-id>", " (Displays a frame on your selected group)");
-            CMDUtils.sendCMD(sender, "/mdis anim editframe <frame-id> <delay-in-ticks> <duration-in-ticks>", " (Edit properties of a single frame)");
-            CMDUtils.sendCMD(sender, "/mdis anim editallframes <delay-in-ticks> <duration-in-ticks>", " (Edit properties of all frames)");
+            CMDUtils.sendCMD(sender, "/mdis anim editframe <frame-id> <tick-delay> <tick-duration>", " (Edit properties of a single frame)");
+            CMDUtils.sendCMD(sender, "/mdis anim editallframes <tick-delay> <tick-duration>", " (Edit properties of all frames)");
             CMDUtils.sendCMD(sender, "/mdis anim addsound <frame-id> <sound> <volume> <pitch> <start | end>", " (Add a sound to a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim removesound <frame-id> <sound> <start | end>", " (Remove a sound from a frame)");
+            CMDUtils.sendCMD(sender, "/mdis anim addparticle <frame-id> <start | end>", " (Add a particle to a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim overwriteframe <frame-id>", " (Overwrite the transformation data of a frame)");
         }
         else{
             CMDUtils.sendCMD(sender, "/mdis anim reverse", " (Reverse the order of frames in your selected animation)");
             CMDUtils.sendCMD(sender, "/mdis anim togglescalerespect", " (Toggle whether your selected animation should respect the group's scale)");
+            CMDUtils.sendCMD(sender, "/mdis anim showframe <frame-id>", " (Displays a frame on your selected group)");
             CMDUtils.sendCMD(sender, "/mdis anim play [-loop]", " (Play your selected animation on your selected group. Include \"-loop\" to loop the animation)");
             CMDUtils.sendCMD(sender, "/mdis anim stop", " (Stop an animation playing on a group)");
             CMDUtils.sendCMD(sender, "/mdis anim select <anim-tag>", " (Select a saved DisplayAnimation from a storage location)");
-            CMDUtils.sendCMD(sender,"/mdis anim save <storage-location>", " (Save your selected animation)");
-            CMDUtils.sendCMD(sender,"/mdis anim delete <anim-tag> <storage-location>", " (Delete a saved animation from a storage location)");
+            CMDUtils.sendCMD(sender, "/mdis anim save <storage-location>", " (Save your selected animation)");
+            CMDUtils.sendCMD(sender, "/mdis anim delete <anim-tag> <storage-location>", " (Delete a saved animation from a storage location)");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }

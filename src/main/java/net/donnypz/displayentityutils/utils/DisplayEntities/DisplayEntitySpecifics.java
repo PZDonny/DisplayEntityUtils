@@ -96,7 +96,7 @@ abstract class DisplayEntitySpecifics implements Serializable {
         return glowColorOverride;
     }
 
-    void updateDisplay(DisplayEntity displayEntity, Display display){
+    void apply(DisplayEntity displayEntity, Display display){
         display.setTransformation(serialTransformation.toTransformation());
         display.setBillboard(billboard);
         display.setViewRange(viewRange);
@@ -110,9 +110,13 @@ abstract class DisplayEntitySpecifics implements Serializable {
         if (brightnessBlockLight != -1 && brightnessSkyLight != -1){
             display.setBrightness(new Display.Brightness(brightnessBlockLight, brightnessSkyLight));
         }
-        for (String partTag : partTags){
-            display.addScoreboardTag(partTag);
+
+        if (partTags != null){
+            for (String partTag : partTags){
+                display.addScoreboardTag(partTag);
+            }
         }
+
 
         if (displayEntity.persistentDataContainer != null){
             try{

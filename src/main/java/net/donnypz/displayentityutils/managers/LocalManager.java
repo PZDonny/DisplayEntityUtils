@@ -214,7 +214,7 @@ public final class LocalManager {
                     if (!frame.isEmptyFrame()){
                         anim.addFrame(frame);
                     }
-                    createdGroup.setToFrame(anim.getFrames().getFirst());
+                    createdGroup.setToFrame(anim, anim.getFrames().getFirst());
 
                     //Save with first frame applied to group
                     Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {

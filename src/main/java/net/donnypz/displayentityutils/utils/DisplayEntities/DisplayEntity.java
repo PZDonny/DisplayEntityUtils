@@ -1,6 +1,5 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -50,7 +49,6 @@ final class DisplayEntity implements Serializable {
         catch(IOException e){
             e.printStackTrace();
         }
-
     }
 
     DisplayEntity setMaster(){
@@ -58,22 +56,23 @@ final class DisplayEntity implements Serializable {
         return this;
     }
 
+
     /**
      * Spawn a Display representative of this
      * @param location The location to spawn the Display
-     * @param isVisible Determines if the part will be visible
+     * @param settings Determines the settings to apply on a group
      * @return The spawned Display
      */
-    public Display createEntity(Location location, boolean isVisible){
+    Display createEntity(@NotNull Location location, @NotNull GroupSpawnSettings settings){
         switch(type){
             case BLOCK ->{
-                return spawnBlockDisplay(location, isVisible);
+                return spawnBlockDisplay(location, settings);
             }
             case ITEM ->{
-                return spawnItemDisplay(location, isVisible);
+                return spawnItemDisplay(location, settings);
             }
             case TEXT ->{
-                return spawnTextDisplay(location, isVisible);
+                return spawnTextDisplay(location, settings);
             }
             default ->{
                 return null;
@@ -81,70 +80,30 @@ final class DisplayEntity implements Serializable {
         }
     }
 
-    /**
-     * Spawn a Display representative of this
-     * @param location The location to spawn the Display
-     * @param hiddenTags A list of tags that will hide the part if the part has any of these tags
-     * @return The spawned Display
-     */
-    public Display createEntity(Location location, @NotNull List<String> hiddenTags){
-        switch(type){
-            case BLOCK ->{
-                return spawnBlockDisplay(location, hiddenTags);
-            }
-            case ITEM ->{
-                return spawnItemDisplay(location, hiddenTags);
-            }
-            case TEXT ->{
-                return spawnTextDisplay(location, hiddenTags);
-            }
-            default ->{
-                return null;
-            }
-        }
-    }
 
-    Display spawnBlockDisplay(Location location, boolean isVisible){
+    private Display spawnBlockDisplay(Location location, GroupSpawnSettings settings){
         BlockDisplaySpecifics spec = (BlockDisplaySpecifics) specifics;
         BlockData data = Bukkit.createBlockData(spec.getBlockData());
         return location.getWorld().spawn(location, BlockDisplay.class, display ->{
             display.setBlock(data);
-            specifics.updateDisplay(this, display);
-            display.setVisibleByDefault(isVisible);
+            specifics.apply(this, display);
+            settings.apply(display);
         });
     }
 
-    Display spawnBlockDisplay(Location location, List<String> hiddenTags){
-        BlockDisplaySpecifics spec = (BlockDisplaySpecifics) specifics;
-        BlockData data = Bukkit.createBlockData(spec.getBlockData());
-        return location.getWorld().spawn(location, BlockDisplay.class, display ->{
-            display.setBlock(data);
-            specifics.updateDisplay(this, display);
-            determineVisibleByDefault(display, hiddenTags);
-        });
-    }
 
-    Display spawnItemDisplay(Location location, boolean isVisible){
+    private Display spawnItemDisplay(Location location, GroupSpawnSettings settings){
         ItemDisplaySpecifics spec = (ItemDisplaySpecifics) specifics;
         return location.getWorld().spawn(location, ItemDisplay.class, display ->{
             display.setItemDisplayTransform(spec.getItemDisplayTransform());
             display.setItemStack(spec.getItemStack());
-            specifics.updateDisplay(this, display);
-            display.setVisibleByDefault(isVisible);
+            specifics.apply(this, display);
+            settings.apply(display);
         });
     }
 
-    Display spawnItemDisplay(Location location, List<String> hiddenTags){
-        ItemDisplaySpecifics spec = (ItemDisplaySpecifics) specifics;
-        return location.getWorld().spawn(location, ItemDisplay.class, display ->{
-            display.setItemDisplayTransform(spec.getItemDisplayTransform());
-            display.setItemStack(spec.getItemStack());
-            specifics.updateDisplay(this, display);
-            determineVisibleByDefault(display, hiddenTags);
-        });
-    }
 
-    Display spawnTextDisplay(Location location, boolean isVisible){
+    private Display spawnTextDisplay(Location location, GroupSpawnSettings settings){
         TextDisplaySpecifics spec = (TextDisplaySpecifics) specifics;
         return location.getWorld().spawn(location, TextDisplay.class, display ->{
             display.text(spec.getText());
@@ -157,48 +116,9 @@ final class DisplayEntity implements Serializable {
             display.setShadowed(spec.isShadowed());
             display.setSeeThrough(spec.isSeeThrough());
             display.setDefaultBackground(spec.isDefaultBackground());
-            specifics.updateDisplay(this, display);
-            display.setVisibleByDefault(isVisible);
+            specifics.apply(this, display);
+            settings.apply(display);
         });
-    }
-
-    Display spawnTextDisplay(Location location, List<String> hiddenTags){
-        TextDisplaySpecifics spec = (TextDisplaySpecifics) specifics;
-        return location.getWorld().spawn(location, TextDisplay.class, display ->{
-            display.text(spec.getText());
-            display.setAlignment(spec.getAlignment());
-            display.setLineWidth(spec.getLineWidth());
-            if (spec.getBackgroundColorARGB() != Color.BLACK.asARGB()){
-                display.setBackgroundColor(Color.fromARGB(spec.getBackgroundColorARGB()));
-            }
-            display.setTextOpacity(spec.getTextOpacity());
-            display.setShadowed(spec.isShadowed());
-            display.setSeeThrough(spec.isSeeThrough());
-            display.setDefaultBackground(spec.isDefaultBackground());
-            specifics.updateDisplay(this, display);
-            determineVisibleByDefault(display, hiddenTags);
-        });
-    }
-
-    private void determineVisibleByDefault(Display display, List<String> hiddenTags){
-        boolean visible = true;
-
-        for (String legacy : getLegacyPartTags()){ //Legacy Tags (Scoreboard)
-            if (hiddenTags.contains(legacy)){
-                visible = false;
-            }
-        }
-
-        if (visible){ //PDC Tags and not hidden from Legacy
-            for (String tag : hiddenTags){
-                if (DisplayUtils.hasTag(display, tag)){
-                    visible = false;
-                    break;
-                }
-            }
-        }
-
-        display.setVisibleByDefault(visible);
     }
 
     /**
