@@ -6,20 +6,22 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * Called when an Entity is mounted on top of a SpawnedDisplayEntityGroup.
+ * Called when a {@link SpawnedDisplayEntityGroup} begins scaling.
  * Can be cancelled
  */
 public class GroupScaleEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     float newScale;
     float lastScale;
+    int scaleDuration;
     SpawnedDisplayEntityGroup group;
     private boolean isCancelled = false;
 
-    public GroupScaleEvent(SpawnedDisplayEntityGroup group, float newScale, float lastScale){
+    public GroupScaleEvent(SpawnedDisplayEntityGroup group, float newScale, float lastScale, int scaleDuration){
         this.group = group;
         this.newScale = newScale;
         this.lastScale = lastScale;
+        this.scaleDuration = scaleDuration;
     }
 
     /**
@@ -44,6 +46,14 @@ public class GroupScaleEvent extends Event implements Cancellable {
      */
     public float getLastScale() {
         return lastScale;
+    }
+
+    /**
+     * Get the amount of time in ticks it will take for the scaling to finish
+     * @return an integer
+     */
+    public int getScaleDuration() {
+        return scaleDuration;
     }
 
     @Override
