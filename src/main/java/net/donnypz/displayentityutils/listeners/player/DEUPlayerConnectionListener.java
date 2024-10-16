@@ -2,6 +2,9 @@ package net.donnypz.displayentityutils.listeners.player;
 
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
+import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -12,7 +15,11 @@ public final class DEUPlayerConnectionListener implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e){
-        DisplayGroupManager.deselectSpawnedGroup(e.getPlayer());
-        DisplayAnimationManager.deselectSpawnedAnimation(e.getPlayer());
+        Player p = e.getPlayer();
+
+        DisplayGroupManager.deselectSpawnedGroup(p);
+        DisplayAnimationManager.deselectSpawnedAnimation(p);
+        AnimationParticleBuilder.removeParticleBuilder(p);
+        DEUCommandUtils.removeParticleDisplays(p);
     }
 }
