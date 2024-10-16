@@ -62,6 +62,8 @@ public enum Permission {
     ANIM_SHOW_FRAME("deu.anim.showframe"),
     ANIM_ADD_SOUND("deu.anim.addsound"),
     ANIM_REMOVE_SOUND("deu.anim.removesound"),
+    ANIM_ADD_PARTICLE("deu.anim.addparticle"),
+    ANIM_REMOVE_PARTICLE("deu.anim.removeparticle"),
     ANIM_REVERSE("deu.anim.reverse"),
     ANIM_TOGGLE_SCALE("deu.anim.scale"),
     ANIM_SET_TAG("deu.anim.settag"),
