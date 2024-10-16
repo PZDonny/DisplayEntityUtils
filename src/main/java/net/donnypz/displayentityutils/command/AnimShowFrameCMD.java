@@ -1,6 +1,5 @@
 package net.donnypz.displayentityutils.command;
 
-import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
@@ -8,8 +7,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -44,6 +41,7 @@ class AnimShowFrameCMD implements SubCommand{
             AnimCMD.hasNoFrames(player);
             return;
         }
+
         try {
             int id = Integer.parseInt(args[2]);
             if (id < 0) {
@@ -53,7 +51,7 @@ class AnimShowFrameCMD implements SubCommand{
                 player.sendMessage(Component.text("Invalid ID! The ID cannot be >= the amount of frames!", NamedTextColor.RED));
                 return;
             }
-            group.setToFrame(frames.get(id));
+            group.setToFrame(anim, frames.get(id));
             player.sendMessage(Component.text("Showing your selected display entity group as Frame #" + id, NamedTextColor.GREEN));
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid ID! ID's must be >= 0", NamedTextColor.RED));
