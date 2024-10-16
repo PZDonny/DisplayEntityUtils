@@ -49,7 +49,7 @@ Access the wiki [HERE](https://github.com/PZDonny/DisplayEntityUtils/wiki)
 <dependency>
   <groupId>com.github.PZDonny</groupId>
   <artifactId>DisplayEntityUtils</artifactId>
-  <version>2.4.3</version>
+  <version>2.5.0</version>
   <scope>provided</scope>
 </dependency>
 ```
