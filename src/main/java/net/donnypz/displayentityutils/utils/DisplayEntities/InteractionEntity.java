@@ -11,7 +11,6 @@ import org.joml.Vector3f;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 final class InteractionEntity implements Serializable {
@@ -41,11 +40,10 @@ final class InteractionEntity implements Serializable {
         }
     }
 
-    Interaction createEntity(Location location, boolean isVisible){
+    Interaction createEntity(Location location, GroupSpawnSettings settings){
         return location.getWorld().spawn(location, Interaction.class, spawn ->{
             spawn.setInteractionHeight(height);
             spawn.setInteractionWidth(width);
-            spawn.setVisibleByDefault(isVisible);
             for (String partTag : partTags){
                 spawn.addScoreboardTag(partTag);
             }
@@ -60,47 +58,8 @@ final class InteractionEntity implements Serializable {
             if (partUUID != null){
                 spawn.getPersistentDataContainer().set(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
             }
-        });
-    }
 
-    Interaction createEntity(Location location, List<String> hiddenTags){
-        return location.getWorld().spawn(location, Interaction.class, spawn ->{
-            spawn.setInteractionHeight(height);
-            spawn.setInteractionWidth(width);
-
-            for (String partTag : partTags){
-                spawn.addScoreboardTag(partTag);
-            }
-
-            if (persistentDataContainer != null){
-                try{
-                    spawn.getPersistentDataContainer().readFromBytes(persistentDataContainer);
-                }
-                catch(IOException ignore){}
-            }
-
-            boolean visible = true;
-
-            for (String legacy : partTags){ //Legacy Tags (Scoreboard)
-                if (hiddenTags.contains(legacy)){
-                    visible = false;
-                }
-            }
-
-            if (visible){ //PDC Tags and not hidden from Legacy
-                for (String tag : hiddenTags){
-                    if (DisplayUtils.hasTag(spawn, tag)){
-                        visible = false;
-                        break;
-                    }
-                }
-            }
-
-            spawn.setVisibleByDefault(visible);
-
-            if (partUUID != null){
-                spawn.getPersistentDataContainer().set(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
-            }
+            settings.apply(spawn);
         });
     }
 
