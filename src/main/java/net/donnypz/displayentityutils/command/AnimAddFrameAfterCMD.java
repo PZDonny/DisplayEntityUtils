@@ -31,7 +31,7 @@ class AnimAddFrameAfterCMD implements SubCommand{
             return;
         }
         if (args.length < 5) {
-            player.sendMessage(Component.text("/mdis anim addframeafter <frame-id> <delay-in-ticks> <duration-in-ticks>", NamedTextColor.RED));
+            player.sendMessage(Component.text("/mdis anim addframeafter <frame-id> <tick-delay> <tick-duration>", NamedTextColor.RED));
             player.sendMessage(Component.text("First frame is 0, Second frame is 1, and so on...", NamedTextColor.GRAY));
             return;
         }

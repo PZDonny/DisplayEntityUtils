@@ -31,7 +31,7 @@ class AnimEditFrameCMD implements SubCommand{
         }
 
         if (args.length < 5) {
-            player.sendMessage(Component.text("/mdis anim editframe <frame-id> <delay-in-ticks> <duration-in-ticks>", NamedTextColor.RED));
+            player.sendMessage(Component.text("/mdis anim editframe <frame-id> <tick-delay> <tick-duration>", NamedTextColor.RED));
             player.sendMessage(Component.text("First frame is 0, Second frame is 1, and so on...", NamedTextColor.GRAY));
             return;
         }
