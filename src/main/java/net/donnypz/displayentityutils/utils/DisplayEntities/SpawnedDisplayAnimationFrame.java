@@ -1,22 +1,24 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticle;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Interaction;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 public final class SpawnedDisplayAnimationFrame {
     HashMap<UUID, Transformation> displayTransformations = new HashMap<>(); //Part UUIDS
-    HashMap<UUID, Vector>  interactionTranslations = new HashMap<>(); //Part UUIDS
+    HashMap<UUID, Vector3f>  interactionTransformations = new HashMap<>(); //Part UUIDS
 
     int delay;
     int duration;
@@ -24,6 +26,11 @@ public final class SpawnedDisplayAnimationFrame {
     HashMap<Sound, Float[]> frameStartSoundMap;
     HashMap<Sound, Float[]> frameEndSoundMap;
 
+    Set<AnimationParticle> frameStartParticles = new HashSet<>();
+    Set<AnimationParticle> frameEndParticles = new HashSet<>();
+
+
+    @ApiStatus.Internal
     public SpawnedDisplayAnimationFrame(int delay, int duration){
         this.delay = delay;
         this.duration = duration;
@@ -31,11 +38,14 @@ public final class SpawnedDisplayAnimationFrame {
         this.frameEndSoundMap = new HashMap<>();
     }
 
-    public SpawnedDisplayAnimationFrame(int delay, int duration, HashMap<Sound, Float[]> frameStartSoundMap, HashMap<Sound, Float[]> frameEndSoundMap){
+    @ApiStatus.Internal
+    public SpawnedDisplayAnimationFrame(int delay, int duration, HashMap<Sound, Float[]> frameStartSoundMap, HashMap<Sound, Float[]> frameEndSoundMap, Set<AnimationParticle> frameStartParticles, Set<AnimationParticle> frameEndParticles){
         this.delay = delay;
         this.duration = duration;
         this.frameStartSoundMap = frameStartSoundMap == null ? new HashMap<>() : frameStartSoundMap;
-        this.frameEndSoundMap= frameEndSoundMap== null ? new HashMap<>() : frameEndSoundMap;
+        this.frameEndSoundMap = frameEndSoundMap == null ? new HashMap<>() : frameEndSoundMap;
+        this.frameStartParticles = frameStartParticles == null ? new HashSet<>() : frameStartParticles;
+        this.frameEndParticles = frameEndParticles == null ? new HashSet<>() : frameEndParticles;
     }
 
 
@@ -95,23 +105,27 @@ public final class SpawnedDisplayAnimationFrame {
     }
 
     /**
-     * Get whether or not this frame has transformation data stored
+     * Get whether this frame has transformation data stored
      * @return a boolean
      */
     public boolean isEmptyFrame(){
-        return displayTransformations.isEmpty() && interactionTranslations.isEmpty();
+        return displayTransformations.isEmpty() && interactionTransformations.isEmpty();
     }
 
 
     /**
      * Change the transformation data of this frame to the transformation of a group.
-     * @param group
-     * @return
+     * @param group the group to get transformation data from
+     * @return this
      */
-    public SpawnedDisplayAnimationFrame setTransformation(SpawnedDisplayEntityGroup group){
+    public SpawnedDisplayAnimationFrame setTransformation(@NotNull SpawnedDisplayEntityGroup group){
+        Location gLoc = group.getLocation();
         for (SpawnedDisplayEntityPart part : group.spawnedParts){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                setInteractionTranslation(part, DisplayUtils.getInteractionTranslation(((Interaction) part.getEntity())));
+                Interaction i = (Interaction) part.getEntity();
+
+                InteractionTransformation transform = new InteractionTransformation(DisplayUtils.getInteractionTranslation(i).toVector3f(), gLoc.getYaw(), gLoc.getPitch(), i.getInteractionHeight(), i.getInteractionWidth());
+                setInteractionTransformation(part, transform);
             }
             else{
                 setDisplayEntityTransformation(part, ((Display) part.getEntity()).getTransformation());
@@ -124,13 +138,14 @@ public final class SpawnedDisplayAnimationFrame {
     /**
      * Change the transformation data of this frame to the transformation of a group.
      * Only parts within the group with the specified part tag will be transformed
-     * @param group
-     * @param partTag
-     * @return
+     * @param group the group to get transformation data from
+     * @param partTag the part tag that is required for a part's transformation to be contained in this frame
+     * @return this
      */
-    public SpawnedDisplayAnimationFrame setTransformation(SpawnedDisplayEntityGroup group, @NotNull String partTag){
+    public SpawnedDisplayAnimationFrame setTransformation(@NotNull SpawnedDisplayEntityGroup group, @NotNull String partTag){
         displayTransformations.clear();
-        interactionTranslations.clear();
+        interactionTransformations.clear();
+        Location gLoc = group.getLocation();
         for (SpawnedDisplayEntityPart part : group.spawnedParts){
         //Ignore if part does not have specified tag
             if (!part.hasTag(partTag)){
@@ -138,7 +153,10 @@ public final class SpawnedDisplayAnimationFrame {
             }
 
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                setInteractionTranslation(part, DisplayUtils.getInteractionTranslation(((Interaction) part.getEntity())));
+                Interaction i = (Interaction) part.getEntity();
+
+                InteractionTransformation transform = new InteractionTransformation(DisplayUtils.getInteractionTranslation(i).toVector3f(), gLoc.getYaw(), gLoc.getPitch(), i.getInteractionHeight(), i.getInteractionWidth());
+                setInteractionTransformation(part, transform);
             }
             else{
                 setDisplayEntityTransformation(part, ((Display) part.getEntity()).getTransformation());
@@ -149,7 +167,9 @@ public final class SpawnedDisplayAnimationFrame {
 
     /**
      * Add a sound that will be played at the start of this frame
-     * @param sound
+     * @param sound the sound
+     * @param volume the volume
+     * @param pitch the pitch
      * @return this
      */
     public SpawnedDisplayAnimationFrame addFrameStartSound(Sound sound, float volume, float pitch){
@@ -159,7 +179,9 @@ public final class SpawnedDisplayAnimationFrame {
 
     /**
      * Add a sound that will be played at the end of this frame
-     * @param sound
+     * @param sound the sound
+     * @param volume the volume
+     * @param pitch the pitch
      * @return this
      */
     public SpawnedDisplayAnimationFrame addFrameEndSound(Sound sound, float volume, float pitch){
@@ -205,6 +227,54 @@ public final class SpawnedDisplayAnimationFrame {
         return new HashMap<>(frameEndSoundMap);
     }
 
+    @ApiStatus.Internal
+    public SpawnedDisplayAnimationFrame addFrameStartParticle(AnimationParticle animationParticle){
+        frameStartParticles.add(animationParticle);
+        return this;
+    }
+
+    @ApiStatus.Internal
+    public SpawnedDisplayAnimationFrame addFrameEndParticle(AnimationParticle animationParticle){
+        frameEndParticles.add(animationParticle);
+        return this;
+    }
+
+    @ApiStatus.Internal
+    public SpawnedDisplayAnimationFrame removeFrameStartParticle(AnimationParticle animationParticle){
+        frameStartParticles.remove(animationParticle);
+        return this;
+    }
+
+    @ApiStatus.Internal
+    public SpawnedDisplayAnimationFrame removeFrameEndParticle(AnimationParticle animationParticle){
+        frameEndParticles.remove(animationParticle);
+        return this;
+    }
+
+    public List<AnimationParticle> getFrameStartParticles(){
+        return new ArrayList<>(frameStartParticles);
+    }
+
+    public List<AnimationParticle> getFrameEndParticles(){
+        return new ArrayList<>(frameEndParticles);
+    }
+
+    /**
+     * Check if this frame will display particles when the frame begins playing, or simply if it contains {@link AnimationParticle} for the start.
+     * @return true if particles will be displayed.
+     */
+    public boolean hasFrameStartParticles(){
+        return !frameStartParticles.isEmpty();
+    }
+
+    /**
+     * Check if this frame will display particles when the frame emds, or simply if it contains {@link AnimationParticle} for the end.
+     * @return true if particles will be displayed.
+     */
+    public boolean hasFrameEndParticles(){
+        return !frameEndParticles.isEmpty();
+    }
+
     /**
      * Play the sounds that will play at the start of this frame at a specified location
      * @param location
@@ -233,41 +303,63 @@ public final class SpawnedDisplayAnimationFrame {
         }
     }
 
-    boolean setDisplayEntityTransformation(SpawnedDisplayEntityPart part, Transformation transformation){
-        displayTransformations.put(part.getPartUUID(), transformation);
-        return true;
+    /**
+     * Show the particles that will be displayed at the start of this frame
+     * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
+     */
+    public void showStartParticles(SpawnedDisplayEntityGroup group){
+        for (AnimationParticle particle : frameStartParticles){
+            particle.spawn(group);
+        }
     }
 
+    /**
+     * Show the particles that will be displayed at the end of this frame
+     * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
+     */
+    public void showEndParticles(SpawnedDisplayEntityGroup group){
+        for (AnimationParticle particle : frameEndParticles){
+            particle.spawn(group);
+        }
+    }
 
+    @ApiStatus.Internal
+    public void visuallyEditStartParticles(@NotNull Player player, @NotNull SpawnedDisplayEntityGroup group){
+        DEUCommandUtils.spawnParticleDisplays(group, player, this, true);
+    }
 
+    @ApiStatus.Internal
+    public void visuallyEditEndParticles(@NotNull Player player, @NotNull SpawnedDisplayEntityGroup group){
+        DEUCommandUtils.spawnParticleDisplays(group, player, this, false);
+    }
 
-
-    boolean setInteractionTranslation(SpawnedDisplayEntityPart part, Vector translation){
-        interactionTranslations.put(part.getPartUUID(), translation);
-        return true;
+    void setDisplayEntityTransformation(SpawnedDisplayEntityPart part, Transformation transformation){
+        setDisplayEntityTransformation(part.getPartUUID(), transformation);
     }
 
     void setDisplayEntityTransformation(UUID partUUID, Transformation transformation){
         displayTransformations.put(partUUID, transformation);
     }
 
-    void setInteractionTranslation(UUID partUUID, Vector translation){
-        interactionTranslations.put(partUUID, translation);
+
+    boolean setInteractionTransformation(SpawnedDisplayEntityPart part, Vector3f transformation){
+        setInteractionTransformation(part.getPartUUID(), transformation);
+        return true;
     }
 
-    /**
-     * Convert this to a {@link DisplayAnimationFrame} for serialization.
-     * Should not need to be called outside of DisplayEntityUtils Plugin
-     * @return {@link DisplayAnimationFrame}
-     */
+    void setInteractionTransformation(UUID partUUID, Vector3f transformation){
+        interactionTransformations.put(partUUID, transformation);
+    }
+
+
     @ApiStatus.Internal
     public DisplayAnimationFrame toDisplayAnimationFrame(){
-        DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, frameStartSoundMap, frameEndSoundMap);
+        DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, frameStartSoundMap, frameEndSoundMap, frameStartParticles, frameEndParticles);
         for (UUID uuid : displayTransformations.keySet()){
             frame.setDisplayEntityTransformation(uuid, new SerialTransformation(displayTransformations.get(uuid)));
         }
-        for (UUID uuid : interactionTranslations.keySet()){
-            frame.setInteractionTranslation(uuid, interactionTranslations.get(uuid).toVector3f());
+        for (UUID uuid : interactionTransformations.keySet()){
+            frame.setInteractionTransformation(uuid, interactionTransformations.get(uuid));
         }
         return frame;
     }
