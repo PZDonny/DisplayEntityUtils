@@ -26,7 +26,7 @@ import java.util.*;
 public final class SpawnedDisplayEntityGroup {
     public static final long defaultPartUUIDSeed = 99;
 
-    List<SpawnedDisplayEntityPart> spawnedParts = new ArrayList<>();
+    LinkedHashMap<UUID, SpawnedDisplayEntityPart> spawnedParts = new LinkedHashMap<>();
     List<SpawnedPartSelection> partSelections = new ArrayList<>();
     private String tag;
     SpawnedDisplayEntityPart masterPart;
@@ -40,6 +40,7 @@ public final class SpawnedDisplayEntityGroup {
     private float scaleMultiplier = 1;
     private UUID followedEntity = null;
     private long lastAnimationTimeStamp = -1;
+    private boolean isPersistent = true;
 
 
 
@@ -149,7 +150,7 @@ public final class SpawnedDisplayEntityGroup {
                 masterPart.getEntity().addPassenger(displayEntity);
             }
             else if (!spawnedParts.isEmpty()){
-                for (SpawnedDisplayEntityPart spawnedPart : spawnedParts){
+                for (SpawnedDisplayEntityPart spawnedPart : spawnedParts.values()){
                     if (!spawnedPart.getEntity().equals(part.getEntity())){
                         masterPart.getEntity().addPassenger(spawnedPart.getEntity());
                     }
@@ -264,7 +265,7 @@ public final class SpawnedDisplayEntityGroup {
     public void seedPartUUIDs(long seed){
         byte[] byteArray;
         Random random = new Random(seed);
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             byteArray = new byte[16];
             random.nextBytes(byteArray);
             part.setPartUUID(UUID.nameUUIDFromBytes(byteArray));
@@ -276,7 +277,7 @@ public final class SpawnedDisplayEntityGroup {
      * @param player The player to reveal this group to
      */
     public void showToPlayer(Player player){
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.showToPlayer(player);
         }
     }
@@ -286,7 +287,7 @@ public final class SpawnedDisplayEntityGroup {
      * @param player The player to hide this group from
      */
     public void hideFromPlayer(Player player){
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.hideFromPlayer(player);
 
         }
@@ -337,15 +338,22 @@ public final class SpawnedDisplayEntityGroup {
      */
     public List<Interaction> removeInteractionEntities(){
         List<Interaction> interactions = new ArrayList<>();
+        HashSet<Chunk> loadedChunks = new HashSet<>();
         for (SpawnedDisplayEntityPart part : getSpawnedParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
+            Chunk chunk = part.getEntity().getChunk();
+            chunk.addPluginChunkTicket(DisplayEntityPlugin.getInstance());
+            loadedChunks.add(chunk);
             part.remove(false);
+        }
+        for (Chunk c : loadedChunks){
+            c.removePluginChunkTicket(DisplayEntityPlugin.getInstance());
         }
         return interactions;
     }
 
     /**
-     * Get the location of this SpawnedDisplayEntityGroup.
-     * @return Location of this group's master part. Null if the group is not spawned
+     * Get the location of this group.
+     * @return Location of this group's master part. Null if the group is invalid
      */
     public Location getLocation(){
         if (!this.isSpawned()){
@@ -355,11 +363,20 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Get a list of all this group's parts.
-     * @return a list of all {@link SpawnedDisplayEntityPart} in this group
+     * Get a {@link SpawnedDisplayEntityPart} by its part uuid
+     * @param partUUID the part uuid of the part
+     * @return a {@link SpawnedDisplayEntityPart} or null if no part in this group contains the provided part uuid
      */
-    public List<SpawnedDisplayEntityPart> getSpawnedParts(){
-        return new ArrayList<>(spawnedParts);
+    public @Nullable SpawnedDisplayEntityPart getSpawnedPart(UUID partUUID){
+        return spawnedParts.get(partUUID);
+    }
+
+    /**
+     * Get a {@link SequencedCollection} of all this group's parts.
+     * @return a sequenced collection
+     */
+    public SequencedCollection<SpawnedDisplayEntityPart> getSpawnedParts(){
+        return new ArrayList<>(spawnedParts.sequencedValues());
     }
 
     /**
@@ -368,7 +385,7 @@ public final class SpawnedDisplayEntityGroup {
      */
     public List<SpawnedDisplayEntityPart> getSpawnedParts(SpawnedDisplayEntityPart.PartType partType){
         List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.sequencedValues()){
             if (partType == part.getType()){
                 partList.add(part);
             }
@@ -383,7 +400,7 @@ public final class SpawnedDisplayEntityGroup {
      */
     public List<SpawnedDisplayEntityPart> getSpawnedDisplayParts(){
         List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.sequencedValues()){
             if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
                 partList.add(part);
             }
@@ -397,7 +414,7 @@ public final class SpawnedDisplayEntityGroup {
      */
     public List<SpawnedDisplayEntityPart> getSpawnedParts(@NotNull String tag){
         List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.sequencedValues()){
             if (part.hasTag(tag)){
                 partList.add(part);
             }
@@ -411,7 +428,7 @@ public final class SpawnedDisplayEntityGroup {
      */
     public List<SpawnedDisplayEntityPart> getSpawnedParts(@NotNull Collection<String> tags){
         List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.sequencedValues()){
             for (String tag : tags){
                 if (part.hasTag(tag)){
                     partList.add(part);
@@ -430,7 +447,7 @@ public final class SpawnedDisplayEntityGroup {
      */
     public List<Entity> getSpawnedPartEntities(SpawnedDisplayEntityPart.PartType partType){
         List<Entity> partList = new ArrayList<>();
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.sequencedValues()){
             if (partType == part.getType()){
                 partList.add(part.getEntity());
             }
@@ -445,7 +462,7 @@ public final class SpawnedDisplayEntityGroup {
      */
     public <T> List<T> getSpawnedPartEntities(Class<T> entityClazz){
         List<T> partList = new ArrayList<>();
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.sequencedValues()){
             Entity partEntity = part.getEntity();
             if (entityClazz.isInstance(partEntity)){
                 T entity = entityClazz.cast(partEntity);
@@ -464,6 +481,28 @@ public final class SpawnedDisplayEntityGroup {
     @ApiStatus.Internal
     public SpawnedDisplayEntityGroup addPlayerSelection(Player player){
         DisplayGroupManager.setSelectedSpawnedGroup(player, this);
+        return this;
+    }
+
+
+    /**
+     * Return whether this group will stay spawned after a server restart
+     * @return true if this group is persistent
+     */
+    public boolean isPersistent(){
+        return isPersistent;
+    }
+
+    /**
+     * Set whether this group should persist after a server restart. If false, the group's entities will be despawned after a restart.
+     * @param persistent if this group should persist
+     * @return this
+     */
+    public SpawnedDisplayEntityGroup setPersistent(boolean persistent){
+        for (SpawnedDisplayEntityPart p : spawnedParts.values()){
+            p.getEntity().setPersistent(persistent);
+        }
+        this.isPersistent = persistent;
         return this;
     }
 
@@ -494,7 +533,7 @@ public final class SpawnedDisplayEntityGroup {
         if (event.isCancelled()){
             return false;
         }
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             //Displays
             if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Display d = (Display) part.getEntity();
@@ -725,7 +764,7 @@ public final class SpawnedDisplayEntityGroup {
      * @param pivotInteractions true if interactions should pivot around the group with the yaw change
      */
     public void setYaw(float yaw, boolean pivotInteractions){
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setYaw(yaw, pivotInteractions);
         }
     }
@@ -735,7 +774,7 @@ public final class SpawnedDisplayEntityGroup {
      * @param pitch The pitch to set for this group
      */
     public void setPitch(float pitch){
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setPitch(pitch);
         }
     }
@@ -745,7 +784,7 @@ public final class SpawnedDisplayEntityGroup {
      * @param brightness the brightness to set, null to use brightness based on position
      */
     public void setBrightness(@Nullable Display.Brightness brightness){
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setBrightness(brightness);
         }
     }
@@ -755,7 +794,7 @@ public final class SpawnedDisplayEntityGroup {
      * @param billboard the billboard to set
      */
     public void setBillboard(Display.Billboard billboard){
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setBillboard(billboard);
         }
     }
@@ -765,7 +804,7 @@ public final class SpawnedDisplayEntityGroup {
      * @param range The color to set
      */
     public void setViewRange(float range){
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setViewRange(range);
         }
     }
@@ -791,7 +830,7 @@ public final class SpawnedDisplayEntityGroup {
     private void largestCulling(float widthAdder, float heightAdder){
         float maxWidth = 0;
         float maxHeight = 0;
-        for (SpawnedDisplayEntityPart part : spawnedParts) {
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()) {
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
                 continue;
             }
@@ -802,19 +841,19 @@ public final class SpawnedDisplayEntityGroup {
             maxHeight = Math.max(maxHeight, scale.y);
         }
 
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.cull(maxWidth + widthAdder, maxHeight + heightAdder);
         }
     }
 
     private void localCulling(float widthAdder, float heightAdder){
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.autoCull(widthAdder, heightAdder);
         }
     }
 
     private void noneCulling(){
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.cull(0, 0);
         }
     }
@@ -824,7 +863,7 @@ public final class SpawnedDisplayEntityGroup {
      * @param color The color to set
      */
     public void setGlowColor(Color color){
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setGlowColor(color);
         }
     }
@@ -856,7 +895,7 @@ public final class SpawnedDisplayEntityGroup {
         if (event.isCancelled()){
             return false;
         }
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.translateForce(distance, durationInTicks, delayInTicks, direction);
         }
         return true;
@@ -881,7 +920,7 @@ public final class SpawnedDisplayEntityGroup {
         if (event.isCancelled()){
             return false;
         }
-        for(SpawnedDisplayEntityPart part : spawnedParts){
+        for(SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.translateForce(distance, durationInTicks, delayInTicks, direction);
         }
         return true;
@@ -896,7 +935,7 @@ public final class SpawnedDisplayEntityGroup {
         if (tag == null){
             return this;
         }
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             Entity entity = part.getEntity();
             PersistentDataContainer pdc = entity.getPersistentDataContainer();
             pdc.set(DisplayEntityPlugin.getGroupTagKey(), PersistentDataType.STRING, tag);
@@ -936,13 +975,14 @@ public final class SpawnedDisplayEntityGroup {
      * Get this group's master part
      * @return This group's master part. Null if it could not be found
      */
-    public SpawnedDisplayEntityPart getMasterPart(){
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+    public @Nullable SpawnedDisplayEntityPart getMasterPart(){
+        return masterPart;
+        /*for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             if (part.isMaster()){
                 return part;
             }
         }
-        return null;
+        return null;*/
     }
 
     /**
@@ -959,7 +999,7 @@ public final class SpawnedDisplayEntityGroup {
      * @return this
      */
     public SpawnedDisplayEntityGroup glow(boolean ignoreUnglowable){
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             if (ignoreUnglowable && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY || part.getMaterial() == Material.AIR)){
                 continue;
             }
@@ -974,7 +1014,7 @@ public final class SpawnedDisplayEntityGroup {
      * @return this
      */
     public SpawnedDisplayEntityGroup glow(long durationInTicks, boolean ignoreUnglowable){
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             if (ignoreUnglowable && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY || part.getMaterial() == Material.AIR)){
                 continue;
             }
@@ -988,7 +1028,7 @@ public final class SpawnedDisplayEntityGroup {
      * @return this
      */
     public SpawnedDisplayEntityGroup unglow(){
-        for (SpawnedDisplayEntityPart part : spawnedParts){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.unglow();
         }
         return this;
@@ -1098,7 +1138,7 @@ public final class SpawnedDisplayEntityGroup {
                 if (!group.isSpawned() || followedEntity != entity.getUniqueId() || !entity.isValid()){
                     if (!entity.isValid() && unregisterAfterEntityDeathDelay > -1){
                         Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                            group.unregister(true);
+                            group.unregister(true, true);
                         }, unregisterAfterEntityDeathDelay);
                     }
                     cancel();
@@ -1208,7 +1248,7 @@ public final class SpawnedDisplayEntityGroup {
         }
         mergingGroup.removeAllPartSelections();
         mergingGroup.spawnedParts.clear();
-        mergingGroup.unregister(false);
+        mergingGroup.unregister(false, false);
 
         float widthCullingAdder = DisplayEntityPlugin.widthCullingAdder();
         float heightCullingAdder = DisplayEntityPlugin.heightCullingAdder();
@@ -1405,16 +1445,19 @@ public final class SpawnedDisplayEntityGroup {
 
     /**
      * Removes all stored SpawnedPartSelections and SpawnedDisplayEntityParts
-     * @param despawnParts Decides whether the parts should be despawned or not
+     * <p>
      * This unregisters anything related to the group within the DisplayEntityUtils Plugin
-     * This group will be unusable afterwards
+     * This group will be unusable afterwards.
+     * @param despawnParts Decides whether the parts should be despawned or not
+     * @param force Force load every chunk containing this group's parts to ensure parts are despawned. Only applies if despawnParts is true
+
      */
-    public void unregister(boolean despawnParts){
+    public void unregister(boolean despawnParts, boolean force){
         if (masterPart == null){
             return;
         }
         DisplayAnimatorStateMachine.unregisterFromStateMachine(this);
-        DisplayGroupManager.removeSpawnedGroup(this, despawnParts);
+        DisplayGroupManager.removeSpawnedGroup(this, despawnParts, force);
         masterPart = null;
         followedEntity = null;
     }
