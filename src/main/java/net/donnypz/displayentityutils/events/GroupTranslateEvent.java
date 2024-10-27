@@ -7,7 +7,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * Called when a SpawnDisplayEntityGroup translates it's parts, including both display and interaction entities.
+ * Called when a {@link SpawnedDisplayEntityGroup} translates its parts, including both display and interaction entities.
  * Can be cancelled
  */
 public class GroupTranslateEvent extends Event implements Cancellable {

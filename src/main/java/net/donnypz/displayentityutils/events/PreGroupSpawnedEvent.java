@@ -8,7 +8,8 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * Called before a {@link SpawnedDisplayEntityGroup} is created through {@link DisplayEntityGroup#spawn(Location, GroupSpawnedEvent.SpawnReason)} or any variation.
+ * Called before a {@link SpawnedDisplayEntityGroup}
+ * is created through {@link DisplayEntityGroup#spawn(Location, GroupSpawnedEvent.SpawnReason)} or any variation.
  * <p>
  * Can be cancelled
  */

@@ -10,6 +10,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
+
+/**
+ * An animation state machine to switch multiple different animation states of a group.
+ * This can manage many groups that share the same states and animations
+ */
 @ApiStatus.Experimental
 public class DisplayAnimatorStateMachine {
     private static final Map<SpawnedDisplayEntityGroup, DisplayAnimatorStateMachine> allStateMachines = new HashMap<>();

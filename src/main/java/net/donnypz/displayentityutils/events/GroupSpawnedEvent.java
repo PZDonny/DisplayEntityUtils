@@ -6,7 +6,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Called when a SpawnDisplayEntityGroup is spawned from a {@link net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup}.
+ * Called when a {@link SpawnedDisplayEntityGroup} is spawned from a {@link net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup}.
  */
 public class GroupSpawnedEvent extends Event {
     private static final HandlerList handlers = new HandlerList();

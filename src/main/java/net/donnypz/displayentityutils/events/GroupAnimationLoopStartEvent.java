@@ -6,6 +6,11 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+/**
+ * Called when {@link DisplayAnimator} begins a {@link SpawnedDisplayAnimation} loop.
+ * This is only called on animators with a type of {@link DisplayAnimator.AnimationType#LOOP}
+ * Refer to {@link GroupAnimationStartEvent} for linear animations
+ */
 public class GroupAnimationLoopStartEvent extends Event{
     private static final HandlerList handlers = new HandlerList();
     SpawnedDisplayEntityGroup spawnedDisplayEntityGroup;

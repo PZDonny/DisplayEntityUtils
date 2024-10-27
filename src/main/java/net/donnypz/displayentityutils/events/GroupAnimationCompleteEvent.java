@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Called at the completion of a {@link SpawnedDisplayAnimation}.
- * This is not called for looping animations unless the {@link DisplayAnimator} type is changed to LINEAR.
+ * This is not called for looping animations unless the {@link DisplayAnimator}'s type is changed from LOOPING to LINEAR.
  * Refer to {@link GroupAnimationLoopStartEvent} for looping animations instead
  */
 public class GroupAnimationCompleteEvent extends Event {
