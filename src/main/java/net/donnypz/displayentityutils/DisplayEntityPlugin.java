@@ -56,7 +56,6 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     static double maximumInteractionSearchRange;
     static boolean readSameChunks = true;
     static boolean autoPivotInteractions;
-    static boolean despawnGroupsOnServerStop;
     static boolean overwriteExistingSaves;
     static boolean unregisterOnUnload;
     static boolean isUnregisterOnUnloadBlacklist;
@@ -66,6 +65,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     static boolean cacheAnimations;
     static float widthCullingAdder;
     static float heightCullingAdder;
+    static boolean asynchronousAnimations;
 
     @Override
     public void onEnable() {
@@ -99,12 +99,6 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     public void onDisable() {
         MYSQLManager.closeConnection();
         MongoManager.closeConnection();
-        if (despawnGroupsOnServerStop){
-            for (SpawnedDisplayEntityGroup group : DisplayGroupManager.getAllSpawnedGroups()){
-                group.unregister(true);
-            }
-        }
-
     }
 
     private void createLocalSaveFolders(){
@@ -174,7 +168,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     /**
      * Gets the value of "automaticGroupDetection.maximumInteractionSearchRange" in the config
-     * @return the boolean value set in config
+     * @return the value set in config
      */
     public static double getMaximumInteractionSearchRange(){
         return maximumInteractionSearchRange;
@@ -247,7 +241,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     /**
      * Gets the value of "widthCullingAdder" in the config
-     * @return the boolean value set in config
+     * @return the float value set in config
      */
     public static float widthCullingAdder() {
         return widthCullingAdder;
@@ -255,18 +249,18 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     /**
      * Gets the value of "heightCullingAdder" in the config
-     * @return the boolean value set in config
+     * @return the float value set in config
      */
     public static float heightCullingAdder() {
         return heightCullingAdder;
     }
 
     /**
-     * Gets the value of "despawnGroupsOnServerStop" in the config
+     * Gets the value of "asynchronousAnimations" in the config
      * @return the boolean value set in config
      */
-    public static boolean despawnGroupsOnServerStop() {
-        return despawnGroupsOnServerStop;
+    public static boolean asynchronousAnimations() {
+        return asynchronousAnimations;
     }
 
     /**

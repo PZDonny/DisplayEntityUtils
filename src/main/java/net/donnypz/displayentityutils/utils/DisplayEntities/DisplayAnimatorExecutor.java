@@ -11,11 +11,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Interaction;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
+
+import java.util.UUID;
 
 public final class DisplayAnimatorExecutor {
     final DisplayAnimator animator;
@@ -47,12 +48,7 @@ public final class DisplayAnimatorExecutor {
             executeAnimation(animation, group, frame, playSingleFrame);
         }
         else{
-            new BukkitRunnable(){
-                @Override
-                public void run() {
-                    executeAnimation(animation, group, frame, playSingleFrame);
-                }
-            }.runTaskLater(DisplayEntityPlugin.getInstance(), delay);
+            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> executeAnimation(animation, group, frame, playSingleFrame), delay);
         }
     }
 
@@ -82,93 +78,9 @@ public final class DisplayAnimatorExecutor {
             new GroupAnimateFrameStartEvent(group, animator, animation, frame).callEvent();
             frame.playStartSounds(groupLoc);
             frame.showStartParticles(group);
-            for (SpawnedDisplayEntityPart part : group.spawnedParts){
-                if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){ //Interaction Entities
-                    Interaction i = (Interaction) part.getEntity();
-                    Vector currentVector = DisplayUtils.getInteractionTranslation(i);
-                    if (currentVector == null){
-                        continue;
-                    }
 
-                    Vector3f transform = frame.interactionTransformations.get(part.getPartUUID());
-                    if (transform == null){
-                        continue;
-                    }
-
-                    Vector v;
-                    float height = i.getInteractionHeight();
-                    float width = i.getInteractionWidth();
-                    float yawAtCreation = InteractionTransformation.invalidDirectionValue;
-                    if (transform instanceof InteractionTransformation t && t.vector != null){
-                        v = t.vector.clone();
-                        if (t.height != -1 && t.width != -1){
-                            height = t.height;
-                            width = t.width;
-                            if (animation.groupScaleRespect()){
-                                height*=group.getScaleMultiplier();
-                                width*=group.getScaleMultiplier();
-                            }
-                            yawAtCreation = t.groupYawAtCreation;
-                        }
-                    }
-                    else{
-                        v = Vector.fromJOML(transform);
-                    }
-
-                    if (animation.groupScaleRespect()){
-                        v.multiply(group.getScaleMultiplier());
-                    }
-
-                    if (yawAtCreation != InteractionTransformation.invalidDirectionValue){ //Pivot
-                        v.rotateAroundY(Math.toRadians(yawAtCreation - groupLoc.getYaw()));
-                    }
-
-                    if (!currentVector.equals(v)) {
-                        Vector moveVector = currentVector.subtract(v);
-                        part.translate((float) moveVector.length(), frame.duration, 0, moveVector);
-                    }
-
-                    DisplayUtils.scaleInteraction(i, height, width, frame.duration, 0);
-
-
-                }
-                else { //Display Entities
-                    Transformation transformation = frame.displayTransformations.get(part.getPartUUID());
-                    if (transformation == null){
-                        continue;
-                    }
-
-                    Display display = ((Display) part.getEntity());
-                    //Prevents jittering in some cases
-                    if (display.getTransformation().equals(transformation)){
-                        continue;
-                    }
-
-                    if (frame.duration > 0) {
-                        display.setInterpolationDelay(0);
-                    } else {
-                        display.setInterpolationDelay(-1);
-                    }
-                    display.setInterpolationDuration(frame.duration);
-
-                    //Group Scale Respect
-                    if (animation.respectGroupScale){
-                        try{
-                            Vector3f translationVector = (Vector3f) transformation.getTranslation().clone();
-                            translationVector.mul(group.getScaleMultiplier());
-                            Transformation respectTransform = new Transformation(translationVector, transformation.getLeftRotation(), display.getTransformation().getScale(), transformation.getRightRotation());
-                            display.setTransformation(respectTransform);
-                        }
-                        catch(CloneNotSupportedException e){
-                            Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"Failed to play animation frame (scale respect)");
-                            return;
-                        }
-                    }
-                    else{
-                        display.setTransformation(transformation);
-                    }
-                }
-            }
+            animateInteractions(groupLoc, frame, group, animation);
+            animateDisplays(frame, group, animation);
         }
 
         if (playSingleFrame){
@@ -254,4 +166,114 @@ public final class DisplayAnimatorExecutor {
             }
         }
     }
+
+    private void animateInteractions(Location groupLoc, SpawnedDisplayAnimationFrame frame, SpawnedDisplayEntityGroup group, SpawnedDisplayAnimation animation){
+        for (UUID partUUID : frame.interactionTransformations.keySet()){
+            SpawnedDisplayEntityPart part = group.getSpawnedPart(partUUID);
+            if (part == null){
+                continue;
+            }
+
+            Interaction i = (Interaction) part.getEntity();
+            Vector currentVector = DisplayUtils.getInteractionTranslation(i);
+            if (currentVector == null){
+                continue;
+            }
+
+            Vector3f transform = frame.interactionTransformations.get(partUUID);
+            if (transform == null){
+                continue;
+            }
+
+            Vector v;
+            float height = i.getInteractionHeight();
+            float width = i.getInteractionWidth();
+            float yawAtCreation = InteractionTransformation.invalidDirectionValue;
+            if (transform instanceof InteractionTransformation t && t.vector != null){
+                v = t.vector.clone();
+                if (t.height != -1 && t.width != -1){
+                    height = t.height;
+                    width = t.width;
+                    if (animation.groupScaleRespect()){
+                        height*=group.getScaleMultiplier();
+                        width*=group.getScaleMultiplier();
+                    }
+                    yawAtCreation = t.groupYawAtCreation;
+                }
+            }
+
+            else{
+                v = Vector.fromJOML(transform);
+            }
+
+            if (animation.groupScaleRespect()){
+                v.multiply(group.getScaleMultiplier());
+            }
+
+            if (yawAtCreation != InteractionTransformation.invalidDirectionValue){ //Pivot
+                v.rotateAroundY(Math.toRadians(yawAtCreation - groupLoc.getYaw()));
+            }
+
+            if (!currentVector.equals(v)) {
+                Vector moveVector = currentVector.subtract(v);
+                part.translate((float) moveVector.length(), frame.duration, 0, moveVector);
+            }
+
+            DisplayUtils.scaleInteraction(i, height, width, frame.duration, 0);
+        }
+    }
+
+    private void animateDisplays(SpawnedDisplayAnimationFrame frame, SpawnedDisplayEntityGroup group, SpawnedDisplayAnimation animation){
+        for (UUID partUUID : frame.displayTransformations.keySet()){
+            Transformation transformation = frame.displayTransformations.get(partUUID);
+            if (transformation == null){ //Part does not change transformation
+                continue;
+            }
+
+            SpawnedDisplayEntityPart part = group.getSpawnedPart(partUUID);
+            if (part == null){
+                continue;
+            }
+            Display display = ((Display) part.getEntity());
+            if (display.getTransformation().equals(transformation)){ //Prevents jittering in some cases
+                continue;
+            }
+
+            if (DisplayEntityPlugin.asynchronousAnimations()){ //Asynchronously apply transformation changes
+                Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+                    applyDisplayTransformation(display, frame, animation, group, transformation);
+                });
+            }
+            else{
+                applyDisplayTransformation(display, frame, animation, group, transformation);
+            }
+        }
+    }
+
+    private void applyDisplayTransformation(Display display, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, SpawnedDisplayEntityGroup group, Transformation transformation){
+        if (frame.duration > 0) {
+            display.setInterpolationDelay(0);
+        } else {
+            display.setInterpolationDelay(-1);
+        }
+        display.setInterpolationDuration(frame.duration);
+
+        if (animation.respectGroupScale){ //Group Scale Respect
+            try{
+                Vector3f translationVector = (Vector3f) transformation.getTranslation().clone();
+                translationVector.mul(group.getScaleMultiplier());
+                Transformation respectTransform = new Transformation(translationVector, transformation.getLeftRotation(), display.getTransformation().getScale(), transformation.getRightRotation());
+                display.setTransformation(respectTransform);
+            }
+            catch(CloneNotSupportedException e){
+                Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"Failed to play animation frame (scale respect)");
+            }
+        }
+        else{
+            display.setTransformation(transformation);
+        }
+    }
+
+
+
 }

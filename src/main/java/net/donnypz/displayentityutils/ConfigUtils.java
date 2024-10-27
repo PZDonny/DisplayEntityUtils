@@ -59,9 +59,9 @@ final class ConfigUtils {
         }
 
         DisplayEntityPlugin.autoPivotInteractions = config.getBoolean("autoPivotInteractionsOnSpawn");
-        DisplayEntityPlugin.despawnGroupsOnServerStop = config.getBoolean("despawnGroupsOnServerStop");
         DisplayEntityPlugin.overwriteExistingSaves = config.getBoolean("overwriteExistingSaves");
         DisplayEntityPlugin.autoSelectGroups = config.getBoolean("autoSelectGroups");
+
         String cullConfig = config.getString("cullOption");
         try{
             if (cullConfig != null){
@@ -82,6 +82,8 @@ final class ConfigUtils {
             DisplayEntityPlugin.widthCullingAdder = 0;
             DisplayEntityPlugin.heightCullingAdder = 0;
         }
+
+        DisplayEntityPlugin.asynchronousAnimations = config.getBoolean("asynchronousAnimations");
     }
     
     
