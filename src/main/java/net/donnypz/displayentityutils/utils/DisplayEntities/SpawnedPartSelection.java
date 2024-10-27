@@ -55,7 +55,7 @@ public final class SpawnedPartSelection {
     public SpawnedPartSelection(SpawnedDisplayEntityGroup group){
         this.group = group;
         if (!group.spawnedParts.isEmpty()){
-            selectedParts.addAll(group.spawnedParts);
+            selectedParts.addAll(group.spawnedParts.sequencedValues());
         }
         group.partSelections.add(this);
     }
@@ -69,6 +69,10 @@ public final class SpawnedPartSelection {
         return new ArrayList<>(selectedParts);
     }
 
+    /**
+     * Get the part that is selected out of all the parts within this SpawnedPartSelection
+     * @return a {@link SpawnedDisplayEntityPart}. Null if there are no parts in this selection
+     */
     public SpawnedDisplayEntityPart getSelectedPart() {
         return selectedPart;
     }

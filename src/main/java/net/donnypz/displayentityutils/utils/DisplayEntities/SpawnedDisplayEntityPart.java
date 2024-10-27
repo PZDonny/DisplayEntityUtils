@@ -51,13 +51,15 @@ public final class SpawnedDisplayEntityPart {
         this.partData = new PartData(entity);
         allParts.put(partData, this);
 
-        group.spawnedParts.add(this);
+
         if (isMaster()){
             group.masterPart = this;
         }
 
         //Transformation instantly updates if a Display Entity hasn't existed for 2 more than ticks
         setPartUUID(random);
+        group.spawnedParts.put(partUUID, this);
+        entity.setPersistent(group.isPersistent());
     }
 
 
@@ -73,8 +75,9 @@ public final class SpawnedDisplayEntityPart {
         this.partData = new PartData(entity);
         allParts.put(partData, this);
 
-        group.spawnedParts.add(this);
         setPartUUID(random);
+        group.spawnedParts.put(partUUID, this);
+        entity.setPersistent(group.isPersistent());
     }
 
     public void setPartUUID(UUID uuid){
@@ -123,13 +126,8 @@ public final class SpawnedDisplayEntityPart {
         return randomUUID;
     }
 
-    private boolean groupContainsUUID(UUID uuid){
-        for (SpawnedDisplayEntityPart part : group.spawnedParts){
-            if (part != this && uuid.equals(part.partUUID)){
-                return true;
-            }
-        }
-        return false;
+    private boolean groupContainsUUID(UUID partUUID){
+        return group.spawnedParts.containsKey(partUUID);
     }
 
     /** Get this part's UUID, used for animations and identifying parts
@@ -293,16 +291,12 @@ public final class SpawnedDisplayEntityPart {
             return this;
         }
 
+        UUID originalUUID = partUUID;
         if (this.group != null){
-            this.group.spawnedParts.remove(this);
+            this.group.spawnedParts.remove(originalUUID);
         }
 
         this.group = group;
-
-        if (!group.spawnedParts.contains(this)) {
-            group.spawnedParts.add(this);
-        }
-
         if (type != PartType.INTERACTION){
             Display display = (Display) entity;
             Entity master = group.masterPart.entity;
@@ -315,7 +309,11 @@ public final class SpawnedDisplayEntityPart {
             setPartUUID(group.partUUIDRandom);
         }
 
+        group.spawnedParts.remove(originalUUID);
+        group.spawnedParts.put(partUUID, this);
+
         entity.getPersistentDataContainer().set(new NamespacedKey(DisplayEntityPlugin.getInstance(), "creationtime"), PersistentDataType.LONG, group.getCreationTime());
+        entity.setPersistent(group.isPersistent());
         return this;
     }
 
@@ -744,16 +742,19 @@ public final class SpawnedDisplayEntityPart {
     /**
      * Removes this SpawnedDisplayEntityPart from it's SpawnedDisplayEntityGroup, without dismounting the part from the group.
      * This makes this part invalid and unusable after removal. If the part needs to be reused, see {@link #removeFromGroup()}
-     * @param kill Whether to kill this part when removed
-     * @return Returns the part's entity. Null if the entity was killed
+     * <p>
+     *     The part may not be killed if the part's entity is within an unloaded chunk
+     *     Create a chunk ticket for this entity's chunk to guarantee removal
+     * @param kill Whether to kill this part when removed.
+     * @return Returns the part's entity.
      */
     public Entity remove(boolean kill) {
         removeFromGroup();
         if (kill) {
-            if (entity.isValid()){
+            if (!entity.isDead()){
                 entity.remove();
             }
-            return null;
+            return entity;
         }
         Entity e = entity;
         entity = null;
@@ -761,13 +762,14 @@ public final class SpawnedDisplayEntityPart {
         return e;
     }
 
+
     /**
      * Removes this SpawnedDisplayEntityPart from it's SpawnedDisplayEntityGroup, without dismounting the part from the group.
      * This part will still be valid and can be readded to a group through {@link SpawnedDisplayEntityGroup#addSpawnedDisplayEntityPart(SpawnedDisplayEntityPart)}
      */
     public void removeFromGroup() {
         allParts.remove(partData);
-        group.spawnedParts.remove(this);
+        group.spawnedParts.remove(partUUID);
         group = null;
     }
 }

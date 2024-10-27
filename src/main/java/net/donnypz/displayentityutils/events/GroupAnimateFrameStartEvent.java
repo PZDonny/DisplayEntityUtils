@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 
 /**
- * Called when an animation frame begins
+ * Called when a {@link SpawnedDisplayAnimationFrame} begins on a {@link SpawnedDisplayAnimation}
  */
 public class GroupAnimateFrameStartEvent extends Event {
     private static final HandlerList handlers = new HandlerList();

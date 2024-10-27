@@ -52,7 +52,7 @@ class PartsRemoveCMD implements SubCommand{
 
         if (partSelection.getGroup().getSpawnedParts().size() <= 1){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Despawning your group, not enough parts remain");
-            partSelection.getGroup().unregister(true);
+            partSelection.getGroup().unregister(true, true);
             return;
         }
         partSelection.remove();

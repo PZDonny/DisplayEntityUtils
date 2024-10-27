@@ -14,6 +14,9 @@ import java.util.Collection;
 /**
  * Called when an interaction entity is clicked, before {@link InteractionClickEvent}.
  * Cancelling this event stops {@link InteractionClickEvent} from being called.
+ * <p>
+ * Listening to this event may be preferred over {@link InteractionClickEvent}, as this event does not load commands stored on an
+ * interaction entity.
  */
 public class PreInteractionClickEvent extends Event implements Cancellable {
 

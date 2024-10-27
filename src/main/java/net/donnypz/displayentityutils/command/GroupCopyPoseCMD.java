@@ -26,6 +26,6 @@ class GroupCopyPoseCMD implements SubCommand{
             return;
         }
         group.copyTransformation(copy.group());
-        copy.group().unregister(true);
+        copy.group().unregister(true, false);
     }
 }

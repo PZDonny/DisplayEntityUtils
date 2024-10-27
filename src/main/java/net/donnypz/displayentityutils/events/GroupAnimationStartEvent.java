@@ -10,7 +10,8 @@ import org.bukkit.event.HandlerList;
 import javax.annotation.Nullable;
 
 /**
- * Called when a SpawnDisplayEntityGroup is created.
+ * Called when a {@link DisplayAnimator} starts playing a {@link SpawnedDisplayAnimation}.
+ * This is called once on an animator of the type {@link DisplayAnimator.AnimationType#LOOP}.
  */
 public class GroupAnimationStartEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();

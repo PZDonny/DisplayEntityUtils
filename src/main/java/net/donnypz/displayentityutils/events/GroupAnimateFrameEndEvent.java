@@ -9,7 +9,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Called when an animation frame ends.
+ * Called when a {@link SpawnedDisplayAnimationFrame} ends in a {@link SpawnedDisplayAnimation}
  * This ignores the frame's delay and is called after translation of parts in the group.
  */
 public class GroupAnimateFrameEndEvent extends Event {

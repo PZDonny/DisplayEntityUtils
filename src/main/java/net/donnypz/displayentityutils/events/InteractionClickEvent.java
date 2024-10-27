@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Called when an Interaction Entity is clicked.
+ * Called when an Interaction Entity is clicked, providing commands stored on the entity, the clicker, and {@link ClickType}.
  */
 public class InteractionClickEvent extends Event implements Cancellable {
 

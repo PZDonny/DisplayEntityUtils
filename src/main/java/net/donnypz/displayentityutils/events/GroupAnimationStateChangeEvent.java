@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.events;
 
+import jdk.jfr.Experimental;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimatorStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -8,6 +9,12 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.Nullable;
 
+
+/**
+ * Called when a {@link SpawnedDisplayEntityGroup}'s animation state in a {@link DisplayAnimatorStateMachine} is changed.
+ * Can be cancelled.
+ */
+@Experimental
 public class GroupAnimationStateChangeEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private boolean isCancelled = false;

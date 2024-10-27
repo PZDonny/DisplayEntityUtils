@@ -120,7 +120,7 @@ public final class SpawnedDisplayAnimationFrame {
      */
     public SpawnedDisplayAnimationFrame setTransformation(@NotNull SpawnedDisplayEntityGroup group){
         Location gLoc = group.getLocation();
-        for (SpawnedDisplayEntityPart part : group.spawnedParts){
+        for (SpawnedDisplayEntityPart part : group.spawnedParts.values()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Interaction i = (Interaction) part.getEntity();
 
@@ -146,7 +146,7 @@ public final class SpawnedDisplayAnimationFrame {
         displayTransformations.clear();
         interactionTransformations.clear();
         Location gLoc = group.getLocation();
-        for (SpawnedDisplayEntityPart part : group.spawnedParts){
+        for (SpawnedDisplayEntityPart part : group.spawnedParts.values()){
         //Ignore if part does not have specified tag
             if (!part.hasTag(partTag)){
                 continue;
@@ -279,7 +279,7 @@ public final class SpawnedDisplayAnimationFrame {
      * Play the sounds that will play at the start of this frame at a specified location
      * @param location
      */
-    public void playStartSounds(Location location){
+    public void playStartSounds(@NotNull Location location){
         if (!location.isChunkLoaded()){
             return;
         }
@@ -293,7 +293,7 @@ public final class SpawnedDisplayAnimationFrame {
      * Play the sounds that will play at the end of this frame at a specified location
      * @param location
      */
-    public void playEndSounds(Location location){
+    public void playEndSounds(@NotNull Location location){
         if (!location.isChunkLoaded()){
             return;
         }
@@ -307,7 +307,7 @@ public final class SpawnedDisplayAnimationFrame {
      * Show the particles that will be displayed at the start of this frame
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
      */
-    public void showStartParticles(SpawnedDisplayEntityGroup group){
+    public void showStartParticles(@NotNull SpawnedDisplayEntityGroup group){
         for (AnimationParticle particle : frameStartParticles){
             particle.spawn(group);
         }
@@ -317,7 +317,7 @@ public final class SpawnedDisplayAnimationFrame {
      * Show the particles that will be displayed at the end of this frame
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
      */
-    public void showEndParticles(SpawnedDisplayEntityGroup group){
+    public void showEndParticles(@NotNull SpawnedDisplayEntityGroup group){
         for (AnimationParticle particle : frameEndParticles){
             particle.spawn(group);
         }

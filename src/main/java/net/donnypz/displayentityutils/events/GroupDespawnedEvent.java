@@ -6,7 +6,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * Called when a SpawnDisplayEntityGroup is mounted on top of an Entity.
+ * Called when a {@link SpawnedDisplayEntityGroup} is unregistered.
  * Can be cancelled
  */
 public class GroupDespawnedEvent extends Event implements Cancellable {
@@ -21,7 +21,7 @@ public class GroupDespawnedEvent extends Event implements Cancellable {
 
     /**
      * Get the {@link SpawnedDisplayEntityGroup} involved in this event
-     * @return
+     * @return a group
      */
     public SpawnedDisplayEntityGroup getGroup() {
         return spawnedDisplayEntityGroup;

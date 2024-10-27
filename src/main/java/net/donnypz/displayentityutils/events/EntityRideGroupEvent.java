@@ -7,7 +7,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * Called when an Entity is mounted on top of a SpawnedDisplayEntityGroup.
+ * Called when an Entity is mounted on top of a {@link SpawnedDisplayEntityGroup}.
  * Can be cancelled
  */
 public class EntityRideGroupEvent extends Event implements Cancellable {

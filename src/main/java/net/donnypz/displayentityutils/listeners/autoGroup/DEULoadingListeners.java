@@ -48,7 +48,7 @@ public final class DEULoadingListeners implements Listener {
 
         if (DisplayEntityPlugin.shouldUnregisterWorld(worldName)){
             for (SpawnedDisplayEntityGroup group : DisplayGroupManager.getSpawnedGroups(worldName)){
-                group.unregister(false);
+                group.unregister(false, false);
             }
         }
     }
