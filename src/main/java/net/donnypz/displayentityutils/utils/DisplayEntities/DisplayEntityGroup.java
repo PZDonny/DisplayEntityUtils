@@ -18,6 +18,7 @@ public final class DisplayEntityGroup implements Serializable{
     private final ArrayList<InteractionEntity> interactionEntities = new ArrayList<>();
     DisplayEntity masterEntity;
     private String tag;
+    private Boolean isPersistent = true;
 
     @Serial
     private static final long serialVersionUID = 99L;
@@ -29,24 +30,28 @@ public final class DisplayEntityGroup implements Serializable{
         Display spawnedMasterEntity = (Display) spawnedGroup.getMasterPart().getEntity();
         this.masterEntity = addDisplayEntity(spawnedMasterEntity).setMaster();
 
-        HashMap<UUID, DisplayEntity> displayPairs = new HashMap<>();
-        HashMap<UUID, InteractionEntity> interactionPairs = new HashMap<>();
+        //HashMap<UUID, DisplayEntity> displayPairs = new HashMap<>();
+        //HashMap<UUID, InteractionEntity> interactionPairs = new HashMap<>();
 
         for (SpawnedDisplayEntityPart part : spawnedGroup.getSpawnedParts()){
 
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Interaction i = (Interaction) part.getEntity();
-                InteractionEntity entity = addInteractionEntity(i);
-                interactionPairs.put(part.getPartUUID(), entity);
+                addInteractionEntity(i);
+                //InteractionEntity entity = addInteractionEntity(i);
+                //interactionPairs.put(part.getPartUUID(), entity);
             }
             else{
                 if (!part.isMaster()){
                     Display d = (Display) part.getEntity();
-                    DisplayEntity entity = addDisplayEntity(d);
-                    displayPairs.put(part.getPartUUID(), entity);
+                    addDisplayEntity(d);
+                    //DisplayEntity entity = addDisplayEntity(d);
+                    //displayPairs.put(part.getPartUUID(), entity);
                 }
             }
         }
+
+        this.isPersistent = spawnedGroup.isPersistent();
     }
 
     private DisplayEntity addDisplayEntity(Display entity){
@@ -167,6 +172,13 @@ public final class DisplayEntityGroup implements Serializable{
         }
         SpawnedDisplayEntityGroup spawnedGroup = new SpawnedDisplayEntityGroup(settings.visibleByDefault);
         Display blockDisplay = masterEntity.createEntity(location, settings);
+        if (isPersistent == null){
+            spawnedGroup.setPersistent(true);
+        }
+        else{
+            spawnedGroup.setPersistent(isPersistent);
+        }
+
 
         spawnedGroup.setTag(tag);
         spawnedGroup.addDisplayEntity(blockDisplay).setMaster();

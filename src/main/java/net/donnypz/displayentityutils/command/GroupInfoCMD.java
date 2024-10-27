@@ -32,6 +32,7 @@ class GroupInfoCMD implements SubCommand{
         player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: <yellow>"+groupTag));
         player.sendMessage(MiniMessage.miniMessage().deserialize("World: <yellow>"+group.getWorldName()));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Total Parts: <yellow>"+(group.getSpawnedParts().size() - 1)));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Is Persistent: <yellow>"+group.isPersistent()));
 
         Location loc = group.getLocation();
         player.sendMessage(MiniMessage.miniMessage().deserialize("Pitch: <yellow>"+loc.getPitch()));
