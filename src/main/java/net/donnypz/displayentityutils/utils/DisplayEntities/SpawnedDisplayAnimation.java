@@ -30,7 +30,7 @@ public final class SpawnedDisplayAnimation {
     SpawnedDisplayAnimation(SpawnedDisplayEntityGroup group){
         SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(0, 0);
         Location gLoc = group.getLocation();
-        for (SpawnedDisplayEntityPart part : group.spawnedParts){
+        for (SpawnedDisplayEntityPart part : group.spawnedParts.values()){
             if (part.isMaster()){
                 continue;
             }
@@ -52,14 +52,12 @@ public final class SpawnedDisplayAnimation {
         this.partTag = partTag;
         Location gLoc = group.getLocation();
         SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(0, 0);
-        for (SpawnedDisplayEntityPart part : group.spawnedParts){
+        for (SpawnedDisplayEntityPart part : group.spawnedParts.values()){
             if (part.isMaster()){
                 continue;
             }
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Interaction i = (Interaction) part.getEntity();
-
-
 
                 InteractionTransformation transform = new InteractionTransformation(DisplayUtils.getInteractionTranslation(i).toVector3f(), gLoc.getYaw(), gLoc.getPitch(), i.getInteractionHeight(), i.getInteractionWidth());
                 frame.setInteractionTransformation(part, transform);
