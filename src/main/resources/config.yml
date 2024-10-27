@@ -72,12 +72,6 @@ automaticGroupDetection:
 #in order to match the group's yaw
 autoPivotInteractionsOnSpawn: true
 
-
-#Despawns groups spawned and automatically detected during the current server session
-#  If groups were created before the server's current session those groups
-#  will not be automatically despawned, if automaticGroupDetection is false
-despawnGroupsOnServerStop: false
-
 #Enable this to allow overwriting of existing saved DisplayEntityGroups and Animations
 overwriteExistingSaves: true
 
@@ -108,6 +102,10 @@ heightCullingAdder: 1.5
 #those animations are saved on a database like MongoDB or MySQL. This will help prevent server lag/freezes, but also takes up
 #more memory.
 cacheAnimations: true
+
+#Play animations asynchronously to possibly improve performance
+#Set this value to false if animations do not display as intended
+asynchronousAnimations: true
 
 
 
