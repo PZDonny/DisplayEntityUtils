@@ -8,6 +8,7 @@ import net.donnypz.displayentityutils.utils.GroupResult;
 import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -145,23 +146,48 @@ public final class DisplayGroupManager {
     }
 
 
-    /**
-     * Removes and despawns a SpawnedDisplayEntityGroup along with it's SpawnedPartSelections
-     *
-     * @param spawnedGroup The SpawnedDisplayEntityGroup to be removed
-     */
     @ApiStatus.Internal
-    public static void removeSpawnedGroup(SpawnedDisplayEntityGroup spawnedGroup, boolean despawn) {
+    public static void removeSpawnedGroup(SpawnedDisplayEntityGroup spawnedGroup, boolean despawn, boolean force) {
         GroupDespawnedEvent event = new GroupDespawnedEvent(spawnedGroup);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return;
         }
 
+
+        if (force){
+            HashSet<Chunk> chunks = new HashSet<>();
+            Chunk mainChunk = spawnedGroup.getLocation().getChunk();
+            ticketChunk(mainChunk, chunks);
+            for (SpawnedDisplayEntityPart part : spawnedGroup.getSpawnedParts()) {
+                if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){ //Chunk may be different from main chunk
+                    Entity e = part.getEntity();
+                    Chunk c = e.getChunk();
+                    if (c != mainChunk){
+                        ticketChunk(c, chunks);
+                    }
+                }
+                part.remove(despawn);
+            }
+
+            for (Chunk c : chunks){ //Remove Chunk Tickets
+                c.removePluginChunkTicket(DisplayEntityPlugin.getInstance());
+            }
+        }
+        else{
+            for (SpawnedDisplayEntityPart part : spawnedGroup.getSpawnedParts()) {
+                part.remove(despawn);
+            }
+        }
+
         allSpawnedGroups.remove(spawnedGroup.getMasterPart());
         spawnedGroup.removeAllPartSelections();
-        for (SpawnedDisplayEntityPart part : spawnedGroup.getSpawnedParts()) {
-            part.remove(despawn);
+    }
+
+    private static void ticketChunk(Chunk chunk, HashSet<Chunk> chunks){
+        if (!chunk.isLoaded()){
+            chunk.addPluginChunkTicket(DisplayEntityPlugin.getInstance());
+            chunks.add(chunk);
         }
     }
 
@@ -389,6 +415,7 @@ public final class DisplayGroupManager {
             return null;
         }
         group = new SpawnedDisplayEntityGroup(displayEntity);
+        group.setPersistent(displayEntity.isPersistent());
         return new GroupResult(group, false);
     }
 
@@ -519,7 +546,7 @@ public final class DisplayGroupManager {
     }
 
     /**
-     * Get the list of all the SpawnedDisplayEntityGroups that have been registered during this play session.
+     * Get the list of all the {@link SpawnedDisplayEntityGroup}s that have been registered during this play session.
      *
      * @return List of all registered SpawnedDisplayEntityGroups
      */

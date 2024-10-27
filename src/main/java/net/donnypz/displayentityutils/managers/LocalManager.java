@@ -241,7 +241,7 @@ public final class LocalManager {
                             groupSuccess = false;
                         }
 
-                        createdGroup.unregister(true);
+                        createdGroup.unregister(true, true);
 
                         if (animationSuccess){
                             player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.GREEN+"Successfully converted BDEngine animation to DisplayAnimation.");

@@ -3,10 +3,7 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Color;
 import org.bukkit.entity.Player;
 
 class GroupDespawnCMD implements SubCommand{
@@ -24,6 +21,6 @@ class GroupDespawnCMD implements SubCommand{
 
         player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GRAY+"Successfully despawned selected display entity group!");
         DisplayGroupManager.deselectSpawnedGroup(player);
-        group.unregister(true);
+        group.unregister(true, true);
     }
 }
