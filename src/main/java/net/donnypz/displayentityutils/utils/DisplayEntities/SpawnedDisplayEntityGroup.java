@@ -27,7 +27,7 @@ public final class SpawnedDisplayEntityGroup {
     public static final long defaultPartUUIDSeed = 99;
 
     LinkedHashMap<UUID, SpawnedDisplayEntityPart> spawnedParts = new LinkedHashMap<>();
-    List<SpawnedPartSelection> partSelections = new ArrayList<>();
+    Set<SpawnedPartSelection> partSelections = new HashSet<>();
     private String tag;
     SpawnedDisplayEntityPart masterPart;
     long creationTime = System.currentTimeMillis();
@@ -265,7 +265,9 @@ public final class SpawnedDisplayEntityGroup {
     public void seedPartUUIDs(long seed){
         byte[] byteArray;
         Random random = new Random(seed);
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
+        SequencedCollection<SpawnedDisplayEntityPart> parts = getSpawnedParts();
+        spawnedParts.clear();
+        for (SpawnedDisplayEntityPart part : parts){
             byteArray = new byte[16];
             random.nextBytes(byteArray);
             part.setPartUUID(UUID.nameUUIDFromBytes(byteArray));
@@ -1380,11 +1382,11 @@ public final class SpawnedDisplayEntityGroup {
      * @param frame the frame to display
      * @return false if this group is in an unloaded chunk
      */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
+    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, boolean isAsync) {
         if (!isInLoadedChunk()){
             return false;
         }
-        DisplayAnimatorExecutor.setGroupToFrame(this, animation, frame);
+        DisplayAnimatorExecutor.setGroupToFrame(this, animation, frame, isAsync);
         return true;
     }
 
@@ -1458,6 +1460,7 @@ public final class SpawnedDisplayEntityGroup {
         }
         DisplayAnimatorStateMachine.unregisterFromStateMachine(this);
         DisplayGroupManager.removeSpawnedGroup(this, despawnParts, force);
+        spawnedParts.clear();
         masterPart = null;
         followedEntity = null;
     }
