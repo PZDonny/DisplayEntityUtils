@@ -4,13 +4,12 @@ import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Interaction;
+import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public final class SpawnedDisplayAnimation {
     String animationTag;
@@ -122,20 +121,55 @@ public final class SpawnedDisplayAnimation {
     /**
      * Add a frame to this SpawnedDisplayAnimation
      * @param frame the frame to add
-     * @return An empty frame if the passed in frame is identical to the frame before it, else the passed in frame
      */
-    public SpawnedDisplayAnimationFrame addFrame(SpawnedDisplayAnimationFrame frame){
-        if (!frames.isEmpty() && frames.getLast().equals(frame)){
-            SpawnedDisplayAnimationFrame newFrame = new SpawnedDisplayAnimationFrame(frame.delay, frame.duration);
-            frames.add(newFrame);
-            return newFrame;
+    public void addFrame(SpawnedDisplayAnimationFrame frame){
+        if (frames.isEmpty()){
+            frames.add(frame);
+            return;
         }
-        frames.add(frame);
-        return frame;
+        SpawnedDisplayAnimationFrame lastFrame = frames.getLast(); //Compare previous frame
+
+        //Remove identical part changes
+        for (UUID partUUID : lastFrame.displayTransformations.keySet()){
+            Transformation oldT = lastFrame.displayTransformations.get(partUUID);
+            Transformation newT = frame.displayTransformations.get(partUUID);
+            if (oldT != null && newT != null){
+                if (newT.equals(oldT)){ //Remove identical Display Entity changes
+                    frame.displayTransformations.remove(partUUID);
+                }
+            }
+        }
+
+        for (UUID partUUID : lastFrame.interactionTransformations.keySet()){
+            Vector3f oldV = lastFrame.interactionTransformations.get(partUUID);
+            Vector3f newV = frame.interactionTransformations.get(partUUID);
+            if (oldV != null && newV != null){
+                if (newV.equals(oldV)){ //Remove identical Interaction changes
+                    frame.interactionTransformations.remove(partUUID);
+                }
+            }
+        }
+
+        if (!frame.isEmptyFrame()){ //Changes still remain after frame size reduction
+            frames.add(frame);
+        }
+        else{
+            lastFrame.delay+=frame.delay+frame.duration;
+        }
+
+        /*if (!frames.isEmpty() && frames.getLast().equals(frame)){
+            lastFrame.duration+=frame.duration;
+            lastFrame.delay+= frame.delay;
+            //SpawnedDisplayAnimationFrame newFrame = new SpawnedDisplayAnimationFrame(frame.delay, frame.duration);
+            //frames.add(newFrame);
+            //return newFrame;
+        }*/
+
+        //return frame;
     }
 
     /**
-     * Add a frame to this {@link SpawnedDisplayAnimation} even if the previous frame is identical
+     * Add a frame to this {@link SpawnedDisplayAnimation} without any optimizations
      * @param frame the frame to add
      */
     public void forceAddFrame(SpawnedDisplayAnimationFrame frame){
@@ -169,7 +203,7 @@ public final class SpawnedDisplayAnimation {
     }
 
     /**
-     * Remove all frames from the animation and make it essentially unusable.
+     * Remove all frames from the animation, making it essentially unusable.
      */
     public void remove(){
         for (SpawnedDisplayAnimationFrame frame : frames){
@@ -215,8 +249,9 @@ public final class SpawnedDisplayAnimation {
             newFrame.interactionTransformations = new HashMap<>(frame.interactionTransformations);
             reversed.addFrame(newFrame);
         }
-        reversed.partTag = partTag;
-        reversed.respectGroupScale = respectGroupScale;
+        reversed.animationTag = this.animationTag;
+        reversed.partTag = this.partTag;
+        reversed.respectGroupScale = this.respectGroupScale;
         return reversed;
     }
 
