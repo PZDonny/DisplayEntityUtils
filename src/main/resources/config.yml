@@ -103,9 +103,9 @@ heightCullingAdder: 1.5
 #more memory.
 cacheAnimations: true
 
-#Play animations asynchronously to possibly improve performance
-#Set this value to false if animations do not display as intended
-asynchronousAnimations: true
+#Attempt to improve server performance by playing animations asynchronously
+#Keep this value as false if animations do not display as intended or are choppy
+asynchronousAnimations: false
 
 
 
