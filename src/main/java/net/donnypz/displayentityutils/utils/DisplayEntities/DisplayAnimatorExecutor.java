@@ -6,7 +6,8 @@ import net.donnypz.displayentityutils.events.GroupAnimateFrameStartEvent;
 import net.donnypz.displayentityutils.events.GroupAnimationCompleteEvent;
 import net.donnypz.displayentityutils.events.GroupAnimationLoopStartEvent;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
@@ -22,17 +23,20 @@ public final class DisplayAnimatorExecutor {
     final DisplayAnimator animator;
     final long animationTimestamp;
     private final boolean playSingleFrame;
+    private final boolean isAsync;
 
     DisplayAnimatorExecutor(DisplayAnimator animator, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayEntityGroup group, @NotNull SpawnedDisplayAnimationFrame frame, int delay, long animationTimestamp){
         this.animator = animator;
         this.animationTimestamp = animationTimestamp;
+        this.isAsync = DisplayEntityPlugin.asynchronousAnimations();
         playSingleFrame = false;
         executeAnimation(animation, group, frame, delay);
     }
 
-    private DisplayAnimatorExecutor(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayEntityGroup group, @NotNull SpawnedDisplayAnimationFrame frame, int delay, long animationTimestamp){
+    private DisplayAnimatorExecutor(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayEntityGroup group, @NotNull SpawnedDisplayAnimationFrame frame, int delay, long animationTimestamp, boolean isAsync){
         this.animator = null;
         this.animationTimestamp = animationTimestamp;
+        this.isAsync = isAsync;
         playSingleFrame = true;
         executeAnimation(animation, group, frame, delay);
     }
@@ -58,10 +62,10 @@ public final class DisplayAnimatorExecutor {
      * @param animation the animation the frame is from
      * @param frame the frame to display
      */
-    public static void setGroupToFrame(@NotNull SpawnedDisplayEntityGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame){
+    public static void setGroupToFrame(@NotNull SpawnedDisplayEntityGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, boolean isAsync){
         long timeStamp = System.currentTimeMillis();
         group.setLastAnimationTimeStamp(timeStamp);
-        new DisplayAnimatorExecutor(animation, group, frame,0, timeStamp);
+        new DisplayAnimatorExecutor(animation, group, frame,0, timeStamp, isAsync);
     }
 
     private void executeAnimation(SpawnedDisplayAnimation animation, SpawnedDisplayEntityGroup group, SpawnedDisplayAnimationFrame frame, boolean playSingleFrame){
@@ -194,7 +198,7 @@ public final class DisplayAnimatorExecutor {
                 if (t.height != -1 && t.width != -1){
                     height = t.height;
                     width = t.width;
-                    if (animation.groupScaleRespect()){
+                    if (group.getScaleMultiplier() != 1 && animation.groupScaleRespect()){
                         height*=group.getScaleMultiplier();
                         width*=group.getScaleMultiplier();
                     }
@@ -206,7 +210,7 @@ public final class DisplayAnimatorExecutor {
                 v = Vector.fromJOML(transform);
             }
 
-            if (animation.groupScaleRespect()){
+            if (group.getScaleMultiplier() != 1 && animation.groupScaleRespect()){
                 v.multiply(group.getScaleMultiplier());
             }
 
@@ -239,7 +243,7 @@ public final class DisplayAnimatorExecutor {
                 continue;
             }
 
-            if (DisplayEntityPlugin.asynchronousAnimations()){ //Asynchronously apply transformation changes
+            if (isAsync){ //Asynchronously apply transformation changes
                 Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
                     applyDisplayTransformation(display, frame, animation, group, transformation);
                 });
@@ -253,20 +257,26 @@ public final class DisplayAnimatorExecutor {
     private void applyDisplayTransformation(Display display, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, SpawnedDisplayEntityGroup group, Transformation transformation){
         if (frame.duration > 0) {
             display.setInterpolationDelay(0);
-        } else {
+        }
+        else {
             display.setInterpolationDelay(-1);
         }
         display.setInterpolationDuration(frame.duration);
 
-        if (animation.respectGroupScale){ //Group Scale Respect
+        if (animation.respectGroupScale){
             try{
                 Vector3f translationVector = (Vector3f) transformation.getTranslation().clone();
-                translationVector.mul(group.getScaleMultiplier());
-                Transformation respectTransform = new Transformation(translationVector, transformation.getLeftRotation(), display.getTransformation().getScale(), transformation.getRightRotation());
+                Vector3f scaleVector = (Vector3f) transformation.getScale().clone();
+                if (group.getScaleMultiplier() != 1){
+                    translationVector.mul(group.getScaleMultiplier());
+                    scaleVector.mul(group.getScaleMultiplier());
+                }
+                Transformation respectTransform = new Transformation(translationVector, transformation.getLeftRotation(), scaleVector, transformation.getRightRotation());
                 display.setTransformation(respectTransform);
             }
             catch(CloneNotSupportedException e){
-                Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"Failed to play animation frame (scale respect)");
+                Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix
+                        .append(Component.text("Failed to play animation frame (scale respect)", NamedTextColor.RED)));
             }
         }
         else{
