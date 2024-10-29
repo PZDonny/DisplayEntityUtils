@@ -6,7 +6,6 @@ import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
 class GroupMoveCMD implements SubCommand{
@@ -31,20 +30,20 @@ class GroupMoveCMD implements SubCommand{
             Direction direction = Direction.valueOf(args[2].toUpperCase());
             double distance = Double.parseDouble(args[3]);
             if (distance <= 0){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a number greater than 0 for the distance!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a number greater than 0 for the distance!", NamedTextColor.RED)));
                 return;
             }
             int duration = Integer.parseInt(args[4]);
             if (duration <= 0){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a whole number greater than 0 for the duration!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a whole number greater than 0 for the duration!", NamedTextColor.RED)));
                 return;
             }
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Moving spawned display entity group!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Moving spawned display entity group!", NamedTextColor.GREEN)));
             group.teleportMove(direction, distance, duration);
         }
         catch(IllegalArgumentException e){
             if (e instanceof NumberFormatException){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter valid numbers!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter valid numbers!", NamedTextColor.RED)));
             }
             else{
                 DisplayEntityPluginCommand.invalidDirection(player);

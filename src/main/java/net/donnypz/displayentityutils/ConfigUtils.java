@@ -3,7 +3,8 @@ package net.donnypz.displayentityutils;
 import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
 import net.donnypz.displayentityutils.utils.CullOption;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -107,7 +108,7 @@ final class ConfigUtils {
         try {
             externalConfig.save(configFile);
             if (wasUpdated){
-                Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.YELLOW+" Plugin Config Updated!");
+                Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Plugin Config Updated!", NamedTextColor.YELLOW)));
             }
 
         } catch (IOException e) {

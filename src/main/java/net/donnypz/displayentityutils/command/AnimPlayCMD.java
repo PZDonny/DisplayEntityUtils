@@ -7,7 +7,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
 class AnimPlayCMD implements SubCommand{
@@ -36,11 +35,12 @@ class AnimPlayCMD implements SubCommand{
 
         if (args.length >= 3 && args[2].equalsIgnoreCase("-loop")){
             group.animateLooping(anim);
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.GREEN + "Playing Animation! " + ChatColor.YELLOW+"(LOOPING)");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Playing Animation!"))
+                    .append(Component.text(" (LOOPING)", NamedTextColor.YELLOW)));
         }
         else{
             group.animate(anim);
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.GREEN + "Playing Animation!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Playing Animation!", NamedTextColor.GREEN)));
         }
     }
 }

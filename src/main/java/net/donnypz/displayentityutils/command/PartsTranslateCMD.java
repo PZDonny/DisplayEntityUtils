@@ -9,7 +9,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
 class PartsTranslateCMD implements SubCommand{
@@ -32,7 +31,7 @@ class PartsTranslateCMD implements SubCommand{
         }
 
         if (args.length < 5){
-            player.sendMessage(Component.text("/mdis parts translate <direction> <distance> <tick-duration> [-all]", NamedTextColor.RED));
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("/mdis parts translate <direction> <distance> <tick-duration> [-all]", NamedTextColor.RED)));
             return;
         }
 
@@ -40,7 +39,7 @@ class PartsTranslateCMD implements SubCommand{
             Direction direction = Direction.valueOf(args[2].toUpperCase());
             float distance = Float.parseFloat(args[3]);
             if (distance <= 0){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"Enter a number greater than 0 for the distance!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a number greater than 0 for the distance!", NamedTextColor.RED)));
                 return;
             }
             int duration = Integer.parseInt(args[4]);
@@ -49,18 +48,18 @@ class PartsTranslateCMD implements SubCommand{
             }
             if (args.length >= 6 && args[5].equalsIgnoreCase("-all")){
                 partSelection.translate(distance, duration, -1, direction);
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Translating all selected parts!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Translating all selected parts!", NamedTextColor.GREEN)));
             }
             else{
                 SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
                 selected.translate(distance, duration, -1, direction);
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Translating your selected part!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Translating your selected part!", NamedTextColor.GREEN)));
             }
 
         }
         catch(IllegalArgumentException e){
             if (e instanceof NumberFormatException){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter valid numbers!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter valid numbers!", NamedTextColor.RED)));
                 player.sendMessage(Component.text("Duration must be a positive whole number, distance can be any positive number", NamedTextColor.GRAY, TextDecoration.ITALIC));
             }
             else{

@@ -6,7 +6,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
@@ -30,12 +29,12 @@ class TextSeeThroughCMD implements SubCommand{
 
         SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
         if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "You can only do this with text display entities");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
             return;
         }
 
         TextDisplay display = (TextDisplay) selected.getEntity();
         display.setSeeThrough(!display.isSeeThrough());
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Successfully toggled see through of text display!");
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully toggled see through of text display!", NamedTextColor.GREEN)));
     }
 }

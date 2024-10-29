@@ -5,7 +5,6 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
 class GroupMoveHereCMD implements SubCommand{
@@ -23,9 +22,9 @@ class GroupMoveHereCMD implements SubCommand{
 
         boolean result = group.teleport(player.getLocation(), true);
         if (!result){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Failed to move spawned display entity group to your location");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to move spawned display entity group to your location", NamedTextColor.RED)));
             return;
         }
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Moved spawned group to your location!");
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Moved spawned group to your location!", NamedTextColor.GREEN)));
     }
 }

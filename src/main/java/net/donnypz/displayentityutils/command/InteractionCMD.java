@@ -58,13 +58,13 @@ class InteractionCMD implements SubCommand{
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         sender.sendMessage(Component.text("These commands prioritize the interaction entity you're looking at over the one you may have selected", NamedTextColor.GRAY));
         CMDUtils.sendCMD(sender, "/mdis interaction help", " (Get help for interactions)");
-        CMDUtils.sendCMD(sender,"/mdis interaction height <height>", " (Set the height of an interaction)");
-        CMDUtils.sendCMD(sender,"/mdis interaction width <width>", " (Set the width of an interaction)");
+        CMDUtils.sendCMD(sender, "/mdis interaction height <height>", " (Set the height of an interaction)");
+        CMDUtils.sendCMD(sender, "/mdis interaction width <width>", " (Set the width of an interaction)");
         CMDUtils.sendCMD(sender, "/mdis interaction scale <height> <width> <tick-duration> <tick-delay>", " (Scale an interaction entity over a period of time)");
-        CMDUtils.sendCMD(sender,"/mdis interaction addcmd <player | console> <left | right | both> <command>", " (Add a command to an interaction)");
-        CMDUtils.sendCMD(sender,"/mdis interaction listcmds", "(List all commands stored on an interaction)");
-        CMDUtils.sendCMD(sender,"/mdis interaction pivot <angle>", " (Pivot an interaction around it's group's actual location center)");
-        CMDUtils.sendCMD(sender,"/mdis interaction pivotselection <angle>", " (Pivot all Interactions in a part selection)");
+        CMDUtils.sendCMD(sender, "/mdis interaction addcmd <player | console> <left | right | both> <command>", " (Add a command to an interaction)");
+        CMDUtils.sendCMD(sender, "/mdis interaction listcmds", "(List all commands stored on an interaction)");
+        CMDUtils.sendCMD(sender, "/mdis interaction pivot <angle>", " (Pivot an interaction around it's group's actual location center)");
+        CMDUtils.sendCMD(sender, "/mdis interaction pivotselection <angle>", " (Pivot all Interactions in a part selection)");
     }
 
     static Interaction getInteraction(Player p, boolean checkTargeted){
@@ -86,7 +86,7 @@ class InteractionCMD implements SubCommand{
 
                 SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
                 if (selected.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION) {
-                    p.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "You can only do this with interaction entities");
+                    p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You can only do this with interaction entities", NamedTextColor.RED)));
                     return null;
                 }
                 return (Interaction) selected.getEntity();
@@ -95,7 +95,7 @@ class InteractionCMD implements SubCommand{
     }
 
     private static void noPartSelectionInteraction(Player player){
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You must look at the interaction you wish to add the command to, or select a part!");
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You must look at the interaction you wish to add the command to, or select a part!", NamedTextColor.RED)));
         player.sendMessage(Component.text("/mdis parts cycle <first | prev | next | last>", NamedTextColor.GRAY));
         player.sendMessage(Component.text("/mdis parts select <part-tag>", NamedTextColor.GRAY));
     }

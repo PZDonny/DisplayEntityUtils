@@ -6,6 +6,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.GroupResult;
 import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -399,7 +401,7 @@ public final class DisplayGroupManager {
             displayEntity = (Display) displayEntity.getVehicle();
         } else if (displayEntity.getPassengers().isEmpty()) {
             if (getter != null) {
-                getter.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "The selected display entity is not grouped");
+                getter.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("The selected display entity is not grouped", NamedTextColor.RED)));
             }
             return null;
         }
@@ -484,7 +486,7 @@ public final class DisplayGroupManager {
         Display master = getNearestDisplayEntity(location, radius, tag);
         if (master == null) {
             if (getter != null) {
-                getter.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "Could not find display entities within " + radius + " blocks of you, with the tag, \"" + tag + "\"");
+                getter.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Could not find display entities within " + radius + " blocks of you, with the tag, \"" + tag + "\"", NamedTextColor.RED)));
             }
             return null;
         }
@@ -503,7 +505,7 @@ public final class DisplayGroupManager {
         Display master = getNearestDisplayEntity(location, radius);
         if (master == null){
             if (getter != null) {
-                getter.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "You are not near any spawned display entity groups!");
+                getter.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You are not near any spawned display entity groups!", NamedTextColor.RED)));
             }
             return null;
         }

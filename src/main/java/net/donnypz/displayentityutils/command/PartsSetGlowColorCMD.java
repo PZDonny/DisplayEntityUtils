@@ -8,7 +8,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection
 import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.entity.Player;
 
@@ -32,14 +31,14 @@ class PartsSetGlowColorCMD implements SubCommand{
         }
 
         if (args.length < 3) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + "Enter a valid color!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a valid color!", NamedTextColor.RED)));
             player.sendMessage(Component.text("/mdis parts setglowcolor <color | hex-code> [-all]", NamedTextColor.GRAY));
             return;
         }
 
         Color c = DEUCommandUtils.getColorFromText(args[2]);
         if (c == null){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+"Enter a valid color!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a valid color!", NamedTextColor.RED)));
             player.sendMessage(Component.text("/mdis parts setglowcolor <color | hex-code> [-all]", NamedTextColor.GRAY));
             return;
         }
@@ -49,17 +48,17 @@ class PartsSetGlowColorCMD implements SubCommand{
                 part.setGlowColor(c);
             }
             selection.glow(60, true);
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Glow color successfully set for selected display entity part(s) in your part selection!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Glow color successfully set for selected display entity part(s) in your part selection!", NamedTextColor.GREEN)));
         }
         else{
             SpawnedDisplayEntityPart selectedPart = selection.getSelectedPart();
             selectedPart.setGlowColor(c);
             if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION) {
                 selectedPart.glow(60);
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Failed to set glow color of selected part! It's an Interaction entity.");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to set glow color of selected part! It's an Interaction entity.", NamedTextColor.RED)));
             }
             else{
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Glow color successfully set for selected display entity part(s) in your part selection!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Glow color successfully set for selected display entity part(s) in your part selection!", NamedTextColor.GREEN)));
             }
         }
     }

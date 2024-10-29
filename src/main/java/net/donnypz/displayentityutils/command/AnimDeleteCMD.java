@@ -3,10 +3,9 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
 class AnimDeleteCMD implements SubCommand{
@@ -22,7 +21,7 @@ class AnimDeleteCMD implements SubCommand{
 
         String tag = args[2];
 
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.GRAY+"Attempting to delete display animation "+ChatColor.WHITE+"(Tagged: "+tag+")");
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<gray>Attempting to delete display animation <white>(Tagged: "+tag+")")));
         switch(args[3].toLowerCase()){
             case "all" ->{
                 DisplayAnimationManager.deleteDisplayAnimation(LoadMethod.LOCAL, tag, player);

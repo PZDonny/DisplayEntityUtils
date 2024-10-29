@@ -10,6 +10,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -34,7 +35,7 @@ class GroupSpawnCMD implements SubCommand{
 
     private static void spawnGroup(Player p, String tag, String storage){
         if (storage.equals("all")){
-            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Attempting to spawn display entity group from all storage locations");
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Attempting to spawn display entity group from all storage locations", NamedTextColor.YELLOW)));
             attemptAll(p, tag, LoadMethod.LOCAL, true);
             return;
         }
@@ -69,7 +70,7 @@ class GroupSpawnCMD implements SubCommand{
             }
         },1);
 
-        p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Successfully spawned display entity group at your location! "+ChatColor.WHITE+"(Tagged: "+tag+")");
+        p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully spawned display entity group at your location! <white>(Tagged: "+tag+")")));
     }
 
 
@@ -77,7 +78,7 @@ class GroupSpawnCMD implements SubCommand{
         LoadMethod nextStorage;
         if (storage == LoadMethod.LOCAL){
             nextStorage = LoadMethod.MONGODB;
-            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Attempting to spawn group "+ChatColor.WHITE+"(Tagged: "+tag+")");
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Attempting to spawn group <white>(Tagged: "+tag+")")));
             if (!DisplayEntityPlugin.isLocalEnabled()){
                 p.sendMessage(Component.text("- Local storage is disabled, checking MongoDB...", NamedTextColor.GRAY));
                 attemptAll(p, tag, nextStorage, isGroup);
@@ -110,7 +111,7 @@ class GroupSpawnCMD implements SubCommand{
                     return;
                 }
 
-                p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Successfully spawned display entity group at your location! "+ChatColor.WHITE+"(Tagged: "+tag+")");
+                p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully spawned display entity group at your location! <white>(Tagged: "+tag+")")));
                 Location spawnLoc = p.getLocation();
 
                 Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
@@ -136,7 +137,7 @@ class GroupSpawnCMD implements SubCommand{
                     return;
                 }
                 DisplayAnimationManager.setSelectedSpawnedAnimation(p, anim.toSpawnedDisplayAnimation());
-                p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Successfully selected display animation! "+ChatColor.WHITE+"(Tagged: "+tag+")");
+                p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully selected display animation! <white>(Tagged: "+tag+")")));
             }
         });
     }

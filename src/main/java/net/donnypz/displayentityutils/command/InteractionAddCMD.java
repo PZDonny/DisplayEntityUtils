@@ -4,7 +4,7 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 
@@ -68,12 +68,12 @@ class InteractionAddCMD implements SubCommand{
         if (isBoth){
             DisplayUtils.addInteractionCommand(interaction, command, true, isConsole);
             DisplayUtils.addInteractionCommand(interaction, command, false, isConsole);
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Command Added! "+ChatColor.YELLOW+"("+command+")");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Command Added! <yellow>("+command+")")));
         }
         else{
             DisplayUtils.addInteractionCommand(interaction, command, isLeftClick, isConsole);
             int cmdID = DisplayUtils.getInteractionCommands(interaction).size()-1;
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Command Added! "+ChatColor.YELLOW+"(ID: "+cmdID+" | "+command+")");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Command Added! <yellow>(ID: "+cmdID+" | "+command+")")));
         }
     }
 }

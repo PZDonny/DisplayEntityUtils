@@ -11,6 +11,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.Binary;
@@ -250,7 +251,7 @@ public final class MongoManager{
                     groupCollection = database.getCollection(groupColl);
                     animationCollection = database.getCollection(animColl);
 
-                    Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.AQUA+"Successfully connected to"+ChatColor.GREEN+ " MongoDB!");
+                    Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <green>MongoDB!")));
                     isConnected = true;
                 }catch (IllegalArgumentException | MongoException e){
                     isConnected = false;

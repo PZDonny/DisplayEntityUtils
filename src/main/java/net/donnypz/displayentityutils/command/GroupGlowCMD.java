@@ -2,7 +2,6 @@ package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,7 +21,7 @@ class GroupGlowCMD implements SubCommand{
             return;
         }
 
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.GREEN + "Glowing selected spawned display entity group!");
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Glowing selected spawned display entity group!", NamedTextColor.GREEN)));
         group.glow(100, false);
     }
 }

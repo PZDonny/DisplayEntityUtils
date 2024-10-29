@@ -3,7 +3,6 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 
@@ -29,7 +28,7 @@ class InteractionHeightCMD implements SubCommand{
         try{
             float change = Float.parseFloat(args[2]);
             if (change <= 0){
-                p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Invalid "+dim+", enter a positive number!");
+                p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid "+dim+", enter a positive number!", NamedTextColor.RED)));
                 return;
             }
             if (dim.equals("height")){
@@ -39,10 +38,10 @@ class InteractionHeightCMD implements SubCommand{
                 interaction.setInteractionWidth(change);
             }
 
-            p.sendMessage(ChatColor.GREEN+"Successfully set interaction entity's "+dim+" to "+change);
+            p.sendMessage(Component.text("Successfully set interaction entity's "+dim+" to "+change, NamedTextColor.GREEN));
         }
-        catch(NumberFormatException e){
-            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Invalid "+dim+", enter a positive number!");
+        catch(NumberFormatException e) {
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid " + dim + ", enter a positive number!", NamedTextColor.RED)));
         }
     }
 }

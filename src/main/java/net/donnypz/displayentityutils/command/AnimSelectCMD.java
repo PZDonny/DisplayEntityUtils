@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -27,7 +28,7 @@ class AnimSelectCMD implements SubCommand{
 
     static void getAnimation(Player p, String tag, String storage){
         if (storage.equals("all")){
-            p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Attempting to spawn display from all storage locations");
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Attempting to spawn display from all storage locations", NamedTextColor.YELLOW)));
             GroupSpawnCMD.attemptAll(p, tag, LoadMethod.LOCAL, false);
             return;
         }
@@ -51,6 +52,6 @@ class AnimSelectCMD implements SubCommand{
             return;
         }
         DisplayAnimationManager.setSelectedSpawnedAnimation(p, anim.toSpawnedDisplayAnimation());
-        p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Successfully selected display animation! "+ChatColor.WHITE+"(Tagged: "+tag+")");
+        p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully selected display animation! <white>(Tagged: "+tag+")")));
     }
 }

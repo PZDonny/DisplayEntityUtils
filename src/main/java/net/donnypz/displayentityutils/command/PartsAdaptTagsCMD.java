@@ -5,7 +5,8 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 class PartsAdaptTagsCMD implements SubCommand{
@@ -32,17 +33,17 @@ class PartsAdaptTagsCMD implements SubCommand{
             for (SpawnedDisplayEntityPart part : group.getSpawnedParts()){
                 part.adaptScoreboardTags(removeFromSB);
             }
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Adapted all scoreboard tags in your selected group!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Adapted all scoreboard tags in your selected group!", NamedTextColor.GREEN)));
         }
         else{ //Adapt for selection
             if (!partSelection.isValid()){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Invalid part selection! Please try again!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid part selection! Please try again!", NamedTextColor.RED)));
                 return;
             }
             for (SpawnedDisplayEntityPart part : partSelection.getSelectedParts()){
                 part.adaptScoreboardTags(removeFromSB);
             }
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Adapted all scoreboard tags in your part selection!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Adapted all scoreboard tags in your part selection!", NamedTextColor.GREEN)));
         }
     }
 

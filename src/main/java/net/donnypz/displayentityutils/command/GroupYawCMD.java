@@ -5,7 +5,6 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
 class GroupYawCMD implements SubCommand{
@@ -36,11 +35,11 @@ class GroupYawCMD implements SubCommand{
             }
             double oldYaw = group.getLocation().getYaw();
             group.setYaw(yaw, pivot);
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Yaw set!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Yaw set!", NamedTextColor.GREEN)));
             player.sendMessage(Component.text("| Old Yaw: "+oldYaw, NamedTextColor.GRAY));
         }
         catch(NumberFormatException e){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Please enter a valid number!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Please enter a valid number!", NamedTextColor.RED)));
         }
     }
 }

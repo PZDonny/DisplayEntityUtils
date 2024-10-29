@@ -49,7 +49,7 @@ class AnimAddFrameCMD implements SubCommand{
                 frame.setTransformation(group);
             }
 
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.GREEN + "Successfully captured animation frame");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully captured animation frame", NamedTextColor.GREEN)));
             player.playSound(player, Sound.ENTITY_SHEEP_SHEAR, 1, 0.75f);
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid value entered for delay or duration! Enter a whole number >= 0", NamedTextColor.RED));

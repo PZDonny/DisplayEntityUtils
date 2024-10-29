@@ -6,7 +6,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
 class PartsSelectCMD implements SubCommand{
@@ -32,10 +32,10 @@ class PartsSelectCMD implements SubCommand{
         }
         partSelection = new SpawnedPartSelection(group, args[2]);
         if (partSelection.getSelectedParts().isEmpty()){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Failed to find parts with that part tag!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to find parts with that part tag!", NamedTextColor.RED)));
             return;
         }
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Part(s) successfully selected! "+ChatColor.WHITE+"(Part(s) Tagged: "+args[1]+")");
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Part(s) successfully selected! <white>(Part(s) Tagged: "+args[1]+")")));
         DisplayGroupManager.setPartSelection(player, partSelection, false);
         partSelection.glow(30, false);
     }

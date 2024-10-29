@@ -7,7 +7,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
 class GroupSetSpawnAnimationCMD implements SubCommand{
@@ -32,11 +31,11 @@ class GroupSetSpawnAnimationCMD implements SubCommand{
         try{
             DisplayAnimator.AnimationType type = DisplayAnimator.AnimationType.valueOf(args[3].toUpperCase());
             group.setSpawnAnimationTag(args[2], type);
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.GREEN + "Spawn/Load Animation Tag set!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Spawn/Load Animation Tag set!", NamedTextColor.GREEN)));
             player.sendMessage(Component.text("If an animation with that tag does not exist, this group will not perform the animation when it is spawned", NamedTextColor.GRAY, TextDecoration.ITALIC));
         }
         catch(IllegalArgumentException e){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "Invalid Animation type!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid Animation type!", NamedTextColor.RED)));
             sendAnimationTypes(player);
         }
     }

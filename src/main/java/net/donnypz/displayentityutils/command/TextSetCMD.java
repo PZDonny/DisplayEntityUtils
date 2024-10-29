@@ -8,7 +8,6 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
@@ -37,7 +36,7 @@ class TextSetCMD implements SubCommand{
 
         SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
         if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "You can only do this with text display entities");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
             return;
         }
 
@@ -54,7 +53,7 @@ class TextSetCMD implements SubCommand{
         Key oldFont = display.text().font();
         Component comp = LegacyComponentSerializer.legacyAmpersand().deserialize(textResult);
         display.text(comp.font(oldFont));
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Successfully set text on text display!");
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully set text on text display!", NamedTextColor.GREEN)));
         player.sendMessage(Component.text("Keep in mind, you can include \"\\n\" in your text display to create a new line.", NamedTextColor.GRAY));
     }
 }

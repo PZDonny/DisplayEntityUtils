@@ -7,7 +7,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Player;
@@ -32,7 +32,7 @@ class PartsSetBlockCMD implements SubCommand{
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /mdis parts setblock <\"-held\" | \"-target\" | block-id> [-all]"));
+            player.sendMessage(Component.text("Incorrect Usage! /mdis parts setblock <\"-held\" | \"-target\" | block-id> [-all]", NamedTextColor.RED));
             return;
         }
         
@@ -53,15 +53,15 @@ class PartsSetBlockCMD implements SubCommand{
                     return;
                 }
             }
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Successfully set block of ALL selected block displays!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully set block of ALL selected block displays!", NamedTextColor.GREEN)));
         }
         else{
             SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
             if (selected.getType() != SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY) {
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "You can only do this with block display entities");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You can only do this with block display entities", NamedTextColor.RED)));
                 return;
             }
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Successfully set block of selected block display!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully set block of selected block display!", NamedTextColor.GREEN)));
         }
     }
 

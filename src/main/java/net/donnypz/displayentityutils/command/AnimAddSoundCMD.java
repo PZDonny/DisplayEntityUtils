@@ -2,13 +2,10 @@ package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -47,7 +44,7 @@ class AnimAddSoundCMD implements SubCommand{
                 player.sendMessage(Component.text("Invalid Option! Choose between \"start\" and \"end\"", NamedTextColor.RED));
             }
 
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.GREEN + "Successfully added sound to frame's "+placement);
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully added sound to frame's "+placement, NamedTextColor.GREEN)));
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             player.sendMessage(Component.text("Invalid value entered for frame-id, volume, or pitch! Enter a number >= 0", NamedTextColor.RED));
         }

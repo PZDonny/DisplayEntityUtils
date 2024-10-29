@@ -7,7 +7,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
 class AnimStopCMD implements SubCommand{
@@ -30,6 +29,6 @@ class AnimStopCMD implements SubCommand{
         }
 
         group.stopAnimation(true);
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.YELLOW + "Stopping a animation played on group!");
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Stopping a animation played on group!", NamedTextColor.YELLOW)));
     }
 }

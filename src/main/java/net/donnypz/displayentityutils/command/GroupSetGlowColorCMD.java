@@ -24,20 +24,20 @@ class GroupSetGlowColorCMD implements SubCommand{
         }
 
         if (args.length < 3) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + "Enter a valid color!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a valid color!", NamedTextColor.RED)));
             player.sendMessage(Component.text("/mdis group setglowcolor <color | hex-code>", NamedTextColor.GRAY));
             return;
         }
 
         Color c = DEUCommandUtils.getColorFromText(args[2]);
         if (c == null){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+"Enter a valid color!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a valid color!", NamedTextColor.RED)));
             player.sendMessage(Component.text("/mdis group setglowcolor <color | hex-code>", NamedTextColor.GRAY));
             return;
         }
         group.setGlowColor(c);
         group.glow(60, true);
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Glow color successfully set for display entity group!");
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Glow color successfully set for display entity group!", NamedTextColor.GREEN)));
     }
 
 }

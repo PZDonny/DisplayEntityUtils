@@ -6,7 +6,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.GroupResult;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -25,7 +24,7 @@ class GroupMergeCMD implements SubCommand{
         }
 
         if (args.length < 3) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "Enter a number for the distance from your group to attempt to merge other groups");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a number for the distance from your group to attempt to merge other groups", NamedTextColor.RED)));
             player.sendMessage(Component.text("/mdis group merge <distance>", NamedTextColor.GRAY));
             return;
         }
@@ -33,12 +32,12 @@ class GroupMergeCMD implements SubCommand{
         try{
             double radius = Double.parseDouble(args[2]);
             if (radius <= 0){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a number greater than 0 for the merging distance!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a number greater than 0 for the merging distance!", NamedTextColor.RED)));
                 return;
             }
             List<GroupResult> results = DisplayGroupManager.getSpawnedGroupsNearLocation(group.getMasterPart().getEntity().getLocation(), radius);
             if (results.isEmpty() || results.size() == 1){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Your selected group is the only group within the set merging distance!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your selected group is the only group within the set merging distance!", NamedTextColor.RED)));
                 return;
             }
             for (GroupResult result : results){
@@ -47,11 +46,11 @@ class GroupMergeCMD implements SubCommand{
                 }
                 group.merge(result.group());
             }
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Successfully merged nearby groups");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully merged nearby groups", NamedTextColor.GREEN)));
             group.glow(60, true);
         }
         catch(NumberFormatException e){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a valid number for the merging distance!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a valid number for the merging distance!", NamedTextColor.RED)));
         }
     }
 }
