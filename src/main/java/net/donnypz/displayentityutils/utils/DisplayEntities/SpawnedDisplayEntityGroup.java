@@ -232,13 +232,14 @@ public final class SpawnedDisplayEntityGroup {
     /**
      * Add Interactions that are meant to be a part of this group
      * Usually these Interactions are unadded when a SpawnedDisplayEntityGroup is created during a new play session
+     * @param searchRange Distance to search for Interaction entities from the group's location
      * @return a list of the interaction entities added to the group
      */
-    public List<Interaction> addMissingInteractionEntities(double distance){
+    public List<Interaction> addMissingInteractionEntities(double searchRange){
         List<Interaction> interactions = new ArrayList<>();
         List<Entity> existingInteractions = getSpawnedPartEntities(SpawnedDisplayEntityPart.PartType.INTERACTION);
 
-        for(Entity e : getMasterPart().getEntity().getNearbyEntities(distance, distance, distance)) {
+        for(Entity e : getMasterPart().getEntity().getNearbyEntities(searchRange, searchRange, searchRange)) {
             if (!(e instanceof Interaction i)){
                 continue;
             }
@@ -308,18 +309,18 @@ public final class SpawnedDisplayEntityGroup {
 
     /**
      * Get Interactions that are not part of this SpawnedDisplayEntityGroup
-     * @param distance Distance to serach for Interactions from the location of the master entity
+     * @param searchRange Distance to search for Interaction entities from the group's location
      * @param addToGroup Whether to add the found Interactions to the group automatically
      * @return List of the found Interactions
      */
-    public List<Interaction> getUnaddedInteractionEntitiesInRange(double distance, boolean addToGroup){
-        if (distance <= 0){
+    public List<Interaction> getUnaddedInteractionEntitiesInRange(double searchRange, boolean addToGroup){
+        if (searchRange <= 0){
             return new ArrayList<>();
         }
         List<Interaction> interactions = new ArrayList<>();
         if (getMasterPart() != null){
             List<Entity> existingInteractions = getSpawnedPartEntities(SpawnedDisplayEntityPart.PartType.INTERACTION);
-            for(Entity e : getMasterPart().getEntity().getNearbyEntities(distance, distance, distance)) {
+            for(Entity e : getMasterPart().getEntity().getNearbyEntities(searchRange, searchRange, searchRange)) {
                 if ((e instanceof Interaction interaction)){
                     if (!existingInteractions.contains(e)){
                         if (addToGroup){
