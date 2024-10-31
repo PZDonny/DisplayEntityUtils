@@ -43,8 +43,9 @@ class BDEngineImportModelCMD implements SubCommand{
                     player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Attempted to spawn model at your location!", NamedTextColor.GREEN)));
 
                     if (result.getCommandCount() > 1){
-                        player.sendMessage(Component.text("! The model resulted in creating multiple groups! Use \"/mdis group merge\" to merge " +
-                                "the produced groups!", NamedTextColor.RED));
+                        player.sendMessage(Component.text("! The model resulted in creating multiple groups!", NamedTextColor.RED));
+                        player.sendMessage(Component.text("Select the group then use \"/mdis group merge\" to merge the produced group", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                        player.sendMessage(Component.text("It is not recommended to import groups that use animations this way!", NamedTextColor.RED, TextDecoration.ITALIC));
                     }
 
                     player.sendMessage(Component.text("\n- If your model did NOT spawn, the commands that are stored on the model are not compatible with your server version.\n", NamedTextColor.GRAY));
