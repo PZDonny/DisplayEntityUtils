@@ -36,11 +36,10 @@ public final class BDEngineUtils {
             HttpResponse<String> response = httpClient.send(getRequest, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 400){
                 BDEngineError error = gson.fromJson(response.body(), BDEngineError.class);
-                throw new RuntimeException(error.getError());
+                throw new IOException(error.getError());
             }
 
-            BDEngineModelResult result = gson.fromJson(response.body(), BDEngineModelResult.class);
-            return result;
+            return gson.fromJson(response.body(), BDEngineModelResult.class);
         }
     }
 }
