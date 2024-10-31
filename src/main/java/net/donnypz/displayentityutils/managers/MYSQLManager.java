@@ -65,12 +65,11 @@ public final class MYSQLManager {
                 DbUtils.closeQuietly(statement);
                 DbUtils.closeQuietly(connection);
 
-
-                Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.AQUA+"Successfully connected to" + ChatColor.BLUE + " MYSQL!");
+                Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <blue>MYSQL!")));
                 connected = true;
             } catch (SQLException e) {
                 e.printStackTrace();
-                Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"There was an error connecting to the MYSQL database");
+                Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("There was an error connecting to the MYSQL database", NamedTextColor.RED)));
                 closeConnection();
             }
         });

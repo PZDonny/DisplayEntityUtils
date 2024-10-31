@@ -23,7 +23,7 @@ class AnimNewCMD implements SubCommand{
         }
 
         DisplayAnimationManager.setSelectedSpawnedAnimation(player, animation);
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.GREEN + "You can now prepare a new animation");
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You can now prepare a new animation", NamedTextColor.GREEN)));
         player.sendMessage(Component.text(" - Before animating, if you want your display entity group to retain it's pose, you must save it's current pose " +
                 "as a single frame animation", NamedTextColor.GRAY));
         if (!animation.isPartAnimation()){

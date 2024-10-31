@@ -84,6 +84,7 @@ public final class SpawnedDisplayEntityPart {
         this.partUUID = uuid;
         PersistentDataContainer pdc = entity.getPersistentDataContainer();
         pdc.set(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
+        group.spawnedParts.put(partUUID, this);
     }
 
     private void setPartUUID(Random random){
@@ -692,14 +693,14 @@ public final class SpawnedDisplayEntityPart {
 
     /**
      * Pivot an Interaction Entity around its group's master part
-     * @param angle the pivot angle
+     * @param angleInDegrees the pivot angle
      */
-    public void pivot(double angle){
+    public void pivot(double angleInDegrees){
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION){
             return;
         }
         Interaction i = (Interaction) entity;
-        DisplayUtils.pivot(i, group.getLocation(), angle);
+        DisplayUtils.pivot(i, group.getLocation(), angleInDegrees);
     }
 
 

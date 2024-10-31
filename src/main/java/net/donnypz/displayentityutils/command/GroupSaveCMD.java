@@ -7,7 +7,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
 class GroupSaveCMD implements SubCommand{
@@ -32,7 +32,7 @@ class GroupSaveCMD implements SubCommand{
             player.sendMessage(Component.text("Failed to save display entity group, no tag provided! /mdis group settag <tag>", NamedTextColor.RED));
             return;
         }
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Attempting to save spawned display entity group "+ChatColor.WHITE+"(Tagged: "+group.getTag()+")");
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<gray>Attempting to save spawned display entity group <white>(Tagged: "+group.getTag()+")")));
         DisplayEntityGroup displayGroup = group.toDisplayEntityGroup();
         switch (args[2].toLowerCase()) {
             case "all" -> {

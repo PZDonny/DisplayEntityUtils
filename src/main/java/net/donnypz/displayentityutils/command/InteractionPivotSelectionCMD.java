@@ -5,9 +5,8 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.entity.Interaction;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 class InteractionPivotSelectionCMD implements SubCommand{
@@ -24,7 +23,7 @@ class InteractionPivotSelectionCMD implements SubCommand{
         }
 
         if (args.length < 3){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Incorrect Usage! /mdis interaction pivotselection <angle>");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Incorrect Usage! /mdis interaction pivotselection <angle>", NamedTextColor.RED)));
             return;
         }
 
@@ -34,7 +33,7 @@ class InteractionPivotSelectionCMD implements SubCommand{
             SpawnedPartSelection selection = DisplayGroupManager.getPartSelection(player);
             if (selection != null){
                 selection.pivot(angle);
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Pivoting all Interaction Entities in selection around group!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Pivoting all Interaction Entities in part selection around group!", NamedTextColor.GREEN)));
             }
 
             else{
@@ -44,7 +43,7 @@ class InteractionPivotSelectionCMD implements SubCommand{
             }
         }
         catch(NumberFormatException e){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a valid number for the angle!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a valid number for the angle!", NamedTextColor.RED)));
         }
     }
 }

@@ -7,7 +7,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
 class PartsRemoveCMD implements SubCommand{
@@ -31,7 +30,7 @@ class PartsRemoveCMD implements SubCommand{
         if (args.length >= 3 && args[2].equalsIgnoreCase("-all")){
             for (SpawnedDisplayEntityPart part : partSelection.getSelectedParts()){
                 if (part.isMaster()){
-                    player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You cannot despawn the master part! Continuing to despawn other selected parts");
+                    player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You cannot despawn the master part! Continuing to despawn other selected parts", NamedTextColor.RED)));
                     continue;
                 }
                 part.remove(true);
@@ -41,7 +40,7 @@ class PartsRemoveCMD implements SubCommand{
         else{
             SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
             if (selected.isMaster()){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You cannot despawn the master part!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You cannot despawn the master part!", NamedTextColor.RED)));
                 return;
             }
             selected.remove(true);
@@ -51,7 +50,7 @@ class PartsRemoveCMD implements SubCommand{
 
 
         if (partSelection.getGroup().getSpawnedParts().size() <= 1){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Despawning your group, not enough parts remain");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Despawning your group, not enough parts remain", NamedTextColor.YELLOW)));
             partSelection.getGroup().unregister(true, true);
             return;
         }

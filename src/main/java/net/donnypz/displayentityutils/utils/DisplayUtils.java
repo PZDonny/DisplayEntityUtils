@@ -323,11 +323,11 @@ public final class DisplayUtils {
      * Pivot an Interaction entity around a location
      * @param interaction the interaction
      * @param center the location the interaction should pivot around
-     * @param angle the pivot angle
+     * @param angleInDegrees the pivot angle in degrees
      */
-    public static void pivot(Interaction interaction, Location center, double angle){
+    public static void pivot(Interaction interaction, Location center, double angleInDegrees){
         Vector translationVector = DisplayUtils.getInteractionTranslation(interaction, center);
-        translationVector.rotateAroundY(Math.toRadians(angle));
+        translationVector.rotateAroundY(Math.toRadians(angleInDegrees));
         Location newLoc = center.clone().subtract(translationVector);
         interaction.teleport(newLoc);
     }

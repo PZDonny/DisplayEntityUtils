@@ -5,7 +5,8 @@ import net.donnypz.displayentityutils.listeners.bdengine.DEUEntitySpawned;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -55,8 +56,8 @@ public final class LocalManager {
                 }
                 else{
                     if (saver != null){
-                        saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display entity group locally!");
-                        saver.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Save with tag already exists!");
+                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display entity group locally!"));
+                        saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
                     }
                     return false;
                 }
@@ -67,14 +68,14 @@ public final class LocalManager {
             fileOut.write(data);
             fileOut.close();
             if (saver != null) {
-                saver.sendMessage(ChatColor.WHITE+"- "+ ChatColor.GREEN + "Successfully saved display entity group locally!");
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved display entity group locally!"));
             }
             return true;
         }
         catch(IOException ex){
             ex.printStackTrace();
             if (saver != null) {
-                saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display entity group locally!");
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display entity group locally!"));
             }
             return false;
         }
@@ -86,12 +87,12 @@ public final class LocalManager {
         if (saveFile.exists()){
             saveFile.delete();
             if (deleter != null){
-                deleter.sendMessage(ChatColor.WHITE+"- "+ChatColor.LIGHT_PURPLE+"Successfully deleted from local files!");
+                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted from local files!"));
                 return;
             }
         }
         if (deleter != null){
-            deleter.sendMessage(ChatColor.WHITE+"- "+ChatColor.RED+"Saved Display Entity Group does not exist in local files!");
+            deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved Display Entity Group does not exist in local files!"));
         }
     }
 
@@ -128,8 +129,8 @@ public final class LocalManager {
                 }
                 else{
                     if (saver != null){
-                        saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display animation locally!");
-                        saver.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Save with tag already exists!");
+                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display animation locally!"));
+                        saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
                     }
                     return false;
                 }
@@ -140,14 +141,14 @@ public final class LocalManager {
             fileOut.write(data);
             fileOut.close();
             if (saver != null) {
-                saver.sendMessage(ChatColor.WHITE+"- "+ ChatColor.GREEN + "Successfully saved display animation locally!");
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved display animation locally!"));
             }
             return true;
         }
         catch(IOException ex){
             ex.printStackTrace();
             if (saver != null) {
-                saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display animation locally!");
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display animation locally!"));
             }
             return false;
         }
@@ -191,7 +192,8 @@ public final class LocalManager {
                 }, 30);
             }
         } catch (IOException e) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"Failed to find datapack with the provided name! Ensure that the datapack is placed in the \"bdenginedatapacks\" folder of this plugin, as a .zip file");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix
+                    .append(Component.text("Failed to find datapack with the provided name! Ensure that the datapack is placed in the \"bdenginedatapacks\" folder of this plugin, as a .zip file", NamedTextColor.RED)));
         }
     }
 
@@ -203,9 +205,10 @@ public final class LocalManager {
 
         DEUEntitySpawned.finalizeTimestampedAnimationPreparation(timeStamp);
         createdGroup.seedPartUUIDs(SpawnedDisplayEntityGroup.defaultPartUUIDSeed);
+        final SpawnedDisplayAnimation anim = new SpawnedDisplayAnimation();
+        SpawnedDisplayAnimationFrame initialFrame = new SpawnedDisplayAnimationFrame(-1, -1).setTransformation(createdGroup);
 
         new BukkitRunnable(){
-            final SpawnedDisplayAnimation anim = new SpawnedDisplayAnimation();
             int i = 0;
             @Override
             public void run() {
@@ -214,12 +217,13 @@ public final class LocalManager {
                     if (!frame.isEmptyFrame()){
                         anim.addFrame(frame);
                     }
-                    createdGroup.setToFrame(anim, anim.getFrames().getFirst());
+
+                    createdGroup.setToFrame(anim, initialFrame, false);
 
                     //Save with first frame applied to group
                     Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                         if (animationSaveTag.isBlank()){
-                            anim.setAnimationTag(datapackName.replace(".zip", "")+"_autoconvert");
+                            anim.setAnimationTag(datapackName.replace(".zip", "_autoconvert"));
                         }
                         else{
                             anim.setAnimationTag(animationSaveTag);
@@ -230,7 +234,7 @@ public final class LocalManager {
                         boolean groupSuccess;
                         if (!groupSaveTag.equals("-")){
                             if (groupSaveTag.isBlank()){
-                                createdGroup.setTag(datapackName.replace(".zip", "")+"_autoconvert");
+                                createdGroup.setTag(datapackName.replace(".zip", "_autoconvert"));
                             }
                             else{
                                 createdGroup.setTag(groupSaveTag);
@@ -244,7 +248,8 @@ public final class LocalManager {
                         createdGroup.unregister(true, true);
 
                         if (animationSuccess){
-                            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.GREEN+"Successfully converted BDEngine animation to DisplayAnimation.");
+                            player.sendMessage(DisplayEntityPlugin.pluginPrefix
+                                    .append(Component.text("Successfully converted BDEngine animation to DisplayAnimation.", NamedTextColor.GREEN)));
                             player.sendMessage(Component.text(" | Animation Tag: "+anim.getAnimationTag(), NamedTextColor.GRAY));
                             player.playSound(player, Sound.ENTITY_SHEEP_SHEAR, 1, 0.75f);
                         }
@@ -269,12 +274,11 @@ public final class LocalManager {
                             throw new RuntimeException("Failed to close zip file");
                         }
                     },1);
-
                     cancel();
                     return;
                 }
 
-                //Get Frame
+                //Create Frame
                 SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(0, 2).setTransformation(createdGroup);
                 if (!frame.isEmptyFrame()){
                     anim.addFrame(frame);
@@ -294,7 +298,7 @@ public final class LocalManager {
     }
 
 
-    private static long executeCommands(ZipEntry zipEntry, ZipFile zipFile, Player player, Location location, boolean returnData){
+    private static long executeCommands(ZipEntry zipEntry, ZipFile zipFile, Player player, Location location, boolean expectData){
         try{
             InputStream stream = zipFile.getInputStream(zipEntry);
             BufferedReader br = new BufferedReader(new InputStreamReader(stream));
@@ -368,7 +372,8 @@ public final class LocalManager {
             stream.close();
 
         //True if command was summon.mcfuntion command, returns group timestamp created by BDEngine
-            if (returnData){
+            //Also to get total number of groups created by BDEngine commands
+            if (expectData){
                 return value;
             }
             else{
@@ -389,12 +394,12 @@ public final class LocalManager {
         if (saveFile.exists()){
             saveFile.delete();
             if (deleter != null){
-                deleter.sendMessage(ChatColor.WHITE+"- "+ChatColor.LIGHT_PURPLE+"Successfully deleted from local files!");
+                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted from local files!"));
                 return;
             }
         }
         if (deleter != null){
-            deleter.sendMessage(ChatColor.WHITE+"- "+ChatColor.RED+"Saved Display Animation does not exist in local files!");
+            deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved Display Animation does not exist in local files!"));
         }
     }
 

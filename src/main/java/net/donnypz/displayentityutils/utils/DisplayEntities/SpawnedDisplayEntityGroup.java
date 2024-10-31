@@ -27,7 +27,7 @@ public final class SpawnedDisplayEntityGroup {
     public static final long defaultPartUUIDSeed = 99;
 
     LinkedHashMap<UUID, SpawnedDisplayEntityPart> spawnedParts = new LinkedHashMap<>();
-    List<SpawnedPartSelection> partSelections = new ArrayList<>();
+    Set<SpawnedPartSelection> partSelections = new HashSet<>();
     private String tag;
     SpawnedDisplayEntityPart masterPart;
     long creationTime = System.currentTimeMillis();
@@ -232,13 +232,14 @@ public final class SpawnedDisplayEntityGroup {
     /**
      * Add Interactions that are meant to be a part of this group
      * Usually these Interactions are unadded when a SpawnedDisplayEntityGroup is created during a new play session
+     * @param searchRange Distance to search for Interaction entities from the group's location
      * @return a list of the interaction entities added to the group
      */
-    public List<Interaction> addMissingInteractionEntities(double distance){
+    public List<Interaction> addMissingInteractionEntities(double searchRange){
         List<Interaction> interactions = new ArrayList<>();
         List<Entity> existingInteractions = getSpawnedPartEntities(SpawnedDisplayEntityPart.PartType.INTERACTION);
 
-        for(Entity e : getMasterPart().getEntity().getNearbyEntities(distance, distance, distance)) {
+        for(Entity e : getMasterPart().getEntity().getNearbyEntities(searchRange, searchRange, searchRange)) {
             if (!(e instanceof Interaction i)){
                 continue;
             }
@@ -265,7 +266,9 @@ public final class SpawnedDisplayEntityGroup {
     public void seedPartUUIDs(long seed){
         byte[] byteArray;
         Random random = new Random(seed);
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
+        SequencedCollection<SpawnedDisplayEntityPart> parts = getSpawnedParts();
+        spawnedParts.clear();
+        for (SpawnedDisplayEntityPart part : parts){
             byteArray = new byte[16];
             random.nextBytes(byteArray);
             part.setPartUUID(UUID.nameUUIDFromBytes(byteArray));
@@ -306,18 +309,18 @@ public final class SpawnedDisplayEntityGroup {
 
     /**
      * Get Interactions that are not part of this SpawnedDisplayEntityGroup
-     * @param distance Distance to serach for Interactions from the location of the master entity
+     * @param searchRange Distance to search for Interaction entities from the group's location
      * @param addToGroup Whether to add the found Interactions to the group automatically
      * @return List of the found Interactions
      */
-    public List<Interaction> getUnaddedInteractionEntitiesInRange(double distance, boolean addToGroup){
-        if (distance <= 0){
+    public List<Interaction> getUnaddedInteractionEntitiesInRange(double searchRange, boolean addToGroup){
+        if (searchRange <= 0){
             return new ArrayList<>();
         }
         List<Interaction> interactions = new ArrayList<>();
         if (getMasterPart() != null){
             List<Entity> existingInteractions = getSpawnedPartEntities(SpawnedDisplayEntityPart.PartType.INTERACTION);
-            for(Entity e : getMasterPart().getEntity().getNearbyEntities(distance, distance, distance)) {
+            for(Entity e : getMasterPart().getEntity().getNearbyEntities(searchRange, searchRange, searchRange)) {
                 if ((e instanceof Interaction interaction)){
                     if (!existingInteractions.contains(e)){
                         if (addToGroup){
@@ -1380,11 +1383,11 @@ public final class SpawnedDisplayEntityGroup {
      * @param frame the frame to display
      * @return false if this group is in an unloaded chunk
      */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
+    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, boolean isAsync) {
         if (!isInLoadedChunk()){
             return false;
         }
-        DisplayAnimatorExecutor.setGroupToFrame(this, animation, frame);
+        DisplayAnimatorExecutor.setGroupToFrame(this, animation, frame, isAsync);
         return true;
     }
 
@@ -1458,6 +1461,7 @@ public final class SpawnedDisplayEntityGroup {
         }
         DisplayAnimatorStateMachine.unregisterFromStateMachine(this);
         DisplayGroupManager.removeSpawnedGroup(this, despawnParts, force);
+        spawnedParts.clear();
         masterPart = null;
         followedEntity = null;
     }

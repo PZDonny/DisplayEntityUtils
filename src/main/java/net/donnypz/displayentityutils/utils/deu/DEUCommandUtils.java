@@ -6,7 +6,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticle;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -82,7 +81,7 @@ public class DEUCommandUtils {
         if (block.equals("-held")){
             ItemStack mainHand = player.getInventory().getItemInMainHand();
             if (!mainHand.getType().isBlock()){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"You must be holding a block to do that!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You must be holding a block to do that!", NamedTextColor.RED)));
                 return null;
             }
             blockData = mainHand.getType().createBlockData();
@@ -97,7 +96,7 @@ public class DEUCommandUtils {
                 b = result.getHitBlock();
             }
             if (result == null || b == null){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Block not found, target a block within "+targetDistance+" of you");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Block not found, target a block within "+targetDistance+" of you", NamedTextColor.RED)));
                 return null;
             }
             b = result.getHitBlock();
@@ -108,7 +107,7 @@ public class DEUCommandUtils {
         else{
             Material material = Material.matchMaterial(block.toLowerCase());
             if (material == null || !material.isBlock()){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Block not recognized! The block's name might have been misspelled or the block doesn't exist.");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Block not recognized! The block's name might have been misspelled or the block doesn't exist.", NamedTextColor.RED)));
                 return null;
             }
             blockData = material.createBlockData();
@@ -121,7 +120,7 @@ public class DEUCommandUtils {
         if (item.equals("-held")){
             ItemStack mainHand = player.getInventory().getItemInMainHand();
             if (mainHand.getType().isBlock()){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"Your held item cannot be a block!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your held item cannot be a block!", NamedTextColor.RED)));
                 return null;
             }
             itemStack = mainHand.clone();
@@ -132,7 +131,7 @@ public class DEUCommandUtils {
         else{
             Material material = Material.matchMaterial(item.toLowerCase());
             if (material == null || material.isBlock()){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Item not recognized! The item's name might have been misspelled, the item doesn't exist or the item is a block.");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Item not recognized! The item's name might have been misspelled, the item doesn't exist or the item is a block.", NamedTextColor.RED)));
                 return null;
             }
             itemStack = new ItemStack(material);

@@ -6,7 +6,6 @@ import net.donnypz.displayentityutils.utils.bdengine.BDEngineUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -23,7 +22,7 @@ class BDEngineImportModelCMD implements SubCommand{
             return;
         }
         if (args.length < 3) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "Incorrect Usage! /mdis bdengine importmodel <model-id>");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Incorrect Usage! /mdis bdengine importmodel <model-id>", NamedTextColor.RED)));
             return;
         }
         Location spawnLoc = player.getLocation();
@@ -38,14 +37,15 @@ class BDEngineImportModelCMD implements SubCommand{
 
                 Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
                     if (!result.spawn(spawnLoc)){
-                        player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED+ "Failed to spawn model! The spawn location's chunk is not loaded!");
+                        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to spawn model! The spawn location's chunk is not loaded!", NamedTextColor.RED)));
                         return;
                     }
-                    player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.GREEN+"Attempted to spawn model at your location!");
+                    player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Attempted to spawn model at your location!", NamedTextColor.GREEN)));
 
                     if (result.getCommandCount() > 1){
-                        player.sendMessage(Component.text("! The model resulted in creating multiple groups! Use \"/mdis group merge\" to merge " +
-                                "the produced groups!", NamedTextColor.RED));
+                        player.sendMessage(Component.text("! The model resulted in creating multiple groups!", NamedTextColor.RED));
+                        player.sendMessage(Component.text("Select the group then use \"/mdis group merge\" to merge the produced group", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                        player.sendMessage(Component.text("It is not recommended to import groups that use animations this way!", NamedTextColor.RED, TextDecoration.ITALIC));
                     }
 
                     player.sendMessage(Component.text("\n- If your model did NOT spawn, the commands that are stored on the model are not compatible with your server version.\n", NamedTextColor.GRAY));

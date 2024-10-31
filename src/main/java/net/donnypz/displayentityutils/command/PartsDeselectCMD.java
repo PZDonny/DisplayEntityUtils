@@ -4,7 +4,8 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 class PartsDeselectCMD implements SubCommand{
@@ -22,10 +23,10 @@ class PartsDeselectCMD implements SubCommand{
 
         SpawnedPartSelection selection = DisplayGroupManager.getPartSelection(player);
         if (selection == null){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Your part selection is already cleared!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your part selection is already cleared!", NamedTextColor.YELLOW)));
             return;
         }
         DisplayGroupManager.removePartSelection(player);
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Part selection cleared!");
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Part selection cleared!", NamedTextColor.GREEN)));
     }
 }

@@ -7,6 +7,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -31,17 +32,17 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     int delayInTicks = 0;
     AnimationParticle editParticle = null;
 
-    String prefix = DisplayEntityPlugin.pluginPrefix;
-    String particleMSG = prefix+ChatColor.YELLOW+"Enter the name of the particle to use";
-    String amountMSG = prefix+ChatColor.YELLOW+"Enter the amount of particles to spawn";
-    String colorMSG = prefix+ChatColor.YELLOW+"Enter the color to set for the particle(s) and a particle size";
-    String colorTransitionMSG = prefix+ChatColor.YELLOW+"Enter the color transition to set for the particle(s) and a particle size";
-    String extraMSG = prefix+ChatColor.YELLOW+"Enter the extra value for the particle(s)";
-    String blockMSG = prefix+ChatColor.YELLOW+"Enter the block to use for the particle(s).\nType \"-held\" to use your held block item, \"-target\" for your targeted block, or the block's id.";
-    String itemMSG = prefix+ChatColor.YELLOW+"Enter the item to use for the particle(s)";
-    String offsetMSG = prefix+ChatColor.YELLOW+"Enter the x, y, and z offset for the particle(s)";
-    String delayMSG = prefix+ChatColor.YELLOW+"Enter the amount of delay (in ticks) before the particle should be shown";
-    String separatedMSG = ChatColor.GRAY+""+ChatColor.ITALIC+"All values should be entered separated by spaces.";
+    Component prefix = DisplayEntityPlugin.pluginPrefix;
+    Component particleMSG = prefix.append(Component.text("Enter the name of the particle to use", NamedTextColor.YELLOW));
+    Component amountMSG = prefix.append(Component.text("Enter the amount of particles to spawn", NamedTextColor.YELLOW));
+    Component colorMSG = prefix.append(Component.text("Enter the color to set for the particle(s) and a particle size", NamedTextColor.YELLOW));
+    Component colorTransitionMSG = prefix.append(Component.text("Enter the color transition to set for the particle(s) and a particle size", NamedTextColor.YELLOW));
+    Component extraMSG = prefix.append(Component.text("Enter the extra value for the particle(s)", NamedTextColor.YELLOW));
+    Component blockMSG = prefix.append(Component.text("Enter the block to use for the particle(s).\nType \"-held\" to use your held block item, \"-target\" for your targeted block, or the block's id.", NamedTextColor.YELLOW));
+    Component itemMSG = prefix.append(Component.text("Enter the item to use for the particle(s)", NamedTextColor.YELLOW));
+    Component offsetMSG = prefix.append(Component.text("Enter the x, y, and z offset for the particle(s)", NamedTextColor.YELLOW));
+    Component delayMSG = prefix.append(Component.text("Enter the amount of delay (in ticks) before the particle should be shown", NamedTextColor.YELLOW));
+    Component separatedMSG = Component.text("All values should be entered separated by spaces.", NamedTextColor.GRAY, TextDecoration.ITALIC);
 
     @ApiStatus.Internal
     public AnimationParticleBuilder(@NotNull Player player, @NotNull SpawnedDisplayAnimationFrame frame, boolean isStartAdd){
@@ -71,10 +72,10 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         if (editParticle != null){
             Player player = this.player;
             if (updateParticle()){
-                player.sendMessage(prefix+ChatColor.GREEN+"Particle Changes applied successfully!");
+                player.sendMessage(prefix.append(Component.text("Particle Changes applied successfully!", NamedTextColor.GREEN)));
             }
             else{
-                player.sendMessage(prefix+ChatColor.RED+"Particle Changed failed to apply!");
+                player.sendMessage(prefix.append(Component.text("Particle Changed failed to apply!", NamedTextColor.RED)));
             }
             return;
         }
@@ -86,7 +87,7 @@ public class AnimationParticleBuilder extends ParticleBuilder{
             }
             else{
                 build(selectedGroup, player.getLocation());
-                player.sendMessage(prefix+ChatColor.GREEN+"Successfully created an animation particle!");
+                player.sendMessage(prefix.append(Component.text("Successfully created an animation particle!", NamedTextColor.GREEN)));
             }
             remove();
             return;

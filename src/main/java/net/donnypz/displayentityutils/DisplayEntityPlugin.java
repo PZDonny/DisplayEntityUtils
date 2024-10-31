@@ -8,7 +8,6 @@ import net.donnypz.displayentityutils.listeners.autoGroup.DEULoadingListeners;
 import net.donnypz.displayentityutils.listeners.bdengine.DEUEntitySpawned;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerChatListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerConnectionListener;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
@@ -18,6 +17,8 @@ import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
 import net.donnypz.displayentityutils.utils.deu.ParticleDisplay;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -38,7 +39,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     private static DisplayEntityPlugin instance;
 
     @ApiStatus.Internal
-    public static final String pluginPrefix = ChatColor.YELLOW+"[DisplayEntityUtils] ";
+    public static final Component pluginPrefix = Component.text("[DisplayEntityUtils] ", NamedTextColor.YELLOW);
     @ApiStatus.Internal
     public static final String pluginPrefixLong = ChatColor.GRAY+"-------["+ChatColor.YELLOW+"DisplayEntityUtils"+ChatColor.GRAY+"]-------";
     private static NamespacedKey partUUIDKey;
@@ -76,7 +77,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
         getCommand("managedisplays").setExecutor(new DisplayEntityPluginCommand());
         getCommand("managedisplays").setTabCompleter(new DisplayEntityPluginTabCompleter());
-        getServer().getConsoleSender().sendMessage(pluginPrefix+ChatColor.GREEN+"Plugin Enabled!");
+        getServer().getConsoleSender().sendMessage(pluginPrefix.append( Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
 
 
         Bukkit.getPluginManager().registerEvents(this, this);
@@ -344,10 +345,10 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
                 }
                 boolean result = ParticleDisplay.delete(i.getUniqueId());
                 if (result){
-                    p.sendMessage(pluginPrefix+ChatColor.YELLOW+"Successfully removed particle from frame!");
+                    p.sendMessage(pluginPrefix.append(Component.text("Successfully removed particle from frame!", NamedTextColor.YELLOW)));
                 }
                 else{
-                    p.sendMessage(pluginPrefix+ChatColor.RED+"This particle has already been removed by another player or other methods!");
+                    p.sendMessage(pluginPrefix.append(Component.text("This particle has already been removed by another player or other methods!", NamedTextColor.RED)));
                 }
             }
             else{

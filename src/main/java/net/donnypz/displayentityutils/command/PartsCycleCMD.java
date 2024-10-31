@@ -72,7 +72,7 @@ class PartsCycleCMD implements SubCommand{
                 displayPartInfo(player, partSelection);
             }
             default ->{
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"Invalid Option! /mdis parts cycle <first | prev | next | last>");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid Option! /mdis parts cycle <first | prev | next | last>", NamedTextColor.RED)));
             }
         }
     }
@@ -113,7 +113,7 @@ class PartsCycleCMD implements SubCommand{
         int index = partSelection.indexOf(part)+1;
         int size = partSelection.getSize();
         String ratio = ChatColor.GOLD+"["+index+"/"+size+"] ";
-        p.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Selected Part! "+ratio+desc);
+        p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Selected Part! "+ratio+desc, NamedTextColor.GREEN)));
     }
 
 }

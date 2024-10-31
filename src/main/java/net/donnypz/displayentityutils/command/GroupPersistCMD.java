@@ -3,7 +3,8 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 class GroupPersistCMD implements SubCommand{
@@ -21,10 +22,10 @@ class GroupPersistCMD implements SubCommand{
         boolean oldPersist = group.isPersistent();
         group.setPersistent(!oldPersist);
         if (oldPersist){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Your selected group will no longer persist after a server shutdown!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your selected group will no longer persist after a server shutdown!", NamedTextColor.YELLOW)));
         }
         else{
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Your group will persist after a server shutdown!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your group will persist after a server shutdown!", NamedTextColor.GREEN)));
         }
 
     }

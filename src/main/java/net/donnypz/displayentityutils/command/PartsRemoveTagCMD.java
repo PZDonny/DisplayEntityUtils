@@ -5,7 +5,7 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
 class PartsRemoveTagCMD implements SubCommand{
@@ -21,7 +21,7 @@ class PartsRemoveTagCMD implements SubCommand{
             return;
         }
         if (!partSelection.isValid()){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Invalid part selection! Please try again!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid part selection! Please try again!", NamedTextColor.RED)));
             return;
         }
         if (args.length < 3){
@@ -31,11 +31,11 @@ class PartsRemoveTagCMD implements SubCommand{
         String tag  = args[2];
         if (args.length >= 4 && args[3].equalsIgnoreCase("-all")){
             partSelection.removeTag(tag);
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Removing part tag from ALL selected parts! "+ChatColor.WHITE+"(Removed Tag: "+tag+")");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Removing part tag from ALL selected parts! <white>(Removed Tag: "+tag+")")));
         }
         else{
             partSelection.getSelectedPart().removeTag(tag);
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Removing part tag from selected part! "+ChatColor.WHITE+"(Removed Tag: "+tag+")");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Removing part tag from selected part! <white>(Removed Tag: "+tag+")")));
         }
 
 

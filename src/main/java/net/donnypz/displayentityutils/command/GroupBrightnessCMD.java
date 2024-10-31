@@ -5,7 +5,6 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 
@@ -34,7 +33,7 @@ class GroupBrightnessCMD implements SubCommand{
             if (sky > 15 || sky < 0 || block > 15 || block < 0){
                 if (sky == -1 && block == -1){ //Reset Brightness
                     group.setBrightness(null);
-                    player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.YELLOW+"Brightness reset!");
+                    player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Brightness reset!", NamedTextColor.YELLOW)));
                     return;
                 }
                 else{
@@ -42,10 +41,10 @@ class GroupBrightnessCMD implements SubCommand{
                 }
             }
             group.setBrightness(new Display.Brightness(block, sky));
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Brightness set!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Brightness set!", NamedTextColor.GREEN)));
         }
         catch(NumberFormatException e){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Brightness values can only be whole numbers 0-15!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Brightness values can only be whole numbers 0-15!", NamedTextColor.RED)));
             player.sendMessage(Component.text("Values of -1 for both block and sky will reset the brightness"));
         }
     }

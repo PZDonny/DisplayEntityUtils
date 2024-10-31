@@ -7,7 +7,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
 class GroupTranslateCMD implements SubCommand{
@@ -32,7 +31,7 @@ class GroupTranslateCMD implements SubCommand{
             Direction direction = Direction.valueOf(args[2].toUpperCase());
             double distance = Double.parseDouble(args[3]);
             if (distance <= 0){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a number greater than 0 for the distance!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a number greater than 0 for the distance!", NamedTextColor.RED)));
                 return;
             }
             int duration = Integer.parseInt(args[4]);
@@ -40,11 +39,11 @@ class GroupTranslateCMD implements SubCommand{
                 duration = 0;
             }
             group.translate(direction, (float) distance, duration, -1);
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Translating spawned display entity group!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Translating spawned display entity group!", NamedTextColor.GREEN)));
         }
         catch(IllegalArgumentException e){
             if (e instanceof NumberFormatException){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter valid numbers!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter valid numbers!", NamedTextColor.RED)));
                 player.sendMessage(Component.text("Duration must be a positive whole number, distance can be any positive number", NamedTextColor.GRAY, TextDecoration.ITALIC));
             }
             else{

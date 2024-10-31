@@ -5,7 +5,8 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 
@@ -27,7 +28,7 @@ class InteractionPivotCMD implements SubCommand{
             return;
         }
         if (args.length < 3){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"Incorrect Usage! /mdis interaction pivot <angle>");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Incorrect Usage! /mdis interaction pivot <angle>", NamedTextColor.RED)));
             return;
         }
         Interaction interaction = InteractionCMD.getInteraction(player, false);
@@ -36,10 +37,10 @@ class InteractionPivotCMD implements SubCommand{
         }
         try{
             DisplayUtils.pivot(interaction, selection.getGroup().getLocation(), Double.parseDouble(args[2]));
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Pivoting Interaction Entity around group");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Pivoting Interaction Entity around group", NamedTextColor.GREEN)));
         }
         catch(NumberFormatException e){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a valid number for the angle!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a valid number for the angle!", NamedTextColor.RED)));
             return;
         }
     }

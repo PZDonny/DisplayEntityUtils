@@ -4,7 +4,6 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -105,7 +104,7 @@ class AnimCMD implements SubCommand{
     }
 
     static void noAnimationSelection(Player player){
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"You have not have an animation selected!");
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You have not have an animation selected!", NamedTextColor.RED)));
         player.sendMessage(Component.text("/mdis anim select <animation-tag>", NamedTextColor.GRAY));
     }
 

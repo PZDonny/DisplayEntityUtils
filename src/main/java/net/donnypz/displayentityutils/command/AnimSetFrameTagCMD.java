@@ -38,7 +38,7 @@ class AnimSetFrameTagCMD implements SubCommand{
             String tag = args[3];
             SpawnedDisplayAnimationFrame frame = frames.get(id);
             frame.setTag(tag);
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.GREEN + "Frame tag successfully set to \"" + tag + "\"");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Frame tag successfully set to \"" + tag + "\"", NamedTextColor.GREEN)));
         }
         catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid ID entered! Enter a whole number >= 0", NamedTextColor.RED));

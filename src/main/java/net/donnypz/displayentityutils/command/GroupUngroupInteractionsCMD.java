@@ -3,7 +3,8 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 class GroupUngroupInteractionsCMD implements SubCommand{
@@ -19,7 +20,7 @@ class GroupUngroupInteractionsCMD implements SubCommand{
             return;
         }
 
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Removed any interactions entities attached to the spawned display entity group");
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Removed any interactions entities attached to the spawned display entity group", NamedTextColor.RED)));
         group.removeInteractionEntities();
     }
 }

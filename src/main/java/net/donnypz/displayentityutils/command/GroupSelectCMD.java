@@ -6,7 +6,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.GroupResult;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
 class GroupSelectCMD implements SubCommand{
@@ -17,7 +16,7 @@ class GroupSelectCMD implements SubCommand{
         }
 
         if (args.length < 3) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "Enter a number for the distance to select interaction entities");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a number for the distance to select interaction entities", NamedTextColor.RED)));
             player.sendMessage(Component.text("/mdis group selectnearest <interaction-distance>", NamedTextColor.GRAY));
             return;
         }
@@ -29,14 +28,14 @@ class GroupSelectCMD implements SubCommand{
                 return;
             }
             SpawnedDisplayEntityGroup group = result.group();
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.GREEN + "Selection made!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Selection made!", NamedTextColor.GREEN)));
             DisplayGroupManager.setSelectedSpawnedGroup(player, group);
             DisplayGroupManager.removePartSelection(player);
 
             group.getUnaddedInteractionEntitiesInRange(interactionDistance, true);
             group.glow(100, false);
         } catch (NumberFormatException e) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "Enter a number for the distance to select interaction entities");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a number for the distance to select interaction entities", NamedTextColor.RED)));
         }
     }
 }

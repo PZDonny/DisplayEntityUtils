@@ -43,11 +43,10 @@ class AnimRemoveSoundCMD implements SubCommand{
                 player.sendMessage(Component.text("Invalid Option! Choose between \"start\" and \"end\"", NamedTextColor.RED));
             }
 
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.YELLOW + "Successfully removed sound from frame's "+placement);
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully removed sound from frame's "+placement, NamedTextColor.YELLOW)));
         }
         catch (NumberFormatException | IndexOutOfBoundsException e) {
             player.sendMessage(Component.text("Invalid value entered for frame-id! Enter a whole number >= 0", NamedTextColor.RED));
-            return;
         }
         catch (IllegalArgumentException e){
             player.sendMessage(Component.text("Invalid Sound Name!", NamedTextColor.RED));

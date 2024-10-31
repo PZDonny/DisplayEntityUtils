@@ -5,7 +5,8 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.key.Key;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
@@ -29,12 +30,12 @@ class TextFontCMD implements SubCommand{
 
         SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
         if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "You can only do this with text display entities");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
             return;
         }
 
         if (args.length < 3){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"Incorrect Usage! /mdis text font <default | alt | uniform | illageralt>");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Incorrect Usage! /mdis text font <default | alt | uniform | illageralt>", NamedTextColor.RED)));
             return;
         }
 
@@ -45,11 +46,11 @@ class TextFontCMD implements SubCommand{
                 display.text(display.text().font(Key.key("minecraft:"+font)));
             }
             default -> {
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Invalid Font!");
-                player.sendMessage(ChatColor.GRAY+"Valid fonts are \"default\", \"alt\", \"uniform\" and \"illageralt\"");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid Font!", NamedTextColor.RED)));
+                player.sendMessage(Component.text("Valid fonts are \"default\", \"alt\", \"uniform\" and \"illageralt\"", NamedTextColor.GRAY));
                 return;
             }
         }
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Font successfully set to "+args[2]);
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Font successfully set to "+args[2], NamedTextColor.GREEN)));
     }
 }

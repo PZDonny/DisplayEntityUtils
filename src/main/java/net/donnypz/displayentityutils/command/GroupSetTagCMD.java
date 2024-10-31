@@ -5,7 +5,7 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
 class GroupSetTagCMD implements SubCommand{
@@ -27,6 +27,6 @@ class GroupSetTagCMD implements SubCommand{
         }
         String tag = args[2];
         group.setTag(tag);
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.GREEN+"Successfully tagged spawned display entity group! "+ChatColor.WHITE+"(Tagged: "+tag+")");
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully tagged spawned display entity group! <white>(Tagged: "+tag+")")));
     }
 }

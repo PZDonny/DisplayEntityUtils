@@ -5,7 +5,6 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
 class GroupScaleCMD implements SubCommand{
@@ -29,22 +28,22 @@ class GroupScaleCMD implements SubCommand{
         try{
             float multiplier = Float.parseFloat(args[2]);
             if (multiplier <= 0){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a number greater than 0 for the scale multiplier!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a number greater than 0 for the scale multiplier!", NamedTextColor.RED)));
                 return;
             }
             int duration = Integer.parseInt(args[3]);
             if (duration < 0){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter a whole number, 0 or greater, for the duration!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a whole number, 0 or greater, for the duration!", NamedTextColor.RED)));
                 return;
             }
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Scaling spawned display entity group!");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Scaling spawned display entity group!", NamedTextColor.GREEN)));
             player.sendMessage(Component.text("Old Scale: "+group.getScaleMultiplier()+"x", NamedTextColor.GRAY));
             player.sendMessage(Component.text("New Scale: "+multiplier+"x", NamedTextColor.YELLOW));
             group.scale(multiplier, duration, true);
         }
         catch(IllegalArgumentException e){
             if (e instanceof NumberFormatException){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Enter valid numbers!");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter valid numbers!", NamedTextColor.RED)));
             }
         }
     }

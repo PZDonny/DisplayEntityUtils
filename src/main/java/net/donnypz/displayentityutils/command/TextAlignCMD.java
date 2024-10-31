@@ -4,7 +4,8 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
@@ -28,12 +29,12 @@ class TextAlignCMD implements SubCommand{
 
         SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
         if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix + ChatColor.RED + "You can only do this with text display entities");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
             return;
         }
 
         if (args.length < 3){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix+ ChatColor.RED+"Incorrect Usage! /mdis text align <left| right | center>");
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Incorrect Usage! /mdis text align <left| right | center>", NamedTextColor.RED)));
             return;
         }
 
@@ -50,11 +51,11 @@ class TextAlignCMD implements SubCommand{
                 display.setAlignment(TextDisplay.TextAlignment.CENTER);
             }
             default -> {
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.RED+"Invalid Alignment!");
-                player.sendMessage(ChatColor.GRAY+"Valid alignments are \"left\", \"right\" and \"center\"");
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid Alignment!", NamedTextColor.RED)));
+                player.sendMessage(Component.text("Valid alignments are \"left\", \"right\" and \"center\"", NamedTextColor.GRAY));
                 return;
             }
         }
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix+ChatColor.GREEN+"Alignment successfully set to "+args[2]);
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Alignment successfully set to "+args[2], NamedTextColor.GREEN)));
     }
 }
