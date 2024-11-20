@@ -8,15 +8,15 @@ import java.util.UUID;
 
 public class PartData {
 
-    private final UUID uuid;
+    private final UUID entityUUID;
     private String worldName;
 
     PartData(@NotNull Entity entity){
         this(entity.getUniqueId(), entity.getWorld().getName());
     }
 
-    PartData(@NotNull UUID uuid, @NotNull String worldName){
-        this.uuid = uuid;
+    PartData(@NotNull UUID entityUUID, @NotNull String worldName){
+        this.entityUUID = entityUUID;
         this.worldName = worldName;
     }
 
@@ -29,7 +29,7 @@ public class PartData {
      * @return a UUID
      */
     public UUID getUUID() {
-        return uuid;
+        return entityUUID;
     }
 
     /**
@@ -50,11 +50,11 @@ public class PartData {
         }
 
         PartData data = (PartData) obj;
-        return uuid.equals(data.uuid) && worldName.equals(data.worldName);
+        return entityUUID.equals(data.entityUUID) && worldName.equals(data.worldName);
     }
 
     @Override
     public int hashCode(){
-        return Objects.hash(uuid, worldName);
+        return Objects.hash(entityUUID, worldName);
     }
 }

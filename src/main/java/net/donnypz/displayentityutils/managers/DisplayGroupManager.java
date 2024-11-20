@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.managers;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupDespawnedEvent;
+import net.donnypz.displayentityutils.events.GroupRegisteredEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.GroupResult;
@@ -9,14 +10,13 @@ import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.*;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
@@ -387,11 +387,14 @@ public final class DisplayGroupManager {
     }
 
 
-    public static GroupResult getSpawnedGroup(Display displayEntity, @Nullable Player getter) {
+    @ApiStatus.Internal
+    public static @Nullable GroupResult getSpawnedGroup(Display displayEntity, @Nullable Player getter) {
         //Check for existing group
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(displayEntity);
         if (part != null && part.getGroup() != null) {
-            return new GroupResult(part.getGroup(), true);
+            if (part.getGroup().isSpawned()){
+                return new GroupResult(part.getGroup(), true);
+            }
         }
 
 
@@ -399,7 +402,8 @@ public final class DisplayGroupManager {
         SpawnedDisplayEntityGroup group;
         if (displayEntity.getVehicle() != null && displayEntity.getVehicle() instanceof Display) {
             displayEntity = (Display) displayEntity.getVehicle();
-        } else if (displayEntity.getPassengers().isEmpty()) {
+        }
+        else if (displayEntity.getPassengers().isEmpty()) {
             if (getter != null) {
                 getter.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("The selected display entity is not grouped", NamedTextColor.RED)));
             }
@@ -417,6 +421,10 @@ public final class DisplayGroupManager {
             return null;
         }
         group = new SpawnedDisplayEntityGroup(displayEntity);
+        new GroupRegisteredEvent(group).callEvent();
+        if (!group.isSpawned()){
+            return null;
+        }
         group.setPersistent(displayEntity.isPersistent());
         return new GroupResult(group, false);
     }
@@ -501,7 +509,7 @@ public final class DisplayGroupManager {
      * @param getter   Player who is getting the spawned group
      * @return A {@link GroupResult}. Null if not found.
      */
-    public static GroupResult getSpawnedGroupNearLocation(Location location, float radius, @Nullable Player getter) {
+    public static @Nullable GroupResult getSpawnedGroupNearLocation(Location location, float radius, @Nullable Player getter) {
         Display master = getNearestDisplayEntity(location, radius);
         if (master == null){
             if (getter != null) {
@@ -557,12 +565,11 @@ public final class DisplayGroupManager {
     }
 
     private static Display getNearestDisplayEntity(Location loc, double radius, String tag) {
-        BlockDisplay tempEntity = loc.getWorld().spawn(loc, BlockDisplay.class);
 
         Display nearest = null;
         double lastDistance = Double.MAX_VALUE;
-        for (Entity e : tempEntity.getNearbyEntities(radius, radius, radius)) {
-            if (!(e instanceof Display display) || !DisplayUtils.isGroupTag(display, tag) || e.equals(tempEntity)) {
+        for (Entity e : loc.getNearbyEntities(radius, radius, radius)) {
+            if (!(e instanceof Display display) || !DisplayUtils.isGroupTag(display, tag)) {
                 continue;
             }
 
@@ -572,17 +579,15 @@ public final class DisplayGroupManager {
                 nearest = (Display) e;
             }
         }
-        tempEntity.remove();
         return nearest;
     }
 
     private static Display getNearestDisplayEntity(Location loc, double radius) {
-        BlockDisplay tempEntity = loc.getWorld().spawn(loc, BlockDisplay.class);
 
         Display nearest = null;
         double lastDistance = Double.MAX_VALUE;
-        for (Entity e : tempEntity.getNearbyEntities(radius, radius, radius)) {
-            if (!(e instanceof Display) || e.equals(tempEntity)) {
+        for (Entity e : loc.getNearbyEntities(radius, radius, radius)) {
+            if (!(e instanceof Display)) {
                 continue;
             }
 
@@ -592,7 +597,6 @@ public final class DisplayGroupManager {
                 nearest = (Display) e;
             }
         }
-        tempEntity.remove();
         return nearest;
     }
 

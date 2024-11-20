@@ -37,7 +37,7 @@ class BDEngineImportModelCMD implements SubCommand{
 
                 Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
                     if (!result.spawn(spawnLoc)){
-                        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to spawn model! The spawn location's chunk is not loaded!", NamedTextColor.RED)));
+                        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to spawn model! The spawn location's chunk is not loaded or the model was uploaded as a BDEngine file on the website (Spawning Commands not found), and that format is not supported!", NamedTextColor.RED)));
                         return;
                     }
                     player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Attempted to spawn model at your location!", NamedTextColor.GREEN)));
@@ -48,8 +48,7 @@ class BDEngineImportModelCMD implements SubCommand{
                         player.sendMessage(Component.text("It is not recommended to import groups that use animations this way!", NamedTextColor.RED, TextDecoration.ITALIC));
                     }
 
-                    player.sendMessage(Component.text("\n- If your model did NOT spawn, the commands that are stored on the model are not compatible with your server version.\n", NamedTextColor.GRAY));
-
+                    player.sendMessage(Component.text("\n- If your model did NOT spawn, the model was uploaded as a BDEngine file on the website, and that format is not supported.\n", NamedTextColor.GRAY));
                 });
 
             }

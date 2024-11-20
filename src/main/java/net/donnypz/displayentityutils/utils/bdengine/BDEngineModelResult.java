@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 
 /**
  * The result of a BDEngine Request after using {@link BDEngineUtils#requestModel(int)}
+ * No commands will be provided if the model was uploaded to BDEngine as a BDEngine Project File.
  */
 public final class BDEngineModelResult {
     private static final CommandSender silentSender = Bukkit.createCommandSender(feedback -> {});
@@ -27,10 +28,10 @@ public final class BDEngineModelResult {
      * Spawn the model stored within the result at a location.
      * This method should be run synchronously.
      * @param location the location to spawn the model
-     * @return false if the location's chunk is not loaded
+     * @return false if the model could not be spawned due to an unloaded chunk, or the result contained 0 commands
      */
     public boolean spawn(@NotNull Location location){
-        if (!location.isChunkLoaded()){
+        if (!location.isChunkLoaded() || commands.isEmpty()){
             return false;
         }
         for (String command : commands.sequencedValues()){

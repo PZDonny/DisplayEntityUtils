@@ -44,22 +44,10 @@ public final class SpawnedDisplayEntityPart {
             this.type = PartType.TEXT_DISPLAY;
         }
 
-        adaptLegacyPartTags();
-        displayEntity.getPersistentDataContainer().set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, group.getCreationTime());
-        removeFromPreviousGroup(displayEntity);
-
-        this.partData = new PartData(entity);
-        allParts.put(partData, this);
-
-
+        applyData(random);
         if (isMaster()){
             group.masterPart = this;
         }
-
-        //Transformation instantly updates if a Display Entity hasn't existed for 2 more than ticks
-        setPartUUID(random);
-        group.spawnedParts.put(partUUID, this);
-        entity.setPersistent(group.isPersistent());
     }
 
 
@@ -67,10 +55,21 @@ public final class SpawnedDisplayEntityPart {
         this.group = group;
         this.entity = interactionEntity;
         this.type = PartType.INTERACTION;
+        applyData(random);
 
+    }
+
+    private void applyData(Random random){
         adaptLegacyPartTags();
-        interactionEntity.getPersistentDataContainer().set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, group.getCreationTime());
-        removeFromPreviousGroup(interactionEntity);
+        entity.getPersistentDataContainer().set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, group.getCreationTime());
+        if (entity instanceof Display display){
+            removeFromPreviousGroup(display);
+        }
+        else{
+            removeFromPreviousGroup((Interaction) entity);
+        }
+
+
 
         this.partData = new PartData(entity);
         allParts.put(partData, this);
@@ -78,9 +77,12 @@ public final class SpawnedDisplayEntityPart {
         setPartUUID(random);
         group.spawnedParts.put(partUUID, this);
         entity.setPersistent(group.isPersistent());
+
+        //For parts before v2.5.3
+        setGroupPDC();
     }
 
-    public void setPartUUID(UUID uuid){
+    public void setPartUUID(@NotNull UUID uuid){
         this.partUUID = uuid;
         PersistentDataContainer pdc = entity.getPersistentDataContainer();
         pdc.set(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
@@ -93,13 +95,15 @@ public final class SpawnedDisplayEntityPart {
     //New Part/Group
         if (value == null){
             if (DisplayEntityPlugin.seededPartUUIDS()){
-                byte[] byteArray = new byte[16];
-                random.nextBytes(byteArray);
-                partUUID = UUID.nameUUIDFromBytes(byteArray);
-                while(groupContainsUUID(partUUID)){
-                    byteArray = new byte[16];
+                if (groupContainsUUID(partUUID) || partUUID == null){
+                    byte[] byteArray = new byte[16];
                     random.nextBytes(byteArray);
                     partUUID = UUID.nameUUIDFromBytes(byteArray);
+                    while(groupContainsUUID(partUUID)){
+                        byteArray = new byte[16];
+                        random.nextBytes(byteArray);
+                        partUUID = UUID.nameUUIDFromBytes(byteArray);
+                    }
                 }
             }
             else{
@@ -287,35 +291,53 @@ public final class SpawnedDisplayEntityPart {
         return this;
     }
 
-    public SpawnedDisplayEntityPart setGroup(SpawnedDisplayEntityGroup group){
+    public SpawnedDisplayEntityPart setGroup(@NotNull SpawnedDisplayEntityGroup group){
         if (this.group == group){
             return this;
         }
 
-        UUID originalUUID = partUUID;
+
         if (this.group != null){
-            this.group.spawnedParts.remove(originalUUID);
+            this.group.spawnedParts.remove(partUUID);
         }
 
         this.group = group;
         if (type != PartType.INTERACTION){
             Display display = (Display) entity;
             Entity master = group.masterPart.entity;
+
             Vector worldPos = DisplayUtils.getModelLocation(display).toVector();
             Vector translation = worldPos.subtract(master.getLocation().toVector());
+
             Transformation transformation = display.getTransformation();
             display.setInterpolationDuration(-1);
             display.setTransformation(new Transformation(translation.toVector3f(), transformation.getLeftRotation(), transformation.getScale(), transformation.getRightRotation()));
             master.addPassenger(entity);
-            setPartUUID(group.partUUIDRandom);
         }
 
-        group.spawnedParts.remove(originalUUID);
-        group.spawnedParts.put(partUUID, this);
+        if (partUUID == null || groupContainsUUID(partUUID)){
+            setPartUUID(group.partUUIDRandom);
+        }
+        else{
+            setPartUUID(partUUID);
+        }
 
-        entity.getPersistentDataContainer().set(new NamespacedKey(DisplayEntityPlugin.getInstance(), "creationtime"), PersistentDataType.LONG, group.getCreationTime());
+        PersistentDataContainer pdc = entity.getPersistentDataContainer();
+        pdc.set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, group.getCreationTime());
+        setGroupPDC();
+
         entity.setPersistent(group.isPersistent());
         return this;
+    }
+
+    void setGroupPDC(){
+        PersistentDataContainer pdc = entity.getPersistentDataContainer();
+        if (group == null || group.getTag() == null){
+            pdc.remove(DisplayEntityPlugin.getGroupTagKey());
+        }
+        else{
+            pdc.set(DisplayEntityPlugin.getGroupTagKey(), PersistentDataType.STRING, group.getTag());
+        }
     }
 
     /**

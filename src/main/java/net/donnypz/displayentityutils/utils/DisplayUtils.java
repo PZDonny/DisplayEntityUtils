@@ -191,7 +191,7 @@ public final class DisplayUtils {
 
         Location destination = display.getLocation().clone().add(Vector.fromJOML(translation));
 
-        if (!new PartTranslateEvent(display, destination).callEvent()){
+        if (!new PartTranslateEvent(display, destination, oldTransformation, newTransformation).callEvent()){
             return;
         }
 
@@ -229,7 +229,7 @@ public final class DisplayUtils {
      */
     public static void translate(Interaction interaction, double distance, int durationInTicks, int delayInTicks, Vector direction){
         Location destination = interaction.getLocation().clone().add(direction.clone().normalize().multiply(distance));
-        PartTranslateEvent event = new PartTranslateEvent(interaction, destination);
+        PartTranslateEvent event = new PartTranslateEvent(interaction, destination, null,null);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()){
             return;
