@@ -10,6 +10,7 @@ import org.bukkit.entity.Interaction;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,14 +27,18 @@ public final class PartTranslateEvent extends Event implements Cancellable {
     Entity entity;
     Location destination;
     private boolean isCancelled;
+    Transformation oldTransformation;
+    Transformation newTransformation;
 
     /**
      * Called when a Display Entity or Interaction Entity changes its translation through the DisplayGroupManager.
      * Can be cancelled
      */
-    public PartTranslateEvent(@NotNull Entity entity, Location destination){
+    public PartTranslateEvent(@NotNull Entity entity, Location destination, Transformation oldTransformation, Transformation newTransformation){
         this.entity = entity;
         this.destination = destination;
+        this.oldTransformation = oldTransformation;
+        this.newTransformation = newTransformation;
         isCancelled = false;
     }
 
@@ -43,6 +48,14 @@ public final class PartTranslateEvent extends Event implements Cancellable {
      */
     public Entity getEntity() {
         return entity;
+    }
+
+    /**
+     * Get whether this is a {@link Display} entity (Text, Block, Item)
+     * @return true if it is a display entity
+     */
+    public boolean isDisplay(){
+        return entity instanceof Display;
     }
 
     /**
@@ -65,6 +78,23 @@ public final class PartTranslateEvent extends Event implements Cancellable {
     public Location getDestination() {
         return destination;
     }
+
+    /**
+     * Get the {@link Transformation} that the entity has before this event, if it is a {@link Display} entity
+     * @return a transformation or null
+     */
+    public @Nullable Transformation getOldTransformation() {
+        return oldTransformation;
+    }
+
+    /**
+     * Get the new {@link Transformation} that will be applied to the entity, if it is a {@link Display} entity
+     * @return a transformation or null
+     */
+    public @Nullable Transformation getNewTransformation() {
+        return newTransformation;
+    }
+
 
 
     /**
