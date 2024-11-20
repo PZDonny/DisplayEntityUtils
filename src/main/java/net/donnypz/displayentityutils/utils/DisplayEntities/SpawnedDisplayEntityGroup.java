@@ -237,22 +237,28 @@ public final class SpawnedDisplayEntityGroup {
      */
     public List<Interaction> addMissingInteractionEntities(double searchRange){
         List<Interaction> interactions = new ArrayList<>();
-        List<Entity> existingInteractions = getSpawnedPartEntities(SpawnedDisplayEntityPart.PartType.INTERACTION);
+        //List<Entity> existingInteractions = getSpawnedPartEntities(SpawnedDisplayEntityPart.PartType.INTERACTION);
 
-        for(Entity e : getMasterPart().getEntity().getNearbyEntities(searchRange, searchRange, searchRange)) {
+        for (Entity e : getMasterPart().getEntity().getNearbyEntities(searchRange, searchRange, searchRange)) {
             if (!(e instanceof Interaction i)){
                 continue;
             }
-            if (!existingInteractions.contains(i) && sameCreationTime(i)){
-                SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(i);
-                if (part == null){
-                    new SpawnedDisplayEntityPart(this, (Interaction) e, partUUIDRandom);
-                }
-                else{
-                    part.setGroup(this);
-                }
-                interactions.add((Interaction) e);
+            //if (!existingInteractions.contains(i) && sameCreationTime(i)){
+            if (!sameCreationTime(i)){
+                continue;
             }
+
+            SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(i);
+            if (part == null){
+                new SpawnedDisplayEntityPart(this, (Interaction) e, partUUIDRandom);
+            }
+            else{
+                if (this == part.getGroup()){ //Already in this group
+                    continue;
+                }
+                part.setGroup(this);
+            }
+            interactions.add((Interaction) e);
         }
         return interactions;
     }
@@ -931,19 +937,14 @@ public final class SpawnedDisplayEntityGroup {
 
     /**
      * Set this group's tag
-     * @param tag What to set this group's tag to
+     * @param tag What to set this group's tag to. Null to remove the group tag
      * @return this
      */
     public SpawnedDisplayEntityGroup setTag(String tag){
-        if (tag == null){
-            return this;
-        }
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            Entity entity = part.getEntity();
-            PersistentDataContainer pdc = entity.getPersistentDataContainer();
-            pdc.set(DisplayEntityPlugin.getGroupTagKey(), PersistentDataType.STRING, tag);
-        }
         this.tag = tag;
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
+            part.setGroupPDC();
+        }
         return this;
     }
 
@@ -1245,12 +1246,16 @@ public final class SpawnedDisplayEntityGroup {
      * @return This display entity group with the other group merged
      */
     public SpawnedDisplayEntityGroup merge(SpawnedDisplayEntityGroup mergingGroup){
-        mergingGroup.masterPart.remove(true);
         for (SpawnedDisplayEntityPart part : mergingGroup.getSpawnedParts()){
-            part.setGroup(this);
+            if (part.isMaster()){
+                part.remove(true);
+            }
+            else{
+                part.setGroup(this);
+            }
         }
+
         mergingGroup.removeAllPartSelections();
-        mergingGroup.spawnedParts.clear();
         mergingGroup.unregister(false, false);
 
         float widthCullingAdder = DisplayEntityPlugin.widthCullingAdder();
