@@ -10,10 +10,10 @@ BDEngine is what you'll use to create models and animations that can be transfer
 - Manipulate Groups (BDEngine Models)
 - Manipulate every part (Display Entity) within a model
 - Manipulate Interaction Entities
-- Include Interaction Entities as part of groups
+- Include Interaction Entities as part of groups/models
 - Execute commands through Interaction Entities
-- Create Animations through the plugin
-- Convert Animations from BDEngine (preferred over creating in-game)
+- Create and Play Animations through the plugin
+- Convert Datapack Animations from BDEngine (preferred over creating in-game)
 - Retrieve models from BDEngine and spawn them in-game
 - Save groups and animations through Local Storage, MySQL, or MongoDB
 - And so much more!
@@ -21,9 +21,9 @@ BDEngine is what you'll use to create models and animations that can be transfer
 ## What can it do for developers?
 - Tools to manipulate Display and Interaction entity as individual entities
 - Show/Hide groups to/from certain players
-- Play looping animations
 - Create animation state machines
 - Mount groups on entities (or vice-versa)
+- Request models from BDEngine's website
 - Theres too many things to list!
 
 ## Video Showcases
