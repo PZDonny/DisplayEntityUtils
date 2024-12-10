@@ -33,7 +33,7 @@ class TextShadowCMD implements SubCommand{
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
             return;
         }
-        TextDisplay display = (TextDisplay) partSelection.getSelectedParts().getFirst().getEntity();
+        TextDisplay display = (TextDisplay) partSelection.getSelectedPart().getEntity();
         display.setShadowed(!display.isShadowed());
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully toggled shadow on text display!", NamedTextColor.GREEN)));
     }
