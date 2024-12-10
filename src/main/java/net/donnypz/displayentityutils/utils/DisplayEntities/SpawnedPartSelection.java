@@ -2,8 +2,9 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.Direction;
+import org.bukkit.Material;
+import org.bukkit.entity.BlockDisplay;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,9 +12,12 @@ import java.util.*;
 
 public final class SpawnedPartSelection {
     List<SpawnedDisplayEntityPart> selectedParts = new ArrayList<>();
+    Set<SpawnedDisplayEntityPart.PartType> partTypes;
+    Set<Material> itemTypes;
+    Set<Material> blockTypes;
     SpawnedDisplayEntityGroup group;
     SpawnedDisplayEntityPart selectedPart = null;
-    Collection<String> partTags = null;
+    Collection<String> partTags;
 
     /**
      * Create a SpawnedPartSelection for parts with the specified part tag from a group.
@@ -21,7 +25,7 @@ public final class SpawnedPartSelection {
      * @param partTag The part tag to check for
      */
     public SpawnedPartSelection(SpawnedDisplayEntityGroup group, String partTag){
-        this(group, List.of(partTag));
+        this(group, Set.of(partTag));
     }
 
     /**
@@ -30,36 +34,64 @@ public final class SpawnedPartSelection {
      * @param partTags The part tags to check for
      */
     public SpawnedPartSelection(SpawnedDisplayEntityGroup group, Collection<String> partTags){
-        this.group = group;
-
-        for (SpawnedDisplayEntityPart part : group.getSpawnedParts()){
-            for (String tag : partTags){
-                if (part.hasTag(tag)){
-                    selectedParts.add(part);
-                    break; //Break out of loop checking all part tags
-                }
-            }
-        }
-        if (!selectedParts.isEmpty()){
-            selectedPart = selectedParts.getFirst();
-        }
-        group.partSelections.add(this);
-        this.partTags = partTags;
+        this(group, new SelectionBuilder().addPartTags(partTags));
     }
 
     /**
      * Create a SpawnedPartSelection containing all parts within a group.
      * @param group The group to cycle through for this selection.
      */
-    @ApiStatus.Internal
     public SpawnedPartSelection(SpawnedDisplayEntityGroup group){
-        this.group = group;
-        if (!group.spawnedParts.isEmpty()){
-            selectedParts.addAll(group.spawnedParts.sequencedValues());
-        }
-        group.partSelections.add(this);
+        this(group, new SelectionBuilder());
     }
 
+    SpawnedPartSelection(SpawnedDisplayEntityGroup group, SelectionBuilder builder){
+        this.group = group;
+        this.partTypes = builder.partTypes;
+        this.partTags = builder.partTags;
+        this.itemTypes = builder.itemTypes;
+        this.blockTypes = builder.blockTypes;
+
+        for (SpawnedDisplayEntityPart part : group.getSpawnedParts()){
+            SpawnedDisplayEntityPart.PartType type = part.getType();
+
+            if (!partTypes.isEmpty() && !partTypes.contains(type)){ //Type not contained
+                continue;
+            }
+            if (type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY && !blockTypes.isEmpty()){ //Block Display Material not contained
+                BlockDisplay bd = (BlockDisplay) part.getEntity();
+                if (!blockTypes.contains(bd.getBlock().getMaterial())){
+                    continue;
+                }
+            }
+
+            if (type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY && !itemTypes.isEmpty()){ //Item Display Material not contained
+                BlockDisplay bd = (BlockDisplay) part.getEntity();
+                if (!itemTypes.contains(bd.getBlock().getMaterial())){
+                    continue;
+                }
+            }
+
+            if (!partTags.isEmpty()){
+                for (String tag : partTags){
+                    if (part.hasTag(tag)){
+                        selectedParts.add(part);
+                        break; //Break out of loop checking all part tags
+                    }
+                }
+            }
+            else{
+                selectedParts.add(part);
+            }
+
+        }
+
+        if (!selectedParts.isEmpty()){
+            selectedPart = selectedParts.getFirst();
+        }
+
+        group.partSelections.add(this);
+    }
 
     /**
      * Get the SpawnedDisplayEntityParts within this SpawnedPartSelection
@@ -232,7 +264,7 @@ public final class SpawnedPartSelection {
      * @return The part tags.
      */
     public @Nullable Collection<String> getPartTags(){
-        if (partTags == null){
+        if (partTags.isEmpty()){
             return null;
         }
         return new ArrayList<>(partTags);
