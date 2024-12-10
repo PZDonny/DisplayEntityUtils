@@ -50,7 +50,6 @@ class PartsSetBlockCMD implements SubCommand{
             for (SpawnedDisplayEntityPart part : partSelection.getSelectedParts()){
                 if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY) {
                     setBlock(part, blockData);
-                    return;
                 }
             }
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully set block of ALL selected block displays!", NamedTextColor.GREEN)));
@@ -61,6 +60,7 @@ class PartsSetBlockCMD implements SubCommand{
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You can only do this with block display entities", NamedTextColor.RED)));
                 return;
             }
+            setBlock(selected, blockData);
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully set block of selected block display!", NamedTextColor.GREEN)));
         }
     }
