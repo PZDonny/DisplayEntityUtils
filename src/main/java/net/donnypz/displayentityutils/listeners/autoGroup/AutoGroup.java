@@ -50,12 +50,12 @@ final class AutoGroup {
         for (Entity entity : entities){
             if (entity instanceof Display display){
                 if (!DisplayUtils.isMaster(display)){
-                    return;
+                    continue;
                 }
                 //Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
                     GroupResult result = DisplayGroupManager.getSpawnedGroup(display, null);
                     if (result == null || foundGroups.contains(result.group())){
-                        return;
+                        continue;
                     }
 
                     SpawnedDisplayEntityGroup group = result.group();
@@ -83,7 +83,7 @@ final class AutoGroup {
             //Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
                 List<GroupResult> results = DisplayGroupManager.getSpawnedGroupsNearLocation(interaction.getLocation(), DisplayEntityPlugin.getMaximumInteractionSearchRange());
                 if (results.isEmpty()){ //Group has not been created yet, or it is not a group interaction
-                    return;
+                    continue;
                 }
 
                 for (GroupResult result : results){
