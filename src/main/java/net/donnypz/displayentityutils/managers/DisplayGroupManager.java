@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -387,8 +388,15 @@ public final class DisplayGroupManager {
     }
 
 
-    @ApiStatus.Internal
-    public static @Nullable GroupResult getSpawnedGroup(Display displayEntity, @Nullable Player getter) {
+    /**
+     * Get the {@link GroupResult} of a display entity containing its {@link SpawnedDisplayEntityGroup}, if applicable.
+     * <br>
+     * If a group is created as a result of this, {@link GroupRegisteredEvent} will be called
+     *
+     * @param displayEntity The display entity within a group
+     * @param getter The player searching for a group (For commands, otherwise null)
+     */
+    public static @Nullable GroupResult getSpawnedGroup(@NotNull Display displayEntity, @Nullable Player getter) {
         //Check for existing group
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(displayEntity);
         if (part != null && part.getGroup() != null) {
@@ -405,7 +413,7 @@ public final class DisplayGroupManager {
         }
         else if (displayEntity.getPassengers().isEmpty()) {
             if (getter != null) {
-                getter.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("The selected display entity is not grouped", NamedTextColor.RED)));
+                getter.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("The found display entity is not grouped", NamedTextColor.RED)));
             }
             return null;
         }
@@ -448,7 +456,7 @@ public final class DisplayGroupManager {
      * @param radius The radius to check for a spawned display entity group
      * @return SpawnedDisplayEntityGroup containing the interaction entity. Null if not found.
      */
-    public static SpawnedDisplayEntityGroup getSpawnedGroup(Interaction interaction, double radius) {
+    public static SpawnedDisplayEntityGroup getSpawnedGroup(@NotNull Interaction interaction, double radius) {
         //Check for existing group
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(interaction);
         if (part != null && part.getGroup() != null) {
