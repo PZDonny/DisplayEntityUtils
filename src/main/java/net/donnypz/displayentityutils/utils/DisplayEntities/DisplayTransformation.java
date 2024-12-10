@@ -10,7 +10,6 @@ import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -20,8 +19,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 
-@ApiStatus.Internal
-public class DisplayTransformation extends Transformation{
+class DisplayTransformation extends Transformation{
     private SpawnedDisplayEntityPart.PartType type;
     private Object data;
 
@@ -30,7 +28,7 @@ public class DisplayTransformation extends Transformation{
         super(transformation.getTranslation(), transformation.getLeftRotation(), transformation.getScale(), transformation.getRightRotation());
     }
 
-    public DisplayTransformation(@NotNull Vector3f translation, @NotNull Quaternionf leftRotation, @NotNull Vector3f scale, @NotNull Quaternionf rightRotation){
+    DisplayTransformation(@NotNull Vector3f translation, @NotNull Quaternionf leftRotation, @NotNull Vector3f scale, @NotNull Quaternionf rightRotation){
         super(translation, leftRotation, scale, rightRotation);
     }
 
@@ -51,7 +49,7 @@ public class DisplayTransformation extends Transformation{
         return dTransform;
     }
 
-    public static DisplayTransformation get(@NotNull Vector3f translation, @NotNull Quaternionf leftRotation, @NotNull Vector3f scale, @NotNull Quaternionf rightRotation, Serializable data, SpawnedDisplayEntityPart.PartType type){
+    static DisplayTransformation get(@NotNull Vector3f translation, @NotNull Quaternionf leftRotation, @NotNull Vector3f scale, @NotNull Quaternionf rightRotation, Serializable data, SpawnedDisplayEntityPart.PartType type){
         DisplayTransformation displayTransformation = new DisplayTransformation(translation, leftRotation, scale, rightRotation);
         displayTransformation.setData(type, data);
         return displayTransformation;
@@ -89,11 +87,11 @@ public class DisplayTransformation extends Transformation{
         }
     }
 
-    public @Nullable Object getData(){
+    @Nullable Object getData(){
         return data;
     }
 
-    public @Nullable Serializable getSerializableData(){
+    @Nullable Serializable getSerializableData(){
         if (type == null || data == null){
             return null;
         }
@@ -108,11 +106,11 @@ public class DisplayTransformation extends Transformation{
         }
     }
 
-    public SpawnedDisplayEntityPart.PartType getType(){
+    SpawnedDisplayEntityPart.PartType getType(){
         return type;
     }
 
-    public boolean isSimilar(Transformation transformation){
+    boolean isSimilar(Transformation transformation){
         if (transformation == this){
             return true;
         }
@@ -156,7 +154,7 @@ public class DisplayTransformation extends Transformation{
         return Objects.equals(data, other.data);
     }
 
-    public Transformation toTransformation(){
+    Transformation toTransformation(){
         return new Transformation(getTranslation(), getLeftRotation(), getScale(), getRightRotation());
     }
 }
