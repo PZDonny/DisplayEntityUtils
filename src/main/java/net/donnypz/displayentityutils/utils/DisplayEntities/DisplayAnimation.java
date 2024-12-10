@@ -50,7 +50,7 @@ public final class DisplayAnimation implements Serializable {
         anim.respectGroupScale = this.respectGroupScale;
         anim.partTag = this.partTag;
         for (DisplayAnimationFrame frame : frames){
-            anim.addFrame(frame.toSpawnedDisplayAnimationFrame());
+            anim.forceAddFrame(frame.toSpawnedDisplayAnimationFrame());
         }
         return anim;
     }
