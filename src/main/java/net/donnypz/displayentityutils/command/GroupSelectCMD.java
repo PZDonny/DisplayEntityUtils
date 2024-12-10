@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.donnypz.displayentityutils.utils.GroupResult;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -31,6 +32,7 @@ class GroupSelectCMD implements SubCommand{
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Selection made!", NamedTextColor.GREEN)));
             DisplayGroupManager.setSelectedSpawnedGroup(player, group);
             DisplayGroupManager.removePartSelection(player);
+            DisplayGroupManager.setPartSelection(player, new SpawnedPartSelection(group), false);
 
             group.getUnaddedInteractionEntitiesInRange(interactionDistance, true);
             group.glow(100, false);
