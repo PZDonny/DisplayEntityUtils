@@ -229,7 +229,7 @@ public final class DisplayAnimatorExecutor {
 
     private void animateDisplays(SpawnedDisplayAnimationFrame frame, SpawnedDisplayEntityGroup group, SpawnedDisplayAnimation animation){
         for (UUID partUUID : frame.displayTransformations.keySet()){
-            Transformation transformation = frame.displayTransformations.get(partUUID);
+            DisplayTransformation transformation = frame.displayTransformations.get(partUUID);
             if (transformation == null){ //Part does not change transformation
                 continue;
             }
@@ -239,22 +239,27 @@ public final class DisplayAnimatorExecutor {
                 continue;
             }
             Display display = ((Display) part.getEntity());
-            if (display.getTransformation().equals(transformation)){ //Prevents jittering in some cases
-                continue;
-            }
+
+            //Prevents jittering in some cases
+            boolean applyDataOnly = transformation.isSimilar(display.getTransformation());
 
             if (isAsync){ //Asynchronously apply transformation changes
                 Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
-                    applyDisplayTransformation(display, frame, animation, group, transformation);
+                    applyDisplayTransformation(display, frame, animation, group, transformation, applyDataOnly);
                 });
             }
             else{
-                applyDisplayTransformation(display, frame, animation, group, transformation);
+                applyDisplayTransformation(display, frame, animation, group, transformation, applyDataOnly);
             }
         }
     }
 
-    private void applyDisplayTransformation(Display display, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, SpawnedDisplayEntityGroup group, Transformation transformation){
+    private void applyDisplayTransformation(Display display, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, SpawnedDisplayEntityGroup group, DisplayTransformation transformation, boolean applyDataOnly){
+        if (applyDataOnly){
+            transformation.applyData(display);
+            return;
+        }
+
         if (frame.duration > 0) {
             display.setInterpolationDelay(0);
         }
@@ -271,8 +276,9 @@ public final class DisplayAnimatorExecutor {
                     translationVector.mul(group.getScaleMultiplier());
                     scaleVector.mul(group.getScaleMultiplier());
                 }
-                Transformation respectTransform = new Transformation(translationVector, transformation.getLeftRotation(), scaleVector, transformation.getRightRotation());
+                Transformation respectTransform = new DisplayTransformation(translationVector, transformation.getLeftRotation(), scaleVector, transformation.getRightRotation());
                 display.setTransformation(respectTransform);
+                transformation.applyData(display);
             }
             catch(CloneNotSupportedException e){
                 Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix
