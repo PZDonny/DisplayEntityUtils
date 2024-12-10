@@ -8,7 +8,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
@@ -17,7 +16,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 public final class SpawnedDisplayAnimationFrame {
-    HashMap<UUID, Transformation> displayTransformations = new HashMap<>(); //Part UUIDS
+    HashMap<UUID, DisplayTransformation> displayTransformations = new HashMap<>(); //Part UUIDS
     HashMap<UUID, Vector3f>  interactionTransformations = new HashMap<>(); //Part UUIDS
 
     int delay;
@@ -128,7 +127,8 @@ public final class SpawnedDisplayAnimationFrame {
                 setInteractionTransformation(part, transform);
             }
             else{
-                setDisplayEntityTransformation(part, ((Display) part.getEntity()).getTransformation());
+                DisplayTransformation transform = DisplayTransformation.get((Display) part.getEntity());
+                setDisplayEntityTransformation(part, transform);
             }
         }
         return this;
@@ -159,7 +159,8 @@ public final class SpawnedDisplayAnimationFrame {
                 setInteractionTransformation(part, transform);
             }
             else{
-                setDisplayEntityTransformation(part, ((Display) part.getEntity()).getTransformation());
+                DisplayTransformation transform = DisplayTransformation.get((Display) part.getEntity());
+                setDisplayEntityTransformation(part, transform);
             }
         }
         return this;
@@ -333,11 +334,11 @@ public final class SpawnedDisplayAnimationFrame {
         DEUCommandUtils.spawnParticleDisplays(group, player, this, false);
     }
 
-    void setDisplayEntityTransformation(SpawnedDisplayEntityPart part, Transformation transformation){
-        setDisplayEntityTransformation(part.getPartUUID(), transformation);
+    void setDisplayEntityTransformation(SpawnedDisplayEntityPart part, DisplayTransformation transformation){
+        this.setDisplayEntityTransformation(part.getPartUUID(), transformation);
     }
 
-    void setDisplayEntityTransformation(UUID partUUID, Transformation transformation){
+    void setDisplayEntityTransformation(UUID partUUID, DisplayTransformation transformation){
         displayTransformations.put(partUUID, transformation);
     }
 
@@ -356,7 +357,10 @@ public final class SpawnedDisplayAnimationFrame {
     public DisplayAnimationFrame toDisplayAnimationFrame(){
         DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, frameStartSoundMap, frameEndSoundMap, frameStartParticles, frameEndParticles);
         for (UUID uuid : displayTransformations.keySet()){
-            frame.setDisplayEntityTransformation(uuid, new SerialTransformation(displayTransformations.get(uuid)));
+            DisplayTransformation transform = displayTransformations.get(uuid);
+            if (transform != null){
+                frame.setDisplayEntityTransformation(uuid, new SerialTransformation(transform));
+            }
         }
         for (UUID uuid : interactionTransformations.keySet()){
             frame.setInteractionTransformation(uuid, interactionTransformations.get(uuid));

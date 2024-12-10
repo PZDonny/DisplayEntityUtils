@@ -1,11 +1,8 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities.particles;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -36,7 +33,7 @@ public class ItemStackAnimationParticle extends AnimationParticle implements Ser
 
     @Override
     protected void initalize() {
-        itemStack = Bukkit.getUnsafe().deserializeItem(itemStackAsBytes);
+        itemStack = ItemStack.deserializeBytes(itemStackAsBytes);
     }
 
     @Override

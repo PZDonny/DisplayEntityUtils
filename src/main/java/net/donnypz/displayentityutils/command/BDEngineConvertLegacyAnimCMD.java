@@ -6,14 +6,14 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class BDEngineConvertAnimCMD implements SubCommand{
+class BDEngineConvertLegacyAnimCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.BDENGINE_CONVERT_ANIM)){
             return;
         }
         if (args.length < 5) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Incorrect Usage! /mdis bdengine convertanim <datapack-name> <group-tag-to-set> <anim-tag-prefix-to-set>", NamedTextColor.RED)));
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Incorrect Usage! /mdis bdengine convertanimleg <datapack-name> <group-tag-to-set> <anim-tag-to-set>", NamedTextColor.RED)));
             player.sendMessage(Component.text("Use \"-\" for the group tag if you do not want to save the group", NamedTextColor.GRAY));
             return;
         }
@@ -25,6 +25,6 @@ class BDEngineConvertAnimCMD implements SubCommand{
         player.sendMessage(Component.text(" | DO NOT LEAVE THIS AREA UNTIL CONVERSION IS COMPLETED/FAILS", NamedTextColor.YELLOW));
         player.sendMessage(Component.text(" | Conversion time may vary.", NamedTextColor.YELLOW));
         player.sendMessage(Component.text(" | Entities may not be visible while converting", NamedTextColor.YELLOW));
-        LocalManager.saveDatapackAnimation(player, datapackName, groupTag, animTag);
+        LocalManager.saveDatapackLegacyAnimation(player, datapackName, groupTag, animTag);
     }
 }

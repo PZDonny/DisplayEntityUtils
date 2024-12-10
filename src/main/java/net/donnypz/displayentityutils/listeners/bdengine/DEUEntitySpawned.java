@@ -17,8 +17,8 @@ import java.util.List;
 
 @ApiStatus.Internal
 public final class DEUEntitySpawned implements Listener {
-    private static final HashMap<Long, SpawnedDisplayEntityGroup> groups = new HashMap<>();
-    private static final HashSet<Long> incomingAnimationTimestamps = new HashSet<>();
+    private static final HashMap<Object, SpawnedDisplayEntityGroup> groups = new HashMap<>();
+    private static final HashSet<Object> incomingAnimationValue = new HashSet<>();
 
     @EventHandler
     public void onSpawn(EntitySpawnEvent e){
@@ -26,26 +26,32 @@ public final class DEUEntitySpawned implements Listener {
             return;
         }
 
-        for (Long timestamp : incomingAnimationTimestamps){
-            applyToEntity(display, timestamp);
+        for (Object projectName : incomingAnimationValue){
+            applyToEntity(display, projectName);
         }
     }
 
+
+    public static SpawnedDisplayEntityGroup getProjectGroup(String projectName){
+        return groups.get(projectName);
+    }
 
     public static SpawnedDisplayEntityGroup getTimestampGroup(long timestamp){
         return groups.get(timestamp);
     }
 
-    public static void prepareAnimationMaster(long timestamp){
-        incomingAnimationTimestamps.add(timestamp);
+
+    public static void prepareAnimationMaster(Object projectValue){
+        incomingAnimationValue.add(projectValue);
     }
 
-    private static void applyToEntity(Display display, long timestamp){
+
+    private static void applyToEntity(Display display, Object projectValue){
         for (String tag : display.getScoreboardTags()){
-            if (tag.contains(String.valueOf(timestamp))){
-                SpawnedDisplayEntityGroup group = groups.get(timestamp);
+            if (tag.contains(String.valueOf(projectValue))){
+                SpawnedDisplayEntityGroup group = groups.get(projectValue);
                 if (group == null){
-                    storeTimestampedGroupAnimation(timestamp, display);
+                    storeGroupAnimation(projectValue, display);
                 }
 
                 //Add parts that aren't grouped/animated later to the group, so the animation can be used
@@ -53,29 +59,35 @@ public final class DEUEntitySpawned implements Listener {
                 //DisplayEntityGroups created outside the animator spawn ungrouped parts last,
                 //while the animator spawns them after the MAIN master part
                 else {
-                    if (tag.contains(timestamp+"_0_")) {
+                    if (tag.contains(projectValue +"_")) {
                         display.addScoreboardTag(LocalManager.datapackUngroupedAddLaterTag);
                     }
-                //Tags the master of the ungrouped parts to be deleted later
-                    /*else{
-                        display.addScoreboardTag(LocalManager.datapackConvertDeleteSubParentTag);
-                    }*/
                     group.addDisplayEntity(display);
                 }
+                return;
             }
         }
     }
 
-    private static void storeTimestampedGroupAnimation(long timestamp, Display master){
-        if (groups.containsKey(timestamp)){
+    private static void storeGroupAnimation(Object projectValue, Display master){
+        if (groups.containsKey(projectValue)){
             throw new RuntimeException("Failed to successfully convert animation, conversion may already be in progress?");
         }
-        groups.put(timestamp, new SpawnedDisplayEntityGroup(master));
+        groups.put(projectValue, new SpawnedDisplayEntityGroup(master));
     }
 
-    public static void finalizeTimestampedAnimationPreparation(long timestamp){
-        SpawnedDisplayEntityGroup group = groups.get(timestamp);
 
+    @ApiStatus.Internal
+    public static void finalizeAnimationPreparation(Object projectValue){
+        SpawnedDisplayEntityGroup group = groups.get(projectValue);
+        finalize(group);
+
+        groups.remove(projectValue);
+        incomingAnimationValue.remove(projectValue);
+    }
+
+
+    private static void finalize(SpawnedDisplayEntityGroup group){
         if (group != null){
             List<Entity> laterParts = new ArrayList<>();
             Entity masterPart = group.getMasterPart().getEntity();
@@ -100,8 +112,5 @@ public final class DEUEntitySpawned implements Listener {
                 group.addPartEntity(part);
             }
         }
-
-        groups.remove(timestamp);
-        incomingAnimationTimestamps.remove(timestamp);
     }
 }

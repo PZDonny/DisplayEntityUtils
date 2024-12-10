@@ -46,6 +46,11 @@ public enum Permission {
     TEXT_SET_ALIGNMENT("deu.text.align"),
     TEXT_SET_LINE_WIDTH("deu.text.linewidth"),
 
+    ITEM_TOGGLE_GLINT("deu.item.glint"),
+    ITEM_SET("deu.item.setitem"),
+    ITEM_SET_TRANSFORM("deu.item.settransform"),
+
+
     INTERACTION_ADD_CMD("deu.interaction.addcmd"),
     INTERACTION_REMOVE_CMD("deu.interaction.removecmd"),
     INTERACTION_LIST_CMD("deu.interaction.listcmd"),

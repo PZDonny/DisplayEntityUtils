@@ -40,7 +40,8 @@ public final class SpawnedDisplayAnimation {
                 frame.setInteractionTransformation(part, transform);
             }
             else{
-                frame.setDisplayEntityTransformation(part, ((Display) part.getEntity()).getTransformation());
+                DisplayTransformation transform = DisplayTransformation.get((Display) part.getEntity());
+                frame.setDisplayEntityTransformation(part, transform);
             }
         }
         addFrame(frame);
@@ -62,7 +63,8 @@ public final class SpawnedDisplayAnimation {
                 frame.setInteractionTransformation(part, transform);
             }
             else{
-                frame.setDisplayEntityTransformation(part, ((Display) part.getEntity()).getTransformation());
+                DisplayTransformation transform = DisplayTransformation.get((Display) part.getEntity());
+                frame.setDisplayEntityTransformation(part, transform);
             }
         }
         addFrame(frame);
@@ -119,7 +121,8 @@ public final class SpawnedDisplayAnimation {
     }
 
     /**
-     * Add a frame to this SpawnedDisplayAnimation
+     * Add a frame to this SpawnedDisplayAnimation. This will attempt to automatically optimize the animation, removing duplicate transformation data. To avoid this
+     * and any errors it may potentially cause, use {@link SpawnedDisplayAnimation#forceAddFrame(SpawnedDisplayAnimationFrame)} instead.
      * @param frame the frame to add
      */
     public void addFrame(SpawnedDisplayAnimationFrame frame){
@@ -127,25 +130,43 @@ public final class SpawnedDisplayAnimation {
             frames.add(frame);
             return;
         }
-        SpawnedDisplayAnimationFrame lastFrame = frames.getLast(); //Compare previous frame
 
-        //Remove identical part changes
-        for (UUID partUUID : lastFrame.displayTransformations.keySet()){
-            Transformation oldT = lastFrame.displayTransformations.get(partUUID);
-            Transformation newT = frame.displayTransformations.get(partUUID);
-            if (oldT != null && newT != null){
-                if (newT.equals(oldT)){ //Remove identical Display Entity changes
-                    frame.displayTransformations.remove(partUUID);
+        //Remove identical transformations
+        SpawnedDisplayAnimationFrame firstFrame = frames.getFirst();
+
+        for (UUID partUUID : firstFrame.displayTransformations.keySet()){
+            for (int i = frames.size()-1; i >= 0; i--){
+                SpawnedDisplayAnimationFrame lastFrame = frames.get(i);
+                if (!lastFrame.displayTransformations.containsKey(partUUID)){
+                    continue;
+                }
+
+                DisplayTransformation oldT = lastFrame.displayTransformations.get(partUUID);
+                DisplayTransformation newT = frame.displayTransformations.get(partUUID);
+                if (oldT != null && newT != null){
+                    if (newT.equals(oldT)){ //Remove identical Display Entity changes
+                        frame.displayTransformations.remove(partUUID);
+                    }
+                    break;
                 }
             }
+
         }
 
-        for (UUID partUUID : lastFrame.interactionTransformations.keySet()){
-            Vector3f oldV = lastFrame.interactionTransformations.get(partUUID);
-            Vector3f newV = frame.interactionTransformations.get(partUUID);
-            if (oldV != null && newV != null){
-                if (newV.equals(oldV)){ //Remove identical Interaction changes
-                    frame.interactionTransformations.remove(partUUID);
+        for (UUID partUUID : firstFrame.interactionTransformations.keySet()){
+            for (int i = frames.size()-1; i>= 0; i--){
+                SpawnedDisplayAnimationFrame lastFrame = frames.get(i);
+                if (!lastFrame.interactionTransformations.containsKey(partUUID)){
+                    continue;
+                }
+
+                Vector3f oldV = lastFrame.interactionTransformations.get(partUUID);
+                Vector3f newV = frame.interactionTransformations.get(partUUID);
+                if (oldV != null && newV != null){
+                    if (newV.equals(oldV)){ //Remove identical Interaction changes
+                        frame.interactionTransformations.remove(partUUID);
+                    }
+                    break;
                 }
             }
         }
@@ -154,6 +175,7 @@ public final class SpawnedDisplayAnimation {
             frames.add(frame);
         }
         else{
+            SpawnedDisplayAnimationFrame lastFrame = frames.getLast();
             lastFrame.delay+=frame.delay+frame.duration;
         }
 
@@ -184,6 +206,15 @@ public final class SpawnedDisplayAnimation {
      */
     public boolean removeFrame(SpawnedDisplayAnimationFrame frame){
         return frames.remove(frame);
+    }
+
+    /**
+     * Remove a frame from this {@link SpawnedDisplayAnimation}
+     * @param index the index to remove a frame
+     * @return the element at the specified index, if it exists
+     */
+    public SpawnedDisplayAnimationFrame removeFrame(int index){
+        return frames.remove(index);
     }
 
     /**

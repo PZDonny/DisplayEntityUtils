@@ -119,10 +119,6 @@ public class DEUCommandUtils {
         ItemStack itemStack;
         if (item.equals("-held")){
             ItemStack mainHand = player.getInventory().getItemInMainHand();
-            if (mainHand.getType().isBlock()){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your held item cannot be a block!", NamedTextColor.RED)));
-                return null;
-            }
             itemStack = mainHand.clone();
         }
 
@@ -130,8 +126,8 @@ public class DEUCommandUtils {
         //Item-ID
         else{
             Material material = Material.matchMaterial(item.toLowerCase());
-            if (material == null || material.isBlock()){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Item not recognized! The item's name might have been misspelled, the item doesn't exist or the item is a block.", NamedTextColor.RED)));
+            if (material == null){
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Item not recognized! The item's name might have been misspelled.", NamedTextColor.RED)));
                 return null;
             }
             itemStack = new ItemStack(material);

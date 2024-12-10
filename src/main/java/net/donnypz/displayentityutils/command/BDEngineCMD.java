@@ -16,6 +16,7 @@ class BDEngineCMD implements SubCommand{
 
     BDEngineCMD(){
         subCommands.put("convertanim", new BDEngineConvertAnimCMD());
+        subCommands.put("convertanimleg", new BDEngineConvertLegacyAnimCMD());
         subCommands.put("importmodel", new BDEngineImportModelCMD());
     }
 
@@ -46,8 +47,10 @@ class BDEngineCMD implements SubCommand{
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Use <yellow>\"block-display.com\" (BDEngine) <aqua>to create convertable models and animations"));
         sender.sendMessage(Component.empty());
-        CMDUtils.sendCMD(sender,"/mdis bdengine convertanim <datapack-name> <group-tag-to-set> <anim-tag-to-set>",
+        CMDUtils.sendCMD(sender,"/mdis bdengine convertanim <datapack-name> <group-tag-to-set> <anim-tag-prefix-to-set>",
                 " (Convert an animation datapack from \"block-display.com\" into a animation file usable for DisplayEntityUtils)");
+        CMDUtils.sendCMD(sender,"/mdis bdengine convertanimleg <datapack-name> <group-tag-to-set> <anim-tag-to-set>",
+                " (Convert an old animation datapack from \"block-display.com\", before BDEngine v1.13 (Dec. 8th 2024), into a animation file usable for DisplayEntityUtils)");
         sender.sendMessage(Component.empty());
         CMDUtils.sendCMD(sender, "/mdis bdengine importmodel <model-id>");
 

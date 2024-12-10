@@ -16,17 +16,32 @@ final class SerialTransformation implements Serializable {
     Quaternionf leftRotation;
     Vector3f scale;
     Quaternionf rightRotation;
+    Serializable data;
+    SpawnedDisplayEntityPart.PartType type;
 
     SerialTransformation(Transformation transformation){
         translation = transformation.getTranslation();
         leftRotation = transformation.getLeftRotation();
         scale = transformation.getScale();
         rightRotation = transformation.getRightRotation();
+        this.data = null;
+        this.type = null;
+    }
+
+    SerialTransformation(DisplayTransformation displayTransformation){
+        this((Transformation) displayTransformation);
+        this.data = displayTransformation.getSerializableData();
+        this.type = displayTransformation.getType();
     }
 
 
-    public Transformation toTransformation(){
-        return new Transformation(translation, leftRotation, scale, rightRotation);
+    public DisplayTransformation toTransformation(){
+        /*if (type == null || data == null){
+            return new Transformation(translation, leftRotation, scale, rightRotation);
+        }*/
+
+        return DisplayTransformation.get(translation, leftRotation, scale, rightRotation, data, type);
+
     }
 
 }

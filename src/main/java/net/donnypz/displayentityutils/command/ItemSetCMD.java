@@ -8,14 +8,14 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection
 import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
-class PartsSetBlockCMD implements SubCommand{
+class ItemSetCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_SET_BLOCK)){
+        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ITEM_SET)){
             return;
         }
 
@@ -32,42 +32,43 @@ class PartsSetBlockCMD implements SubCommand{
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /mdis parts setblock <\"-held\" | \"-target\" | block-id> [-all]", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /mdis parts setitem <\"-held\" | \"-target\" | item-id> [-all]", NamedTextColor.RED));
             return;
         }
         
-        String block = args[2];
+        String item = args[2];
 
         if (partSelection.getSelectedParts().isEmpty()){
             PartsCMD.invalidPartSelection(player);
             return;
         }
 
-        BlockData blockData = DEUCommandUtils.getBlockFromText(block, player);
-        if (blockData == null) return;
+
+        ItemStack itemStack = DEUCommandUtils.getItemFromText(item, player);
+        if (itemStack == null) return;
 
         if (args.length >= 4 && args[3].equalsIgnoreCase("-all")){
             for (SpawnedDisplayEntityPart part : partSelection.getSelectedParts()){
-                if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY) {
-                    setBlock(part, blockData);
+                if (part.getType() == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
+                    setItem(part, itemStack);
                 }
             }
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully set block of ALL selected block displays!", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully set item of ALL selected item displays!", NamedTextColor.GREEN)));
         }
         else{
             SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
-            if (selected.getType() != SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY) {
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You can only do this with block display entities", NamedTextColor.RED)));
+            if (selected.getType() != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You can only do this with item display entities", NamedTextColor.RED)));
                 return;
             }
-            setBlock(selected, blockData);
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully set block of selected block display!", NamedTextColor.GREEN)));
+            setItem(selected, itemStack);
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully set item of selected item display!", NamedTextColor.GREEN)));
         }
     }
 
-    private void setBlock(SpawnedDisplayEntityPart part, BlockData blockData){
-        BlockDisplay display = (BlockDisplay) part.getEntity();
-        display.setBlock(blockData);
+    private void setItem(SpawnedDisplayEntityPart part, ItemStack itemStack){
+        ItemDisplay display = (ItemDisplay) part.getEntity();
+        display.setItemStack(itemStack);
     }
 
 }
