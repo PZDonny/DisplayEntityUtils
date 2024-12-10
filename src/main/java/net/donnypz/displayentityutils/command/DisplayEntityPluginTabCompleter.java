@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.utils.Direction;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.ItemDisplay;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
@@ -40,6 +41,9 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                 }
                 case "text" -> {
                     return DisplayEntityPluginCommand.getTextTabComplete();
+                }
+                case "item" -> {
+                    return DisplayEntityPluginCommand.getItemTabComplete();
                 }
                 case "listgroups", "listanim" -> addStorages(suggestions);
             }
@@ -93,6 +97,19 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                         case "listtags" -> {
                             suggestions.add("part");
                             suggestions.add("selection");
+                        }
+                    }
+                }
+                case "item" -> {
+                    switch (args[1].toLowerCase()){
+                        case "set" -> {
+                            suggestions.add("-held");
+                            suggestions.add("item-id");
+                        }
+                        case "settransform" -> {
+                            for (ItemDisplay.ItemDisplayTransform transform : ItemDisplay.ItemDisplayTransform.values()){
+                                suggestions.add(transform.name());
+                            }
                         }
                     }
                 }

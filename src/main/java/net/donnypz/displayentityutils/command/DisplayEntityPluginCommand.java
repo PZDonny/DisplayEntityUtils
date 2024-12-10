@@ -24,6 +24,7 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
 
         subCommands.put("group", new GroupCMD());
         subCommands.put("parts", new PartsCMD());
+        subCommands.put("item", new ItemCMD());
         subCommands.put("text", new TextCMD());
         subCommands.put("interaction", new InteractionCMD());
         subCommands.put("anim", new AnimCMD());
@@ -59,6 +60,11 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
     public static List<String> getTextTabComplete(){
         return TextCMD.getTabComplete();
     }
+
+    public static List<String> getItemTabComplete(){
+        return ItemCMD.getTabComplete();
+    }
+
 
     static void invalidDirection(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid direction type!", NamedTextColor.RED)));
@@ -117,12 +123,13 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
 
     static void mainCommandHelp(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-        sender.sendMessage(Component.text("Valid storage is \"local\", \"mongodb\", \"mysql\", and \"all\"", NamedTextColor.DARK_AQUA));
+        //sender.sendMessage(Component.text("Valid storage is \"local\", \"mongodb\", \"mysql\", and \"all\"", NamedTextColor.DARK_AQUA));
         CMDUtils.sendCMD(sender, "/mdis group");
+        CMDUtils.sendCMD(sender, "/mdis anim");
         CMDUtils.sendCMD(sender, "/mdis parts");
+        CMDUtils.sendCMD(sender, "/mdis item");
         CMDUtils.sendCMD(sender, "/mdis text");
         CMDUtils.sendCMD(sender, "/mdis interaction");
-        CMDUtils.sendCMD(sender, "/mdis anim");
         CMDUtils.sendCMD(sender, "/mdis listgroups <storage> [page-number]");
         CMDUtils.sendCMD(sender, "/mdis listanims <storage> [page-number]");
         CMDUtils.sendCMD(sender, "/mdis bdengine", " (Import models from BDEngine or convert animations)");
