@@ -50,7 +50,8 @@ public class DEUCommandUtils {
             pd.reveal(player);
         }
         particleDisplays.put(player.getUniqueId(), displays);
-        player.sendMessage(Component.text("Run \"/mdis anim cancelparticles\" to stop viewing particles", NamedTextColor.YELLOW));
+        player.sendMessage(Component.text("Click a particle to edit/view it", NamedTextColor.YELLOW));
+        player.sendMessage(Component.text("| Run \"/mdis anim cancelparticles\" to stop viewing particles", NamedTextColor.GRAY));
     }
 
     /**
