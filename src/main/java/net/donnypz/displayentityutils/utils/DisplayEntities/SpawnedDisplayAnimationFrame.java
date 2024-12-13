@@ -22,9 +22,8 @@ public final class SpawnedDisplayAnimationFrame {
     int delay;
     int duration;
     String tag;
-    HashMap<Sound, Float[]> frameStartSoundMap;
-    HashMap<Sound, Float[]> frameEndSoundMap;
-
+    HashMap<String, AnimationSound> frameStartSounds;
+    HashMap<String, AnimationSound> frameEndSounds;
     Set<AnimationParticle> frameStartParticles = new HashSet<>();
     Set<AnimationParticle> frameEndParticles = new HashSet<>();
 
@@ -33,16 +32,16 @@ public final class SpawnedDisplayAnimationFrame {
     public SpawnedDisplayAnimationFrame(int delay, int duration){
         this.delay = delay;
         this.duration = duration;
-        this.frameStartSoundMap = new HashMap<>();
-        this.frameEndSoundMap = new HashMap<>();
+        this.frameStartSounds = new HashMap<>();
+        this.frameEndSounds = new HashMap<>();
     }
 
     @ApiStatus.Internal
-    public SpawnedDisplayAnimationFrame(int delay, int duration, HashMap<Sound, Float[]> frameStartSoundMap, HashMap<Sound, Float[]> frameEndSoundMap, Set<AnimationParticle> frameStartParticles, Set<AnimationParticle> frameEndParticles){
+    public SpawnedDisplayAnimationFrame(int delay, int duration, HashMap<String, AnimationSound> frameStartSounds, HashMap<String, AnimationSound> frameEndSounds, Set<AnimationParticle> frameStartParticles, Set<AnimationParticle> frameEndParticles){
         this.delay = delay;
         this.duration = duration;
-        this.frameStartSoundMap = frameStartSoundMap == null ? new HashMap<>() : frameStartSoundMap;
-        this.frameEndSoundMap = frameEndSoundMap == null ? new HashMap<>() : frameEndSoundMap;
+        this.frameStartSounds = frameStartSounds == null ? new HashMap<>() : frameStartSounds;
+        this.frameEndSounds = frameEndSounds == null ? new HashMap<>() : frameEndSounds;
         this.frameStartParticles = frameStartParticles == null ? new HashSet<>() : frameStartParticles;
         this.frameEndParticles = frameEndParticles == null ? new HashSet<>() : frameEndParticles;
     }
@@ -174,7 +173,7 @@ public final class SpawnedDisplayAnimationFrame {
      * @return this
      */
     public SpawnedDisplayAnimationFrame addFrameStartSound(Sound sound, float volume, float pitch){
-        frameStartSoundMap.put(sound, new Float[]{volume, pitch});
+        frameStartSounds.put(sound.getKey().getKey(), new AnimationSound(sound, volume, pitch));
         return this;
     }
 
@@ -186,27 +185,61 @@ public final class SpawnedDisplayAnimationFrame {
      * @return this
      */
     public SpawnedDisplayAnimationFrame addFrameEndSound(Sound sound, float volume, float pitch){
-        frameEndSoundMap.put(sound, new Float[]{volume, pitch});
+        frameEndSounds.put(sound.getKey().getKey(), new AnimationSound(sound, volume, pitch));
         return this;
     }
 
     /**
      * Remove a sound that would be played at the start of this frame
-     * @param sound
+     * @param sound the sound to remove
+     * @return true if the sound was removed
+     */
+    public boolean removeFrameStartSound(Sound sound){
+        return removeFrameStartSound(sound.getKey().getKey());
+    }
+
+    /**
+     * Remove a sound that would be played at the start of this frame
+     * @param soundName name of the sound to remove
+     * @return true if the sound was removed
+     */
+    public boolean removeFrameStartSound(String soundName){
+        return frameStartSounds.remove(soundName) != null;
+    }
+
+    /**
+     * Remove all sounds that would be played at the start of this frame
      * @return this
      */
-    public SpawnedDisplayAnimationFrame removeFrameStartSound(Sound sound){
-        frameStartSoundMap.remove(sound);
+    public SpawnedDisplayAnimationFrame removeAllFrameStartSounds(){
+        frameStartSounds.clear();
         return this;
     }
 
     /**
      * Remove a sound that would be played at the end of this frame
-     * @param sound
+     * @param sound the sound to remove
+     * @return true if the sound was removed
+     */
+    public boolean removeFrameEndSound(Sound sound){
+        return removeFrameEndSound(sound.getKey().getKey());
+    }
+
+    /**
+     * Remove a sound that would be played at the end of this frame
+     * @param soundName name of the sound to remove
+     * @return true if the sound was removed
+     */
+    public boolean removeFrameEndSound(String soundName){
+        return frameEndSounds.remove(soundName) != null;
+    }
+
+    /**
+     * Remove all sounds that would be played at the end of this frame
      * @return this
      */
-    public SpawnedDisplayAnimationFrame removeFrameEndSound(Sound sound){
-        frameEndSoundMap.remove(sound);
+    public SpawnedDisplayAnimationFrame removeAllFrameEndSounds(){
+        frameEndSounds.clear();
         return this;
     }
 
@@ -215,8 +248,8 @@ public final class SpawnedDisplayAnimationFrame {
      * Each Float[] contains 2 elements, being the volume and pitch in that respective order.
      * @return a map
      */
-    public HashMap<Sound, Float[]> getFrameStartSounds(){
-        return new HashMap<>(frameStartSoundMap);
+    public HashMap<String, AnimationSound> getFrameStartSounds(){
+        return new HashMap<>(frameStartSounds);
     }
 
     /**
@@ -224,8 +257,8 @@ public final class SpawnedDisplayAnimationFrame {
      * Each Float[] contains 2 elements, being the volume and pitch in that respective order.
      * @return a map
      */
-    public HashMap<Sound, Float[]> getFrameEndSounds(){
-        return new HashMap<>(frameEndSoundMap);
+    public HashMap<String, AnimationSound> getFrameEndSounds(){
+        return new HashMap<>(frameEndSounds);
     }
 
     @ApiStatus.Internal
@@ -284,9 +317,8 @@ public final class SpawnedDisplayAnimationFrame {
         if (!location.isChunkLoaded()){
             return;
         }
-        for (Sound sound : frameStartSoundMap.keySet()){
-            Float[] soundValues = frameStartSoundMap.get(sound);
-            location.getWorld().playSound(location, sound, soundValues[0], soundValues[1]);
+        for (AnimationSound sound : frameStartSounds.values()){
+            location.getWorld().playSound(location, sound.sound, sound.volume, sound.pitch);
         }
     }
 
@@ -298,9 +330,8 @@ public final class SpawnedDisplayAnimationFrame {
         if (!location.isChunkLoaded()){
             return;
         }
-        for (Sound sound : frameEndSoundMap.keySet()){
-            Float[] soundValues = frameEndSoundMap.get(sound);
-            location.getWorld().playSound(location, sound, soundValues[0], soundValues[1]);
+        for (AnimationSound sound : frameEndSounds.values()){
+            location.getWorld().playSound(location, sound.sound, sound.volume, sound.pitch);
         }
     }
 
@@ -355,7 +386,7 @@ public final class SpawnedDisplayAnimationFrame {
 
     @ApiStatus.Internal
     public DisplayAnimationFrame toDisplayAnimationFrame(){
-        DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, frameStartSoundMap, frameEndSoundMap, frameStartParticles, frameEndParticles);
+        DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, frameStartSounds, frameEndSounds, frameStartParticles, frameEndParticles);
         for (UUID uuid : displayTransformations.keySet()){
             DisplayTransformation transform = displayTransformations.get(uuid);
             if (transform != null){
