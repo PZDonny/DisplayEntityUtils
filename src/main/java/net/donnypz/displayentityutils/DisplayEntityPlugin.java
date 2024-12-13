@@ -337,18 +337,29 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         Interaction i = event.getInteraction();
 
     //Particle Displays
-        if (DisplayUtils.hasTag(i, "deu_particle_display")){
+        if (ParticleDisplay.isParticleDisplay(i)){
             Player p = event.getPlayer();
-            if (p.isSneaking() && event.getClickType() == InteractionClickEvent.ClickType.RIGHT){
-                if (!DisplayEntityPluginCommand.hasPermission(p, Permission.ANIM_REMOVE_PARTICLE)){
-                    return;
-                }
-                boolean result = ParticleDisplay.delete(i.getUniqueId());
-                if (result){
-                    p.sendMessage(pluginPrefix.append(Component.text("Successfully removed particle from frame!", NamedTextColor.YELLOW)));
+            if (event.getClickType() == InteractionClickEvent.ClickType.RIGHT){
+                if (p.isSneaking()){
+                    if (!DisplayEntityPluginCommand.hasPermission(p, Permission.ANIM_REMOVE_PARTICLE)){
+                        return;
+                    }
+                    boolean result = ParticleDisplay.delete(i.getUniqueId());
+                    if (result){
+                        p.sendMessage(pluginPrefix.append(Component.text("Successfully removed particle from frame!", NamedTextColor.YELLOW)));
+                    }
+                    else{
+                        p.sendMessage(pluginPrefix.append(Component.text("This particle has already been removed by another player or other methods!", NamedTextColor.RED)));
+                    }
                 }
                 else{
-                    p.sendMessage(pluginPrefix.append(Component.text("This particle has already been removed by another player or other methods!", NamedTextColor.RED)));
+                    ParticleDisplay particle = ParticleDisplay.get(i.getUniqueId());
+                    if (particle == null){
+                        p.sendMessage(Component.text("Failed to get particle", NamedTextColor.RED));
+                        return;
+                    }
+                    particle.spawn();
+                    p.sendMessage(Component.text("Particle Spawned", NamedTextColor.GREEN));
                 }
             }
             else{

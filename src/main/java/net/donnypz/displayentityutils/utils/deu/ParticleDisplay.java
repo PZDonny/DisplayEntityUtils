@@ -29,6 +29,7 @@ public class ParticleDisplay {
     static final HashMap<UUID, ParticleDisplay> interactions = new HashMap<>();
     boolean isStartParticle;
     private static String particleDisplayTag = "deu_particle_display";
+    Location spawnLocation;
 
     private boolean isValid = true;
 
@@ -51,6 +52,7 @@ public class ParticleDisplay {
         });
         interactions.put(interaction.getUniqueId(), this);
         DisplayUtils.addTag(interaction, particleDisplayTag);
+        this.spawnLocation = spawnLocation;
         this.particle = particle;
         this.frame = frame;
         this.isStartParticle = isStartParticle;
@@ -59,6 +61,12 @@ public class ParticleDisplay {
     void reveal(Player player){
         player.showEntity(DisplayEntityPlugin.getInstance(), display);
         player.showEntity(DisplayEntityPlugin.getInstance(), interaction);
+    }
+
+    public void spawn(){
+        if (spawnLocation != null){
+            particle.spawn(spawnLocation);
+        }
     }
 
     public static void sendInfo(UUID uuid, Player player){
@@ -98,6 +106,7 @@ public class ParticleDisplay {
         if (!isValid){
             return;
         }
+        spawnLocation = null;
         display.remove();
         interaction.remove();
         interactions.remove(interaction.getUniqueId());
