@@ -1,5 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.io.*;
 import java.util.ArrayList;
 
@@ -42,6 +44,13 @@ public final class DisplayAnimation implements Serializable {
 
     public void removeFrame(DisplayAnimationFrame frame){
         frames.remove(frame);
+    }
+
+    @ApiStatus.Internal
+    public void adaptOldSounds(){
+        for (DisplayAnimationFrame frame: frames){
+            frame.repairOldSounds();
+        }
     }
 
     public SpawnedDisplayAnimation toSpawnedDisplayAnimation(){
