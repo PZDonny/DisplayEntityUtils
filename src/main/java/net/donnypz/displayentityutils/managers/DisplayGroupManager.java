@@ -324,8 +324,7 @@ public final class DisplayGroupManager {
             e.printStackTrace();
             return null;
         }
-        try {
-            ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes);
+        try(ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes)) {
             GZIPInputStream gzipInputStream = new GZIPInputStream(byteStream);
 
             ObjectInputStream objIn = new DisplayObjectInputStream(gzipInputStream);
@@ -339,8 +338,7 @@ public final class DisplayGroupManager {
         }
     //Not Compressed (Will typically be old file version)
         catch (ZipException z){
-            try{
-                ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes);
+            try(ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes)){
                 ObjectInputStream objIn = new DisplayObjectInputStream(byteStream);
                 DisplayEntityGroup group = (DisplayEntityGroup) objIn.readObject();
 

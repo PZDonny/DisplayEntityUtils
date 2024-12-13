@@ -31,8 +31,7 @@ class DatapackConverter {
     private final LinkedHashMap<String, ArrayList<ZipEntry>> animations = new LinkedHashMap<>();
 
     DatapackConverter(Player player, String datapackName, String groupSaveTag, String animationSaveTag){
-        try{
-            ZipFile zipFile = new ZipFile(LocalManager.getAnimationDatapackFolder()+"/"+datapackName);
+        try(ZipFile zipFile = new ZipFile(LocalManager.getAnimationDatapackFolder()+"/"+datapackName)){
             searchEntries(player, datapackName, zipFile.entries(), zipFile, groupSaveTag, animationSaveTag);
         }
         catch (IOException e) {
@@ -148,12 +147,6 @@ class DatapackConverter {
             //Despawn group after all animation conversions
             Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                 createdGroup.unregister(true, true);
-                try{
-                    zipFile.close();
-                }
-                catch(IOException e){
-                    throw new RuntimeException("Failed to close zip file");
-                }
             }, delay+5);
         }, 30);
     }
@@ -216,12 +209,9 @@ class DatapackConverter {
 
 
     private void executeCommands(ZipEntry zipEntry, ZipFile zipFile, Player player, Location location){
-        try{
-            InputStream stream = zipFile.getInputStream(zipEntry);
+        try(InputStream stream = zipFile.getInputStream(zipEntry)){
             BufferedReader br = new BufferedReader(new InputStreamReader(stream));
             String line;
-
-
             while ((line = br.readLine()) != null){
                 if (line.startsWith("#") || line.isEmpty()){
                     continue;
@@ -269,7 +259,6 @@ class DatapackConverter {
                 Bukkit.dispatchCommand(LocalManager.silentSender, "execute positioned "+coordinates+" in "+location.getWorld().getName()+" run "+line);
             }
             br.close();
-            stream.close();
         }
         catch (IOException e){
             player.sendMessage(Component.text("Animation conversion failed! Read console"));

@@ -222,8 +222,7 @@ public final class DisplayAnimationManager {
             e.printStackTrace();
             return null;
         }
-        try{
-            ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes);
+        try(ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes)){
             GZIPInputStream gzipInputStream = new GZIPInputStream(byteStream);
 
             ObjectInputStream objIn = new DisplayAnimationInputStream(gzipInputStream);
@@ -247,8 +246,7 @@ public final class DisplayAnimationManager {
 
     //Not Compressed (Will typically be old file version)
         catch (ZipException z){
-            try{
-                ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes);
+            try(ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes)){
                 ObjectInputStream objIn = new DisplayAnimationInputStream(byteStream);
                 DisplayAnimation anim = (DisplayAnimation) objIn.readObject();
                 anim.adaptOldSounds();
