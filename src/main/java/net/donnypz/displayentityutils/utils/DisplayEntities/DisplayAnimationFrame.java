@@ -10,7 +10,7 @@ import java.util.*;
 
 public final class DisplayAnimationFrame implements Serializable {
     HashMap<UUID, SerialTransformation> displayTransformations = new HashMap<>();
-    HashMap<UUID, Vector3f> interactionTranslations = new HashMap<>(); //Do not change name
+    HashMap<UUID, Vector3f> interactionTranslations = new HashMap<>();
     int delay;
     int duration;
 
@@ -23,16 +23,28 @@ public final class DisplayAnimationFrame implements Serializable {
     Set<AnimationParticle> frameStartParticles;
     Set<AnimationParticle> frameEndParticles;
 
+    List<String> startCommands;
+    List<String> endCommands;
+
     @Serial
     private static final long serialVersionUID = 99L;
 
-    DisplayAnimationFrame(int delay, int duration, HashMap<String, AnimationSound> startSounds, HashMap<String, AnimationSound> endSounds, Set<AnimationParticle> frameStartParticles, Set<AnimationParticle> frameEndParticles){
+    DisplayAnimationFrame(
+            int delay, int duration,
+            HashMap<String, AnimationSound> startSounds,
+            HashMap<String, AnimationSound> endSounds,
+            Set<AnimationParticle> frameStartParticles,
+            Set<AnimationParticle> frameEndParticles,
+            List<String> startCommands,
+            List<String> endCommands){
         this.delay = delay;
         this.duration = duration;
         this.startSounds = new HashMap<>(startSounds);
         this.endSounds = new HashMap<>(endSounds);
-        this.frameStartParticles = frameStartParticles;
-        this.frameEndParticles = frameEndParticles;
+        this.frameStartParticles = new HashSet<>(frameStartParticles);
+        this.frameEndParticles = new HashSet<>(frameEndParticles);
+        this.startCommands = new ArrayList<>(startCommands);
+        this.endCommands = new ArrayList<>(endCommands);
     }
 
     void setDisplayEntityTransformation(UUID uuid, SerialTransformation transformation){
@@ -44,7 +56,7 @@ public final class DisplayAnimationFrame implements Serializable {
     }
 
     public SpawnedDisplayAnimationFrame toSpawnedDisplayAnimationFrame(){
-        SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(delay, duration, startSounds, endSounds, frameStartParticles, frameEndParticles);
+        SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(delay, duration, startSounds, endSounds, frameStartParticles, frameEndParticles, startCommands, endCommands);
         for (UUID uuid : displayTransformations.keySet()){
             frame.setDisplayEntityTransformation(uuid, displayTransformations.get(uuid).toTransformation());
         }

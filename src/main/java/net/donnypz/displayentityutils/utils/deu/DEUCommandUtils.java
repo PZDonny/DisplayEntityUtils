@@ -6,9 +6,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticle;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
@@ -201,4 +199,22 @@ public class DEUCommandUtils {
         }
         return c;
     }
+
+    @ApiStatus.Internal
+    public static String getCoordinateString(Location location){
+        return location.x()+" "+location.y()+" "+location.z();
+    }
+
+    @ApiStatus.Internal
+    public static String getExecuteCommandWorldName(World w){
+        String worldName;
+        if (w.equals(Bukkit.getWorlds().getFirst())){
+            worldName = "overworld";
+        }
+        else{
+            worldName = w.getName();
+        }
+        return worldName;
+    }
+
 }

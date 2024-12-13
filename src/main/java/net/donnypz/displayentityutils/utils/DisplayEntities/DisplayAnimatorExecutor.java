@@ -80,8 +80,7 @@ public final class DisplayAnimatorExecutor {
         Location groupLoc = group.getLocation();
         if (group.isInLoadedChunk()){
             new GroupAnimateFrameStartEvent(group, animator, animation, frame).callEvent();
-            frame.playStartSounds(groupLoc);
-            frame.showStartParticles(group);
+            frame.playStartEffects(group);
 
             animateInteractions(groupLoc, frame, group, animation);
             animateDisplays(frame, group, animation);
@@ -101,14 +100,12 @@ public final class DisplayAnimatorExecutor {
             }
             if (frame.duration > 0){
                 Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                    frame.playEndSounds(groupLoc);
-                    frame.showEndParticles(group);
+                    frame.playEndEffects(group);
                     new GroupAnimateFrameEndEvent(group, animator, animation, frame).callEvent();
                 }, frame.duration);
             }
             else{
-                frame.playEndSounds(groupLoc);
-                frame.showEndParticles(group);
+                frame.playEndEffects(group);
                 new GroupAnimateFrameEndEvent(group, animator, animation, frame).callEvent();
             }
 
@@ -122,8 +119,7 @@ public final class DisplayAnimatorExecutor {
             if (animator.type != DisplayAnimator.AnimationType.LOOP){
                 Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                     if (animator.type == DisplayAnimator.AnimationType.LOOP && group.isSpawned()){
-                        frame.playEndSounds(groupLoc);
-                        frame.showEndParticles(group);
+                        frame.playEndEffects(group);
                         new GroupAnimationCompleteEvent(group, animator, animation).callEvent();
                     }
                 }, frame.duration);
@@ -137,14 +133,12 @@ public final class DisplayAnimatorExecutor {
             else{
                 if (frame.duration > 0){
                     Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                        frame.playEndSounds(groupLoc);
-                        frame.showEndParticles(group);
+                        frame.playEndEffects(group);
                         executeAnimation(animation, group, animation.frames.getFirst(), false);
                     }, frame.duration);
                 }
                 else{
-                    frame.playEndSounds(groupLoc);
-                    frame.showEndParticles(group);
+                    frame.playEndEffects(group);
                     executeAnimation(animation, group, animation.frames.getFirst(), false);
                 }
             }
@@ -155,16 +149,14 @@ public final class DisplayAnimatorExecutor {
             if (frame.duration > 0){
                 Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                     if (group.isSpawned()){
-                        frame.playEndSounds(groupLoc);
-                        frame.showEndParticles(group);
+                        frame.playEndEffects(group);
                         new GroupAnimationCompleteEvent(group, animation).callEvent();
                     }
                 }, frame.duration);
             }
             else{
                 if (group.isSpawned()){
-                    frame.playEndSounds(groupLoc);
-                    frame.showEndParticles(group);
+                    frame.playEndEffects(group);
                     new GroupAnimationCompleteEvent(group, animation).callEvent();
                 }
             }

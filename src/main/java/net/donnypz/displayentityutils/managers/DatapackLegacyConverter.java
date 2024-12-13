@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.VersionUtils;
+import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -200,7 +201,7 @@ public class DatapackLegacyConverter {
                     //Master Part
                     if (line.contains("execute as @s")){
 
-                        String coordinates = DatapackConverter.getCoordinateString(location);
+                        String coordinates = DEUCommandUtils.getCoordinateString(location);
                         String replacement = "execute at "+player.getName()+" run summon block_display "+coordinates;
                         line = line.replace("execute as @s run summon block_display ~ ~ ~", replacement);
                         String[] timestampSplit = line.split(":\\[\""+projectName.replace("_", ""));

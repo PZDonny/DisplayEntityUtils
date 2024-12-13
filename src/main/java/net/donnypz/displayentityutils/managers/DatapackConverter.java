@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.VersionUtils;
+import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -128,7 +129,7 @@ class DatapackConverter {
                     createdGroup.setTag(groupSaveTag);
                 }
                 DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.LOCAL, createdGroup.toDisplayEntityGroup(), player);
-                player.sendMessage(Component.text(" | Group Tag: "+createdGroup.getTag(), NamedTextColor.GRAY));
+                player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Group Tag: <yellow>"+createdGroup.getTag()));
             }
             else{
                 player.sendMessage(Component.text("The group was not saved during this conversion due to setting the group tag to \"-\"", NamedTextColor.GRAY));
@@ -139,7 +140,7 @@ class DatapackConverter {
             for (String animName : animations.sequencedKeySet()){
                 List<ZipEntry> frames = animations.get(animName);
                 Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                    player.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Converting Animations: <yellow>"+animName));
+                    player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Converting Animation: <yellow>"+animName));
                     processAnimation(createdGroup, zipFile, frames, datapackName, animName, player, animationSaveTagPrefix);
                     }, delay);
 
@@ -199,10 +200,11 @@ class DatapackConverter {
 
                 //Apply Transformations, Texture Values, etc.
                 ZipEntry entry = frames.get(i);
-                executeCommands(entry, zipFile, player, createdGroup.getLocation());
+                List<String> commands = executeCommands(entry, zipFile, player, createdGroup.getLocation());
 
                 //Create Frame
                 SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(0, 2).setTransformation(createdGroup);
+                frame.setStartCommands(commands);
                 anim.addFrame(frame);
                 i++;
             }
@@ -210,13 +212,24 @@ class DatapackConverter {
     }
 
 
-    private void executeCommands(ZipEntry zipEntry, ZipFile zipFile, Player player, Location location){
+    private List<String> executeCommands(ZipEntry zipEntry, ZipFile zipFile, Player player, Location location){
+        List<String> commands;
+        if (zipEntry.getName().endsWith(createModelPath)) {
+            commands = null;
+        }
+        else{
+            commands = new ArrayList<>();
+        }
         try{
             InputStream stream = zipFile.getInputStream(zipEntry);
             BufferedReader br = new BufferedReader(new InputStreamReader(stream));
             String line;
             while ((line = br.readLine()) != null){
                 if (line.startsWith("#") || line.isEmpty()){
+                    continue;
+                }
+
+                if (zipEntry.getName().endsWith("/check_loop.mcfunction") || zipEntry.getName().contains("/check_pause_")){
                     continue;
                 }
 
@@ -227,7 +240,7 @@ class DatapackConverter {
                     //Master Part
                     //if (line.contains("execute as @s")){
                     if (line.startsWith("summon block_display")){
-                        String coordinates = getCoordinateString(location);
+                        String coordinates = DEUCommandUtils.getCoordinateString(location);
                         String replacement = "execute at "+player.getName()+" run summon block_display "+coordinates;
                         line = line.replace("summon block_display ~ ~ ~", replacement);
                         try{
@@ -255,17 +268,17 @@ class DatapackConverter {
                     line = line.substring(0, line.length()-2)+",\""+LocalManager.datapackConvertDeleteSubParentTag+"\"]}";
                 }
 
-                else if (line.startsWith("schedule") || line.startsWith("function")) {
+                else if (line.startsWith("schedule")) {
                     continue;
                 }
-                String coordinates = getCoordinateString(location);
+
+                String coordinates = DEUCommandUtils.getCoordinateString(location);
                 World w = location.getWorld();
-                String worldName;
-                if (w.equals(Bukkit.getWorlds().getFirst())){ //Allows conversion in default world
-                    worldName = "overworld";
-                }
-                else{
-                    worldName = w.getName();
+                String worldName = DEUCommandUtils.getExecuteCommandWorldName(w);
+
+
+                if (!line.startsWith("data merge entity @e[") && commands != null){ //Not an animation command
+                    commands.add(line);
                 }
                 Bukkit.dispatchCommand(LocalManager.silentSender, "execute positioned "+coordinates+" in "+worldName+" run "+line);
             }
@@ -279,9 +292,8 @@ class DatapackConverter {
             catch(IOException ignored){}
             throw new RuntimeException("Failed to execute command from ZipEntry: "+zipEntry.getName());
         }
+        return commands;
     }
 
-    static String getCoordinateString(Location location){
-        return location.x()+" "+location.y()+" "+location.z();
-    }
+
 }
