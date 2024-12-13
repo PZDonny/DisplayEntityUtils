@@ -28,6 +28,7 @@ public class ParticleDisplay {
     SpawnedDisplayAnimationFrame frame;
     static final HashMap<UUID, ParticleDisplay> interactions = new HashMap<>();
     boolean isStartParticle;
+    private static String particleDisplayTag = "deu_particle_display";
 
     private boolean isValid = true;
 
@@ -40,7 +41,7 @@ public class ParticleDisplay {
             id.setGlowColorOverride(Color.YELLOW);
             id.setGlowing(true);
         });
-        DisplayUtils.addTag(display, "deu_particle_display");
+        DisplayUtils.addTag(display, particleDisplayTag);
 
         interaction = spawnLocation.getWorld().spawn(spawnLocation, Interaction.class, i -> {
            i.setVisibleByDefault(false);
@@ -49,7 +50,7 @@ public class ParticleDisplay {
            i.setPersistent(false);
         });
         interactions.put(interaction.getUniqueId(), this);
-        DisplayUtils.addTag(interaction, "deu_particle_display");
+        DisplayUtils.addTag(interaction, particleDisplayTag);
         this.particle = particle;
         this.frame = frame;
         this.isStartParticle = isStartParticle;
@@ -82,6 +83,14 @@ public class ParticleDisplay {
         }
         display.remove();
         return true;
+    }
+
+    public static ParticleDisplay get(UUID uuid){
+        return interactions.get(uuid);
+    }
+
+    public static boolean isParticleDisplay(Entity entity){
+        return DisplayUtils.hasTag(entity, particleDisplayTag);
     }
 
 
