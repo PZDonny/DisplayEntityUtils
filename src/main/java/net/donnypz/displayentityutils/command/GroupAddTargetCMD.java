@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.deu.ParticleDisplay;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Entity;
@@ -25,7 +26,11 @@ class GroupAddTargetCMD implements SubCommand{
         Entity entity = player.getTargetEntity(5);
         if (!(entity instanceof Interaction interaction)) {
             player.sendMessage(Component.text("Your targeted entity must be an interaction entity within 5 blocks of you", NamedTextColor.RED));
-            return ;
+            return;
+        }
+        if (ParticleDisplay.isParticleDisplay(entity)){
+            player.sendMessage(Component.text("Your cannot add the interaction entity from a particle preview!", NamedTextColor.RED));
+            return;
         }
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(interaction);
         if (part != null) {
