@@ -6,8 +6,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 class AnimRemoveSoundCMD implements SubCommand{
@@ -23,33 +21,50 @@ class AnimRemoveSoundCMD implements SubCommand{
             return;
         }
         if (args.length < 5) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis anim removesound <frame-id> <sound> <start | end>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /mdis anim removesound <frame-id> <sound | -all> <start | end>", NamedTextColor.RED));
             return;
         }
         try {
             int id = Integer.parseInt(args[2]);
-            String soundString = args[3];
+            String soundName = args[3];
+            boolean isRemoveAll = soundName.equalsIgnoreCase("-all");
             String placement = args[4];
-            soundString = soundString.replace(".", "_").toUpperCase();
-            Sound sound = Sound.valueOf(soundString);
             SpawnedDisplayAnimationFrame frame = anim.getFrames().get(id);
+            boolean success = true;
             if (placement.equalsIgnoreCase("start")){
-                frame.removeFrameStartSound(sound);
+                if (isRemoveAll){
+                    frame.removeAllFrameStartSounds();
+                }
+                else{
+                    success = frame.removeFrameStartSound(soundName);
+                }
+
             }
             else if (placement.equalsIgnoreCase("end")){
-                frame.removeFrameEndSound(sound);
+                if (isRemoveAll){
+                    frame.removeAllFrameEndSounds();
+                }
+                else{
+                    success = frame.removeFrameEndSound(soundName);
+                }
             }
             else{
                 player.sendMessage(Component.text("Invalid Option! Choose between \"start\" and \"end\"", NamedTextColor.RED));
             }
-
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully removed sound from frame's "+placement, NamedTextColor.YELLOW)));
+            if (isRemoveAll){
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Removed all sounds from frame's "+placement, NamedTextColor.YELLOW)));
+            }
+            else{
+                if (success){
+                    player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully removed sound from frame's "+placement, NamedTextColor.YELLOW)));
+                }
+                else{
+                    player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Sound does not exist for frame's "+placement, NamedTextColor.RED)));
+                }
+            }
         }
         catch (NumberFormatException | IndexOutOfBoundsException e) {
             player.sendMessage(Component.text("Invalid value entered for frame-id! Enter a whole number >= 0", NamedTextColor.RED));
-        }
-        catch (IllegalArgumentException e){
-            player.sendMessage(Component.text("Invalid Sound Name!", NamedTextColor.RED));
         }
     }
 }
