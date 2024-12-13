@@ -99,7 +99,8 @@ public abstract class AnimationParticle implements Externalizable {
 
     public abstract void spawn(Location location);
 
-    public void repair(){
+    @ApiStatus.Internal
+    public void applyVector(){
         vectorFromOrigin = Vector.fromJOML(vector);
         initalize();
     }
@@ -123,6 +124,7 @@ public abstract class AnimationParticle implements Externalizable {
             player.sendMessage(unique);
         }
 
+        player.sendMessage(Component.text("Right Click to PREVIEW this particle", NamedTextColor.YELLOW, TextDecoration.BOLD));
         player.sendMessage(Component.text("Sneak+Right Click to DELETE this particle", NamedTextColor.RED, TextDecoration.BOLD));
         player.sendMessage(Component.text("Use \"/mdis anim cancelparticles\" to hide revealed particles", NamedTextColor.GRAY, TextDecoration.ITALIC));
     }
@@ -141,12 +143,13 @@ public abstract class AnimationParticle implements Externalizable {
 
     protected abstract Component getUniqueInfo();
 
+
     boolean editParticle(AnimationParticleBuilder builder){
         AnimationParticleBuilder.Step step = builder.step;
         switch (step){
             case PARTICLE -> {
                 if (this.particle.getDataType() == builder.particle().getDataType()){
-                    builder.player.sendMessage(Component.text("Particle Type could not be changed! Previous particle has unique data."));
+                    builder.player.sendMessage(Component.text("Particle Type could not be changed! Previous particle has unique data.", NamedTextColor.RED));
                     builder.player.sendMessage(Component.text("Particles that have particle specific data, such as block, item, or color data, cannot be replaced with another particle.", NamedTextColor.GRAY));
                     return false;
                 }
@@ -174,8 +177,9 @@ public abstract class AnimationParticle implements Externalizable {
     protected abstract boolean editUniqueParticle(AnimationParticleBuilder builder, AnimationParticleBuilder.Step step);
 
     @ApiStatus.Internal
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeObject(particle);
+        out.writeObject(particle.name());
         out.writeInt(count);
         out.writeDouble(extra);
 
@@ -194,8 +198,27 @@ public abstract class AnimationParticle implements Externalizable {
     }
 
     @ApiStatus.Internal
+    @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        this.particle = (Particle) in.readObject();
+        Object particleObj = in.readObject();
+        if (particleObj instanceof String string) {
+            try{
+                this.particle = Particle.valueOf(string);
+            }
+            catch (IllegalArgumentException e){
+                this.particle = Particle.FLAME;
+                Bukkit.getLogger().warning("Failed to migrate old particle name. Defaulting to FLAME.");
+            }
+        }
+        else if (particleObj instanceof Particle) {
+            try {
+                this.particle = ((Particle) particleObj); //Legacy Format
+            }
+            catch (Exception e) { //Fallback
+                this.particle = Particle.FLAME;
+                Bukkit.getLogger().warning("Failed to migrate old particle name. Defaulting to FLAME.");
+            }
+        }
         this.count = in.readInt();
         this.extra = in.readDouble();
 
