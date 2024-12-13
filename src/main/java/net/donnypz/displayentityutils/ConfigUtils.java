@@ -59,6 +59,7 @@ final class ConfigUtils {
             DisplayEntityPlugin.unregisterUnloadWorlds = config.getStringList("automaticGroupDetection.unregisterOnUnload.worlds");
         }
 
+        DisplayEntityPlugin.cacheAnimations = config.getBoolean("cacheAnimations");
         DisplayEntityPlugin.autoPivotInteractions = config.getBoolean("autoPivotInteractionsOnSpawn");
         DisplayEntityPlugin.overwriteExistingSaves = config.getBoolean("overwriteExistingSaves");
         DisplayEntityPlugin.autoSelectGroups = config.getBoolean("autoSelectGroups");
