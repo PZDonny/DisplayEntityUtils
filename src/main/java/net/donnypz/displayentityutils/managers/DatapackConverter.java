@@ -12,6 +12,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +32,8 @@ class DatapackConverter {
     private final LinkedHashMap<String, ArrayList<ZipEntry>> animations = new LinkedHashMap<>();
 
     DatapackConverter(Player player, String datapackName, String groupSaveTag, String animationSaveTag){
-        try(ZipFile zipFile = new ZipFile(LocalManager.getAnimationDatapackFolder()+"/"+datapackName)){
+        try{
+            ZipFile zipFile = new ZipFile(LocalManager.getAnimationDatapackFolder()+"/"+datapackName);
             searchEntries(player, datapackName, zipFile.entries(), zipFile, groupSaveTag, animationSaveTag);
         }
         catch (IOException e) {
@@ -110,7 +112,7 @@ class DatapackConverter {
 
             if (createdGroup == null){
                 player.sendMessage(Component.text("Failed to find model/group created from datapack!", NamedTextColor.RED));
-                player.sendMessage(Component.text("| The datapack may be a legacy one (before v1.13 of BDEngine). Try using /mdis bdengine convertanimleg"));
+                player.sendMessage(Component.text("| The datapack may be a legacy one (before v1.13 of BDEngine). Try using /mdis bdengine convertanimleg", NamedTextColor.GRAY));
                 return;
             }
 
@@ -209,7 +211,8 @@ class DatapackConverter {
 
 
     private void executeCommands(ZipEntry zipEntry, ZipFile zipFile, Player player, Location location){
-        try(InputStream stream = zipFile.getInputStream(zipEntry)){
+        try{
+            InputStream stream = zipFile.getInputStream(zipEntry);
             BufferedReader br = new BufferedReader(new InputStreamReader(stream));
             String line;
             while ((line = br.readLine()) != null){
@@ -256,12 +259,24 @@ class DatapackConverter {
                     continue;
                 }
                 String coordinates = getCoordinateString(location);
-                Bukkit.dispatchCommand(LocalManager.silentSender, "execute positioned "+coordinates+" in "+location.getWorld().getName()+" run "+line);
+                World w = location.getWorld();
+                String worldName;
+                if (w.equals(Bukkit.getWorlds().getFirst())){ //Allows conversion in default world
+                    worldName = "overworld";
+                }
+                else{
+                    worldName = w.getName();
+                }
+                Bukkit.dispatchCommand(LocalManager.silentSender, "execute positioned "+coordinates+" in "+worldName+" run "+line);
             }
             br.close();
         }
         catch (IOException e){
             player.sendMessage(Component.text("Animation conversion failed! Read console"));
+            try{
+                zipFile.close();
+            }
+            catch(IOException ignored){}
             throw new RuntimeException("Failed to execute command from ZipEntry: "+zipEntry.getName());
         }
     }
