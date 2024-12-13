@@ -41,7 +41,7 @@ BDEngine is what you'll use to create models and animations that can be transfer
 
 
 
-## WIKI [WIP]
+## WIKI (WIP)
 Access the wiki [HERE](https://github.com/PZDonny/DisplayEntityUtils/wiki)
 
 ## How can you access the API?
