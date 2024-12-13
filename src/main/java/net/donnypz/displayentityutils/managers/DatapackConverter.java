@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.listeners.bdengine.DEUEntitySpawned;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -25,7 +26,6 @@ import java.util.zip.ZipFile;
 
 class DatapackConverter {
 
-    static final boolean is1_21 = Bukkit.getUnsafe().getProtocolVersion() >= 767;
     private static final String createModelPath = "/create.mcfunction";
     private String projectName = null;
     private final LinkedHashMap<String, ArrayList<ZipEntry>> animations = new LinkedHashMap<>();
@@ -43,7 +43,7 @@ class DatapackConverter {
 
     private String getAnimationName(String entryName, String folder){
         String animName;
-        if (is1_21){
+        if (VersionUtils.is1_21){
             animName = entryName.split("function/"+folder+"/")[1];
         }
         else{
@@ -62,7 +62,7 @@ class DatapackConverter {
         if (projectName == null){
             String projectName;
 
-            if (is1_21){
+            if (VersionUtils.is1_21){
                 projectName = entryName.split("/function/")[0];
             }
             else{
@@ -85,7 +85,7 @@ class DatapackConverter {
 
             entryName = entry.getName();
             if (!entryName.endsWith(".mcfunction") &&
-                    ((is1_21 && entryName.contains("/function/a/") && !entryName.endsWith("/function/a/")) || ((entryName.contains("/functions/a/") && !entryName.endsWith("/functions/a/"))))){
+                    ((VersionUtils.is1_21 && entryName.contains("/function/a/") && !entryName.endsWith("/function/a/")) || ((entryName.contains("/functions/a/") && !entryName.endsWith("/functions/a/"))))){
                 animations.putIfAbsent(getAnimationName(entryName, "a"), new ArrayList<>());
             }
             else if (entryName.endsWith(createModelPath)) { //Summon Model for animation

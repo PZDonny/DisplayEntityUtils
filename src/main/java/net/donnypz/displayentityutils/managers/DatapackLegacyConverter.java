@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.listeners.bdengine.DEUEntitySpawned;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -186,7 +187,7 @@ public class DatapackLegacyConverter {
 
                 if (zipEntry.getName().contains("summon")){
                     String projectName = zipEntry.getName();
-                    if (DatapackConverter.is1_21){
+                    if (VersionUtils.is1_21){
                         projectName = projectName.replace("function/summon.mcfunction", "");
                     }
                     else{
