@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationSound;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -58,15 +59,18 @@ class AnimFrameInfoCMD implements SubCommand{
             sendSounds(player, "Start Sounds: ", frame.getFrameStartSounds());
             player.sendMessage(Component.empty());
             sendSounds(player, "End Sounds: ", frame.getFrameEndSounds());
-            Component editStartParticles = Component.text("Click here to view frame START particles", NamedTextColor.AQUA).clickEvent(ClickEvent.callback(f -> {
+            player.sendMessage(Component.empty());
+            Component editStartParticles = MiniMessage.miniMessage().deserialize("<aqua>Click here to view frame <green>START <aqua>particles").clickEvent(ClickEvent.callback(f -> {
                 player.sendMessage(Component.empty());
-                player.sendMessage(Component.text("Showing START particles for frame "+id, NamedTextColor.LIGHT_PURPLE));
+                player.sendMessage(Component.text("Showing START particles for frame "+id, NamedTextColor.YELLOW));
+                player.playSound(player, Sound.ENTITY_ITEM_FRAME_PLACE, 1, 2);
                 frame.visuallyEditStartParticles(player, group);
             }));
 
-            Component editEndParticles = Component.text("Click here to view frame END particles", NamedTextColor.GOLD).clickEvent(ClickEvent.callback(f -> {
+            Component editEndParticles = MiniMessage.miniMessage().deserialize("<aqua>Click here to view frame <gold>END <aqua>particles").clickEvent(ClickEvent.callback(f -> {
                 player.sendMessage(Component.empty());
-                player.sendMessage(Component.text("Showing END particles for frame "+id, NamedTextColor.LIGHT_PURPLE));
+                player.sendMessage(Component.text("Showing END particles for frame "+id, NamedTextColor.YELLOW));
+                player.playSound(player, Sound.ENTITY_ITEM_FRAME_PLACE, 1, 2);
                 frame.visuallyEditEndParticles(player, group);
             }));
             player.sendMessage(editStartParticles);
@@ -78,16 +82,21 @@ class AnimFrameInfoCMD implements SubCommand{
     }
 
 
-    private void sendSounds(Player player, String prefix, HashMap<Sound, Float[]> sounds){
+    private void sendSounds(Player player, String prefix, HashMap<String, AnimationSound> sounds){
         if (sounds.isEmpty()){
             player.sendMessage(Component.text(prefix).append(Component.text("NONE", NamedTextColor.GRAY)));
         }
         else{
             player.sendMessage(Component.text(prefix));
-            for (Sound sound : sounds.keySet()){
-                Float[] data = sounds.get(sound);
-                player.sendMessage(Component.text("- "+sound.name()+": ", NamedTextColor.YELLOW));
-                player.sendMessage(Component.text("| Vol: "+data[0]+", Pitch: "+data[1], NamedTextColor.GRAY));
+            for (AnimationSound sound : sounds.values()){
+                if (sound.existsInGameVersion()){
+                    player.sendMessage(Component.text("- "+sound.getSoundName()+": ", NamedTextColor.YELLOW));
+                }
+                else{
+                    player.sendMessage(Component.text("- "+sound.getSoundName()+": ", NamedTextColor.YELLOW).append(Component.text(" (Invalid)", NamedTextColor.RED)));
+                }
+
+                player.sendMessage(Component.text("| Vol: "+sound.getVolume()+", Pitch: "+sound.getPitch(), NamedTextColor.GRAY));
             }
         }
     }
