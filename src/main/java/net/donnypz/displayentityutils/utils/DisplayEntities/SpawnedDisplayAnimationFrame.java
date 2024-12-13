@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticle;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Display;
@@ -26,6 +27,8 @@ public final class SpawnedDisplayAnimationFrame {
     HashMap<String, AnimationSound> frameEndSounds;
     Set<AnimationParticle> frameStartParticles = new HashSet<>();
     Set<AnimationParticle> frameEndParticles = new HashSet<>();
+    List<String> startCommands = new ArrayList<>();
+    List<String> endCommands = new ArrayList<>();
 
 
     @ApiStatus.Internal
@@ -36,14 +39,22 @@ public final class SpawnedDisplayAnimationFrame {
         this.frameEndSounds = new HashMap<>();
     }
 
-    @ApiStatus.Internal
-    public SpawnedDisplayAnimationFrame(int delay, int duration, HashMap<String, AnimationSound> frameStartSounds, HashMap<String, AnimationSound> frameEndSounds, Set<AnimationParticle> frameStartParticles, Set<AnimationParticle> frameEndParticles){
+    SpawnedDisplayAnimationFrame(
+            int delay, int duration,
+            HashMap<String, AnimationSound> frameStartSounds,
+            HashMap<String, AnimationSound> frameEndSounds,
+            Set<AnimationParticle> frameStartParticles,
+            Set<AnimationParticle> frameEndParticles,
+            List<String> startCommands,
+            List<String> endCommands){
         this.delay = delay;
         this.duration = duration;
         this.frameStartSounds = frameStartSounds == null ? new HashMap<>() : frameStartSounds;
         this.frameEndSounds = frameEndSounds == null ? new HashMap<>() : frameEndSounds;
         this.frameStartParticles = frameStartParticles == null ? new HashSet<>() : frameStartParticles;
         this.frameEndParticles = frameEndParticles == null ? new HashSet<>() : frameEndParticles;
+        this.startCommands = startCommands == null ? new ArrayList<>() : startCommands;
+        this.endCommands = endCommands == null ? new ArrayList<>() : endCommands;
     }
 
 
@@ -107,7 +118,14 @@ public final class SpawnedDisplayAnimationFrame {
      * @return a boolean
      */
     public boolean isEmptyFrame(){
-        return displayTransformations.isEmpty() && interactionTransformations.isEmpty();
+
+        return displayTransformations.isEmpty()
+                && interactionTransformations.isEmpty()
+                && frameStartSounds.isEmpty()
+                && frameEndSounds.isEmpty()
+                && frameStartParticles.isEmpty()
+                && frameEndParticles.isEmpty()
+                && startCommands.isEmpty();
     }
 
 
@@ -261,6 +279,63 @@ public final class SpawnedDisplayAnimationFrame {
         return new HashMap<>(frameEndSounds);
     }
 
+
+    /**
+     * Set the commands that will be executed when this frame starts
+     * @param commands the commands
+     * @return this
+     */
+    public SpawnedDisplayAnimationFrame setStartCommands(List<String> commands){
+        startCommands = new ArrayList<>(commands);
+        return this;
+    }
+
+    /**
+     * Add a command that will be executed when this frame starts
+     * @param command the command to add
+     * @return this
+     */
+    public SpawnedDisplayAnimationFrame addStartCommand(String command){
+        startCommands.add(command);
+        return this;
+    }
+
+    /**
+     * Set the commands that will be executed when this frame ends
+     * @param commands the commands
+     * @return this
+     */
+    public SpawnedDisplayAnimationFrame setEndCommands(List<String> commands){
+        endCommands = new ArrayList<>(commands);
+        return this;
+    }
+
+    /**
+     * Add a command that will be executed when this frame ends
+     * @param command the command to add
+     * @return this
+     */
+    public SpawnedDisplayAnimationFrame addEndCommand(String command){
+        endCommands.add(command);
+        return this;
+    }
+
+    /**
+     * Get the commands that will be executed when this frame starts
+     * @return a string list of commands
+     */
+    public List<String> getStartCommands() {
+        return new ArrayList<>(startCommands);
+    }
+
+    /**
+     * Get the commands that will be executed when this frame ends
+     * @return a string list of commands
+     */
+    public List<String> getEndCommands() {
+        return new ArrayList<>(endCommands);
+    }
+
     @ApiStatus.Internal
     public SpawnedDisplayAnimationFrame addFrameStartParticle(AnimationParticle animationParticle){
         frameStartParticles.add(animationParticle);
@@ -285,10 +360,18 @@ public final class SpawnedDisplayAnimationFrame {
         return this;
     }
 
+    /**
+     * Get the particles that will be spawned when this frame starts
+     * @return a list of {@link AnimationParticle}
+     */
     public List<AnimationParticle> getFrameStartParticles(){
         return new ArrayList<>(frameStartParticles);
     }
 
+    /**
+     * Get the particles that will be spawned when this frame ends
+     * @return a list of {@link AnimationParticle}
+     */
     public List<AnimationParticle> getFrameEndParticles(){
         return new ArrayList<>(frameEndParticles);
     }
@@ -335,6 +418,7 @@ public final class SpawnedDisplayAnimationFrame {
         }
     }
 
+
     /**
      * Show the particles that will be displayed at the start of this frame
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
@@ -354,6 +438,61 @@ public final class SpawnedDisplayAnimationFrame {
             particle.spawn(group);
         }
     }
+
+    /**
+     * Execute the commands that are expected to run at the start of this frame from a specified location
+     * @param location
+     */
+    public void executeStartCommands(@NotNull Location location){
+        executeCommands(location, startCommands);
+    }
+
+    /**
+     * Execute the commands that are expected to run at the end of this frame from a specified location
+     * @param location
+     */
+    public void executeEndCommands(@NotNull Location location){
+        executeCommands(location, endCommands);
+    }
+
+    private void executeCommands(Location location, List<String> commands){
+        if (!location.isChunkLoaded() || endCommands.isEmpty()) {
+            return;
+        }
+        String coordinates = DEUCommandUtils.getCoordinateString(location);
+        String worldName = DEUCommandUtils.getExecuteCommandWorldName(location.getWorld());
+        for (String s : commands){
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute positioned "+coordinates+" in "+worldName+" run "+s);
+        }
+    }
+
+    /**
+     * Play all effects that are expected at the start of this frame (e.g. sounds, particles, commands)
+     * @param group the group to play these effects for
+     */
+    public void playStartEffects(SpawnedDisplayEntityGroup group){
+        Location groupLoc = group.getLocation();
+        if (groupLoc != null){
+            playStartSounds(groupLoc);
+            executeStartCommands(groupLoc);
+        }
+        showStartParticles(group);
+    }
+
+    /**
+     * Play all effects that are expected at the end of this frame (e.g. sounds, particles, commands)
+     * @param group the group to play these effects for
+     */
+    public void playEndEffects(@NotNull SpawnedDisplayEntityGroup group){
+        Location groupLoc = group.getLocation();
+        if (groupLoc != null){
+            playEndSounds(groupLoc);
+            executeEndCommands(groupLoc);
+        }
+        showEndParticles(group);
+    }
+
+
 
     @ApiStatus.Internal
     public void visuallyEditStartParticles(@NotNull Player player, @NotNull SpawnedDisplayEntityGroup group){
@@ -386,7 +525,7 @@ public final class SpawnedDisplayAnimationFrame {
 
     @ApiStatus.Internal
     public DisplayAnimationFrame toDisplayAnimationFrame(){
-        DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, frameStartSounds, frameEndSounds, frameStartParticles, frameEndParticles);
+        DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, frameStartSounds, frameEndSounds, frameStartParticles, frameEndParticles, startCommands, endCommands);
         for (UUID uuid : displayTransformations.keySet()){
             DisplayTransformation transform = displayTransformations.get(uuid);
             if (transform != null){
