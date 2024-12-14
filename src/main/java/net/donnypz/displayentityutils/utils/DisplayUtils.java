@@ -341,7 +341,7 @@ public final class DisplayUtils {
      * @param delayInTicks how long before the scaling should start
      */
     public static void scaleInteraction(Interaction interaction, float height, float width, int durationInTicks, int delayInTicks){
-        if (durationInTicks == 0 && delayInTicks == 0){
+        if (durationInTicks <= 0 && delayInTicks <= 0){
             interaction.setInteractionHeight(height);
             interaction.setInteractionWidth(width);
             return;

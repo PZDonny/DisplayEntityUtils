@@ -14,7 +14,7 @@ class InteractionHeightCMD implements SubCommand{
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /mdis interaction setheight <height>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /mdis interaction height <height>", NamedTextColor.RED));
             return;
         }
         setInteractionDimensions(player, args, "height");
@@ -27,10 +27,6 @@ class InteractionHeightCMD implements SubCommand{
         }
         try{
             float change = Float.parseFloat(args[2]);
-            if (change <= 0){
-                p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid "+dim+", enter a positive number!", NamedTextColor.RED)));
-                return;
-            }
             if (dim.equals("height")){
                 interaction.setInteractionHeight(change);
             }
@@ -41,7 +37,7 @@ class InteractionHeightCMD implements SubCommand{
             p.sendMessage(Component.text("Successfully set interaction entity's "+dim+" to "+change, NamedTextColor.GREEN));
         }
         catch(NumberFormatException e) {
-            p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid " + dim + ", enter a positive number!", NamedTextColor.RED)));
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid " + dim + ", enter a number!", NamedTextColor.RED)));
         }
     }
 }
