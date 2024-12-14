@@ -48,7 +48,7 @@ public enum Permission {
 
     ITEM_TOGGLE_GLINT("deu.item.glint"),
     ITEM_SET("deu.item.setitem"),
-    ITEM_SET_TRANSFORM("deu.item.settransform"),
+    ITEM_TRANSFORM("deu.item.transform"),
 
 
     INTERACTION_ADD_CMD("deu.interaction.addcmd"),

@@ -10,10 +10,10 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 
-class ItemSetTransformCMD implements SubCommand{
+class ItemTransformCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ITEM_SET_TRANSFORM)){
+        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ITEM_TRANSFORM)){
             return;
         }
 
@@ -30,7 +30,7 @@ class ItemSetTransformCMD implements SubCommand{
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /mdis item settransform <transform-type> [-all]", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /mdis item transform <transform-type> [-all]", NamedTextColor.RED));
             return;
         }
 

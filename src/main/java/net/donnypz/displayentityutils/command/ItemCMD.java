@@ -19,7 +19,7 @@ class ItemCMD implements SubCommand{
         subCommands.put("help", new ItemHelpCMD());
         subCommands.put("set", new ItemSetCMD());
         subCommands.put("toggleglint", new ItemToggleGlintCMD());
-        subCommands.put("settransform", new ItemSetTransformCMD());
+        subCommands.put("transform", new ItemTransformCMD());
     }
 
     static List<String> getTabComplete(){
@@ -51,7 +51,7 @@ class ItemCMD implements SubCommand{
         sender.sendMessage(Component.text("| Commands with \"-all\" will apply the command to all item displays within a part selection", NamedTextColor.GOLD));
         CMDUtils.sendCMD(sender,"/mdis item help <page-number>", " (Get help for item displays)");
         CMDUtils.sendCMD(sender, "/mdis item set <\"-held\" | \"-target\" | item-id> [-all]", " (Change the item of a item display part)");
-        CMDUtils.sendCMD(sender, "/mdis item settransform <transform-type> [-all]", "(Change the item display transform of a item display part)");
+        CMDUtils.sendCMD(sender, "/mdis item transform <transform-type> [-all]", "(Change the item display transform of a item display part)");
         CMDUtils.sendCMD(sender,"/mdis item toggleglint [-all]", " (Toggle the enchantment glint of an item display's item)");
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>--------------------------"));
     }
