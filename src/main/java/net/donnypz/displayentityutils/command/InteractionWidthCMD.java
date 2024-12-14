@@ -12,7 +12,7 @@ class InteractionWidthCMD implements SubCommand{
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /mdis interaction setwidth <width>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /mdis interaction width <width>", NamedTextColor.RED));
             return;
         }
         InteractionHeightCMD.setInteractionDimensions(player, args, "width");
