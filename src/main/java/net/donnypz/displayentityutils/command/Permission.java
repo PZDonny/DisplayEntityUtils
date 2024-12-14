@@ -39,8 +39,8 @@ public enum Permission {
     PARTS_SET_BLOCK("deu.parts.setblock"),
 
 
-    TEXT_SET_TEXT("deu.text.settext"),
-    TEXT_SET_FONT("deu.text.setfont"),
+    TEXT_SET_TEXT("deu.text.set"),
+    TEXT_SET_FONT("deu.text.font"),
     TEXT_TOGGLE_SHADOW("deu.text.shadow"),
     TEXT_TOGGLE_SEE_THROUGH("deu.text.seethrough"),
     TEXT_SET_ALIGNMENT("deu.text.align"),
