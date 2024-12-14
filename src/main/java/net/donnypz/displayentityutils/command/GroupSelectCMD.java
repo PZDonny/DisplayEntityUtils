@@ -32,9 +32,9 @@ class GroupSelectCMD implements SubCommand{
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Selection made!", NamedTextColor.GREEN)));
             DisplayGroupManager.setSelectedSpawnedGroup(player, group);
             DisplayGroupManager.removePartSelection(player);
-            DisplayGroupManager.setPartSelection(player, new SpawnedPartSelection(group), false);
 
             group.getUnaddedInteractionEntitiesInRange(interactionDistance, true);
+            DisplayGroupManager.setPartSelection(player, new SpawnedPartSelection(group), false);
             group.glow(100, false);
         } catch (NumberFormatException e) {
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a number for the distance to select interaction entities", NamedTextColor.RED)));
