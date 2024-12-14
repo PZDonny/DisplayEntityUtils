@@ -39,7 +39,7 @@ autoSelectGroups: false
 
 #Attempts to automatically detect Spawned Display Entity Groups on Server Start
 #Also attempts to asynchronously detect groups when a chunk loads
-#This feature may not work 100% work on worlds that keep spawn in memory, but will work after a world reload (unload -> laod)
+#This feature may not work 100% work on worlds that keep spawn in memory, but will work after a world reload (unload -> load)
 automaticGroupDetection:
   enabled: true
 
