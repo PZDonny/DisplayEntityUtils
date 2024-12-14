@@ -103,7 +103,7 @@ public final class SpawnedPartSelection {
 
     /**
      * Get the part that is selected out of all the parts within this SpawnedPartSelection
-     * @return a {@link SpawnedDisplayEntityPart}. Null if there are no parts in this selection
+     * @return a {@link SpawnedDisplayEntityPart}. Null if a part is not selected
      */
     public SpawnedDisplayEntityPart getSelectedPart() {
         return selectedPart;
