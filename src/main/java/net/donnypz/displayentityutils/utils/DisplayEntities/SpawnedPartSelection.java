@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.Direction;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.util.Vector;
@@ -279,6 +280,16 @@ public final class SpawnedPartSelection {
         DisplayGroupManager.removePartSelection(this);
     }
 
+
+    /**
+     * Set the glow color of all parts in this selection
+     * @param color The color to set
+     */
+    public void setGlowColor(@Nullable Color color){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            part.setGlowColor(color);
+        }
+    }
 
     /**
      * Change the translation of the SpawnedDisplayEntityParts in this SpawnedPartSelection.
