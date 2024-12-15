@@ -802,7 +802,7 @@ public final class SpawnedDisplayEntityGroup {
      * Set the billboard of this group
      * @param billboard the billboard to set
      */
-    public void setBillboard(Display.Billboard billboard){
+    public void setBillboard(@NotNull Display.Billboard billboard){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setBillboard(billboard);
         }
@@ -810,7 +810,7 @@ public final class SpawnedDisplayEntityGroup {
 
     /**
      * Set the view range of this group
-     * @param range The color to set
+     * @param range The range to set
      */
     public void setViewRange(float range){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
