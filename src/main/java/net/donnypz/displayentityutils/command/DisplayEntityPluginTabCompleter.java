@@ -65,6 +65,9 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                         case "save" -> {
                             addStorages(suggestions);
                         }
+                        case "billboard" -> {
+                            addBillboard(suggestions);
+                        }
                     }
                 }
                 case "anim" -> {
@@ -99,6 +102,9 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                             suggestions.add("part");
                             suggestions.add("selection");
                         }
+                        case "billboard" -> {
+                            addBillboard(suggestions);
+                        }
                     }
                 }
                 case "item" -> {
@@ -128,13 +134,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                     addStorages(suggestions);
                 }
             }
-            if (args[0].equalsIgnoreCase("group") || args[0].equalsIgnoreCase("parts")){
-                if (args[1].equalsIgnoreCase("billboard")){
-                    for (Display.Billboard billboard : Display.Billboard.values()){
-                        suggestions.add(billboard.name());
-                    }
-                }
-            }
+
             else if (args[0].equalsIgnoreCase("interaction")){
                 if (args[1].equalsIgnoreCase("addcmd")){
                     suggestions.add("left");
@@ -149,6 +149,12 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
     private void addDirections(List<String> suggestions){
         for (Direction dir : Direction.values()){
             suggestions.add(dir.name().toLowerCase());
+        }
+    }
+
+    private void addBillboard(List<String> suggestions){
+        for (Display.Billboard billboard : Display.Billboard.values()){
+            suggestions.add(billboard.name());
         }
     }
 
