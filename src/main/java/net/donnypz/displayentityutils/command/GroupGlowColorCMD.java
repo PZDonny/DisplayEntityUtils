@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 class GroupGlowColorCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_GLOW_COLOR_SET)){
+        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_GLOW_COLOR)){
             return;
         }
 
