@@ -393,20 +393,22 @@ public final class SpawnedDisplayEntityPart {
 
     /**
      * Adds the glow effect to this SpawnDisplayEntityPart.
-     * It will glow if it's a Block/Item Display.
      * Outlined with soul fire flame particles if Interaction.
      * Cloud Particle if it's the master part
+     * @param particleHidden don't show the part with particles if it's the master part or has no material
      */
 
-    public void glow(){
+    public void glow(boolean particleHidden){
         if (type == PartType.INTERACTION) {
-            //temporaryParticles(entity, durationInTicks, Particle.COMPOSTER);
-            interactionOutline((Interaction) entity, Integer.MAX_VALUE);
+            interactionOutline((Interaction) entity, Long.MAX_VALUE);
         }
-        else if (type != PartType.TEXT_DISPLAY){
-            if (!this.equals(group.getMasterPart())){
 
-                Material material = getMaterial();
+        if (!particleHidden){
+            Material material = getMaterial();
+            if (material == null){
+                entity.setGlowing(true);
+            }
+            else{
                 switch (material){
                     case AIR, CAVE_AIR, VOID_AIR -> {
                         temporaryParticles(entity, -1, Particle.CLOUD);
@@ -416,6 +418,9 @@ public final class SpawnedDisplayEntityPart {
                     }
                 }
             }
+        }
+        else{
+            entity.setGlowing(true);
         }
     }
 
@@ -430,34 +435,44 @@ public final class SpawnedDisplayEntityPart {
         if (type == PartType.INTERACTION) {
             //temporaryParticles(entity, durationInTicks, Particle.COMPOSTER);
             interactionOutline((Interaction) entity, durationInTicks);
+            return;
         }
-        else if (type != PartType.TEXT_DISPLAY){
-            if (this.equals(group.getMasterPart())){
-                temporaryParticles(entity, durationInTicks, Particle.FLAME);
-            }
-
+        if (this.equals(group.getMasterPart())){
+            temporaryParticles(entity, durationInTicks, Particle.FLAME);
+            entity.setGlowing(true);
+        }
+        else{
             Material material = getMaterial();
-            switch (material){
-                case AIR, CAVE_AIR, VOID_AIR -> {
-                    temporaryParticles(entity, durationInTicks, Particle.CLOUD);
-                }
-                default -> {
-                    entity.setGlowing(true);
+            if (material != null){
+                switch (material){
+                    case AIR, CAVE_AIR, VOID_AIR -> {
+                        temporaryParticles(entity, durationInTicks, Particle.CLOUD);
+                        entity.setGlowing(true);
+                    }
+                    default -> {
+                        entity.setGlowing(true);
+                    }
                 }
             }
-            new BukkitRunnable(){
-                final Entity e = entity;
-                @Override
-                public void run() {
-                    if (entity != null){
-                        entity.setGlowing(false);
-                    }
-                    else if (e.isValid()){
-                        e.setGlowing(false);
-                    }
-                }
-            }.runTaskLater(DisplayEntityPlugin.getInstance(), durationInTicks);
+            else{
+                entity.setGlowing(true);
+            }
         }
+
+
+
+        new BukkitRunnable(){
+            final Entity e = entity;
+            @Override
+            public void run() {
+                if (entity != null){
+                    entity.setGlowing(false);
+                }
+                else if (e.isValid()){
+                    e.setGlowing(false);
+                }
+            }
+        }.runTaskLater(DisplayEntityPlugin.getInstance(), durationInTicks);
     }
 
     /**
@@ -468,7 +483,7 @@ public final class SpawnedDisplayEntityPart {
             //temporaryParticles(entity, durationInTicks, Particle.COMPOSTER);
             isInteractionOutlined = false;
         }
-        else if (type != PartType.TEXT_DISPLAY){
+        else{
             entity.setGlowing(false);
         }
     }

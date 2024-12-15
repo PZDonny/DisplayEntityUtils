@@ -999,15 +999,17 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Adds the glow effect to all the parts in this group
+     * Adds the glow effect the parts within this group
+     * @param ignoreInteractions choose if interaction entities should be outlined with particles
+     * @param particleHidden show parts with particles if it's the master part or has no material
      * @return this
      */
-    public SpawnedDisplayEntityGroup glow(boolean ignoreUnglowable){
+    public SpawnedDisplayEntityGroup glow(boolean ignoreInteractions, boolean particleHidden){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            if (ignoreUnglowable && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY || part.getMaterial() == Material.AIR)){
+            if (ignoreInteractions && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION)){
                 continue;
             }
-            part.glow();
+            part.glow(particleHidden);
         }
         return this;
     }
@@ -1017,9 +1019,9 @@ public final class SpawnedDisplayEntityGroup {
      * @param durationInTicks How long to highlight this selection
      * @return this
      */
-    public SpawnedDisplayEntityGroup glow(long durationInTicks, boolean ignoreUnglowable){
+    public SpawnedDisplayEntityGroup glow(long durationInTicks, boolean ignoreInteractions){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            if (ignoreUnglowable && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY || part.getMaterial() == Material.AIR)){
+            if (ignoreInteractions && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION)){
                 continue;
             }
             part.glow(durationInTicks);

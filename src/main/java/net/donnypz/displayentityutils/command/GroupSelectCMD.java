@@ -35,7 +35,9 @@ class GroupSelectCMD implements SubCommand{
 
             group.getUnaddedInteractionEntitiesInRange(interactionDistance, true);
             DisplayGroupManager.setPartSelection(player, new SpawnedPartSelection(group), false);
-            group.glow(100, false);
+            if (!group.getMasterPart().getEntity().isGlowing()){
+                group.glow(100, false);
+            }
         } catch (NumberFormatException e) {
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a number for the distance to select interaction entities", NamedTextColor.RED)));
         }

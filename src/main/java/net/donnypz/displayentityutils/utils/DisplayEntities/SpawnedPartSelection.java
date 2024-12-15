@@ -222,26 +222,28 @@ public final class SpawnedPartSelection {
 
     /**
      * Adds the glow effect the parts within this selection
+     * @param ignoreInteractions choose if interaction entities should be outlined with particles
+     * @param particleHidden show parts with particles if it's the master part or has no material
      * @return this
      */
-    public SpawnedPartSelection glow(boolean ignoreInteractionAndText){
+    public SpawnedPartSelection glow(boolean ignoreInteractions, boolean particleHidden){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            if (ignoreInteractionAndText && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)){
+            if (ignoreInteractions && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION)){
                 continue;
             }
-            part.glow();
+            part.glow(particleHidden);
         }
         return this;
     }
 
     /**
-     * Adds the glow effect to all the parts in this group
-     * @param durationInTicks How long to glow this selection
+     * Adds the glow effect the parts within this selection
+     * @param ignoreInteraction choose if interaction entities should be outlined with particles
      * @return this
      */
-    public SpawnedPartSelection glow(int durationInTicks, boolean ignoreInteractionAndText){
+    public SpawnedPartSelection glow(int durationInTicks, boolean ignoreInteraction){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            if (ignoreInteractionAndText && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)){
+            if (ignoreInteraction && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION)){
                 continue;
             }
             part.glow(durationInTicks);
