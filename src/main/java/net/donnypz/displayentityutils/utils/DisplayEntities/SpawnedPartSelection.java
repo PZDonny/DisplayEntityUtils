@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.utils.Direction;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Display;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -348,6 +349,26 @@ public final class SpawnedPartSelection {
     public void setPitch(float pitch){
         for (SpawnedDisplayEntityPart part : selectedParts){
             part.setPitch(pitch);
+        }
+    }
+
+    /**
+     * Set the view range of all parts in this selection
+     * @param range The range to set
+     */
+    public void setViewRange(float range){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            part.setViewRange(range);
+        }
+    }
+
+    /**
+     * Set the billboard of all parts in this selection
+     * @param billboard the billboard to set
+     */
+    public void setBillboard(@NotNull Display.Billboard billboard){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            part.setBillboard(billboard);
         }
     }
 
