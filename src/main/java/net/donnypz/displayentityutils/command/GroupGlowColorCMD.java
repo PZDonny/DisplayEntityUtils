@@ -6,11 +6,10 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.entity.Player;
 
-class GroupSetGlowColorCMD implements SubCommand{
+class GroupGlowColorCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_GLOW_COLOR_SET)){
@@ -25,14 +24,14 @@ class GroupSetGlowColorCMD implements SubCommand{
 
         if (args.length < 3) {
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a valid color!", NamedTextColor.RED)));
-            player.sendMessage(Component.text("/mdis group setglowcolor <color | hex-code>", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("/mdis group glowcolor <color | hex-code>", NamedTextColor.GRAY));
             return;
         }
 
         Color c = DEUCommandUtils.getColorFromText(args[2]);
         if (c == null){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a valid color!", NamedTextColor.RED)));
-            player.sendMessage(Component.text("/mdis group setglowcolor <color | hex-code>", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("/mdis group glowcolor <color | hex-code>", NamedTextColor.GRAY));
             return;
         }
         group.setGlowColor(c);
