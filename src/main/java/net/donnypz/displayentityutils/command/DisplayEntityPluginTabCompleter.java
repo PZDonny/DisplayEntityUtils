@@ -55,7 +55,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                         case "selectnearest" -> {
                             suggestions.add("<interaction-distance>");
                         }
-                        case "setglowcolor" -> {
+                        case "glowcolor" -> {
                             addColors(suggestions);
                         }
                         case "move", "translate" -> {
@@ -73,7 +73,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                 }
                 case "parts" -> {
                     switch (args[1].toLowerCase()){
-                        case "setglowcolor" -> {
+                        case "glowcolor" -> {
                             addColors(suggestions);
                         }
                         case "translate" -> {
@@ -106,7 +106,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                             suggestions.add("-held");
                             suggestions.add("item-id");
                         }
-                        case "settransform" -> {
+                        case "transform" -> {
                             for (ItemDisplay.ItemDisplayTransform transform : ItemDisplay.ItemDisplayTransform.values()){
                                 suggestions.add(transform.name());
                             }
