@@ -23,7 +23,8 @@ class GroupBrightnessCMD implements SubCommand{
 
         if (args.length < 4) {
             player.sendMessage(Component.text("/mdis group brightness <block> <sky>", NamedTextColor.RED));
-            player.sendMessage(Component.text("Set both \"block\" and \"sky\" to -1 to reset brightness"));
+            player.sendMessage(Component.text("| Brightness can any number between 0 and 15", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Set both \"block\" and \"sky\" to -1 to reset brightness", NamedTextColor.GRAY));
             return;
         }
 
