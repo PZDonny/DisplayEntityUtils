@@ -871,7 +871,7 @@ public final class SpawnedDisplayEntityGroup {
      * Set the glow color of this group
      * @param color The color to set
      */
-    public void setGlowColor(Color color){
+    public void setGlowColor(@Nullable Color color){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setGlowColor(color);
         }

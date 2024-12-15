@@ -652,7 +652,7 @@ public final class SpawnedDisplayEntityPart {
      * Set the glow color of this part
      * @param color The color to set
      */
-    public void setGlowColor(Color color){
+    public void setGlowColor(@Nullable Color color){
         if (entity instanceof Interaction){
             return;
         }
