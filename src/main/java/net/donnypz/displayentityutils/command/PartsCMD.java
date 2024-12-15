@@ -30,6 +30,7 @@ class PartsCMD implements SubCommand{
         subCommands.put("translate", new PartsTranslateCMD());
         subCommands.put("seeduuids", new PartsSeedUUIDsCMD());
         subCommands.put("setblock", new PartsSetBlockCMD());
+        subCommands.put("billboard", new PartsBillboardCMD());
     }
 
     static List<String> getTabComplete(){
@@ -68,19 +69,23 @@ class PartsCMD implements SubCommand{
             CMDUtils.sendCMD(sender, "/mdis parts addtag <part-tag> [-all]", " (Add a tag to your selected part");
             CMDUtils.sendCMD(sender, "/mdis parts removetag <part-tag> [-all]", " (Remove a tag from your selected part)");
             CMDUtils.sendCMD(sender, "/mdis parts adapttags [-remove]",
-                    " (Adapt scoreboard tags to tags usable by DisplayEntityUtils. Done to selected parts or group if there's no selection."+
+                    " (Adapt scoreboard tags to tags usable by DisplayEntityUtils. Applied to selected parts."+
                             " \"-remove\" removes tag from scoreboard)");
         }
-        else{
+        else if (page == 2) {
             CMDUtils.sendCMD(sender, "/mdis parts listtags <part | selection>", " (List tags of selected part or entire part selection)");
             CMDUtils.sendCMD(sender, "/mdis parts select <part-tag>", " (Select multiple parts by their part tag)");
             CMDUtils.sendCMD(sender, "/mdis parts deselect", " (Clear your part selection)");
             CMDUtils.sendCMD(sender, "/mdis parts remove [-all]", " (Despawn and remove your selected part from a group)");
             CMDUtils.sendCMD(sender, "/mdis parts glow [-toggle] [-all]", " (Make a part or all selected parts glow. \"-toggle\" to toggle the glowing)");
             CMDUtils.sendCMD(sender, "/mdis parts glowcolor <color | hex-code> [-all]", " (Set your selected part's glow color)");
+            CMDUtils.sendCMD(sender, "/mdis parts billboard <fixed | vertical | horizontal | center> [-all]", " (Set the billboard of your selected part)");
+        }
+        else{
             CMDUtils.sendCMD(sender, "/mdis parts translate <direction> <distance> <tick-duration> [-all]", " (Translate your selected part)");
-            CMDUtils.sendCMD(sender, "/mdis parts seeduuids <group | selection> <seed>"," (Useful when wanting to use the same animation on similar groups.)");
             CMDUtils.sendCMD(sender, "/mdis parts setblock <\"-held\" | \"-target\" | block-id> [-all]", " (Change the block of a block display part)");
+            CMDUtils.sendCMD(sender, "/mdis parts seeduuids <group | selection> <seed>"," (Useful when wanting to use the same animation on similar groups.)");
+
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }

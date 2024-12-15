@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.utils.Direction;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -125,6 +126,13 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
             if (args[0].equalsIgnoreCase("group") || args[0].equalsIgnoreCase("anim")){
                 if (args[1].equals("delete")){
                     addStorages(suggestions);
+                }
+            }
+            if (args[0].equalsIgnoreCase("group") || args[0].equalsIgnoreCase("parts")){
+                if (args[1].equalsIgnoreCase("billboard")){
+                    for (Display.Billboard billboard : Display.Billboard.values()){
+                        suggestions.add(billboard.name());
+                    }
                 }
             }
             else if (args[0].equalsIgnoreCase("interaction")){

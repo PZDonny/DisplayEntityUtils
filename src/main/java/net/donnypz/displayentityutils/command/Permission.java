@@ -25,6 +25,7 @@ public enum Permission {
     GROUP_COPY_POSE("deu.group.copy"),
     GROUP_SET_SPAWN_ANIM("deu.group.spawnanim"),
     GROUP_TOGGLE_PERSIST("deu.group.persist"),
+    GROUP_BILLBOARD("deu.group.billboard"),
 
 
     PARTS_CYCLE("deu.parts.cycle"),
@@ -37,6 +38,7 @@ public enum Permission {
     PARTS_TRANSLATE("deu.parts.translate"),
     PARTS_SEED_UUIDS("deu.parts.seed"),
     PARTS_SET_BLOCK("deu.parts.setblock"),
+    PARTS_BILLBOARD("deu.parts.billboard"),
 
 
     TEXT_SET_TEXT("deu.text.set"),
