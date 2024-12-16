@@ -19,6 +19,7 @@ class PartsCMD implements SubCommand{
         subCommands.put("help", new PartsHelpCMD());
         subCommands.put("cycle", new PartsCycleCMD());
         subCommands.put("glow", new PartsGlowCMD());
+        subCommands.put("unglow", new PartsUnglowCMD());
         subCommands.put("glowcolor", new PartsGlowColorCMD());
         subCommands.put("select", new PartsSelectCMD());
         subCommands.put("deselect", new PartsDeselectCMD());
@@ -77,11 +78,13 @@ class PartsCMD implements SubCommand{
             CMDUtils.sendCMD(sender, "/mdis parts select <part-tag>", " (Select multiple parts by their part tag)");
             CMDUtils.sendCMD(sender, "/mdis parts deselect", " (Clear your part selection)");
             CMDUtils.sendCMD(sender, "/mdis parts remove [-all]", " (Despawn and remove your selected part from a group)");
-            CMDUtils.sendCMD(sender, "/mdis parts glow [-toggle] [-all]", " (Make a part or all selected parts glow. \"-toggle\" to toggle the glowing)");
+            CMDUtils.sendCMD(sender, "/mdis parts glow [-all]", " (Make your selected part glow)");
+            CMDUtils.sendCMD(sender, "/mdis parts unglow [-all]", " (Remove the glow from your selected part)");
             CMDUtils.sendCMD(sender, "/mdis parts glowcolor <color | hex-code> [-all]", " (Set your selected part's glow color)");
-            CMDUtils.sendCMD(sender, "/mdis parts billboard <fixed | vertical | horizontal | center> [-all]", " (Set the billboard of your selected part)");
+
         }
         else{
+            CMDUtils.sendCMD(sender, "/mdis parts billboard <fixed | vertical | horizontal | center> [-all]", " (Set the billboard of your selected part)");
             CMDUtils.sendCMD(sender, "/mdis parts translate <direction> <distance> <tick-duration> [-all]", " (Translate your selected part)");
             CMDUtils.sendCMD(sender, "/mdis parts setblock <\"-held\" | \"-target\" | block-id> [-all]", " (Change the block of a block display part)");
             CMDUtils.sendCMD(sender, "/mdis parts seeduuids <group | selection> <seed>"," (Useful when wanting to use the same animation on similar groups.)");

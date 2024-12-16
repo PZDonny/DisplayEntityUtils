@@ -37,6 +37,7 @@ class GroupCMD implements SubCommand{
         subCommands.put("clone", new GroupCloneCMD());
         subCommands.put("clonehere", new GroupCloneHereCMD());
         subCommands.put("glow", new GroupGlowCMD());
+        subCommands.put("unglow", new GroupUnglowCMD());
         subCommands.put("glowcolor", new GroupGlowColorCMD());
         subCommands.put("copypose", new GroupCopyPoseCMD());
         subCommands.put("setspawnanim", new GroupSetSpawnAnimationCMD());
@@ -102,7 +103,8 @@ class GroupCMD implements SubCommand{
         else{
             CMDUtils.sendCMD(sender, "/mdis group copypose", " (Copies the transformations of the group you're closest to, to your selected group)");
             CMDUtils.sendCMD(sender, "/mdis group billboard <fixed | vertical | horizontal | center>", " (Set the billboard of all parts in this group)");
-            CMDUtils.sendCMD(sender, "/mdis group glow [-toggle]", " (Make all parts in this group glow. Add \"-toggle\" to toggle the glowing of the group)");
+            CMDUtils.sendCMD(sender, "/mdis group glow", " (Make all parts in this group glow)");
+            CMDUtils.sendCMD(sender, "/mdis group unglow", " (Remove the glowing effect from all parts in this group)");
             CMDUtils.sendCMD(sender, "/mdis group glowcolor <color | hex-code>", " (Set the glow color for all parts in this group)");
             CMDUtils.sendCMD(sender, "/mdis group setspawnanim <anim-tag> <linear | loop>", " (Set an animation to play when this group is spawned/loaded)");
             CMDUtils.sendCMD(sender, "/mdis group togglepersist", " (Toggle whether this group should persist after a server shutdown)");
