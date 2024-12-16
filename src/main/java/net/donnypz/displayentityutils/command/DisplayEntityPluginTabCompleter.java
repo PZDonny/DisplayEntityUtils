@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.utils.Direction;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -55,7 +56,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                         case "selectnearest" -> {
                             suggestions.add("<interaction-distance>");
                         }
-                        case "setglowcolor" -> {
+                        case "glowcolor" -> {
                             addColors(suggestions);
                         }
                         case "move", "translate" -> {
@@ -63,6 +64,9 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                         }
                         case "save" -> {
                             addStorages(suggestions);
+                        }
+                        case "billboard" -> {
+                            addBillboard(suggestions);
                         }
                     }
                 }
@@ -73,7 +77,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                 }
                 case "parts" -> {
                     switch (args[1].toLowerCase()){
-                        case "setglowcolor" -> {
+                        case "glowcolor" -> {
                             addColors(suggestions);
                         }
                         case "translate" -> {
@@ -98,6 +102,9 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                             suggestions.add("part");
                             suggestions.add("selection");
                         }
+                        case "billboard" -> {
+                            addBillboard(suggestions);
+                        }
                     }
                 }
                 case "item" -> {
@@ -106,7 +113,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                             suggestions.add("-held");
                             suggestions.add("item-id");
                         }
-                        case "settransform" -> {
+                        case "transform" -> {
                             for (ItemDisplay.ItemDisplayTransform transform : ItemDisplay.ItemDisplayTransform.values()){
                                 suggestions.add(transform.name());
                             }
@@ -127,6 +134,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                     addStorages(suggestions);
                 }
             }
+
             else if (args[0].equalsIgnoreCase("interaction")){
                 if (args[1].equalsIgnoreCase("addcmd")){
                     suggestions.add("left");
@@ -141,6 +149,12 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
     private void addDirections(List<String> suggestions){
         for (Direction dir : Direction.values()){
             suggestions.add(dir.name().toLowerCase());
+        }
+    }
+
+    private void addBillboard(List<String> suggestions){
+        for (Display.Billboard billboard : Display.Billboard.values()){
+            suggestions.add(billboard.name());
         }
     }
 

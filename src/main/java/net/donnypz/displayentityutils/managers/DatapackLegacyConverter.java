@@ -5,6 +5,8 @@ import net.donnypz.displayentityutils.listeners.bdengine.DEUEntitySpawned;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.VersionUtils;
+import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -186,7 +188,7 @@ public class DatapackLegacyConverter {
 
                 if (zipEntry.getName().contains("summon")){
                     String projectName = zipEntry.getName();
-                    if (DatapackConverter.is1_21){
+                    if (VersionUtils.is1_21){
                         projectName = projectName.replace("function/summon.mcfunction", "");
                     }
                     else{
@@ -199,7 +201,7 @@ public class DatapackLegacyConverter {
                     //Master Part
                     if (line.contains("execute as @s")){
 
-                        String coordinates = DatapackConverter.getCoordinateString(location);
+                        String coordinates = DEUCommandUtils.getCoordinateString(location);
                         String replacement = "execute at "+player.getName()+" run summon block_display "+coordinates;
                         line = line.replace("execute as @s run summon block_display ~ ~ ~", replacement);
                         String[] timestampSplit = line.split(":\\[\""+projectName.replace("_", ""));

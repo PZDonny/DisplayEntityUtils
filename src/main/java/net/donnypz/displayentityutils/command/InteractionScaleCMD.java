@@ -33,11 +33,13 @@ class InteractionScaleCMD implements SubCommand{
             }
             DisplayUtils.scaleInteraction(interaction, height, width, duration, delay);
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Scaling Interaction Entity over "+duration+" ticks!", NamedTextColor.GREEN)));
+            player.sendMessage(Component.text("| Height: "+height, NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Width: "+width, NamedTextColor.GRAY));
             player.sendMessage(Component.text("| Delay: "+delay, NamedTextColor.GRAY));
         }
         catch(NumberFormatException e){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter valid numbers!", NamedTextColor.RED)));
-            player.sendMessage(Component.text("| Duration and Delay must be positive whole numbers. Width must be positive", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Duration and delay must be positive whole numbers.", NamedTextColor.GRAY));
         }
     }
 }

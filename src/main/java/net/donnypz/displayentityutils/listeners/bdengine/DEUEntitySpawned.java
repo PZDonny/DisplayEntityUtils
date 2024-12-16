@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.listeners.bdengine;
 import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
@@ -54,11 +55,20 @@ public final class DEUEntitySpawned implements Listener {
                     storeGroupAnimation(projectValue, display);
                 }
 
-                //Add parts that aren't grouped/animated later to the group, so the animation can be used
-                //for other display entities, not created through the animator, (or spawned later, after conversion)
-                //DisplayEntityGroups created outside the animator spawn ungrouped parts last,
-                //while the animator spawns them after the MAIN master part
+
                 else {
+                    Location groupLoc = group.getLocation();
+                    if (groupLoc != null){
+                        if (groupLoc.distanceSquared(display.getLocation()) > 0.25){ //0.5^2, display can't be part of group
+                            return;
+                        }
+                    }
+
+                    //LEGACY ANIMATIONS
+                    //Add parts that aren't grouped/animated later to the group, so the animation can be used
+                    //for other display entities, not created through the animator, (or spawned later, after conversion)
+                    //DisplayEntityGroups created outside the animator spawn ungrouped parts last,
+                    //while the animator spawns them after the MAIN master part
                     if (tag.contains(projectValue +"_")) {
                         display.addScoreboardTag(LocalManager.datapackUngroupedAddLaterTag);
                     }

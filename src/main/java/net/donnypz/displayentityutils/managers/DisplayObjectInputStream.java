@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
 
-final class DisplayObjectInputStream extends ObjectInputStream {
+class DisplayObjectInputStream extends ObjectInputStream {
 
     private static final String oldPackage = "com.pzdonny";
     DisplayObjectInputStream(InputStream in) throws IOException {

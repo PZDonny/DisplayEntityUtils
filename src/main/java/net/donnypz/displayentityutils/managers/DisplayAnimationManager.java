@@ -74,28 +74,32 @@ public final class DisplayAnimationManager {
      * @param saver Player who is saving the animation
      * @return boolean whether the save was successful
      */
-    public static boolean saveDisplayAnimation(LoadMethod loadMethod, DisplayAnimation displayAnimation, @Nullable Player saver){
+    public static boolean saveDisplayAnimation(@NotNull LoadMethod loadMethod, DisplayAnimation displayAnimation, @Nullable Player saver){
         if (displayAnimation.getAnimationTag() == null){
             return false;
         }
+        boolean success = false;
         switch(loadMethod){
             case LOCAL -> {
                 if (DisplayEntityPlugin.isLocalEnabled()){
-                    return LocalManager.saveDisplayAnimation(displayAnimation, saver);
+                    success = LocalManager.saveDisplayAnimation(displayAnimation, saver);
                 }
             }
             case MONGODB -> {
                 if (DisplayEntityPlugin.isMongoEnabled()){
-                    return MongoManager.saveDisplayAnimation(displayAnimation, saver);
+                    success = MongoManager.saveDisplayAnimation(displayAnimation, saver);
                 }
             }
             case MYSQL -> {
                 if (DisplayEntityPlugin.isMYSQLEnabled()){
-                    return MYSQLManager.saveDisplayAnimation(displayAnimation, saver);
+                    success = MYSQLManager.saveDisplayAnimation(displayAnimation, saver);
                 }
             }
         }
-        return false;
+        if (success){
+           attemptCacheAnimation(displayAnimation.getAnimationTag(), displayAnimation.toSpawnedDisplayAnimation());
+        }
+        return success;
     }
 
     /**
@@ -127,9 +131,10 @@ public final class DisplayAnimationManager {
      * @return a {@link SpawnedDisplayAnimation}, or null if the animation is not cached and does not exist in any storage location.
      */
     public static SpawnedDisplayAnimation getSpawnAnimation(String tag){
-        SpawnedDisplayAnimation cachedAnim = cachedAnimations.get(tag);
-        if (cachedAnim != null){
-            return cachedAnim;
+    //Check Cache
+        SpawnedDisplayAnimation spawnedAnim = cachedAnimations.get(tag);
+        if (spawnedAnim != null){
+            return spawnedAnim;
         }
 
         DisplayAnimation anim = getAnimation(tag);
@@ -137,12 +142,15 @@ public final class DisplayAnimationManager {
             return null;
         }
 
-        cachedAnim = anim.toSpawnedDisplayAnimation();
-        if (DisplayEntityPlugin.cacheAnimations()){
-            cachedAnimations.put(tag, cachedAnim);
-        }
+        spawnedAnim = anim.toSpawnedDisplayAnimation();
+        attemptCacheAnimation(tag, spawnedAnim);
+        return spawnedAnim;
+    }
 
-        return cachedAnim;
+    private static void attemptCacheAnimation(String tag, SpawnedDisplayAnimation animation){
+        if (DisplayEntityPlugin.cacheAnimations()){
+            cachedAnimations.put(tag, animation);
+        }
     }
 
     /**
@@ -214,12 +222,12 @@ public final class DisplayAnimationManager {
             e.printStackTrace();
             return null;
         }
-        try{
-            ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes);
+        try(ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes)){
             GZIPInputStream gzipInputStream = new GZIPInputStream(byteStream);
 
-            ObjectInputStream objIn = new DisplayObjectInputStream(gzipInputStream);
+            ObjectInputStream objIn = new DisplayAnimationInputStream(gzipInputStream);
             DisplayAnimation anim = (DisplayAnimation) objIn.readObject();
+            anim.adaptOldSounds();
 
             objIn.close();
             gzipInputStream.close();
@@ -227,20 +235,21 @@ public final class DisplayAnimationManager {
             inputStream.close();
             for (DisplayAnimationFrame f : anim.getFrames()){
                 for (AnimationParticle p : f.getFrameStartParticles()){
-                    p.repair();
+                    p.applyVector();
                 }
                 for (AnimationParticle p : f.getFrameEndParticles()){
-                    p.repair();
+                    p.applyVector();
                 }
             }
             return anim;
         }
+
     //Not Compressed (Will typically be old file version)
         catch (ZipException z){
-            try{
-                ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes);
-                ObjectInputStream objIn = new DisplayObjectInputStream(byteStream);
+            try(ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes)){
+                ObjectInputStream objIn = new DisplayAnimationInputStream(byteStream);
                 DisplayAnimation anim = (DisplayAnimation) objIn.readObject();
+                anim.adaptOldSounds();
 
                 objIn.close();
                 byteStream.close();

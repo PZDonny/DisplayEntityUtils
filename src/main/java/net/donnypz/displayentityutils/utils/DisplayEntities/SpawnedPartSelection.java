@@ -2,8 +2,10 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.Direction;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Display;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -103,7 +105,7 @@ public final class SpawnedPartSelection {
 
     /**
      * Get the part that is selected out of all the parts within this SpawnedPartSelection
-     * @return a {@link SpawnedDisplayEntityPart}. Null if there are no parts in this selection
+     * @return a {@link SpawnedDisplayEntityPart}. Null if a part is not selected
      */
     public SpawnedDisplayEntityPart getSelectedPart() {
         return selectedPart;
@@ -220,26 +222,28 @@ public final class SpawnedPartSelection {
 
     /**
      * Adds the glow effect the parts within this selection
+     * @param ignoreInteractions choose if interaction entities should be outlined with particles
+     * @param particleHidden show parts with particles if it's the master part or has no material
      * @return this
      */
-    public SpawnedPartSelection glow(boolean ignoreInteractionAndText){
+    public SpawnedPartSelection glow(boolean ignoreInteractions, boolean particleHidden){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            if (ignoreInteractionAndText && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)){
+            if (ignoreInteractions && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION)){
                 continue;
             }
-            part.glow();
+            part.glow(particleHidden);
         }
         return this;
     }
 
     /**
-     * Adds the glow effect to all the parts in this group
-     * @param durationInTicks How long to glow this selection
+     * Adds the glow effect the parts within this selection
+     * @param ignoreInteraction choose if interaction entities should be outlined with particles
      * @return this
      */
-    public SpawnedPartSelection glow(int durationInTicks, boolean ignoreInteractionAndText){
+    public SpawnedPartSelection glow(int durationInTicks, boolean ignoreInteraction){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            if (ignoreInteractionAndText && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)){
+            if (ignoreInteraction && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION)){
                 continue;
             }
             part.glow(durationInTicks);
@@ -279,6 +283,16 @@ public final class SpawnedPartSelection {
         DisplayGroupManager.removePartSelection(this);
     }
 
+
+    /**
+     * Set the glow color of all parts in this selection
+     * @param color The color to set
+     */
+    public void setGlowColor(@Nullable Color color){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            part.setGlowColor(color);
+        }
+    }
 
     /**
      * Change the translation of the SpawnedDisplayEntityParts in this SpawnedPartSelection.
@@ -337,6 +351,26 @@ public final class SpawnedPartSelection {
     public void setPitch(float pitch){
         for (SpawnedDisplayEntityPart part : selectedParts){
             part.setPitch(pitch);
+        }
+    }
+
+    /**
+     * Set the view range of all parts in this selection
+     * @param range The range to set
+     */
+    public void setViewRange(float range){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            part.setViewRange(range);
+        }
+    }
+
+    /**
+     * Set the billboard of all parts in this selection
+     * @param billboard the billboard to set
+     */
+    public void setBillboard(@NotNull Display.Billboard billboard){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            part.setBillboard(billboard);
         }
     }
 

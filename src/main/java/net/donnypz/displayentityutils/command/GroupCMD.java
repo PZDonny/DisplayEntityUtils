@@ -37,10 +37,12 @@ class GroupCMD implements SubCommand{
         subCommands.put("clone", new GroupCloneCMD());
         subCommands.put("clonehere", new GroupCloneHereCMD());
         subCommands.put("glow", new GroupGlowCMD());
-        subCommands.put("setglowcolor", new GroupSetGlowColorCMD());
+        subCommands.put("unglow", new GroupUnglowCMD());
+        subCommands.put("glowcolor", new GroupGlowColorCMD());
         subCommands.put("copypose", new GroupCopyPoseCMD());
         subCommands.put("setspawnanim", new GroupSetSpawnAnimationCMD());
         subCommands.put("togglepersist", new GroupPersistCMD());
+        subCommands.put("billboard", new GroupBillboardCMD());
     }
 
     static List<String> getTabComplete(){
@@ -79,27 +81,31 @@ class GroupCMD implements SubCommand{
             CMDUtils.sendCMD(sender, "/mdis group spawn <group-tag> <storage>", " (Spawn a saved DisplayEntityGroup from a storage location)");
             CMDUtils.sendCMD(sender, "/mdis group despawn", " (Despawn your selected group)");
             CMDUtils.sendCMD(sender, "/mdis group save <storage-location>", " (Save your selected group)");
-            CMDUtils.sendCMD(sender, "/mdis group delete <group-tag> <storage-location>", " (Delete a saved group from a storage location)");
         }
         else if (page == 2){
+            CMDUtils.sendCMD(sender, "/mdis group delete <group-tag> <storage-location>", " (Delete a saved group from a storage location)");
             CMDUtils.sendCMD(sender, "/mdis group addtarget", " (Add a targeted interaction entity to your group)");
             CMDUtils.sendCMD(sender, "/mdis group ungroupinteractions", " (Remove all interactions from your group)");
             CMDUtils.sendCMD(sender, "/mdis group settag <group-tag>", " (Set this group's tag, or identifier)");
             CMDUtils.sendCMD(sender, "/mdis group yaw <yaw> [-pivot]"," (Set your selected group's yaw, \"-pivot\" pivots interaction entities around the group)");
             CMDUtils.sendCMD(sender, "/mdis group pitch <pitch>", " (Set your selected group's pitch)");
             CMDUtils.sendCMD(sender, "/mdis group scale <scale-multiplier> <tick-duration>", " (Scale your selected group)");
+        }
+        else if (page == 3){
             CMDUtils.sendCMD(sender, "/mdis group brightness <block> <sky>", " (Set your selected group's brightness. Enter values between 0-15. -1 resets)");
             CMDUtils.sendCMD(sender, "/mdis group clone", " (Spawn a cloned group at your selected group's location)");
             CMDUtils.sendCMD(sender, "/mdis group clonehere", " (Spawn a cloned group at your location)");
-        }
-        else{
             CMDUtils.sendCMD(sender, "/mdis group move <direction> <distance> <tick-duration>", " (Change the actual location of your selected group)");
             CMDUtils.sendCMD(sender, "/mdis group translate <direction> <distance> <tick-duration>"," (Changes your selected group's translation and not it's actual location, use \"move\" instead if this group uses animations)");
             CMDUtils.sendCMD(sender, "/mdis group movehere", " (Change your selected group's actual location to your location)");
             CMDUtils.sendCMD(sender, "/mdis group merge <distance>"," (Merges groups near your select group)");
+        }
+        else{
             CMDUtils.sendCMD(sender, "/mdis group copypose", " (Copies the transformations of the group you're closest to, to your selected group)");
+            CMDUtils.sendCMD(sender, "/mdis group billboard <fixed | vertical | horizontal | center>", " (Set the billboard of all parts in this group)");
             CMDUtils.sendCMD(sender, "/mdis group glow", " (Make all parts in this group glow)");
-            CMDUtils.sendCMD(sender, "/mdis group setglowcolor <color | hex-code>", " (Set the glow color for all parts in this group)");
+            CMDUtils.sendCMD(sender, "/mdis group unglow", " (Remove the glowing effect from all parts in this group)");
+            CMDUtils.sendCMD(sender, "/mdis group glowcolor <color | hex-code>", " (Set the glow color for all parts in this group)");
             CMDUtils.sendCMD(sender, "/mdis group setspawnanim <anim-tag> <linear | loop>", " (Set an animation to play when this group is spawned/loaded)");
             CMDUtils.sendCMD(sender, "/mdis group togglepersist", " (Toggle whether this group should persist after a server shutdown)");
         }

@@ -6,7 +6,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
-class GroupGlowCMD implements SubCommand{
+class GroupUnglowCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_GLOW)){
@@ -19,7 +19,7 @@ class GroupGlowCMD implements SubCommand{
             return;
         }
 
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Glowing selected group!")));
-        group.glow(true, true);
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Unglowing selected group!")));
+        group.unglow();
     }
 }

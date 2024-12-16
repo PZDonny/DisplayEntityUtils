@@ -8,7 +8,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class PartsGlowCMD implements SubCommand{
+class PartsUnglowCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_GLOW)){
@@ -37,12 +37,12 @@ class PartsGlowCMD implements SubCommand{
         }
 
         if (isAll){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Glowing applied to your selection!", NamedTextColor.GREEN)));
-            partSelection.glow(false, true);
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Removed the glow from your selection!", NamedTextColor.YELLOW)));
+            partSelection.unglow();
         }
         else{
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Glowing applied to your selected part!", NamedTextColor.GREEN)));
-            partSelection.getSelectedPart().glow(true);
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Removed the glow from your selected part!", NamedTextColor.YELLOW)));
+            partSelection.getSelectedPart().unglow();
         }
 
     }

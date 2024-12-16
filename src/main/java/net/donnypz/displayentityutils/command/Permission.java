@@ -21,15 +21,16 @@ public enum Permission {
     GROUP_ADD_TARGET("deu.group.addtarget"),
     GROUP_CLONE("deu.group.clone"),
     GROUP_GLOW("deu.group.glow"),
-    GROUP_GLOW_COLOR_SET("deu.group.glow.set"),
+    GROUP_GLOW_COLOR("deu.group.glow.set"),
     GROUP_COPY_POSE("deu.group.copy"),
     GROUP_SET_SPAWN_ANIM("deu.group.spawnanim"),
     GROUP_TOGGLE_PERSIST("deu.group.persist"),
+    GROUP_BILLBOARD("deu.group.billboard"),
 
 
     PARTS_CYCLE("deu.parts.cycle"),
     PARTS_GLOW("deu.parts.glow"),
-    PARTS_GLOW_SET_COLOR("deu.parts.glow.set"),
+    PARTS_GLOW_COLOR("deu.parts.glow.set"),
     PARTS_SELECT("deu.parts.select"),
     PARTS_TAG("deu.parts.tag"),
     PARTS_LIST_TAGS("deu.parts.tag.list"),
@@ -37,10 +38,11 @@ public enum Permission {
     PARTS_TRANSLATE("deu.parts.translate"),
     PARTS_SEED_UUIDS("deu.parts.seed"),
     PARTS_SET_BLOCK("deu.parts.setblock"),
+    PARTS_BILLBOARD("deu.parts.billboard"),
 
 
-    TEXT_SET_TEXT("deu.text.settext"),
-    TEXT_SET_FONT("deu.text.setfont"),
+    TEXT_SET_TEXT("deu.text.set"),
+    TEXT_SET_FONT("deu.text.font"),
     TEXT_TOGGLE_SHADOW("deu.text.shadow"),
     TEXT_TOGGLE_SEE_THROUGH("deu.text.seethrough"),
     TEXT_SET_ALIGNMENT("deu.text.align"),
@@ -48,7 +50,7 @@ public enum Permission {
 
     ITEM_TOGGLE_GLINT("deu.item.glint"),
     ITEM_SET("deu.item.setitem"),
-    ITEM_SET_TRANSFORM("deu.item.settransform"),
+    ITEM_TRANSFORM("deu.item.transform"),
 
 
     INTERACTION_ADD_CMD("deu.interaction.addcmd"),

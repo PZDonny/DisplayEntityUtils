@@ -28,6 +28,8 @@ public class ParticleDisplay {
     SpawnedDisplayAnimationFrame frame;
     static final HashMap<UUID, ParticleDisplay> interactions = new HashMap<>();
     boolean isStartParticle;
+    private static String particleDisplayTag = "deu_particle_display";
+    Location spawnLocation;
 
     private boolean isValid = true;
 
@@ -40,7 +42,7 @@ public class ParticleDisplay {
             id.setGlowColorOverride(Color.YELLOW);
             id.setGlowing(true);
         });
-        DisplayUtils.addTag(display, "deu_particle_display");
+        DisplayUtils.addTag(display, particleDisplayTag);
 
         interaction = spawnLocation.getWorld().spawn(spawnLocation, Interaction.class, i -> {
            i.setVisibleByDefault(false);
@@ -49,7 +51,8 @@ public class ParticleDisplay {
            i.setPersistent(false);
         });
         interactions.put(interaction.getUniqueId(), this);
-        DisplayUtils.addTag(interaction, "deu_particle_display");
+        DisplayUtils.addTag(interaction, particleDisplayTag);
+        this.spawnLocation = spawnLocation;
         this.particle = particle;
         this.frame = frame;
         this.isStartParticle = isStartParticle;
@@ -58,6 +61,12 @@ public class ParticleDisplay {
     void reveal(Player player){
         player.showEntity(DisplayEntityPlugin.getInstance(), display);
         player.showEntity(DisplayEntityPlugin.getInstance(), interaction);
+    }
+
+    public void spawn(){
+        if (spawnLocation != null){
+            particle.spawn(spawnLocation);
+        }
     }
 
     public static void sendInfo(UUID uuid, Player player){
@@ -84,11 +93,20 @@ public class ParticleDisplay {
         return true;
     }
 
+    public static ParticleDisplay get(UUID uuid){
+        return interactions.get(uuid);
+    }
+
+    public static boolean isParticleDisplay(Entity entity){
+        return DisplayUtils.hasTag(entity, particleDisplayTag);
+    }
+
 
     void remove(){
         if (!isValid){
             return;
         }
+        spawnLocation = null;
         display.remove();
         interaction.remove();
         interactions.remove(interaction.getUniqueId());

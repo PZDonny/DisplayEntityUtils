@@ -86,7 +86,7 @@ class AnimCMD implements SubCommand{
             CMDUtils.sendCMD(sender, "/mdis anim editframe <frame-id> <tick-delay> <tick-duration>", " (Edit properties of a single frame)");
             CMDUtils.sendCMD(sender, "/mdis anim editallframes <tick-delay> <tick-duration>", " (Edit properties of all frames)");
             CMDUtils.sendCMD(sender, "/mdis anim addsound <frame-id> <sound> <volume> <pitch> <start | end>", " (Add a sound to a frame)");
-            CMDUtils.sendCMD(sender, "/mdis anim removesound <frame-id> <sound> <start | end>", " (Remove a sound from a frame)");
+            CMDUtils.sendCMD(sender, "/mdis anim removesound <frame-id> <sound | -all> <start | end>", " (Remove a sound from a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim addparticle <frame-id> <start | end>", " (Add a particle to a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim overwriteframe <frame-id>", " (Overwrite the transformation data of a frame)");
         }

@@ -5,12 +5,15 @@ import net.donnypz.displayentityutils.listeners.bdengine.DEUEntitySpawned;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.VersionUtils;
+import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +28,6 @@ import java.util.zip.ZipFile;
 
 class DatapackConverter {
 
-    static final boolean is1_21 = Bukkit.getUnsafe().getProtocolVersion() >= 767;
     private static final String createModelPath = "/create.mcfunction";
     private String projectName = null;
     private final LinkedHashMap<String, ArrayList<ZipEntry>> animations = new LinkedHashMap<>();
@@ -43,7 +45,7 @@ class DatapackConverter {
 
     private String getAnimationName(String entryName, String folder){
         String animName;
-        if (is1_21){
+        if (VersionUtils.is1_21){
             animName = entryName.split("function/"+folder+"/")[1];
         }
         else{
@@ -62,7 +64,7 @@ class DatapackConverter {
         if (projectName == null){
             String projectName;
 
-            if (is1_21){
+            if (VersionUtils.is1_21){
                 projectName = entryName.split("/function/")[0];
             }
             else{
@@ -85,7 +87,7 @@ class DatapackConverter {
 
             entryName = entry.getName();
             if (!entryName.endsWith(".mcfunction") &&
-                    ((is1_21 && entryName.contains("/function/a/") && !entryName.endsWith("/function/a/")) || ((entryName.contains("/functions/a/") && !entryName.endsWith("/functions/a/"))))){
+                    ((VersionUtils.is1_21 && entryName.contains("/function/a/") && !entryName.endsWith("/function/a/")) || ((entryName.contains("/functions/a/") && !entryName.endsWith("/functions/a/"))))){
                 animations.putIfAbsent(getAnimationName(entryName, "a"), new ArrayList<>());
             }
             else if (entryName.endsWith(createModelPath)) { //Summon Model for animation
@@ -111,7 +113,7 @@ class DatapackConverter {
 
             if (createdGroup == null){
                 player.sendMessage(Component.text("Failed to find model/group created from datapack!", NamedTextColor.RED));
-                player.sendMessage(Component.text("| The datapack may be a legacy one (before v1.13 of BDEngine). Try using /mdis bdengine convertanimleg"));
+                player.sendMessage(Component.text("| The datapack may be a legacy one (before v1.13 of BDEngine). Try using /mdis bdengine convertanimleg", NamedTextColor.GRAY));
                 return;
             }
 
@@ -127,7 +129,7 @@ class DatapackConverter {
                     createdGroup.setTag(groupSaveTag);
                 }
                 DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.LOCAL, createdGroup.toDisplayEntityGroup(), player);
-                player.sendMessage(Component.text(" | Group Tag: "+createdGroup.getTag(), NamedTextColor.GRAY));
+                player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Group Tag: <yellow>"+createdGroup.getTag()));
             }
             else{
                 player.sendMessage(Component.text("The group was not saved during this conversion due to setting the group tag to \"-\"", NamedTextColor.GRAY));
@@ -138,7 +140,7 @@ class DatapackConverter {
             for (String animName : animations.sequencedKeySet()){
                 List<ZipEntry> frames = animations.get(animName);
                 Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                    player.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Converting Animations: <yellow>"+animName));
+                    player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Converting Animation: <yellow>"+animName));
                     processAnimation(createdGroup, zipFile, frames, datapackName, animName, player, animationSaveTagPrefix);
                     }, delay);
 
@@ -148,12 +150,6 @@ class DatapackConverter {
             //Despawn group after all animation conversions
             Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                 createdGroup.unregister(true, true);
-                try{
-                    zipFile.close();
-                }
-                catch(IOException e){
-                    throw new RuntimeException("Failed to close zip file");
-                }
             }, delay+5);
         }, 30);
     }
@@ -204,10 +200,11 @@ class DatapackConverter {
 
                 //Apply Transformations, Texture Values, etc.
                 ZipEntry entry = frames.get(i);
-                executeCommands(entry, zipFile, player, createdGroup.getLocation());
+                List<String> commands = executeCommands(entry, zipFile, player, createdGroup.getLocation());
 
                 //Create Frame
                 SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(0, 2).setTransformation(createdGroup);
+                frame.setStartCommands(commands);
                 anim.addFrame(frame);
                 i++;
             }
@@ -215,15 +212,24 @@ class DatapackConverter {
     }
 
 
-    private void executeCommands(ZipEntry zipEntry, ZipFile zipFile, Player player, Location location){
+    private List<String> executeCommands(ZipEntry zipEntry, ZipFile zipFile, Player player, Location location){
+        List<String> commands;
+        if (zipEntry.getName().endsWith(createModelPath)) {
+            commands = null;
+        }
+        else{
+            commands = new ArrayList<>();
+        }
         try{
             InputStream stream = zipFile.getInputStream(zipEntry);
             BufferedReader br = new BufferedReader(new InputStreamReader(stream));
             String line;
-
-
             while ((line = br.readLine()) != null){
                 if (line.startsWith("#") || line.isEmpty()){
+                    continue;
+                }
+
+                if (zipEntry.getName().endsWith("/check_loop.mcfunction") || zipEntry.getName().contains("/check_pause_")){
                     continue;
                 }
 
@@ -234,7 +240,7 @@ class DatapackConverter {
                     //Master Part
                     //if (line.contains("execute as @s")){
                     if (line.startsWith("summon block_display")){
-                        String coordinates = getCoordinateString(location);
+                        String coordinates = DEUCommandUtils.getCoordinateString(location);
                         String replacement = "execute at "+player.getName()+" run summon block_display "+coordinates;
                         line = line.replace("summon block_display ~ ~ ~", replacement);
                         try{
@@ -262,22 +268,32 @@ class DatapackConverter {
                     line = line.substring(0, line.length()-2)+",\""+LocalManager.datapackConvertDeleteSubParentTag+"\"]}";
                 }
 
-                else if (line.startsWith("schedule") || line.startsWith("function")) {
+                else if (line.startsWith("schedule")) {
                     continue;
                 }
-                String coordinates = getCoordinateString(location);
-                Bukkit.dispatchCommand(LocalManager.silentSender, "execute positioned "+coordinates+" in "+location.getWorld().getName()+" run "+line);
+
+                String coordinates = DEUCommandUtils.getCoordinateString(location);
+                World w = location.getWorld();
+                String worldName = DEUCommandUtils.getExecuteCommandWorldName(w);
+
+
+                if (!line.startsWith("data merge entity @e[") && commands != null){ //Not an animation command
+                    commands.add(line);
+                }
+                Bukkit.dispatchCommand(LocalManager.silentSender, "execute positioned "+coordinates+" in "+worldName+" run "+line);
             }
             br.close();
-            stream.close();
         }
         catch (IOException e){
             player.sendMessage(Component.text("Animation conversion failed! Read console"));
+            try{
+                zipFile.close();
+            }
+            catch(IOException ignored){}
             throw new RuntimeException("Failed to execute command from ZipEntry: "+zipEntry.getName());
         }
+        return commands;
     }
 
-    static String getCoordinateString(Location location){
-        return location.x()+" "+location.y()+" "+location.z();
-    }
+
 }

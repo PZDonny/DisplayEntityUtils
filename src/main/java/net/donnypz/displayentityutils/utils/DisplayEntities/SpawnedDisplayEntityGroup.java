@@ -802,7 +802,7 @@ public final class SpawnedDisplayEntityGroup {
      * Set the billboard of this group
      * @param billboard the billboard to set
      */
-    public void setBillboard(Display.Billboard billboard){
+    public void setBillboard(@NotNull Display.Billboard billboard){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setBillboard(billboard);
         }
@@ -810,7 +810,7 @@ public final class SpawnedDisplayEntityGroup {
 
     /**
      * Set the view range of this group
-     * @param range The color to set
+     * @param range The range to set
      */
     public void setViewRange(float range){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
@@ -871,7 +871,7 @@ public final class SpawnedDisplayEntityGroup {
      * Set the glow color of this group
      * @param color The color to set
      */
-    public void setGlowColor(Color color){
+    public void setGlowColor(@Nullable Color color){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setGlowColor(color);
         }
@@ -999,15 +999,17 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Adds the glow effect to all the parts in this group
+     * Adds the glow effect the parts within this group
+     * @param ignoreInteractions choose if interaction entities should be outlined with particles
+     * @param particleHidden show parts with particles if it's the master part or has no material
      * @return this
      */
-    public SpawnedDisplayEntityGroup glow(boolean ignoreUnglowable){
+    public SpawnedDisplayEntityGroup glow(boolean ignoreInteractions, boolean particleHidden){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            if (ignoreUnglowable && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY || part.getMaterial() == Material.AIR)){
+            if (ignoreInteractions && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION)){
                 continue;
             }
-            part.glow();
+            part.glow(particleHidden);
         }
         return this;
     }
@@ -1017,9 +1019,9 @@ public final class SpawnedDisplayEntityGroup {
      * @param durationInTicks How long to highlight this selection
      * @return this
      */
-    public SpawnedDisplayEntityGroup glow(long durationInTicks, boolean ignoreUnglowable){
+    public SpawnedDisplayEntityGroup glow(long durationInTicks, boolean ignoreInteractions){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            if (ignoreUnglowable && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY || part.getMaterial() == Material.AIR)){
+            if (ignoreInteractions && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION)){
                 continue;
             }
             part.glow(durationInTicks);

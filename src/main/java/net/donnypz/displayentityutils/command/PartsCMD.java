@@ -19,7 +19,8 @@ class PartsCMD implements SubCommand{
         subCommands.put("help", new PartsHelpCMD());
         subCommands.put("cycle", new PartsCycleCMD());
         subCommands.put("glow", new PartsGlowCMD());
-        subCommands.put("setglowcolor", new PartsSetGlowColorCMD());
+        subCommands.put("unglow", new PartsUnglowCMD());
+        subCommands.put("glowcolor", new PartsGlowColorCMD());
         subCommands.put("select", new PartsSelectCMD());
         subCommands.put("deselect", new PartsDeselectCMD());
         subCommands.put("adapttags", new PartsAdaptTagsCMD());
@@ -30,6 +31,7 @@ class PartsCMD implements SubCommand{
         subCommands.put("translate", new PartsTranslateCMD());
         subCommands.put("seeduuids", new PartsSeedUUIDsCMD());
         subCommands.put("setblock", new PartsSetBlockCMD());
+        subCommands.put("billboard", new PartsBillboardCMD());
     }
 
     static List<String> getTabComplete(){
@@ -61,26 +63,32 @@ class PartsCMD implements SubCommand{
         if (page <= 1){
             sender.sendMessage(Component.text("\"Parts\" are each individual display/interaction entity that is contained within a group", NamedTextColor.AQUA));
             sender.sendMessage(Component.text("| Add tags to parts to identify each part in a group", NamedTextColor.AQUA));
-            sender.sendMessage(Component.text("| Commands with \"-all\" will apply the command to all parts within a part selection", NamedTextColor.GOLD));
+            sender.sendMessage(Component.text("| \"-all\" will apply the command to all parts within your part selection where valid. By default a selected group's parts is your part selection", NamedTextColor.GOLD));
             sender.sendMessage(Component.empty());
             CMDUtils.sendCMD(sender, "/mdis parts help <page-number>", " (Get help for parts)");
-            CMDUtils.sendCMD(sender, "/mdis parts cycle <first | prev | next | last> [jump]", " (Cycle between selected parts or all parts in your group)");
-            CMDUtils.sendCMD(sender, "/mdis parts addtag <part-tag> [-all]", " (Add a tag to a part)");
-            CMDUtils.sendCMD(sender, "/mdis parts removetag <part-tag> [-all]", " (Remove a tag from a part)");
+            CMDUtils.sendCMD(sender, "/mdis parts cycle <first | prev | next | last> [jump]", " (Cycle between parts in your part selection)");
+            CMDUtils.sendCMD(sender, "/mdis parts addtag <part-tag> [-all]", " (Add a tag to your selected part");
+            CMDUtils.sendCMD(sender, "/mdis parts removetag <part-tag> [-all]", " (Remove a tag from your selected part)");
             CMDUtils.sendCMD(sender, "/mdis parts adapttags [-remove]",
-                    " (Adapt scoreboard tags to tags usable by DisplayEntityUtils. Done to selected parts or group if there's no selection."+
+                    " (Adapt scoreboard tags to tags usable by DisplayEntityUtils. Applied to selected parts."+
                             " \"-remove\" removes tag from scoreboard)");
         }
-        else{
+        else if (page == 2) {
             CMDUtils.sendCMD(sender, "/mdis parts listtags <part | selection>", " (List tags of selected part or entire part selection)");
             CMDUtils.sendCMD(sender, "/mdis parts select <part-tag>", " (Select multiple parts by their part tag)");
             CMDUtils.sendCMD(sender, "/mdis parts deselect", " (Clear your part selection)");
             CMDUtils.sendCMD(sender, "/mdis parts remove [-all]", " (Despawn and remove your selected part from a group)");
-            CMDUtils.sendCMD(sender, "/mdis parts glow", " (Make selected parts glow temporarily)");
-            CMDUtils.sendCMD(sender, "/mdis parts setglowcolor <color | hex-code> [-all]", " (Set your selected part's glow color)");
+            CMDUtils.sendCMD(sender, "/mdis parts glow [-all]", " (Make your selected part glow)");
+            CMDUtils.sendCMD(sender, "/mdis parts unglow [-all]", " (Remove the glow from your selected part)");
+            CMDUtils.sendCMD(sender, "/mdis parts glowcolor <color | hex-code> [-all]", " (Set your selected part's glow color)");
+
+        }
+        else{
+            CMDUtils.sendCMD(sender, "/mdis parts billboard <fixed | vertical | horizontal | center> [-all]", " (Set the billboard of your selected part)");
             CMDUtils.sendCMD(sender, "/mdis parts translate <direction> <distance> <tick-duration> [-all]", " (Translate your selected part)");
-            CMDUtils.sendCMD(sender, "/mdis parts seeduuids <group | selection> <seed>"," (Useful when wanting to use the same animation on similar groups.)");
             CMDUtils.sendCMD(sender, "/mdis parts setblock <\"-held\" | \"-target\" | block-id> [-all]", " (Change the block of a block display part)");
+            CMDUtils.sendCMD(sender, "/mdis parts seeduuids <group | selection> <seed>"," (Useful when wanting to use the same animation on similar groups.)");
+
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }

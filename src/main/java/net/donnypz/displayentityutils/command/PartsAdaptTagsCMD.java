@@ -26,25 +26,20 @@ class PartsAdaptTagsCMD implements SubCommand{
         if (args.length < 2){
             removeFromSB = false;
         }
-        else removeFromSB = args[1].equals("-remove");
+        else{
+            removeFromSB = args[1].equalsIgnoreCase("-remove");
+        }
 
         SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
-        if (partSelection == null){ //Adapt for all parts
-            for (SpawnedDisplayEntityPart part : group.getSpawnedParts()){
-                part.adaptScoreboardTags(removeFromSB);
-            }
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Adapted all scoreboard tags in your selected group!", NamedTextColor.GREEN)));
+        if (partSelection == null || partSelection.isValid()){ //Adapt for all parts
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid part selection! Please try again!", NamedTextColor.RED)));
+            return;
         }
-        else{ //Adapt for selection
-            if (!partSelection.isValid()){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid part selection! Please try again!", NamedTextColor.RED)));
-                return;
-            }
-            for (SpawnedDisplayEntityPart part : partSelection.getSelectedParts()){
-                part.adaptScoreboardTags(removeFromSB);
-            }
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Adapted all scoreboard tags in your part selection!", NamedTextColor.GREEN)));
+
+        for (SpawnedDisplayEntityPart part : partSelection.getSelectedParts()){
+            part.adaptScoreboardTags(removeFromSB);
         }
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Adapted all scoreboard tags in your part selection!", NamedTextColor.GREEN)));
     }
 
 }
