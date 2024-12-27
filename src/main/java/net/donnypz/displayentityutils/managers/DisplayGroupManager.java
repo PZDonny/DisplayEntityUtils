@@ -260,7 +260,7 @@ public final class DisplayGroupManager {
      * @param tag The tag of the {@link DisplayEntityGroup} to be retrieved
      * @return The found {@link DisplayEntityGroup}. Null if not found.
      */
-    public DisplayEntityGroup getGroup(String tag){
+    public static DisplayEntityGroup getGroup(String tag){
         DisplayEntityGroup group = getGroup(LoadMethod.LOCAL, tag);
         if (group == null){
             group = getGroup(LoadMethod.MONGODB, tag);
