@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
@@ -31,12 +32,11 @@ class GroupInfoCMD implements SubCommand{
 
         player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: <yellow>"+groupTag));
         player.sendMessage(MiniMessage.miniMessage().deserialize("World: <yellow>"+group.getWorldName()));
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Total Parts: <yellow>"+(group.getSpawnedParts().size() - 1)));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Total Parts: <yellow>"+(group.getSpawnedParts().size())));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Is Persistent: <yellow>"+group.isPersistent()));
 
         Location loc = group.getLocation();
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Pitch: <yellow>"+loc.getPitch()));
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Yaw: <yellow>"+loc.getYaw()));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Pitch & Yaw: <yellow>"+loc.getPitch()+", "+loc.getYaw()));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Scale Multiplier: <yellow>"+group.getScaleMultiplier()));
 
         String animTag = group.getSpawnAnimationTag();
@@ -45,9 +45,13 @@ class GroupInfoCMD implements SubCommand{
         DisplayAnimator.AnimationType type = group.getSpawnAnimationType();
         String animType = type == null ? "<red>NOT SET" : "<yellow>"+type.name();
 
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Spawn/Load Animation Tag: "+animTag));
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Spawn/Load Animation Type: "+animType));
-        player.sendMessage("");
+        LoadMethod loadMethod = group.getSpawnAnimationLoadMethod();
+        String animLoadMethod = loadMethod == null ? "<red>NOT SET" : "<yellow>"+loadMethod.name();
+
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Spawn Animation Tag: "+animTag));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Spawn Animation Type: "+animType));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Spawn Animation Storage: "+animLoadMethod));
+        player.sendMessage(Component.empty());
         Color color = group.getGlowColor();
         if (color != null) {
             player.sendMessage(Component.text("Glow Color: ").append(Component.text("COLOR", TextColor.color(color.getRed(), color.getGreen(), color.getBlue()))));

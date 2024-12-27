@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
@@ -22,15 +23,26 @@ class GroupSetSpawnAnimationCMD implements SubCommand{
             return;
         }
 
-        if (args.length < 4) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis group setspawnanim <animation-tag> <linear | loop>", NamedTextColor.RED));
+        if (args.length < 5) {
+            player.sendMessage(Component.text("Incorrect Usage! /mdis group setspawnanim <animation-tag> <storage> <linear | loop>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Valid storage methods are local, mongodb, or mysql", NamedTextColor.GRAY));
             sendAnimationTypes(player);
             return;
         }
 
+        LoadMethod loadMethod;
         try{
-            DisplayAnimator.AnimationType type = DisplayAnimator.AnimationType.valueOf(args[3].toUpperCase());
-            group.setSpawnAnimationTag(args[2], type);
+            loadMethod = LoadMethod.valueOf(args[3].toUpperCase());
+        }
+        catch(IllegalArgumentException e){
+            player.sendMessage(Component.text("Invalid Storage Method!", NamedTextColor.RED));
+            player.sendMessage(Component.text("Valid storage methods are local, mongodb, or mysql", NamedTextColor.GRAY));
+            return;
+        }
+
+        try{
+            DisplayAnimator.AnimationType type = DisplayAnimator.AnimationType.valueOf(args[4].toUpperCase());
+            group.setSpawnAnimationTag(args[2], type, loadMethod);
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Spawn/Load Animation Tag set!", NamedTextColor.GREEN)));
             player.sendMessage(Component.text("If an animation with that tag does not exist, this group will not perform the animation when it is spawned", NamedTextColor.GRAY, TextDecoration.ITALIC));
         }
@@ -41,7 +53,6 @@ class GroupSetSpawnAnimationCMD implements SubCommand{
     }
 
     private void sendAnimationTypes(Player player){
-        player.sendMessage(Component.empty());
         player.sendMessage(Component.text("- LINEAR: Plays an animation one time then stops", NamedTextColor.GRAY));
         player.sendMessage(Component.text("- LOOP: Plays an animation infinitely until manually stopped", NamedTextColor.GRAY));
     }

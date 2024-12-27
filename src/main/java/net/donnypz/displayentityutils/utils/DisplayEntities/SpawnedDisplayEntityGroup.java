@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -35,6 +36,7 @@ public final class SpawnedDisplayEntityGroup {
     static final NamespacedKey scaleKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "scale");
     static final NamespacedKey spawnAnimationKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimation");
     static final NamespacedKey spawnAnimationTypeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimationtype");
+    static final NamespacedKey spawnAnimationLoadMethodKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimationloader");
     final Random partUUIDRandom = new Random(defaultPartUUIDSeed);
     boolean isVisibleByDefault;
     private float scaleMultiplier = 1;
@@ -1295,7 +1297,7 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Get the tag of the animation to be applied to this group when it's spawned/loaded
+     * Get the tag of the animation applied to this group when it's spawned/loaded
      * @return a string or null if not set;
      */
     public @Nullable String getSpawnAnimationTag(){
@@ -1304,7 +1306,7 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Get the {@link DisplayAnimator.AnimationType} to be applied to this group's spawn animation
+     * Get the {@link DisplayAnimator.AnimationType} applied to this group's spawn animation
      * @return a {@link  DisplayAnimator.AnimationType} or null if not set;
      */
     public @Nullable DisplayAnimator.AnimationType getSpawnAnimationType(){
@@ -1322,26 +1324,46 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
+     * Get the {@link LoadMethod} when fetching the spawn animation for this group
+     * @return a {@link  LoadMethod} or null if not set;
+     */
+    public @Nullable LoadMethod getSpawnAnimationLoadMethod(){
+        PersistentDataContainer c = masterPart.getEntity().getPersistentDataContainer();
+        String method = c.get(spawnAnimationLoadMethodKey, PersistentDataType.STRING);
+        if (method == null){
+            return null;
+        }
+        try{
+            return LoadMethod.valueOf(method);
+        }
+        catch(IllegalArgumentException e){
+            return null;
+        }
+    }
+
+    /**
      * Set the animation to apply to a group when it is spawned, by its tag.
      * A null animation tag will remove any existing spawn animation from this group.
      * @param animationTag tag of animation to apply whenever this group is spawned/loaded
      * @param animationType type of animation to be applied
      */
-    public void setSpawnAnimationTag(@Nullable String animationTag, DisplayAnimator.AnimationType animationType){
+    public void setSpawnAnimationTag(@Nullable String animationTag, @NotNull DisplayAnimator.AnimationType animationType, @NotNull LoadMethod loadMethod){
         PersistentDataContainer c = masterPart.getEntity().getPersistentDataContainer();
         if (animationTag == null){
             c.remove(spawnAnimationKey);
             c.remove(spawnAnimationTypeKey);
+            c.remove(spawnAnimationLoadMethodKey);
         }
         else{
             c.set(spawnAnimationKey, PersistentDataType.STRING, animationTag);
             c.set(spawnAnimationTypeKey, PersistentDataType.STRING, animationType.name());
+            c.set(spawnAnimationLoadMethodKey, PersistentDataType.STRING, loadMethod.name());
         }
     }
 
 
     /**
-     * Start playing this group's looping spawn animation. This will do nothing if the spawn animation was never set with {@link #setSpawnAnimationTag(String, DisplayAnimator.AnimationType)}
+     * Start playing this group's looping spawn animation. This will do nothing if the spawn animation was never set with {@link #setSpawnAnimationTag(String, DisplayAnimator.AnimationType, LoadMethod)}
      * or through plugin commands.
      */
     public void playSpawnAnimation(){
@@ -1351,7 +1373,7 @@ public final class SpawnedDisplayEntityGroup {
             return;
         }
 
-        SpawnedDisplayAnimation anim = DisplayAnimationManager.getSpawnAnimation(spawnAnimationTag);
+        SpawnedDisplayAnimation anim = DisplayAnimationManager.getSpawnedDisplayAnimation(spawnAnimationTag, getSpawnAnimationLoadMethod());
         if (anim != null){
             DisplayAnimator.AnimationType type = getSpawnAnimationType();
             if (type == null){
