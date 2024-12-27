@@ -161,14 +161,18 @@ public final class DisplayEntityGroup implements Serializable{
      * This cannot be called asynchronously
      * @param location The location to spawn the group
      * @param spawnReason The reason for this display entity group to spawn
-     * @param settings The settings to apply to every display entity and interaction entity created from this
+     * @param settings The settings to apply to every display entity and interaction entity created from this. This may be overridden with the {@link PreGroupSpawnedEvent}
      * with {@link SpawnedDisplayEntityPart#showToPlayer(Player)} or by other custom methods
      * @return A {@link SpawnedDisplayEntityGroup} representative of this DisplayEntityGroup
      */
     public SpawnedDisplayEntityGroup spawn(@NotNull Location location, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings settings){
-        PreGroupSpawnedEvent event = new PreGroupSpawnedEvent(this);
+        PreGroupSpawnedEvent event = new PreGroupSpawnedEvent(this, spawnReason);
         if (event.isCancelled()){
             return null;
+        }
+        GroupSpawnSettings newSettings = event.getNewSettings();
+        if (newSettings != null){
+            settings = newSettings;
         }
         SpawnedDisplayEntityGroup spawnedGroup = new SpawnedDisplayEntityGroup(settings.visibleByDefault);
         Display blockDisplay = masterEntity.createEntity(location, settings);
