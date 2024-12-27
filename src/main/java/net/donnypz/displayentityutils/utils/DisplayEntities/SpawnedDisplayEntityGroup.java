@@ -44,6 +44,10 @@ public final class SpawnedDisplayEntityGroup {
     private long lastAnimationTimeStamp = -1;
     private boolean isPersistent = true;
 
+    private FollowType followType;
+    int unregisterAfterEntityDeathDelay;
+    boolean pivotInteractionsWhenFollowing;
+
 
 
     SpawnedDisplayEntityGroup(boolean isVisible) {
@@ -1136,33 +1140,36 @@ public final class SpawnedDisplayEntityGroup {
         if (teleportationDuration < 0){
             teleportationDuration = 0;
         }
-        setTeleportDuration(teleportationDuration);
-        followedEntity = entity.getUniqueId();
         SpawnedDisplayEntityGroup group = this;
+        this.setTeleportDuration(teleportationDuration);
+        followedEntity = entity.getUniqueId();
+        this.followType = followType;
+        this.unregisterAfterEntityDeathDelay = unregisterAfterEntityDeathDelay;
+        this.pivotInteractionsWhenFollowing = pivotInteractions;
 
         new BukkitRunnable(){
             @Override
             public void run() {
                 if (!group.isSpawned() || followedEntity != entity.getUniqueId() || !entity.isValid()){
-                    if (!entity.isValid() && unregisterAfterEntityDeathDelay > -1){
+                    if (!entity.isValid() && group.unregisterAfterEntityDeathDelay > -1){
                         Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                             group.unregister(true, true);
-                        }, unregisterAfterEntityDeathDelay);
+                        }, group.unregisterAfterEntityDeathDelay);
                     }
                     cancel();
                     return;
                 }
-                switch(followType){
+                switch(group.followType){
                     case BODY-> {
                         LivingEntity e = (LivingEntity) entity;
-                        group.setYaw(e.getBodyYaw(), pivotInteractions);
+                        group.setYaw(e.getBodyYaw(), pivotInteractionsWhenFollowing);
                     }
                     case PITCH_AND_YAW, PITCH, YAW -> {
-                        if (followType == FollowType.PITCH || followType == FollowType.PITCH_AND_YAW){
+                        if (group.followType == FollowType.PITCH || group.followType == FollowType.PITCH_AND_YAW){
                             group.setPitch(entity.getPitch());
                         }
-                        if (followType == FollowType.YAW || followType == FollowType.PITCH_AND_YAW){
-                            group.setYaw(entity.getYaw(), pivotInteractions);
+                        if (group.followType == FollowType.YAW || group.followType == FollowType.PITCH_AND_YAW){
+                            group.setYaw(entity.getYaw(), pivotInteractionsWhenFollowing);
                         }
                     }
                 }
@@ -1172,21 +1179,51 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Stop following an entity's direction after using {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)},
-     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean, int)},
-     * or any other variation
+     * Stop following an entity's direction after using
+     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)}
+     * or any variation
      */
     public void stopFollowingEntity(){
         followedEntity = null;
     }
 
     /**
-     * Get the entity being followed after using {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)},
-     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean, int)},
-     * or any other variation
+     * Get the entity being followed after using
+     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)}
+     * or any variation
      */
     public Entity getFollowedEntity(){
         return followedEntity != null ? Bukkit.getEntity(followedEntity) : null;
+    }
+
+    /**
+     * Change the {@link FollowType} that should be used to follow an entity's direction. This should only be called after using
+     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)}
+     * or any variation
+     */
+    public SpawnedDisplayEntityGroup setEntityFollowType(@NotNull FollowType followType){
+        this.followType = followType;
+        return this;
+    }
+
+    /**
+     * Change the delay that this group should be despawned after its followed entity dies. This should only be called after using
+     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)}
+     * or any variation
+     */
+    public SpawnedDisplayEntityGroup setUnregisterAfterDeathDelay(int delay){
+        this.unregisterAfterEntityDeathDelay = delay;
+        return this;
+    }
+
+    /**
+     * Change whether interaction entities should pivot when following an entity's direction. This should only be called after using
+     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)}
+     * or any variation
+     */
+    public SpawnedDisplayEntityGroup pivotInteractionsWhenFollowing(boolean pivotInteractions){
+        this.pivotInteractionsWhenFollowing = pivotInteractions;
+        return this;
     }
 
 
