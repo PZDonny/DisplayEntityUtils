@@ -11,7 +11,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -46,7 +45,7 @@ class GroupSpawnCMD implements SubCommand{
         }
         catch(IllegalArgumentException e){
             p.sendMessage(Component.text("Invalid Storage Method!", NamedTextColor.RED));
-            p.sendMessage(Component.text("Valid storage methods are local, mongodb, or mysql"));
+            p.sendMessage(Component.text("Valid storage methods are local, mongodb, or mysql", NamedTextColor.GRAY));
             return;
         }
 
