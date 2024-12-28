@@ -71,7 +71,7 @@ public final class DisplayGroupManager {
                 lastGroup.unregister(false);
             }*/
         }
-        selectedGroup.put(player.getUniqueId(), spawnedDisplayEntityGroup);
+        setPartSelection(player, new SpawnedPartSelection(spawnedDisplayEntityGroup),true);
     }
 
     /**
