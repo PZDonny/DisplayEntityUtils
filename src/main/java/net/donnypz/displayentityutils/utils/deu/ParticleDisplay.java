@@ -98,7 +98,7 @@ public class ParticleDisplay {
     }
 
     public static boolean isParticleDisplay(Entity entity){
-        return DisplayUtils.hasTag(entity, particleDisplayTag);
+        return DisplayUtils.hasPartTag(entity, particleDisplayTag);
     }
 
 

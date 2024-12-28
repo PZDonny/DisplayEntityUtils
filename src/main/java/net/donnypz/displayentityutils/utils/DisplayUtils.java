@@ -636,7 +636,7 @@ public final class DisplayUtils {
      * @param tag the tag to check for
      * @return true if this part has the tag
      */
-    public static boolean hasTag(@NotNull Entity entity, @NotNull String tag){
+    public static boolean hasPartTag(@NotNull Entity entity, @NotNull String tag){
         PersistentDataContainer container = entity.getPersistentDataContainer();
         if (!container.has(DisplayEntityPlugin.getPartPDCTagKey(), tagPDCType)){
             return false;

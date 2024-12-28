@@ -263,7 +263,7 @@ public final class SpawnedDisplayEntityPart {
      * @return true if this part has the tag
      */
     public boolean hasTag(@NotNull String tag){
-        return DisplayUtils.hasTag(entity, tag);
+        return DisplayUtils.hasPartTag(entity, tag);
     }
 
 
