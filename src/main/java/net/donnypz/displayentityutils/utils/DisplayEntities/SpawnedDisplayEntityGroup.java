@@ -1477,8 +1477,26 @@ public final class SpawnedDisplayEntityGroup {
      * @return Cloned SpawnedDisplayEntityGroup
      */
     public SpawnedDisplayEntityGroup clone(Location location){
-        DisplayEntityGroup group = toDisplayEntityGroup();
-        return group.spawn(location, GroupSpawnedEvent.SpawnReason.CLONE);
+
+        if (DisplayEntityPlugin.autoPivotInteractions()){
+            HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
+            for (SpawnedDisplayEntityPart part : getSpawnedParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
+                float oldYaw = part.getEntity().getYaw();
+                oldYaws.put(part,  oldYaw);
+                part.pivot(-oldYaw);
+            }
+
+            DisplayEntityGroup group = toDisplayEntityGroup();
+            SpawnedDisplayEntityGroup cloned = group.spawn(location, GroupSpawnedEvent.SpawnReason.CLONE);
+            for (SpawnedDisplayEntityPart part : oldYaws.keySet()){
+                part.pivot(oldYaws.get(part));
+            }
+            oldYaws.clear();
+            return cloned;
+        }
+        else{
+            return toDisplayEntityGroup().spawn(location, GroupSpawnedEvent.SpawnReason.CLONE);
+        }
     }
 
     /**
