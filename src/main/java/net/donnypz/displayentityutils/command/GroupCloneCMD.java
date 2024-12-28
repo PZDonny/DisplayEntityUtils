@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 
 class GroupCloneCMD implements SubCommand{
@@ -28,7 +29,8 @@ class GroupCloneCMD implements SubCommand{
             p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to clone spawned display entity group!", NamedTextColor.RED)));
         }
         else{
-            p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully cloned spawned display entity group", NamedTextColor.GREEN)));
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully cloned your selected group", NamedTextColor.GREEN)));
+            p.sendMessage(Component.text("- Your group selection has been changes to the newly created group", NamedTextColor.GRAY, TextDecoration.ITALIC));
             DisplayGroupManager.setSelectedSpawnedGroup(p, clonedGroup);
             clonedGroup.glow(80, false);
         }
