@@ -59,15 +59,8 @@ class GroupSpawnCMD implements SubCommand{
             return;
         }
         Location spawnLoc = p.getLocation();
-        SpawnedDisplayEntityGroup spawnedGroup = group.spawn(spawnLoc, GroupSpawnedEvent.SpawnReason.COMMAND);
+        group.spawn(spawnLoc, GroupSpawnedEvent.SpawnReason.COMMAND);
 
-        Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-            if (DisplayEntityPlugin.autoPivotInteractions()){
-                if (spawnedGroup != null){
-                    spawnedGroup.setYaw(spawnLoc.getYaw(), true);
-                }
-            }
-        },1);
 
         p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully spawned display entity group at your location! <white>(Tagged: "+tag+")")));
     }

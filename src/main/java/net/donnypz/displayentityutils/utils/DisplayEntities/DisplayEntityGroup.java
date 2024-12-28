@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.events.PreGroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
@@ -209,6 +210,12 @@ public final class DisplayEntityGroup implements Serializable{
             SpawnedDisplayEntityPart part = spawnedGroup.addInteractionEntity(interaction);
             if (!entity.getLegacyPartTags().isEmpty()){
                 part.adaptScoreboardTags(true);
+            }
+
+            if (DisplayEntityPlugin.autoPivotInteractions()){
+                float yaw = location.getYaw();
+                interaction.setRotation(yaw, location.getPitch());
+                DisplayUtils.pivot(interaction, location, yaw);
             }
         }
 
