@@ -327,7 +327,7 @@ public final class DisplayUtils {
      */
     public static void pivot(Interaction interaction, Location center, double angleInDegrees){
         Vector translationVector = DisplayUtils.getInteractionTranslation(interaction, center);
-        translationVector.rotateAroundY(Math.toRadians(angleInDegrees));
+        translationVector.rotateAroundY(Math.toRadians(angleInDegrees*-1));
         Location newLoc = center.clone().subtract(translationVector);
         interaction.teleport(newLoc);
     }

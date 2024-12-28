@@ -582,10 +582,9 @@ public final class SpawnedDisplayEntityPart {
      * @param pivotIfInteraction true if this part's type is {@link PartType#INTERACTION} and it should pivot around the group's location
      */
     public void setYaw(float yaw, boolean pivotIfInteraction){
-        float oldYaw = entity.getYaw();
         entity.setRotation(yaw, entity.getLocation().getPitch());
         if (type == PartType.INTERACTION && pivotIfInteraction){
-            pivot(oldYaw-yaw);
+            pivot(yaw);
         }
     }
 
