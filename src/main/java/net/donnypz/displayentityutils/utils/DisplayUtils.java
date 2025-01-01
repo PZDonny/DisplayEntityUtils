@@ -65,7 +65,7 @@ public final class DisplayUtils {
     /**
      * Get the translation vector from the group's master part to the interaction's location
      * @param interaction the interaction
-     * @return a vector
+     * @return a vector or null if the Interaction entity is not in a group
      */
     public static Vector getInteractionTranslation(@NotNull Interaction interaction){
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(interaction);
@@ -648,10 +648,10 @@ public final class DisplayUtils {
 
 
     /**
-     * Checks if this display entity has the specified part tag
-     * @param display Display Entity to check for a part tag
+     * Checks if this display entity has the specified group tag
+     * @param display Display Entity to check for a group tag
      * @param tag The tag to check for
-     * @return boolean whether this display entity has a part tag
+     * @return boolean whether this display entity has the group tag
      */
     public static boolean isGroupTag(Display display, @NotNull String tag){
         String value = display.getPersistentDataContainer().get(DisplayEntityPlugin.getGroupTagKey(), PersistentDataType.STRING);
@@ -662,10 +662,10 @@ public final class DisplayUtils {
     }
 
     /**
-     * Checks if this interaction entity has the specified part tag
-     * @param interaction Interaction Entity to check for a part tag
+     * Checks if this interaction entity has the specified group tag
+     * @param interaction Interaction Entity to check for a group tag
      * @param tag The tag to check for
-     * @return boolean whether this interaction entity has a part tag
+     * @return boolean whether this interaction entity has the group tag
      */
     public static boolean isGroupTag(Interaction interaction, @NotNull String tag){
         String value = interaction.getPersistentDataContainer().get(DisplayEntityPlugin.getGroupTagKey(), PersistentDataType.STRING);
