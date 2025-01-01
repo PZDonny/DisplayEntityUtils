@@ -194,7 +194,7 @@ public final class DisplayGroupManager {
         }
     }
 
-    public static boolean isGroupSpawned(SpawnedDisplayEntityGroup spawnedGroup) {
+    public static boolean isGroupRegistered(SpawnedDisplayEntityGroup spawnedGroup) {
         return allSpawnedGroups.containsKey(spawnedGroup.getMasterPart());
     }
 
