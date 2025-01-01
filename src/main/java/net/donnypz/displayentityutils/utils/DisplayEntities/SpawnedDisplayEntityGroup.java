@@ -1555,7 +1555,7 @@ public final class SpawnedDisplayEntityGroup {
      * @return true if the group's master (parent) entity is not dead (or marked for removal).
      */
     public boolean isSpawned(){
-        return !masterPart.getEntity().isDead();
+        return masterPart != null && !masterPart.getEntity().isDead();
     }
 
     /**
