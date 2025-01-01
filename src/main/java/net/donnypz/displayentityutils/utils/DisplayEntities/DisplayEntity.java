@@ -109,9 +109,7 @@ final class DisplayEntity implements Serializable {
             display.text(spec.getText());
             display.setAlignment(spec.getAlignment());
             display.setLineWidth(spec.getLineWidth());
-            if (spec.getBackgroundColorARGB() != Color.BLACK.asARGB()){
-                display.setBackgroundColor(Color.fromARGB(spec.getBackgroundColorARGB()));
-            }
+            display.setBackgroundColor(Color.fromARGB(spec.getBackgroundColorARGB()));
             display.setTextOpacity(spec.getTextOpacity());
             display.setShadowed(spec.isShadowed());
             display.setSeeThrough(spec.isSeeThrough());
