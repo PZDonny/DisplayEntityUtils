@@ -304,15 +304,25 @@ public final class SpawnedDisplayEntityPart {
         this.group = group;
         if (type != PartType.INTERACTION){
             Display display = (Display) entity;
+            if (isMaster() && this != group.masterPart){
+                group.masterPart = this;
+            }
+
             Entity master = group.masterPart.entity;
 
-            Vector worldPos = DisplayUtils.getModelLocation(display).toVector();
-            Vector translation = worldPos.subtract(master.getLocation().toVector());
+            Vector translation;
+            if (!isMaster()){
+                Vector worldPos = DisplayUtils.getModelLocation(display).toVector();
+                translation = worldPos.subtract(master.getLocation().toVector());
+                master.addPassenger(entity);
+            }
+            else{
+                translation = new Vector();
+            }
 
             Transformation transformation = display.getTransformation();
             display.setInterpolationDuration(-1);
             display.setTransformation(new Transformation(translation.toVector3f(), transformation.getLeftRotation(), transformation.getScale(), transformation.getRightRotation()));
-            master.addPassenger(entity);
         }
 
         if (partUUID == null || groupContainsUUID(partUUID)){

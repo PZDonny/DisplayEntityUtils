@@ -398,7 +398,7 @@ public final class DisplayGroupManager {
         //Check for existing group
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(displayEntity);
         if (part != null && part.getGroup() != null) {
-            if (part.getGroup().isSpawned()){
+            if (part.getGroup().isSpawned() && part.getGroup().isRegistered()){
                 return new GroupResult(part.getGroup(), true);
             }
         }
