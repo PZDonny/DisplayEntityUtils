@@ -1,0 +1,24 @@
+
+#Valid Group Storage Locations:
+#LOCAL
+#MYSQL
+#MONGODB
+
+#Entity Follow Types (Controls how the group/model will move in orient itself in respect to the mythic mob):
+#PITCH_AND_YAW -> Follows an entity's head pitch and yaw
+#PITCH -> Follows an entity's head pitch
+#YAW -> Follows an entity's head yaw
+#BODY -> Follows an entity's body yaw
+
+#"deathDespawnDelay" can be set to -1 to disable removal of a group, after the mythic mob's death. The delay is in ticks.
+
+#"teleportDuration" is measured in ticks. This controls how smoothly the group will respect the entity's looking direction
+
+ExampleMythicMob:
+  groupTag: exampleTag
+  groupStorageLocation: LOCAL
+  entityFollowType: BODY
+  deathDespawnDelay: 20
+  teleportationDuration: 2
+  pivotInteractions: false
+

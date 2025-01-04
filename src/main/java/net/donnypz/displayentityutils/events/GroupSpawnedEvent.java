@@ -46,6 +46,7 @@ public class GroupSpawnedEvent extends Event {
     public enum SpawnReason{
         COMMAND,
         CLONE,
+        MYTHIC_MOB,
         CUSTOM;
     }
 }
