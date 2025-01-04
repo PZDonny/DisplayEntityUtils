@@ -124,26 +124,33 @@ public final class DisplayAnimationManager {
 
 
     /**
-     * Get a {@link SpawnedDisplayAnimation} that is applied to a {@link SpawnedDisplayEntityGroup} when spawned, if
-     * the group has a spawn animation set, and if {@link DisplayEntityPlugin#cacheAnimations()} is true.
-     * <br><br>
-     * If an animation is not already cached, an attempt will be made to retrieve it from all storage locations, and will cache it if found.
+     * Get a cached {@link SpawnedDisplayAnimation}. If the desired animation is not cached, it will be fetched with the desired {@link LoadMethod}
+     * @param animationTag the tag of the animation
+     * @param loadMethod The lhe storage location of the animation. Null if unknown or to search all locations.
+     * <hr>
+     * <p>If an animation is not already cached, an attempt will be made to retrieve from the desired storage location</p>
      * @return a {@link SpawnedDisplayAnimation}, or null if the animation is not cached and does not exist in any storage location.
      */
-    public static SpawnedDisplayAnimation getSpawnAnimation(String tag){
+    public static SpawnedDisplayAnimation getSpawnedDisplayAnimation(String animationTag, @Nullable LoadMethod loadMethod){
     //Check Cache
-        SpawnedDisplayAnimation spawnedAnim = cachedAnimations.get(tag);
+        SpawnedDisplayAnimation spawnedAnim = cachedAnimations.get(animationTag);
         if (spawnedAnim != null){
             return spawnedAnim;
         }
+        DisplayAnimation anim;
+        if (loadMethod == null){
+            anim = getAnimation(animationTag);
+        }
+        else{
+            anim = getAnimation(loadMethod, animationTag);
+        }
 
-        DisplayAnimation anim = getAnimation(tag);
         if (anim == null){
             return null;
         }
 
         spawnedAnim = anim.toSpawnedDisplayAnimation();
-        attemptCacheAnimation(tag, spawnedAnim);
+        attemptCacheAnimation(animationTag, spawnedAnim);
         return spawnedAnim;
     }
 

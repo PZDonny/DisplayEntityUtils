@@ -31,10 +31,8 @@ class GroupSelectCMD implements SubCommand{
             SpawnedDisplayEntityGroup group = result.group();
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Selection made!", NamedTextColor.GREEN)));
             DisplayGroupManager.setSelectedSpawnedGroup(player, group);
-            DisplayGroupManager.removePartSelection(player);
 
             group.getUnaddedInteractionEntitiesInRange(interactionDistance, true);
-            DisplayGroupManager.setPartSelection(player, new SpawnedPartSelection(group), false);
             if (!group.getMasterPart().getEntity().isGlowing()){
                 group.glow(100, false);
             }

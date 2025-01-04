@@ -8,10 +8,12 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 
 public final class BDEngineUtils {
 
-    static final Gson gson = new Gson();
+    private static final Gson gson = new Gson();
+    private static final int timeoutTime = 15;
 
     private BDEngineUtils(){}
 
@@ -29,10 +31,12 @@ public final class BDEngineUtils {
         String url = "https://block-display.com/api/?type=getModel&id="+modelID;
 
         HttpRequest getRequest = HttpRequest.newBuilder()
+                .timeout(Duration.ofSeconds(timeoutTime))
                 .uri(new URI(url))
                 .GET()
                 .build();
-        try (HttpClient httpClient = HttpClient.newHttpClient()) {
+
+        try (HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(timeoutTime)).build()) {
             HttpResponse<String> response = httpClient.send(getRequest, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 400){
                 BDEngineError error = gson.fromJson(response.body(), BDEngineError.class);

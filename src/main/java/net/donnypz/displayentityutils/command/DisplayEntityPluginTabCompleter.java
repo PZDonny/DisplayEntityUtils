@@ -47,6 +47,10 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                     return DisplayEntityPluginCommand.getItemTabComplete();
                 }
                 case "listgroups", "listanim" -> addStorages(suggestions);
+                case "reload" -> {
+                    suggestions.add("config");
+                    suggestions.add("mythic");
+                }
             }
         }
         else if (args.length == 3){
@@ -129,8 +133,13 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
             }
         }
         else if (args.length == 4) {
-            if (args[0].equalsIgnoreCase("group") || args[0].equalsIgnoreCase("anim")){
-                if (args[1].equals("delete")){
+            if (args[0].equalsIgnoreCase("group")){
+                if (args[1].equalsIgnoreCase("delete") || args[1].equalsIgnoreCase("setspawnanim")){
+                    addStorages(suggestions);
+                }
+            }
+            else if (args[0].equalsIgnoreCase("anim")){
+                if (args[1].equalsIgnoreCase("delete")){
                     addStorages(suggestions);
                 }
             }
@@ -140,6 +149,14 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                     suggestions.add("left");
                     suggestions.add("right");
                     suggestions.add("both");
+                }
+            }
+        }
+        else if (args.length == 5){
+            if (args[0].equalsIgnoreCase("group")){
+                if (args[1].equalsIgnoreCase("setspawnanim")){
+                    suggestions.add("linear");
+                    suggestions.add("loop");
                 }
             }
         }

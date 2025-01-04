@@ -106,7 +106,7 @@ class GroupCMD implements SubCommand{
             CMDUtils.sendCMD(sender, "/mdis group glow", " (Make all parts in this group glow)");
             CMDUtils.sendCMD(sender, "/mdis group unglow", " (Remove the glowing effect from all parts in this group)");
             CMDUtils.sendCMD(sender, "/mdis group glowcolor <color | hex-code>", " (Set the glow color for all parts in this group)");
-            CMDUtils.sendCMD(sender, "/mdis group setspawnanim <anim-tag> <linear | loop>", " (Set an animation to play when this group is spawned/loaded)");
+            CMDUtils.sendCMD(sender, "/mdis group setspawnanim <anim-tag> <storage> <linear | loop>", " (Set an animation to play when this group is spawned/loaded)");
             CMDUtils.sendCMD(sender, "/mdis group togglepersist", " (Toggle whether this group should persist after a server shutdown)");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));

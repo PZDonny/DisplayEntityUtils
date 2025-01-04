@@ -144,7 +144,7 @@ public class GroupSpawnSettings {
             }
 
             for (String tag : brightness.keySet()){
-                if (DisplayUtils.hasTag(display, tag)){
+                if (DisplayUtils.hasPartTag(display, tag)){
                     display.setBrightness(brightness.get(tag));
                     break;
                 }
@@ -159,7 +159,7 @@ public class GroupSpawnSettings {
             }
 
             for (String tag : billboard.keySet()){
-                if (DisplayUtils.hasTag(display, tag)){
+                if (DisplayUtils.hasPartTag(display, tag)){
                     display.setBillboard(billboard.get(tag));
                     break;
                 }
@@ -194,7 +194,7 @@ public class GroupSpawnSettings {
 
     private void determineVisibleByDefault(Display display){
         for (String tag : hiddenPartTags.keySet()){
-            if (DisplayUtils.hasTag(display, tag)){
+            if (DisplayUtils.hasPartTag(display, tag)){
                 display.setVisibleByDefault(false);
                 reveal(display, tag);
                 break;
@@ -204,7 +204,7 @@ public class GroupSpawnSettings {
 
     private void determineVisibleByDefault(Interaction interaction){
         for (String tag : hiddenPartTags.keySet()){
-            if (DisplayUtils.hasTag(interaction, tag)){
+            if (DisplayUtils.hasPartTag(interaction, tag)){
                 interaction.setVisibleByDefault(false);
                 reveal(interaction, tag);
                 break;

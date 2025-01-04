@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.listeners.autoGroup;
 
+import com.google.gson.Gson;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.ChunkAddGroupInteractionsEvent;
 import net.donnypz.displayentityutils.events.ChunkRegisterGroupEvent;
@@ -8,11 +9,15 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.GroupResult;
+import net.donnypz.displayentityutils.utils.mythic.MythicDisplayManager;
+import net.donnypz.displayentityutils.utils.mythic.MythicDisplayOptions;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 
@@ -21,6 +26,7 @@ final class AutoGroup {
     private AutoGroup(){}
 
     static final HashMap<String, ArrayList<Long>> readChunks = new HashMap<>();
+    private static final Gson gson = new Gson();
 
     static void detectGroups(Chunk chunk, List<Entity> entities){
         if (!DisplayEntityPlugin.automaticGroupDetection()){
@@ -46,6 +52,7 @@ final class AutoGroup {
         HashMap<SpawnedDisplayEntityGroup, Collection<Interaction>> addedInteractionsForEvent = new HashMap<>();
         HashSet<Interaction> interactions = new HashSet<>();
         HashMap<SpawnedDisplayEntityGroup, ChunkRegisterGroupEvent> events = new HashMap<>();
+        HashSet<SpawnedDisplayEntityGroup> mythicGroup = new HashSet<>();
 
         for (Entity entity : entities){
             if (entity instanceof Display display){
@@ -65,6 +72,9 @@ final class AutoGroup {
                     if (!result.alreadyLoaded()){
                         events.put(group, new ChunkRegisterGroupEvent(group, chunk));
                         group.playSpawnAnimation();
+                        if (DisplayEntityPlugin.isMythicMobsInstalled() && MythicDisplayManager.isPersistentMythicGroup(group)){
+                            mythicGroup.add(group);
+                        }
                     }
                 //});
             }
@@ -99,6 +109,21 @@ final class AutoGroup {
                     }
                 }
             //});
+        }
+
+        for (SpawnedDisplayEntityGroup group : mythicGroup){
+            PersistentDataContainer pdc = group.getMasterPart().getEntity().getPersistentDataContainer();
+            MythicDisplayOptions options = gson.fromJson(pdc.get(MythicDisplayManager.persistKey, PersistentDataType.STRING), MythicDisplayOptions.class);
+            if (options != null){
+                Entity vehicle = group.getVehicle();
+                if (vehicle != null){
+                    options.followGroup(group, group.getVehicle());
+                }
+                else{
+                    group.unregister(true, false);
+                    events.remove(group);
+                }
+            }
         }
 
         for (ChunkRegisterGroupEvent event : events.values()){

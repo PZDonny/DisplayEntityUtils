@@ -4,6 +4,8 @@ main: net.donnypz.displayentityutils.DisplayEntityPlugin
 api-version: '1.21'
 author: DonnyPZ
 load: POSTWORLD
+softdepend:
+  - MythicMobs
 commands:
   managedisplays:
     aliases: [mdis]

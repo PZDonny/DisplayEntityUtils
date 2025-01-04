@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
  * guarantee values will not be removed from this Enum. As such, you should not
  * depend on the ordinal values of this class.
  */
+//1.21.1 and lower
 @ApiStatus.Internal
 public enum OldSound implements Keyed, net.kyori.adventure.sound.Sound.Type { // Paper - implement Sound.Type
 

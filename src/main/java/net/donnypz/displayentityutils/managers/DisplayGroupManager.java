@@ -71,7 +71,7 @@ public final class DisplayGroupManager {
                 lastGroup.unregister(false);
             }*/
         }
-        selectedGroup.put(player.getUniqueId(), spawnedDisplayEntityGroup);
+        setPartSelection(player, new SpawnedPartSelection(spawnedDisplayEntityGroup),true);
     }
 
     /**
@@ -194,7 +194,7 @@ public final class DisplayGroupManager {
         }
     }
 
-    public static boolean isGroupSpawned(SpawnedDisplayEntityGroup spawnedGroup) {
+    public static boolean isGroupRegistered(SpawnedDisplayEntityGroup spawnedGroup) {
         return allSpawnedGroups.containsKey(spawnedGroup.getMasterPart());
     }
 
@@ -260,7 +260,7 @@ public final class DisplayGroupManager {
      * @param tag The tag of the {@link DisplayEntityGroup} to be retrieved
      * @return The found {@link DisplayEntityGroup}. Null if not found.
      */
-    public DisplayEntityGroup getGroup(String tag){
+    public static DisplayEntityGroup getGroup(String tag){
         DisplayEntityGroup group = getGroup(LoadMethod.LOCAL, tag);
         if (group == null){
             group = getGroup(LoadMethod.MONGODB, tag);
@@ -398,7 +398,7 @@ public final class DisplayGroupManager {
         //Check for existing group
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(displayEntity);
         if (part != null && part.getGroup() != null) {
-            if (part.getGroup().isSpawned()){
+            if (part.getGroup().isSpawned() && part.getGroup().isRegistered()){
                 return new GroupResult(part.getGroup(), true);
             }
         }

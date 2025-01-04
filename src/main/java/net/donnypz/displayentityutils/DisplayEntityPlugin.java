@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.events.InteractionClickEvent;
 import net.donnypz.displayentityutils.events.PreInteractionClickEvent;
 import net.donnypz.displayentityutils.listeners.autoGroup.DEULoadingListeners;
 import net.donnypz.displayentityutils.listeners.bdengine.DEUEntitySpawned;
+import net.donnypz.displayentityutils.listeners.mythic.DEUMythicListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerChatListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerConnectionListener;
 import net.donnypz.displayentityutils.managers.LocalManager;
@@ -68,10 +69,17 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     static float heightCullingAdder;
     static boolean asynchronousAnimations;
 
+    private static boolean isMythicMobsInstalled;
+
     @Override
     public void onEnable() {
         instance = this;
         getConfig().options().copyDefaults(true);
+
+        isMythicMobsInstalled = Bukkit.getPluginManager().isPluginEnabled("MythicMobs");
+        if (isMythicMobsInstalled){
+            Bukkit.getPluginManager().registerEvents(new DEUMythicListener(), this);
+        }
 
         reloadPlugin(true);
 
@@ -265,6 +273,14 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     }
 
     /**
+     * Get whether MythicMobs is installed on this server
+     * @return true if MythicMobs is present
+     */
+    public static boolean isMythicMobsInstalled() {
+        return isMythicMobsInstalled;
+    }
+
+    /**
      * Determines whether {@link SpawnedDisplayEntityGroup}s should be unregistered in a world based
      * on config settings
      * @return the boolean value set in config
@@ -298,11 +314,19 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         else{
             saveDefaultConfig();
             ConfigUtils.updateConfig();
+            ConfigUtils.registerMythic();
         }
 
         reloadConfig();
         ConfigUtils.setConfigVariables(getConfig());
         createLocalSaveFolders();
+    }
+
+    /**
+     * Reload the registered MythicMob Groups from the "mythicgroups.yml" file
+     */
+    public void reloadMythic(){
+        ConfigUtils.registerMythic();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
