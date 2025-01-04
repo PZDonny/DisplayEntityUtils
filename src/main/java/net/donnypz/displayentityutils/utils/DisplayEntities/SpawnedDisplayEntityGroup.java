@@ -1155,7 +1155,7 @@ public final class SpawnedDisplayEntityGroup {
             @Override
             public void run() {
                 if (!group.isSpawned() || followedEntity != entity.getUniqueId() || entity.isDead()){
-                    if (!entity.isDead() && group.unregisterAfterEntityDeathDelay > -1){
+                    if (entity.isDead() && group.unregisterAfterEntityDeathDelay > -1){
                         Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                             group.unregister(true, true);
                         }, group.unregisterAfterEntityDeathDelay);
