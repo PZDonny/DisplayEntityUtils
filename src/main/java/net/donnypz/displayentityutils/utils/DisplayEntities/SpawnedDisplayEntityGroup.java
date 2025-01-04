@@ -1137,6 +1137,10 @@ public final class SpawnedDisplayEntityGroup {
             throw new IllegalArgumentException("Only living entities can have a follow type of \"BODY\"");
         }
 
+        if (entity.getUniqueId() == followedEntity){
+            return;
+        }
+
         if (teleportationDuration < 0){
             teleportationDuration = 0;
         }
@@ -1150,13 +1154,16 @@ public final class SpawnedDisplayEntityGroup {
         new BukkitRunnable(){
             @Override
             public void run() {
-                if (!group.isSpawned() || followedEntity != entity.getUniqueId() || !entity.isValid()){
-                    if (!entity.isValid() && group.unregisterAfterEntityDeathDelay > -1){
+                if (!group.isSpawned() || followedEntity != entity.getUniqueId() || entity.isDead()){
+                    if (!entity.isDead() && group.unregisterAfterEntityDeathDelay > -1){
                         Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                             group.unregister(true, true);
                         }, group.unregisterAfterEntityDeathDelay);
                     }
                     cancel();
+                    return;
+                }
+                if (!group.isInLoadedChunk()){
                     return;
                 }
                 switch(group.followType){
@@ -1175,7 +1182,7 @@ public final class SpawnedDisplayEntityGroup {
                 }
 
             }
-        }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, 1);
+        }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, teleportationDuration);
     }
 
     /**
