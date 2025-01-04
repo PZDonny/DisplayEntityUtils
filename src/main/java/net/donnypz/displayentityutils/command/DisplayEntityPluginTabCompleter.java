@@ -47,6 +47,10 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                     return DisplayEntityPluginCommand.getItemTabComplete();
                 }
                 case "listgroups", "listanim" -> addStorages(suggestions);
+                case "reload" -> {
+                    suggestions.add("config");
+                    suggestions.add("mythic");
+                }
             }
         }
         else if (args.length == 3){
