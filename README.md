@@ -1,7 +1,7 @@
 # DisplayEntityUtils
-[![](https://dcbadge.limes.pink/api/server/k3wtdG5fRZ)](https://discord.gg/k3wtdG5fRZ)
-
 [![](https://jitpack.io/v/PZDonny/DisplayEntityUtils.svg)](https://jitpack.io/#PZDonny/DisplayEntityUtils)
+
+[Join the Discord Here!](https://discord.gg/k3wtdG5fRZ)
 
 DisplayEntityUtils is a extensive plugin designed for use with BDEngine, a modeling/animation engine designed for display entities without the need for resource packs or mods.
 
@@ -17,6 +17,7 @@ BDEngine is what you'll use to create models and animations that can be transfer
 - Create and Play Animations through the plugin
 - Convert Datapack Animations from BDEngine (preferred over creating in-game)
 - Retrieve models from BDEngine and spawn them in-game
+- Intergration with **MythicMobs**
 - Save groups and animations through Local Storage, MySQL, or MongoDB
 - And so much more!
 
@@ -32,12 +33,15 @@ BDEngine is what you'll use to create models and animations that can be transfer
 - Conversion of BDEngine Datapack Animations into plugin usable animations *(Credit goes to [HaniVindinggame](https://block-display.com/author/hanivindinggame/) for the Dungeon Door model and animation)*
 > ![](https://github.com/user-attachments/assets/0f53ea0d-3e91-4bd7-b811-8c59fafcd4fb)
 
+- Mythic Mobs Integration
+> ![ezgif-1-873ca90c95 (1)](https://github.com/user-attachments/assets/ee189856-3459-49b8-b75c-4c18d1b43818)
 
 - API: Display Entities rotating smoothly with yaw changes, and Interaction entities pivoting around the center
 > ![](https://github.com/user-attachments/assets/5c333cd4-71ba-4ad1-a631-f8ec648651f0)
 
 - API: Animation State Machines *(Credit goes to [Yegor_Mechanic](https://block-display.com/author/yegor_mechanic/) for all Dodo Bird Models/Animations)*
 > ![](https://github.com/user-attachments/assets/594a4ffe-89cf-4e49-aff5-2f8c43ea21ad)
+
 
 
 
@@ -56,7 +60,7 @@ Access the wiki [HERE](https://github.com/PZDonny/DisplayEntityUtils/wiki)
 <dependency>
   <groupId>com.github.PZDonny</groupId>
   <artifactId>DisplayEntityUtils</artifactId>
-  <version>2.5.5</version>
+  <version>2.5.6</version>
   <scope>provided</scope>
 </dependency>
 ```
