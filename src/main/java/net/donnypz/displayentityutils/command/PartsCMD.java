@@ -32,6 +32,7 @@ class PartsCMD implements SubCommand{
         subCommands.put("seeduuids", new PartsSeedUUIDsCMD());
         subCommands.put("setblock", new PartsSetBlockCMD());
         subCommands.put("billboard", new PartsBillboardCMD());
+        subCommands.put("brightness", new PartsBrightnessCMD());
     }
 
     static List<String> getTabComplete(){
@@ -84,6 +85,7 @@ class PartsCMD implements SubCommand{
 
         }
         else{
+            CMDUtils.sendCMD(sender, "/mdis parts brightness <block> <sky> [-all]", "(Set your selected part's brightness. Enter values between 0-15. -1 resets)");
             CMDUtils.sendCMD(sender, "/mdis parts billboard <fixed | vertical | horizontal | center> [-all]", " (Set the billboard of your selected part)");
             CMDUtils.sendCMD(sender, "/mdis parts translate <direction> <distance> <tick-duration> [-all]", " (Translate your selected part)");
             CMDUtils.sendCMD(sender, "/mdis parts setblock <\"-held\" | \"-target\" | block-id> [-all]", " (Change the block of a block display part)");

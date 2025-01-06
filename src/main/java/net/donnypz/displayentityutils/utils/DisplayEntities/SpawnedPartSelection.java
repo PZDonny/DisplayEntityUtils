@@ -295,6 +295,17 @@ public final class SpawnedPartSelection {
     }
 
     /**
+     * Set the brightness of all parts in this selection
+     * @param brightness the brightness to set
+     */
+    public void setBrightness(@Nullable Display.Brightness brightness){
+        for (SpawnedDisplayEntityPart  part: selectedParts){
+            part.setBrightness(brightness);
+        }
+    }
+
+
+    /**
      * Change the translation of the SpawnedDisplayEntityParts in this SpawnedPartSelection.
      * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results

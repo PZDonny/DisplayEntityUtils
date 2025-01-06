@@ -592,10 +592,10 @@ public final class SpawnedDisplayEntityPart {
      * @param pivotIfInteraction true if this part's type is {@link PartType#INTERACTION} and it should pivot around the group's location
      */
     public void setYaw(float yaw, boolean pivotIfInteraction){
-        entity.setRotation(yaw, entity.getLocation().getPitch());
         if (type == PartType.INTERACTION && pivotIfInteraction){
-            pivot(yaw);
+            pivot(yaw-entity.getYaw());
         }
+        entity.setRotation(yaw, entity.getPitch());
     }
 
     /**
@@ -603,7 +603,7 @@ public final class SpawnedDisplayEntityPart {
      * @param pitch The pitch to set for this part
      */
     public void setPitch(float pitch){
-        entity.setRotation(entity.getLocation().getYaw(), pitch);
+        entity.setRotation(entity.getYaw(), pitch);
     }
 
 
