@@ -540,6 +540,9 @@ public final class SpawnedDisplayEntityGroup {
         if (newScaleMultiplier <= 0){
             throw new IllegalArgumentException("New Scale Multiplier cannot be <= 0");
         }
+        if (newScaleMultiplier == scaleMultiplier){
+            return true;
+        }
         if (!isInLoadedChunk()){
             return false;
         }
@@ -548,6 +551,9 @@ public final class SpawnedDisplayEntityGroup {
         if (event.isCancelled()){
             return false;
         }
+
+        float largestWidth = 0;
+        float largestHeight = 0;
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             //Displays
             if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
@@ -558,10 +564,10 @@ public final class SpawnedDisplayEntityGroup {
                 Transformation transformation = d.getTransformation();
 
                 //Reset Scale then multiply by newScaleMultiplier
-                Vector3f scaleVector = transformation.getScale();
-                scaleVector.x = (scaleVector.x/scaleMultiplier)*newScaleMultiplier;
-                scaleVector.y = (scaleVector.y/scaleMultiplier)*newScaleMultiplier;
-                scaleVector.z = (scaleVector.z/scaleMultiplier)*newScaleMultiplier;
+                Vector3f scale = transformation.getScale();
+                scale.x = (scale.x/scaleMultiplier)*newScaleMultiplier;
+                scale.y = (scale.y/scaleMultiplier)*newScaleMultiplier;
+                scale.z = (scale.z/scaleMultiplier)*newScaleMultiplier;
 
                 //Reset Translation then multiply by newScaleMultiplier
                 Vector3f translationVector = transformation.getTranslation();
@@ -574,6 +580,14 @@ public final class SpawnedDisplayEntityGroup {
                     d.setInterpolationDuration(durationInTicks);
                     d.setInterpolationDelay(-1);
                     d.setTransformation(transformation);
+                }
+                //Culling
+                if (DisplayEntityPlugin.autoCulling() == CullOption.LOCAL){
+                    part.autoCull(DisplayEntityPlugin.widthCullingAdder(), DisplayEntityPlugin.heightCullingAdder());
+                }
+                else if (DisplayEntityPlugin.autoCulling() == CullOption.LARGEST){
+                    largestWidth = Math.max(largestWidth, Math.max(scale.x, scale.z));
+                    largestHeight = Math.max(largestHeight, scale.y);
                 }
             }
             //Interactions
@@ -599,6 +613,14 @@ public final class SpawnedDisplayEntityGroup {
                 part.translateForce((float) moveVector.length(), durationInTicks, 0, moveVector);
             }
         }
+
+    //Culling
+        if (DisplayEntityPlugin.autoCulling() == CullOption.LARGEST){
+            for (SpawnedDisplayEntityPart part : spawnedParts.values()){
+                part.cull(largestWidth+DisplayEntityPlugin.widthCullingAdder(), largestHeight+DisplayEntityPlugin.heightCullingAdder());
+            }
+        }
+
 
 
         PersistentDataContainer pdc = masterPart.getEntity().getPersistentDataContainer();
@@ -835,6 +857,9 @@ public final class SpawnedDisplayEntityGroup {
      */
     @ApiStatus.Experimental
     public void autoSetCulling(CullOption cullOption, float widthAdder, float heightAdder){
+        if (!isInLoadedChunk()){
+            return;
+        }
         switch (cullOption){
             case LARGEST -> largestCulling(widthAdder, heightAdder);
             case LOCAL -> localCulling(widthAdder, heightAdder);
