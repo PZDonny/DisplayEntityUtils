@@ -48,6 +48,7 @@ public enum Permission {
     TEXT_TOGGLE_SEE_THROUGH("deu.text.seethrough"),
     TEXT_SET_ALIGNMENT("deu.text.align"),
     TEXT_SET_LINE_WIDTH("deu.text.linewidth"),
+    TEXT_OPACITY("deu.text.opacity"),
 
     ITEM_TOGGLE_GLINT("deu.item.glint"),
     ITEM_SET("deu.item.setitem"),

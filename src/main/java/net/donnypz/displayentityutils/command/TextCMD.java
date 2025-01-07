@@ -20,6 +20,7 @@ class TextCMD implements SubCommand{
         subCommands.put("seethrough", new TextSeeThroughCMD());
         subCommands.put("align", new TextAlignCMD());
         subCommands.put("linewidth", new TextLineWidthCMD());
+        subCommands.put("opacity", new TextOpacityCMD());
     }
 
     static List<String> getTabComplete(){
@@ -54,6 +55,7 @@ class TextCMD implements SubCommand{
         CMDUtils.sendCMD(sender, "/mdis text seethrough", " (Toggle see through setting of your selected text display)");
         CMDUtils.sendCMD(sender, "/mdis text align <left | right | center>", " (Set your selected text display's text alignment)");
         CMDUtils.sendCMD(sender, "/mdis text linewidth <width>", " (Set the line width of your selected text display)");
+        CMDUtils.sendCMD(sender, "/mdis text opacity <0-1>", " (Set the text opacity for your selected text display)");
     }
 
 }
