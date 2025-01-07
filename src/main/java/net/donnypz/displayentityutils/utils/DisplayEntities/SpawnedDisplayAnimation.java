@@ -4,7 +4,6 @@ import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Interaction;
-import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
