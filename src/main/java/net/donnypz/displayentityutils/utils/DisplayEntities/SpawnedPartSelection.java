@@ -274,6 +274,25 @@ public final class SpawnedPartSelection {
         return new ArrayList<>(partTags);
     }
 
+    /**
+     * Remove a {@link SpawnedDisplayEntityPart} from this selection
+     * @param part
+     * @return true if the part was contained and removed
+     */
+    public boolean removePart(SpawnedDisplayEntityPart part){
+        boolean removed = selectedParts.remove(part);
+        if (removed && selectedPart == part){
+            if (!selectedParts.isEmpty()){
+                selectedPart = selectedParts.getFirst();
+            }
+            else{
+                selectedPart = null;
+            }
+        }
+        return removed;
+
+    }
+
 
     /**
      * Remove this part selection.
