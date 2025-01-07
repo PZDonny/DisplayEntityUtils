@@ -90,6 +90,11 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
         player.sendMessage(Component.text("/mdis parts select <part-tag>", NamedTextColor.GRAY));
     }
 
+    static void suggestUpdateSelection(Player player){
+        player.sendMessage(Component.text("| It is recommended to update/reset your part selection after adding parts!", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("| Quickly reset with \"/mdis parts deselect", NamedTextColor.GRAY));
+    }
+
     public static boolean hasPermission(Player player, Permission permission){
         if (!player.hasPermission(permission.getPermission())){
             player.sendMessage(Component.text("You do not have permission to do that!", NamedTextColor.RED));
