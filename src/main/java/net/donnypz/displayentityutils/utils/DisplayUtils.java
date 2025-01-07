@@ -19,6 +19,7 @@ import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -363,13 +364,12 @@ public final class DisplayUtils {
         }.runTaskTimer(DisplayEntityPlugin.getInstance(), delayInTicks, 1);
     }
 
-
     /**
      * Gets the group tag of a Display Entity
      * @param display Display Entity to retrieve the tag from
      * @return Group tag of the entity. Null if the entity did not have a group tag.
      */
-    public static String getGroupTag(Display display){
+    public static @Nullable String getGroupTag(Display display){
         return getPDCGroupTag(display);
     }
 
@@ -378,7 +378,7 @@ public final class DisplayUtils {
      * @param interaction Interaction Entity to retrieve the tag from
      * @return Group tag of the entity. Null if the entity did not have a group tag.
      */
-    public static String getGroupTag(Interaction interaction){
+    public static @Nullable String getGroupTag(Interaction interaction){
         return getPDCGroupTag(interaction);
     }
 
