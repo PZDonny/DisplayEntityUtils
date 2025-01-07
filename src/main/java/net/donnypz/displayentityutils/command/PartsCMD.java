@@ -22,7 +22,7 @@ class PartsCMD implements SubCommand{
         subCommands.put("unglow", new PartsUnglowCMD());
         subCommands.put("glowcolor", new PartsGlowColorCMD());
         subCommands.put("select", new PartsSelectCMD());
-        subCommands.put("deselect", new PartsDeselectCMD());
+        subCommands.put("reselect", new PartsReselectCMD());
         subCommands.put("adapttags", new PartsAdaptTagsCMD());
         subCommands.put("addtag", new PartsAddTagCMD());
         subCommands.put("removetag", new PartsRemoveTagCMD());
@@ -77,7 +77,7 @@ class PartsCMD implements SubCommand{
         else if (page == 2) {
             CMDUtils.sendCMD(sender, "/mdis parts listtags <part | selection>", " (List tags of selected part or entire part selection)");
             CMDUtils.sendCMD(sender, "/mdis parts select <part-tag>", " (Select multiple parts by their part tag)");
-            CMDUtils.sendCMD(sender, "/mdis parts deselect", " (Clear your part selection)");
+            CMDUtils.sendCMD(sender, "/mdis parts reselect", " (Reset your part selection)");
             CMDUtils.sendCMD(sender, "/mdis parts remove [-all]", " (Despawn and remove your selected part from a group)");
             CMDUtils.sendCMD(sender, "/mdis parts glow [-all]", " (Make your selected part glow)");
             CMDUtils.sendCMD(sender, "/mdis parts unglow [-all]", " (Remove the glow from your selected part)");

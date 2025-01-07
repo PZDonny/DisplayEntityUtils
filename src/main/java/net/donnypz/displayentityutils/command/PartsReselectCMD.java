@@ -8,7 +8,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class PartsDeselectCMD implements SubCommand{
+class PartsReselectCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_SELECT)){
@@ -23,10 +23,10 @@ class PartsDeselectCMD implements SubCommand{
 
         SpawnedPartSelection selection = DisplayGroupManager.getPartSelection(player);
         if (selection == null){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your part selection is already cleared!", NamedTextColor.YELLOW)));
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You do not have a part selection!", NamedTextColor.YELLOW)));
             return;
         }
         DisplayGroupManager.removePartSelection(player);
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Part selection cleared!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Part selection reset!", NamedTextColor.GREEN)));
     }
 }
