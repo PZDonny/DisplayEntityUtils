@@ -59,6 +59,7 @@ public enum Permission {
     INTERACTION_LIST_CMD("deu.interaction.listcmd"),
     INTERACTION_DIMENSION("deu.interaction.dim"),
     INTERACTION_PIVOT("deu.interaction.pivot"),
+    INTERACTION_SPAWN("deu.interaction.spawn"),
 
     ANIM_NEW("deu.anim.new"),
     ANIM_SAVE("deu.anim.save"),
