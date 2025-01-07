@@ -31,6 +31,7 @@ class InteractionCMD implements SubCommand{
         subCommands.put("pivotselection", new InteractionPivotSelectionCMD());
         subCommands.put("spawn", new InteractionSpawnCMD());
         subCommands.put("spawnhere", new InteractionSpawnHereCMD());
+        subCommands.put("info", new InteractionInfoCMD());
     }
 
     static List<String> getTabComplete(){
@@ -61,13 +62,14 @@ class InteractionCMD implements SubCommand{
         if (page == 1){
             sender.sendMessage(Component.text("Where applicable, these commands prioritize the interaction entity you're looking at over the one you may have selected", NamedTextColor.GRAY));
             CMDUtils.sendCMD(sender, "/mdis interaction help", " (Get help for interactions)");
+            CMDUtils.sendCMD(sender, "/mdis interaction info", "(Get info about an interaction entity, targeted or selected)");
             CMDUtils.sendCMD(sender, "/mdis interaction spawn <height> <width> (Create an interaction entity part for a group, at the group's location)");
             CMDUtils.sendCMD(sender, "/mdis interaction spawnhere <height> <width> (Create an interaction entity part for a group, at your location)");
             CMDUtils.sendCMD(sender, "/mdis interaction height <height>", " (Set the height of an interaction)");
             CMDUtils.sendCMD(sender, "/mdis interaction width <width>", " (Set the width of an interaction)");
-            CMDUtils.sendCMD(sender, "/mdis interaction scale <height> <width> <tick-duration> <tick-delay>", " (Scale an interaction entity over a period of time)");
         }
         else{
+            CMDUtils.sendCMD(sender, "/mdis interaction scale <height> <width> <tick-duration> <tick-delay>", " (Scale an interaction entity over a period of time)");
             CMDUtils.sendCMD(sender, "/mdis interaction addcmd <player | console> <left | right | both> <command>", " (Add a command to an interaction)");
             CMDUtils.sendCMD(sender, "/mdis interaction listcmds", "(List all commands stored on an interaction)");
             CMDUtils.sendCMD(sender, "/mdis interaction pivot <angle>", " (Pivot an interaction around it's group's actual location center)");
