@@ -1557,7 +1557,6 @@ public final class SpawnedDisplayEntityGroup {
      */
     public void removePartSelection(SpawnedPartSelection partSelection){
         if (partSelections.contains(partSelection)){
-            partSelections.remove(partSelection);
             partSelection.removeNoManager();
         }
     }
