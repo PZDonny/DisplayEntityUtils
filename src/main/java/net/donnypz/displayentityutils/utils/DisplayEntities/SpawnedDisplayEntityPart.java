@@ -811,12 +811,15 @@ public final class SpawnedDisplayEntityPart {
 
 
     /**
-     * Removes this SpawnedDisplayEntityPart from it's SpawnedDisplayEntityGroup, without dismounting the part from the group.
+     * Removes this SpawnedDisplayEntityPart from its group, without dismounting the part from the group.
      * This part will still be valid and can be readded to a group through {@link SpawnedDisplayEntityGroup#addSpawnedDisplayEntityPart(SpawnedDisplayEntityPart)}
      */
     public void removeFromGroup() {
         allParts.remove(partData);
         group.spawnedParts.remove(partUUID);
+        for (SpawnedPartSelection selection : group.partSelections){
+            selection.removePart(this);
+        }
         group = null;
     }
 }
