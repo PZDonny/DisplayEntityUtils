@@ -247,6 +247,9 @@ public final class DisplayAnimatorExecutor {
     }
 
     private void applyDisplayTransformation(Display display, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, SpawnedDisplayEntityGroup group, DisplayTransformation transformation, boolean applyDataOnly){
+        if (!DisplayUtils.isInLoadedChunk(display)) {
+            return;
+        }
         if (applyDataOnly){
             transformation.applyData(display);
             return;
