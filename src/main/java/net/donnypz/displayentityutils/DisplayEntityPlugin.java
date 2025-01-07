@@ -335,11 +335,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             return;
         }
         if (e.getRightClicked() instanceof Interaction entity){
-            if (!new PreInteractionClickEvent(e.getPlayer(), entity, InteractionClickEvent.ClickType.RIGHT).callEvent()){
-                return;
-            }
-            List<InteractionCommand> commands = DisplayUtils.getInteractionCommandsWithData(entity);
-            callInteractionEvent(new InteractionClickEvent(e.getPlayer(), entity, InteractionClickEvent.ClickType.RIGHT, commands));
+            determineAction(entity, e.getPlayer(), InteractionClickEvent.ClickType.RIGHT);
         }
     }
 
@@ -349,53 +345,54 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             return;
         }
         if (e.getEntity() instanceof Interaction entity){
-            if (!new PreInteractionClickEvent((Player) e.getDamager(), entity, InteractionClickEvent.ClickType.LEFT).callEvent()){
-                return;
-            }
-            List<InteractionCommand> commands = DisplayUtils.getInteractionCommandsWithData(entity);
-            callInteractionEvent(new InteractionClickEvent((Player) e.getDamager(), entity, InteractionClickEvent.ClickType.LEFT, commands));
+            determineAction(entity, (Player) e.getDamager(), InteractionClickEvent.ClickType.LEFT);
         }
     }
 
-    private void callInteractionEvent(InteractionClickEvent event){
-        Interaction i = event.getInteraction();
-
-    //Particle Displays
-        if (ParticleDisplay.isParticleDisplay(i)){
-            Player p = event.getPlayer();
-            if (event.getClickType() == InteractionClickEvent.ClickType.RIGHT){
-                if (p.isSneaking()){
-                    if (!DisplayEntityPluginCommand.hasPermission(p, Permission.ANIM_REMOVE_PARTICLE)){
+    private void determineAction(Interaction interaction, Player player, InteractionClickEvent.ClickType clickType){
+        //Particle Displays
+        if (ParticleDisplay.isParticleDisplay(interaction)){
+            if (clickType == InteractionClickEvent.ClickType.RIGHT){
+                if (player.isSneaking()){
+                    if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_REMOVE_PARTICLE)){
                         return;
                     }
-                    boolean result = ParticleDisplay.delete(i.getUniqueId());
+                    boolean result = ParticleDisplay.delete(interaction.getUniqueId());
                     if (result){
-                        p.sendMessage(pluginPrefix.append(Component.text("Successfully removed particle from frame!", NamedTextColor.YELLOW)));
+                        player.sendMessage(pluginPrefix.append(Component.text("Successfully removed particle from frame!", NamedTextColor.YELLOW)));
                     }
                     else{
-                        p.sendMessage(pluginPrefix.append(Component.text("This particle has already been removed by another player or other methods!", NamedTextColor.RED)));
+                        player.sendMessage(pluginPrefix.append(Component.text("This particle has already been removed by another player or other methods!", NamedTextColor.RED)));
                     }
                 }
                 else{
-                    ParticleDisplay particle = ParticleDisplay.get(i.getUniqueId());
+                    ParticleDisplay particle = ParticleDisplay.get(interaction.getUniqueId());
                     if (particle == null){
-                        p.sendMessage(Component.text("Failed to get particle", NamedTextColor.RED));
+                        player.sendMessage(Component.text("Failed to get particle", NamedTextColor.RED));
                         return;
                     }
                     particle.spawn();
-                    p.sendMessage(Component.text("Particle Spawned", NamedTextColor.GREEN));
+                    player.sendMessage(Component.text("Particle Spawned", NamedTextColor.GREEN));
                 }
             }
             else{
-                ParticleDisplay.sendInfo(i.getUniqueId(), p);
+                ParticleDisplay.sendInfo(interaction.getUniqueId(), player);
             }
             return;
         }
+
+        if (!new PreInteractionClickEvent(player, interaction, clickType).callEvent()){
+            return;
+        }
+
+        List<InteractionCommand> commands = DisplayUtils.getInteractionCommandsWithData(interaction);
+        InteractionClickEvent event = new InteractionClickEvent(player, interaction, clickType, commands);
 
         if (!event.callEvent()){
             return;
         }
 
+        //Commands
         Player p = event.getPlayer();
         for (InteractionCommand cmd : event.getCommands()){
             if (cmd.isLeftClick() && event.getClickType() == InteractionClickEvent.ClickType.LEFT){
