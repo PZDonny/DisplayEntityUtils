@@ -49,6 +49,7 @@ public enum Permission {
     TEXT_SET_ALIGNMENT("deu.text.align"),
     TEXT_SET_LINE_WIDTH("deu.text.linewidth"),
     TEXT_OPACITY("deu.text.opacity"),
+    TEXT_BACKGROUND("deu.text.background"),
 
     ITEM_TOGGLE_GLINT("deu.item.glint"),
     ITEM_SET("deu.item.setitem"),
