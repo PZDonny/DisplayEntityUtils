@@ -130,6 +130,11 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                         suggestions.add("console");
                     }
                 }
+                case "text" -> {
+                    if (args[1].equalsIgnoreCase("background")){
+                        addColors(suggestions);
+                    }
+                }
             }
         }
         else if (args.length == 4) {
