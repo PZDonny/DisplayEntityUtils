@@ -254,8 +254,14 @@ public final class DisplayUtils {
         Vector finalDirection = direction;
         new BukkitRunnable(){
             double currentDistance = 0;
+            float lastYaw = interaction.getYaw();
             @Override
             public void run() {
+                float newYaw = interaction.getYaw();
+                if (newYaw != lastYaw){
+                    finalDirection.rotateAroundY(Math.toRadians(lastYaw-newYaw));
+                    lastYaw = newYaw;
+                }
                 currentDistance+=Math.abs(movementIncrement);
                 Location tpLoc = interaction.getLocation().clone().add(finalDirection);
                 interaction.teleport(tpLoc);
