@@ -123,11 +123,12 @@ public final class SpawnedDisplayAnimation {
      * Add a frame to this SpawnedDisplayAnimation. This will attempt to automatically optimize the animation, removing duplicate transformation data. To avoid this
      * and any errors it may potentially cause, use {@link SpawnedDisplayAnimation#forceAddFrame(SpawnedDisplayAnimationFrame)} instead.
      * @param frame the frame to add
+     * @return true if this added the provided frame. false if it merged durations with the previous frame due to similar data
      */
-    public void addFrame(SpawnedDisplayAnimationFrame frame){
+    public boolean addFrame(SpawnedDisplayAnimationFrame frame){
         if (frames.isEmpty()){
             frames.add(frame);
-            return;
+            return true;
         }
 
         //Remove identical transformations
@@ -172,10 +173,12 @@ public final class SpawnedDisplayAnimation {
 
         if (!frame.isEmptyFrame()){ //Changes still remain after frame size reduction
             frames.add(frame);
+            return true;
         }
         else{
             SpawnedDisplayAnimationFrame lastFrame = frames.getLast();
             lastFrame.delay+=frame.delay+frame.duration;
+            return false;
         }
 
         /*if (!frames.isEmpty() && frames.getLast().equals(frame)){
