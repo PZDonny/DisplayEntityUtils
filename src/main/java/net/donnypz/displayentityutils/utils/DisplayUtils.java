@@ -179,7 +179,7 @@ public final class DisplayUtils {
      * @param durationInTicks How long it should take for the translation to complete
      * @param direction The direction to translate the display entity
      */
-    public static void translate(Display display, double distance, int durationInTicks, int delayInTicks, Vector direction){
+    public static void translate(@NotNull Display display, double distance, int durationInTicks, int delayInTicks, Vector direction){
         if (delayInTicks < 0){
             delayInTicks = -1;
         }
@@ -209,7 +209,7 @@ public final class DisplayUtils {
      * @param durationInTicks How long it should take for the translation to complete
      * @param direction The direction to translate the display entity
      */
-    public static void translate(Display display, double distance, int durationInTicks, int delayInTicks, Direction direction){
+    public static void translate(@NotNull Display display, double distance, int durationInTicks, int delayInTicks, Direction direction){
         Vector v = direction.getVector(display);
         if (direction != Direction.UP && direction != Direction.DOWN){
             v.rotateAroundY(Math.toRadians(display.getYaw()));
@@ -228,7 +228,7 @@ public final class DisplayUtils {
      * @param durationInTicks How long it should take for the translation to complete
      * @param direction The direction to translate the interaction entity
      */
-    public static void translate(Interaction interaction, double distance, int durationInTicks, int delayInTicks, Vector direction){
+    public static void translate(@NotNull Interaction interaction, double distance, int durationInTicks, int delayInTicks, Vector direction){
         Location destination = interaction.getLocation().clone().add(direction.clone().normalize().multiply(distance));
         PartTranslateEvent event = new PartTranslateEvent(interaction, destination, null,null);
         Bukkit.getPluginManager().callEvent(event);
