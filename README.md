@@ -60,7 +60,7 @@ Access the wiki [HERE](https://github.com/PZDonny/DisplayEntityUtils/wiki)
 <dependency>
   <groupId>com.github.PZDonny</groupId>
   <artifactId>DisplayEntityUtils</artifactId>
-  <version>2.5.7</version>
+  <version>PLUGIN-VERSION</version>
   <scope>provided</scope>
 </dependency>
 ```
