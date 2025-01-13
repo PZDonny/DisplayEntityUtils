@@ -112,6 +112,19 @@ public final class SpawnedDisplayAnimation {
     }
 
     /**
+     * Get the full duration of this animation from the delays and durations of every {@link SpawnedDisplayAnimationFrame} in this animation.
+     * @return the animation length in ticks
+     */
+    public int getDuration(){
+        int duration = 0;
+        for (SpawnedDisplayAnimationFrame frame : frames){
+            duration+= frame.getDuration();
+            duration+= frame.getDelay();
+        }
+        return duration;
+    }
+
+    /**
      * Set the frames that should be contained within this animation
      * @param frames the frames this animation should contain
      */

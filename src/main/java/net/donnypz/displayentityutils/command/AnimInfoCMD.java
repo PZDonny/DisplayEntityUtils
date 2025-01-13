@@ -28,6 +28,7 @@ class AnimInfoCMD implements SubCommand{
             player.sendMessage("Animation Part Tag: " + ChatColor.YELLOW + animation.getPartTag());
         }
         player.sendMessage("Total Frames: " + ChatColor.YELLOW + animation.getFrames().size());
+        player.sendMessage("Total Duration: "+ChatColor.YELLOW+animation.getDuration()+" ticks");
         player.sendMessage("Respect Scale: " + ChatColor.YELLOW + animation.groupScaleRespect());
     }
 }
