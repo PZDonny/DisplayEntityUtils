@@ -84,7 +84,7 @@ overwriteExistingSaves: true
 #
 #Use this setting at your own risk and ONLY if you know what you are doing.
 #This may have client performance benefits for players when selecting the correct option for your server.
-#LARGEST is the safest option to reduce Display Entities being culled too early.
+#LARGEST is the safest option to reduce Display Entities being culled too early, but may cause performance issues in areas with many display entities.
 # !KEEP IN MIND! it is NOT possible for the culling to be perfect.
 autoCulling: NONE
 
