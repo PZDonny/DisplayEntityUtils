@@ -22,7 +22,7 @@ class GroupUnsetSpawnAnimationCMD implements SubCommand{
             return;
         }
 
-        if (group.getSpawnAnimationTag() != null){
+        if (group.getSpawnAnimationTag() == null){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your selected group does not have a spawn animation!", NamedTextColor.RED)));
             return;
         }
