@@ -41,21 +41,6 @@ public final class DisplayAnimatorExecutor {
         executeAnimation(animation, group, frame, delay);
     }
 
-    private void executeAnimation(SpawnedDisplayAnimation animation, SpawnedDisplayEntityGroup group, SpawnedDisplayAnimationFrame frame, int delay){
-        if (animator != null && animation != null){
-            if (animation.frames.indexOf(frame) == 0 && animator.type == DisplayAnimator.AnimationType.LOOP){
-                new GroupAnimationLoopStartEvent(group, animator).callEvent();
-            }
-        }
-
-        if (delay <= 0){
-            executeAnimation(animation, group, frame, playSingleFrame);
-        }
-        else{
-            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> executeAnimation(animation, group, frame, playSingleFrame), delay);
-        }
-    }
-
     /**
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame}
      * @param group the group the transformations should be applied to
@@ -68,13 +53,27 @@ public final class DisplayAnimatorExecutor {
         new DisplayAnimatorExecutor(animation, group, frame,0, timeStamp, isAsync);
     }
 
+    private void executeAnimation(SpawnedDisplayAnimation animation, SpawnedDisplayEntityGroup group, SpawnedDisplayAnimationFrame frame, int delay){
+        if (delay <= 0){
+            executeAnimation(animation, group, frame, playSingleFrame);
+        }
+        else{
+            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> executeAnimation(animation, group, frame, playSingleFrame), delay);
+        }
+    }
+
     private void executeAnimation(SpawnedDisplayAnimation animation, SpawnedDisplayEntityGroup group, SpawnedDisplayAnimationFrame frame, boolean playSingleFrame){
         if (group.getLastAnimationTimeStamp() != animationTimestamp){
             return;
         }
-
-        if (!group.isSpawned()){
+        if (!group.isRegistered()){
             return;
+        }
+
+        if (animator != null && animator.type == DisplayAnimator.AnimationType.LOOP){
+            if (animation.frames.getFirst() == frame){
+                new GroupAnimationLoopStartEvent(group, animator).callEvent();
+            }
         }
 
         Location groupLoc = group.getLocation();
@@ -117,15 +116,21 @@ public final class DisplayAnimatorExecutor {
         //Anim Complete (Using Animator)
         else if (animator != null){
             if (animator.type != DisplayAnimator.AnimationType.LOOP){
-                Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                    if (animator.type == DisplayAnimator.AnimationType.LOOP && group.isSpawned()){
-                        frame.playEndEffects(group);
+                if (frame.duration > 0){
+                    Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                        if (group.isSpawned()) frame.playEndEffects(group);
                         new GroupAnimationCompleteEvent(group, animator, animation).callEvent();
+                        if (group.getLastAnimationTimeStamp() == animationTimestamp){
+                            group.stopAnimation(false);
+                        }
+                    }, frame.duration);
+                }
+                else{
+                    if (group.isSpawned()) frame.playEndEffects(group);
+                    new GroupAnimationCompleteEvent(group, animator, animation).callEvent();
+                    if (group.getLastAnimationTimeStamp() == animationTimestamp){
+                        group.stopAnimation(false);
                     }
-                }, frame.duration);
-                //Unregister animated group
-                if (group.getLastAnimationTimeStamp() == animationTimestamp){
-                    animator.stop(group);
                 }
             }
 
@@ -148,16 +153,18 @@ public final class DisplayAnimatorExecutor {
         else {
             if (frame.duration > 0){
                 Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                    if (group.isSpawned()){
-                        frame.playEndEffects(group);
-                        new GroupAnimationCompleteEvent(group, animation).callEvent();
+                    if (group.isSpawned()) frame.playEndEffects(group);
+                    new GroupAnimationCompleteEvent(group, animation).callEvent();
+                    if (group.getLastAnimationTimeStamp() == animationTimestamp){
+                        group.stopAnimation(false);
                     }
                 }, frame.duration);
             }
             else{
-                if (group.isSpawned()){
-                    frame.playEndEffects(group);
-                    new GroupAnimationCompleteEvent(group, animation).callEvent();
+                if (group.isSpawned()) frame.playEndEffects(group);
+                new GroupAnimationCompleteEvent(group, animation).callEvent();
+                if (group.getLastAnimationTimeStamp() == animationTimestamp){
+                    group.stopAnimation(false);
                 }
             }
         }
