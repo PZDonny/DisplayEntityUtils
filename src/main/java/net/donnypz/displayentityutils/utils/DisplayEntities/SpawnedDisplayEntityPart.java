@@ -28,6 +28,7 @@ public final class SpawnedDisplayEntityPart {
     private PartData partData;
     private UUID partUUID;
     private boolean isInteractionOutlined;
+    boolean valid = true;
 
 
 
@@ -44,7 +45,7 @@ public final class SpawnedDisplayEntityPart {
             this.type = PartType.TEXT_DISPLAY;
         }
 
-        applyData(random);
+        applyData(random, entity);
         if (isMaster()){
             group.masterPart = this;
         }
@@ -55,11 +56,11 @@ public final class SpawnedDisplayEntityPart {
         this.group = group;
         this.entity = interactionEntity;
         this.type = PartType.INTERACTION;
-        applyData(random);
+        applyData(random, interactionEntity);
 
     }
 
-    private void applyData(Random random){
+    private void applyData(Random random, Entity entity){
         adaptLegacyPartTags();
         entity.getPersistentDataContainer().set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, group.getCreationTime());
         if (entity instanceof Display display){
@@ -84,13 +85,13 @@ public final class SpawnedDisplayEntityPart {
 
     public void setPartUUID(@NotNull UUID uuid){
         this.partUUID = uuid;
-        PersistentDataContainer pdc = entity.getPersistentDataContainer();
+        PersistentDataContainer pdc = getEntity().getPersistentDataContainer();
         pdc.set(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
         group.spawnedParts.put(partUUID, this);
     }
 
     private void setPartUUID(Random random){
-        PersistentDataContainer pdc = entity.getPersistentDataContainer();
+        PersistentDataContainer pdc = getEntity().getPersistentDataContainer();
         String value = pdc.get(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING);
     //New Part/Group
         if (value == null){
@@ -165,10 +166,10 @@ public final class SpawnedDisplayEntityPart {
     }
 
     public long getCreationTime() {
-        if (!entity.getPersistentDataContainer().has(SpawnedDisplayEntityGroup.creationTimeKey)){
+        if (!getEntity().getPersistentDataContainer().has(SpawnedDisplayEntityGroup.creationTimeKey)){
             return -1;
         }
-        return entity.getPersistentDataContainer().get(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG);
+        return getEntity().getPersistentDataContainer().get(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG);
     }
 
     /**
@@ -181,11 +182,39 @@ public final class SpawnedDisplayEntityPart {
 
     /**
      * Get the entity of this SpawnedDisplayEntityPart
-     * @return This part's entity
+     * @return This part's entity or null if this part has been previously removed
      */
-    public Entity getEntity() {
-        return entity;
+    public @Nullable Entity getEntity() {
+        if (entity == null){
+            return null;
+        }
+        //Stale Entity
+        if (!entity.getLocation().isChunkLoaded()){
+            return entity;
+        }
+        else{
+            Entity nonStale = Bukkit.getEntity(partData.getUUID());
+            if (entity == nonStale){
+                return entity;
+            }
+            else if (entity.isDead() && nonStale != null){
+                entity = nonStale;
+                return nonStale;
+            }
+            else{
+                return entity;
+            }
+        }
     }
+
+    /**
+     *  Get the last known location of this part's entity
+     * @return a location
+     */
+    public @NotNull Location getLocation(){
+        return entity.getLocation();
+    }
+
 
     PartData getPartData() {
         return partData;
@@ -219,7 +248,7 @@ public final class SpawnedDisplayEntityPart {
      * @return this
      */
     public SpawnedDisplayEntityPart addTag(@NotNull String tag){
-        DisplayUtils.addTag(entity, tag);
+        DisplayUtils.addTag(getEntity(), tag);
         return this;
     }
 
@@ -229,7 +258,7 @@ public final class SpawnedDisplayEntityPart {
      * @return this
      */
     public SpawnedDisplayEntityPart removeTag(@NotNull String tag){
-        DisplayUtils.removeTag(entity, tag);
+        DisplayUtils.removeTag(getEntity(), tag);
         return this;
     }
 
@@ -238,7 +267,7 @@ public final class SpawnedDisplayEntityPart {
      * @return This part's part tags.
      */
     public @NotNull List<String> getTags(){
-        return DisplayUtils.getTags(entity);
+        return DisplayUtils.getTags(getEntity());
     }
 
     /**
@@ -247,9 +276,9 @@ public final class SpawnedDisplayEntityPart {
      * @return this
      */
     public SpawnedDisplayEntityPart adaptScoreboardTags(boolean removeFromScoreboard){
-        for (String tag : new HashSet<>(entity.getScoreboardTags())){
+        for (String tag : new HashSet<>(getEntity().getScoreboardTags())){
             if (removeFromScoreboard){
-                entity.removeScoreboardTag(tag);
+                getEntity().removeScoreboardTag(tag);
             }
             addTag(tag);
         }
@@ -263,11 +292,11 @@ public final class SpawnedDisplayEntityPart {
      * @return true if this part has the tag
      */
     public boolean hasTag(@NotNull String tag){
-        return DisplayUtils.hasPartTag(entity, tag);
+        return DisplayUtils.hasPartTag(getEntity(), tag);
     }
 
 
-    private void adaptLegacyPartTags(){
+    private void adaptLegacyPartTags(){ //Don't use getEntity()
         List<String> legacyTags = new ArrayList<>();
         for (String s : new HashSet<>(entity.getScoreboardTags())){
             if (s.contains(DisplayEntityPlugin.getLegacyPartTagPrefix())){
@@ -287,7 +316,7 @@ public final class SpawnedDisplayEntityPart {
 
     SpawnedDisplayEntityPart setMaster(){
         group.masterPart = this;
-        entity.getPersistentDataContainer().set(DisplayEntityPlugin.getMasterKey(), PersistentDataType.BOOLEAN, true);
+        getEntity().getPersistentDataContainer().set(DisplayEntityPlugin.getMasterKey(), PersistentDataType.BOOLEAN, true);
         return this;
     }
 
@@ -303,18 +332,18 @@ public final class SpawnedDisplayEntityPart {
 
         this.group = group;
         if (type != PartType.INTERACTION){
-            Display display = (Display) entity;
+            Display display = (Display) getEntity();
             if (isMaster() && this != group.masterPart){
                 group.masterPart = this;
             }
 
-            Entity master = group.masterPart.entity;
+            Entity master = group.masterPart.getEntity();
 
             Vector translation;
             if (!isMaster()){
                 Vector worldPos = DisplayUtils.getModelLocation(display).toVector();
                 translation = worldPos.subtract(master.getLocation().toVector());
-                master.addPassenger(entity);
+                master.addPassenger(getEntity());
             }
             else{
                 translation = new Vector();
@@ -332,16 +361,16 @@ public final class SpawnedDisplayEntityPart {
             setPartUUID(partUUID);
         }
 
-        PersistentDataContainer pdc = entity.getPersistentDataContainer();
+        PersistentDataContainer pdc = getEntity().getPersistentDataContainer();
         pdc.set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, group.getCreationTime());
         setGroupPDC();
 
-        entity.setPersistent(group.isPersistent());
+        getEntity().setPersistent(group.isPersistent());
         return this;
     }
 
     void setGroupPDC(){
-        PersistentDataContainer pdc = entity.getPersistentDataContainer();
+        PersistentDataContainer pdc = getEntity().getPersistentDataContainer();
         if (group == null || group.getTag() == null){
             pdc.remove(DisplayEntityPlugin.getGroupTagKey());
         }
@@ -359,25 +388,25 @@ public final class SpawnedDisplayEntityPart {
     }
 
     /**
-     * Reveal this part's entity to a player
+     * Reveal this part's entity to a player. This may produce unexpected results if this part is in an unloaded chunk
      * @param player
      */
     public void showToPlayer(Player player){
-        if (entity == null){
+        if (getEntity() == null){
             return;
         }
-        player.showEntity(DisplayEntityPlugin.getInstance(), entity);
+        player.showEntity(DisplayEntityPlugin.getInstance(), getEntity());
     }
 
     /**
-     * Hide this part's entity from a player
+     * Hide this part's entity from a player. This may produce unexpected results if this part is in an unloaded chunk
      * @param player
      */
     public void hideFromPlayer(Player player){
-        if (entity == null){
+        if (getEntity() == null){
             return;
         }
-        player.hideEntity(DisplayEntityPlugin.getInstance(), entity);
+        player.hideEntity(DisplayEntityPlugin.getInstance(), getEntity());
     }
 
     /**
@@ -409,6 +438,7 @@ public final class SpawnedDisplayEntityPart {
      */
 
     public void glow(boolean particleHidden){
+        Entity entity = getEntity();
         if (type == PartType.INTERACTION) {
             interactionOutline((Interaction) entity, Long.MAX_VALUE);
         }
@@ -442,6 +472,7 @@ public final class SpawnedDisplayEntityPart {
      * @param durationInTicks How long to glow this selection
      */
     public void glow(long durationInTicks){
+        Entity entity = getEntity();
         if (type == PartType.INTERACTION) {
             //temporaryParticles(entity, durationInTicks, Particle.COMPOSTER);
             interactionOutline((Interaction) entity, durationInTicks);
@@ -472,15 +503,9 @@ public final class SpawnedDisplayEntityPart {
 
 
         new BukkitRunnable(){
-            final Entity e = entity;
             @Override
             public void run() {
-                if (entity != null){
-                    entity.setGlowing(false);
-                }
-                else if (e.isValid()){
-                    e.setGlowing(false);
-                }
+                entity.setGlowing(false);
             }
         }.runTaskLater(DisplayEntityPlugin.getInstance(), durationInTicks);
     }
@@ -494,7 +519,7 @@ public final class SpawnedDisplayEntityPart {
             isInteractionOutlined = false;
         }
         else{
-            entity.setGlowing(false);
+            getEntity().setGlowing(false);
         }
     }
 
@@ -592,6 +617,7 @@ public final class SpawnedDisplayEntityPart {
      * @param pivotIfInteraction true if this part's type is {@link PartType#INTERACTION} and it should pivot around the group's location
      */
     public void setYaw(float yaw, boolean pivotIfInteraction){
+        Entity entity = getEntity();
         if (type == PartType.INTERACTION && pivotIfInteraction){
             pivot(yaw-entity.getYaw());
         }
@@ -603,6 +629,7 @@ public final class SpawnedDisplayEntityPart {
      * @param pitch The pitch to set for this part
      */
     public void setPitch(float pitch){
+        Entity entity = getEntity();
         entity.setRotation(entity.getYaw(), pitch);
     }
 
@@ -612,6 +639,7 @@ public final class SpawnedDisplayEntityPart {
      * @param brightness the brightness to set, null to use brightness based on position
      */
     public void setBrightness(@Nullable Display.Brightness brightness){
+        Entity entity = getEntity();
         if (entity instanceof Interaction){
             return;
         }
@@ -624,6 +652,7 @@ public final class SpawnedDisplayEntityPart {
      * @param billboard the billboard to set
      */
     public void setBillboard(@NotNull Display.Billboard billboard){
+        Entity entity = getEntity();
         if (entity instanceof Interaction){
             return;
         }
@@ -634,22 +663,24 @@ public final class SpawnedDisplayEntityPart {
 
     /**
      * Set the view range of this part
-     * @param range The color to set
+     * @param viewRangeMultiplier The range multiplier to set
      */
-    public void setViewRange(float range){
+    public void setViewRange(float viewRangeMultiplier){
+        Entity entity = getEntity();
         if (entity instanceof Interaction){
             return;
         }
         Display display = (Display) entity;
-        display.setViewRange(range);
+        display.setViewRange(viewRangeMultiplier);
     }
 
 
     @ApiStatus.Experimental
     void cull(float width, float height){
+        Entity entity = getEntity();
         if (entity instanceof Display display){
             display.setDisplayHeight(height);
-            display.setDisplayWidth(width*2);
+            display.setDisplayWidth(width);
         }
     }
 
@@ -664,6 +695,7 @@ public final class SpawnedDisplayEntityPart {
      */
     @ApiStatus.Experimental
     public void autoCull(float widthAdder, float heightAdder){
+        Entity entity = getEntity();
         if (entity instanceof Display display){
             Transformation transformation = display.getTransformation();
             Vector3f scale = transformation.getScale();
@@ -677,6 +709,7 @@ public final class SpawnedDisplayEntityPart {
      * @param color The color to set
      */
     public void setGlowColor(@Nullable Color color){
+        Entity entity = getEntity();
         if (entity instanceof Interaction){
             return;
         }
@@ -692,6 +725,7 @@ public final class SpawnedDisplayEntityPart {
         if (type == PartType.INTERACTION){
             return null;
         }
+        Entity entity = getEntity();
         return ((Display) entity).getGlowColorOverride();
     }
 
@@ -742,6 +776,7 @@ public final class SpawnedDisplayEntityPart {
      * @param angleInDegrees the pivot angle
      */
     public void pivot(double angleInDegrees){
+        Entity entity = getEntity();
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION){
             return;
         }
@@ -752,20 +787,18 @@ public final class SpawnedDisplayEntityPart {
 
 
     /**
-     * Attempts to spawn an Interaction entity based upon the scaling of the part. May not work 100% of the time
-     * @return the spawned interaction. Null if any part of the scale is 0, the x and z of the scale aren't the same, or the part is a text display
+     * Attempts to spawn an Interaction entity based upon the scaling of the part
+     * @return the spawned interaction, or null if this part is not spawned or if this part's type is {@link PartType#TEXT_DISPLAY}
      */
     @ApiStatus.Experimental
     public Interaction spawnInteractionAtDisplay(){
-        if (entity instanceof TextDisplay){
+        Entity entity = getEntity();
+        if (entity == null || entity instanceof TextDisplay){
             return null;
         }
         Display display = (Display) entity;
         Vector3f scale = display.getTransformation().getScale();
 
-        if (scale.x == 0f || scale.y == 0f || (Math.abs(scale.x-scale.z) > 0.1)){
-            return null;
-        }
 
         float width = scale.x;
         float height = scale.y;
@@ -797,16 +830,16 @@ public final class SpawnedDisplayEntityPart {
      */
     public Entity remove(boolean kill) {
         removeFromGroup();
-        if (kill) {
+        Entity entity = getEntity();
+        if (kill && entity != null) {
             if (!entity.isDead()){
                 entity.remove();
             }
             return entity;
         }
-        Entity e = entity;
-        entity = null;
         partData = null;
-        return e;
+        valid = false;
+        return entity;
     }
 
 
