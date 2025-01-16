@@ -515,7 +515,7 @@ public final class DisplayGroupManager {
      * @param getter   Player who is getting the spawned group
      * @return A {@link GroupResult}. Null if not found.
      */
-    public static @Nullable GroupResult getSpawnedGroupNearLocation(Location location, float radius, @Nullable Player getter) {
+    public static @Nullable GroupResult getSpawnedGroupNearLocation(Location location, double radius, @Nullable Player getter) {
         Display master = getNearestDisplayEntity(location, radius);
         if (master == null){
             if (getter != null) {
