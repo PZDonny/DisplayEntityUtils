@@ -98,7 +98,7 @@ public final class DisplayUtils {
      * @return true if the part is in a loaded chunk
      */
     public static boolean isInLoadedChunk(SpawnedDisplayEntityPart part){
-        if (part == null){
+        if (part == null || part.getEntity() == null){
             return false;
         }
         return isInLoadedChunk(part.getEntity());
