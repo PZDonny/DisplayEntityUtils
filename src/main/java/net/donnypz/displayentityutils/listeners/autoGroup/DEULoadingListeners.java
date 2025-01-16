@@ -34,11 +34,8 @@ public final class DEULoadingListeners implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWorldUnload(WorldUnloadEvent e){
-        if (e.isCancelled()){
-            return;
-        }
         String worldName = e.getWorld().getName();
         ArrayList<Long> storedChunks = AutoGroup.readChunks.get(worldName);
         if (storedChunks != null){
