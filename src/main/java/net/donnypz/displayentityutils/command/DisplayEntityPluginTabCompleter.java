@@ -49,7 +49,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                 case "listgroups", "listanim" -> addStorages(suggestions);
                 case "reload" -> {
                     suggestions.add("config");
-                    suggestions.add("mythic");
+                    suggestions.add("controllers");
                 }
             }
         }

@@ -341,9 +341,9 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     }
 
     /**
-     * Reload the registered MythicMob Groups from the "mythicgroups.yml" file
+     * Reload the registered {@link DisplayController}s from the "mythicgroups.yml" file
      */
-    public void reloadMythic(){
+    public void reloadControllers(){
         ConfigUtils.registerMobControllers();
     }
 
