@@ -1202,6 +1202,19 @@ public final class SpawnedDisplayEntityGroup {
         return true;
     }
 
+    /**
+     * Make this group stop riding its vehicle
+     * @return the entity this group was riding
+     */
+    public @Nullable Entity dismount(){
+        Entity vehicle = getVehicle();
+        Entity masterEntity = masterPart.getEntity();
+        if (masterEntity != null){
+            masterPart.getEntity().leaveVehicle();
+        }
+        return vehicle;
+    }
+
     private void alignInteractionWithMountedGroup(SpawnedDisplayEntityPart part, Entity vehicle){
         new BukkitRunnable() {
             final Interaction interaction = (Interaction) part.getEntity();
