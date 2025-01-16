@@ -7,6 +7,7 @@ import net.donnypz.displayentityutils.events.PreInteractionClickEvent;
 import net.donnypz.displayentityutils.listeners.autoGroup.DEULoadingListeners;
 import net.donnypz.displayentityutils.listeners.bdengine.DEUEntitySpawned;
 import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
+import net.donnypz.displayentityutils.listeners.entity.DEUMythicListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerChatListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerConnectionListener;
 import net.donnypz.displayentityutils.managers.LocalManager;
@@ -86,7 +87,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
         isMythicMobsInstalled = Bukkit.getPluginManager().isPluginEnabled("MythicMobs");
         if (isMythicMobsInstalled){
-            Bukkit.getPluginManager().registerEvents(new DEUEntityListener(), this);
+            Bukkit.getPluginManager().registerEvents(new DEUMythicListener(), this);
         }
 
         reloadPlugin(true);
@@ -103,6 +104,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         }
         Bukkit.getPluginManager().registerEvents(new DEUPlayerConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerChatListener(), this);
+        Bukkit.getPluginManager().registerEvents(new DEUEntityListener(), this);
 
 
 
