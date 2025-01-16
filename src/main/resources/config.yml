@@ -44,7 +44,7 @@ automaticGroupDetection:
   enabled: true
 
   #Maximum Range to Search for Interaction Entities in a Group
-  #High values with frequent searches may lead to lag spikes
+  #High values with frequent searches may lead to lag spikes and/or unexpected results
   #This will not work if (automaticGroupDetection is false)
   #Setting this value to 0 will effectively disable this feature
   maximumInteractionSearchRange: 7
