@@ -6,18 +6,20 @@ import net.donnypz.displayentityutils.events.InteractionClickEvent;
 import net.donnypz.displayentityutils.events.PreInteractionClickEvent;
 import net.donnypz.displayentityutils.listeners.autoGroup.DEULoadingListeners;
 import net.donnypz.displayentityutils.listeners.bdengine.DEUEntitySpawned;
-import net.donnypz.displayentityutils.listeners.mythic.DEUMythicListener;
+import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerChatListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerConnectionListener;
 import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
 import net.donnypz.displayentityutils.utils.CullOption;
+import net.donnypz.displayentityutils.utils.DisplayEntities.MachineState;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
 import net.donnypz.displayentityutils.utils.deu.ParticleDisplay;
+import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
@@ -30,9 +32,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
@@ -78,7 +86,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
         isMythicMobsInstalled = Bukkit.getPluginManager().isPluginEnabled("MythicMobs");
         if (isMythicMobsInstalled){
-            Bukkit.getPluginManager().registerEvents(new DEUMythicListener(), this);
+            Bukkit.getPluginManager().registerEvents(new DEUEntityListener(), this);
         }
 
         reloadPlugin(true);
@@ -119,6 +127,16 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         }
         if (!LocalManager.getAnimationDatapackFolder().exists()){
             LocalManager.getAnimationDatapackFolder().mkdirs();
+        }
+        if (!LocalManager.getDisplayControllerFolder().exists()){
+            LocalManager.getDisplayControllerFolder().mkdirs();
+            String exampleController = "examplecontroller.yml";
+            File exampleFile = new File(LocalManager.getDisplayControllerFolder(), exampleController);
+            InputStream stream = DisplayEntityPlugin.getInstance().getResource(exampleController);
+            try {
+                Files.copy(stream, exampleFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                stream.close();
+            } catch (IOException e) {}
         }
     }
 
@@ -307,6 +325,8 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
      * Reload the plugin's config
      */
     public void reloadPlugin(boolean isOnEnable){
+        createLocalSaveFolders();
+
         if (!isOnEnable){
             MongoManager.closeConnection();
             MYSQLManager.closeConnection();
@@ -314,19 +334,26 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         else{
             saveDefaultConfig();
             ConfigUtils.updateConfig();
-            ConfigUtils.registerMythic();
         }
-
         reloadConfig();
         ConfigUtils.setConfigVariables(getConfig());
-        createLocalSaveFolders();
+        ConfigUtils.registerMobControllers();
     }
 
     /**
      * Reload the registered MythicMob Groups from the "mythicgroups.yml" file
      */
     public void reloadMythic(){
-        ConfigUtils.registerMythic();
+        ConfigUtils.registerMobControllers();
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    private void onStart(ServerLoadEvent e){
+        if (e.getType() == ServerLoadEvent.LoadType.RELOAD){
+            return;
+        }
+        MachineState.registerNullLoaderStates();
+        DisplayController.registerNullLoaderControllers();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

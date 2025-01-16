@@ -1,37 +1,34 @@
 package net.donnypz.displayentityutils.events;
 
 import jdk.jfr.Experimental;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimatorStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayStateMachine;
+import net.donnypz.displayentityutils.utils.DisplayEntities.MachineState;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
 /**
- * Called when a {@link SpawnedDisplayEntityGroup}'s animation state in a {@link DisplayAnimatorStateMachine} is changed.
+ * Called when a {@link SpawnedDisplayEntityGroup}'s animation state in a {@link DisplayStateMachine} is changed.
  * Can be cancelled.
  */
 @Experimental
 public class GroupAnimationStateChangeEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private boolean isCancelled = false;
-    SpawnedDisplayEntityGroup group;
-    DisplayAnimatorStateMachine stateMachine;
-    String newStateName;
-    DisplayAnimator newDisplayAnimator;
-    String oldStateName;
-    DisplayAnimator oldDisplayAnimator;
+    private final SpawnedDisplayEntityGroup group;
+    private final DisplayStateMachine stateMachine;
+    private final MachineState newState;
+    private final MachineState oldState;
     
-    public GroupAnimationStateChangeEvent(SpawnedDisplayEntityGroup group, DisplayAnimatorStateMachine stateMachine, String newStateName, DisplayAnimator newDisplayAnimator, String oldStateName, @Nullable DisplayAnimator oldDisplayAnimator){
+    public GroupAnimationStateChangeEvent(@NotNull SpawnedDisplayEntityGroup group, @NotNull DisplayStateMachine stateMachine, @Nullable MachineState newState, @Nullable MachineState oldState){
         this.group = group;
         this.stateMachine = stateMachine;
-        this.newStateName = newStateName;
-        this.newDisplayAnimator = newDisplayAnimator;
-        this.oldStateName = oldStateName;
-        this.oldDisplayAnimator = oldDisplayAnimator;
+        this.newState = newState;
+        this.oldState = oldState;
     }
 
     /**
@@ -43,51 +40,37 @@ public class GroupAnimationStateChangeEvent extends Event implements Cancellable
     }
 
     /**
-     * Get the {@link DisplayAnimatorStateMachine} involved in this event
-     * @return a {@link DisplayAnimatorStateMachine}
+     * Get the {@link DisplayStateMachine} involved in this event
+     * @return a {@link DisplayStateMachine}
      */
-    public DisplayAnimatorStateMachine getDisplayAnimatorStateMachine() {
+    public DisplayStateMachine getDisplayStateMachine() {
         return stateMachine;
     }
 
     /**
-     * Get the state name of the new animation state
-     * @return a string. Null if the state machine did not have a group state for the group previously
+     * Get the new {@link MachineState} that will be applied to the group
+     * @return a {@link MachineState}, or null
      */
-    public String getNewStateName() {
-        return newStateName;
+    public @Nullable MachineState getNewState() {
+        return newState;
     }
 
-    /**
-     * Get the {@link DisplayAnimator} used for the new animation state
-     * @return a DisplayAnimator.
-     */
-    public DisplayAnimator getNewDisplayAnimator() {
-        return newDisplayAnimator;
-    }
 
     /**
-     * Get the state name of the previous animation state
-     * @return a string. Null if the state machine did not have a group state for the group previously
+     * Get the {@link MachineState} that was previously applied to the group
+     * @return {@link MachineState}, or null
      */
-    public @Nullable String getOldStateName() {
-        return oldStateName;
+    public @Nullable MachineState getOldState() {
+        return oldState;
     }
 
-    /**
-     * Get the {@link DisplayAnimator} used for the old animation state
-     * @return a DisplayAnimator. Null if the state machine did not have a group state for the group previously
-     */
-    public @Nullable DisplayAnimator getOldDisplayAnimator() {
-        return oldDisplayAnimator;
-    }
 
     /**
      * Get whether the state machine had a previous state for the group
      * @return a boolean
      */
     public boolean hasPreviousState(){
-        return oldDisplayAnimator != null;
+        return oldState != null;
     }
 
     @Override

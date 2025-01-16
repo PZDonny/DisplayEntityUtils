@@ -8,7 +8,7 @@ public class DisplayAnimator {
 
     /**
      * Create a display animator that manages playing and stopping animations for SpawnedDisplayEntityGroups.
-     * A single instance CAN be used for multiple groups. For managing animation states, see {@link DisplayAnimatorStateMachine}
+     * A single instance CAN be used for multiple groups. For managing animation states, see {@link DisplayStateMachine}
      * @param animation
      * @param type
      */
