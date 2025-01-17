@@ -29,6 +29,8 @@ groupProperties:
   #Set "flip" to true to reverse this group's follow property directions
   #This is useful if your model is facing the opposite direction than intended
   flip: false
+  #Set the vertical offset that this group should have when attached to an entity
+  verticalOffset: 0
 
 
 #-----------------------------------------------------------------------

@@ -44,6 +44,7 @@ public final class SpawnedDisplayEntityGroup {
     private long lastAnimationTimeStamp = -1;
     private boolean isPersistent = true;
     private MachineState currentMachineState;
+    private float verticalOffset = 0;
 
     public static final NamespacedKey creationTimeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "creationtime");
     static final NamespacedKey scaleKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "scale");
@@ -113,6 +114,24 @@ public final class SpawnedDisplayEntityGroup {
 
     void setLastAnimationTimeStamp(long timestamp){
         this.lastAnimationTimeStamp = timestamp;
+    }
+
+    /**
+     * Set the vertical translation offset of this group riding an entity. This will apply to animations
+     * as long as this group is riding an entity.
+     * @param verticalOffset
+     */
+    public SpawnedDisplayEntityGroup setVerticalOffset(float verticalOffset) {
+        this.verticalOffset = verticalOffset;
+        return this;
+    }
+
+    /**
+     * Get the vertical translation offset of this group when riding an entity.
+     * @return a float
+     */
+    public float getVerticalOffset() {
+        return verticalOffset;
     }
 
     /**
@@ -1210,7 +1229,11 @@ public final class SpawnedDisplayEntityGroup {
         Entity vehicle = getVehicle();
         Entity masterEntity = masterPart.getEntity();
         if (masterEntity != null){
-            masterPart.getEntity().leaveVehicle();
+            if (masterPart.getEntity().leaveVehicle()){
+                if (verticalOffset != 0){
+                    translate(Direction.UP, verticalOffset*-1, -1, -1);
+                }
+            }
         }
         return vehicle;
     }
@@ -1256,6 +1279,21 @@ public final class SpawnedDisplayEntityGroup {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * Determine if this group's vertical offset can be applied if
+     * @return
+     */
+    public boolean canApplyVerticalOffset(){
+        if (verticalOffset == 0){
+            return false;
+        }
+        Entity vehicle = getVehicle();
+        if (vehicle == null){
+            return false;
+        }
+        return !vehicle.isDead();
     }
 
     /**

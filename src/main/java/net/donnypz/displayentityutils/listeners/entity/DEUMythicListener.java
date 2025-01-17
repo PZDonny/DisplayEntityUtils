@@ -53,6 +53,7 @@ public class DEUMythicListener implements Listener {
 
         boolean persistGroupAfterRestart = e.getMob().getDespawnMode().getSavesToDisk();
         SpawnedDisplayEntityGroup spawned = group.spawn(e.getLocation(), GroupSpawnedEvent.SpawnReason.DISPLAY_CONTROLLER);
+        spawned.setVerticalOffset(controller.getVerticalOffset());
         spawned.rideEntity(e.getEntity());
         spawned.setPersistent(persistGroupAfterRestart);
 

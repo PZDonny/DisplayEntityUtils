@@ -2,7 +2,9 @@ package net.donnypz.displayentityutils.listeners.entity;
 
 import com.destroystokyo.paper.event.entity.EntityJumpEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
+import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
@@ -59,6 +61,11 @@ public final class DEUEntityListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDeath(EntityDeathEvent e){
         applyState(e.getEntity(), MachineState.StateType.DEATH);
+        //Group Vertical Offset
+        for (SpawnedDisplayEntityGroup group : DisplayUtils.getGroupPassengers(e.getEntity())){
+            if (group.getVerticalOffset() == 0) continue;
+            group.translate(Direction.UP, group.getVerticalOffset()*-1, -1, -1);
+        }
     }
 
 

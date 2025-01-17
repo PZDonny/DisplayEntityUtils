@@ -270,28 +270,29 @@ public final class DisplayAnimatorExecutor {
         }
         display.setInterpolationDuration(frame.duration);
 
+        Vector3f translationVector = new Vector3f(transformation.getTranslation());
         if (animation.respectGroupScale){
-            try{
-                Vector3f translationVector = (Vector3f) transformation.getTranslation().clone();
-                Vector3f scaleVector = (Vector3f) transformation.getScale().clone();
-                if (group.getScaleMultiplier() != 1){
-                    translationVector.mul(group.getScaleMultiplier());
-                    scaleVector.mul(group.getScaleMultiplier());
-                }
-                Transformation respectTransform = new DisplayTransformation(translationVector, transformation.getLeftRotation(), scaleVector, transformation.getRightRotation());
-                display.setTransformation(respectTransform);
-                transformation.applyData(display);
+            Vector3f scaleVector = new Vector3f(transformation.getScale());
+            if (group.getScaleMultiplier() != 1){
+                translationVector.mul(group.getScaleMultiplier());
+                scaleVector.mul(group.getScaleMultiplier());
             }
-            catch(CloneNotSupportedException e){
-                Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix
-                        .append(Component.text("Failed to play animation frame (scale respect)", NamedTextColor.RED)));
+            if (group.canApplyVerticalOffset()){
+                translationVector.add(0, group.getVerticalOffset(), 0);
             }
+            Transformation respectTransform = new DisplayTransformation(translationVector, transformation.getLeftRotation(), scaleVector, transformation.getRightRotation());
+            display.setTransformation(respectTransform);
         }
         else{
-            display.setTransformation(transformation);
+            if (group.canApplyVerticalOffset()){
+                translationVector.add(0, group.getVerticalOffset(), 0);
+                Transformation offsetTransformation = new DisplayTransformation(translationVector, transformation.getLeftRotation(), transformation.getScale(), transformation.getRightRotation());
+                display.setTransformation(offsetTransformation);
+            }
+            else{
+                display.setTransformation(transformation);
+            }
         }
+        transformation.applyData(display);
     }
-
-
-
 }

@@ -32,6 +32,7 @@ public class DisplayController {
     DisplayStateMachine stateMachine;
     String controllerID;
     boolean configController;
+    float verticalOffset = 0;
 
     public DisplayController(@NotNull String controllerID) {
         this.controllerID = controllerID;
@@ -107,6 +108,15 @@ public class DisplayController {
     public DisplayController setDisplayEntityGroup(@NotNull String groupTag, @NotNull LoadMethod loadMethod){
         this.group = DisplayGroupManager.getGroup(loadMethod, groupTag);
         return this;
+    }
+
+    public DisplayController setVerticalOffset(float verticalOffset){
+        this.verticalOffset = verticalOffset;
+        return this;
+    }
+
+    public float getVerticalOffset() {
+        return verticalOffset;
     }
 
     public DisplayController setMythicMobs(@NotNull Collection<String> mythicMobIDs) {
@@ -234,6 +244,7 @@ public class DisplayController {
             controller.markNullLoader(groupTag);
         }
         boolean flip = groupProps.getBoolean("flip");
+        controller.verticalOffset = (float) groupProps.getDouble("verticalOffset");
 
         //Default Follow Properties
         FollowType followType;
