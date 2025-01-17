@@ -181,8 +181,9 @@ public final class SpawnedDisplayEntityPart {
     }
 
     /**
-     * Get the entity of this SpawnedDisplayEntityPart
-     * @return This part's entity or null if this part has been previously removed
+     * Get the entity of that this part represents
+     * @return This part's entity or null if this part has been previously removed.
+     * This may return a stale entity if the part exists in an unloaded chunk
      */
     public @Nullable Entity getEntity() {
         if (entity == null){
