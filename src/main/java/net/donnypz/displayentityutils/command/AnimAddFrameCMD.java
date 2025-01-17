@@ -42,15 +42,24 @@ class AnimAddFrameCMD implements SubCommand{
                 throw new NumberFormatException();
             }
             SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(delay, duration);
-            anim.addFrame(frame);
             if (anim.isPartAnimation()) {
                 frame.setTransformation(group, anim.getPartTag());
             } else {
                 frame.setTransformation(group);
             }
+            boolean isUnique = anim.addFrame(frame);
+            if (isUnique){
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully captured animation frame", NamedTextColor.GREEN)));
+                player.playSound(player, Sound.ENTITY_SHEEP_SHEAR, 1, 0.75f);
+            }
+            else{
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Merged frame delay and duration with previous frame!", NamedTextColor.YELLOW)));
+                player.sendMessage(Component.text("| Duplicate frame data", NamedTextColor.YELLOW));
+                player.playSound(player, Sound.ENTITY_SHEEP_SHEAR, 1, 0.5f);
+            }
+            player.sendMessage(Component.text("| Delay: "+delay, NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Duration: "+duration, NamedTextColor.GRAY));
 
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully captured animation frame", NamedTextColor.GREEN)));
-            player.playSound(player, Sound.ENTITY_SHEEP_SHEAR, 1, 0.75f);
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid value entered for delay or duration! Enter a whole number >= 0", NamedTextColor.RED));
         }

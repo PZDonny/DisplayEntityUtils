@@ -48,6 +48,8 @@ public enum Permission {
     TEXT_TOGGLE_SEE_THROUGH("deu.text.seethrough"),
     TEXT_SET_ALIGNMENT("deu.text.align"),
     TEXT_SET_LINE_WIDTH("deu.text.linewidth"),
+    TEXT_OPACITY("deu.text.opacity"),
+    TEXT_BACKGROUND("deu.text.background"),
 
     ITEM_TOGGLE_GLINT("deu.item.glint"),
     ITEM_SET("deu.item.setitem"),
@@ -59,6 +61,8 @@ public enum Permission {
     INTERACTION_LIST_CMD("deu.interaction.listcmd"),
     INTERACTION_DIMENSION("deu.interaction.dim"),
     INTERACTION_PIVOT("deu.interaction.pivot"),
+    INTERACTION_SPAWN("deu.interaction.spawn"),
+    INTERACTION_INFO("deu.interaction.info"),
 
     ANIM_NEW("deu.anim.new"),
     ANIM_SAVE("deu.anim.save"),

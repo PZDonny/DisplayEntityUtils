@@ -27,10 +27,10 @@ class PartsRemoveCMD implements SubCommand{
             PartsCMD.noPartSelection(player);
             return;
         }
+
         if (args.length >= 3 && args[2].equalsIgnoreCase("-all")){
             for (SpawnedDisplayEntityPart part : partSelection.getSelectedParts()){
                 if (part.isMaster()){
-                    player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You cannot despawn the master part! Continuing to despawn other selected parts", NamedTextColor.RED)));
                     continue;
                 }
                 part.remove(true);
@@ -40,23 +40,21 @@ class PartsRemoveCMD implements SubCommand{
         else{
             SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
             if (selected.isMaster()){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You cannot despawn the master part!", NamedTextColor.RED)));
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You cannot despawn the master/parent part!", NamedTextColor.RED)));
                 return;
             }
             selected.remove(true);
             player.sendMessage(Component.text("Successfully despawned your selected part!", NamedTextColor.GREEN));
         }
 
-
-
-        if (partSelection.getGroup().getSpawnedParts().size() <= 1){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Despawning your group, not enough parts remain", NamedTextColor.YELLOW)));
-            partSelection.getGroup().unregister(true, true);
-            return;
+        if (partSelection.getSize() == 0){
+            partSelection.remove();
+            player.sendMessage(Component.text("Part selection reset! (No parts remaining)", NamedTextColor.RED));
         }
-        partSelection.remove();
 
-
+        if (group.getSpawnedParts().size() <= 1){
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Despawning your group, not enough parts remain", NamedTextColor.YELLOW)));
+            group.unregister(true, true);
+        }
     }
-
 }

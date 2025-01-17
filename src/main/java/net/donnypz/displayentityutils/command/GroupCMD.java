@@ -41,6 +41,7 @@ class GroupCMD implements SubCommand{
         subCommands.put("glowcolor", new GroupGlowColorCMD());
         subCommands.put("copypose", new GroupCopyPoseCMD());
         subCommands.put("setspawnanim", new GroupSetSpawnAnimationCMD());
+        subCommands.put("unsetspawnanim", new GroupUnsetSpawnAnimationCMD());
         subCommands.put("togglepersist", new GroupPersistCMD());
         subCommands.put("billboard", new GroupBillboardCMD());
     }
@@ -107,6 +108,7 @@ class GroupCMD implements SubCommand{
             CMDUtils.sendCMD(sender, "/mdis group unglow", " (Remove the glowing effect from all parts in this group)");
             CMDUtils.sendCMD(sender, "/mdis group glowcolor <color | hex-code>", " (Set the glow color for all parts in this group)");
             CMDUtils.sendCMD(sender, "/mdis group setspawnanim <anim-tag> <storage> <linear | loop>", " (Set an animation to play when this group is spawned/loaded)");
+            CMDUtils.sendCMD(sender, "/mdis group unsetspawnanim", " (Remove the spawn animation that's set on your selected group)");
             CMDUtils.sendCMD(sender, "/mdis group togglepersist", " (Toggle whether this group should persist after a server shutdown)");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));

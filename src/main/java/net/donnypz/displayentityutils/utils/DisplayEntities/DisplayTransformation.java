@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -49,13 +50,21 @@ class DisplayTransformation extends Transformation{
         return dTransform;
     }
 
-    static DisplayTransformation get(@NotNull Vector3f translation, @NotNull Quaternionf leftRotation, @NotNull Vector3f scale, @NotNull Quaternionf rightRotation, Serializable data, SpawnedDisplayEntityPart.PartType type){
+    static DisplayTransformation get(@NotNull Vector3f translation,
+                                     @NotNull Quaternionf leftRotation,
+                                     @NotNull Vector3f scale,
+                                     @NotNull Quaternionf rightRotation,
+                                     Serializable data,
+                                     SpawnedDisplayEntityPart.PartType type){
         DisplayTransformation displayTransformation = new DisplayTransformation(translation, leftRotation, scale, rightRotation);
         displayTransformation.setData(type, data);
         return displayTransformation;
     }
 
     void applyData(Display display){
+        if (!DisplayUtils.isInLoadedChunk(display)){
+            return;
+        }
         if (type == null || data == null){
             return;
         }

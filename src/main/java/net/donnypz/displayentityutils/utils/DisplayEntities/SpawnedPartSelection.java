@@ -274,6 +274,41 @@ public final class SpawnedPartSelection {
         return new ArrayList<>(partTags);
     }
 
+    /**
+     * Remove a {@link SpawnedDisplayEntityPart} from this selection
+     * @param part
+     * @return true if the part was contained and removed
+     */
+    public boolean removePart(SpawnedDisplayEntityPart part){
+        boolean removed = selectedParts.remove(part);
+        if (removed && selectedPart == part){
+            if (!selectedParts.isEmpty()){
+                selectedPart = selectedParts.getFirst();
+            }
+            else{
+                selectedPart = null;
+            }
+        }
+        return removed;
+    }
+
+    /**
+     * Remove parts from this selection, that also exist in a different one. If the provided selection is this, then {@link #remove()} will be called
+     * @param selection
+     */
+    public void removeParts(SpawnedPartSelection selection){
+        if (selection == this){
+            remove();
+        }
+        for (SpawnedDisplayEntityPart part : selection.selectedParts){
+            selectedParts.remove(part);
+            if (selectedPart == part){
+                selectedPart = null;
+            }
+        }
+    }
+
+
 
     /**
      * Remove this part selection.
@@ -367,11 +402,11 @@ public final class SpawnedPartSelection {
 
     /**
      * Set the view range of all parts in this selection
-     * @param range The range to set
+     * @param viewRangeMultiplier The range to set
      */
-    public void setViewRange(float range){
+    public void setViewRange(float viewRangeMultiplier){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            part.setViewRange(range);
+            part.setViewRange(viewRangeMultiplier);
         }
     }
 

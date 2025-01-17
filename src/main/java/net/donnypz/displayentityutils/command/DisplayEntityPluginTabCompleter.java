@@ -49,7 +49,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                 case "listgroups", "listanim" -> addStorages(suggestions);
                 case "reload" -> {
                     suggestions.add("config");
-                    suggestions.add("mythic");
+                    suggestions.add("controllers");
                 }
             }
         }
@@ -128,6 +128,11 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                     if (args[1].equalsIgnoreCase("addcmd")){
                         suggestions.add("player");
                         suggestions.add("console");
+                    }
+                }
+                case "text" -> {
+                    if (args[1].equalsIgnoreCase("background")){
+                        addColors(suggestions);
                     }
                 }
             }

@@ -10,6 +10,7 @@ import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.FollowType;
 import io.papermc.paper.entity.TeleportFlag;
+import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -26,27 +27,30 @@ import java.util.*;
 
 public final class SpawnedDisplayEntityGroup {
     public static final long defaultPartUUIDSeed = 99;
+    final Random partUUIDRandom = new Random(defaultPartUUIDSeed);
 
     LinkedHashMap<UUID, SpawnedDisplayEntityPart> spawnedParts = new LinkedHashMap<>();
     Set<SpawnedPartSelection> partSelections = new HashSet<>();
+    List<SpawnedDisplayFollower> followers = new ArrayList<>();
+    SpawnedDisplayFollower defaultFollower;
+
     private String tag;
     SpawnedDisplayEntityPart masterPart;
     long creationTime = System.currentTimeMillis();
-    public static final NamespacedKey creationTimeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "creationtime");
-    static final NamespacedKey scaleKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "scale");
-    static final NamespacedKey spawnAnimationKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimation");
-    static final NamespacedKey spawnAnimationTypeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimationtype");
-    static final NamespacedKey spawnAnimationLoadMethodKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimationloader");
-    final Random partUUIDRandom = new Random(defaultPartUUIDSeed);
+
     boolean isVisibleByDefault;
     private float scaleMultiplier = 1;
     private UUID followedEntity = null;
     private long lastAnimationTimeStamp = -1;
     private boolean isPersistent = true;
+    private MachineState currentMachineState;
+    private float verticalOffset = 0;
 
-    private FollowType followType;
-    int unregisterAfterEntityDeathDelay;
-    boolean pivotInteractionsWhenFollowing;
+    public static final NamespacedKey creationTimeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "creationtime");
+    static final NamespacedKey scaleKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "scale");
+    static final NamespacedKey spawnAnimationKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimation");
+    static final NamespacedKey spawnAnimationTypeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimationtype");
+    static final NamespacedKey spawnAnimationLoadMethodKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimationloader");
 
 
 
@@ -113,14 +117,131 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
+     * Set the vertical translation offset of this group riding an entity. This will apply to animations
+     * as long as this group is riding an entity.
+     * @param verticalOffset
+     */
+    public SpawnedDisplayEntityGroup setVerticalOffset(float verticalOffset) {
+        this.verticalOffset = verticalOffset;
+        return this;
+    }
+
+    /**
+     * Get the vertical translation offset of this group when riding an entity.
+     * @return a float
+     */
+    public float getVerticalOffset() {
+        return verticalOffset;
+    }
+
+    /**
      * Manually stop an animation from playing on a group
      * @param removeFromStateMachine removes this animation from its state machine if true
      */
     public void stopAnimation(boolean removeFromStateMachine){
         this.lastAnimationTimeStamp = -1;
         if (removeFromStateMachine){
-            DisplayAnimatorStateMachine.unregisterFromStateMachine(this);
+            DisplayStateMachine.unregisterFromStateMachine(this);
         }
+    }
+
+    /**
+     * Check if this group's is animating, by checking if its last animation timestamp is not -1
+     * @return a boolean
+     */
+    public boolean isAnimating(){
+        return lastAnimationTimeStamp != -1;
+    }
+
+    /**
+     * Get this group's current animation state, respective of its {@link DisplayStateMachine}
+     * @return a {@link MachineState} or null
+     */
+    public @Nullable MachineState getMachineState(){
+        return currentMachineState;
+    }
+
+    /**
+     * Get the {@link DisplayStateMachine} this group is associated with
+     * @return a {@link DisplayStateMachine} or null
+     */
+    public @Nullable DisplayStateMachine getDisplayStateMachine(){
+        return DisplayStateMachine.getStateMachine(this);
+    }
+
+    /**
+     * Set the animation state of a group in its {@link DisplayStateMachine}
+     * @param state
+     * @param stateMachine
+     * @return false if:
+     * <p>- This group's state machine is locked by a MythicMobs skill</p>
+     * <p>- Group is not contained in the state machine</p>
+     * <p>- The state is part of a different state machine</p>
+     * <p>- GroupAnimationStateChangeEvent is cancelled</p>
+     * <p>- The current state has a transition lock and the new state cannot ignore it</p>
+     */
+    public boolean setMachineState(@NotNull MachineState state, @NotNull DisplayStateMachine stateMachine){
+        if (currentMachineState == state){
+            return false;
+        }
+
+        if (!stateMachine.contains(this) || state.getStateMachine() != stateMachine){
+            return false;
+        }
+
+        if (currentMachineState != null && !currentMachineState.canTransitionFrom(this, state)){
+            return false;
+        }
+
+        if (!new GroupAnimationStateChangeEvent(this, stateMachine, state, currentMachineState).callEvent()){
+            return false;
+        }
+
+
+
+        currentMachineState = state;
+
+        DisplayAnimator animator = state.getDisplayAnimator();
+
+        if (animator != null){
+            animator.play(this);
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    /**
+     * Unset this group's {@link DisplayStateMachine}'s animation state
+     */
+    public void unsetMachineState(){
+        DisplayStateMachine machine = getDisplayStateMachine();
+        if (machine == null || currentMachineState == null){
+            return;
+        }
+
+        DisplayAnimator animator = currentMachineState.getDisplayAnimator();
+        if (animator != null){
+            animator.stop(this);
+        }
+        currentMachineState = null;
+    }
+
+    /**
+     * Unset this group's state machine state if the provided state is the group's current state
+     * @param state
+     * @return true if the state was unset
+     */
+    public boolean unsetIfCurrentMachineState(MachineState state){
+        if (currentMachineState == null){
+            return false;
+        }
+        if (currentMachineState == state){
+            unsetMachineState();
+            return true;
+        }
+        return false;
     }
 
 
@@ -150,6 +271,7 @@ public final class SpawnedDisplayEntityGroup {
 
         SpawnedDisplayEntityPart part = new SpawnedDisplayEntityPart(this, displayEntity, partUUIDRandom);
         if (masterPart != null){
+            Location masterLoc = masterPart.getLocation();
             if (!part.isMaster()){
                 Display masterEntity = (Display) masterPart.getEntity();
                 displayEntity.setTeleportDuration(masterEntity.getTeleportDuration());
@@ -175,14 +297,17 @@ public final class SpawnedDisplayEntityGroup {
      * @return a {@link SpawnedDisplayEntityPart} representing the Interaction entity
      */
     public SpawnedDisplayEntityPart addInteractionEntity(@NotNull Interaction interactionEntity){
-        SpawnedDisplayEntityPart existing = SpawnedDisplayEntityPart.getPart(interactionEntity);
-        if (existing == null){
-            return new SpawnedDisplayEntityPart(this, interactionEntity, partUUIDRandom);
+        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(interactionEntity);
+        if (part == null){
+            part =  new SpawnedDisplayEntityPart(this, interactionEntity, partUUIDRandom);
         }
         else{
-            existing.setGroup(this);
-            return existing;
+            part.setGroup(this);
         }
+        if (getVehicle() != null){
+            alignInteractionWithMountedGroup(part, getVehicle());
+        }
+        return part;
     }
 
     /**
@@ -304,7 +429,6 @@ public final class SpawnedDisplayEntityGroup {
     public void hideFromPlayer(Player player){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.hideFromPlayer(player);
-
         }
     }
 
@@ -374,7 +498,7 @@ public final class SpawnedDisplayEntityGroup {
         if (!this.isSpawned()){
             return null;
         }
-        return masterPart.getEntity().getLocation();
+        return masterPart.getLocation();
     }
 
     /**
@@ -838,11 +962,11 @@ public final class SpawnedDisplayEntityGroup {
 
     /**
      * Set the view range of this group
-     * @param range The range to set
+     * @param viewRangeMultiplier The range multiplier to set
      */
-    public void setViewRange(float range){
+    public void setViewRange(float viewRangeMultiplier){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.setViewRange(range);
+            part.setViewRange(viewRangeMultiplier);
         }
     }
 
@@ -1073,26 +1197,77 @@ public final class SpawnedDisplayEntityGroup {
 
     /**
      * Put a SpawnedDisplayEntityGroup on top of an entity
-     * Calls the GroupMountEntityEvent if successful
-     * @param mount The entity for the SpawnedDisplayEntityGroup to ride
-     * @return Whether the mount was successful or not
+     * Calls the {@link GroupRideEntityEvent}
+     * @param vehicle The entity for the SpawnedDisplayEntityGroup to ride
+     * @return false if the {@link GroupRideEntityEvent} is cancelled or if {@link Entity#addPassenger(Entity)} fails for whatever reason
      */
-    public boolean rideEntity(Entity mount){
-        try{
-            Entity masterEntity = masterPart.getEntity();
-            GroupRideEntityEvent event = new GroupRideEntityEvent(this, mount);
-            Bukkit.getPluginManager().callEvent(event);
-            if (event.isCancelled()){
-                return false;
-
-            }
-            mount.addPassenger(masterEntity);
-            return true;
-        }
-        catch(NullPointerException e){
-            e.printStackTrace();
+    public boolean rideEntity(@NotNull Entity vehicle){
+        Entity masterEntity = masterPart.getEntity();
+        GroupRideEntityEvent event = new GroupRideEntityEvent(this, vehicle);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()){
             return false;
         }
+
+        boolean result = vehicle.addPassenger(masterEntity);
+        if (!result){
+            return false;
+        }
+
+        for (SpawnedDisplayEntityPart interactionPart: getSpawnedParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
+            alignInteractionWithMountedGroup(interactionPart, vehicle);
+        }
+        if (verticalOffset != 0) {
+            translate(Direction.UP, verticalOffset, -1, -1);
+        }
+
+        return true;
+    }
+
+    /**
+     * Make this group stop riding its vehicle
+     * @return the entity this group was riding
+     */
+    public @Nullable Entity dismount(){
+        Entity vehicle = getVehicle();
+        Entity masterEntity = masterPart.getEntity();
+        if (masterEntity != null){
+            if (masterPart.getEntity().leaveVehicle()){
+                if (verticalOffset != 0){
+                    translate(Direction.UP, verticalOffset*-1, -1, -1);
+                }
+            }
+        }
+        return vehicle;
+    }
+
+    private void alignInteractionWithMountedGroup(SpawnedDisplayEntityPart part, Entity vehicle){
+        new BukkitRunnable() {
+            final Interaction interaction = (Interaction) part.getEntity();
+            Location lastLoc = getLocation();
+            @Override
+            public void run() {
+                if (!isSpawned() || !isRegistered() || SpawnedDisplayEntityGroup.this != part.getGroup()){
+                    cancel();
+                    return;
+                }
+
+                Location newLoc = getLocation();
+                Location tpLoc = interaction.getLocation().clone();
+                double distance = lastLoc.distance(tpLoc);
+
+                if (distance != 0){
+                    Vector adjustVec = lastLoc.toVector().subtract(newLoc.toVector());
+                    tpLoc.subtract(adjustVec);
+                    lastLoc = newLoc;
+                    interaction.teleport(tpLoc);
+                }
+
+                if (getVehicle() != vehicle){
+                    cancel();
+                }
+            }
+        }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, 1);
     }
 
     /**
@@ -1110,105 +1285,92 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
+     * Determine if this group's vertical offset can be applied if
+     * @return
+     */
+    public boolean canApplyVerticalOffset(){
+        if (verticalOffset == 0){
+            return false;
+        }
+        Entity vehicle = getVehicle();
+        if (vehicle == null){
+            return false;
+        }
+        return !vehicle.isDead();
+    }
+
+    /**
      * Force the SpawnedDisplayEntityGroup to look in the same direction as a specified entity
+     * <br>
+     * It is recommended to use this with {@link #rideEntity(Entity)}
      * @param entity The entity with the directions to follow
-     * @param followType The follow type
+     * @param followType The follow type, or null to disable respecting looking direction
      * @param unregisterOnEntityDeath Determines if this group should be despawned after the entity's death
      * @throws IllegalArgumentException If the {@link FollowType} is set to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
      */
-    public void followEntityDirection(@NotNull Entity entity, @NotNull FollowType followType, boolean unregisterOnEntityDeath, boolean pivotInteractions){
+    public void followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, boolean unregisterOnEntityDeath, boolean pivotInteractions){
         followEntityDirection(entity, followType, unregisterOnEntityDeath, pivotInteractions, getTeleportDuration());
     }
 
     /**
      * Force the SpawnedDisplayEntityGroup to look in the same direction as a specified entity
+     * <br>
+     * It is recommended to use this with {@link #rideEntity(Entity)}
      * @param entity The entity with the directions to follow
-     * @param followType The follow type
+     * @param followType The follow type, or null to disable respecting looking direction
      * @param unregisterAfterEntityDeathDelay How long after an entity dies to despawn the group, in ticks
      * @throws IllegalArgumentException If the {@link FollowType} is set to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
      */
-    public void followEntityDirection(@NotNull Entity entity, @NotNull FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions){
+    public void followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions){
         followEntityDirection(entity, followType, unregisterAfterEntityDeathDelay, pivotInteractions, getTeleportDuration());
     }
 
     /**
      * Force the SpawnedDisplayEntityGroup to look in the same direction as a specified entity
+     * <br>
+     * It is recommended to use this with {@link #rideEntity(Entity)}
      * @param entity The entity with the directions to follow
-     * @param followType The follow type
+     * @param followType The follow type, or null to disable respecting looking direction
      * @param unregisterOnEntityDeath Determines if this group should be despawned after the entity's death
      * @param teleportationDuration Set the teleportationDuration (rotation smoothness) of all parts within this group
      * @throws IllegalArgumentException If the {@link FollowType} is set to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
      */
-    public void followEntityDirection(@NotNull Entity entity, @NotNull FollowType followType, boolean unregisterOnEntityDeath, boolean pivotInteractions, int teleportationDuration){
-        if (unregisterOnEntityDeath){
-            followEntityDirection(entity, followType, 0, pivotInteractions, teleportationDuration);
-        }
-        else{
-            followEntityDirection(entity, followType, -1, pivotInteractions, teleportationDuration);
-        }
+    public void followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, boolean unregisterOnEntityDeath, boolean pivotInteractions, int teleportationDuration){
+        int delay = unregisterOnEntityDeath ? 0 : -1;
+        GroupFollowProperties followProperties = new GroupFollowProperties(followType, delay, pivotInteractions, teleportationDuration, null);
+        followEntityDirection(entity, followProperties);
 
     }
 
     /**
      * Force the SpawnedDisplayEntityGroup to look in the same direction as a specified entity
+     * <br>
+     * It is recommended to use this with {@link #rideEntity(Entity)}
      * @param entity The entity with the directions to follow
-     * @param followType The follow type
+     * @param followType The follow type, or null to disable respecting looking direction
      * @param unregisterAfterEntityDeathDelay How long after an entity dies to despawn the group, in ticks. A value of -1 will not despawn the group.
      * @param teleportationDuration Set the teleportationDuration (rotation smoothness) of all parts within this group
      * @throws IllegalArgumentException If the {@link FollowType} is set to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
      */
-    public void followEntityDirection(@NotNull Entity entity, @NotNull FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions, int teleportationDuration){
-        if (!(entity instanceof LivingEntity) && followType == FollowType.BODY){
-            throw new IllegalArgumentException("Only living entities can have a follow type of \"BODY\"");
-        }
-
-        if (entity.getUniqueId() == followedEntity){
-            return;
-        }
-
-        if (teleportationDuration < 0){
-            teleportationDuration = 0;
-        }
-        SpawnedDisplayEntityGroup group = this;
-        this.setTeleportDuration(teleportationDuration);
-        followedEntity = entity.getUniqueId();
-        this.followType = followType;
-        this.unregisterAfterEntityDeathDelay = unregisterAfterEntityDeathDelay;
-        this.pivotInteractionsWhenFollowing = pivotInteractions;
-
-        new BukkitRunnable(){
-            @Override
-            public void run() {
-                if (!group.isSpawned() || followedEntity != entity.getUniqueId() || entity.isDead()){
-                    if (entity.isDead() && group.unregisterAfterEntityDeathDelay > -1){
-                        Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                            group.unregister(true, true);
-                        }, group.unregisterAfterEntityDeathDelay);
-                    }
-                    cancel();
-                    return;
-                }
-                if (!group.isInLoadedChunk()){
-                    return;
-                }
-                switch(group.followType){
-                    case BODY-> {
-                        LivingEntity e = (LivingEntity) entity;
-                        group.setYaw(e.getBodyYaw(), pivotInteractionsWhenFollowing);
-                    }
-                    case PITCH_AND_YAW, PITCH, YAW -> {
-                        if (group.followType == FollowType.PITCH || group.followType == FollowType.PITCH_AND_YAW){
-                            group.setPitch(entity.getPitch());
-                        }
-                        if (group.followType == FollowType.YAW || group.followType == FollowType.PITCH_AND_YAW){
-                            group.setYaw(entity.getYaw(), pivotInteractionsWhenFollowing);
-                        }
-                    }
-                }
-
-            }
-        }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, teleportationDuration);
+    public void followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions, int teleportationDuration){
+        followEntityDirection(entity, new GroupFollowProperties(followType, unregisterAfterEntityDeathDelay, pivotInteractions, teleportationDuration, null));
     }
+
+
+    /**
+     * Force the SpawnedDisplayEntityGroup to look in the same direction as a specified entity
+     * <br>
+     * It is recommended to use this with {@link #rideEntity(Entity)}
+     * @param entity The entity with the directions to follow
+     * @param properties The properties to use when following the entity's direction
+     * @throws IllegalArgumentException If the {@link FollowType} is set to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
+     */
+    public void followEntityDirection(@NotNull Entity entity, @NotNull GroupFollowProperties properties){
+        SpawnedDisplayFollower follower = new SpawnedDisplayFollower(this, properties);
+        followers.add(follower);
+        follower.follow(entity);
+    }
+
 
     /**
      * Stop following an entity's direction after using
@@ -1226,36 +1388,6 @@ public final class SpawnedDisplayEntityGroup {
      */
     public Entity getFollowedEntity(){
         return followedEntity != null ? Bukkit.getEntity(followedEntity) : null;
-    }
-
-    /**
-     * Change the {@link FollowType} that should be used to follow an entity's direction. This should only be called after using
-     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)}
-     * or any variation
-     */
-    public SpawnedDisplayEntityGroup setEntityFollowType(@NotNull FollowType followType){
-        this.followType = followType;
-        return this;
-    }
-
-    /**
-     * Change the delay that this group should be despawned after its followed entity dies. This should only be called after using
-     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)}
-     * or any variation
-     */
-    public SpawnedDisplayEntityGroup setUnregisterAfterDeathDelay(int delay){
-        this.unregisterAfterEntityDeathDelay = delay;
-        return this;
-    }
-
-    /**
-     * Change whether interaction entities should pivot when following an entity's direction. This should only be called after using
-     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)}
-     * or any variation
-     */
-    public SpawnedDisplayEntityGroup pivotInteractionsWhenFollowing(boolean pivotInteractions){
-        this.pivotInteractionsWhenFollowing = pivotInteractions;
-        return this;
     }
 
 
@@ -1489,18 +1621,6 @@ public final class SpawnedDisplayEntityGroup {
         return true;
     }
 
-    /**
-     * Set this group's animation state if it has been added to a {@link DisplayAnimatorStateMachine}.
-     * @param stateName The name of the state to set for this SpawnedDisplayEntityGroup
-     * @return true if this group's state was changed. false if this group has not been added to a DisplayAnimatorStateMachine
-     */
-    public boolean setAnimationState(@NotNull String stateName){
-        DisplayAnimatorStateMachine stateMachine = DisplayAnimatorStateMachine.getStateMachine(this);
-        if (stateMachine == null){
-            return false;
-        }
-        return stateMachine.setState(stateName, this);
-    }
 
 
     /**
@@ -1557,7 +1677,6 @@ public final class SpawnedDisplayEntityGroup {
      */
     public void removePartSelection(SpawnedPartSelection partSelection){
         if (partSelections.contains(partSelection)){
-            partSelections.remove(partSelection);
             partSelection.removeNoManager();
         }
     }
@@ -1575,19 +1694,20 @@ public final class SpawnedDisplayEntityGroup {
         if (masterPart == null){
             return;
         }
-        DisplayAnimatorStateMachine.unregisterFromStateMachine(this);
+        DisplayStateMachine.unregisterFromStateMachine(this);
         DisplayGroupManager.removeSpawnedGroup(this, despawnParts, force);
         spawnedParts.clear();
         masterPart = null;
         followedEntity = null;
+        followers.clear();
     }
 
     /**
      * Check if this group is spawned in a world.
-     * @return true if the group's master (parent) entity is not dead (or marked for removal).
+     * @return true if the group's master part is not invalid.
      */
     public boolean isSpawned(){
-        return masterPart != null && !masterPart.getEntity().isDead();
+        return masterPart != null && masterPart.valid;
     }
 
     /**

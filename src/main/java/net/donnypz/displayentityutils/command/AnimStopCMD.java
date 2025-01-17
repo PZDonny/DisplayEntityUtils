@@ -1,9 +1,7 @@
 package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,13 +20,8 @@ class AnimStopCMD implements SubCommand{
             return;
         }
 
-        SpawnedDisplayAnimation anim = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
-        if (anim == null) {
-            AnimCMD.noAnimationSelection(player);
-            return;
-        }
 
         group.stopAnimation(true);
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Stopping a animation played on group!", NamedTextColor.YELLOW)));
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Stopping any animation played on your selected group!", NamedTextColor.YELLOW)));
     }
 }

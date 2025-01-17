@@ -1,0 +1,194 @@
+#Group and Animation Storage Locations:
+#It is recommended to enable "cacheAnimations" in the plugin config
+#LOCAL
+#MYSQL
+#MONGODB
+#NULL (Use this if you will handle loading the group/animation through the API's Null(Group/Animation)LoadEvent)
+
+#The identifier for this controller
+#USE UNIQUE IDs FOR EACH CONTROLLER
+controllerID: "example"
+
+#----------------------------------------------------
+#Mobs:
+#Associate a group with mythic mobs of the specified type(s)
+#The group will be associated to the mythic mob when spawned
+#
+#NOTE: If planning to use this mob handler internally, without MythicMobs,
+#simply set "mythicMobs" to []
+#----------------------------------------------------
+mythicMobs: ["ExampleMythicMob", "ExampleMythicMob2"]
+
+
+#------------------------------------------------------
+#Group Properties:
+#------------------------------------------------------
+groupProperties:
+  tag: "tag-of-group"
+  storage: LOCAL
+  #Set "flip" to true to reverse this group's follow property directions
+  #This is useful if your model is facing the opposite direction than intended
+  flip: false
+  #Set the vertical offset that this group should have when attached to an entity
+  verticalOffset: 0
+
+
+#-----------------------------------------------------------------------
+#Follow Properties:
+#Determine how the parts in a group will respect actions of an entity
+#-----------------------------------------------------------------------
+defaultFollowProperties:
+  #Entity Follow Types (Controls how the group/model will move in orient itself in respect to the mythic mob):
+  #PITCH_AND_YAW -> Follows an entity's head pitch and yaw
+  #PITCH -> Follows an entity's head pitch
+  #YAW -> Follows an entity's head yaw
+  #BODY -> Follows an entity's body yaw
+  #NONE -> Following will be disabled
+  entityFollowType: PITCH_AND_YAW
+
+  #"deathDespawnDelay" can be set to -1 to disable removal of a group, after an entity's death.
+  #The delay is measured in ticks and the value is the same for the default follow properties and part follow properties.
+  deathDespawnDelay: 20
+
+  #"teleportDuration" controls how smoothly the group will respect the entity's looking direction
+  #The duration is measured in ticks.
+  teleportationDuration: 2
+
+  #Determine if interaction entities should pivot while follow an entity's looking direction
+  pivotInteractions: false
+
+#Follow Properties that parts with specified tags will use
+#If setting follow properties for parts with certain tags is not desired, the section below can be omitted
+partFollowProperties:
+  #The ID to give this follow property
+  followPropertyID1:
+    #Parts with the specified part tags will respect this follow property
+    partTags: ["partTag1", "partTag2"]
+    entityFollowType: BODY
+    teleportationDuration: 2
+    pivotInteractions: false
+
+    #Determine whether certain animation states will enable/disable this follow property
+    #If a state disables this property, the parts in the property will use the defaultFollowProperty's settings
+    #If a state filter is not required, this section can be removed
+    stateFilter:
+      states: ["state1", "state2"]
+      #If true, the listed states WILL NOT use this follow property and will use the default if they are the active state
+      #If false, the listed states WILL use this follow property if they are the active state
+      blacklist: true
+
+  #An example of setting a property for parts with the tag "head"
+  headProperty:
+    partTags: ["head"]
+    entityFollowType: PITCH_AND_YAW
+    teleportationDuration: 2
+    pivotInteractions: false
+    stateFilter:
+      states: []
+      blacklist: true
+
+
+
+
+#----------------------------------------------------------------------------------------
+#Animation States:
+#Remove the ENTIRE "states" section if creating an animation state machine is NOT desired
+#
+#Removing unwanted states will not interfere with other animation states
+#For example:
+#You can remove the "spawn" state and keep the "idle" state, and the idle state will still work as expected
+#
+#"animationType" determines how the animation will be played.
+#"LINEAR" will play the animation one time through
+#"LOOP" will play the animation repeatedly, from the beginning
+#
+#"lockTransition" stops other animations from being played before the
+#current one finishes its animation cycle
+#
+#An "animationType" of "LOOP" with a true "lockTransition" may lead to blocking transitions to other states
+#
+#The death state will ALWAYS ignore the "lockTransition" value of other states
+#----------------------------------------------------------------------------------------
+
+states:
+  #------------------------------------------
+  #Playing Animations with Mythic Mobs Skills:
+  #For MythicMobs skills to perform animations, the following mechanic must be added to your skills
+  #
+  #- deuanimate{id=controller-id;anim=animation-tag;t=animation-type;s=storage-location} @self
+  #
+  #EXAMPLE: deuanimate{id=mycontroller;anim=walking_animation;t=LINEAR;s=LOCAL} @self
+  #------------------------------------------
+
+  #Below, animations can be triggered when an associated entity/mythic mob performs an action below
+  spawn:
+    animation: "spawn_animation"
+    storage: LOCAL
+    animationType: LINEAR
+    lockTransition: true
+
+  death:
+    animation: "death_animation"
+    storage: LOCAL
+    animationType: LINEAR
+    lockTransition: true
+
+  idle:
+    animation: "idle_animation"
+    storage: LOCAL
+    animationType: LOOP
+    lockTransition: false
+
+  walk:
+    animation: "walk_animation"
+    storage: LOCAL
+    animationType: LOOP
+    lockTransition: false
+
+  swimming:
+    animation: "swim_animation"
+    storage: LOCAL
+    animationType: LOOP
+    lockTransition: false
+
+  jump:
+    animation: "jump_animation"
+    storage: LOCAL
+    animationType: LOOP
+    lockTransition: true
+
+  falling:
+    animation: "falling_animation"
+    storage: LOCAL
+    animationType: LOOP
+    lockTransition: false
+
+  melee:
+    animation: "melee_animation"
+    storage: LOCAL
+    animationType: LINEAR
+    lockTransition: true
+
+    #The delay in ticks until the damage should be applied on the melee victim
+    #Setting this value to 0 will deal damage regularly, without any delay
+    damageDelay: 0
+
+
+  shoot_bow:
+    animation: "shoot_bow_animation"
+    storage: LOCAL
+    animationType: LINEAR
+    lockTransition: true
+
+  damaged:
+    animation: "damaged_animation"
+    storage: LOCAL
+    animationType: LINEAR
+    lockTransition: true
+
+  teleport:
+    animation: "teleport_animation"
+    storage: LOCAL
+    animationType: LINEAR
+    lockTransition: false
+

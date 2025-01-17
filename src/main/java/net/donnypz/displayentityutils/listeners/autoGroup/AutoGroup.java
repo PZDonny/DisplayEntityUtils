@@ -9,8 +9,9 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.GroupResult;
-import net.donnypz.displayentityutils.utils.mythic.MythicDisplayManager;
-import net.donnypz.displayentityutils.utils.mythic.MythicDisplayOptions;
+import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
+import net.donnypz.displayentityutils.utils.controller.DisplayController;
+import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Display;
@@ -52,7 +53,7 @@ final class AutoGroup {
         HashMap<SpawnedDisplayEntityGroup, Collection<Interaction>> addedInteractionsForEvent = new HashMap<>();
         HashSet<Interaction> interactions = new HashSet<>();
         HashMap<SpawnedDisplayEntityGroup, ChunkRegisterGroupEvent> events = new HashMap<>();
-        HashSet<SpawnedDisplayEntityGroup> mythicGroup = new HashSet<>();
+        HashSet<SpawnedDisplayEntityGroup> controllerGroups = new HashSet<>();
 
         for (Entity entity : entities){
             if (entity instanceof Display display){
@@ -72,8 +73,8 @@ final class AutoGroup {
                     if (!result.alreadyLoaded()){
                         events.put(group, new ChunkRegisterGroupEvent(group, chunk));
                         group.playSpawnAnimation();
-                        if (DisplayEntityPlugin.isMythicMobsInstalled() && MythicDisplayManager.isPersistentMythicGroup(group)){
-                            mythicGroup.add(group);
+                        if (DisplayEntityPlugin.isMythicMobsInstalled() && DisplayControllerManager.isControllerGroup(group)){
+                            controllerGroups.add(group);
                         }
                     }
                 //});
@@ -111,19 +112,48 @@ final class AutoGroup {
             //});
         }
 
-        for (SpawnedDisplayEntityGroup group : mythicGroup){
+        //Display Controllers
+        for (SpawnedDisplayEntityGroup group : controllerGroups){
+            Entity vehicle = group.getVehicle();
+            if (vehicle == null){
+                group.unregister(true, false);
+                events.remove(group);
+                continue;
+            }
+
             PersistentDataContainer pdc = group.getMasterPart().getEntity().getPersistentDataContainer();
-            MythicDisplayOptions options = gson.fromJson(pdc.get(MythicDisplayManager.persistKey, PersistentDataType.STRING), MythicDisplayOptions.class);
-            if (options != null){
-                Entity vehicle = group.getVehicle();
-                if (vehicle != null){
-                    options.followGroup(group, group.getVehicle());
+            String data = pdc.get(DisplayControllerManager.controllerGroupKey, PersistentDataType.STRING);
+
+
+
+
+            DisplayController controller = DisplayController.getController(data);
+            //Data is controllerID from rework
+            if (controller != null){
+
+                Set<GroupFollowProperties> properties = controller.getFollowProperties();
+                for (GroupFollowProperties property : properties){
+                    property.followGroup(group, vehicle);
                 }
-                else{
-                    group.unregister(true, false);
-                    events.remove(group);
+                if (controller.hasStateMachine()){
+                    controller.getStateMachine().addGroup(group);
                 }
             }
+
+            //Data is pre-rework mythic group follow properties ("mythicgroups.yml")
+            else{
+                String preReworkJson = pdc.get(DisplayControllerManager.preControllerGroupKey, PersistentDataType.STRING);
+                GroupFollowProperties properties = gson.fromJson(preReworkJson, GroupFollowProperties.class);
+                if (properties != null){
+                    properties.followGroup(group, vehicle);
+                }
+                else{
+                    group.unregister(true, true);
+                    events.remove(group);
+                    continue;
+                }
+            }
+            DisplayControllerManager.registerEntity(vehicle, group);
         }
 
         for (ChunkRegisterGroupEvent event : events.values()){

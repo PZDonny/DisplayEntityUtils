@@ -44,7 +44,7 @@ automaticGroupDetection:
   enabled: true
 
   #Maximum Range to Search for Interaction Entities in a Group
-  #High values with frequent searches may lead to lag spikes
+  #High values with frequent searches may lead to lag spikes and/or unexpected results
   #This will not work if (automaticGroupDetection is false)
   #Setting this value to 0 will effectively disable this feature
   maximumInteractionSearchRange: 7
@@ -84,7 +84,7 @@ overwriteExistingSaves: true
 #
 #Use this setting at your own risk and ONLY if you know what you are doing.
 #This may have client performance benefits for players when selecting the correct option for your server.
-#LARGEST is the safest option to reduce Display Entities being culled too early.
+#LARGEST is the safest option to reduce Display Entities being culled too early, but may cause performance issues in areas with many display entities.
 # !KEEP IN MIND! it is NOT possible for the culling to be perfect.
 autoCulling: NONE
 

@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.managers;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -21,6 +22,7 @@ public final class LocalManager {
     static final File groupSaveFolder = new File(DisplayEntityPlugin.getInstance().getDataFolder(), "/savedentities/");
     static final File animSaveFolder = new File(DisplayEntityPlugin.getInstance().getDataFolder(), "/animations/");
     static final File animDatapackFolder = new File(DisplayEntityPlugin.getInstance().getDataFolder(), "/bdenginedatapacks/");
+    static final File displayControllerFolder = new File(DisplayEntityPlugin.getInstance().getDataFolder(), "/displaycontrollers/");
     public static final String datapackConvertDeleteSubParentTag = "deu_delete_sub_parent";
     public static final String datapackUngroupedAddLaterTag = "deu_add_later";
     static final CommandSender silentSender = Bukkit.createCommandSender(feedback -> {});
@@ -236,7 +238,20 @@ public final class LocalManager {
         return animSaveFolder;
     }
 
+
+    /**
+     * Get the folder for placing animation datapacks for conversion, created from BDEngine
+     * @return a file
+     */
     public static File getAnimationDatapackFolder(){
         return animDatapackFolder;
+    }
+
+    /**
+     * Get the folder for creating {@link DisplayController}s through a .yml file
+     * @return a file
+     */
+    public static File getDisplayControllerFolder(){
+        return displayControllerFolder;
     }
 }

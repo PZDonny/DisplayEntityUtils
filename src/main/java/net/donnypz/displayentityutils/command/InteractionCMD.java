@@ -6,7 +6,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
@@ -21,7 +21,7 @@ class InteractionCMD implements SubCommand{
 
 
     InteractionCMD(){
-        subCommands.put("help", null);
+        subCommands.put("help", new InteractionHelpCMD());
         subCommands.put("addcmd", new InteractionAddCMD());
         subCommands.put("listcmd", new InteractionListCMD());
         subCommands.put("height", new InteractionHeightCMD());
@@ -29,6 +29,9 @@ class InteractionCMD implements SubCommand{
         subCommands.put("scale", new InteractionScaleCMD());
         subCommands.put("pivot", new InteractionPivotCMD());
         subCommands.put("pivotselection", new InteractionPivotSelectionCMD());
+        subCommands.put("spawn", new InteractionSpawnCMD());
+        subCommands.put("spawnhere", new InteractionSpawnHereCMD());
+        subCommands.put("info", new InteractionInfoCMD());
     }
 
     static List<String> getTabComplete(){
@@ -38,7 +41,7 @@ class InteractionCMD implements SubCommand{
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 2){
-            interactionHelp(player);
+            interactionHelp(player, 1);
             return;
         }
         String arg = args[1];
@@ -47,24 +50,32 @@ class InteractionCMD implements SubCommand{
             if (!DisplayEntityPluginCommand.hasPermission(player, Permission.HELP)){
                 return;
             }
-            interactionHelp(player);
+            interactionHelp(player, 1);
         }
         else{
             subCommand.execute(player, args);
         }
     }
 
-    static void interactionHelp(CommandSender sender){
+    static void interactionHelp(CommandSender sender, int page){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-        sender.sendMessage(Component.text("These commands prioritize the interaction entity you're looking at over the one you may have selected", NamedTextColor.GRAY));
-        CMDUtils.sendCMD(sender, "/mdis interaction help", " (Get help for interactions)");
-        CMDUtils.sendCMD(sender, "/mdis interaction height <height>", " (Set the height of an interaction)");
-        CMDUtils.sendCMD(sender, "/mdis interaction width <width>", " (Set the width of an interaction)");
-        CMDUtils.sendCMD(sender, "/mdis interaction scale <height> <width> <tick-duration> <tick-delay>", " (Scale an interaction entity over a period of time)");
-        CMDUtils.sendCMD(sender, "/mdis interaction addcmd <player | console> <left | right | both> <command>", " (Add a command to an interaction)");
-        CMDUtils.sendCMD(sender, "/mdis interaction listcmds", "(List all commands stored on an interaction)");
-        CMDUtils.sendCMD(sender, "/mdis interaction pivot <angle>", " (Pivot an interaction around it's group's actual location center)");
-        CMDUtils.sendCMD(sender, "/mdis interaction pivotselection <angle>", " (Pivot all Interactions in a part selection)");
+        if (page == 1){
+            sender.sendMessage(Component.text("Where applicable, these commands prioritize the interaction entity you're looking at over the one you may have selected", NamedTextColor.GRAY));
+            CMDUtils.sendCMD(sender, "/mdis interaction help", " (Get help for interactions)");
+            CMDUtils.sendCMD(sender, "/mdis interaction info", "(Get info about an interaction entity, targeted or selected)");
+            CMDUtils.sendCMD(sender, "/mdis interaction spawn <height> <width> (Create an interaction entity part for a group, at the group's location)");
+            CMDUtils.sendCMD(sender, "/mdis interaction spawnhere <height> <width> (Create an interaction entity part for a group, at your location)");
+            CMDUtils.sendCMD(sender, "/mdis interaction height <height>", " (Set the height of an interaction)");
+            CMDUtils.sendCMD(sender, "/mdis interaction width <width>", " (Set the width of an interaction)");
+        }
+        else{
+            CMDUtils.sendCMD(sender, "/mdis interaction scale <height> <width> <tick-duration> <tick-delay>", " (Scale an interaction entity over a period of time)");
+            CMDUtils.sendCMD(sender, "/mdis interaction addcmd <player | console> <left | right | both> <command>", " (Add a command to an interaction)");
+            CMDUtils.sendCMD(sender, "/mdis interaction listcmds", "(List all commands stored on an interaction)");
+            CMDUtils.sendCMD(sender, "/mdis interaction pivot <angle>", " (Pivot an interaction around it's group's actual location center)");
+            CMDUtils.sendCMD(sender, "/mdis interaction pivotselection <angle>", " (Pivot all Interactions in a part selection)");
+        }
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }
 
     static Interaction getInteraction(Player p, boolean checkTargeted){

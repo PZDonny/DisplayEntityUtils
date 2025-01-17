@@ -6,18 +6,21 @@ import net.donnypz.displayentityutils.events.InteractionClickEvent;
 import net.donnypz.displayentityutils.events.PreInteractionClickEvent;
 import net.donnypz.displayentityutils.listeners.autoGroup.DEULoadingListeners;
 import net.donnypz.displayentityutils.listeners.bdengine.DEUEntitySpawned;
-import net.donnypz.displayentityutils.listeners.mythic.DEUMythicListener;
+import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
+import net.donnypz.displayentityutils.listeners.entity.DEUMythicListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerChatListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerConnectionListener;
 import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
 import net.donnypz.displayentityutils.utils.CullOption;
+import net.donnypz.displayentityutils.utils.DisplayEntities.MachineState;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
 import net.donnypz.displayentityutils.utils.deu.ParticleDisplay;
+import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
@@ -30,9 +33,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
@@ -95,6 +104,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         }
         Bukkit.getPluginManager().registerEvents(new DEUPlayerConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerChatListener(), this);
+        Bukkit.getPluginManager().registerEvents(new DEUEntityListener(), this);
 
 
 
@@ -119,6 +129,16 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         }
         if (!LocalManager.getAnimationDatapackFolder().exists()){
             LocalManager.getAnimationDatapackFolder().mkdirs();
+        }
+        if (!LocalManager.getDisplayControllerFolder().exists()){
+            LocalManager.getDisplayControllerFolder().mkdirs();
+            String exampleController = "examplecontroller.yml";
+            File exampleFile = new File(LocalManager.getDisplayControllerFolder(), exampleController);
+            InputStream stream = DisplayEntityPlugin.getInstance().getResource(exampleController);
+            try {
+                Files.copy(stream, exampleFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                stream.close();
+            } catch (IOException e) {}
         }
     }
 
@@ -307,6 +327,8 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
      * Reload the plugin's config
      */
     public void reloadPlugin(boolean isOnEnable){
+        createLocalSaveFolders();
+
         if (!isOnEnable){
             MongoManager.closeConnection();
             MYSQLManager.closeConnection();
@@ -314,19 +336,26 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         else{
             saveDefaultConfig();
             ConfigUtils.updateConfig();
-            ConfigUtils.registerMythic();
         }
-
         reloadConfig();
         ConfigUtils.setConfigVariables(getConfig());
-        createLocalSaveFolders();
+        ConfigUtils.registerMobControllers();
     }
 
     /**
-     * Reload the registered MythicMob Groups from the "mythicgroups.yml" file
+     * Reload the registered {@link DisplayController}s from the "mythicgroups.yml" file
      */
-    public void reloadMythic(){
-        ConfigUtils.registerMythic();
+    public void reloadControllers(){
+        ConfigUtils.registerMobControllers();
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    private void onStart(ServerLoadEvent e){
+        if (e.getType() == ServerLoadEvent.LoadType.RELOAD){
+            return;
+        }
+        MachineState.registerNullLoaderStates();
+        DisplayController.registerNullLoaderControllers();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -335,11 +364,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             return;
         }
         if (e.getRightClicked() instanceof Interaction entity){
-            if (!new PreInteractionClickEvent(e.getPlayer(), entity, InteractionClickEvent.ClickType.RIGHT).callEvent()){
-                return;
-            }
-            List<InteractionCommand> commands = DisplayUtils.getInteractionCommandsWithData(entity);
-            callInteractionEvent(new InteractionClickEvent(e.getPlayer(), entity, InteractionClickEvent.ClickType.RIGHT, commands));
+            determineAction(entity, e.getPlayer(), InteractionClickEvent.ClickType.RIGHT);
         }
     }
 
@@ -349,53 +374,54 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             return;
         }
         if (e.getEntity() instanceof Interaction entity){
-            if (!new PreInteractionClickEvent((Player) e.getDamager(), entity, InteractionClickEvent.ClickType.LEFT).callEvent()){
-                return;
-            }
-            List<InteractionCommand> commands = DisplayUtils.getInteractionCommandsWithData(entity);
-            callInteractionEvent(new InteractionClickEvent((Player) e.getDamager(), entity, InteractionClickEvent.ClickType.LEFT, commands));
+            determineAction(entity, (Player) e.getDamager(), InteractionClickEvent.ClickType.LEFT);
         }
     }
 
-    private void callInteractionEvent(InteractionClickEvent event){
-        Interaction i = event.getInteraction();
-
-    //Particle Displays
-        if (ParticleDisplay.isParticleDisplay(i)){
-            Player p = event.getPlayer();
-            if (event.getClickType() == InteractionClickEvent.ClickType.RIGHT){
-                if (p.isSneaking()){
-                    if (!DisplayEntityPluginCommand.hasPermission(p, Permission.ANIM_REMOVE_PARTICLE)){
+    private void determineAction(Interaction interaction, Player player, InteractionClickEvent.ClickType clickType){
+        //Particle Displays
+        if (ParticleDisplay.isParticleDisplay(interaction)){
+            if (clickType == InteractionClickEvent.ClickType.RIGHT){
+                if (player.isSneaking()){
+                    if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_REMOVE_PARTICLE)){
                         return;
                     }
-                    boolean result = ParticleDisplay.delete(i.getUniqueId());
+                    boolean result = ParticleDisplay.delete(interaction.getUniqueId());
                     if (result){
-                        p.sendMessage(pluginPrefix.append(Component.text("Successfully removed particle from frame!", NamedTextColor.YELLOW)));
+                        player.sendMessage(pluginPrefix.append(Component.text("Successfully removed particle from frame!", NamedTextColor.YELLOW)));
                     }
                     else{
-                        p.sendMessage(pluginPrefix.append(Component.text("This particle has already been removed by another player or other methods!", NamedTextColor.RED)));
+                        player.sendMessage(pluginPrefix.append(Component.text("This particle has already been removed by another player or other methods!", NamedTextColor.RED)));
                     }
                 }
                 else{
-                    ParticleDisplay particle = ParticleDisplay.get(i.getUniqueId());
+                    ParticleDisplay particle = ParticleDisplay.get(interaction.getUniqueId());
                     if (particle == null){
-                        p.sendMessage(Component.text("Failed to get particle", NamedTextColor.RED));
+                        player.sendMessage(Component.text("Failed to get particle", NamedTextColor.RED));
                         return;
                     }
                     particle.spawn();
-                    p.sendMessage(Component.text("Particle Spawned", NamedTextColor.GREEN));
+                    player.sendMessage(Component.text("Particle Spawned", NamedTextColor.GREEN));
                 }
             }
             else{
-                ParticleDisplay.sendInfo(i.getUniqueId(), p);
+                ParticleDisplay.sendInfo(interaction.getUniqueId(), player);
             }
             return;
         }
+
+        if (!new PreInteractionClickEvent(player, interaction, clickType).callEvent()){
+            return;
+        }
+
+        List<InteractionCommand> commands = DisplayUtils.getInteractionCommandsWithData(interaction);
+        InteractionClickEvent event = new InteractionClickEvent(player, interaction, clickType, commands);
 
         if (!event.callEvent()){
             return;
         }
 
+        //Commands
         Player p = event.getPlayer();
         for (InteractionCommand cmd : event.getCommands()){
             if (cmd.isLeftClick() && event.getClickType() == InteractionClickEvent.ClickType.LEFT){

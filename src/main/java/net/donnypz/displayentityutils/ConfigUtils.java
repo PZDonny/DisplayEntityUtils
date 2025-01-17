@@ -1,12 +1,10 @@
 package net.donnypz.displayentityutils;
 
-import net.donnypz.displayentityutils.managers.LoadMethod;
+import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
 import net.donnypz.displayentityutils.utils.CullOption;
-import net.donnypz.displayentityutils.utils.FollowType;
-import net.donnypz.displayentityutils.utils.mythic.MythicDisplayManager;
-import net.donnypz.displayentityutils.utils.mythic.MythicDisplayOptions;
+import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -15,54 +13,31 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 
 final class ConfigUtils {
     
     private ConfigUtils(){}
 
-    static void registerMythic(){
-        File file = new File(DisplayEntityPlugin.getInstance().getDataFolder(), "/mythicgroups.yml");
-        InputStream in = DisplayEntityPlugin.getInstance().getResource("mythicgroups.yml");
-        if (!file.exists()){
+    static void registerMobControllers(){
+        DisplayController.unregisterConfigControllers();
+        File controllerFolder = LocalManager.getDisplayControllerFolder();
+        if (!controllerFolder.exists()){
             try{
-                Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                controllerFolder.mkdirs();
             }
-            catch(IOException | SecurityException e){
-                Bukkit.getLogger().severe("Failed to create \"mythicgroups.yml\" file for MythicMobs!");
+            catch(SecurityException e){
+                Bukkit.getLogger().severe("Failed to find \"displaycontrollers\" folder for MythicMobs!");
+                return;
             }
-            return;
         }
-        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-        for (String key : config.getKeys(false)){
-            String groupTag = config.getString(key+".groupTag");
-            LoadMethod loadMethod;
-            try{
-                loadMethod = LoadMethod.valueOf(config.getString(key+".groupStorageLocation"));
-            }
-            catch(IllegalArgumentException e){
-                throw new IllegalArgumentException("Invalid \"groupStorageLocation\" for "+key);
-            }
-            FollowType followType;
-            try{
-                followType = FollowType.valueOf(config.getString(key+".entityFollowType"));
-            }
-            catch(IllegalArgumentException e){
-                throw new IllegalArgumentException("Invalid \"entityFollowType\" for "+key);
-            }
-
-            int deathDespawnDelay = config.getInt(key+".deathDespawnDelay");
-            int teleportationDuration = config.getInt(key+".teleportationDuration");
-            boolean pivotInteractions = config.getBoolean(key+".pivotInteractions");
 
 
-            MythicDisplayOptions options = new MythicDisplayOptions(groupTag, loadMethod, followType, deathDespawnDelay, pivotInteractions, teleportationDuration);
-            MythicDisplayManager.setAssignedGroup(key, options);
-            Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix
-                    .append(Component.text("Registered Mythic Mob - (Mob:"+key+" | Group:"+groupTag+")", NamedTextColor.YELLOW)));
+        for (File file : controllerFolder.listFiles()){
+            if (!file.getName().endsWith(".yml")){
+                continue;
+            }
+            DisplayController.read(file);
         }
     }
 

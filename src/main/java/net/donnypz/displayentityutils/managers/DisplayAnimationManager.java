@@ -123,6 +123,16 @@ public final class DisplayAnimationManager {
     }
 
 
+
+    /**
+     * Get an animation {@link SpawnedDisplayAnimation}
+     * @param animationTag the tag of the animation
+     * @return a {@link SpawnedDisplayAnimation} or null if not cached
+     */
+    public static SpawnedDisplayAnimation getCachedAnimation(String animationTag){
+        return cachedAnimations.get(animationTag);
+    }
+
     /**
      * Get a cached {@link SpawnedDisplayAnimation}. If the desired animation is not cached, it will be fetched with the desired {@link LoadMethod}
      * @param animationTag the tag of the animation
@@ -133,7 +143,7 @@ public final class DisplayAnimationManager {
      */
     public static SpawnedDisplayAnimation getSpawnedDisplayAnimation(String animationTag, @Nullable LoadMethod loadMethod){
     //Check Cache
-        SpawnedDisplayAnimation spawnedAnim = cachedAnimations.get(animationTag);
+        SpawnedDisplayAnimation spawnedAnim = getCachedAnimation(animationTag);
         if (spawnedAnim != null){
             return spawnedAnim;
         }
