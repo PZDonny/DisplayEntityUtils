@@ -1217,6 +1217,9 @@ public final class SpawnedDisplayEntityGroup {
         for (SpawnedDisplayEntityPart interactionPart: getSpawnedParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
             alignInteractionWithMountedGroup(interactionPart, vehicle);
         }
+        if (verticalOffset != 0) {
+            translate(Direction.UP, verticalOffset, -1, -1);
+        }
 
         return true;
     }
