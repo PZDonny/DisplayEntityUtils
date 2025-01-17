@@ -112,6 +112,7 @@ public class MachineState {
     }
 
 
+    @ApiStatus.Internal
     public boolean isNullLoader(){
         return animationlessStates.containsKey(this);
     }
@@ -150,6 +151,10 @@ public class MachineState {
         return stateID;
     }
 
+    /**
+     * Get the {@link DisplayAnimator} used for this machine state
+     * @return a {@link DisplayAnimator}
+     */
     public DisplayAnimator getDisplayAnimator(){
         return animator;
     }

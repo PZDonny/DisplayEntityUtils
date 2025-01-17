@@ -55,7 +55,9 @@ public class DisplayController {
         return true;
     }
 
-
+    /**
+     * Unregister all {@link DisplayController}s created from the plugin's "displaycontrollers" folder
+     */
     public static void unregisterConfigControllers(){
         for (String id : new HashSet<>(controllers.keySet())){
             DisplayController controller = controllers.get(id);
@@ -71,6 +73,10 @@ public class DisplayController {
     }
 
 
+    /**
+     * Check if this controller was created from the plugin's "displaycontrollers" folder
+     * @return a boolean
+     */
     public boolean isConfigController(){
         return configController;
     }
@@ -100,79 +106,158 @@ public class DisplayController {
         }
     }
 
+    /**
+     * Set the {@link DisplayEntityGroup} this controller should use
+     * @param group
+     * @return this
+     */
     public DisplayController setDisplayEntityGroup(@NotNull DisplayEntityGroup group) {
         this.group = group;
         return this;
     }
 
+    /**
+     * Set the {@link DisplayEntityGroup} this controller should use by its tag and load method
+     * @param groupTag
+     * @param loadMethod
+     * @return this
+     */
     public DisplayController setDisplayEntityGroup(@NotNull String groupTag, @NotNull LoadMethod loadMethod){
         this.group = DisplayGroupManager.getGroup(loadMethod, groupTag);
         return this;
     }
 
+    /**
+     * Set the vertical offset for the {@link SpawnedDisplayEntityGroup} that will be spawned for entities using this controller.
+     * The value is offset from the entity's passenger position
+     * @param verticalOffset
+     * @return this
+     */
     public DisplayController setVerticalOffset(float verticalOffset){
         this.verticalOffset = verticalOffset;
         return this;
     }
 
+    /**
+     * Get the vertical offset this controller will apply to {@link SpawnedDisplayEntityGroup}s of entities using this controller.
+     * @return a float
+     */
     public float getVerticalOffset() {
         return verticalOffset;
     }
 
+    /**
+     * Set the mythic mobs that should use this controller
+     * @param mythicMobIDs
+     * @return this
+     */
     public DisplayController setMythicMobs(@NotNull Collection<String> mythicMobIDs) {
         this.mythicMobs = mythicMobIDs;
         return this;
     }
 
+    /**
+     * Add a mythic mob that should use this controller
+     * @param mythicMobID
+     * @return this
+     */
     public DisplayController addMythicMob(@NotNull String mythicMobID){
         this.mythicMobs.add(mythicMobID);
         return this;
     }
 
 
+    /**
+     * Add a {@link GroupFollowProperties} to this controller
+     * @param followProperty
+     * @return this
+     */
     public DisplayController addFollowProperty(@NotNull GroupFollowProperties followProperty){
         this.followProperties.add(followProperty);
         return this;
     }
 
+    /**
+     * Set this controller's state machine
+     * @param stateMachine
+     * @return this
+     */
     public DisplayController setStateMachine(@NotNull DisplayStateMachine stateMachine) {
         this.stateMachine = stateMachine;
         return this;
     }
 
 
+    /**
+     * Get this controller's ID
+     * @return a string
+     */
     public String getControllerID() {
         return controllerID;
     }
 
+    /**
+     * Get the {@link DisplayEntityGroup} that will be used for this controller
+     * @return a {@link DisplayEntityGroup}
+     */
     public DisplayEntityGroup getDisplayEntityGroup(){
         return group;
     }
 
+    /**
+     * Get the mythic mobs that will use this controller
+     * @return a collection of mythic mob names
+     */
     public @NotNull Collection<String> getMythicMobs() {
         return Set.copyOf(mythicMobs);
     }
 
+    /**
+     * Get all the {@link GroupFollowProperties} on this controller
+     * @return a set of {@link GroupFollowProperties}
+     */
     public @NotNull Set<GroupFollowProperties> getFollowProperties() {
         return Set.copyOf(followProperties);
     }
 
+    /**
+     * Get this controller's state machine
+     * @return a {@link DisplayStateMachine}
+     */
     public DisplayStateMachine getStateMachine() {
         return stateMachine;
     }
 
+    /**
+     * Check if this controller has a state machine
+     * @return a boolean
+     */
     public boolean hasStateMachine(){
         return stateMachine != null;
     }
 
+    /**
+     * Get a {@link DisplayController} by its ID
+     * @param controllerID
+     * @return a {@link DisplayController} or null
+     */
     public static @Nullable DisplayController getController(String controllerID){
         return controllers.get(controllerID);
     }
 
+    /**
+     * Check if this controller is registered
+     * @return a boolean
+     */
     public boolean isRegistered(){
         return isRegistered(controllerID);
     }
 
+    /**
+     * Check if a controller is registered
+     * @param controllerID
+     * @return a boolean
+     */
     public static boolean isRegistered(String controllerID){
         return controllers.containsKey(controllerID);
     }
