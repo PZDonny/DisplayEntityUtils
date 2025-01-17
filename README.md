@@ -34,7 +34,7 @@ BDEngine is what you'll use to create models and animations that can be transfer
 - Conversion of BDEngine Datapack Animations into plugin usable animations *(Credit goes to [HaniVindinggame](https://block-display.com/author/hanivindinggame/) for the Dungeon Door model and animation)*
 > ![](https://github.com/user-attachments/assets/0f53ea0d-3e91-4bd7-b811-8c59fafcd4fb)
 
-- Display Controllers (Using Models as equipment) - With(out) MythicMobs
+- Display Controllers (Using Models as cosmetic equipment) - With(out) MythicMobs
 > ![ezgif-1-873ca90c95 (1)](https://github.com/user-attachments/assets/ee189856-3459-49b8-b75c-4c18d1b43818)
 
 - Display Controllers (Creating Animation State Machines) - With(out) MythicMobs *(Credit goes to [Yegor_Mechanic](https://block-display.com/author/yegor_mechanic/) for all Dodo Bird Models/Animations)*
