@@ -104,23 +104,32 @@ class SpawnedDisplayFollower {
                     }
                     follow = group.defaultFollower.properties.followType();
                 }
+                boolean flip = properties.flip();
+
+                float yaw = entity.getYaw();
+                float pitch = entity.getPitch();
+                if (flip){
+                    yaw += 180;
+                    pitch*=-1;
+                }
 
                 if (follow == FollowType.BODY){
                     LivingEntity e = (LivingEntity) entity;
-                    selection.setYaw(e.getBodyYaw(), properties.pivotInteractions());
+                    yaw = flip ? e.getBodyYaw()+180 : e.getBodyYaw();
+                    selection.setYaw(yaw, properties.pivotInteractions());
                     if (followType == FollowType.PITCH || followType == FollowType.PITCH_AND_YAW){
-                        selection.setPitch(entity.getPitch());
+                        selection.setPitch(pitch);
                     }
                 }
                 else if (follow == FollowType.PITCH){
-                    selection.setPitch(entity.getPitch());
+                    selection.setPitch(pitch);
                 }
                 else if (follow == FollowType.YAW) {
-                    selection.setYaw(entity.getYaw(), properties.pivotInteractions());
+                    selection.setYaw(yaw, properties.pivotInteractions());
                 }
                 else if (follow == FollowType.PITCH_AND_YAW){
-                    selection.setPitch(entity.getPitch());
-                    selection.setYaw(entity.getYaw(), properties.pivotInteractions());
+                    selection.setPitch(pitch);
+                    selection.setYaw(yaw, properties.pivotInteractions());
                 }
             }
         }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, teleportationDuration);

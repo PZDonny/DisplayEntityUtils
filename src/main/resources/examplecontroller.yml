@@ -22,11 +22,13 @@ mythicMobs: ["ExampleMythicMob", "ExampleMythicMob2"]
 
 #------------------------------------------------------
 #Group Properties:
-#The group tag and storage location that should be used
 #------------------------------------------------------
 groupProperties:
   tag: "tag-of-group"
   storage: LOCAL
+  #Set "flip" to true to reverse this group's follow property directions
+  #This is useful if your model is facing the opposite direction than intended
+  flip: false
 
 
 #-----------------------------------------------------------------------

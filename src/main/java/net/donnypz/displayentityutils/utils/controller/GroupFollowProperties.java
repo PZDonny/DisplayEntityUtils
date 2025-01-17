@@ -20,6 +20,7 @@ public class GroupFollowProperties{
     Collection<String> partTags;
     Set<String> filteredStates = new HashSet<>();
     boolean filterBlacklist = false;
+    boolean flip;
     
     public GroupFollowProperties(@Nullable FollowType followType, int unregisterDelay, boolean pivotInteractions, int teleportationDuration, @Nullable Collection<String> partTags){
         this.followType = followType;
@@ -51,6 +52,15 @@ public class GroupFollowProperties{
 
     public @Nullable Collection<String> partTags(){
         return partTags;
+    }
+
+    public boolean flip(){
+        return flip;
+    }
+
+    public @NotNull GroupFollowProperties flip(boolean flip){
+        this.flip = flip;
+        return this;
     }
 
     public @NotNull Set<String> filteredStates(){
@@ -90,6 +100,7 @@ public class GroupFollowProperties{
         }
         return filterBlacklist != isFilteredState(state);
     }
+
 
 
     /*public String toJson(){

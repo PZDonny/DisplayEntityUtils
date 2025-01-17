@@ -233,6 +233,7 @@ public class DisplayController {
         catch(IllegalArgumentException e){ //Set with API Event
             controller.markNullLoader(groupTag);
         }
+        boolean flip = groupProps.getBoolean("flip");
 
         //Default Follow Properties
         FollowType followType;
@@ -248,6 +249,7 @@ public class DisplayController {
         boolean pivotInteractions = defaultPropsSection.getBoolean("pivotInteractions");
 
         GroupFollowProperties defaultFollowProperties = new GroupFollowProperties(followType, deathDespawnDelay, pivotInteractions, teleportationDuration, null);
+        defaultFollowProperties.flip = flip;
         controller.addFollowProperty(defaultFollowProperties);
 
 
@@ -270,6 +272,7 @@ public class DisplayController {
                     continue;
                 }
                 GroupFollowProperties partProperty = new GroupFollowProperties(followType, deathDespawnDelay, pivot, duration, partTags);
+                partProperty.flip = flip;
 
                 if (propSect.contains("stateFilter")){
                     for (String state : propSect.getStringList("stateFilter.states")){
