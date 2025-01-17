@@ -59,7 +59,10 @@ public class MachineState {
         }
         else{
             SpawnedDisplayAnimation animation = DisplayAnimationManager.getSpawnedDisplayAnimation(animationTag, loadMethod);
-            this.animator = new DisplayAnimator(animation, animationType);
+            if (animation != null){
+                this.animator = new DisplayAnimator(animation, animationType);
+            }
+
         }
         this.transitionLock = animationType != DisplayAnimator.AnimationType.LOOP && transitionLock;
     }
@@ -108,6 +111,10 @@ public class MachineState {
         }
     }
 
+
+    public boolean isNullLoader(){
+        return animationlessStates.containsKey(this);
+    }
 
     /**
      * Allow this state to ignore the transition locks set by other states

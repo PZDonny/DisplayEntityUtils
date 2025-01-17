@@ -31,6 +31,7 @@ public class DisplayController {
     List<GroupFollowProperties> followProperties = new ArrayList<>();
     DisplayStateMachine stateMachine;
     String controllerID;
+    boolean configController;
 
     public DisplayController(@NotNull String controllerID) {
         this.controllerID = controllerID;
@@ -51,6 +52,26 @@ public class DisplayController {
             DisplayControllerManager.setController(mob, this);
         }
         return true;
+    }
+
+
+    public static void unregisterConfigControllers(){
+        for (String id : new HashSet<>(controllers.keySet())){
+            DisplayController controller = controllers.get(id);
+            if (controller.configController){
+                controllers.remove(id);
+            }
+        }
+    }
+
+    @ApiStatus.Internal
+    public void setConfigController(){
+        this.configController = true;
+    }
+
+
+    public boolean isConfigController(){
+        return configController;
     }
 
     @ApiStatus.Internal
@@ -153,7 +174,7 @@ public class DisplayController {
      * @return a {@link DisplayController} or null
      */
     public static @Nullable DisplayController read(@NotNull File file){
-        return read(YamlConfiguration.loadConfiguration(file), file.getName());
+        return read(YamlConfiguration.loadConfiguration(file), file.getName(), true);
         //String fileName = file.getName().split(".yml")[0];
 
     }
@@ -171,7 +192,7 @@ public class DisplayController {
             return null;
         }
         InputStreamReader reader = new InputStreamReader(controllerStream);
-        return read(YamlConfiguration.loadConfiguration(reader), resourcePath+" | FROM RESOURCES ("+plugin.getName()+")");
+        return read(YamlConfiguration.loadConfiguration(reader), resourcePath+" | FROM RESOURCES ("+plugin.getName()+")", false);
 
 
     }
@@ -183,10 +204,10 @@ public class DisplayController {
      */
     public static @Nullable DisplayController read(@NotNull InputStream stream){
         InputStreamReader reader = new InputStreamReader(stream);
-        return read(YamlConfiguration.loadConfiguration(reader), "Unknown controller from an InputStream...");
+        return read(YamlConfiguration.loadConfiguration(reader), "Unknown controller from an InputStream...", false);
     }
 
-    private static DisplayController read(YamlConfiguration config, String fileName){
+    private static DisplayController read(YamlConfiguration config, String fileName, boolean fromFile){
         String controllerID = config.getString("controllerID");
         if (controllerID == null){
             Bukkit.getLogger().severe("A display controller does not have a \"controllerID\": "+fileName);
@@ -194,6 +215,9 @@ public class DisplayController {
         }
 
         DisplayController controller = new DisplayController(controllerID);
+        if (fromFile){
+            controller.setConfigController();
+        }
 
         //Set Mythic Mobs
         controller.setMythicMobs(config.getStringList("mythicMobs"));
@@ -226,6 +250,8 @@ public class DisplayController {
         GroupFollowProperties defaultFollowProperties = new GroupFollowProperties(followType, deathDespawnDelay, pivotInteractions, teleportationDuration, null);
         controller.addFollowProperty(defaultFollowProperties);
 
+
+        //Part Follow Properties
         ConfigurationSection partPropsSect = config.getConfigurationSection("partFollowProperties");
         if (partPropsSect != null){
             for (String followProperty : partPropsSect.getKeys(false)){
@@ -243,8 +269,15 @@ public class DisplayController {
                     Bukkit.getConsoleSender().sendMessage(Component.text("Failed to find part tags for part follow property. It will be skipped: "+followProperty, NamedTextColor.YELLOW));
                     continue;
                 }
-
                 GroupFollowProperties partProperty = new GroupFollowProperties(followType, deathDespawnDelay, pivot, duration, partTags);
+
+                if (propSect.contains("stateFilter")){
+                    for (String state : propSect.getStringList("stateFilter.states")){
+                        partProperty.addFilterState(state);
+                    }
+                    partProperty.filterBlacklist = propSect.getBoolean("stateFilter.blacklist");
+                }
+
                 controller.addFollowProperty(partProperty);
             }
         }
@@ -286,6 +319,10 @@ public class DisplayController {
 
         boolean lock = section.getBoolean("lockTransition");
         MachineState state = new MachineState(machine, stateType.name(), animTag, loadMethod, animType, lock);
+        if (state.getDisplayAnimator() == null && !state.isNullLoader()){
+            Bukkit.getLogger().warning("Failed to add state, animation not found: "+animTag+" ["+machine.getId()+"]");
+            return;
+        }
         machine.addState(state);
         switch(stateType){
             case DEATH -> {

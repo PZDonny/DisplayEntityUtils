@@ -22,7 +22,7 @@ class SpawnedDisplayFollower {
     SpawnedDisplayFollower(SpawnedDisplayEntityGroup group, GroupFollowProperties followProperties){
         this.group = group;
         this.properties = followProperties;
-        isDefaultFollower = followProperties.partsTags() == null;
+        isDefaultFollower = followProperties.partTags() == null;
     }
 
     void follow(Entity entity){
@@ -46,7 +46,7 @@ class SpawnedDisplayFollower {
         if (teleportationDuration < 0){
             teleportationDuration = 0;
         }
-        Collection<String> partTags = properties.partsTags();
+        Collection<String> partTags = properties.partTags();
         if (partTags != null && !partTags.isEmpty()){
             selection = new SpawnedPartSelection(group, partTags);
             for (SpawnedDisplayEntityPart p : selection.selectedParts){
@@ -66,6 +66,7 @@ class SpawnedDisplayFollower {
         followedEntity = entity.getUniqueId();
 
         new BukkitRunnable(){
+            FollowType follow = followType;
             @Override
             public void run() {
                 if (entity.isDead()) {
@@ -97,17 +98,27 @@ class SpawnedDisplayFollower {
                     return;
                 }
 
-                if (followType == FollowType.BODY){
+                if (!properties.shouldPropertiesApply(group)){
+                    if (group.defaultFollower == null){
+                        return;
+                    }
+                    follow = group.defaultFollower.properties.followType();
+                }
+
+                if (follow == FollowType.BODY){
                     LivingEntity e = (LivingEntity) entity;
                     selection.setYaw(e.getBodyYaw(), properties.pivotInteractions());
+                    if (followType == FollowType.PITCH || followType == FollowType.PITCH_AND_YAW){
+                        selection.setPitch(entity.getPitch());
+                    }
                 }
-                else if (followType == FollowType.PITCH){
+                else if (follow == FollowType.PITCH){
                     selection.setPitch(entity.getPitch());
                 }
-                else if (followType == FollowType.YAW) {
+                else if (follow == FollowType.YAW) {
                     selection.setYaw(entity.getYaw(), properties.pivotInteractions());
                 }
-                else if (followType == FollowType.PITCH_AND_YAW){
+                else if (follow == FollowType.PITCH_AND_YAW){
                     selection.setPitch(entity.getPitch());
                     selection.setYaw(entity.getYaw(), properties.pivotInteractions());
                 }

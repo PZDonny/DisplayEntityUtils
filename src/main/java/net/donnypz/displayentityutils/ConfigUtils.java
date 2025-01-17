@@ -20,6 +20,7 @@ final class ConfigUtils {
     private ConfigUtils(){}
 
     static void registerMobControllers(){
+        DisplayController.unregisterConfigControllers();
         File controllerFolder = LocalManager.getDisplayControllerFolder();
         if (!controllerFolder.exists()){
             try{

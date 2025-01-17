@@ -63,12 +63,25 @@ partFollowProperties:
     entityFollowType: BODY
     teleportationDuration: 2
     pivotInteractions: false
+
+    #Determine whether certain animation states will enable/disable this follow property
+    #If a state disables this property, the parts in the property will use the defaultFollowProperty's settings
+    #If a state filter is not required, this section can be removed
+    stateFilter:
+      states: ["state1", "state2"]
+      #If true, the listed states WILL NOT use this follow property and will use the default if they are the active state
+      #If false, the listed states WILL use this follow property if they are the active state
+      blacklist: true
+
   #An example of setting a property for parts with the tag "head"
   headProperty:
     partTags: ["head"]
     entityFollowType: PITCH_AND_YAW
     teleportationDuration: 2
     pivotInteractions: false
+    stateFilter:
+      states: []
+      blacklist: true
 
 
 
@@ -97,7 +110,10 @@ states:
   #------------------------------------------
   #Playing Animations with Mythic Mobs Skills:
   #For MythicMobs skills to perform animations, the following mechanic must be added to your skills
+  #
   #- deuanimate{id=controller-id;anim=animation-tag;t=animation-type;s=storage-location} @self
+  #
+  #EXAMPLE: deuanimate{id=mycontroller;anim=walking_animation;t=LINEAR;s=LOCAL} @self
   #------------------------------------------
 
   #Below, animations can be triggered when an associated entity/mythic mob performs an action below
