@@ -160,7 +160,7 @@ public class GroupFollowProperties{
      */
     public boolean shouldPropertiesApply(@NotNull SpawnedDisplayEntityGroup group){
         MachineState state = group.getMachineState();
-        if (state == null){
+        if (state == null || filteredStates.isEmpty()){
             return true;
         }
         return filterBlacklist != isFilteredState(state);

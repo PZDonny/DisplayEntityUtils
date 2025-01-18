@@ -57,32 +57,25 @@ defaultFollowProperties:
   #Determine if interaction entities should pivot while follow an entity's looking direction
   pivotInteractions: false
 
+  #Determine whether certain animation states will enable/disable this follow property
+  #If a state disables this property, the parts in the property will use the stop following
+  #If a state filter is not required, this section can be removed
+  stateFilter:
+    states: ["state1", "state2"]
+    #If true, the listed states WILL NOT use this follow property if they are the active state
+    #If false, the listed states WILL use this follow property if they are the active state
+    blacklist: true
+
 #Follow Properties that parts with specified tags will use
 #If setting follow properties for parts with certain tags is not desired, the section below can be omitted
 partFollowProperties:
-  #The ID to give this follow property
-  followPropertyID1:
-    #Parts with the specified part tags will respect this follow property
-    partTags: ["partTag1", "partTag2"]
-    entityFollowType: BODY
-    teleportationDuration: 2
-    pivotInteractions: false
-
-    #Determine whether certain animation states will enable/disable this follow property
-    #If a state disables this property, the parts in the property will use the defaultFollowProperty's settings
-    #If a state filter is not required, this section can be removed
-    stateFilter:
-      states: ["state1", "state2"]
-      #If true, the listed states WILL NOT use this follow property and will use the default if they are the active state
-      #If false, the listed states WILL use this follow property if they are the active state
-      blacklist: true
-
   #An example of setting a property for parts with the tag "head"
-  headProperty:
+  headProperty: #The ID to give this follow property
     partTags: ["head"]
     entityFollowType: PITCH_AND_YAW
     teleportationDuration: 2
     pivotInteractions: false
+    #If a state disables this part follow property, the parts in the property will use the defaultFollowProperty's settings
     stateFilter:
       states: []
       blacklist: true

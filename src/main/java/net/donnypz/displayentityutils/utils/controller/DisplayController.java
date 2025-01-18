@@ -214,10 +214,10 @@ public class DisplayController {
 
     /**
      * Get all the {@link GroupFollowProperties} on this controller
-     * @return a set of {@link GroupFollowProperties}
+     * @return a list of {@link GroupFollowProperties}
      */
-    public @NotNull Set<GroupFollowProperties> getFollowProperties() {
-        return Set.copyOf(followProperties);
+    public @NotNull List<GroupFollowProperties> getFollowProperties() {
+        return List.copyOf(followProperties);
     }
 
     /**
@@ -346,6 +346,12 @@ public class DisplayController {
 
         GroupFollowProperties defaultFollowProperties = new GroupFollowProperties(followType, deathDespawnDelay, pivotInteractions, teleportationDuration, null);
         defaultFollowProperties.flip = flip;
+        if (defaultPropsSection.contains("stateFilter")){
+            for (String state : defaultPropsSection.getStringList("stateFilter.states")){
+                defaultFollowProperties.addFilterState(state);
+            }
+            defaultFollowProperties.filterBlacklist = defaultPropsSection.getBoolean("stateFilter.blacklist");
+        }
         controller.addFollowProperty(defaultFollowProperties);
 
 
@@ -386,9 +392,8 @@ public class DisplayController {
         if (stateSect != null){
             DisplayStateMachine machine = new DisplayStateMachine(controllerID);
             for (MachineState.StateType stateType : MachineState.StateType.values()){
-                String stateLowercase = stateType.name().toLowerCase();
-                if (stateSect.contains(stateLowercase)){
-                    addState(machine, stateType, stateSect.getConfigurationSection(stateLowercase));
+                if (stateSect.contains(stateType.getStateID())){
+                    addState(machine, stateType, stateSect.getConfigurationSection(stateType.getStateID()));
                 }
             }
 
@@ -417,7 +422,7 @@ public class DisplayController {
         }catch(IllegalArgumentException | NullPointerException e){}
 
         boolean lock = section.getBoolean("lockTransition");
-        MachineState state = new MachineState(machine, stateType.name(), animTag, loadMethod, animType, lock);
+        MachineState state = new MachineState(machine, stateType.getStateID(), animTag, loadMethod, animType, lock);
         if (state.getDisplayAnimator() == null && !state.isNullLoader()){
             Bukkit.getLogger().warning("Failed to add state, animation not found: "+animTag+" ["+machine.getId()+"]");
             return;

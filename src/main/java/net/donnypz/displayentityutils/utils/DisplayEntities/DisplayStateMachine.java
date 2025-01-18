@@ -193,7 +193,7 @@ public class DisplayStateMachine {
      * @return false if {@link GroupAnimationStateChangeEvent} is cancelled, the state doesn't exist, or the group is not contained in this state machine.
      */
     public boolean setStateIfPresent(@NotNull MachineState.StateType stateType, @NotNull SpawnedDisplayEntityGroup group){
-        return setStateIfPresent(stateType.name(), group);
+        return setStateIfPresent(stateType.getStateID(), group);
     }
 
     /**
@@ -243,7 +243,7 @@ public class DisplayStateMachine {
      * @return false if {@link GroupAnimationStateChangeEvent} is cancelled or the group is not contained in this state machine.
      */
     public boolean setState(@NotNull MachineState.StateType stateType, @NotNull SpawnedDisplayEntityGroup group){
-        return setState(stateType.name(), group);
+        return setState(stateType.getStateID(), group);
     }
 
     /**
@@ -288,7 +288,7 @@ public class DisplayStateMachine {
      * @return a boolean
      */
     public boolean hasState(@NotNull MachineState.StateType stateType){
-        return hasState(stateType.name());
+        return hasState(stateType.getStateID());
     }
 
     /**

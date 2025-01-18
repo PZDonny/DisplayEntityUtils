@@ -131,7 +131,7 @@ final class AutoGroup {
             //Data is controllerID from rework
             if (controller != null){
 
-                Set<GroupFollowProperties> properties = controller.getFollowProperties();
+                List<GroupFollowProperties> properties = controller.getFollowProperties();
                 for (GroupFollowProperties property : properties){
                     property.followGroup(group, vehicle);
                 }

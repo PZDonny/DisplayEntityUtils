@@ -31,7 +31,7 @@ public class MachineState {
      * @apiNote Having the animation type as {@link DisplayAnimator.AnimationType#LOOP} will force the transitionLock to false, regardless of the value set.
      */
     public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull StateType stateType, @NotNull String animationTag, @Nullable LoadMethod loadMethod, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock){
-        this(stateMachine, stateType.name(), animationTag, loadMethod, animationType, transitionLock);
+        this(stateMachine, stateType.getStateID(), animationTag, loadMethod, animationType, transitionLock);
     }
 
     /**
@@ -77,7 +77,7 @@ public class MachineState {
      * @apiNote Having the animation type as {@link DisplayAnimator.AnimationType#LOOP} will force the transitionLock to false, regardless of the value set.
      */
     public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull StateType stateType, @NotNull SpawnedDisplayAnimation animation, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock){
-        this(stateMachine, stateType.name(), animation, animationType, transitionLock);
+        this(stateMachine, stateType.getStateID(), animation, animationType, transitionLock);
     }
 
     /**
@@ -215,7 +215,7 @@ public class MachineState {
          * @return a string
          */
         public String getStateID(){
-            return name();
+            return name().toLowerCase();
         }
     }
 
