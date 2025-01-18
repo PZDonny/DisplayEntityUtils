@@ -98,9 +98,12 @@ partFollowProperties:
 #"lockTransition" stops other animations from being played before the
 #current one finishes its animation cycle
 #
-#An "animationType" of "LOOP" with a true "lockTransition" may lead to blocking transitions to other states
+#NOTES:
+#- An "animationType" of "LOOP" with a true "lockTransition" may lead to blocking transitions to other states
 #
-#The death state will ALWAYS ignore the "lockTransition" value of other states
+#- The death state will ALWAYS ignore the "lockTransition" value of other states
+#
+#- If the entity has AI, and it's disabled, the automatic states (Not Mythic nor API created states) will not change the current animation state.
 #----------------------------------------------------------------------------------------
 
 states:
@@ -110,7 +113,17 @@ states:
   #
   #- deuanimate{id=controller-id;anim=animation-tag;t=animation-type;s=storage-location} @self
   #
-  #EXAMPLE: deuanimate{id=mycontroller;anim=walking_animation;t=LINEAR;s=LOCAL} @self
+  #EXAMPLE: - deuanimate{id=mycontroller;anim=walking_animation;t=LINEAR;s=LOCAL} @self
+  #
+  #To switch to a different animation state use the following mechanic
+  #- deustate{id=controller-id;newState="state-id} @self
+  #
+  #This mechanic above is useful for changing to machine states created through the api
+  #
+  #EXAMPLE: - deustate{id=mycontroller;newState=idle} @self
+  #
+  #To stop an animation add the following mechanic
+  #- deustop @self
   #------------------------------------------
 
   #Below, animations can be triggered when an associated entity/mythic mob performs an action below
