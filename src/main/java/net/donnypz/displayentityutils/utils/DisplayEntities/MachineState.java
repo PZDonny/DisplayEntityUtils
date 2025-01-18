@@ -19,6 +19,7 @@ public class MachineState {
     DisplayAnimator animator;
     DisplayStateMachine stateMachine;
     int causeDelay = -1;
+    boolean isSkillState = false;
 
     /**
      * Create a machine state for an {@link DisplayStateMachine}, determining which animation should be played when this state is active
@@ -134,6 +135,19 @@ public class MachineState {
         return this;
     }
 
+    @ApiStatus.Internal
+    public MachineState skillState(){
+        this.isSkillState = true;
+        return this;
+    }
+
+    /**
+     * Get whether this state is a skill state
+     * @return a boolean
+     */
+    public boolean isSkillState() {
+        return isSkillState;
+    }
 
     /**
      * Get this machine state's {@link DisplayStateMachine}

@@ -16,7 +16,7 @@ import org.bukkit.entity.Entity;
 
 import java.util.UUID;
 
-class DEUAnimationMythicMechanic  implements ITargetedEntitySkill {
+class DEUAnimationMythicMechanic implements ITargetedEntitySkill {
     static final String mechanicName = "deuanimate";
     MachineState state;
     final String id = UUID.randomUUID().toString();
@@ -47,6 +47,7 @@ class DEUAnimationMythicMechanic  implements ITargetedEntitySkill {
 
         state = new MachineState(controller.getStateMachine(), id, animTag, loadMethod, type, true);
         state.ignoreOtherTransitionLocks();
+        state.skillState();
     }
 
     static DEUAnimationMythicMechanic create(MythicLineConfig config){
