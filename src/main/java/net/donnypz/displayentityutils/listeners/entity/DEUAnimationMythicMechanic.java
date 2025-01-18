@@ -21,7 +21,7 @@ class DEUAnimationMythicMechanic  implements ITargetedEntitySkill {
     MachineState state;
     final String id = UUID.randomUUID().toString();
 
-    DEUAnimationMythicMechanic(MythicLineConfig config) {
+    private DEUAnimationMythicMechanic(MythicLineConfig config) {
         DisplayController controller = DisplayController.getController(config.getString("id"));
         if (controller == null) {
             return;

@@ -29,8 +29,11 @@ public class DEUMythicListener implements Listener {
         if(event.getMechanicName().equalsIgnoreCase(DEUAnimationMythicMechanic.mechanicName))	{
             DEUAnimationMythicMechanic mechanic = DEUAnimationMythicMechanic.create(event.getConfig());
             if (mechanic != null){
-                event.register(new DEUAnimationMythicMechanic(event.getConfig()));
+                event.register(mechanic);
                 Bukkit.getLogger().info("-- Registered DEUAnimationMythicMechanic mechanic!");
+            }
+            else{
+                Bukkit.getLogger().severe("-- Failed to register DEUAnimationMythicMechanic: "+event.getConfig().getLine());
             }
         }
     }
