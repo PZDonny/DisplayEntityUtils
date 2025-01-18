@@ -4,9 +4,9 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupAnimationStateChangeEvent;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -91,7 +91,7 @@ public class DisplayStateMachine {
 
                     //Default Task
                     Entity entity = group.getVehicle();
-                    if (entity == null){
+                    if (entity == null || (entity instanceof LivingEntity le && !le.hasAI())){
                         return;
                     }
 
