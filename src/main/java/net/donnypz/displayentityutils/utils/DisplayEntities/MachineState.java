@@ -19,6 +19,7 @@ public class MachineState {
     DisplayAnimator animator;
     DisplayStateMachine stateMachine;
     int causeDelay = -1;
+    float maxRange;
     boolean isSkillState = false;
 
     /**
@@ -129,9 +130,14 @@ public class MachineState {
 
 
     @ApiStatus.Internal
-    @ApiStatus.Experimental
     public MachineState setCauseDelay(int tickDelay){
         causeDelay = Math.max(0, tickDelay);
+        return this;
+    }
+
+    @ApiStatus.Internal
+    public MachineState setMaxRange(float maxRange){
+        this.maxRange = maxRange;
         return this;
     }
 
@@ -174,9 +180,13 @@ public class MachineState {
     }
 
     @ApiStatus.Internal
-    @ApiStatus.Experimental
     public int getCauseDelay() {
         return causeDelay;
+    }
+
+    @ApiStatus.Internal
+    public float getMaxRange(){
+        return maxRange;
     }
 
     /**

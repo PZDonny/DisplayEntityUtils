@@ -179,6 +179,9 @@ states:
     #Setting this value to 0 will deal damage regularly, without any delay
     damageDelay: 0
 
+    #The distance the victim must be from the attacker for the damage to apply, after the delay.
+    #THis does nothing if "damageDelay" is 0
+    maxRange: 2
 
   shoot_bow:
     animation: "shoot_bow_animation"
