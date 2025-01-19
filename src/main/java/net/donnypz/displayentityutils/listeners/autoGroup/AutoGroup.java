@@ -137,6 +137,7 @@ final class AutoGroup {
                 }
                 if (controller.hasStateMachine()){
                     controller.getStateMachine().addGroup(group);
+                    group.setVerticalOffset(controller.getVerticalOffset());
                 }
             }
 
