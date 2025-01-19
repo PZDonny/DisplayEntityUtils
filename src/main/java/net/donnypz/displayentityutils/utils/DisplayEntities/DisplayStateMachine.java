@@ -301,7 +301,7 @@ public class DisplayStateMachine {
     }
 
     public @Nullable MachineState getState(@NotNull MachineState.StateType stateType){
-        return getState(stateType.name());
+        return getState(stateType.getStateID());
     }
 
     public @Nullable MachineState getState(@NotNull String stateID){
