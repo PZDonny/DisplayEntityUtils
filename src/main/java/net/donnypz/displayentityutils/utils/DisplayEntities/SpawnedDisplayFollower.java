@@ -66,7 +66,6 @@ class SpawnedDisplayFollower {
         followedEntity = entity.getUniqueId();
 
         new BukkitRunnable(){
-            FollowType follow = followType;
             @Override
             public void run() {
                 if (entity.isDead()) {
@@ -98,12 +97,20 @@ class SpawnedDisplayFollower {
                     return;
                 }
 
+                FollowType follow = followType;
                 if (!properties.shouldPropertiesApply(group)){
-                    if (group.defaultFollower == null){
+                    if (group.defaultFollower == null || isDefaultFollower){
                         return;
                     }
                     follow = group.defaultFollower.properties.followType();
                 }
+
+                if (group.defaultFollower != null && !isDefaultFollower){ //Stop part follow if default follower can't follow
+                    if (!group.defaultFollower.properties.shouldPropertiesApply(group)){
+                        return;
+                    }
+                }
+
                 boolean flip = properties.flip();
 
                 float yaw = entity.getYaw();

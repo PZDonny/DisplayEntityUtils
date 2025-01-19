@@ -4,9 +4,9 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupAnimationStateChangeEvent;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -91,7 +91,7 @@ public class DisplayStateMachine {
 
                     //Default Task
                     Entity entity = group.getVehicle();
-                    if (entity == null){
+                    if (entity == null || (entity instanceof LivingEntity le && !le.hasAI())){
                         return;
                     }
 
@@ -193,7 +193,7 @@ public class DisplayStateMachine {
      * @return false if {@link GroupAnimationStateChangeEvent} is cancelled, the state doesn't exist, or the group is not contained in this state machine.
      */
     public boolean setStateIfPresent(@NotNull MachineState.StateType stateType, @NotNull SpawnedDisplayEntityGroup group){
-        return setStateIfPresent(stateType.name(), group);
+        return setStateIfPresent(stateType.getStateID(), group);
     }
 
     /**
@@ -243,7 +243,7 @@ public class DisplayStateMachine {
      * @return false if {@link GroupAnimationStateChangeEvent} is cancelled or the group is not contained in this state machine.
      */
     public boolean setState(@NotNull MachineState.StateType stateType, @NotNull SpawnedDisplayEntityGroup group){
-        return setState(stateType.name(), group);
+        return setState(stateType.getStateID(), group);
     }
 
     /**
@@ -288,7 +288,7 @@ public class DisplayStateMachine {
      * @return a boolean
      */
     public boolean hasState(@NotNull MachineState.StateType stateType){
-        return hasState(stateType.name());
+        return hasState(stateType.getStateID());
     }
 
     /**

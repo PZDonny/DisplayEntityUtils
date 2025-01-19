@@ -17,7 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.Set;
+import java.util.List;
 
 public class DEUMythicListener implements Listener {
 
@@ -26,12 +26,32 @@ public class DEUMythicListener implements Listener {
     public void onMythicMechanicLoad(MythicMechanicLoadEvent event)	{
         Bukkit.getLogger().info("MythicMechanicLoadEvent called for mechanic " + event.getMechanicName());
 
-        if(event.getMechanicName().equalsIgnoreCase(DEUAnimationMythicMechanic.mechanicName))	{
+
+        String mechanicName = event.getMechanicName();
+        if (mechanicName.equalsIgnoreCase(DEUAnimationMythicMechanic.mechanicName))	{
             DEUAnimationMythicMechanic mechanic = DEUAnimationMythicMechanic.create(event.getConfig());
             if (mechanic != null){
-                event.register(new DEUAnimationMythicMechanic(event.getConfig()));
-                Bukkit.getLogger().info("-- Registered DEUAnimationMythicMechanic mechanic!");
+                event.register(mechanic);
+                Bukkit.getLogger().info("-- Registered DEUAnimationMythicMechanic mechanic! (deuanimate)");
             }
+            else{
+                Bukkit.getLogger().severe("-- Failed to register DEUAnimationMythicMechanic (deuanimate): "+event.getConfig().getLine());
+            }
+        }
+        else if (mechanicName.equalsIgnoreCase(DEUStateMythicMechanic.mechanicName)){
+            DEUStateMythicMechanic mechanic = DEUStateMythicMechanic.create(event.getConfig());
+            if (mechanic != null){
+                event.register(mechanic);
+                Bukkit.getLogger().info("-- Registered DEUStateMythicMechanic mechanic! (deustate)");
+            }
+            else{
+                Bukkit.getLogger().severe("-- Failed to register DEUStateMythicMechanic (deustate): "+event.getConfig().getLine());
+            }
+        }
+        else if (mechanicName.equalsIgnoreCase(DEUStopMythicMechanic.mechanicName)){
+            DEUStopMythicMechanic mechanic = DEUStopMythicMechanic.create();
+            event.register(mechanic);
+            Bukkit.getLogger().info("-- Registered DEUStopMythicMechanic mechanic! (deustop)");
         }
     }
 
@@ -44,7 +64,7 @@ public class DEUMythicListener implements Listener {
             return;
         }
 
-        Set<GroupFollowProperties> properties = controller.getFollowProperties();
+        List<GroupFollowProperties> properties = controller.getFollowProperties();
 
         DisplayEntityGroup group = controller.getDisplayEntityGroup();
         if (group == null){

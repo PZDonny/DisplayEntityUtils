@@ -1214,11 +1214,12 @@ public final class SpawnedDisplayEntityGroup {
             return false;
         }
 
-        for (SpawnedDisplayEntityPart interactionPart: getSpawnedParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
-            alignInteractionWithMountedGroup(interactionPart, vehicle);
-        }
         if (verticalOffset != 0) {
             translate(Direction.UP, verticalOffset, -1, -1);
+        }
+
+        for (SpawnedDisplayEntityPart interactionPart: getSpawnedParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
+            alignInteractionWithMountedGroup(interactionPart, vehicle);
         }
 
         return true;

@@ -57,32 +57,25 @@ defaultFollowProperties:
   #Determine if interaction entities should pivot while follow an entity's looking direction
   pivotInteractions: false
 
+  #Determine whether certain animation states will enable/disable this follow property
+  #If a state disables this property, the parts in the property will use the stop following
+  #If a state filter is not required, this section can be removed
+  stateFilter:
+    states: ["state1", "state2"]
+    #If true, the listed states WILL NOT use this follow property if they are the active state
+    #If false, the listed states WILL use this follow property if they are the active state
+    blacklist: true
+
 #Follow Properties that parts with specified tags will use
 #If setting follow properties for parts with certain tags is not desired, the section below can be omitted
 partFollowProperties:
-  #The ID to give this follow property
-  followPropertyID1:
-    #Parts with the specified part tags will respect this follow property
-    partTags: ["partTag1", "partTag2"]
-    entityFollowType: BODY
-    teleportationDuration: 2
-    pivotInteractions: false
-
-    #Determine whether certain animation states will enable/disable this follow property
-    #If a state disables this property, the parts in the property will use the defaultFollowProperty's settings
-    #If a state filter is not required, this section can be removed
-    stateFilter:
-      states: ["state1", "state2"]
-      #If true, the listed states WILL NOT use this follow property and will use the default if they are the active state
-      #If false, the listed states WILL use this follow property if they are the active state
-      blacklist: true
-
   #An example of setting a property for parts with the tag "head"
-  headProperty:
+  headProperty: #The ID to give this follow property
     partTags: ["head"]
     entityFollowType: PITCH_AND_YAW
     teleportationDuration: 2
     pivotInteractions: false
+    #If a state disables this part follow property, the parts in the property will use the defaultFollowProperty's settings
     stateFilter:
       states: []
       blacklist: true
@@ -105,9 +98,12 @@ partFollowProperties:
 #"lockTransition" stops other animations from being played before the
 #current one finishes its animation cycle
 #
-#An "animationType" of "LOOP" with a true "lockTransition" may lead to blocking transitions to other states
+#NOTES:
+#- An "animationType" of "LOOP" with a true "lockTransition" may lead to blocking transitions to other states
 #
-#The death state will ALWAYS ignore the "lockTransition" value of other states
+#- The death state will ALWAYS ignore the "lockTransition" value of other states
+#
+#- If the entity has AI, and it's disabled, the automatic states (Not Mythic nor API created states) will not change the current animation state.
 #----------------------------------------------------------------------------------------
 
 states:
@@ -117,7 +113,17 @@ states:
   #
   #- deuanimate{id=controller-id;anim=animation-tag;t=animation-type;s=storage-location} @self
   #
-  #EXAMPLE: deuanimate{id=mycontroller;anim=walking_animation;t=LINEAR;s=LOCAL} @self
+  #EXAMPLE: - deuanimate{id=mycontroller;anim=walking_animation;t=LINEAR;s=LOCAL} @self
+  #
+  #To switch to a different animation state use the following mechanic
+  #- deustate{id=controller-id;newState="state-id} @self
+  #
+  #This mechanic above is useful for changing to machine states created through the api
+  #
+  #EXAMPLE: - deustate{id=mycontroller;newState=idle} @self
+  #
+  #To stop an animation add the following mechanic
+  #- deustop @self
   #------------------------------------------
 
   #Below, animations can be triggered when an associated entity/mythic mob performs an action below
