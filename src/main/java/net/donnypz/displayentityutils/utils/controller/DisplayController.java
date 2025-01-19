@@ -433,8 +433,8 @@ public class DisplayController {
                 state.ignoreOtherTransitionLocks();
             }
             case MELEE -> {
-                int delay = section.getInt("damageDelay");
-                state.setCauseDelay(delay);
+                state.setCauseDelay(section.getInt("damageDelay"));
+                state.setMaxRange((float) section.getDouble("maxRange"));
             }
         }
     }

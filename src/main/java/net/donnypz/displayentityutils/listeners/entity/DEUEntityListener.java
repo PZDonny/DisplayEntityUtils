@@ -2,11 +2,16 @@ package net.donnypz.displayentityutils.listeners.entity;
 
 import com.destroystokyo.paper.event.entity.EntityJumpEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
+import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
+import org.bukkit.Bukkit;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -31,10 +36,12 @@ public final class DEUEntityListener implements Listener {
         applyState(e.getEntity(), MachineState.StateType.DAMAGED);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onMelee(EntityDamageByEntityEvent e){
-        if (!(e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK
-                || e.getCause() == EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK)){
+        DamageSource source = e.getDamageSource();
+        if (!(source.getDamageType() == DamageType.MOB_ATTACK
+                || source.getDamageType() == DamageType.MOB_ATTACK_NO_AGGRO)
+            || source.getDamageType() == DamageType.GENERIC){
             return;
         }
 
@@ -44,7 +51,28 @@ public final class DEUEntityListener implements Listener {
         }
 
         if (damager != null){
-            applyState(damager, MachineState.StateType.MELEE);
+            DisplayStateMachine machine = applyState(damager, MachineState.StateType.MELEE);
+            if (machine == null){
+                return;
+            }
+            MachineState state = machine.getState(MachineState.StateType.MELEE);
+            if (state == null || state.getCauseDelay() <= 0){
+                return;
+            }
+
+            int delay = state.getCauseDelay();
+            if (e.getEntity() instanceof LivingEntity victim){
+                e.setCancelled(true);
+                Entity finalDamager = damager;
+                Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                    if (finalDamager.getLocation().distanceSquared(victim.getLocation()) <= state.getMaxRange()*state.getMaxRange()){
+                        victim.damage(e.getDamage(), DamageSource.builder(DamageType.GENERIC)
+                                .withDirectEntity(finalDamager)
+                                .build());
+                    }
+                }, delay);
+
+            }
         }
     }
 
@@ -79,15 +107,16 @@ public final class DEUEntityListener implements Listener {
 
 
 
-    private void applyState(Entity entity, MachineState.StateType stateType){
+    private DisplayStateMachine applyState(Entity entity, MachineState.StateType stateType){
         SpawnedDisplayEntityGroup group = DisplayControllerManager.getControllerGroup(entity);
         if (group == null){
-            return;
+            return null;
         }
         DisplayStateMachine stateMachine = group.getDisplayStateMachine();
         if (stateMachine == null){
-            return;
+            return null;
         }
         stateMachine.setStateIfPresent(stateType, group);
+        return stateMachine;
     }
 }
