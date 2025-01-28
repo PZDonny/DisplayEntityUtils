@@ -23,9 +23,6 @@ import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipException;
 
-/**
- * Main Plugin Manager
- */
 public final class DisplayGroupManager {
 
     private DisplayGroupManager() {}
