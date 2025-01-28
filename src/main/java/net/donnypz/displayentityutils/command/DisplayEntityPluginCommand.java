@@ -92,7 +92,7 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
 
     static void suggestUpdateSelection(Player player){
         player.sendMessage(Component.text("| It is recommended to update/reset your part selection after adding parts!", NamedTextColor.GRAY));
-        player.sendMessage(Component.text("| Quickly reset with \"/mdis parts deselect", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("| Quickly reset with \"/mdis parts reselect", NamedTextColor.GRAY));
     }
 
     public static boolean hasPermission(Player player, Permission permission){
