@@ -1,14 +1,11 @@
 package net.donnypz.displayentityutils.command;
 
-import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 class AnimAddParticleCMD implements SubCommand{
