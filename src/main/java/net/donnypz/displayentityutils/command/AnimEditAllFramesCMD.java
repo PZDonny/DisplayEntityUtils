@@ -18,12 +18,6 @@ class AnimEditAllFramesCMD implements SubCommand{
             return;
         }
 
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
-        if (group == null) {
-            player.sendMessage(Component.text("You must have a group selected to do this animation command!", NamedTextColor.RED));
-            return;
-        }
-
         SpawnedDisplayAnimation anim = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
         if (anim == null) {
             AnimCMD.noAnimationSelection(player);
