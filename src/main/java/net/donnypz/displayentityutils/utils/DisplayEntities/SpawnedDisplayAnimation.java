@@ -10,7 +10,7 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-public final class SpawnedDisplayAnimation {
+public final class SpawnedDisplayAnimation{
     String animationTag;
     List<SpawnedDisplayAnimationFrame> frames = new ArrayList<>();
     String partTag = null;
@@ -280,6 +280,16 @@ public final class SpawnedDisplayAnimation {
      */
     public void reverse(){
         Collections.reverse(frames);
+    }
+
+    /**
+     * Get a clone of this {@link SpawnedDisplayAnimation}.
+     * <br>
+     * Any changes made to this animation will not apply to the cloned one and vice versa.
+     * @return a new {@link SpawnedDisplayAnimation}
+     */
+    public SpawnedDisplayAnimation clone(){
+        return toDisplayAnimation().toSpawnedDisplayAnimation();
     }
 
     /** Creates an animation with the same frames as
