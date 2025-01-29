@@ -525,7 +525,7 @@ public final class SpawnedDisplayAnimationFrame {
 
     @ApiStatus.Internal
     public DisplayAnimationFrame toDisplayAnimationFrame(){
-        DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, frameStartSounds, frameEndSounds, frameStartParticles, frameEndParticles, startCommands, endCommands);
+        DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, frameStartSounds, frameEndSounds, frameStartParticles, frameEndParticles, startCommands, endCommands, tag);
         for (UUID uuid : displayTransformations.keySet()){
             DisplayTransformation transform = displayTransformations.get(uuid);
             if (transform != null){

@@ -26,6 +26,8 @@ public final class DisplayAnimationFrame implements Serializable {
     List<String> startCommands;
     List<String> endCommands;
 
+    String frameTag;
+
     @Serial
     private static final long serialVersionUID = 99L;
 
@@ -36,7 +38,8 @@ public final class DisplayAnimationFrame implements Serializable {
             Set<AnimationParticle> frameStartParticles,
             Set<AnimationParticle> frameEndParticles,
             List<String> startCommands,
-            List<String> endCommands){
+            List<String> endCommands,
+            String frameTag){
         this.delay = delay;
         this.duration = duration;
         this.startSounds = new HashMap<>(startSounds);
@@ -45,6 +48,7 @@ public final class DisplayAnimationFrame implements Serializable {
         this.frameEndParticles = new HashSet<>(frameEndParticles);
         this.startCommands = new ArrayList<>(startCommands);
         this.endCommands = new ArrayList<>(endCommands);
+        this.frameTag = frameTag;
     }
 
     void setDisplayEntityTransformation(UUID uuid, SerialTransformation transformation){
@@ -80,6 +84,10 @@ public final class DisplayAnimationFrame implements Serializable {
 
     public Set<AnimationParticle> getFrameEndParticles() {
         return frameEndParticles == null ? new HashSet<>() : new HashSet<>(frameEndParticles);
+    }
+
+    public String getTag(){
+        return frameTag;
     }
 
 
