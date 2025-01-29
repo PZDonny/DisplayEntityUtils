@@ -107,7 +107,7 @@ public final class SpawnedDisplayAnimationFrame {
 
     /**
      * Get the tag that represents the frame
-     * @return the group's tag or  if not set
+     * @return the frame's tag or null if not set
      */
     public @Nullable String getTag(){
         return tag;
