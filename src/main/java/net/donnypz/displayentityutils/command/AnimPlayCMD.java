@@ -35,7 +35,7 @@ class AnimPlayCMD implements SubCommand{
 
         if (args.length >= 3 && args[2].equalsIgnoreCase("-loop")){
             group.animateLooping(anim);
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Playing Animation!"))
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Playing Animation!", NamedTextColor.GREEN))
                     .append(Component.text(" (LOOPING)", NamedTextColor.YELLOW)));
         }
         else{
