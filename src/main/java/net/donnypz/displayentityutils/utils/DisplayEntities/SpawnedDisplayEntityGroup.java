@@ -1155,12 +1155,12 @@ public final class SpawnedDisplayEntityGroup {
      * @param durationInTicks How long to highlight this selection
      * @return this
      */
-    public SpawnedDisplayEntityGroup glow(long durationInTicks, boolean ignoreInteractions){
+    public SpawnedDisplayEntityGroup glow(long durationInTicks, boolean ignoreInteractions, boolean particleHidden){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             if (ignoreInteractions && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION)){
                 continue;
             }
-            part.glow(durationInTicks);
+            part.glow(durationInTicks, particleHidden);
         }
         return this;
     }

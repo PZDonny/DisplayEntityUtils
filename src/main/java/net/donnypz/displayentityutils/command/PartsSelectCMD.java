@@ -37,7 +37,7 @@ class PartsSelectCMD implements SubCommand{
         }
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Part(s) successfully selected! <white>(Part(s) Tagged: "+args[1]+")")));
         DisplayGroupManager.setPartSelection(player, partSelection, false);
-        partSelection.glow(30, false);
+        partSelection.glow(30, false, false);
     }
 
 }

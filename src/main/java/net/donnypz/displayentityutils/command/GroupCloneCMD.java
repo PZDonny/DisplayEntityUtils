@@ -32,7 +32,7 @@ class GroupCloneCMD implements SubCommand{
             p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully cloned your selected group", NamedTextColor.GREEN)));
             p.sendMessage(Component.text("- Your group selection has been changes to the newly created group", NamedTextColor.GRAY, TextDecoration.ITALIC));
             DisplayGroupManager.setSelectedSpawnedGroup(p, clonedGroup);
-            clonedGroup.glow(80, false);
+            clonedGroup.glow(80, true, true);
         }
     }
 }

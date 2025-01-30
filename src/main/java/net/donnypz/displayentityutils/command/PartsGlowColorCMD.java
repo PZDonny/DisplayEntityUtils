@@ -45,7 +45,7 @@ class PartsGlowColorCMD implements SubCommand{
 
         if (args.length >= 4 && args[3].equalsIgnoreCase("-all")) {
             selection.setGlowColor(c);
-            selection.glow(60, true);
+            selection.glow(60, true, true);
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Glow color successfully set for selected display entity part(s) in your selection!", NamedTextColor.GREEN)));
         }
         else{
@@ -55,7 +55,7 @@ class PartsGlowColorCMD implements SubCommand{
             }
             else{
                 selectedPart.setGlowColor(c);
-                selectedPart.glow(60);
+                selectedPart.glow(60, true);
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Glow color successfully set for your selected part!", NamedTextColor.GREEN)));
             }
         }

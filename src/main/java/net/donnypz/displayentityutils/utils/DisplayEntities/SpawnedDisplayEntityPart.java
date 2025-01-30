@@ -435,7 +435,7 @@ public final class SpawnedDisplayEntityPart {
      * Adds the glow effect to this SpawnDisplayEntityPart.
      * Outlined with soul fire flame particles if Interaction.
      * Cloud Particle if it's the master part
-     * @param particleHidden don't show the part with particles if it's the master part or has no material
+     * @param particleHidden don't show parts with particles if it's the master part or has no visible material
      */
 
     public void glow(boolean particleHidden){
@@ -471,16 +471,19 @@ public final class SpawnedDisplayEntityPart {
      * Outlined with soul fire flame particles if Interaction.
      * Cloud Particle if it's the master part
      * @param durationInTicks How long to glow this selection
+     * @param particleHidden don't show parts with particles if it's the master part or has no visible material
      */
-    public void glow(long durationInTicks){
+    public void glow(long durationInTicks, boolean particleHidden){
         Entity entity = getEntity();
-        if (type == PartType.INTERACTION) {
+        if (type == PartType.INTERACTION && !particleHidden) {
             //temporaryParticles(entity, durationInTicks, Particle.COMPOSTER);
             interactionOutline((Interaction) entity, durationInTicks);
             return;
         }
         if (this.equals(group.getMasterPart())){
-            temporaryParticles(entity, durationInTicks, Particle.FLAME);
+            if (!particleHidden){
+                temporaryParticles(entity, durationInTicks, Particle.FLAME);
+            }
             entity.setGlowing(true);
         }
         else{
@@ -488,7 +491,9 @@ public final class SpawnedDisplayEntityPart {
             if (material != null){
                 switch (material){
                     case AIR, CAVE_AIR, VOID_AIR -> {
-                        temporaryParticles(entity, durationInTicks, Particle.CLOUD);
+                        if (!particleHidden){
+                            temporaryParticles(entity, durationInTicks, Particle.CLOUD);
+                        }
                         entity.setGlowing(true);
                     }
                     default -> {

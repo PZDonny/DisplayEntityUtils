@@ -109,7 +109,7 @@ class PartsCycleCMD implements SubCommand{
                 }
             }
         }
-        part.glow(30);
+        part.glow(30, false);
         int index = partSelection.indexOf(part)+1;
         int size = partSelection.getSize();
         String ratio = ChatColor.GOLD+"["+index+"/"+size+"] ";

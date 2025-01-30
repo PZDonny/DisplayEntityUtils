@@ -223,7 +223,7 @@ public final class SpawnedPartSelection {
     /**
      * Adds the glow effect the parts within this selection
      * @param ignoreInteractions choose if interaction entities should be outlined with particles
-     * @param particleHidden show parts with particles if it's the master part or has no material
+     * @param particleHidden don't show parts with particles if it's the master part or has no visible material
      * @return this
      */
     public SpawnedPartSelection glow(boolean ignoreInteractions, boolean particleHidden){
@@ -239,14 +239,15 @@ public final class SpawnedPartSelection {
     /**
      * Adds the glow effect the parts within this selection
      * @param ignoreInteraction choose if interaction entities should be outlined with particles
+     * @param particleHidden don't show parts with particles if it's the master part or has no visible material
      * @return this
      */
-    public SpawnedPartSelection glow(int durationInTicks, boolean ignoreInteraction){
+    public SpawnedPartSelection glow(int durationInTicks, boolean ignoreInteraction, boolean particleHidden){
         for (SpawnedDisplayEntityPart part : selectedParts){
             if (ignoreInteraction && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION)){
                 continue;
             }
-            part.glow(durationInTicks);
+            part.glow(durationInTicks, particleHidden);
         }
         return this;
     }
