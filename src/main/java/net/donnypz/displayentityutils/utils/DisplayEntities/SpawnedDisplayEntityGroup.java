@@ -180,6 +180,9 @@ public final class SpawnedDisplayEntityGroup {
 
 
 
+        if (currentMachineState != null){
+            currentMachineState.animator.stop(this);
+        }
         currentMachineState = state;
 
         DisplayAnimator animator = state.getDisplayAnimator();
@@ -1142,8 +1145,11 @@ public final class SpawnedDisplayEntityGroup {
      */
     public SpawnedDisplayEntityGroup glow(boolean ignoreInteractions, boolean particleHidden){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            if (ignoreInteractions && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION)){
-                continue;
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                if (ignoreInteractions){
+                    continue;
+                }
+                part.glow(false);
             }
             part.glow(particleHidden);
         }
@@ -1157,8 +1163,11 @@ public final class SpawnedDisplayEntityGroup {
      */
     public SpawnedDisplayEntityGroup glow(long durationInTicks, boolean ignoreInteractions, boolean particleHidden){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            if (ignoreInteractions && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION)){
-                continue;
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                if (ignoreInteractions){
+                    continue;
+                }
+                part.glow(durationInTicks, false);
             }
             part.glow(durationInTicks, particleHidden);
         }
