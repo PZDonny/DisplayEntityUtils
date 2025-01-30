@@ -21,7 +21,7 @@ class AnimStopCMD implements SubCommand{
         }
 
 
-        group.stopAnimation(true);
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Stopping any animation played on your selected group!", NamedTextColor.YELLOW)));
+        group.stopAnimations(true);
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Stopping all animations played on your selected group!", NamedTextColor.YELLOW)));
     }
 }

@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.*;
 
 public class DisplayAnimator {
@@ -24,16 +25,10 @@ public class DisplayAnimator {
      * @param animation The animation to play
      * @return False if the playing was cancelled through the {@link GroupAnimationStartEvent}.
      */
-    public static boolean play(SpawnedDisplayEntityGroup group, SpawnedDisplayAnimation animation){
-        if (!new GroupAnimationStartEvent(group, null, animation).callEvent()){
-            return false;
-        }
-
-        SpawnedDisplayAnimationFrame frame = animation.frames.getFirst();
-        long timeStamp = System.currentTimeMillis();
-        group.setLastAnimationTimeStamp(timeStamp);
-        new DisplayAnimatorExecutor(null, animation, group, frame, 0, timeStamp);
-        return true;
+    public static DisplayAnimator play(SpawnedDisplayEntityGroup group, SpawnedDisplayAnimation animation){
+        DisplayAnimator animator = new DisplayAnimator(animation, AnimationType.LINEAR);
+        animator.play(group);
+        return animator;
     }
 
     /**
@@ -50,10 +45,7 @@ public class DisplayAnimator {
 
         SpawnedDisplayAnimationFrame frame = animation.frames.get(frameIndex);
         int delay = frame.delay+ frame.duration;
-        long timeStamp = System.currentTimeMillis();
-        group.setLastAnimationTimeStamp(timeStamp);
-        new DisplayAnimatorExecutor(this, animation, group, frame, delay, timeStamp);
-
+        new DisplayAnimatorExecutor(this, animation, group, frame, delay, DisplayEntityPlugin.asynchronousAnimations(), false);
         return true;
     }
 
@@ -75,7 +67,7 @@ public class DisplayAnimator {
      * @param group the group to stop animating
      */
     public void stop(SpawnedDisplayEntityGroup group){
-        group.stopAnimation(false);
+        group.removeActiveAnimator(this);
     }
 
 

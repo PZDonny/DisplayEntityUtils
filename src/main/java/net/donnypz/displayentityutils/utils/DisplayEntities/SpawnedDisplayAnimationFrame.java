@@ -11,9 +11,9 @@ import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 public final class SpawnedDisplayAnimationFrame {
@@ -422,20 +422,22 @@ public final class SpawnedDisplayAnimationFrame {
     /**
      * Show the particles that will be displayed at the start of this frame
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
+     * @param animator the animator attempting to play the particles
      */
-    public void showStartParticles(@NotNull SpawnedDisplayEntityGroup group){
+    public void showStartParticles(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
         for (AnimationParticle particle : frameStartParticles){
-            particle.spawn(group);
+            particle.spawn(group, animator);
         }
     }
 
     /**
      * Show the particles that will be displayed at the end of this frame
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
+     * @param animator the animator attempting to play the particles
      */
-    public void showEndParticles(@NotNull SpawnedDisplayEntityGroup group){
+    public void showEndParticles(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
         for (AnimationParticle particle : frameEndParticles){
-            particle.spawn(group);
+            particle.spawn(group, animator);
         }
     }
 
@@ -469,27 +471,29 @@ public final class SpawnedDisplayAnimationFrame {
     /**
      * Play all effects that are expected at the start of this frame (e.g. sounds, particles, commands)
      * @param group the group to play these effects for
+     * @param animator the animator attempting to play the effects
      */
-    public void playStartEffects(SpawnedDisplayEntityGroup group){
+    public void playStartEffects(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
         Location groupLoc = group.getLocation();
         if (groupLoc != null){
             playStartSounds(groupLoc);
             executeStartCommands(groupLoc);
         }
-        showStartParticles(group);
+        showStartParticles(group, animator);
     }
 
     /**
      * Play all effects that are expected at the end of this frame (e.g. sounds, particles, commands)
      * @param group the group to play these effects for
+     * @param animator the animator attempting to play the effects
      */
-    public void playEndEffects(@NotNull SpawnedDisplayEntityGroup group){
+    public void playEndEffects(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
         Location groupLoc = group.getLocation();
         if (groupLoc != null){
             playEndSounds(groupLoc);
             executeEndCommands(groupLoc);
         }
-        showEndParticles(group);
+        showEndParticles(group, animator);
     }
 
 

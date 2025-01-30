@@ -41,10 +41,10 @@ public final class SpawnedDisplayEntityGroup {
     boolean isVisibleByDefault;
     private float scaleMultiplier = 1;
     private UUID followedEntity = null;
-    private long lastAnimationTimeStamp = -1;
     private boolean isPersistent = true;
     private MachineState currentMachineState;
     private float verticalOffset = 0;
+    private final HashSet<DisplayAnimator> activeAnimators = new HashSet<>();
 
     public static final NamespacedKey creationTimeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "creationtime");
     static final NamespacedKey scaleKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "scale");
@@ -112,9 +112,7 @@ public final class SpawnedDisplayEntityGroup {
         return DisplayUtils.isInLoadedChunk(masterPart);
     }
 
-    void setLastAnimationTimeStamp(long timestamp){
-        this.lastAnimationTimeStamp = timestamp;
-    }
+
 
     /**
      * Set the vertical translation offset of this group riding an entity. This will apply to animations
@@ -134,24 +132,7 @@ public final class SpawnedDisplayEntityGroup {
         return verticalOffset;
     }
 
-    /**
-     * Manually stop an animation from playing on a group
-     * @param removeFromStateMachine removes this animation from its state machine if true
-     */
-    public void stopAnimation(boolean removeFromStateMachine){
-        this.lastAnimationTimeStamp = -1;
-        if (removeFromStateMachine){
-            DisplayStateMachine.unregisterFromStateMachine(this);
-        }
-    }
 
-    /**
-     * Check if this group's is animating, by checking if its last animation timestamp is not -1
-     * @return a boolean
-     */
-    public boolean isAnimating(){
-        return lastAnimationTimeStamp != -1;
-    }
 
     /**
      * Get this group's current animation state, respective of its {@link DisplayStateMachine}
@@ -1489,14 +1470,6 @@ public final class SpawnedDisplayEntityGroup {
     }
 
 
-    /**
-     * Get the UNIX timestamp when this group last began animating
-     * @return a long
-     */
-    @ApiStatus.Internal
-    public long getLastAnimationTimeStamp(){
-        return lastAnimationTimeStamp;
-    }
 
     /**
      * Get the tag of the animation applied to this group when it's spawned/loaded
@@ -1592,20 +1565,42 @@ public final class SpawnedDisplayEntityGroup {
     /**
      * Make a group perform an animation
      * @param animation the animation this group should play
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
      */
-    public void animate(@NotNull SpawnedDisplayAnimation animation){
-        DisplayAnimator.play(this, animation);
+    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation){
+        return DisplayAnimator.play(this, animation);
     }
 
     /**
-     * Make a group perform a looping animation. There is not a way to manually stop the looped animation, other than by using
-     * a {@link DisplayAnimator}. This is recommended only for debug use or in cases where looped animations don't need to stop.
+     * Make a group perform a looping animation.
      * @param animation the animation this group should play
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
      */
-    public void animateLooping(@NotNull SpawnedDisplayAnimation animation){
+    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
         animator.play(this);
+        return animator;
+    }
 
+    /**
+     * Manually stop an animation from playing on this group
+     * @param displayAnimator the display animator controlling an animation
+     * @return this
+     */
+    public @NotNull SpawnedDisplayEntityGroup stopAnimation(@NotNull DisplayAnimator displayAnimator){
+        removeActiveAnimator(displayAnimator);
+        return this;
+    }
+
+    /**
+     * Manually stop all animations playing on this group
+     * @param removeFromStateMachine removes this animation from its state machine if true
+     */
+    public void stopAnimations(boolean removeFromStateMachine){
+        activeAnimators.clear();
+        if (removeFromStateMachine){
+            DisplayStateMachine.unregisterFromStateMachine(this);
+        }
     }
 
     /**
@@ -1620,6 +1615,29 @@ public final class SpawnedDisplayEntityGroup {
         }
         DisplayAnimatorExecutor.setGroupToFrame(this, animation, frame, isAsync);
         return true;
+    }
+
+    SpawnedDisplayEntityGroup addActiveAnimator(DisplayAnimator animator){
+        activeAnimators.add(animator);
+        return this;
+    }
+
+    SpawnedDisplayEntityGroup removeActiveAnimator(DisplayAnimator animator){
+        activeAnimators.remove(animator);
+        return this;
+    }
+
+    public boolean isActiveAnimator(@NotNull DisplayAnimator animator){
+        return activeAnimators.contains(animator);
+    }
+
+    /**
+     * Check if this group's is animating, by checking if its last animation timestamp is not -1
+     * @return a boolean
+     */
+    public boolean isAnimating(){
+        //return lastAnimationTimeStamp != -1;
+        return !activeAnimators.isEmpty();
     }
 
 

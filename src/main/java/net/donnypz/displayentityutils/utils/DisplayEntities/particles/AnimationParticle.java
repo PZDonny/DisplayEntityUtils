@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities.particles;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
@@ -14,6 +15,8 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.io.*;
@@ -66,15 +69,21 @@ public abstract class AnimationParticle implements Externalizable {
         this.delayInTicks = delayInTicks;
     }
 
-    public void spawn(SpawnedDisplayEntityGroup group){
+    public void spawn(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
         Location spawnLoc = getSpawnLocation(group);
         if (delayInTicks == 0){
             spawn(spawnLoc);
         }
         else{
-            long timeStamp = group.getLastAnimationTimeStamp();
+
             Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                if (group.isSpawned() && group.getLastAnimationTimeStamp() == timeStamp){
+                if (!group.isSpawned()){
+                    return;
+                }
+                if (animator == null){
+                    spawn(getSpawnLocation(group));
+                }
+                else if (group.isActiveAnimator(animator)){
                     spawn(getSpawnLocation(group));
                 }
             }, delayInTicks);
