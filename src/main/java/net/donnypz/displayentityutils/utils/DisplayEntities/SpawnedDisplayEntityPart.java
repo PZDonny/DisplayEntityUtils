@@ -475,8 +475,10 @@ public final class SpawnedDisplayEntityPart {
      */
     public void glow(long durationInTicks, boolean particleHidden){
         Entity entity = getEntity();
-        if (type == PartType.INTERACTION && !particleHidden) {
-            //temporaryParticles(entity, durationInTicks, Particle.COMPOSTER);
+        if (type == PartType.INTERACTION) {
+            if (particleHidden){
+                return;
+            }
             interactionOutline((Interaction) entity, durationInTicks);
             return;
         }
