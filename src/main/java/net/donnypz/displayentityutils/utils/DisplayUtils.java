@@ -517,12 +517,13 @@ public final class DisplayUtils {
     }
 
     /**
-     * Add a tag to a part entity
+     * Add a tag to a part entity. The tag will not be added if it starts with an "!" or is blank
      * @param entity The entity to add a tag to
      * @param tag The tag to add to this part
+     * @return true if the tag was added successfully
      */
-    public static void addTag(@NotNull Entity entity, @NotNull String tag){
-        addToPDCList(entity, tag, DisplayEntityPlugin.getPartPDCTagKey());
+    public static boolean addTag(@NotNull Entity entity, @NotNull String tag){
+        return addToPDCList(entity, tag, DisplayEntityPlugin.getPartPDCTagKey());
     }
 
     /**
@@ -534,10 +535,8 @@ public final class DisplayUtils {
         addManyToPDCList(entity, tags, DisplayEntityPlugin.getPartPDCTagKey());
     }
 
-    static void addToPDCList(@NotNull Entity entity, @NotNull String element, NamespacedKey key){
-        if (element.isBlank()){
-            return;
-        }
+    static boolean addToPDCList(@NotNull Entity entity, @NotNull String element, NamespacedKey key){
+        boolean isPartTag = DisplayEntityPlugin.getPartPDCTagKey() == key;
         PersistentDataContainer container = entity.getPersistentDataContainer();
         List<String> tags;
         if (!container.has(key)){
@@ -547,13 +546,18 @@ public final class DisplayUtils {
             tags = new ArrayList<>(container.get(key, tagPDCType));
         }
 
-        if (!tags.contains(element)){
+        if (!tags.contains(element) && (isPartTag && isValidPartTag(element))){
             tags.add(element);
             container.set(key, tagPDCType, tags);
+            return true;
+        }
+        else{
+            return false;
         }
     }
 
     static void addManyToPDCList(@NotNull Entity entity, @NotNull List<String> elements, NamespacedKey key){
+        boolean isPartTag = DisplayEntityPlugin.getPartPDCTagKey() == key;
         if (elements.isEmpty()){
             return;
         }
@@ -566,11 +570,21 @@ public final class DisplayUtils {
             existing = new ArrayList<>(container.get(key, tagPDCType));
         }
         for (String element : elements){
-            if (!existing.contains(element)) {
+            if (!existing.contains(element) && (isPartTag && isValidPartTag(element))) {
                 existing.add(element);
             }
         }
         container.set(key, tagPDCType, existing);
+    }
+
+
+    /**
+     * Check if a part tag is valid and can be added to a part
+     * @param partTag
+     * @return a boolean
+     */
+    public static boolean isValidPartTag(@NotNull String partTag){
+        return !partTag.contains(",") && !partTag.startsWith("!") && !partTag.isBlank();
     }
 
 

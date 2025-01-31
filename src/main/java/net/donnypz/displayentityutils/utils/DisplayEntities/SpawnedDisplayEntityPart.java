@@ -244,13 +244,12 @@ public final class SpawnedDisplayEntityPart {
     }
 
     /**
-     * Add a tag to this SpawnedDisplayEntityPart
+     * Add a tag to this SpawnedDisplayEntityPart. The tag will not be added if it starts with an "!" or is blank
      * @param tag The part tag to add to this part
-     * @return this
+     * @return true if the tag was added successfully
      */
-    public SpawnedDisplayEntityPart addTag(@NotNull String tag){
-        DisplayUtils.addTag(getEntity(), tag);
-        return this;
+    public boolean addTag(@NotNull String tag){
+        return DisplayUtils.addTag(getEntity(), tag);
     }
 
     /**

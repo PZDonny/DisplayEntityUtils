@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
@@ -129,15 +130,18 @@ public final class SpawnedPartSelection {
     }
 
     /**
-     * Adds a part tag to the parts in this selection
+     * Adds a part tag to the parts in this selection. The tag will not be added if it starts with an "!" or is blank
      * @param partTag The part tag to give the parts in this selection
-     * @return this
+     * @return true if the tag was successfully added
      */
-    public SpawnedPartSelection addTag(String partTag){
+    public boolean addTag(@NotNull String partTag){
+        if (!DisplayUtils.isValidPartTag(partTag)){
+            return false;
+        }
         for (SpawnedDisplayEntityPart part : selectedParts){
             part.addTag(partTag);
         }
-        return this;
+        return true;
     }
 
     /**
@@ -145,7 +149,7 @@ public final class SpawnedPartSelection {
      * @param partTag The part tag to remove from the parts in this selection
      * @return this
      */
-    public SpawnedPartSelection removeTag(String partTag){
+    public SpawnedPartSelection removeTag(@NotNull String partTag){
         for (SpawnedDisplayEntityPart part : selectedParts){
             part.removeTag(partTag);
         }
