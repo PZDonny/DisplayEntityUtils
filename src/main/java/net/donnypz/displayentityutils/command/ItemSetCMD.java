@@ -32,7 +32,7 @@ class ItemSetCMD implements SubCommand{
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /mdis parts setitem <\"-held\" | \"-target\" | item-id> [-all]", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /mdis parts setitem <\"-held\" | item-id> [-all]", NamedTextColor.RED));
             return;
         }
         
