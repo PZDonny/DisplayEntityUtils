@@ -843,7 +843,6 @@ public final class SpawnedDisplayEntityPart {
             if (!entity.isDead()){
                 entity.remove();
             }
-            return entity;
         }
         partData = null;
         valid = false;
