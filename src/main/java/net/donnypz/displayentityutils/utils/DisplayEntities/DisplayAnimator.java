@@ -79,6 +79,10 @@ public class DisplayAnimator {
         return animation;
     }
 
+    public AnimationType getAnimationType(){
+        return type;
+    }
+
 
     public enum AnimationType{
         LINEAR,
