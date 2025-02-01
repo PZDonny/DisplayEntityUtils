@@ -25,7 +25,7 @@ abstract class InteractionEvent extends Event implements Cancellable {
     /**
      * Called when an {@link Interaction} is Left or Right-clicked.
      */
-    public InteractionEvent(@NotNull Player player, @NotNull Interaction interaction, InteractionClickEvent.ClickType clickType){
+    InteractionEvent(@NotNull Player player, @NotNull Interaction interaction, InteractionClickEvent.ClickType clickType){
         this.player = player;
         this.interaction = interaction;
         this.clickType = clickType;
