@@ -66,7 +66,7 @@ public class GroupSpawnSettings {
     }
 
     /**
-     * Add a part tag that, if contained within an entity, will hide the entity
+     * Add a part tag that, if contained within a part, will hide the part's entity
      * @param partTag the part tag
      * @return this
      */
@@ -104,7 +104,7 @@ public class GroupSpawnSettings {
      * @param hideInteractions whether interactions should be hidden
      * @return this
      */
-    public GroupSpawnSettings hideInteractions(boolean hideInteractions) {
+    public GroupSpawnSettings hideInteractionsByDefault(boolean hideInteractions) {
         this.hideInteractions = hideInteractions;
         return this;
     }
