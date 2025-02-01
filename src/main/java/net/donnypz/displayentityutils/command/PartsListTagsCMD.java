@@ -1,15 +1,14 @@
 package net.donnypz.displayentityutils.command;
 
-import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 class PartsListTagsCMD implements SubCommand{
     @Override
@@ -35,14 +34,18 @@ class PartsListTagsCMD implements SubCommand{
         }
 
         String type = args[2];
-        Collection<String> tags;
+        List<String> tags;
+        int split;
         if (type.equalsIgnoreCase("part")){
-            player.sendMessage(Component.text("Individual Part Tag(s): ", NamedTextColor.YELLOW));
+            player.sendMessage(Component.text("Individual Part's Tag(s):", NamedTextColor.YELLOW));
             tags = partSelection.getSelectedPart().getTags();
+            split = tags.size();
         }
         else if (type.equalsIgnoreCase("selection")){
-            player.sendMessage(Component.text("Selection Part Tag(s): ", NamedTextColor.BLUE));
-            tags = partSelection.getPartTags();
+            player.sendMessage(Component.text("Included Part Tag(s):", NamedTextColor.GREEN));
+            tags = new ArrayList<>(partSelection.getIncludedPartTags());
+            split = tags.size();
+            tags.addAll(partSelection.getExcludedPartTags());
         }
         else{
             player.sendMessage(Component.text("Incorrect Usage! /mdis parts listtags <part | selection>", NamedTextColor.RED));
@@ -50,12 +53,16 @@ class PartsListTagsCMD implements SubCommand{
         }
 
 
-        if (tags == null || tags.isEmpty()){
+        if (tags.isEmpty()){
             player.sendMessage(Component.text("- Failed to find part tags!", NamedTextColor.GRAY));
         }
         else{
-            for (String tag : tags){
-                player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>- <yellow>"+tag));
+            for (int i = 0; i < tags.size(); i++){
+                if (i == split){ //For Excluded SpawnedPartSelection Part Tags
+                    player.sendMessage(Component.empty());
+                    player.sendMessage(Component.text("Excluded Part Tag(s):", NamedTextColor.RED));
+                }
+                player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>- <yellow>"+tags.get(i)));
             }
         }
     }

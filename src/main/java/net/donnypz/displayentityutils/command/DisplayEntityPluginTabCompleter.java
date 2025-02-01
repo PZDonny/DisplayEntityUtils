@@ -109,6 +109,12 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                         case "billboard" -> {
                             addBillboard(suggestions);
                         }
+                        case "filtertypes" -> {
+                            suggestions.add("block");
+                            suggestions.add("item");
+                            suggestions.add("text");
+                            suggestions.add("interaction");
+                        }
                     }
                 }
                 case "item" -> {
@@ -139,7 +145,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
         }
         else if (args.length == 4) {
             if (args[0].equalsIgnoreCase("group")){
-                if (args[1].equalsIgnoreCase("delete") || args[1].equalsIgnoreCase("setspawnanim")){
+                if (args[1].equalsIgnoreCase("spawn") ||args[1].equalsIgnoreCase("delete") || args[1].equalsIgnoreCase("setspawnanim")){
                     addStorages(suggestions);
                 }
             }

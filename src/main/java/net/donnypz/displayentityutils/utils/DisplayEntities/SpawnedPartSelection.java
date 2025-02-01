@@ -7,6 +7,7 @@ import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,12 +16,20 @@ import java.util.*;
 
 public final class SpawnedPartSelection {
     List<SpawnedDisplayEntityPart> selectedParts = new ArrayList<>();
-    Set<SpawnedDisplayEntityPart.PartType> partTypes;
-    Set<Material> itemTypes;
-    Set<Material> blockTypes;
+
+    Set<SpawnedDisplayEntityPart.PartType> partTypes = new HashSet<>();
+
+    Set<Material> itemTypes = new HashSet<>();
+    boolean includeItemTypes;
+
+    Set<Material> blockTypes = new HashSet<>();
+    boolean includeBlockTypes;
+
+    Collection<String> includedTags = new HashSet<>();
+    Collection<String> excludedTags = new HashSet<>();
+
     SpawnedDisplayEntityGroup group;
     SpawnedDisplayEntityPart selectedPart = null;
-    Collection<String> partTags;
 
     /**
      * Create a SpawnedPartSelection for parts with the specified part tag from a group.
@@ -37,63 +46,180 @@ public final class SpawnedPartSelection {
      * @param partTags The part tags to check for
      */
     public SpawnedPartSelection(SpawnedDisplayEntityGroup group, Collection<String> partTags){
-        this(group, new SelectionBuilder().addPartTags(partTags));
+        this(group, new PartFilterBuilder().includePartTags(partTags));
     }
 
     /**
-     * Create a SpawnedPartSelection containing all parts within a group.
+     * Create a SpawnedPartSelection containing all parts from a group.
      * @param group The group to cycle through for this selection.
      */
     public SpawnedPartSelection(SpawnedDisplayEntityGroup group){
-        this(group, new SelectionBuilder());
+        this(group, new PartFilterBuilder());
     }
 
-    SpawnedPartSelection(SpawnedDisplayEntityGroup group, SelectionBuilder builder){
+    /**
+     * Create a SpawnedPartSelection containing filtered parts from a group.
+     * @param group The group to cycle through for this selection.
+     * @param builder The filter builder used to filter parts
+     */
+    public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull PartFilterBuilder builder){
         this.group = group;
-        this.partTypes = builder.partTypes;
-        this.partTags = builder.partTags;
-        this.itemTypes = builder.itemTypes;
-        this.blockTypes = builder.blockTypes;
 
+        applyFilter(builder, false);
+        group.partSelections.add(this);
+
+        this.includeBlockTypes = builder.includeBlockTypes;
+        this.includeItemTypes = builder.includeItemTypes;
+    }
+
+
+    /**
+     * Check if this selection has any filters applied to it
+     * @return a boolean
+     */
+    public boolean hasFilters(){
+        return
+                !(partTypes.isEmpty()
+                && includedTags.isEmpty()
+                && excludedTags.isEmpty()
+                && itemTypes.isEmpty()
+                && blockTypes.isEmpty());
+    }
+
+
+    /**
+     * Update this selection's parts based on the filters set by a {@link PartFilterBuilder}. This builds upon any previous filters applied
+     * @param builder the builder to use
+     * @param reset whether to reset the currently selected parts and all filters
+     * @return true if the selection's group is still valid
+     */
+    public boolean applyFilter(PartFilterBuilder builder, boolean reset){
+        if (group == null){
+            return false;
+        }
+
+        if (reset){
+            reset();
+        }
+
+        this.partTypes.addAll(builder.partTypes);
+        this.includedTags.addAll(builder.includedTags);
+        this.excludedTags.addAll(builder.excludedTags);
+
+        if (this.itemTypes.isEmpty()){
+            this.includeBlockTypes = builder.includeBlockTypes;
+        }
+
+        if (this.blockTypes.isEmpty()){
+            this.includeItemTypes = builder.includeItemTypes;
+        }
+
+        this.itemTypes.addAll(builder.itemTypes);
+        this.blockTypes.addAll(builder.blockTypes);
+
+        refresh();
+        return true;
+    }
+
+    /**
+     * Cycle through the part's of this selection's group and reselect the parts based on the filters applied
+     */
+    public void refresh(){
+        selectedParts.clear();
+
+        filter:
         for (SpawnedDisplayEntityPart part : group.getSpawnedParts()){
             SpawnedDisplayEntityPart.PartType type = part.getType();
 
-            if (!partTypes.isEmpty() && !partTypes.contains(type)){ //Type not contained
+            //Part Types not contained
+            if (!partTypes.isEmpty() && !partTypes.contains(type)){
                 continue;
             }
-            if (type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY && !blockTypes.isEmpty()){ //Block Display Material not contained
+
+
+            //Block Display Material
+            if (type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY && !blockTypes.isEmpty()){
                 BlockDisplay bd = (BlockDisplay) part.getEntity();
-                if (!blockTypes.contains(bd.getBlock().getMaterial())){
+                Material material = bd.getBlock().getMaterial();
+                boolean contains = blockTypes.contains(material);
+                if ((contains && !includeBlockTypes) || (!contains && includeBlockTypes)){
                     continue;
                 }
             }
 
-            if (type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY && !itemTypes.isEmpty()){ //Item Display Material not contained
-                BlockDisplay bd = (BlockDisplay) part.getEntity();
-                if (!itemTypes.contains(bd.getBlock().getMaterial())){
+            //Item Display Material
+            if (type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY && !itemTypes.isEmpty()){
+                ItemDisplay id = (ItemDisplay) part.getEntity();
+                Material material = id.getItemStack().getType();
+                boolean contains = itemTypes.contains(material);
+                if ((contains && !includeItemTypes) || (!contains && includeItemTypes)){
                     continue;
                 }
             }
 
-            if (!partTags.isEmpty()){
-                for (String tag : partTags){
-                    if (part.hasTag(tag)){
+            List<String> list = part.getTags();
+
+            //Part has no tags, but tags are required for filtering
+            if (list.isEmpty() && !includedTags.isEmpty()){
+                continue;
+            }
+
+            Set<String> tags = new HashSet<>(list); //For faster searches
+
+            //Part Has Excluded Tag (Don't Filter Part)
+            for (String excluded : excludedTags){
+                if (tags.contains(excluded)) {
+                    continue filter;
+                }
+            }
+
+            //No Included Tags for filtering
+            if (includedTags.isEmpty()){
+                selectedParts.add(part);
+            }
+            //Part Has Included Tag (Filter Part)
+            else{
+                for (String included : includedTags){
+                    if (tags.contains(included)){
                         selectedParts.add(part);
-                        break; //Break out of loop checking all part tags
+                        continue filter;
                     }
                 }
             }
-            else{
-                selectedParts.add(part);
-            }
-
         }
 
         if (!selectedParts.isEmpty()){
             selectedPart = selectedParts.getFirst();
         }
+    }
 
-        group.partSelections.add(this);
+    /**
+     * Reset this part selection back to all the parts in this selection's group, removing all filters
+     * @return true if the selection's group is still valid
+     */
+    public boolean reset(){
+        if (group == null){
+            return false;
+        }
+        selectedParts.clear();
+        selectedPart = null;
+        this.partTypes.clear();
+        this.includedTags.clear();
+        this.excludedTags.clear();
+        this.itemTypes.clear();
+        this.blockTypes.clear();
+        return true;
+    }
+
+    public void unfilter(@NotNull PartFilterBuilder.FilterType filterType, boolean reselect){
+        switch (filterType){
+            case PART_TYPE -> partTypes.clear();
+            case INCLUDED_TAGS -> includedTags.clear();
+            case EXCLUDED_TAGS ->  excludedTags.clear();
+            case ITEM_TYPE -> itemTypes.clear();
+            case BLOCK_TYPE -> blockTypes.clear();
+        }
+        if (reselect) refresh();
     }
 
     /**
@@ -160,6 +286,7 @@ public final class SpawnedPartSelection {
      * Cycles to a next part within this selection's group.
      * If it attempts to go past the last part, it will wrap from the first part
      * The selected part of this SpawnedPartSelection will be set to the resulting part
+     * @param jump how many parts to skip, a positive number
      * @return this
      */
     public SpawnedPartSelection setToNextPart(int jump){
@@ -177,14 +304,13 @@ public final class SpawnedPartSelection {
      * Cycles to a previous part within this selection's group.
      * If it attempts to go past the first part, it will wrap from the last part
      * The selected part of this SpawnedPartSelection will be set to the resulting part
+     * @param jump how many parts to skip, a positive number
      * @return this
      */
     public SpawnedPartSelection setToPreviousPart(int jump){
         if (!selectedParts.isEmpty()){
-            int index = selectedParts.indexOf(selectedPart)-jump;
-            while (index < 0){
-                index+=selectedParts.size();
-            }
+            int index = (selectedParts.indexOf(selectedPart) - Math.abs(jump)) % selectedParts.size();
+            if (index < 0) index += selectedParts.size();
             selectedPart = selectedParts.get(index);
         }
         return this;
@@ -275,14 +401,25 @@ public final class SpawnedPartSelection {
 
 
     /**
-     * Gets the tags of this part selection
-     * @return The part tags.
+     * Gets the included part tags of this part selection
+     * @return The included part tags.
      */
-    public @Nullable Collection<String> getPartTags(){
-        if (partTags.isEmpty()){
-            return null;
+    public @NotNull Collection<String> getIncludedPartTags(){
+        if (includedTags.isEmpty()){
+            return new HashSet<>();
         }
-        return new ArrayList<>(partTags);
+        return new HashSet<>(includedTags);
+    }
+
+    /**
+     * Gets the excluded part tags of this part selection
+     * @return The excluded part tags.
+     */
+    public @NotNull Collection<String> getExcludedPartTags(){
+        if (excludedTags.isEmpty()){
+            return new HashSet<>();
+        }
+        return new HashSet<>(excludedTags);
     }
 
     /**
@@ -432,7 +569,7 @@ public final class SpawnedPartSelection {
     }
 
     void removeNoManager(){
-        selectedParts.clear();
+        reset();
         group.partSelections.remove(this);
         group = null;
     }
