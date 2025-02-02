@@ -102,7 +102,7 @@ class PartsCMD implements SubCommand{
     }
 
     static void noPartSelection(Player player){
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You have not selected a part!", NamedTextColor.RED)));
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You have not selected any part(s)!", NamedTextColor.RED)));
         player.sendMessage(Component.text("/mdis parts cycle <first | prev | next>", NamedTextColor.GRAY));
         player.sendMessage(Component.text("/mdis parts select <part-tag>", NamedTextColor.GRAY));
     }
