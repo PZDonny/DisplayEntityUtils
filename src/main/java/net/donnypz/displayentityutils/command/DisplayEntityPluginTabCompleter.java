@@ -156,7 +156,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                 }
             }
             else if (args[0].equalsIgnoreCase("anim")){
-                if (args[1].equalsIgnoreCase("delete")){
+                if (args[1].equalsIgnoreCase("delete") || args[1].equalsIgnoreCase("select")){
                     addStorages(suggestions);
                 }
             }
