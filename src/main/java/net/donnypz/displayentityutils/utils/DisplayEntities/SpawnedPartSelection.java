@@ -46,7 +46,7 @@ public final class SpawnedPartSelection {
      * @param partTags The part tags to check for
      */
     public SpawnedPartSelection(SpawnedDisplayEntityGroup group, Collection<String> partTags){
-        this(group, new PartFilterBuilder().includePartTags(partTags));
+        this(group, new PartFilter().includePartTags(partTags));
     }
 
     /**
@@ -54,22 +54,22 @@ public final class SpawnedPartSelection {
      * @param group The group to cycle through for this selection.
      */
     public SpawnedPartSelection(SpawnedDisplayEntityGroup group){
-        this(group, new PartFilterBuilder());
+        this(group, new PartFilter());
     }
 
     /**
      * Create a SpawnedPartSelection containing filtered parts from a group.
      * @param group The group to cycle through for this selection.
-     * @param builder The filter builder used to filter parts
+     * @param filter The filter used to filter parts
      */
-    public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull PartFilterBuilder builder){
+    public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull PartFilter filter){
         this.group = group;
 
-        applyFilter(builder, false);
+        applyFilter(filter, false);
         group.partSelections.add(this);
 
-        this.includeBlockTypes = builder.includeBlockTypes;
-        this.includeItemTypes = builder.includeItemTypes;
+        this.includeBlockTypes = filter.includeBlockTypes;
+        this.includeItemTypes = filter.includeItemTypes;
     }
 
 
@@ -88,12 +88,12 @@ public final class SpawnedPartSelection {
 
 
     /**
-     * Update this selection's parts based on the filters set by a {@link PartFilterBuilder}. This builds upon any previous filters applied
-     * @param builder the builder to use
+     * Update this selection's parts based on the filters set by a {@link PartFilter}. This builds upon any previous filters applied
+     * @param filter the filter to use
      * @param reset whether to reset the currently selected parts and all filters
      * @return true if the selection's group is still valid
      */
-    public boolean applyFilter(PartFilterBuilder builder, boolean reset){
+    public boolean applyFilter(PartFilter filter, boolean reset){
         if (group == null){
             return false;
         }
@@ -102,20 +102,20 @@ public final class SpawnedPartSelection {
             reset();
         }
 
-        this.partTypes.addAll(builder.partTypes);
-        this.includedTags.addAll(builder.includedTags);
-        this.excludedTags.addAll(builder.excludedTags);
+        this.partTypes.addAll(filter.partTypes);
+        this.includedTags.addAll(filter.includedTags);
+        this.excludedTags.addAll(filter.excludedTags);
 
         if (this.itemTypes.isEmpty()){
-            this.includeBlockTypes = builder.includeBlockTypes;
+            this.includeBlockTypes = filter.includeBlockTypes;
         }
 
         if (this.blockTypes.isEmpty()){
-            this.includeItemTypes = builder.includeItemTypes;
+            this.includeItemTypes = filter.includeItemTypes;
         }
 
-        this.itemTypes.addAll(builder.itemTypes);
-        this.blockTypes.addAll(builder.blockTypes);
+        this.itemTypes.addAll(filter.itemTypes);
+        this.blockTypes.addAll(filter.blockTypes);
 
         refresh();
         return true;
@@ -211,7 +211,7 @@ public final class SpawnedPartSelection {
         return true;
     }
 
-    public void unfilter(@NotNull PartFilterBuilder.FilterType filterType, boolean reselect){
+    public void unfilter(@NotNull PartFilter.FilterType filterType, boolean reselect){
         switch (filterType){
             case PART_TYPE -> partTypes.clear();
             case INCLUDED_TAGS -> includedTags.clear();
@@ -589,5 +589,18 @@ public final class SpawnedPartSelection {
      */
     public SpawnedDisplayEntityGroup getGroup() {
         return group;
+    }
+
+    /**
+     * Create a {@link PartFilter} based on all filters previously applied to this selection
+     * @return a {@link PartFilter}
+     */
+    public PartFilter createFilter(){
+        return new PartFilter()
+                .setPartTypes(partTypes)
+                .setItemTypes(itemTypes, includeItemTypes)
+                .setBlockTypes(blockTypes, includeBlockTypes)
+                .includePartTags(includedTags)
+                .excludePartTags(excludedTags);
     }
 }

@@ -2,7 +2,7 @@ package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.PartFilterBuilder;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PartFilter;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
@@ -38,7 +38,7 @@ class PartsFilterBlocksCMD implements SubCommand{
 
         player.sendMessage(Component.empty());
 
-        PartFilterBuilder builder = new PartFilterBuilder();
+        PartFilter builder = new PartFilter();
 
         if (args[2].equals("!")){
             player.sendMessage(Component.text("You cannot do that!", NamedTextColor.RED));
@@ -74,7 +74,7 @@ class PartsFilterBlocksCMD implements SubCommand{
 
         builder.setBlockTypes(types, include);
         player.sendMessage(Component.text());
-        partSelection.unfilter(PartFilterBuilder.FilterType.BLOCK_TYPE, false);
+        partSelection.unfilter(PartFilter.FilterType.BLOCK_TYPE, false);
 
         if (!partSelection.applyFilter(builder, false)){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to apply filter!", NamedTextColor.RED)));

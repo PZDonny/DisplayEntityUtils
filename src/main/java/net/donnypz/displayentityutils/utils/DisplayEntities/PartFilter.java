@@ -1,30 +1,50 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import org.bukkit.Material;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
-public class PartFilterBuilder {
+public class PartFilter implements Serializable {
 
     HashSet<String> includedTags = new HashSet<>();
     HashSet<String> excludedTags = new HashSet<>();
     HashSet<SpawnedDisplayEntityPart.PartType> partTypes = new HashSet<>();
 
-    HashSet<Material> itemTypes = new HashSet<>();
+    transient HashSet<Material> itemTypes = new HashSet<>();
+    transient HashSet<Material> blockTypes = new HashSet<>();
+    private final HashSet<String> serializedItemTypes = new HashSet<>();
+    private final HashSet<String> serializedBlockTypes = new HashSet<>();
     boolean includeItemTypes;
-    HashSet<Material> blockTypes = new HashSet<>();
     boolean includeBlockTypes;
 
+    @Serial
+    private static final long serialVersionUID = 99L;
+
+    @ApiStatus.Internal
+    public void setMaterialsFromSerialization(){
+        for (String type : serializedItemTypes){
+            Material material = Material.getMaterial(type);
+            if (material != null) itemTypes.add(material);
+        }
+
+        for (String type : serializedBlockTypes){
+            Material material = Material.getMaterial(type);
+            if (material != null) blockTypes.add(material);
+        }
+    }
 
     /**
      * Add a part tag that will be included in this filter
      * @param partTag the tag to include
      * @return this
      */
-    public @NotNull PartFilterBuilder includePartTag(@NotNull String partTag){
+    public @NotNull PartFilter includePartTag(@NotNull String partTag){
         this.includedTags.add(partTag);
         return this;
     }
@@ -36,7 +56,7 @@ public class PartFilterBuilder {
      * @param partTag the tag of exclude
      * @return this
      */
-    public @NotNull PartFilterBuilder excludePartTag(@NotNull String partTag){
+    public @NotNull PartFilter excludePartTag(@NotNull String partTag){
         this.excludedTags.add(partTag);
         return this;
     }
@@ -46,7 +66,7 @@ public class PartFilterBuilder {
      * @param partTags the tags to include
      * @return this
      */
-    public @NotNull PartFilterBuilder includePartTags(@NotNull Collection<String> partTags){
+    public @NotNull PartFilter includePartTags(@NotNull Collection<String> partTags){
         this.includedTags.addAll(partTags);
         return this;
     }
@@ -58,7 +78,7 @@ public class PartFilterBuilder {
      * @param partTags the tags of exclude
      * @return this
      */
-    public @NotNull PartFilterBuilder excludePartTags(@NotNull Collection<String> partTags){
+    public @NotNull PartFilter excludePartTags(@NotNull Collection<String> partTags){
         this.excludedTags.addAll(partTags);
         return this;
     }
@@ -68,7 +88,7 @@ public class PartFilterBuilder {
      * @param partTypes the parts to include in the filter
      * @return this
      */
-    public @NotNull PartFilterBuilder setPartTypes(@NotNull SpawnedDisplayEntityPart.PartType... partTypes){
+    public @NotNull PartFilter setPartTypes(@NotNull SpawnedDisplayEntityPart.PartType... partTypes){
         this.partTypes.clear();
         this.partTypes.addAll(Arrays.stream(partTypes).toList());
         return this;
@@ -79,7 +99,7 @@ public class PartFilterBuilder {
      * @param partTypes the parts to include in the filter
      * @return this
      */
-    public @NotNull PartFilterBuilder setPartTypes(@NotNull Collection<SpawnedDisplayEntityPart.PartType> partTypes){
+    public @NotNull PartFilter setPartTypes(@NotNull Collection<SpawnedDisplayEntityPart.PartType> partTypes){
         this.partTypes.clear();
         this.partTypes.addAll(partTypes);
         return this;
@@ -93,9 +113,13 @@ public class PartFilterBuilder {
      * @param isIncluding determine if the material should be included
      * @return this
      */
-    public @NotNull PartFilterBuilder setBlockType(@NotNull Material material, boolean isIncluding){
+    public @NotNull PartFilter setBlockType(@NotNull Material material, boolean isIncluding){
+        if (!material.isBlock()){
+            return this;
+        }
         this.blockTypes.clear();
         this.blockTypes.add(material);
+        this.serializedBlockTypes.add(material.asBlockType().key().asMinimalString());
         this.includeBlockTypes = isIncluding;
         return this;
     }
@@ -106,9 +130,15 @@ public class PartFilterBuilder {
      * @param isIncluding determine if the materials should be included
      * @return this
      */
-    public @NotNull PartFilterBuilder setBlockTypes(@NotNull Collection<Material> materials, boolean isIncluding){
+    public @NotNull PartFilter setBlockTypes(@NotNull Collection<Material> materials, boolean isIncluding){
         this.blockTypes.clear();
-        this.blockTypes.addAll(materials);
+        for (Material material : materials){
+            if (!material.isBlock()){
+                continue;
+            }
+            this.blockTypes.add(material);
+            this.serializedBlockTypes.add(material.asBlockType().key().asMinimalString());
+        }
         this.includeBlockTypes = isIncluding;
         return this;
     }
@@ -119,9 +149,10 @@ public class PartFilterBuilder {
      * @param isIncluding determine if the material should be included
      * @return this
      */
-    public @NotNull PartFilterBuilder setItemType(@NotNull Material material, boolean isIncluding){
+    public @NotNull PartFilter setItemType(@NotNull Material material, boolean isIncluding){
         this.itemTypes.clear();
         this.itemTypes.add(material);
+        this.serializedItemTypes.add(material.asItemType().key().asMinimalString());
         this.includeItemTypes = isIncluding;
         return this;
     }
@@ -132,19 +163,22 @@ public class PartFilterBuilder {
      * @param isIncluding determine if the materials should be included
      * @return this
      */
-    public @NotNull PartFilterBuilder setItemTypes(@NotNull Collection<Material> materials, boolean isIncluding){
+    public @NotNull PartFilter setItemTypes(@NotNull Collection<Material> materials, boolean isIncluding){
         this.itemTypes.clear();
-        this.itemTypes.addAll(materials);
+        for (Material material : materials){
+            this.itemTypes.add(material);
+            this.serializedItemTypes.add(material.asItemType().key().asMinimalString());
+        }
         this.includeItemTypes = isIncluding;
         return this;
     }
 
     /**
-     * Create a {@link SpawnedPartSelection} from this builder
+     * Create a {@link SpawnedPartSelection} from this filter
      * @param group the group to create a selection from
      * @return a {@link SpawnedPartSelection}
      */
-    public @NotNull SpawnedPartSelection build(@NotNull SpawnedDisplayEntityGroup group){
+    public @NotNull SpawnedPartSelection toSpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group){
         return new SpawnedPartSelection(group, this);
     }
 
