@@ -3,10 +3,10 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.donnypz.displayentityutils.utils.GroupResult;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 
 class GroupSelectCMD implements SubCommand{
@@ -34,7 +34,10 @@ class GroupSelectCMD implements SubCommand{
 
             group.getUnaddedInteractionEntitiesInRange(interactionDistance, true);
             if (!group.getMasterPart().getEntity().isGlowing()){
-                group.glow(100, false, false);
+                group.glow(50, false, false);
+            }
+            else{
+                player.sendMessage(Component.text("Your selected group's glowing was not effected!", NamedTextColor.GRAY, TextDecoration.ITALIC));
             }
         } catch (NumberFormatException e) {
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a number for the distance to select interaction entities", NamedTextColor.RED)));
