@@ -22,6 +22,7 @@ class AnimCMD implements SubCommand{
         subCommands.put("delete", new AnimDeleteCMD());
         subCommands.put("info", new AnimInfoCMD());
         subCommands.put("frameinfo", new AnimFrameInfoCMD());
+        subCommands.put("usefilter", new AnimUseFilterCMD());
         subCommands.put("addframe", new AnimAddFrameCMD());
         subCommands.put("addframeafter", new AnimAddFrameAfterCMD());
         subCommands.put("removeframe", new AnimRemoveFrameCMD());
@@ -69,14 +70,14 @@ class AnimCMD implements SubCommand{
         sender.sendMessage(Component.empty());
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         if (page <= 1){
-            sender.sendMessage(Component.text("Create animations that can be saved and loaded as a DisplayAnimation", NamedTextColor.AQUA));
-            sender.sendMessage(Component.text("If using animations, use \"move\" on groups instead of \"translate\"", NamedTextColor.AQUA));
-            sender.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Use <yellow>\"block-display.com\" <aqua>to easier create animations and convert them with " +
+            sender.sendMessage(Component.text("Manage animations that can be saved and loaded", NamedTextColor.AQUA));
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Convert animations from <yellow>\"block-display.com\" <aqua> with " +
                     "\"/mdis bdengine convertanim\""));
             CMDUtils.sendCMD(sender,"/mdis anim help <page-number>", " (Get help for animations)");
-            CMDUtils.sendCMD(sender,"/mdis anim new [part-tag]", " (Manually create a new animation. Animates only parts with a tag, if the tag is specified)");
+            CMDUtils.sendCMD(sender,"/mdis anim new", " (Manually create a new animation)");
             CMDUtils.sendCMD(sender,"/mdis anim info", " (List information about your selected animation)");
             CMDUtils.sendCMD(sender, "/mdis anim frameinfo <frame-id>", " (List information about a frame in your animation)");
+            CMDUtils.sendCMD(sender, "/mdis anim usefilter", " (Animate only your selected, filtered parts.)");
             CMDUtils.sendCMD(sender, "/mdis anim addframe <tick-delay> <tick-duration>", " (Add a frame to your selected animation)");
 
         }
@@ -96,9 +97,9 @@ class AnimCMD implements SubCommand{
             CMDUtils.sendCMD(sender, "/mdis anim showframe <frame-id>", " (Displays a frame on your selected group)");
             CMDUtils.sendCMD(sender, "/mdis anim play [-loop]", " (Play your selected animation on your selected group. Include \"-loop\" to loop the animation)");
             CMDUtils.sendCMD(sender, "/mdis anim stop", " (Stop an animation playing on a group)");
-            CMDUtils.sendCMD(sender, "/mdis anim select <anim-tag>", " (Select a saved DisplayAnimation from a storage location)");
-            CMDUtils.sendCMD(sender, "/mdis anim save <storage-location>", " (Save your selected animation)");
-            CMDUtils.sendCMD(sender, "/mdis anim delete <anim-tag> <storage-location>", " (Delete a saved animation from a storage location)");
+            CMDUtils.sendCMD(sender, "/mdis anim select <anim-tag> <storage-location>", " (Select a saved animation)");
+            CMDUtils.sendCMD(sender, "/mdis anim save <storage-location>", " (Save your selected animation and any changes made)");
+            CMDUtils.sendCMD(sender, "/mdis anim delete <anim-tag> <storage-location>", " (Delete a saved animation)");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }

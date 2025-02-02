@@ -51,15 +51,22 @@ public final class DisplayAnimatorExecutor {
 
     private void prepareAnimation(SpawnedDisplayAnimation animation, SpawnedDisplayEntityGroup group, SpawnedDisplayAnimationFrame frame, int delay){
         group.addActiveAnimator(animator);
-        if (delay <= 0){
-            executeAnimation(animation, group, frame, playSingleFrame);
+        SpawnedPartSelection selection;
+        if (animation.hasFilter()){
+            selection = new SpawnedPartSelection(group, animation.filter);
         }
         else{
-            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> executeAnimation(animation, group, frame, playSingleFrame), delay);
+            selection = new SpawnedPartSelection(group);
+        }
+        if (delay <= 0){
+            executeAnimation(animation, group, selection, frame, playSingleFrame);
+        }
+        else{
+            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> executeAnimation(animation, group, selection, frame, playSingleFrame), delay);
         }
     }
 
-    private void executeAnimation(SpawnedDisplayAnimation animation, SpawnedDisplayEntityGroup group, SpawnedDisplayAnimationFrame frame, boolean playSingleFrame){
+    private void executeAnimation(SpawnedDisplayAnimation animation, SpawnedDisplayEntityGroup group, SpawnedPartSelection selection, SpawnedDisplayAnimationFrame frame, boolean playSingleFrame){
         if (!group.isActiveAnimator(animator)){
             return;
         }
@@ -78,8 +85,8 @@ public final class DisplayAnimatorExecutor {
             new GroupAnimateFrameStartEvent(group, animator, animation, frame).callEvent();
             frame.playStartEffects(group, animator);
 
-            animateInteractions(groupLoc, frame, group, animation);
-            animateDisplays(frame, group, animation);
+            animateInteractions(groupLoc, frame, group, selection, animation);
+            animateDisplays(frame, group, selection, animation);
         }
 
         if (playSingleFrame){
@@ -106,7 +113,7 @@ public final class DisplayAnimatorExecutor {
             }
 
             Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                executeAnimation(animation, group, animation.frames.get(index+1), false);
+                executeAnimation(animation, group, selection, animation.frames.get(index+1), false);
             }, delay);
         }
 
@@ -132,20 +139,20 @@ public final class DisplayAnimatorExecutor {
                 if (frame.duration > 0) {
                     Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                         frame.playEndEffects(group, animator);
-                        executeAnimation(animation, group, animation.frames.getFirst(), false);
+                        executeAnimation(animation, group, selection, animation.frames.getFirst(), false);
                     }, frame.duration);
                 } else {
                     frame.playEndEffects(group, animator);
-                    executeAnimation(animation, group, animation.frames.getFirst(), false);
+                    executeAnimation(animation, group, selection, animation.frames.getFirst(), false);
                 }
             }
         }
     }
 
-    private void animateInteractions(Location groupLoc, SpawnedDisplayAnimationFrame frame, SpawnedDisplayEntityGroup group, SpawnedDisplayAnimation animation){
+    private void animateInteractions(Location groupLoc, SpawnedDisplayAnimationFrame frame, SpawnedDisplayEntityGroup group, SpawnedPartSelection selection, SpawnedDisplayAnimation animation){
         for (UUID partUUID : frame.interactionTransformations.keySet()){
             SpawnedDisplayEntityPart part = group.getSpawnedPart(partUUID);
-            if (part == null){
+            if (part == null || !selection.contains(part)){
                 continue;
             }
 
@@ -198,7 +205,7 @@ public final class DisplayAnimatorExecutor {
         }
     }
 
-    private void animateDisplays(SpawnedDisplayAnimationFrame frame, SpawnedDisplayEntityGroup group, SpawnedDisplayAnimation animation){
+    private void animateDisplays(SpawnedDisplayAnimationFrame frame, SpawnedDisplayEntityGroup group, SpawnedPartSelection selection, SpawnedDisplayAnimation animation){
         for (UUID partUUID : frame.displayTransformations.keySet()){
             DisplayTransformation transformation = frame.displayTransformations.get(partUUID);
             if (transformation == null){ //Part does not change transformation
@@ -206,9 +213,10 @@ public final class DisplayAnimatorExecutor {
             }
 
             SpawnedDisplayEntityPart part = group.getSpawnedPart(partUUID);
-            if (part == null){
+            if (part == null || !selection.contains(part)){
                 continue;
             }
+
             Display display = ((Display) part.getEntity());
 
             //Prevents jittering in some cases

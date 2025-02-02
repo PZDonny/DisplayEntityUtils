@@ -1,9 +1,5 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.utils.DisplayUtils;
-import org.bukkit.Location;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.Interaction;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -13,60 +9,15 @@ import java.util.*;
 public final class SpawnedDisplayAnimation{
     String animationTag;
     List<SpawnedDisplayAnimationFrame> frames = new ArrayList<>();
-    String partTag = null;
+    PartFilter filter;
     boolean respectGroupScale = true;
 
     @ApiStatus.Internal
     public SpawnedDisplayAnimation(){}
 
     @ApiStatus.Internal
-    public SpawnedDisplayAnimation(String partTag){
-        this.partTag = partTag;
-    }
-
-
-    SpawnedDisplayAnimation(SpawnedDisplayEntityGroup group){
-        SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(0, 0);
-        Location gLoc = group.getLocation();
-        for (SpawnedDisplayEntityPart part : group.spawnedParts.values()){
-            if (part.isMaster()){
-                continue;
-            }
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                Interaction i = (Interaction) part.getEntity();
-
-                InteractionTransformation transform = new InteractionTransformation(DisplayUtils.getInteractionTranslation(i).toVector3f(), gLoc.getYaw(), gLoc.getPitch(), i.getInteractionHeight(), i.getInteractionWidth());
-                frame.setInteractionTransformation(part, transform);
-            }
-            else{
-                DisplayTransformation transform = DisplayTransformation.get((Display) part.getEntity());
-                frame.setDisplayEntityTransformation(part, transform);
-            }
-        }
-        addFrame(frame);
-    }
-
-    @ApiStatus.Experimental
-    SpawnedDisplayAnimation(SpawnedDisplayEntityGroup group, String partTag){
-        this.partTag = partTag;
-        Location gLoc = group.getLocation();
-        SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(0, 0);
-        for (SpawnedDisplayEntityPart part : group.spawnedParts.values()){
-            if (part.isMaster()){
-                continue;
-            }
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                Interaction i = (Interaction) part.getEntity();
-
-                InteractionTransformation transform = new InteractionTransformation(DisplayUtils.getInteractionTranslation(i).toVector3f(), gLoc.getYaw(), gLoc.getPitch(), i.getInteractionHeight(), i.getInteractionWidth());
-                frame.setInteractionTransformation(part, transform);
-            }
-            else{
-                DisplayTransformation transform = DisplayTransformation.get((Display) part.getEntity());
-                frame.setDisplayEntityTransformation(part, transform);
-            }
-        }
-        addFrame(frame);
+    public SpawnedDisplayAnimation(PartFilter filter){
+        this.filter = filter;
     }
 
     /**
@@ -86,21 +37,29 @@ public final class SpawnedDisplayAnimation{
     }
 
     /**
-     * Get whether this animation is a part animation, and will only animate parts in a group with a certain part tag.
-     * @return a boolean
+     * Set the filter this animation should use when animating
+     * @param filter the filter to use or null to unfilter
+     * @return this
      */
-    @ApiStatus.Experimental
-    public boolean isPartAnimation(){
-        return partTag != null;
+    public SpawnedDisplayAnimation setFilter(@Nullable PartFilter filter){
+        this.filter = filter;
+        return this;
     }
 
     /**
-     * Get the part tag this animation will animate
-     * @return a string, null if not set and this is not a part animation
+     * Get the filter this animation will use on a group
+     * @return a {@link PartFilter} or null if {@link #hasFilter()} is false
      */
-    @ApiStatus.Experimental
-    public @Nullable String getPartTag() {
-        return partTag;
+    public @Nullable PartFilter getFilter() {
+        return filter;
+    }
+
+    /**
+     * Determine if this group has a filter it will use when animating
+     * @return a boolean
+     */
+    public boolean hasFilter(){
+        return filter != null;
     }
 
     /**
@@ -267,7 +226,9 @@ public final class SpawnedDisplayAnimation{
         DisplayAnimation anim = new DisplayAnimation();
 
         anim.animationTag = this.animationTag;
-        anim.partTag = this.partTag;
+        if (this.filter != null){
+            anim.filter = this.filter.clone();
+        }
         anim.respectGroupScale = this.respectGroupScale;
         for (SpawnedDisplayAnimationFrame frame : frames){
             anim.addFrame(frame.toDisplayAnimationFrame());
@@ -306,7 +267,9 @@ public final class SpawnedDisplayAnimation{
             reversed.addFrame(newFrame);
         }
         reversed.animationTag = this.animationTag;
-        reversed.partTag = this.partTag;
+        if (this.filter != null){
+            reversed.filter = this.filter.clone();
+        }
         reversed.respectGroupScale = this.respectGroupScale;
         return reversed;
     }

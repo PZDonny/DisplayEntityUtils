@@ -47,13 +47,9 @@ class AnimOverwriteFrameCMD implements SubCommand{
                 return;
             }
 
-            SpawnedDisplayAnimationFrame frame = anim.getFrames().get(id);;
+            SpawnedDisplayAnimationFrame frame = anim.getFrames().get(id);
 
-            if (anim.isPartAnimation()) {
-                frame.setTransformation(group, anim.getPartTag());
-            } else {
-                frame.setTransformation(group);
-            }
+            frame.setTransformation(group);
             frame.setDelay(delay);
             frame.setDuration(duration);
 

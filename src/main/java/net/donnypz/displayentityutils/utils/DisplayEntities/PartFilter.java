@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
-public class PartFilter implements Serializable {
+public class PartFilter implements Serializable, Cloneable {
 
     HashSet<String> includedTags = new HashSet<>();
     HashSet<String> excludedTags = new HashSet<>();
@@ -27,14 +27,16 @@ public class PartFilter implements Serializable {
     private static final long serialVersionUID = 99L;
 
     @ApiStatus.Internal
-    public void setMaterialsFromSerialization(){
+    public void deserializeMaterials(){
+        itemTypes = new HashSet<>();
+        blockTypes = new HashSet<>();
         for (String type : serializedItemTypes){
-            Material material = Material.getMaterial(type);
+            Material material = Material.matchMaterial(type);
             if (material != null) itemTypes.add(material);
         }
 
         for (String type : serializedBlockTypes){
-            Material material = Material.getMaterial(type);
+            Material material = Material.matchMaterial(type);
             if (material != null) blockTypes.add(material);
         }
     }
@@ -173,6 +175,34 @@ public class PartFilter implements Serializable {
         return this;
     }
 
+    public HashSet<String> getIncludedPartTags() {
+        return new HashSet<>(includedTags);
+    }
+
+    public HashSet<String> getExcludedPartTags() {
+        return new HashSet<>(excludedTags);
+    }
+
+    public HashSet<SpawnedDisplayEntityPart.PartType> getPartTypes() {
+        return new HashSet<>(partTypes);
+    }
+
+    public HashSet<Material> getItemTypes() {
+        return new HashSet<>(itemTypes);
+    }
+
+    public HashSet<Material> getBlockTypes() {
+        return new HashSet<>(blockTypes);
+    }
+
+    public boolean isIncludingItemTypes() {
+        return includeItemTypes;
+    }
+
+    public boolean isIncludingBlockTypes() {
+        return includeBlockTypes;
+    }
+
     /**
      * Create a {@link SpawnedPartSelection} from this filter
      * @param group the group to create a selection from
@@ -180,6 +210,22 @@ public class PartFilter implements Serializable {
      */
     public @NotNull SpawnedPartSelection toSpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group){
         return new SpawnedPartSelection(group, this);
+    }
+
+
+    /**
+     * Create a copy of this {@link PartFilter}
+     * @return a {@link PartFilter} identical to this one
+     */
+    @Override
+    public PartFilter clone(){
+        try{
+            return (PartFilter) super.clone();
+        }
+        catch(CloneNotSupportedException e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public enum FilterType{

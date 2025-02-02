@@ -42,11 +42,8 @@ class AnimAddFrameCMD implements SubCommand{
                 throw new NumberFormatException();
             }
             SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(delay, duration);
-            if (anim.isPartAnimation()) {
-                frame.setTransformation(group, anim.getPartTag());
-            } else {
-                frame.setTransformation(group);
-            }
+            frame.setTransformation(group);
+
             boolean isUnique = anim.addFrame(frame);
             if (isUnique){
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully captured animation frame", NamedTextColor.GREEN)));

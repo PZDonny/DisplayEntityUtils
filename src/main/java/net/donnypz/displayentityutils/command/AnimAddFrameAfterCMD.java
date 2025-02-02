@@ -54,11 +54,7 @@ class AnimAddFrameAfterCMD implements SubCommand{
             }
             SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(delay, duration);
 
-            if (anim.isPartAnimation()) {
-                frame.setTransformation(group, anim.getPartTag());
-            } else {
-                frame.setTransformation(group);
-            }
+            frame.setTransformation(group);
 
             frames.add(id + 1, frame);
             anim.setFrames(frames);

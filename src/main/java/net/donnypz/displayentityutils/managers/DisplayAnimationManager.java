@@ -245,6 +245,8 @@ public final class DisplayAnimationManager {
             ObjectInputStream objIn = new DisplayAnimationInputStream(gzipInputStream);
             DisplayAnimation anim = (DisplayAnimation) objIn.readObject();
             anim.adaptOldSounds();
+            PartFilter filter = anim.getPartFilter();
+            if (filter != null) filter.deserializeMaterials();
 
             objIn.close();
             gzipInputStream.close();

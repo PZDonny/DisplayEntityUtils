@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public final class SpawnedPartSelection {
-    List<SpawnedDisplayEntityPart> selectedParts = new ArrayList<>();
+    LinkedHashSet<SpawnedDisplayEntityPart> selectedParts = new LinkedHashSet<>();
 
     Set<SpawnedDisplayEntityPart.PartType> partTypes = new HashSet<>();
 
@@ -72,6 +72,15 @@ public final class SpawnedPartSelection {
         this.includeItemTypes = filter.includeItemTypes;
     }
 
+    /**
+     * Determine whether a {@link SpawnedDisplayEntityPart} is contained in this selection
+     * @param part
+     * @return a boolean
+     */
+    public boolean contains(@NotNull SpawnedDisplayEntityPart part){
+        return selectedParts.contains(part);
+    }
+
 
     /**
      * Check if this selection has any filters applied to it
@@ -93,7 +102,7 @@ public final class SpawnedPartSelection {
      * @param reset whether to reset the currently selected parts and all filters
      * @return true if the selection's group is still valid
      */
-    public boolean applyFilter(PartFilter filter, boolean reset){
+    public boolean applyFilter(@NotNull PartFilter filter, boolean reset){
         if (group == null){
             return false;
         }
@@ -229,7 +238,7 @@ public final class SpawnedPartSelection {
      * Get the SpawnedDisplayEntityParts within this SpawnedPartSelection
      * @return List of the parts in this selection
      */
-    public List<SpawnedDisplayEntityPart> getSelectedParts() {
+    public SequencedCollection<SpawnedDisplayEntityPart> getSelectedParts() {
         return new ArrayList<>(selectedParts);
     }
 
@@ -247,7 +256,14 @@ public final class SpawnedPartSelection {
      * @return an integer. -1 if the part is not contained in this SpawnedPartSelection
      */
     public int indexOf(@NotNull SpawnedDisplayEntityPart part){
-        return selectedParts.indexOf(part);
+        int i = 0;
+        for (SpawnedDisplayEntityPart p : selectedParts){
+            if (part.equals(p)){
+                return i;
+            }
+            i++;
+        }
+        return -1;
     }
 
     /**
@@ -294,11 +310,12 @@ public final class SpawnedPartSelection {
      */
     public SpawnedPartSelection setToNextPart(int jump){
         if (!selectedParts.isEmpty()){
-            int index = selectedParts.indexOf(selectedPart)+jump;
+            List<SpawnedDisplayEntityPart> parts = new ArrayList<>(selectedParts);
+            int index = indexOf(selectedPart)+jump;
             while (index >= selectedParts.size()){
                 index-=selectedParts.size();
             }
-            selectedPart = selectedParts.get(index);
+            selectedPart = parts.get(index);
         }
         return this;
     }
@@ -312,9 +329,10 @@ public final class SpawnedPartSelection {
      */
     public SpawnedPartSelection setToPreviousPart(int jump){
         if (!selectedParts.isEmpty()){
-            int index = (selectedParts.indexOf(selectedPart) - Math.abs(jump)) % selectedParts.size();
+            List<SpawnedDisplayEntityPart> parts = new ArrayList<>(selectedParts);
+            int index = (indexOf(selectedPart) - Math.abs(jump)) % selectedParts.size();
             if (index < 0) index += selectedParts.size();
-            selectedPart = selectedParts.get(index);
+            selectedPart = parts.get(index);
         }
         return this;
     }
@@ -598,7 +616,7 @@ public final class SpawnedPartSelection {
      * Create a {@link PartFilter} based on all filters previously applied to this selection
      * @return a {@link PartFilter}
      */
-    public PartFilter createFilter(){
+    public PartFilter toFilter(){
         return new PartFilter()
                 .setPartTypes(partTypes)
                 .setItemTypes(itemTypes, includeItemTypes)
