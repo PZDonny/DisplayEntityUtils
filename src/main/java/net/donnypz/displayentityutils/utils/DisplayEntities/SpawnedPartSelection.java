@@ -167,14 +167,17 @@ public final class SpawnedPartSelection {
             Set<String> tags = new HashSet<>(list); //For faster searches
 
             //Part Has Excluded Tag (Don't Filter Part)
+            boolean filterable = true;
             for (String excluded : excludedTags){
                 if (tags.contains(excluded)) {
-                    continue filter;
+                    filterable = false;
+                    break;
+                    //continue filter;
                 }
             }
 
-            //No Included Tags for filtering
-            if (includedTags.isEmpty()){
+            //No Included Tags for filtering and still filterable
+            if (includedTags.isEmpty() && filterable){
                 selectedParts.add(part);
             }
             //Part Has Included Tag (Filter Part)
