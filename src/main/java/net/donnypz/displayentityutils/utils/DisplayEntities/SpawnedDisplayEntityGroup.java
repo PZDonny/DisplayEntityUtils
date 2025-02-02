@@ -365,7 +365,7 @@ public final class SpawnedDisplayEntityGroup {
 
             SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(i);
             if (part == null){
-                new SpawnedDisplayEntityPart(this, (Interaction) e, partUUIDRandom);
+                new SpawnedDisplayEntityPart(this, i, partUUIDRandom);
             }
             else{
                 if (this == part.getGroup()){ //Already in this group
@@ -373,17 +373,12 @@ public final class SpawnedDisplayEntityGroup {
                 }
                 part.setGroup(this);
             }
-            interactions.add((Interaction) e);
+            interactions.add(i);
         }
         return interactions;
     }
 
-    /**
-     * Randomize the part uuids of all parts in this group with a given seed.
-     * Useful when wanting to use the same animation on similar SpawnedDisplayEntityGroups.
-     * Animations are not guaranteed to work properly if the order of parts are changed or if there is a difference in the number of parts.
-     * @param seed The seed to use for the part randomization
-     */
+    @ApiStatus.Internal
     public void seedPartUUIDs(long seed){
         byte[] byteArray;
         Random random = new Random(seed);
@@ -447,7 +442,7 @@ public final class SpawnedDisplayEntityGroup {
                             addInteractionEntity(interaction);
 
                         }
-                        interactions.add((Interaction) e);
+                        interactions.add(interaction);
                     }
                 }
             }

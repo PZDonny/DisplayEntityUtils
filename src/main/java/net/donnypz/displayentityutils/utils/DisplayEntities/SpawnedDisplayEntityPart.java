@@ -83,6 +83,7 @@ public final class SpawnedDisplayEntityPart {
         setGroupPDC();
     }
 
+    @ApiStatus.Internal
     public void setPartUUID(@NotNull UUID uuid){
         this.partUUID = uuid;
         PersistentDataContainer pdc = getEntity().getPersistentDataContainer();
