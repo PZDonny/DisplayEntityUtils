@@ -140,6 +140,12 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                     if (args[1].equalsIgnoreCase("background")){
                         addColors(suggestions);
                     }
+                    else if (args[1].equalsIgnoreCase("font")){
+                        suggestions.add("default");
+                        suggestions.add("uniform");
+                        suggestions.add("alt");
+                        suggestions.add("illageralt");
+                    }
                 }
             }
         }
