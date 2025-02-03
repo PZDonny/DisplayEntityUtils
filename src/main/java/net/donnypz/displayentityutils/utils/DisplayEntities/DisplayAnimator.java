@@ -70,6 +70,15 @@ public class DisplayAnimator {
         group.removeActiveAnimator(this);
     }
 
+    /**
+     * Check if this animator is animating a group
+     * @param group
+     * @return a boolean
+     */
+    public boolean isAnimating(SpawnedDisplayEntityGroup group){
+        return group.isActiveAnimator(this);
+    }
+
 
     /**
      * Get the {@link SpawnedDisplayAnimation} that this animator uses on groups
