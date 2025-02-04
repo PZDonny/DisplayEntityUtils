@@ -125,7 +125,7 @@ public final class DisplayAnimationManager {
 
 
     /**
-     * Get an animation {@link SpawnedDisplayAnimation}
+     * Get a cached {@link SpawnedDisplayAnimation}
      * @param animationTag the tag of the animation
      * @return a {@link SpawnedDisplayAnimation} or null if not cached
      */
@@ -134,7 +134,7 @@ public final class DisplayAnimationManager {
     }
 
     /**
-     * Get a cached {@link SpawnedDisplayAnimation}. If the desired animation is not cached, it will be fetched with the desired {@link LoadMethod}
+     * Get a cached {@link SpawnedDisplayAnimation}. If the desired animation is not cached, it will be fetched with the specified {@link LoadMethod}
      * @param animationTag the tag of the animation
      * @param loadMethod The lhe storage location of the animation. Null if unknown or to search all locations.
      * <hr>
@@ -145,7 +145,7 @@ public final class DisplayAnimationManager {
     //Check Cache
         SpawnedDisplayAnimation spawnedAnim = getCachedAnimation(animationTag);
         if (spawnedAnim != null){
-            return spawnedAnim;
+            return spawnedAnim.clone();
         }
         DisplayAnimation anim;
         if (loadMethod == null){
