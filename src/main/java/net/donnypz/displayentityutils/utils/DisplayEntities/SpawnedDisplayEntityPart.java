@@ -19,7 +19,7 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-public final class SpawnedDisplayEntityPart {
+public final class SpawnedDisplayEntityPart implements Spawned {
 
     private static final HashMap<PartData, SpawnedDisplayEntityPart> allParts = new HashMap<>();
     private SpawnedDisplayEntityGroup group;
@@ -392,7 +392,8 @@ public final class SpawnedDisplayEntityPart {
      * Reveal this part's entity to a player. This may produce unexpected results if this part is in an unloaded chunk
      * @param player
      */
-    public void showToPlayer(Player player){
+    @Override
+    public void showToPlayer(@NotNull Player player){
         if (getEntity() == null){
             return;
         }
@@ -403,7 +404,8 @@ public final class SpawnedDisplayEntityPart {
      * Hide this part's entity from a player. This may produce unexpected results if this part is in an unloaded chunk
      * @param player
      */
-    public void hideFromPlayer(Player player){
+    @Override
+    public void hideFromPlayer(@NotNull Player player){
         if (getEntity() == null){
             return;
         }
@@ -436,9 +438,10 @@ public final class SpawnedDisplayEntityPart {
      * Outlined with soul fire flame particles if Interaction.
      * Cloud Particle if it's the master part
      * @param particleHidden don't show parts with particles if it's the master part or has no visible material
+     * @return this
      */
 
-    public void glow(boolean particleHidden){
+    public SpawnedDisplayEntityPart glow(boolean particleHidden){
         Entity entity = getEntity();
         if (type == PartType.INTERACTION) {
             interactionOutline((Interaction) entity, Long.MAX_VALUE);
@@ -463,6 +466,7 @@ public final class SpawnedDisplayEntityPart {
         else{
             entity.setGlowing(true);
         }
+        return this;
     }
 
     /**
@@ -472,15 +476,16 @@ public final class SpawnedDisplayEntityPart {
      * Cloud Particle if it's the master part
      * @param durationInTicks How long to glow this selection
      * @param particleHidden don't show parts with particles if it's the master part or has no visible material
+     * @return this
      */
-    public void glow(long durationInTicks, boolean particleHidden){
+    public SpawnedDisplayEntityPart glow(long durationInTicks, boolean particleHidden){
         Entity entity = getEntity();
         if (type == PartType.INTERACTION) {
             if (particleHidden){
-                return;
+                return this;
             }
             interactionOutline((Interaction) entity, durationInTicks);
-            return;
+            return this;
         }
         if (this.equals(group.getMasterPart())){
             if (!particleHidden){
@@ -516,12 +521,14 @@ public final class SpawnedDisplayEntityPart {
                 entity.setGlowing(false);
             }
         }.runTaskLater(DisplayEntityPlugin.getInstance(), durationInTicks);
+        return this;
     }
 
     /**
      * Stops this part from glowing
      */
-    public void unglow(){
+    @Override
+    public SpawnedDisplayEntityPart unglow(){
         if (type == PartType.INTERACTION) {
             //temporaryParticles(entity, durationInTicks, Particle.COMPOSTER);
             isInteractionOutlined = false;
@@ -529,6 +536,7 @@ public final class SpawnedDisplayEntityPart {
         else{
             getEntity().setGlowing(false);
         }
+        return this;
     }
 
     private void interactionOutline(Interaction interaction, long durationInTicks){
@@ -592,29 +600,30 @@ public final class SpawnedDisplayEntityPart {
     }
 
     private void temporaryParticles(Entity entity, long durationInTicks, Particle particle){
-        Location loc;
         entity.setGlowing(true);
-        if (entity instanceof Display d){
-            loc = DisplayUtils.getModelLocation(d);
-        }
-        else{
-            loc = entity.getLocation();
-        }
 
         new BukkitRunnable(){
+            Location loc;
             long i = 0;
             @Override
             public void run() {
-                if (!entity.isValid() || (durationInTicks != -1 && i >= durationInTicks) || group == null || !group.isSpawned() || group.spawnedParts.isEmpty()){
+                if (!entity.isGlowing() || !entity.isValid() || (durationInTicks != -1 && i >= durationInTicks) || group == null || !group.isSpawned() || group.spawnedParts.isEmpty()){
                     cancel();
                     return;
+                }
+
+
+                if (entity instanceof Display d){
+                    loc = DisplayUtils.getModelLocation(d);
+                }
+                else{
+                    loc = entity.getLocation();
                 }
 
                 loc.getWorld().spawnParticle(particle, loc, 1, 0, 0,0 , 0);
                 if (durationInTicks != -1){
                     i+=2;
                 }
-
             }
         }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, 2);
     }
@@ -624,6 +633,7 @@ public final class SpawnedDisplayEntityPart {
      * @param yaw The yaw to set for this part
      * @param pivotIfInteraction true if this part's type is {@link PartType#INTERACTION} and it should pivot around the group's location
      */
+    @Override
     public void setYaw(float yaw, boolean pivotIfInteraction){
         Entity entity = getEntity();
         if (type == PartType.INTERACTION && pivotIfInteraction){
@@ -636,6 +646,7 @@ public final class SpawnedDisplayEntityPart {
      * Change the pitch of this part
      * @param pitch The pitch to set for this part
      */
+    @Override
     public void setPitch(float pitch){
         Entity entity = getEntity();
         entity.setRotation(entity.getYaw(), pitch);
@@ -646,6 +657,7 @@ public final class SpawnedDisplayEntityPart {
      * Set the brightness of this part
      * @param brightness the brightness to set, null to use brightness based on position
      */
+    @Override
     public void setBrightness(@Nullable Display.Brightness brightness){
         Entity entity = getEntity();
         if (entity instanceof Interaction){
@@ -659,6 +671,7 @@ public final class SpawnedDisplayEntityPart {
      * Set the billboard of this part
      * @param billboard the billboard to set
      */
+    @Override
     public void setBillboard(@NotNull Display.Billboard billboard){
         Entity entity = getEntity();
         if (entity instanceof Interaction){
@@ -673,6 +686,7 @@ public final class SpawnedDisplayEntityPart {
      * Set the view range of this part
      * @param viewRangeMultiplier The range multiplier to set
      */
+    @Override
     public void setViewRange(float viewRangeMultiplier){
         Entity entity = getEntity();
         if (entity instanceof Interaction){
@@ -716,6 +730,7 @@ public final class SpawnedDisplayEntityPart {
      * Set the glow color of this part
      * @param color The color to set
      */
+    @Override
     public void setGlowColor(@Nullable Color color){
         Entity entity = getEntity();
         if (entity instanceof Interaction){
@@ -783,6 +798,7 @@ public final class SpawnedDisplayEntityPart {
      * Pivot an Interaction Entity around its group's master part
      * @param angleInDegrees the pivot angle
      */
+    @Override
     public void pivot(double angleInDegrees){
         Entity entity = getEntity();
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION){

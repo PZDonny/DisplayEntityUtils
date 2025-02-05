@@ -25,7 +25,7 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-public final class SpawnedDisplayEntityGroup {
+public final class SpawnedDisplayEntityGroup implements Spawned {
     public static final long defaultPartUUIDSeed = 99;
     final Random partUUIDRandom = new Random(defaultPartUUIDSeed);
 
@@ -392,20 +392,22 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Reveal a SpawnedDisplayEntityGroup that is spawned hidden (or hidden in another way) to a player
+     * Reveal this group that is spawned hidden (or hidden in another way) to a player
      * @param player The player to reveal this group to
      */
-    public void showToPlayer(Player player){
+    @Override
+    public void showToPlayer(@NotNull Player player){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.showToPlayer(player);
         }
     }
 
     /**
-     * Hide a SpawnedDisplayEntityGroup that is spawned hidden (or hidden in another way) from a player
+     * Hide this group from a player
      * @param player The player to hide this group from
      */
-    public void hideFromPlayer(Player player){
+    @Override
+    public void hideFromPlayer(@NotNull Player player){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.hideFromPlayer(player);
         }
@@ -899,10 +901,24 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
+     * Pivot all Interaction parts in this selection around the SpawnedDisplayEntityGroup's master part
+     * @param angle the pivot angle
+     */
+    @Override
+    public void pivot(double angle){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                part.pivot(angle);
+            }
+        }
+    }
+
+    /**
      * Change the yaw of this group
      * @param yaw The yaw to set for this group
      * @param pivotInteractions true if interactions should pivot around the group with the yaw change
      */
+    @Override
     public void setYaw(float yaw, boolean pivotInteractions){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setYaw(yaw, pivotInteractions);
@@ -913,6 +929,7 @@ public final class SpawnedDisplayEntityGroup {
      * Change the pitch of this group
      * @param pitch The pitch to set for this group
      */
+    @Override
     public void setPitch(float pitch){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setPitch(pitch);
@@ -923,6 +940,7 @@ public final class SpawnedDisplayEntityGroup {
      * Set the brightness of this group
      * @param brightness the brightness to set, null to use brightness based on position
      */
+    @Override
     public void setBrightness(@Nullable Display.Brightness brightness){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setBrightness(brightness);
@@ -933,6 +951,7 @@ public final class SpawnedDisplayEntityGroup {
      * Set the billboard of this group
      * @param billboard the billboard to set
      */
+    @Override
     public void setBillboard(@NotNull Display.Billboard billboard){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setBillboard(billboard);
@@ -943,6 +962,7 @@ public final class SpawnedDisplayEntityGroup {
      * Set the view range of this group
      * @param viewRangeMultiplier The range multiplier to set
      */
+    @Override
     public void setViewRange(float viewRangeMultiplier){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setViewRange(viewRangeMultiplier);
@@ -1005,6 +1025,7 @@ public final class SpawnedDisplayEntityGroup {
      * Set the glow color of this group
      * @param color The color to set
      */
+    @Override
     public void setGlowColor(@Nullable Color color){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setGlowColor(color);
@@ -1173,6 +1194,7 @@ public final class SpawnedDisplayEntityGroup {
      * Removes the glow effect from all the parts in this group
      * @return this
      */
+    @Override
     public SpawnedDisplayEntityGroup unglow(){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.unglow();
@@ -1611,6 +1633,7 @@ public final class SpawnedDisplayEntityGroup {
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame}
      * @param animation the animation the frame is from
      * @param frame the frame to display
+     * @param isAsync whether to show this frame asynchronously (unpredictable results)
      * @return false if this group is in an unloaded chunk
      */
     public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, boolean isAsync) {
@@ -1631,12 +1654,17 @@ public final class SpawnedDisplayEntityGroup {
         return this;
     }
 
+    /**
+     * Check if an animator is animating on this group
+     * @param animator
+     * @return a boolean
+     */
     public boolean isActiveAnimator(@NotNull DisplayAnimator animator){
         return activeAnimators.contains(animator);
     }
 
     /**
-     * Check if this group's is animating, by checking if its last animation timestamp is not -1
+     * Check if this group's is being animated by any {@link DisplayAnimator}s
      * @return a boolean
      */
     public boolean isAnimating(){

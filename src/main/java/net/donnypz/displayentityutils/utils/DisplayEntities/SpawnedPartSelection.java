@@ -5,24 +5,24 @@ import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.entity.BlockDisplay;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.ItemDisplay;
+import org.bukkit.block.BlockType;
+import org.bukkit.entity.*;
+import org.bukkit.inventory.ItemType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public final class SpawnedPartSelection {
+public final class SpawnedPartSelection implements Spawned {
     LinkedHashSet<SpawnedDisplayEntityPart> selectedParts = new LinkedHashSet<>();
 
     Set<SpawnedDisplayEntityPart.PartType> partTypes = new HashSet<>();
 
-    Set<Material> itemTypes = new HashSet<>();
+    Set<ItemType> itemTypes = new HashSet<>();
     boolean includeItemTypes;
 
-    Set<Material> blockTypes = new HashSet<>();
+    Set<BlockType> blockTypes = new HashSet<>();
     boolean includeBlockTypes;
 
     Collection<String> includedTags = new HashSet<>();
@@ -355,6 +355,28 @@ public final class SpawnedPartSelection {
         return this;
     }
 
+    /**
+     * Reveal all parts in this selection that are hidden from a player
+     * @param player The player to reveal parts to
+     */
+    @Override
+    public void showToPlayer(@NotNull Player player){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            part.showToPlayer(player);
+        }
+    }
+
+    /**
+     * Hide all parts in this selection from a player
+     * @param player The player to hide parts from
+     */
+    @Override
+    public void hideFromPlayer(@NotNull Player player){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            part.hideFromPlayer(player);
+        }
+    }
+
 
     /**
      * Randomize the part uuids of all parts in this SpawnedPartSelection.
@@ -413,6 +435,7 @@ public final class SpawnedPartSelection {
      * Removes the glow effect from all the parts in this selection
      * @return this
      */
+    @Override
     public SpawnedPartSelection unglow(){
         for (SpawnedDisplayEntityPart part : selectedParts){
             part.unglow();
@@ -492,6 +515,7 @@ public final class SpawnedPartSelection {
      * Set the glow color of all parts in this selection
      * @param color The color to set
      */
+    @Override
     public void setGlowColor(@Nullable Color color){
         for (SpawnedDisplayEntityPart part : selectedParts){
             part.setGlowColor(color);
@@ -502,6 +526,7 @@ public final class SpawnedPartSelection {
      * Set the brightness of all parts in this selection
      * @param brightness the brightness to set
      */
+    @Override
     public void setBrightness(@Nullable Display.Brightness brightness){
         for (SpawnedDisplayEntityPart  part: selectedParts){
             part.setBrightness(brightness);
@@ -538,9 +563,10 @@ public final class SpawnedPartSelection {
     }
 
     /**
-     * Pivot all Interaction parts in this group around the SpawnedDisplayEntityGroup's master part
+     * Pivot all Interaction parts in this selection around the SpawnedDisplayEntityGroup's master part
      * @param angle the pivot angle
      */
+    @Override
     public void pivot(double angle){
         for (SpawnedDisplayEntityPart part : selectedParts){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
@@ -553,6 +579,7 @@ public final class SpawnedPartSelection {
      * Set the yaw of all parts in this selection
      * @param yaw the yaw to set
      */
+    @Override
     public void setYaw(float yaw, boolean pivotInteractions){
         for (SpawnedDisplayEntityPart part : selectedParts){
             part.setYaw(yaw, pivotInteractions);
@@ -563,6 +590,7 @@ public final class SpawnedPartSelection {
      * Set the pitch of all parts in this selection
      * @param pitch the pitch to set
      */
+    @Override
     public void setPitch(float pitch){
         for (SpawnedDisplayEntityPart part : selectedParts){
             part.setPitch(pitch);
@@ -573,6 +601,7 @@ public final class SpawnedPartSelection {
      * Set the view range of all parts in this selection
      * @param viewRangeMultiplier The range to set
      */
+    @Override
     public void setViewRange(float viewRangeMultiplier){
         for (SpawnedDisplayEntityPart part : selectedParts){
             part.setViewRange(viewRangeMultiplier);
@@ -583,6 +612,7 @@ public final class SpawnedPartSelection {
      * Set the billboard of all parts in this selection
      * @param billboard the billboard to set
      */
+    @Override
     public void setBillboard(@NotNull Display.Billboard billboard){
         for (SpawnedDisplayEntityPart part : selectedParts){
             part.setBillboard(billboard);

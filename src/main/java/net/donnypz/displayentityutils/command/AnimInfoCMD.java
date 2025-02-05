@@ -9,8 +9,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.block.BlockType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemType;
 
 class AnimInfoCMD implements SubCommand{
     @Override
@@ -60,8 +61,8 @@ class AnimInfoCMD implements SubCommand{
                 player.sendMessage(Component.text("| Block Types (Excluded):", NamedTextColor.GRAY));
             }
 
-            for (Material material : filter.getBlockTypes()){
-                player.sendMessage(Component.text("- "+material.asBlockType().getKey().asMinimalString(), NamedTextColor.YELLOW));
+            for (BlockType type: filter.getBlockTypes()){
+                player.sendMessage(Component.text("- "+type.getKey().asMinimalString(), NamedTextColor.YELLOW));
             }
 
             if (filter.isIncludingItemTypes()){
@@ -71,8 +72,8 @@ class AnimInfoCMD implements SubCommand{
                 player.sendMessage(Component.text("| Item Types (Excluded):", NamedTextColor.GRAY));
             }
 
-            for (Material material : filter.getItemTypes()){
-                player.sendMessage(Component.text("- "+material.asItemType().getKey().asMinimalString(), NamedTextColor.YELLOW));
+            for (ItemType type : filter.getItemTypes()){
+                player.sendMessage(Component.text("- "+type.getKey().asMinimalString(), NamedTextColor.YELLOW));
             }
         }
     }
