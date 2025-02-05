@@ -77,10 +77,10 @@ public final class DisplayAnimation implements Serializable {
 
         if (this.filter != null){
             anim.filter = this.filter.clone();
-            if (partTag != null) anim.filter.includePartTag(partTag);
+            if (partTag != null) anim.filter.includePartTag(LegacyUtils.stripLegacyPartTagPrefix(partTag));
         }
         else if (partTag != null){
-            anim.filter = new PartFilter().includePartTag(partTag);
+            anim.filter = new PartFilter().includePartTag(LegacyUtils.stripLegacyPartTagPrefix(partTag));
         }
 
         for (DisplayAnimationFrame frame : frames){
