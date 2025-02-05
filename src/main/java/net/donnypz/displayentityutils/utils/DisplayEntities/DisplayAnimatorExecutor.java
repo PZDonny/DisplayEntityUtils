@@ -17,7 +17,7 @@ import org.joml.Vector3f;
 
 import java.util.UUID;
 
-public final class DisplayAnimatorExecutor {
+final class DisplayAnimatorExecutor {
     final DisplayAnimator animator;
     private final boolean playSingleFrame;
     private final boolean isAsync;
@@ -126,11 +126,13 @@ public final class DisplayAnimatorExecutor {
                         if (group.isSpawned()) frame.playEndEffects(group, animator);
                         new GroupAnimationCompleteEvent(group, animator, animation).callEvent();
                         group.stopAnimation(animator);
+                        selection.remove();
                     }, frame.duration);
                 } else {
                     if (group.isSpawned()) frame.playEndEffects(group, animator);
                     new GroupAnimationCompleteEvent(group, animator, animation).callEvent();
                     group.stopAnimation(animator);
+                    selection.remove();
                 }
             }
 
@@ -206,30 +208,45 @@ public final class DisplayAnimatorExecutor {
     }
 
     private void animateDisplays(SpawnedDisplayAnimationFrame frame, SpawnedDisplayEntityGroup group, SpawnedPartSelection selection, SpawnedDisplayAnimation animation){
-        for (UUID partUUID : frame.displayTransformations.keySet()){
-            DisplayTransformation transformation = frame.displayTransformations.get(partUUID);
-            if (transformation == null){ //Part does not change transformation
-                continue;
+        if (selection.selectedParts.size() >= frame.displayTransformations.size()){
+            for (UUID partUUID : frame.displayTransformations.keySet()){
+                DisplayTransformation transformation = frame.displayTransformations.get(partUUID);
+                if (transformation == null){ //Part does not change transformation
+                    continue;
+                }
+
+                SpawnedDisplayEntityPart part = group.getSpawnedPart(partUUID);
+                if (part == null || !selection.contains(part)){
+                    continue;
+                }
+
+                animateDisplay(part, transformation, group, animation, frame);
             }
-
-            SpawnedDisplayEntityPart part = group.getSpawnedPart(partUUID);
-            if (part == null || !selection.contains(part)){
-                continue;
+        }
+        else{
+            for (SpawnedDisplayEntityPart part : selection.selectedParts){
+                DisplayTransformation transformation = frame.displayTransformations.get(part.getPartUUID());
+                if (transformation == null){ //Part does not change transformation
+                    continue;
+                }
+                animateDisplay(part, transformation, group, animation, frame);
             }
+        }
+    }
 
-            Display display = ((Display) part.getEntity());
+    private void animateDisplay(SpawnedDisplayEntityPart part, DisplayTransformation transformation, SpawnedDisplayEntityGroup group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame){
+        Display display = ((Display) part.getEntity());
 
-            //Prevents jittering in some cases
-            boolean applyDataOnly = transformation.isSimilar(display.getTransformation());
+        //Prevents jittering in some cases
+        boolean applyDataOnly = transformation.isSimilar(display.getTransformation());
 
-            if (isAsync){ //Asynchronously apply transformation changes
-                Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
-                    applyDisplayTransformation(display, frame, animation, group, transformation, applyDataOnly);
-                });
-            }
-            else{
+        if (isAsync){ //Asynchronously apply transformation changes
+            Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
                 applyDisplayTransformation(display, frame, animation, group, transformation, applyDataOnly);
-            }
+            });
+        }
+        else{
+            applyDisplayTransformation(display, frame, animation, group, transformation, applyDataOnly);
         }
     }
 

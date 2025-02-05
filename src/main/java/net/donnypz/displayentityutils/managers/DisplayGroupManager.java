@@ -142,7 +142,10 @@ public final class DisplayGroupManager {
                 break;
             }
         }
-        partSelection.getGroup().removePartSelection(partSelection);
+        SpawnedDisplayEntityGroup g = partSelection.getGroup();
+        if (g != null){
+            g.removePartSelection(partSelection);
+        }
     }
 
 
