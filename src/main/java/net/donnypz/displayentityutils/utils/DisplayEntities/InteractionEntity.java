@@ -23,12 +23,14 @@ final class InteractionEntity implements Serializable {
     float height;
     float width;
     private byte[] persistentDataContainer = null;
+    boolean isResponsive;
 
     InteractionEntity(Interaction interaction){
         //partTags = LegacyUtils.getLegacyPartTags(interaction);
 
-        height = interaction.getInteractionHeight();
-        width = interaction.getInteractionWidth();
+        this.height = interaction.getInteractionHeight();
+        this.width = interaction.getInteractionWidth();
+        this.isResponsive = interaction.isResponsive();
         this.vector = DisplayUtils.getInteractionTranslation(interaction).toVector3f();
         this.partUUID = DisplayUtils.getPartUUID(interaction);
 
@@ -44,6 +46,7 @@ final class InteractionEntity implements Serializable {
         return location.getWorld().spawn(location, Interaction.class, spawn ->{
             spawn.setInteractionHeight(height);
             spawn.setInteractionWidth(width);
+            spawn.setResponsive(isResponsive);
             for (String partTag : partTags){
                 spawn.addScoreboardTag(partTag);
             }
@@ -70,20 +73,16 @@ final class InteractionEntity implements Serializable {
     ArrayList<String> getLegacyPartTags() {
         return partTags;
     }
-
-    /**
-     * Get this InteractionEntity's height
-     * @return InteractionEntity's height
-     */
+    
     float getHeight() {
         return height;
     }
 
-    /**
-     * Get this InteractionEntity's width
-     * @return InteractionEntity's width
-     */
     float getWidth() {
         return width;
+    }
+
+    boolean isReponsive(){
+        return isResponsive;
     }
 }
