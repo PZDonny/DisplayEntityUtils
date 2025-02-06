@@ -73,6 +73,7 @@ class GroupDismountCMD implements ConsoleUsableSubCommand {
 
         for (SpawnedDisplayEntityGroup g : DisplayUtils.getGroupPassengers(vehicle)){
             g.dismount();
+            g.stopFollowingEntity();
             if (!keep){
                 g.unregister(true, true);
             }
