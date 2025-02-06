@@ -18,6 +18,7 @@ class SpawnedDisplayFollower {
     UUID followedEntity;
     boolean isDefaultFollower;
     SpawnedPartSelection selection;
+    boolean stopped = false;
 
     SpawnedDisplayFollower(SpawnedDisplayEntityGroup group, GroupFollowProperties followProperties){
         this.group = group;
@@ -67,6 +68,10 @@ class SpawnedDisplayFollower {
         new BukkitRunnable(){
             @Override
             public void run() {
+                if ((!group.followers.contains(SpawnedDisplayFollower.this) && !isDefaultFollower) || stopped){
+                    cancel();
+                    return;
+                }
                 if (entity.isDead()) {
                     if (properties.unregisterDelay() > -1) {
                         Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
@@ -79,13 +84,13 @@ class SpawnedDisplayFollower {
                 }
 
                 if (isDefaultFollower && group.defaultFollower != SpawnedDisplayFollower.this){
-                    group.defaultFollower = null;
+                    //group.defaultFollower = null;
                     cancel();
                     remove();
                     return;
                 }
 
-                if (!group.isSpawned() || entity != group.getFollowedEntity()){
+                if (!group.isSpawned()){
                     cancel();
                     remove();
                     return;
@@ -141,7 +146,11 @@ class SpawnedDisplayFollower {
         }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, teleportationDuration);
     }
 
-    private void remove(){
+    void remove(){
+        stopped = true;
         group.followers.remove(this);
+        if (isDefaultFollower){
+            group.defaultFollower = null;
+        }
     }
 }

@@ -40,7 +40,6 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
 
     boolean isVisibleByDefault;
     private float scaleMultiplier = 1;
-    private UUID followedEntity = null;
     private boolean isPersistent = true;
     private MachineState currentMachineState;
     private float verticalOffset = 0;
@@ -181,7 +180,10 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
 
 
         if (currentMachineState != null){
-            currentMachineState.animator.stop(this);
+            DisplayAnimator animator = currentMachineState.animator;
+            if (animator != null){
+                animator.stop(this);
+            }
         }
         currentMachineState = state;
 
@@ -1293,7 +1295,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
     }
 
     /**
-     * Determine if this group's vertical offset can be applied if
+     * Determine if this group's vertical offset can be applied, typically when mounted on an entity
      * @return
      */
     public boolean canApplyVerticalOffset(){
@@ -1386,16 +1388,14 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * or any variation
      */
     public void stopFollowingEntity(){
-        followedEntity = null;
-    }
-
-    /**
-     * Get the entity being followed after using
-     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)}
-     * or any variation
-     */
-    public Entity getFollowedEntity(){
-        return followedEntity != null ? Bukkit.getEntity(followedEntity) : null;
+        for (SpawnedDisplayFollower follower : new HashSet<>(followers)){
+            follower.remove();
+        }
+        if (defaultFollower != null){
+            defaultFollower.remove();
+            defaultFollower = null;
+        }
+        followers.clear();
     }
 
 
@@ -1749,8 +1749,11 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
         DisplayGroupManager.removeSpawnedGroup(this, despawnParts, force);
         spawnedParts.clear();
         masterPart = null;
-        followedEntity = null;
         followers.clear();
+        if (defaultFollower != null){
+            defaultFollower.remove();
+            defaultFollower = null;
+        }
     }
 
     /**
