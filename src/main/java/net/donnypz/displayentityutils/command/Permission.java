@@ -60,6 +60,7 @@ public enum Permission {
     INTERACTION_REMOVE_CMD("deu.interaction.removecmd"),
     INTERACTION_LIST_CMD("deu.interaction.listcmd"),
     INTERACTION_DIMENSION("deu.interaction.dim"),
+    INTERACTION_RESPONSIVE("deu.interaction.responsive"),
     INTERACTION_PIVOT("deu.interaction.pivot"),
     INTERACTION_SPAWN("deu.interaction.spawn"),
     INTERACTION_INFO("deu.interaction.info"),

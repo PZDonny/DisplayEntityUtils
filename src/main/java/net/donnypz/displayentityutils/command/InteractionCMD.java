@@ -29,6 +29,7 @@ class InteractionCMD implements ConsoleUsableSubCommand {
         subCommands.put("scale", new InteractionScaleCMD());
         subCommands.put("pivot", new InteractionPivotCMD());
         subCommands.put("pivotselection", new InteractionPivotSelectionCMD());
+        subCommands.put("responsive", new InteractionResponsiveCMD());
         subCommands.put("spawn", new InteractionSpawnCMD());
         subCommands.put("spawnhere", new InteractionSpawnHereCMD());
         subCommands.put("info", new InteractionInfoCMD());
@@ -60,7 +61,7 @@ class InteractionCMD implements ConsoleUsableSubCommand {
     static void interactionHelp(CommandSender sender, int page){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         if (page == 1){
-            sender.sendMessage(Component.text("Where applicable, these commands prioritize the interaction entity you're looking at over the one you may have selected", NamedTextColor.GRAY));
+            sender.sendMessage(Component.text("Where applicable, these commands prioritize the interaction entity you're looking at over the one you may have selected", NamedTextColor.AQUA));
             CMDUtils.sendCMD(sender, "/mdis interaction help", " (Get help for interactions)");
             CMDUtils.sendCMD(sender, "/mdis interaction info", " (Get info about an interaction entity, targeted or selected)");
             CMDUtils.sendCMD(sender, "/mdis interaction spawn <height> <width> (Create an interaction entity part for a group, at the group's location)");
@@ -74,6 +75,7 @@ class InteractionCMD implements ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis interaction listcmds", "(List all commands stored on an interaction)");
             CMDUtils.sendCMD(sender, "/mdis interaction pivot <angle>", " (Pivot an interaction around it's group's actual location center)");
             CMDUtils.sendCMD(sender, "/mdis interaction pivotselection <angle>", " (Pivot all Interactions in a part selection)");
+            CMDUtils.sendCMD(sender, "/mdis interaction responsive", " (Toggle the hit sound of an interaction entity)");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }
