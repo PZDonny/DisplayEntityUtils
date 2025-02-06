@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 import java.util.Arrays;
 import java.util.HashSet;
 
-class PartsFilterTypesCMD implements SubCommand{
+class PartsFilterTypesCMD implements PlayerSubCommand {
 
     private static final HashSet<SpawnedDisplayEntityPart.PartType> partTypes = new HashSet<>(Arrays.stream(SpawnedDisplayEntityPart.PartType.values()).toList());
 

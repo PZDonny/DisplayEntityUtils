@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.List;
 
-class GroupCMD implements SubCommand{
+class GroupCMD implements ConsoleUsableSubCommand {
 
     private static final HashMap<String, SubCommand> subCommands = new HashMap<>();
 
@@ -52,21 +52,21 @@ class GroupCMD implements SubCommand{
 
 
     @Override
-    public void execute(Player player, String[] args) {
+    public void execute(CommandSender sender, String[] args) {
         if (args.length < 2){
-            groupHelp(player, 1);
+            groupHelp(sender, 1);
             return;
         }
         String arg = args[1];
         SubCommand subCommand = subCommands.get(arg);
         if (subCommand == null){
-            if (!DisplayEntityPluginCommand.hasPermission(player, Permission.HELP)){
+            if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.HELP)){
                 return;
             }
-            groupHelp(player, 1);
+            groupHelp(sender, 1);
         }
         else{
-            subCommand.execute(player, args);
+            DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
         }
     }
 

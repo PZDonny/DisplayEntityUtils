@@ -9,9 +9,9 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.List;
 
-class BDEngineCMD implements SubCommand{
+class BDEngineCMD implements PlayerSubCommand {
 
-    private static final HashMap<String, SubCommand> subCommands = new HashMap<>();
+    private static final HashMap<String, PlayerSubCommand> subCommands = new HashMap<>();
 
 
     BDEngineCMD(){
@@ -31,15 +31,15 @@ class BDEngineCMD implements SubCommand{
             return;
         }
         String arg = args[1];
-        SubCommand subCommand = subCommands.get(arg);
-        if (subCommand == null){
+        PlayerSubCommand playerSubCommand = subCommands.get(arg);
+        if (playerSubCommand == null){
             if (!DisplayEntityPluginCommand.hasPermission(player, Permission.HELP)){
                 return;
             }
             conversionHelp(player);
         }
         else{
-            subCommand.execute(player, args);
+            playerSubCommand.execute(player, args);
         }
     }
 

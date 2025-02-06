@@ -9,7 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 
-class InteractionSpawnCMD implements SubCommand{
+class InteractionSpawnCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         spawnForGroup(player, null, args);

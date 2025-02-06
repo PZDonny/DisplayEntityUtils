@@ -1,12 +1,13 @@
 package net.donnypz.displayentityutils.events;
 
+import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Called when a {@link SpawnedDisplayEntityGroup} is spawned from a {@link net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup}.
+ * Called when a {@link SpawnedDisplayEntityGroup} is spawned from a {@link DisplayEntityGroup}.
  */
 public class GroupSpawnedEvent extends Event {
     private static final HandlerList handlers = new HandlerList();

@@ -2,14 +2,13 @@ package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.List;
 
-class TextCMD implements SubCommand{
+class TextCMD implements ConsoleUsableSubCommand {
 
-    private static final HashMap<String, SubCommand> subCommands = new HashMap<>();
+    private static final HashMap<String, PlayerSubCommand> subCommands = new HashMap<>();
 
 
     TextCMD(){
@@ -29,21 +28,21 @@ class TextCMD implements SubCommand{
     }
 
     @Override
-    public void execute(Player player, String[] args) {
+    public void execute(CommandSender sender, String[] args) {
         if (args.length < 2){
-            textHelp(player);
+            textHelp(sender);
             return;
         }
         String arg = args[1];
         SubCommand subCommand = subCommands.get(arg);
         if (subCommand == null){
-            if (!DisplayEntityPluginCommand.hasPermission(player, Permission.HELP)){
+            if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.HELP)){
                 return;
             }
-            textHelp(player);
+            textHelp(sender);
         }
         else{
-            subCommand.execute(player, args);
+            DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
         }
     }
 

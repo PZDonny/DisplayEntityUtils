@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashSet;
 
-class PartsFilterBlocksCMD implements SubCommand{
+class PartsFilterBlocksCMD implements PlayerSubCommand {
 
 
     @Override

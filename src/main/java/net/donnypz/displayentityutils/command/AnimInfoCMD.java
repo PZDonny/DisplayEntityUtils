@@ -13,7 +13,7 @@ import org.bukkit.block.BlockType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemType;
 
-class AnimInfoCMD implements SubCommand{
+class AnimInfoCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_INFO)){

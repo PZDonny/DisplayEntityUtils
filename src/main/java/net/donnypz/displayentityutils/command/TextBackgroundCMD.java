@@ -11,7 +11,7 @@ import org.bukkit.Color;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
-class TextBackgroundCMD implements SubCommand{
+class TextBackgroundCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.TEXT_BACKGROUND)){

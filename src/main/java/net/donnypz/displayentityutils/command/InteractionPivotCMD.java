@@ -10,7 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 
-class InteractionPivotCMD implements SubCommand{
+class InteractionPivotCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.INTERACTION_PIVOT)){

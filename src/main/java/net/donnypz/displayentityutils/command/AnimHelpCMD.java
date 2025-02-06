@@ -1,24 +1,24 @@
 package net.donnypz.displayentityutils.command;
 
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 
-class AnimHelpCMD implements SubCommand{
+class AnimHelpCMD implements ConsoleUsableSubCommand {
 
     @Override
-    public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.HELP)){
+    public void execute(CommandSender sender, String[] args) {
+        if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.HELP)){
             return;
         }
 
         if (args.length < 3){
-            AnimCMD.animationHelp(player, 1);
+            AnimCMD.animationHelp(sender, 1);
         }
         else{
             try{
-                AnimCMD.animationHelp(player, Integer.parseInt(args[2]));
+                AnimCMD.animationHelp(sender, Integer.parseInt(args[2]));
             }
             catch(NumberFormatException e){
-                AnimCMD.animationHelp(player, 1);
+                AnimCMD.animationHelp(sender, 1);
             }
         }
     }

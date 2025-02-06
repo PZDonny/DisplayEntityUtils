@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.List;
 
-class InteractionCMD implements SubCommand{
+class InteractionCMD implements ConsoleUsableSubCommand {
 
     private static final HashMap<String, SubCommand> subCommands = new HashMap<>();
 
@@ -39,21 +39,21 @@ class InteractionCMD implements SubCommand{
     }
 
     @Override
-    public void execute(Player player, String[] args) {
+    public void execute(CommandSender sender, String[] args) {
         if (args.length < 2){
-            interactionHelp(player, 1);
+            interactionHelp(sender, 1);
             return;
         }
         String arg = args[1];
         SubCommand subCommand = subCommands.get(arg);
         if (subCommand == null){
-            if (!DisplayEntityPluginCommand.hasPermission(player, Permission.HELP)){
+            if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.HELP)){
                 return;
             }
-            interactionHelp(player, 1);
+            interactionHelp(sender, 1);
         }
         else{
-            subCommand.execute(player, args);
+            DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
         }
     }
 
@@ -62,7 +62,7 @@ class InteractionCMD implements SubCommand{
         if (page == 1){
             sender.sendMessage(Component.text("Where applicable, these commands prioritize the interaction entity you're looking at over the one you may have selected", NamedTextColor.GRAY));
             CMDUtils.sendCMD(sender, "/mdis interaction help", " (Get help for interactions)");
-            CMDUtils.sendCMD(sender, "/mdis interaction info", "(Get info about an interaction entity, targeted or selected)");
+            CMDUtils.sendCMD(sender, "/mdis interaction info", " (Get info about an interaction entity, targeted or selected)");
             CMDUtils.sendCMD(sender, "/mdis interaction spawn <height> <width> (Create an interaction entity part for a group, at the group's location)");
             CMDUtils.sendCMD(sender, "/mdis interaction spawnhere <height> <width> (Create an interaction entity part for a group, at your location)");
             CMDUtils.sendCMD(sender, "/mdis interaction height <height>", " (Set the height of an interaction)");

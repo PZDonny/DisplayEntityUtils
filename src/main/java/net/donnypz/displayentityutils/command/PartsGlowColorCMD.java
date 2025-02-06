@@ -11,7 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.entity.Player;
 
-class PartsGlowColorCMD implements SubCommand{
+class PartsGlowColorCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_GLOW_COLOR)){
