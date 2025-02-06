@@ -696,6 +696,21 @@ public final class DisplayUtils {
     }
 
     /**
+     * Check if an entity is part of a {@link SpawnedDisplayEntityGroup}
+     * @param entity
+     * @return a boolean
+     */
+    public static boolean isInGroup(Entity entity){
+        if (entity instanceof Display display){
+            return SpawnedDisplayEntityPart.getPart(display) != null;
+        }
+        else if (entity instanceof Interaction interaction){
+            return SpawnedDisplayEntityPart.getPart(interaction) != null;
+        }
+        return false;
+    }
+
+    /**
      * Get the creation time of a Display Entity
      * @param display The Display Entity to check for a creation time
      * @return The Display Entity's Group's Creation time. -1 if this display is not part of a group
