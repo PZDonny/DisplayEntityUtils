@@ -63,7 +63,6 @@ class SpawnedDisplayFollower {
             selection = new SpawnedPartSelection(group);
             group.setTeleportDuration(teleportationDuration);
         }
-        followedEntity = entity.getUniqueId();
 
         new BukkitRunnable(){
             @Override
@@ -86,7 +85,7 @@ class SpawnedDisplayFollower {
                     return;
                 }
 
-                if (!group.isSpawned() || followedEntity != entity.getUniqueId()){
+                if (!group.isSpawned() || entity != group.getFollowedEntity()){
                     cancel();
                     remove();
                     return;
