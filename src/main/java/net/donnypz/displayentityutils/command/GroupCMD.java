@@ -44,6 +44,8 @@ class GroupCMD implements ConsoleUsableSubCommand {
         subCommands.put("unsetspawnanim", new GroupUnsetSpawnAnimationCMD());
         subCommands.put("togglepersist", new GroupPersistCMD());
         subCommands.put("billboard", new GroupBillboardCMD());
+        subCommands.put("ride", new GroupRideCMD());
+        subCommands.put("dismount", new GroupDismountCMD());
     }
 
     static List<String> getTabComplete(){
@@ -72,7 +74,6 @@ class GroupCMD implements ConsoleUsableSubCommand {
 
 
     static void groupHelp(CommandSender sender, int page){
-        sender.sendMessage(Component.empty());
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         if (page <= 1){
             CMDUtils.sendCMD(sender, "/mdis group help <page-number>", " (Get help for groups)");
@@ -97,16 +98,20 @@ class GroupCMD implements ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group clone", " (Spawn a cloned group at your selected group's location)");
             CMDUtils.sendCMD(sender, "/mdis group clonehere", " (Spawn a cloned group at your location)");
             CMDUtils.sendCMD(sender, "/mdis group move <direction> <distance> <tick-duration>", " (Change the actual location of your selected group)");
-            CMDUtils.sendCMD(sender, "/mdis group translate <direction> <distance> <tick-duration>"," (Changes your selected group's translation and not it's actual location, use \"move\" instead if this group uses animations)");
+            CMDUtils.sendCMD(sender, "/mdis group translate <direction> <distance> <tick-duration>"," (Changes your selected group's translation, use \"move\" instead if this group uses animations)");
             CMDUtils.sendCMD(sender, "/mdis group movehere", " (Change your selected group's actual location to your location)");
             CMDUtils.sendCMD(sender, "/mdis group merge <distance>"," (Merges groups near your select group)");
         }
-        else{
+        else if (page == 4){
             CMDUtils.sendCMD(sender, "/mdis group copypose", " (Copies the transformations of the group you're closest to, to your selected group)");
             CMDUtils.sendCMD(sender, "/mdis group billboard <fixed | vertical | horizontal | center>", " (Set the billboard of all parts in this group)");
             CMDUtils.sendCMD(sender, "/mdis group glow", " (Make all parts in this group glow)");
             CMDUtils.sendCMD(sender, "/mdis group unglow", " (Remove the glowing effect from all parts in this group)");
             CMDUtils.sendCMD(sender, "/mdis group glowcolor <color | hex-code>", " (Set the glow color for all parts in this group)");
+            CMDUtils.sendCMD(sender, "/mdis group ride <-target | player-name | entity-uuid> [group-tag] [storage] [controller-id]", "(Make a group ride an entity. Values in brackets [] are optional)");
+            CMDUtils.sendCMD(sender, "/mdis group dismount <keep | despawn> [-target | player-name | entity-uuid]", "(Dismount a group from an entity, and choose to keep or despawn it");
+        }
+        else{
             CMDUtils.sendCMD(sender, "/mdis group setspawnanim <anim-tag> <storage> <linear | loop>", " (Set an animation to play when this group is spawned/loaded)");
             CMDUtils.sendCMD(sender, "/mdis group unsetspawnanim", " (Remove the spawn animation that's set on your selected group)");
             CMDUtils.sendCMD(sender, "/mdis group togglepersist", " (Toggle whether this group should persist after a server shutdown)");

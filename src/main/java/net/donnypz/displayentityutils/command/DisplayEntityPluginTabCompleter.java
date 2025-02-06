@@ -72,6 +72,13 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                         case "billboard" -> {
                             addBillboard(suggestions);
                         }
+                        case "ride" -> {
+                            return null;
+                        }
+                        case "dismount" -> {
+                            suggestions.add("keep");
+                            suggestions.add("despawn");
+                        }
                     }
                 }
                 case "anim" -> {
@@ -153,6 +160,9 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
             if (args[0].equalsIgnoreCase("group")){
                 if (args[1].equalsIgnoreCase("spawn") ||args[1].equalsIgnoreCase("delete") || args[1].equalsIgnoreCase("setspawnanim")){
                     addStorages(suggestions);
+                }
+                else if (args[1].equalsIgnoreCase("dismount")){
+                    return null;
                 }
             }
             else if (args[0].equalsIgnoreCase("anim")){
