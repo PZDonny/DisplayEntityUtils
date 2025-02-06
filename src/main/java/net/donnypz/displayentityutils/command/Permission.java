@@ -15,6 +15,8 @@ public enum Permission {
     GROUP_SELECT("deu.group.select"),
     GROUP_SETTAG("deu.group.settag"),
     GROUP_TRANSFORM("deu.group.transform"),
+    GROUP_RIDE("deu.group.ride"),
+    GROUP_DISMOUNT("deu.group.dismount"),
     GROUP_BRIGHTNESS("deu.group.brightness"),
     GROUP_MERGE("deu.group.merge"),
     GROUP_UNGROUP_INTERACTIONS("deu.group.ungroupi"),

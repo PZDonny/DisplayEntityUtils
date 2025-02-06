@@ -24,7 +24,7 @@ import java.util.UUID;
 class GroupRideCMD implements ConsoleUsableSubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.GROUP_TRANSFORM)){
+        if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.GROUP_RIDE)){
             return;
         }
 

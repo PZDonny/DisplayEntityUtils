@@ -6,17 +6,14 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.UUID;
-
 class GroupDismountCMD implements ConsoleUsableSubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.GROUP_TRANSFORM)){
+        if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.GROUP_DISMOUNT)){
             return;
         }
 
