@@ -1,5 +1,7 @@
 package net.donnypz.displayentityutils;
 
+import ch.njol.skript.Skript;
+import ch.njol.skript.SkriptAddon;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginTabCompleter;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.events.InteractionClickEvent;
@@ -13,6 +15,7 @@ import net.donnypz.displayentityutils.listeners.player.DEUPlayerConnectionListen
 import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
+import net.donnypz.displayentityutils.skript.SkriptTypes;
 import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.DisplayEntities.MachineState;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -79,6 +82,9 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     static boolean asynchronousAnimations;
 
     private static boolean isMythicMobsInstalled;
+    private static boolean isSkriptInstalled;
+
+    SkriptAddon addon;
 
     @Override
     public void onEnable() {
@@ -88,6 +94,18 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         isMythicMobsInstalled = Bukkit.getPluginManager().isPluginEnabled("MythicMobs");
         if (isMythicMobsInstalled){
             Bukkit.getPluginManager().registerEvents(new DEUMythicListener(), this);
+        }
+
+        isSkriptInstalled = Bukkit.getPluginManager().isPluginEnabled("Skript");
+        if (isSkriptInstalled){
+            addon = Skript.registerAddon(this);
+            try {
+                addon.loadClasses("net.donnypz.displayentityutils.skript", "conditions", "events", "effects", "expressions");
+                addon.setLanguageFileDirectory("lang");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            new SkriptTypes();
         }
 
         reloadPlugin(true);
@@ -298,6 +316,14 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
      */
     public static boolean isMythicMobsInstalled() {
         return isMythicMobsInstalled;
+    }
+
+    /**
+     * Get whether Skript is installed on this server
+     * @return true if Skript is present
+     */
+    public static boolean isSkriptInstalled() {
+        return isSkriptInstalled;
     }
 
     /**
