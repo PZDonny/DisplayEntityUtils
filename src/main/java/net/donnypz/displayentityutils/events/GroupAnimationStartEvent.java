@@ -8,8 +8,6 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
-
 /**
  * Called when a {@link DisplayAnimator} starts playing a {@link SpawnedDisplayAnimation}.
  * This is called once on an animator of the type {@link DisplayAnimator.AnimationType#LOOP}.
