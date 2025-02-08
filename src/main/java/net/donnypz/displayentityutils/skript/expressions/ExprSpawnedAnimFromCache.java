@@ -21,10 +21,10 @@ import org.jetbrains.annotations.Nullable;
 @Examples({"set {_spawnedanim} to cached spawned anim tagged \"myanimation\"",
 "set {_spawnedanim} to cached spawned anim tagged \"myotheranim\" or fallback with local storage"})
 @Since("2.6.2")
-public class ExprSavedAnimFromCache extends SimpleExpression<SpawnedDisplayAnimation> {
+public class ExprSpawnedAnimFromCache extends SimpleExpression<SpawnedDisplayAnimation> {
 
     static{
-        Skript.registerExpression(ExprSavedAnimFromCache.class, SpawnedDisplayAnimation.class, ExpressionType.SIMPLE, "cached spawned[ |-]anim[ation] [tagged] %string% [o:or [fallback] (with|from) (1¦local|2¦mysql|3¦mongo[db]) [storage]]");
+        Skript.registerExpression(ExprSpawnedAnimFromCache.class, SpawnedDisplayAnimation.class, ExpressionType.SIMPLE, "cached spawned[ |-]anim[ation] [tagged] %string% [o:or [fallback] (with|from) (1¦local|2¦mysql|3¦mongo[db]) [storage]]");
     }
 
     Expression<String> tag;
