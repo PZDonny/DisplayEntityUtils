@@ -1644,6 +1644,23 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
         return true;
     }
 
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}
+     * @param animation the animation the frame is from
+     * @param frame the frame to display
+     * @param isAsync whether to show this frame asynchronously (unpredictable results)
+     * @param duration how long the frame should play
+     * @param delay how long until the frame should start playing
+     * @return false if this group is in an unloaded chunk
+     */
+    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay, boolean isAsync) {
+        if (!isInLoadedChunk()){
+            return false;
+        }
+        DisplayAnimatorExecutor.setGroupToFrame(this, animation, frame, duration, delay, isAsync);
+        return true;
+    }
+
     SpawnedDisplayEntityGroup addActiveAnimator(DisplayAnimator animator){
         activeAnimators.add(animator);
         return this;

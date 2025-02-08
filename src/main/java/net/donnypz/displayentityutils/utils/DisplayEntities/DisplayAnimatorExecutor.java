@@ -49,6 +49,22 @@ final class DisplayAnimatorExecutor {
         new DisplayAnimatorExecutor(animator, animation, group, frame,0, isAsync, true);
     }
 
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on a {@link SpawnedDisplayEntityGroup}
+     * @param group the group the transformations should be applied to
+     * @param animation the animation the frame is from
+     * @param frame the frame to display
+     * @param duration how long the frame should play
+     * @param delay how long until the frame should start playing
+     * @param isAsync whether this should be done asynchronously
+     */
+    public static void setGroupToFrame(@NotNull SpawnedDisplayEntityGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay, boolean isAsync){
+        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
+        SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
+        clonedFrame.duration = duration;
+        new DisplayAnimatorExecutor(animator, animation, group, clonedFrame, delay, isAsync, true);
+    }
+
     private void prepareAnimation(SpawnedDisplayAnimation animation, SpawnedDisplayEntityGroup group, SpawnedDisplayAnimationFrame frame, int delay){
         group.addActiveAnimator(animator);
         SpawnedPartSelection selection;

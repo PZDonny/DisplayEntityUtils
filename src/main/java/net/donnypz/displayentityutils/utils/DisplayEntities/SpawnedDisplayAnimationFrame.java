@@ -16,7 +16,7 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-public final class SpawnedDisplayAnimationFrame {
+public final class SpawnedDisplayAnimationFrame implements Cloneable{
     HashMap<UUID, DisplayTransformation> displayTransformations = new HashMap<>(); //Part UUIDS
     HashMap<UUID, Vector3f>  interactionTransformations = new HashMap<>(); //Part UUIDS
 
@@ -540,5 +540,25 @@ public final class SpawnedDisplayAnimationFrame {
             frame.setInteractionTransformation(uuid, interactionTransformations.get(uuid));
         }
         return frame;
+    }
+
+    @Override
+    public SpawnedDisplayAnimationFrame clone(){
+        try {
+            SpawnedDisplayAnimationFrame cloned = (SpawnedDisplayAnimationFrame) super.clone();
+
+            cloned.displayTransformations = new HashMap<>(this.displayTransformations);
+            cloned.interactionTransformations = new HashMap<>(this.interactionTransformations);
+            cloned.frameStartSounds = new HashMap<>(this.frameStartSounds);
+            cloned.frameEndSounds = new HashMap<>(this.frameEndSounds);
+            cloned.frameStartParticles = new HashSet<>(this.frameStartParticles);
+            cloned.frameEndParticles = new HashSet<>(this.frameEndParticles);
+            cloned.startCommands = new ArrayList<>(this.startCommands);
+            cloned.endCommands = new ArrayList<>(this.endCommands);
+
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError("Clone not supported", e);
+        }
     }
 }
