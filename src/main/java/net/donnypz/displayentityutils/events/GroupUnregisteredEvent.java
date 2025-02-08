@@ -9,14 +9,16 @@ import org.bukkit.event.HandlerList;
  * Called when a {@link SpawnedDisplayEntityGroup} is unregistered.
  * Can be cancelled
  */
-public class GroupDespawnedEvent extends Event implements Cancellable {
+public class GroupUnregisteredEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     SpawnedDisplayEntityGroup spawnedDisplayEntityGroup;
 
     private boolean isCancelled = false;
+    private boolean isDespawn;
 
-    public GroupDespawnedEvent(SpawnedDisplayEntityGroup group){
+    public GroupUnregisteredEvent(SpawnedDisplayEntityGroup group, boolean despawn){
         this.spawnedDisplayEntityGroup = group;
+        this.isDespawn = despawn;
     }
 
     /**
@@ -26,6 +28,23 @@ public class GroupDespawnedEvent extends Event implements Cancellable {
     public SpawnedDisplayEntityGroup getGroup() {
         return spawnedDisplayEntityGroup;
     }
+
+    /**
+     * Get whether the {@link SpawnedDisplayEntityGroup} involved in this event will despawn its parts
+     * @return a boolean
+     */
+    public boolean isDespawning(){
+        return isDespawn;
+    }
+
+    /**
+     * Set whether the {@link SpawnedDisplayEntityGroup} involved in this event should despawn its parts
+     * @param despawn
+     */
+    public void setDespawn(boolean despawn){
+        this.isDespawn = despawn;
+    }
+
 
 
     @Override

@@ -1,0 +1,28 @@
+version: ${project.version}
+
+groupspawnreason:
+    command: command, cmd
+    clone: clone
+    display_controller: display controller, controller
+    custom: custom
+
+animationtype:
+    linear: linear
+    loop: loop
+
+
+interactionclicktype:
+    left: left
+    right: right
+
+parttype:
+    block: block
+    item: item
+    text: text
+    interaction: interaction
+
+types:
+    groupspawnreason: group spawn reason¦s
+    animationtype: animation type¦s, animtype
+    interactionclicktype: interaction click type
+    parttype: part type

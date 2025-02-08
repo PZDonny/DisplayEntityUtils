@@ -12,7 +12,7 @@ import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-class ItemSetCMD implements SubCommand{
+class ItemSetCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ITEM_SET)){
@@ -32,7 +32,7 @@ class ItemSetCMD implements SubCommand{
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /mdis parts setitem <\"-held\" | \"-target\" | item-id> [-all]", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /mdis parts setitem <\"-held\" | item-id> [-all]", NamedTextColor.RED));
             return;
         }
         

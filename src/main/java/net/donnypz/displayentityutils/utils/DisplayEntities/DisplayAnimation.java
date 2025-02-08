@@ -10,6 +10,7 @@ public final class DisplayAnimation implements Serializable {
     ArrayList<DisplayAnimationFrame> frames = new ArrayList<>();
     String partTag;
     boolean respectGroupScale = true;
+    PartFilter filter;
 
     DisplayAnimation(){}
 
@@ -22,11 +23,23 @@ public final class DisplayAnimation implements Serializable {
         return animationTag;
     }
 
+    /**
+     * Get the part tag applied to this animation, before the addition of part filters
+     * @return a string or null
+     */
     public String getPartTag() {
         return partTag;
     }
 
-    public boolean isPartAnimation(){
+    /**
+     * Get the filter that will be used when animating
+     * @return
+     */
+    public PartFilter getPartFilter(){
+        return filter;
+    }
+
+    public boolean isFilteredAnimation(){
         return partTag != null;
     }
 
@@ -36,6 +49,10 @@ public final class DisplayAnimation implements Serializable {
 
     public void setFrames(ArrayList<DisplayAnimationFrame> frames) {
         this.frames = frames;
+    }
+
+    public void setPartFilter(PartFilter filter){
+        this.filter = filter;
     }
 
     public void addFrame(DisplayAnimationFrame frame){
@@ -54,10 +71,18 @@ public final class DisplayAnimation implements Serializable {
     }
 
     public SpawnedDisplayAnimation toSpawnedDisplayAnimation(){
-        SpawnedDisplayAnimation anim = new SpawnedDisplayAnimation();
+        SpawnedDisplayAnimation anim = new SpawnedDisplayAnimation(filter);
         anim.animationTag = this.animationTag;
         anim.respectGroupScale = this.respectGroupScale;
-        anim.partTag = this.partTag;
+
+        if (this.filter != null){
+            anim.filter = this.filter.clone();
+            if (partTag != null) anim.filter.includePartTag(LegacyUtils.stripLegacyPartTagPrefix(partTag));
+        }
+        else if (partTag != null){
+            anim.filter = new PartFilter().includePartTag(LegacyUtils.stripLegacyPartTagPrefix(partTag));
+        }
+
         for (DisplayAnimationFrame frame : frames){
             anim.forceAddFrame(frame.toSpawnedDisplayAnimationFrame());
         }

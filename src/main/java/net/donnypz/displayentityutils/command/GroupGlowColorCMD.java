@@ -9,7 +9,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.entity.Player;
 
-class GroupGlowColorCMD implements SubCommand{
+class GroupGlowColorCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_GLOW_COLOR)){
@@ -35,7 +35,7 @@ class GroupGlowColorCMD implements SubCommand{
             return;
         }
         group.setGlowColor(c);
-        group.glow(60, true);
+        group.glow(60, true, true);
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Glow color successfully set for display entity group!", NamedTextColor.GREEN)));
     }
 

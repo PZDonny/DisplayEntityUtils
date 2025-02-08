@@ -92,12 +92,12 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
 
     static void suggestUpdateSelection(Player player){
         player.sendMessage(Component.text("| It is recommended to update/reset your part selection after adding parts!", NamedTextColor.GRAY));
-        player.sendMessage(Component.text("| Quickly reset with \"/mdis parts deselect", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("| Quickly reset with \"/mdis parts reselect", NamedTextColor.GRAY));
     }
 
-    public static boolean hasPermission(Player player, Permission permission){
-        if (!player.hasPermission(permission.getPermission())){
-            player.sendMessage(Component.text("You do not have permission to do that!", NamedTextColor.RED));
+    public static boolean hasPermission(CommandSender sender, Permission permission){
+        if (!sender.hasPermission(permission.getPermission())){
+            sender.sendMessage(Component.text("You do not have permission to do that!", NamedTextColor.RED));
             return false;
         }
         return true;
@@ -105,11 +105,6 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player p)) {
-            sender.sendMessage(Component.text("You cannot use this command in the console!", NamedTextColor.RED));
-            return true;
-        }
-
         if (args.length == 0) {
             mainCommandHelp(sender);
             return true;
@@ -120,9 +115,22 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
             mainCommandHelp(sender);
         }
         else{
-            subCommand.execute(p, args);
+            executeCommand(subCommand, sender, args);
         }
         return true;
+    }
+
+    static void executeCommand(SubCommand subCommand, CommandSender sender, String[] args){
+        if (subCommand instanceof ConsoleUsableSubCommand c){
+            c.execute(sender, args);
+        }
+        else if (subCommand instanceof PlayerSubCommand c){
+            if (!(sender instanceof Player p)) {
+                sender.sendMessage(Component.text("You cannot use this command in the console!", NamedTextColor.RED));
+                return;
+            }
+            c.execute(p, args);
+        }
     }
 
 

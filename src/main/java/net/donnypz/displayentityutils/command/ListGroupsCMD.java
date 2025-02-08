@@ -7,19 +7,20 @@ import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 
-class ListGroupsCMD implements SubCommand{
+class ListGroupsCMD implements ConsoleUsableSubCommand {
     @Override
-    public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.LIST_GROUPS)){
+    public void execute(CommandSender sender, String[] args) {
+        if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.LIST_GROUPS)){
             return;
         }
 
         if (args.length == 1){
-            player.sendMessage(Component.text("Incorrect Usage! /mdis listgroups <storage> [page-number]", NamedTextColor.RED));
+            sender.sendMessage(Component.text("Incorrect Usage! /mdis listgroups <storage> [page-number]", NamedTextColor.RED));
             return;
         }
         LoadMethod method;
@@ -28,24 +29,24 @@ class ListGroupsCMD implements SubCommand{
         }
         catch(IllegalArgumentException e){
             if (args[1].equalsIgnoreCase("all")){
-                player.sendMessage(Component.text("You cannot use \"all\" here!", NamedTextColor.RED));
+                sender.sendMessage(Component.text("You cannot use \"all\" here!", NamedTextColor.RED));
                 return;
             }
-            player.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-            player.sendMessage(Component.text("Invalid Storage Location!", NamedTextColor.RED));
-            player.sendMessage(Component.text("/mdis listgroups local", NamedTextColor.GRAY));
-            player.sendMessage(Component.text("/mdis listgroups mongodb", NamedTextColor.GRAY));
-            player.sendMessage(Component.text("/mdis listgroups mysql", NamedTextColor.GRAY));
+            sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
+            sender.sendMessage(Component.text("Invalid Storage Location!", NamedTextColor.RED));
+            sender.sendMessage(Component.text("/mdis listgroups local", NamedTextColor.GRAY));
+            sender.sendMessage(Component.text("/mdis listgroups mongodb", NamedTextColor.GRAY));
+            sender.sendMessage(Component.text("/mdis listgroups mysql", NamedTextColor.GRAY));
             return;
         }
 
-        list(player, method, args, true);
+        list(sender, method, args, true);
 
 
 
     }
 
-    static void list(Player player, LoadMethod method, String[] args, boolean isListingGroups){
+    static void list(CommandSender sender, LoadMethod method, String[] args, boolean isListingGroups){
         List<String> tags;
         if (isListingGroups){
             tags = DisplayGroupManager.getSavedDisplayEntityGroups(method);
@@ -54,10 +55,10 @@ class ListGroupsCMD implements SubCommand{
             tags = DisplayAnimationManager.getSavedDisplayAnimations(method);
         }
 
-        player.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Storage Location: <yellow>"+method.getDisplayName()));
+        sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("Storage Location: <yellow>"+method.getDisplayName()));
         if (tags.isEmpty()){
-            player.sendMessage(Component.text("That storage location is empty!", NamedTextColor.RED));
+            sender.sendMessage(Component.text("That storage location is empty!", NamedTextColor.RED));
             return;
         }
 
@@ -71,13 +72,13 @@ class ListGroupsCMD implements SubCommand{
         }
         int end = pageNumber*7;
         int start = end-7;
-        player.sendMessage(Component.text("Page Number: "+pageNumber, NamedTextColor.AQUA));
+        sender.sendMessage(Component.text("Page Number: "+pageNumber, NamedTextColor.AQUA));
         for (int i = start; i <= end; i++){
             if (i >= tags.size()){
                 break;
             }
-            player.sendMessage(MiniMessage.miniMessage().deserialize("- <yellow>"+tags.get(i)));
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("- <yellow>"+tags.get(i)));
         }
-        player.sendMessage("------------------------");
+        sender.sendMessage("------------------------");
     }
 }

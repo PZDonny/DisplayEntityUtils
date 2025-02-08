@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 
-class AnimFrameInfoCMD implements SubCommand{
+class AnimFrameInfoCMD implements PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
@@ -25,10 +25,6 @@ class AnimFrameInfoCMD implements SubCommand{
         }
 
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
-        if (group == null) {
-            player.sendMessage(Component.text("You must have a group selected to do this animation command!", NamedTextColor.RED));
-            return;
-        }
 
         SpawnedDisplayAnimation animation = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
         if (animation == null) {
@@ -61,6 +57,10 @@ class AnimFrameInfoCMD implements SubCommand{
             sendSounds(player, "End Sounds: ", frame.getFrameEndSounds());
             player.sendMessage(Component.empty());
             Component editStartParticles = MiniMessage.miniMessage().deserialize("<aqua>Click here to view frame <green>START <aqua>particles").clickEvent(ClickEvent.callback(f -> {
+                if (group == null){
+                    player.sendMessage(Component.text("You must have a group selected to do this action!", NamedTextColor.RED));
+                    return;
+                }
                 player.sendMessage(Component.empty());
                 player.sendMessage(Component.text("Showing START particles for frame "+id, NamedTextColor.YELLOW));
                 player.playSound(player, Sound.ENTITY_ITEM_FRAME_PLACE, 1, 2);
@@ -68,6 +68,10 @@ class AnimFrameInfoCMD implements SubCommand{
             }));
 
             Component editEndParticles = MiniMessage.miniMessage().deserialize("<aqua>Click here to view frame <gold>END <aqua>particles").clickEvent(ClickEvent.callback(f -> {
+                if (group == null){
+                    player.sendMessage(Component.text("You must have a group selected to do this action!", NamedTextColor.RED));
+                    return;
+                }
                 player.sendMessage(Component.empty());
                 player.sendMessage(Component.text("Showing END particles for frame "+id, NamedTextColor.YELLOW));
                 player.playSound(player, Sound.ENTITY_ITEM_FRAME_PLACE, 1, 2);

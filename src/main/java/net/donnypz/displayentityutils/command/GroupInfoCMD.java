@@ -13,7 +13,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-class GroupInfoCMD implements SubCommand{
+class GroupInfoCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_INFO)){

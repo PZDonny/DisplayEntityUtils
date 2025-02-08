@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-class AnimReverseCMD implements SubCommand{
+class AnimReverseCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_REVERSE)){

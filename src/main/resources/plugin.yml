@@ -6,6 +6,7 @@ author: DonnyPZ
 load: POSTWORLD
 softdepend:
   - MythicMobs
+  - Skript
 commands:
   managedisplays:
     aliases: [mdis]

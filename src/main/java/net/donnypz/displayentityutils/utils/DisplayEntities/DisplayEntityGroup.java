@@ -168,7 +168,7 @@ public final class DisplayEntityGroup implements Serializable{
      */
     public SpawnedDisplayEntityGroup spawn(@NotNull Location location, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings settings){
         PreGroupSpawnedEvent event = new PreGroupSpawnedEvent(this, spawnReason);
-        if (event.isCancelled()){
+        if (!event.callEvent()){
             return null;
         }
         GroupSpawnSettings newSettings = event.getNewSettings();

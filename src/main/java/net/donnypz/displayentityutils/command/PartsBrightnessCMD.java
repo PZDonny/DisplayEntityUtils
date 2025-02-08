@@ -9,7 +9,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 
-class PartsBrightnessCMD implements SubCommand{
+class PartsBrightnessCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_BRIGHTNESS)){

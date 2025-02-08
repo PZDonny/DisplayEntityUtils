@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.List;
 
-class ItemCMD implements SubCommand{
+class ItemCMD implements ConsoleUsableSubCommand{
 
     private static final HashMap<String, SubCommand> subCommands = new HashMap<>();
 
@@ -27,21 +27,21 @@ class ItemCMD implements SubCommand{
     }
 
     @Override
-    public void execute(Player player, String[] args) {
+    public void execute(CommandSender sender, String[] args) {
         if (args.length < 2){
-            itemHelp(player);
+            itemHelp(sender);
             return;
         }
         String arg = args[1];
         SubCommand subCommand = subCommands.get(arg);
         if (subCommand == null){
-            if (!DisplayEntityPluginCommand.hasPermission(player, Permission.HELP)){
+            if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.HELP)){
                 return;
             }
-            itemHelp(player);
+            itemHelp(sender);
         }
         else{
-            subCommand.execute(player, args);
+            DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
         }
     }
 
@@ -49,8 +49,8 @@ class ItemCMD implements SubCommand{
         sender.sendMessage(Component.empty());
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         sender.sendMessage(Component.text("| Commands with \"-all\" will apply the command to all item displays within a part selection", NamedTextColor.GOLD));
-        CMDUtils.sendCMD(sender,"/mdis item help <page-number>", " (Get help for item displays)");
-        CMDUtils.sendCMD(sender, "/mdis item set <\"-held\" | \"-target\" | item-id> [-all]", " (Change the item of a item display part)");
+        CMDUtils.sendCMD(sender,"/mdis item help", " (Get help for item displays)");
+        CMDUtils.sendCMD(sender, "/mdis item set <\"-held\" | item-id> [-all]", " (Change the item of a item display part)");
         CMDUtils.sendCMD(sender, "/mdis item transform <transform-type> [-all]", "(Change the item display transform of a item display part)");
         CMDUtils.sendCMD(sender,"/mdis item toggleglint [-all]", " (Toggle the enchantment glint of an item display's item)");
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>--------------------------"));

@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.managers;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.events.GroupDespawnedEvent;
+import net.donnypz.displayentityutils.events.GroupUnregisteredEvent;
 import net.donnypz.displayentityutils.events.GroupRegisteredEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -23,9 +23,6 @@ import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipException;
 
-/**
- * Main Plugin Manager
- */
 public final class DisplayGroupManager {
 
     private DisplayGroupManager() {}
@@ -145,20 +142,25 @@ public final class DisplayGroupManager {
                 break;
             }
         }
-        partSelection.getGroup().removePartSelection(partSelection);
+        SpawnedDisplayEntityGroup g = partSelection.getGroup();
+        if (g != null){
+            g.removePartSelection(partSelection);
+        }
     }
 
 
     @ApiStatus.Internal
     public static void removeSpawnedGroup(SpawnedDisplayEntityGroup spawnedGroup, boolean despawn, boolean force) {
-        GroupDespawnedEvent event = new GroupDespawnedEvent(spawnedGroup);
+        GroupUnregisteredEvent event = new GroupUnregisteredEvent(spawnedGroup, despawn);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return;
         }
 
+        //In the event a user changed this value
+        despawn = event.isDespawning();
 
-        if (force){
+        if (despawn && force){
             HashSet<Chunk> chunks = new HashSet<>();
             Chunk mainChunk = spawnedGroup.getLocation().getChunk();
             ticketChunk(mainChunk, chunks);

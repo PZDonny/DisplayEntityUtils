@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-class GroupMergeCMD implements SubCommand{
+class GroupMergeCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_MERGE)){
@@ -47,7 +47,7 @@ class GroupMergeCMD implements SubCommand{
                 group.merge(result.group());
             }
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully merged nearby groups", NamedTextColor.GREEN)));
-            group.glow(60, true);
+            group.glow(60, true, true);
         }
         catch(NumberFormatException e){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a valid number for the merging distance!", NamedTextColor.RED)));

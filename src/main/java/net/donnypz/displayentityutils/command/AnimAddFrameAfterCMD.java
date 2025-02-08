@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-class AnimAddFrameAfterCMD implements SubCommand{
+class AnimAddFrameAfterCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_ADD_FRAME)){
@@ -54,11 +54,7 @@ class AnimAddFrameAfterCMD implements SubCommand{
             }
             SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(delay, duration);
 
-            if (anim.isPartAnimation()) {
-                frame.setTransformation(group, anim.getPartTag());
-            } else {
-                frame.setTransformation(group);
-            }
+            frame.setTransformation(group);
 
             frames.add(id + 1, frame);
             anim.setFrames(frames);

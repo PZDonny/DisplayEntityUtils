@@ -10,7 +10,7 @@ import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-class ItemToggleGlintCMD implements SubCommand{
+class ItemToggleGlintCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ITEM_TOGGLE_GLINT)){

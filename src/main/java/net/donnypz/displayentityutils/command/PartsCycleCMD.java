@@ -7,13 +7,13 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
-class PartsCycleCMD implements SubCommand{
+class PartsCycleCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_CYCLE)){
@@ -79,41 +79,43 @@ class PartsCycleCMD implements SubCommand{
 
     private void displayPartInfo(Player p, SpawnedPartSelection partSelection){
         SpawnedDisplayEntityPart part = partSelection.getSelectedPart();
-        String desc = "";
+        Component desc = Component.empty();
         switch(part.getType()){
             case INTERACTION -> {
                 Interaction i = (Interaction) part.getEntity();
-                desc = ChatColor.YELLOW+"(Interaction, H:"+i.getInteractionHeight()+" W:"+i.getInteractionWidth()+")";
+                desc = MiniMessage.miniMessage().deserialize("<yellow>(Interaction, H: "+i.getInteractionHeight()+" W:"+i.getInteractionWidth()+")");
             }
 
             case TEXT_DISPLAY -> {
                 TextDisplay display = (TextDisplay) part.getEntity();
                 if (!display.getText().isBlank()) {
-                    String text = display.getText();//.substring(0, endIndex);
-                    desc = ChatColor.YELLOW+"(Text Display: "+text+ChatColor.YELLOW+")";
+                    desc = Component.text("(Text Display: ", NamedTextColor.YELLOW).append(display.text()).append(Component.text(")", NamedTextColor.YELLOW));
                 }
             }
 
             case BLOCK_DISPLAY -> {
                 if (part.isMaster()){
-                    desc = ChatColor.AQUA+"(Master Entity)";
+                    desc = Component.text("(Master Entity/Part)", NamedTextColor.AQUA);
                 }
                 if (part.getMaterial() == Material.AIR){
-                    desc = ChatColor.GRAY+"(Invisible Block Display | AIR, CAVE_AIR, or VOID_AIR)";
+                    desc = Component.text("(Invisible Block Display | AIR, CAVE_AIR, or VOID_AIR)", NamedTextColor.GRAY);
                 }
             }
 
             case ITEM_DISPLAY -> {
                 if (part.getMaterial() == Material.AIR){
-                    desc = ChatColor.GRAY+"(Invisible Item Display | AIR, CAVE_AIR, or VOID_AIR)";
+                    desc = Component.text("(Invisible Item Display | AIR, CAVE_AIR, or VOID_AIR)", NamedTextColor.GRAY);
                 }
             }
         }
-        part.glow(30);
+        part.glow(30, false);
         int index = partSelection.indexOf(part)+1;
         int size = partSelection.getSize();
-        String ratio = ChatColor.GOLD+"["+index+"/"+size+"] ";
-        p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Selected Part! "+ratio+desc, NamedTextColor.GREEN)));
+        Component ratio = Component.text("["+index+"/"+size+"] ", NamedTextColor.GOLD);
+        p.sendMessage(DisplayEntityPlugin.pluginPrefix
+                .append(Component.text("Selected Part! ", NamedTextColor.GREEN))
+                .append(ratio)
+                .append(desc));
     }
 
 }

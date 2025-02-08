@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 import java.time.Duration;
 import java.util.List;
 
-class InteractionListCMD implements SubCommand{
+class InteractionListCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.INTERACTION_LIST_CMD)){

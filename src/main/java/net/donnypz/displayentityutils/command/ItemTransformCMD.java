@@ -10,7 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 
-class ItemTransformCMD implements SubCommand{
+class ItemTransformCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ITEM_TRANSFORM)){

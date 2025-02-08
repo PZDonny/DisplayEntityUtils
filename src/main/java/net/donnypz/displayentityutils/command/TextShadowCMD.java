@@ -9,7 +9,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
-class TextShadowCMD implements SubCommand{
+class TextShadowCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.TEXT_TOGGLE_SHADOW)){

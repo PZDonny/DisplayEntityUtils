@@ -8,7 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 
-class GroupBrightnessCMD implements SubCommand{
+class GroupBrightnessCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_BRIGHTNESS)){

@@ -1,24 +1,24 @@
 package net.donnypz.displayentityutils.command;
 
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 
-class GroupHelpCMD implements SubCommand{
+class GroupHelpCMD implements ConsoleUsableSubCommand {
 
     @Override
-    public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.HELP)){
+    public void execute(CommandSender sender, String[] args) {
+        if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.HELP)){
             return;
         }
 
         if (args.length < 3){
-            GroupCMD.groupHelp(player, 1);
+            GroupCMD.groupHelp(sender, 1);
         }
         else{
             try{
-                GroupCMD.groupHelp(player, Integer.parseInt(args[2]));
+                GroupCMD.groupHelp(sender, Integer.parseInt(args[2]));
             }
             catch(NumberFormatException e){
-                GroupCMD.groupHelp(player, 1);
+                GroupCMD.groupHelp(sender, 1);
             }
         }
     }

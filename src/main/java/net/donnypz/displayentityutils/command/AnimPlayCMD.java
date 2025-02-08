@@ -9,7 +9,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class AnimPlayCMD implements SubCommand{
+class AnimPlayCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_PLAY)){
@@ -35,7 +35,7 @@ class AnimPlayCMD implements SubCommand{
 
         if (args.length >= 3 && args[2].equalsIgnoreCase("-loop")){
             group.animateLooping(anim);
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Playing Animation!"))
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Playing Animation!", NamedTextColor.GREEN))
                     .append(Component.text(" (LOOPING)", NamedTextColor.YELLOW)));
         }
         else{

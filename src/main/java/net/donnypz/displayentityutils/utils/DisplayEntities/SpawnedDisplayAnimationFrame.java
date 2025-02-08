@@ -11,12 +11,12 @@ import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
-public final class SpawnedDisplayAnimationFrame {
+public final class SpawnedDisplayAnimationFrame implements Cloneable{
     HashMap<UUID, DisplayTransformation> displayTransformations = new HashMap<>(); //Part UUIDS
     HashMap<UUID, Vector3f>  interactionTransformations = new HashMap<>(); //Part UUIDS
 
@@ -107,7 +107,7 @@ public final class SpawnedDisplayAnimationFrame {
 
     /**
      * Get the tag that represents the frame
-     * @return the group's tag or  if not set
+     * @return the frame's tag or null if not set
      */
     public @Nullable String getTag(){
         return tag;
@@ -422,20 +422,22 @@ public final class SpawnedDisplayAnimationFrame {
     /**
      * Show the particles that will be displayed at the start of this frame
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
+     * @param animator the animator attempting to play the particles
      */
-    public void showStartParticles(@NotNull SpawnedDisplayEntityGroup group){
+    public void showStartParticles(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
         for (AnimationParticle particle : frameStartParticles){
-            particle.spawn(group);
+            particle.spawn(group, animator);
         }
     }
 
     /**
      * Show the particles that will be displayed at the end of this frame
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
+     * @param animator the animator attempting to play the particles
      */
-    public void showEndParticles(@NotNull SpawnedDisplayEntityGroup group){
+    public void showEndParticles(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
         for (AnimationParticle particle : frameEndParticles){
-            particle.spawn(group);
+            particle.spawn(group, animator);
         }
     }
 
@@ -469,27 +471,29 @@ public final class SpawnedDisplayAnimationFrame {
     /**
      * Play all effects that are expected at the start of this frame (e.g. sounds, particles, commands)
      * @param group the group to play these effects for
+     * @param animator the animator attempting to play the effects
      */
-    public void playStartEffects(SpawnedDisplayEntityGroup group){
+    public void playStartEffects(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
         Location groupLoc = group.getLocation();
         if (groupLoc != null){
             playStartSounds(groupLoc);
             executeStartCommands(groupLoc);
         }
-        showStartParticles(group);
+        showStartParticles(group, animator);
     }
 
     /**
      * Play all effects that are expected at the end of this frame (e.g. sounds, particles, commands)
      * @param group the group to play these effects for
+     * @param animator the animator attempting to play the effects
      */
-    public void playEndEffects(@NotNull SpawnedDisplayEntityGroup group){
+    public void playEndEffects(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
         Location groupLoc = group.getLocation();
         if (groupLoc != null){
             playEndSounds(groupLoc);
             executeEndCommands(groupLoc);
         }
-        showEndParticles(group);
+        showEndParticles(group, animator);
     }
 
 
@@ -525,7 +529,7 @@ public final class SpawnedDisplayAnimationFrame {
 
     @ApiStatus.Internal
     public DisplayAnimationFrame toDisplayAnimationFrame(){
-        DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, frameStartSounds, frameEndSounds, frameStartParticles, frameEndParticles, startCommands, endCommands);
+        DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, frameStartSounds, frameEndSounds, frameStartParticles, frameEndParticles, startCommands, endCommands, tag);
         for (UUID uuid : displayTransformations.keySet()){
             DisplayTransformation transform = displayTransformations.get(uuid);
             if (transform != null){
@@ -536,5 +540,25 @@ public final class SpawnedDisplayAnimationFrame {
             frame.setInteractionTransformation(uuid, interactionTransformations.get(uuid));
         }
         return frame;
+    }
+
+    @Override
+    public SpawnedDisplayAnimationFrame clone(){
+        try {
+            SpawnedDisplayAnimationFrame cloned = (SpawnedDisplayAnimationFrame) super.clone();
+
+            cloned.displayTransformations = new HashMap<>(this.displayTransformations);
+            cloned.interactionTransformations = new HashMap<>(this.interactionTransformations);
+            cloned.frameStartSounds = new HashMap<>(this.frameStartSounds);
+            cloned.frameEndSounds = new HashMap<>(this.frameEndSounds);
+            cloned.frameStartParticles = new HashSet<>(this.frameStartParticles);
+            cloned.frameEndParticles = new HashSet<>(this.frameEndParticles);
+            cloned.startCommands = new ArrayList<>(this.startCommands);
+            cloned.endCommands = new ArrayList<>(this.endCommands);
+
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError("Clone not supported", e);
+        }
     }
 }

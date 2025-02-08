@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 
-class BDEngineImportModelCMD implements SubCommand{
+class BDEngineImportModelCMD implements PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {

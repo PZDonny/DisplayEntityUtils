@@ -6,7 +6,7 @@
 
     <groupId>net.donnypz</groupId>
     <artifactId>displayentityutils</artifactId>
-    <version>2.6.1</version>
+    <version>2.6.2</version>
     <packaging>jar</packaging>
 
     <name>DisplayEntityUtils</name>
@@ -102,6 +102,12 @@
             <url>https://mvn.lumine.io/repository/maven-public/</url>
         </repository>
 
+        <repository>
+            <id>skript-releases</id>
+            <name>Skript Repository</name>
+            <url>https://repo.skriptlang.org/releases</url>
+        </repository>
+
     </repositories>
 
     <dependencies>
@@ -126,7 +132,6 @@
             <scope>provided</scope>
         </dependency>
 
-
         <!-- https://mvnrepository.com/artifact/commons-dbutils/commons-dbutils -->
         <dependency>
             <groupId>commons-dbutils</groupId>
@@ -134,11 +139,17 @@
             <version>1.8.1</version>
         </dependency>
 
-        <!--HikariCP-->
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>5.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.SkriptLang</groupId>
+            <artifactId>Skript</artifactId>
+            <version>2.10.0</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

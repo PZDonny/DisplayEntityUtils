@@ -121,20 +121,16 @@ class DatapackConverter {
             createdGroup.seedPartUUIDs(SpawnedDisplayEntityGroup.defaultPartUUIDSeed);
 
             player.sendMessage(Component.empty());
-            if (!groupSaveTag.equals("-")){
+            boolean save = !groupSaveTag.equals("-");
+            if (save){
                 if (groupSaveTag.isBlank()){
                     createdGroup.setTag(datapackName.replace(".zip", "_auto"));
                 }
                 else{
                     createdGroup.setTag(groupSaveTag);
                 }
-                DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.LOCAL, createdGroup.toDisplayEntityGroup(), player);
-                player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Group Tag: <yellow>"+createdGroup.getTag()));
+
             }
-            else{
-                player.sendMessage(Component.text("The group was not saved during this conversion due to setting the group tag to \"-\"", NamedTextColor.GRAY));
-            }
-            player.sendMessage(Component.empty());
 
             int delay = 0;
             for (String animName : animations.sequencedKeySet()){
@@ -142,14 +138,23 @@ class DatapackConverter {
                 Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                     player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Converting Animation: <yellow>"+animName));
                     processAnimation(createdGroup, zipFile, frames, datapackName, animName, player, animationSaveTagPrefix);
-                    }, delay);
+                }, delay);
 
                 delay+=(frames.size()*2);
             }
 
             //Despawn group after all animation conversions
             Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                createdGroup.unregister(true, true);
+                player.sendMessage(Component.empty());
+                if (save){
+                    DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.LOCAL, createdGroup.toDisplayEntityGroup(), player);
+                    player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Group Tag: <yellow>"+createdGroup.getTag()));
+                }
+                else{
+                    player.sendMessage(Component.text("The group will not be saved due to setting the group tag to \"-\"", NamedTextColor.GRAY));
+                }
+
+                Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> createdGroup.unregister(true, true));
             }, delay+5);
         }, 30);
     }
@@ -157,7 +162,6 @@ class DatapackConverter {
     private void processAnimation(SpawnedDisplayEntityGroup createdGroup, ZipFile zipFile, List<ZipEntry> frames, String datapackName, String animName, @NotNull Player player, @NotNull String animationSaveTagPrefix){
 
         final SpawnedDisplayAnimation anim = new SpawnedDisplayAnimation();
-        SpawnedDisplayAnimationFrame initialFrame = new SpawnedDisplayAnimationFrame(-1, -1).setTransformation(createdGroup);
 
         final int frameCount = frames.size();
         new BukkitRunnable(){
@@ -165,14 +169,12 @@ class DatapackConverter {
             @Override
             public void run() {
                 if (i == frameCount){
-                    SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(0, 2).setTransformation(createdGroup);
-                    if (!frame.isEmptyFrame()){
-                        anim.addFrame(frame);
+                    try{
+                        createdGroup.setToFrame(anim, anim.getFrames().getFirst(), false);
                     }
+                    catch(IndexOutOfBoundsException ignored){}
 
-                    createdGroup.setToFrame(anim, initialFrame, false);
-
-                    //Save with first frame applied to group
+                    //Save
                     Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                         if (animationSaveTagPrefix.isBlank()){
                             anim.setAnimationTag(datapackName.replace(".zip", "_auto_"+animName));

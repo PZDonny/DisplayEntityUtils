@@ -11,7 +11,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
-class TextSetCMD implements SubCommand{
+class TextSetCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.TEXT_SET_TEXT)){

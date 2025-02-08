@@ -25,7 +25,7 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-public final class SpawnedDisplayEntityGroup {
+public final class SpawnedDisplayEntityGroup implements Spawned {
     public static final long defaultPartUUIDSeed = 99;
     final Random partUUIDRandom = new Random(defaultPartUUIDSeed);
 
@@ -40,11 +40,10 @@ public final class SpawnedDisplayEntityGroup {
 
     boolean isVisibleByDefault;
     private float scaleMultiplier = 1;
-    private UUID followedEntity = null;
-    private long lastAnimationTimeStamp = -1;
     private boolean isPersistent = true;
     private MachineState currentMachineState;
     private float verticalOffset = 0;
+    private final HashSet<DisplayAnimator> activeAnimators = new HashSet<>();
 
     public static final NamespacedKey creationTimeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "creationtime");
     static final NamespacedKey scaleKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "scale");
@@ -112,9 +111,7 @@ public final class SpawnedDisplayEntityGroup {
         return DisplayUtils.isInLoadedChunk(masterPart);
     }
 
-    void setLastAnimationTimeStamp(long timestamp){
-        this.lastAnimationTimeStamp = timestamp;
-    }
+
 
     /**
      * Set the vertical translation offset of this group riding an entity. This will apply to animations
@@ -134,24 +131,7 @@ public final class SpawnedDisplayEntityGroup {
         return verticalOffset;
     }
 
-    /**
-     * Manually stop an animation from playing on a group
-     * @param removeFromStateMachine removes this animation from its state machine if true
-     */
-    public void stopAnimation(boolean removeFromStateMachine){
-        this.lastAnimationTimeStamp = -1;
-        if (removeFromStateMachine){
-            DisplayStateMachine.unregisterFromStateMachine(this);
-        }
-    }
 
-    /**
-     * Check if this group's is animating, by checking if its last animation timestamp is not -1
-     * @return a boolean
-     */
-    public boolean isAnimating(){
-        return lastAnimationTimeStamp != -1;
-    }
 
     /**
      * Get this group's current animation state, respective of its {@link DisplayStateMachine}
@@ -199,6 +179,12 @@ public final class SpawnedDisplayEntityGroup {
 
 
 
+        if (currentMachineState != null){
+            DisplayAnimator animator = currentMachineState.animator;
+            if (animator != null){
+                animator.stop(this);
+            }
+        }
         currentMachineState = state;
 
         DisplayAnimator animator = state.getDisplayAnimator();
@@ -381,7 +367,7 @@ public final class SpawnedDisplayEntityGroup {
 
             SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(i);
             if (part == null){
-                new SpawnedDisplayEntityPart(this, (Interaction) e, partUUIDRandom);
+                new SpawnedDisplayEntityPart(this, i, partUUIDRandom);
             }
             else{
                 if (this == part.getGroup()){ //Already in this group
@@ -389,17 +375,12 @@ public final class SpawnedDisplayEntityGroup {
                 }
                 part.setGroup(this);
             }
-            interactions.add((Interaction) e);
+            interactions.add(i);
         }
         return interactions;
     }
 
-    /**
-     * Randomize the part uuids of all parts in this group with a given seed.
-     * Useful when wanting to use the same animation on similar SpawnedDisplayEntityGroups.
-     * Animations are not guaranteed to work properly if the order of parts are changed or if there is a difference in the number of parts.
-     * @param seed The seed to use for the part randomization
-     */
+    @ApiStatus.Internal
     public void seedPartUUIDs(long seed){
         byte[] byteArray;
         Random random = new Random(seed);
@@ -413,20 +394,22 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Reveal a SpawnedDisplayEntityGroup that is spawned hidden (or hidden in another way) to a player
+     * Reveal this group that is spawned hidden (or hidden in another way) to a player
      * @param player The player to reveal this group to
      */
-    public void showToPlayer(Player player){
+    @Override
+    public void showToPlayer(@NotNull Player player){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.showToPlayer(player);
         }
     }
 
     /**
-     * Hide a SpawnedDisplayEntityGroup that is spawned hidden (or hidden in another way) from a player
+     * Hide this group from a player
      * @param player The player to hide this group from
      */
-    public void hideFromPlayer(Player player){
+    @Override
+    public void hideFromPlayer(@NotNull Player player){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.hideFromPlayer(player);
         }
@@ -463,7 +446,7 @@ public final class SpawnedDisplayEntityGroup {
                             addInteractionEntity(interaction);
 
                         }
-                        interactions.add((Interaction) e);
+                        interactions.add(interaction);
                     }
                 }
             }
@@ -920,10 +903,24 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
+     * Pivot all Interaction parts in this selection around the SpawnedDisplayEntityGroup's master part
+     * @param angle the pivot angle
+     */
+    @Override
+    public void pivot(double angle){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                part.pivot(angle);
+            }
+        }
+    }
+
+    /**
      * Change the yaw of this group
      * @param yaw The yaw to set for this group
      * @param pivotInteractions true if interactions should pivot around the group with the yaw change
      */
+    @Override
     public void setYaw(float yaw, boolean pivotInteractions){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setYaw(yaw, pivotInteractions);
@@ -934,6 +931,7 @@ public final class SpawnedDisplayEntityGroup {
      * Change the pitch of this group
      * @param pitch The pitch to set for this group
      */
+    @Override
     public void setPitch(float pitch){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setPitch(pitch);
@@ -944,6 +942,7 @@ public final class SpawnedDisplayEntityGroup {
      * Set the brightness of this group
      * @param brightness the brightness to set, null to use brightness based on position
      */
+    @Override
     public void setBrightness(@Nullable Display.Brightness brightness){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setBrightness(brightness);
@@ -954,6 +953,7 @@ public final class SpawnedDisplayEntityGroup {
      * Set the billboard of this group
      * @param billboard the billboard to set
      */
+    @Override
     public void setBillboard(@NotNull Display.Billboard billboard){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setBillboard(billboard);
@@ -964,6 +964,7 @@ public final class SpawnedDisplayEntityGroup {
      * Set the view range of this group
      * @param viewRangeMultiplier The range multiplier to set
      */
+    @Override
     public void setViewRange(float viewRangeMultiplier){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setViewRange(viewRangeMultiplier);
@@ -1026,6 +1027,7 @@ public final class SpawnedDisplayEntityGroup {
      * Set the glow color of this group
      * @param color The color to set
      */
+    @Override
     public void setGlowColor(@Nullable Color color){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.setGlowColor(color);
@@ -1161,8 +1163,11 @@ public final class SpawnedDisplayEntityGroup {
      */
     public SpawnedDisplayEntityGroup glow(boolean ignoreInteractions, boolean particleHidden){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            if (ignoreInteractions && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION)){
-                continue;
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                if (ignoreInteractions){
+                    continue;
+                }
+                part.glow(false);
             }
             part.glow(particleHidden);
         }
@@ -1174,12 +1179,15 @@ public final class SpawnedDisplayEntityGroup {
      * @param durationInTicks How long to highlight this selection
      * @return this
      */
-    public SpawnedDisplayEntityGroup glow(long durationInTicks, boolean ignoreInteractions){
+    public SpawnedDisplayEntityGroup glow(long durationInTicks, boolean ignoreInteractions, boolean particleHidden){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            if (ignoreInteractions && (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION)){
-                continue;
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                if (ignoreInteractions){
+                    continue;
+                }
+                part.glow(durationInTicks, false);
             }
-            part.glow(durationInTicks);
+            part.glow(durationInTicks, particleHidden);
         }
         return this;
     }
@@ -1188,6 +1196,7 @@ public final class SpawnedDisplayEntityGroup {
      * Removes the glow effect from all the parts in this group
      * @return this
      */
+    @Override
     public SpawnedDisplayEntityGroup unglow(){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.unglow();
@@ -1286,7 +1295,7 @@ public final class SpawnedDisplayEntityGroup {
     }
 
     /**
-     * Determine if this group's vertical offset can be applied if
+     * Determine if this group's vertical offset can be applied, typically when mounted on an entity
      * @return
      */
     public boolean canApplyVerticalOffset(){
@@ -1379,16 +1388,14 @@ public final class SpawnedDisplayEntityGroup {
      * or any variation
      */
     public void stopFollowingEntity(){
-        followedEntity = null;
-    }
-
-    /**
-     * Get the entity being followed after using
-     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)}
-     * or any variation
-     */
-    public Entity getFollowedEntity(){
-        return followedEntity != null ? Bukkit.getEntity(followedEntity) : null;
+        for (SpawnedDisplayFollower follower : new HashSet<>(followers)){
+            follower.remove();
+        }
+        if (defaultFollower != null){
+            defaultFollower.remove();
+            defaultFollower = null;
+        }
+        followers.clear();
     }
 
 
@@ -1489,14 +1496,6 @@ public final class SpawnedDisplayEntityGroup {
     }
 
 
-    /**
-     * Get the UNIX timestamp when this group last began animating
-     * @return a long
-     */
-    @ApiStatus.Internal
-    public long getLastAnimationTimeStamp(){
-        return lastAnimationTimeStamp;
-    }
 
     /**
      * Get the tag of the animation applied to this group when it's spawned/loaded
@@ -1592,26 +1591,49 @@ public final class SpawnedDisplayEntityGroup {
     /**
      * Make a group perform an animation
      * @param animation the animation this group should play
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
      */
-    public void animate(@NotNull SpawnedDisplayAnimation animation){
-        DisplayAnimator.play(this, animation);
+    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation){
+        return DisplayAnimator.play(this, animation);
     }
 
     /**
-     * Make a group perform a looping animation. There is not a way to manually stop the looped animation, other than by using
-     * a {@link DisplayAnimator}. This is recommended only for debug use or in cases where looped animations don't need to stop.
+     * Make a group perform a looping animation.
      * @param animation the animation this group should play
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
      */
-    public void animateLooping(@NotNull SpawnedDisplayAnimation animation){
+    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
         animator.play(this);
+        return animator;
+    }
 
+    /**
+     * Manually stop an animation from playing on this group
+     * @param displayAnimator the display animator controlling an animation
+     * @return this
+     */
+    public @NotNull SpawnedDisplayEntityGroup stopAnimation(@NotNull DisplayAnimator displayAnimator){
+        removeActiveAnimator(displayAnimator);
+        return this;
+    }
+
+    /**
+     * Manually stop all animations playing on this group
+     * @param removeFromStateMachine removes this animation from its state machine if true
+     */
+    public void stopAnimations(boolean removeFromStateMachine){
+        activeAnimators.clear();
+        if (removeFromStateMachine){
+            DisplayStateMachine.unregisterFromStateMachine(this);
+        }
     }
 
     /**
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame}
      * @param animation the animation the frame is from
      * @param frame the frame to display
+     * @param isAsync whether to show this frame asynchronously (unpredictable results)
      * @return false if this group is in an unloaded chunk
      */
     public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, boolean isAsync) {
@@ -1620,6 +1642,51 @@ public final class SpawnedDisplayEntityGroup {
         }
         DisplayAnimatorExecutor.setGroupToFrame(this, animation, frame, isAsync);
         return true;
+    }
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}
+     * @param animation the animation the frame is from
+     * @param frame the frame to display
+     * @param isAsync whether to show this frame asynchronously (unpredictable results)
+     * @param duration how long the frame should play
+     * @param delay how long until the frame should start playing
+     * @return false if this group is in an unloaded chunk
+     */
+    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay, boolean isAsync) {
+        if (!isInLoadedChunk()){
+            return false;
+        }
+        DisplayAnimatorExecutor.setGroupToFrame(this, animation, frame, duration, delay, isAsync);
+        return true;
+    }
+
+    SpawnedDisplayEntityGroup addActiveAnimator(DisplayAnimator animator){
+        activeAnimators.add(animator);
+        return this;
+    }
+
+    SpawnedDisplayEntityGroup removeActiveAnimator(DisplayAnimator animator){
+        activeAnimators.remove(animator);
+        return this;
+    }
+
+    /**
+     * Check if an animator is animating on this group
+     * @param animator
+     * @return a boolean
+     */
+    public boolean isActiveAnimator(@NotNull DisplayAnimator animator){
+        return activeAnimators.contains(animator);
+    }
+
+    /**
+     * Check if this group's is being animated by any {@link DisplayAnimator}s
+     * @return a boolean
+     */
+    public boolean isAnimating(){
+        //return lastAnimationTimeStamp != -1;
+        return !activeAnimators.isEmpty();
     }
 
 
@@ -1699,8 +1766,11 @@ public final class SpawnedDisplayEntityGroup {
         DisplayGroupManager.removeSpawnedGroup(this, despawnParts, force);
         spawnedParts.clear();
         masterPart = null;
-        followedEntity = null;
         followers.clear();
+        if (defaultFollower != null){
+            defaultFollower.remove();
+            defaultFollower = null;
+        }
     }
 
     /**

@@ -72,6 +72,13 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                         case "billboard" -> {
                             addBillboard(suggestions);
                         }
+                        case "ride" -> {
+                            return null;
+                        }
+                        case "dismount" -> {
+                            suggestions.add("keep");
+                            suggestions.add("despawn");
+                        }
                     }
                 }
                 case "anim" -> {
@@ -109,6 +116,12 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                         case "billboard" -> {
                             addBillboard(suggestions);
                         }
+                        case "filtertypes" -> {
+                            suggestions.add("block");
+                            suggestions.add("item");
+                            suggestions.add("text");
+                            suggestions.add("interaction");
+                        }
                     }
                 }
                 case "item" -> {
@@ -134,17 +147,26 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                     if (args[1].equalsIgnoreCase("background")){
                         addColors(suggestions);
                     }
+                    else if (args[1].equalsIgnoreCase("font")){
+                        suggestions.add("default");
+                        suggestions.add("uniform");
+                        suggestions.add("alt");
+                        suggestions.add("illageralt");
+                    }
                 }
             }
         }
         else if (args.length == 4) {
             if (args[0].equalsIgnoreCase("group")){
-                if (args[1].equalsIgnoreCase("delete") || args[1].equalsIgnoreCase("setspawnanim")){
+                if (args[1].equalsIgnoreCase("spawn") ||args[1].equalsIgnoreCase("delete") || args[1].equalsIgnoreCase("setspawnanim")){
                     addStorages(suggestions);
+                }
+                else if (args[1].equalsIgnoreCase("dismount")){
+                    return null;
                 }
             }
             else if (args[0].equalsIgnoreCase("anim")){
-                if (args[1].equalsIgnoreCase("delete")){
+                if (args[1].equalsIgnoreCase("delete") || args[1].equalsIgnoreCase("select")){
                     addStorages(suggestions);
                 }
             }

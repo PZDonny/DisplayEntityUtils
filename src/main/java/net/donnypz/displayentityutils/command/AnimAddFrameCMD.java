@@ -8,11 +8,10 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-class AnimAddFrameCMD implements SubCommand{
+class AnimAddFrameCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_ADD_FRAME)){
@@ -42,11 +41,8 @@ class AnimAddFrameCMD implements SubCommand{
                 throw new NumberFormatException();
             }
             SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(delay, duration);
-            if (anim.isPartAnimation()) {
-                frame.setTransformation(group, anim.getPartTag());
-            } else {
-                frame.setTransformation(group);
-            }
+            frame.setTransformation(group);
+
             boolean isUnique = anim.addFrame(frame);
             if (isUnique){
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully captured animation frame", NamedTextColor.GREEN)));

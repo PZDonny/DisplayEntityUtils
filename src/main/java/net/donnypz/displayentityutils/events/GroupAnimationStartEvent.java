@@ -6,8 +6,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Called when a {@link DisplayAnimator} starts playing a {@link SpawnedDisplayAnimation}.
@@ -44,9 +43,9 @@ public class GroupAnimationStartEvent extends Event implements Cancellable {
 
     /**
      * Get the {@link DisplayAnimator} involved in this event
-     * @return a DisplayAnimator. Null if the group animated without creating a DisplayAnimator
+     * @return a DisplayAnimator
      */
-    public @Nullable DisplayAnimator getAnimator() {
+    public @NotNull DisplayAnimator getAnimator() {
         return animator;
     }
 
