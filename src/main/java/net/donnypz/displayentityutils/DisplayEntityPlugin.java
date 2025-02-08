@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
+import ch.njol.skript.util.Version;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginTabCompleter;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.events.InteractionClickEvent;
@@ -98,21 +99,28 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
         isSkriptInstalled = Bukkit.getPluginManager().isPluginEnabled("Skript");
         if (isSkriptInstalled){
-            addon = Skript.registerAddon(this);
-            try {
-                addon.loadClasses("net.donnypz.displayentityutils.skript", "conditions", "events", "effects", "expressions");
-                addon.setLanguageFileDirectory("lang");
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (Skript.getVersion().isSmallerThan(new Version(2,10,0))){
+                getServer().getConsoleSender().sendMessage(pluginPrefix.append(Component.text("Skript Version below 2.10.0 Detected! Skript Syntax Disabled!", NamedTextColor.RED)));
+                isSkriptInstalled = false;
             }
-            new SkriptTypes();
+            else{
+                addon = Skript.registerAddon(this);
+                try {
+                    addon.loadClasses("net.donnypz.displayentityutils.skript", "conditions", "events", "effects", "expressions");
+                    addon.setLanguageFileDirectory("lang");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                new SkriptTypes();
+                getServer().getConsoleSender().sendMessage(pluginPrefix.append(Component.text("Skript Syntax Enabled!", NamedTextColor.GREEN)));
+            }
         }
 
         reloadPlugin(true);
 
         getCommand("managedisplays").setExecutor(new DisplayEntityPluginCommand());
         getCommand("managedisplays").setTabCompleter(new DisplayEntityPluginTabCompleter());
-        getServer().getConsoleSender().sendMessage(pluginPrefix.append( Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
+        getServer().getConsoleSender().sendMessage(pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
 
 
         Bukkit.getPluginManager().registerEvents(this, this);
