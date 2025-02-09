@@ -14,6 +14,9 @@ BDEngine is what you'll use to create models and animations that can be transfer
 - Manipulate every part (Display Entity) within a model
 - Manipulate Interaction Entities
 - Integration with [Skript](https://github.com/SkriptLang/Skript)
+
+[![SkriptHubViewTheDocs](http://skripthub.net/static/addon/ViewTheDocsButton.png)](http://skripthub.net/docs/?addon=DisplayEntityUtils)
+
 - Include Interaction Entities as part of groups/models
 - Execute commands through Interaction Entities
 - Create and Play Animations through the plugin
