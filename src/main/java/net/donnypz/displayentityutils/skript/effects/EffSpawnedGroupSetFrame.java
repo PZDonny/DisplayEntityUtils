@@ -16,8 +16,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Animate Spawned Group")
-@Description("Play an animation on a spawned group with a display animator")
+@Name("Show Animation Frame on Spawned Group")
+@Description("Play a single animation frame on a spawned group, optionally with custom duration and delay")
 @Examples({"play frame with id 5 on {_spawnedgroup} from {_spawnedanimation}"})
 @Since("2.6.2")
 public class EffSpawnedGroupSetFrame extends Effect {
