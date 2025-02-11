@@ -223,7 +223,12 @@ public final class SpawnedPartSelection implements Spawned {
         return true;
     }
 
-    public void unfilter(@NotNull PartFilter.FilterType filterType, boolean reselect){
+    /**
+     * Remove any filters applied, based on the {@link PartFilter.FilterType}.
+     * @param filterType the type that should be unfiltered
+     * @param refresh true if the parts in the selection should be updated
+     */
+    public void unfilter(@NotNull PartFilter.FilterType filterType, boolean refresh){
         switch (filterType){
             case PART_TYPE -> partTypes.clear();
             case INCLUDED_TAGS -> includedTags.clear();
@@ -231,7 +236,7 @@ public final class SpawnedPartSelection implements Spawned {
             case ITEM_TYPE -> itemTypes.clear();
             case BLOCK_TYPE -> blockTypes.clear();
         }
-        if (reselect) refresh();
+        if (refresh) refresh();
     }
 
     /**
