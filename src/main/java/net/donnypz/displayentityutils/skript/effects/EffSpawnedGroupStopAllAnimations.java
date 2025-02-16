@@ -9,14 +9,13 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Stop All Animations ")
 @Description("Stop all animations playing on a spawned group")
-@Examples({"stop [all] animations on {_spawnedgroup}", "stop animations on {_spawnedgroup} and remove from state machine"})
+@Examples({"stop all animations on {_spawnedgroup}", "stop animations on {_spawnedgroup} and remove from state machine"})
 @Since("2.6.2")
 public class EffSpawnedGroupStopAllAnimations extends Effect {
     static {

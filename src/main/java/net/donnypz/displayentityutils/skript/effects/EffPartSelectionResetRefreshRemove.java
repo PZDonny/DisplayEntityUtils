@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Part Selection Reset/Refresh/Remove")
 @Description("Reset, refresh, or remove a part selection")
-@Examples({"#Ensure selection filters are updated", "refresh {_selection}",
+@Examples({"#Ensure selected parts are up to date with the applied filters", "refresh {_selection}",
         "",
         "#Reset selection filters", "reset {_selection}",
         "",

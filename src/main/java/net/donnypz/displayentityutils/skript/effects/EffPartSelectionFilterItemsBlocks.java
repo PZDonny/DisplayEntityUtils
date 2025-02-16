@@ -21,7 +21,7 @@ import java.util.Set;
 
 @Name("Part Selection Filter Set Items/Blocks")
 @Description("Set the items/blocks that should be filtered in a part selection")
-@Examples({"set block filter of {_selection} to stone"})
+@Examples({"set block filter of {_selection} with stone"})
 @Since("2.6.2")
 public class EffPartSelectionFilterItemsBlocks extends Effect {
     static {
