@@ -257,31 +257,6 @@ public class SkriptTypes {
                 })
         );
 
-        Classes.registerClass(new ClassInfo<>(DisplayAnimationFrame.class, "savedanimationframe")
-                .user("saved( |-)?(anim(ation)?)?( |-)?frame")
-                .name("Saved Animation Frame")
-                .description("Represents a saved Animation Frame from a saved Animation")
-                .examples()
-                .defaultExpression(new EventValueExpression<>(DisplayAnimationFrame.class))
-                .since("2.6.2")
-                .parser(new Parser<>() {
-
-                    @Override
-                    public boolean canParse(ParseContext context) {
-                        return false;
-                    }
-
-                    @Override
-                    public String toString(DisplayAnimationFrame o, int flags) {
-                        return toVariableNameString(o);
-                    }
-
-                    @Override
-                    public String toVariableNameString(DisplayAnimationFrame o) {
-                        return "savedanimationframe w/ tag: " + o.getTag();
-                    }
-                })
-        );
 
         Classes.registerClass(new ClassInfo<>(InteractionCommand.class, "interactioncommand")
                 .user("interaction( |-)?c(ommand|md)")
