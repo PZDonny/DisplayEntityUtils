@@ -1257,7 +1257,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
             Location lastLoc = getLocation();
             @Override
             public void run() {
-                if (!isSpawned() || !isRegistered() || SpawnedDisplayEntityGroup.this != part.getGroup()){
+                if (getVehicle() == null || !isSpawned() || !isRegistered() || SpawnedDisplayEntityGroup.this != part.getGroup()){
                     cancel();
                     return;
                 }
