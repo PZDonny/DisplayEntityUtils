@@ -28,6 +28,7 @@ public enum Permission {
     GROUP_SET_SPAWN_ANIM("deu.group.spawnanim"),
     GROUP_TOGGLE_PERSIST("deu.group.persist"),
     GROUP_BILLBOARD("deu.group.billboard"),
+    GROUP_VIEWRANGE("deu.group.viewrange"),
 
 
     PARTS_CYCLE("deu.parts.cycle"),
@@ -42,6 +43,7 @@ public enum Permission {
     PARTS_SET_BLOCK("deu.parts.setblock"),
     PARTS_BILLBOARD("deu.parts.billboard"),
     PARTS_BRIGHTNESS("deu.parts.brightness"),
+    PARTS_VIEWRANGE("deu.parts.viewrange"),
 
 
     TEXT_SET_TEXT("deu.text.set"),

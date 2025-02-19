@@ -1,10 +1,8 @@
 package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +42,7 @@ class GroupCMD implements ConsoleUsableSubCommand {
         subCommands.put("unsetspawnanim", new GroupUnsetSpawnAnimationCMD());
         subCommands.put("togglepersist", new GroupPersistCMD());
         subCommands.put("billboard", new GroupBillboardCMD());
+        subCommands.put("viewrange", new GroupViewRangeCMD());
         subCommands.put("ride", new GroupRideCMD());
         subCommands.put("dismount", new GroupDismountCMD());
     }
@@ -100,7 +99,7 @@ class GroupCMD implements ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group move <direction> <distance> <tick-duration>", " (Change the actual location of your selected group)");
             CMDUtils.sendCMD(sender, "/mdis group translate <direction> <distance> <tick-duration>"," (Changes your selected group's translation, use \"move\" instead if this group uses animations)");
             CMDUtils.sendCMD(sender, "/mdis group movehere", " (Change your selected group's actual location to your location)");
-            CMDUtils.sendCMD(sender, "/mdis group merge <distance>"," (Merges groups near your select group)");
+            CMDUtils.sendCMD(sender, "/mdis group merge <distance>"," (Merge groups near your selected group)");
         }
         else if (page == 4){
             CMDUtils.sendCMD(sender, "/mdis group copypose", " (Copies the transformations of the group you're closest to, to your selected group)");
@@ -112,6 +111,7 @@ class GroupCMD implements ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group dismount <keep | despawn> [-target | player-name | entity-uuid]", "(Dismount a group from an entity, and choose to keep or despawn it");
         }
         else{
+            CMDUtils.sendCMD(sender, "/mdis group viewrange <view-range-multiplier>", " (Set the view range multiplier for your selected group)");
             CMDUtils.sendCMD(sender, "/mdis group setspawnanim <anim-tag> <storage> <linear | loop>", " (Set an animation to play when this group is spawned/loaded)");
             CMDUtils.sendCMD(sender, "/mdis group unsetspawnanim", " (Remove the spawn animation that's set on your selected group)");
             CMDUtils.sendCMD(sender, "/mdis group togglepersist", " (Toggle whether this group should persist after a server shutdown)");
