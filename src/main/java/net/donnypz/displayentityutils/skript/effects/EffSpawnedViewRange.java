@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Spawned Group/Part/Selection View Range")
 @Description("Change the view range of a DisplayEntityUtils spawned object")
-@Examples({"set {_spawnedgroup}'s view range multipler to 5", "make {_spawnedpart}'s view range multipler "})
+@Examples({"set {_spawnedgroup}'s view range multiplier to 5", "make {_spawnedpart}'s view range multiplier 0.5"})
 @Since("2.6.2")
 public class EffSpawnedViewRange extends Effect {
     static {
