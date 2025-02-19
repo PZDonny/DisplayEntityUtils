@@ -10,7 +10,6 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +23,6 @@ public class EffGroupSpawnSettingVisibility extends Effect {
     }
 
     Expression<GroupSpawnSettings> settings;
-    Expression<Player> players;
     boolean invisible;
     boolean forInteractions;
 
@@ -33,9 +31,6 @@ public class EffGroupSpawnSettingVisibility extends Effect {
         settings = (Expression<GroupSpawnSettings>) expressions[0];
         forInteractions = parseResult.hasTag("interactions");
         invisible = parseResult.hasTag("in");
-        if (expressions.length == 2){
-            players = (Expression<Player>) expressions[1];
-        }
         return true;
     }
 
