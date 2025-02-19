@@ -14,8 +14,17 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Player's Selected Spawned Group")
-@Description("Get the selected spawned group of a player")
-@Examples({"set {_spawnedgroup} to player's selected spawned group"})
+@Description("Get/Set the selected spawned group of a player")
+@Examples({
+        "#Get selected group",
+        "set {_spawnedgroup} to player's selected spawned group",
+        "",
+        "#Set selected group",
+        "set player's selected group to {_spawnedgroup}",
+        "",
+        "#Reset group selection",
+        "reset player's selected spawned group"
+        })
 @Since("2.6.2")
 public class ExprPlayerSelectedGroup extends SimplePropertyExpression<Player, SpawnedDisplayEntityGroup> {
     static {
