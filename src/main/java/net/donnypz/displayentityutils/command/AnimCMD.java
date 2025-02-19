@@ -23,6 +23,7 @@ class AnimCMD implements ConsoleUsableSubCommand{
         subCommands.put("info", new AnimInfoCMD());
         subCommands.put("frameinfo", new AnimFrameInfoCMD());
         subCommands.put("usefilter", new AnimUseFilterCMD());
+        subCommands.put("unfilter", new AnimUnfilterCMD());
         subCommands.put("addframe", new AnimAddFrameCMD());
         subCommands.put("addframeafter", new AnimAddFrameAfterCMD());
         subCommands.put("removeframe", new AnimRemoveFrameCMD());
@@ -77,7 +78,8 @@ class AnimCMD implements ConsoleUsableSubCommand{
             CMDUtils.sendCMD(sender,"/mdis anim new", " (Manually create a new animation)");
             CMDUtils.sendCMD(sender,"/mdis anim info", " (List information about your selected animation)");
             CMDUtils.sendCMD(sender, "/mdis anim frameinfo <frame-id>", " (List information about a frame in your animation)");
-            CMDUtils.sendCMD(sender, "/mdis anim usefilter", " (Animate only your selected, filtered parts.)");
+            CMDUtils.sendCMD(sender, "/mdis anim usefilter [-trim]", " (Apply your part filter/selection to an animation. Optionally, and irreversibly remove data of unfiltered parts)");
+            CMDUtils.sendCMD(sender, "/mdis anim unfilter", " (Remove your part filter/selection from an animation)");
             CMDUtils.sendCMD(sender, "/mdis anim addframe <tick-delay> <tick-duration>", " (Add a frame to your selected animation)");
 
         }

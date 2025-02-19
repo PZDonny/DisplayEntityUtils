@@ -73,6 +73,7 @@ public enum Permission {
     ANIM_INFO("deu.anim.info"),
     ANIM_FRAME_INFO("deu.anim.info"),
     ANIM_USE_FILTER("deu.anim.usefilter"),
+    ANIM_UNFILTER("deu.anim.unfilter"),
     ANIM_ADD_FRAME("deu.anim.addframe"),
     ANIM_REMOVE_FRAME("deu.anim.removeframe"),
     ANIM_OVERWRITE_FRAME("deu.anim.overwriteframe"),
