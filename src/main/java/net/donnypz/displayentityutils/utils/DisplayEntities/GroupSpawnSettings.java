@@ -24,6 +24,7 @@ public class GroupSpawnSettings {
     HashMap<String, Set<UUID>> hiddenPartTags = new HashMap<>(); //Tag , Player UUIDs
     HashMap<String, Display.Brightness> brightness = new HashMap<>();
     HashMap<String, Display.Billboard> billboard = new HashMap<>();
+    boolean persistentByDefault = true;
     boolean visibleByDefault = true;
     Set<UUID> visiblePlayers = new HashSet<>();
     boolean hideInteractions = false;
@@ -82,6 +83,11 @@ public class GroupSpawnSettings {
         return this;
     }
 
+    public GroupSpawnSettings persistentByDefault(boolean persistentByDefault){
+        this.persistentByDefault = persistentByDefault;
+        return this;
+    }
+
     /**
      * Determine if the {@link SpawnedDisplayEntityGroup} will be visible by default when spawned
      * @param visible the visibility
@@ -131,8 +137,6 @@ public class GroupSpawnSettings {
             }
         }
 
-
-
     //Teleport Duration
         display.setTeleportDuration(teleportationDuration);
 
@@ -165,6 +169,7 @@ public class GroupSpawnSettings {
                 }
             }
         }
+        display.setPersistent(persistentByDefault);
     }
 
     void apply(Interaction interaction){
@@ -188,8 +193,7 @@ public class GroupSpawnSettings {
                 determineVisibleByDefault(interaction);
             }
         }
-
-
+        interaction.setPersistent(persistentByDefault);
     }
 
     private void determineVisibleByDefault(Display display){
