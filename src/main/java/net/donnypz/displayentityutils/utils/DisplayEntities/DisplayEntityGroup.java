@@ -219,6 +219,8 @@ public final class DisplayEntityGroup implements Serializable{
             }
         }
 
+        spawnedGroup.setPersistenceOverride(settings.persistenceOverride);
+
         if (tag != null){
             spawnedGroup.setTag(tag);
         }

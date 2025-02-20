@@ -68,10 +68,16 @@ final class ConfigUtils {
             }
         }
 
-        DisplayEntityPlugin.seededPartUUIDs = config.getBoolean("seededPartUUIDs");
-
+        DisplayEntityPlugin.defaultPersistence = config.getBoolean("defaultPersistence");
         DisplayEntityPlugin.automaticGroupDetection = config.getBoolean("automaticGroupDetection.enabled");
         if (DisplayEntityPlugin.automaticGroupDetection){
+
+            //Persistence Overriding
+            DisplayEntityPlugin.persistenceOverride = config.getBoolean("automaticGroupDetection.persistenceOverride.enabled");
+            if (DisplayEntityPlugin.persistenceValue){
+                DisplayEntityPlugin.persistenceValue = config.getBoolean("automaticGroupDetection.persistenceOverride.persistent");
+            }
+
             DisplayEntityPlugin.maximumInteractionSearchRange = config.getDouble("automaticGroupDetection.maximumInteractionSearchRange");
             if (DisplayEntityPlugin.maximumInteractionSearchRange < 0){
                 DisplayEntityPlugin.maximumInteractionSearchRange = 0;

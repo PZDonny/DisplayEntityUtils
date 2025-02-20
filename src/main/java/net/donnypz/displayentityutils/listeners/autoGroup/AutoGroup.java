@@ -157,7 +157,15 @@ final class AutoGroup {
             DisplayControllerManager.registerEntity(vehicle, group);
         }
 
+        //Call Events
         for (ChunkRegisterGroupEvent event : events.values()){
+            //Persistence Override
+            if (DisplayEntityPlugin.persistenceOverride()){
+                SpawnedDisplayEntityGroup g = event.getGroup();
+                if (g.allowsPersistenceOverriding()){
+                    g.setPersistent(DisplayEntityPlugin.persistenceValue());
+                }
+            }
             event.callEvent();
         }
 
