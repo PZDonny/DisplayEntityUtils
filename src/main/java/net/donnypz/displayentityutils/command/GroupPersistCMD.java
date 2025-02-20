@@ -21,12 +21,14 @@ class GroupPersistCMD implements PlayerSubCommand {
         }
         boolean oldPersist = group.isPersistent();
         group.setPersistent(!oldPersist);
+        Component persist;
         if (oldPersist){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your selected group will no longer persist after a server shutdown!", NamedTextColor.YELLOW)));
+            persist = Component.text("DISABLED", NamedTextColor.RED);
         }
         else{
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your group will persist after a server shutdown!", NamedTextColor.GREEN)));
+            persist = Component.text("ENABLED", NamedTextColor.GREEN);
         }
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Persistence: ", NamedTextColor.WHITE)).append(persist));
 
     }
 }
