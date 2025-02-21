@@ -10,6 +10,7 @@ public final class DisplayAnimation implements Serializable {
     ArrayList<DisplayAnimationFrame> frames = new ArrayList<>();
     String partTag;
     boolean respectGroupScale = true;
+    boolean dataChanges = true;
     PartFilter filter;
 
     DisplayAnimation(){}
@@ -27,6 +28,7 @@ public final class DisplayAnimation implements Serializable {
      * Get the part tag applied to this animation, before the addition of part filters
      * @return a string or null
      */
+    @Deprecated(since = "2.6.3")
     public String getPartTag() {
         return partTag;
     }
@@ -61,6 +63,14 @@ public final class DisplayAnimation implements Serializable {
 
     public void removeFrame(DisplayAnimationFrame frame){
         frames.remove(frame);
+    }
+
+    /**
+     * Get if this animation allows for data changes (texture changes to block/item displays and text display text)
+     * @return a boolean
+     */
+    public boolean allowsTextureChanges(){
+        return dataChanges;
     }
 
     @ApiStatus.Internal

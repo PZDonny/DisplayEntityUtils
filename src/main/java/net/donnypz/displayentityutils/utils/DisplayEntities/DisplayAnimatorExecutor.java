@@ -270,7 +270,7 @@ final class DisplayAnimatorExecutor {
         if (!DisplayUtils.isInLoadedChunk(display)) {
             return;
         }
-        if (applyDataOnly){
+        if (applyDataOnly && animation.allowsDataChanges()){
             transformation.applyData(display);
             return;
         }
@@ -306,6 +306,9 @@ final class DisplayAnimatorExecutor {
                 display.setTransformation(transformation);
             }
         }
-        transformation.applyData(display);
+
+        if (animation.allowsDataChanges()){
+            transformation.applyData(display);
+        }
     }
 }

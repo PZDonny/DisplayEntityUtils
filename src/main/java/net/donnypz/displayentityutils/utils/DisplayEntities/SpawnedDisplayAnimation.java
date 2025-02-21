@@ -12,6 +12,7 @@ public final class SpawnedDisplayAnimation{
     List<SpawnedDisplayAnimationFrame> frames = new ArrayList<>();
     PartFilter filter;
     boolean respectGroupScale = true;
+    boolean dataChanges = true;
 
     @ApiStatus.Internal
     public SpawnedDisplayAnimation(){}
@@ -35,6 +36,24 @@ public final class SpawnedDisplayAnimation{
      */
     public void setAnimationTag(String animationTag) {
         this.animationTag = animationTag;
+    }
+
+    /**
+     * Get if this animation allows for data changes (texture changes to block/item displays, text display text and interaction size)
+     * @return a boolean
+     */
+    public boolean allowsDataChanges(){
+        return dataChanges;
+    }
+
+    /**
+     * Set whether this animation should allow data changes (texture changes to block/item displays and text display text)
+     * @param dataChanges
+     * @return this
+     */
+    public SpawnedDisplayAnimation allowDataChanges(boolean dataChanges){
+        this.dataChanges = dataChanges;
+        return this;
     }
 
     /**
@@ -281,6 +300,7 @@ public final class SpawnedDisplayAnimation{
             anim.filter = this.filter.clone();
         }
         anim.respectGroupScale = this.respectGroupScale;
+        anim.dataChanges = this.dataChanges;
         for (SpawnedDisplayAnimationFrame frame : frames){
             anim.addFrame(frame.toDisplayAnimationFrame());
         }
