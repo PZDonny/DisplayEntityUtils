@@ -16,9 +16,9 @@ interactionclicktype:
     right: right
 
 parttype:
-    block: block
-    item: item
-    text: text
+    block_display: block
+    item_display: item
+    text_display: text
     interaction: interaction
 
 types:
