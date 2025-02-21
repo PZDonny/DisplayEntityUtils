@@ -545,6 +545,7 @@ public final class SpawnedPartSelection implements Spawned {
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results
      * @param distance How far the part should be translated
      * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
      * @param direction The direction to translate the parts
      */
     public void translate(float distance, int durationInTicks, int delayInTicks, Vector direction){
@@ -559,6 +560,7 @@ public final class SpawnedPartSelection implements Spawned {
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results
      * @param distance How far the part should be translated
      * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
      * @param direction The direction to translate the parts
      */
     public void translate(float distance, int durationInTicks, int delayInTicks, Direction direction){
