@@ -40,7 +40,8 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
 
     boolean isVisibleByDefault;
     private float scaleMultiplier = 1;
-    private boolean isPersistent = true;
+    private boolean isPersistent = DisplayEntityPlugin.defaultPersistence();
+    private boolean persistenceOverride = DisplayEntityPlugin.persistenceOverride();
     private MachineState currentMachineState;
     private float verticalOffset = 0;
     private final HashSet<DisplayAnimator> activeAnimators = new HashSet<>();
@@ -50,7 +51,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
     static final NamespacedKey spawnAnimationKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimation");
     static final NamespacedKey spawnAnimationTypeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimationtype");
     static final NamespacedKey spawnAnimationLoadMethodKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimationloader");
-
+    static final NamespacedKey persistenceOverrideKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "persistence_override");
 
 
     SpawnedDisplayEntityGroup(boolean isVisible) {
@@ -71,6 +72,9 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
         }
         if (c.has(scaleKey)){
             scaleMultiplier = c.get(scaleKey, PersistentDataType.FLOAT);
+        }
+        if (c.has(persistenceOverrideKey)) {
+            persistenceOverride = c.get(persistenceOverrideKey, PersistentDataType.BOOLEAN);
         }
 
         //String tag1;
@@ -257,7 +261,6 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
 
         SpawnedDisplayEntityPart part = new SpawnedDisplayEntityPart(this, displayEntity, partUUIDRandom);
         if (masterPart != null){
-            Location masterLoc = masterPart.getLocation();
             if (!part.isMaster()){
                 Display masterEntity = (Display) masterPart.getEntity();
                 displayEntity.setTeleportDuration(masterEntity.getTeleportDuration());
@@ -271,7 +274,6 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
                 }
             }
         }
-
         return part;
     }
 
@@ -629,6 +631,31 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
     }
 
     /**
+     * Get whether this group allows its persistence to change when loaded by a chunk.
+     * <br>
+     * The persistence can only change if {@code automaticGroupDetection.persistenceOverride.enabled} is true in the config.
+     * @return a boolean
+     */
+    public boolean allowsPersistenceOverriding(){
+        return persistenceOverride;
+    }
+
+    /**
+     * Set whether this group's persistence can be overriden when loaded by a chunk
+     * <br>
+     * The persistence can only change if {@code automaticGroupDetection.persistenceOverride.enabled} is true in the config.
+     * @param override whether the persistence should be overriden
+     * @return this
+     */
+    public SpawnedDisplayEntityGroup setPersistenceOverride(boolean override){
+        this.persistenceOverride = override;
+        Entity master = getMasterPart().getEntity();
+        PersistentDataContainer c = master.getPersistentDataContainer();
+        c.set(persistenceOverrideKey, PersistentDataType.BOOLEAN, override);
+        return this;
+    }
+
+    /**
      * Get this group's scale multiplier set after using {@link SpawnedDisplayEntityGroup#scale(float, int, boolean)}
      * @return the group's scale multiplier
      */
@@ -640,7 +667,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * Set the scale for all parts within this group
      * @param newScaleMultiplier the scale multiplier to apply to this group
      * @param durationInTicks how long it should take for the group to scale
-     * @param scaleInteractions whether interaction entities should be scales
+     * @param scaleInteractions whether interaction entities should be scaled
      * @return false if the {@link GroupScaleEvent} was cancelled or if the group is in an unloaded chunk
      */
     public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions){
@@ -665,9 +692,6 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
             //Displays
             if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Display d = (Display) part.getEntity();
-                if (!d.getLocation().getChunk().isLoaded()){
-                    return false;
-                }
                 Transformation transformation = d.getTransformation();
 
                 //Reset Scale then multiply by newScaleMultiplier
@@ -1046,9 +1070,10 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * Change the translation of all the SpawnedDisplayEntityParts in this group.
      * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param direction The direction to translate the part
      * @param distance How far the part should be translated
      * @param durationInTicks How long it should take for the translation to complete
-     * @param direction The direction to translate the part
+     * @param delayInTicks How long before the translation should begin
      * @return false if the {@link GroupTranslateEvent} is cancelled or if the group is in an unloaded chunk
      */
     public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks){
@@ -1074,6 +1099,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * @param direction The direction to translate the part
      * @param distance How far the part should be translated
      * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
      * @return false if the {@link GroupTranslateEvent} is cancelled or if the group is in an unloaded chunk
      */
     public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks){
@@ -1315,21 +1341,9 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * It is recommended to use this with {@link #rideEntity(Entity)}
      * @param entity The entity with the directions to follow
      * @param followType The follow type, or null to disable respecting looking direction
-     * @param unregisterOnEntityDeath Determines if this group should be despawned after the entity's death
-     * @throws IllegalArgumentException If the {@link FollowType} is set to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
-     */
-    public void followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, boolean unregisterOnEntityDeath, boolean pivotInteractions){
-        followEntityDirection(entity, followType, unregisterOnEntityDeath, pivotInteractions, getTeleportDuration());
-    }
-
-    /**
-     * Force the SpawnedDisplayEntityGroup to look in the same direction as a specified entity
-     * <br>
-     * It is recommended to use this with {@link #rideEntity(Entity)}
-     * @param entity The entity with the directions to follow
-     * @param followType The follow type, or null to disable respecting looking direction
-     * @param unregisterAfterEntityDeathDelay How long after an entity dies to despawn the group, in ticks
-     * @throws IllegalArgumentException If the {@link FollowType} is set to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
+     * @param unregisterAfterEntityDeathDelay How long after an entity dies to despawn the group, in ticks. -1 to never despawn
+     * @param pivotInteractions determine if interaction entities should pivot when following an entity's yaw
+     * @throws IllegalArgumentException If followType is to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
      */
     public void followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions){
         followEntityDirection(entity, followType, unregisterAfterEntityDeathDelay, pivotInteractions, getTeleportDuration());
@@ -1341,15 +1355,13 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * It is recommended to use this with {@link #rideEntity(Entity)}
      * @param entity The entity with the directions to follow
      * @param followType The follow type, or null to disable respecting looking direction
-     * @param unregisterOnEntityDeath Determines if this group should be despawned after the entity's death
+     * @param unregisterAfterEntityDeathDelay How long after an entity dies to despawn the group, in ticks. A value of -1 will not despawn the group.
+     * @param pivotInteractions determine if interaction entities should pivot when following an entity's yaw
      * @param teleportationDuration Set the teleportationDuration (rotation smoothness) of all parts within this group
-     * @throws IllegalArgumentException If the {@link FollowType} is set to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
+     * @throws IllegalArgumentException If followType is to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
      */
-    public void followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, boolean unregisterOnEntityDeath, boolean pivotInteractions, int teleportationDuration){
-        int delay = unregisterOnEntityDeath ? 0 : -1;
-        GroupFollowProperties followProperties = new GroupFollowProperties(followType, delay, pivotInteractions, teleportationDuration, null);
-        followEntityDirection(entity, followProperties);
-
+    public void followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions, int teleportationDuration){
+        followEntityDirection(entity, followType, unregisterAfterEntityDeathDelay, pivotInteractions, false, teleportationDuration);
     }
 
     /**
@@ -1359,11 +1371,13 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * @param entity The entity with the directions to follow
      * @param followType The follow type, or null to disable respecting looking direction
      * @param unregisterAfterEntityDeathDelay How long after an entity dies to despawn the group, in ticks. A value of -1 will not despawn the group.
+     * @param pivotInteractions determine if interaction entities should pivot when following an entity's yaw
+     * @param pivotPitch determine if display entities should pivot when following an entity's pitch. ONLY applies if followType is {@link FollowType#PITCH} or {@link FollowType#PITCH_AND_YAW}
      * @param teleportationDuration Set the teleportationDuration (rotation smoothness) of all parts within this group
-     * @throws IllegalArgumentException If the {@link FollowType} is set to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
+     * @throws IllegalArgumentException If followType is to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
      */
-    public void followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions, int teleportationDuration){
-        followEntityDirection(entity, new GroupFollowProperties(followType, unregisterAfterEntityDeathDelay, pivotInteractions, teleportationDuration, null));
+    public void followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions, boolean pivotPitch, int teleportationDuration){
+        followEntityDirection(entity, new GroupFollowProperties(followType, unregisterAfterEntityDeathDelay, pivotInteractions, pivotPitch, teleportationDuration, null));
     }
 
 
@@ -1373,7 +1387,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * It is recommended to use this with {@link #rideEntity(Entity)}
      * @param entity The entity with the directions to follow
      * @param properties The properties to use when following the entity's direction
-     * @throws IllegalArgumentException If the {@link FollowType} is set to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
+     * @throws IllegalArgumentException If followType is to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
      */
     public void followEntityDirection(@NotNull Entity entity, @NotNull GroupFollowProperties properties){
         SpawnedDisplayFollower follower = new SpawnedDisplayFollower(this, properties);
@@ -1384,7 +1398,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
 
     /**
      * Stop following an entity's direction after using
-     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, boolean, boolean)}
+     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, int, boolean)}
      * or any variation
      */
     public void stopFollowingEntity(){
@@ -1423,10 +1437,9 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
     }
 
     /**
-     * Check if this SpawnedDisplayEntityGroup is mounted
-     * to an entity
+     * Check if this SpawnedDisplayEntityGroup is mounted to an entity
      * @param entity the entity to check
-     * @return Whether this SpawnedDisplayEntityGroup is mounted to the entity or not
+     * @return a boolean
      */
     public boolean isMountedToEntity(Entity entity){
         return entity.getPassengers().contains(masterPart.getEntity());
@@ -1436,7 +1449,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
     /**
      * Set the teleportation Duration of all SpawnedDisplayEntityParts in this SpawnedDisplayEntityGroup
      * Useful when using methods such as {@link #teleportMove(Vector, double, int)}, {@link #teleportMove(Direction, double, int)}, {@link #teleport(Location, boolean)}
-     * , or {@link #followEntityDirection(Entity, FollowType, boolean, boolean, int)}
+     * , or {@link #followEntityDirection(Entity, GroupFollowProperties)} variations
      * This makes the teleportation of the group visually smoother
      */
     public void setTeleportDuration(int teleportDuration){
