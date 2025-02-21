@@ -54,8 +54,11 @@ defaultFollowProperties:
   #The duration is measured in ticks.
   teleportationDuration: 2
 
-  #Determine if interaction entities should pivot while follow an entity's looking direction
+  #Determine if interaction entities should pivot (left/right) while following an entity's yaw
   pivotInteractions: false
+
+  #Apply additional pivot (up/down) to display entities while following an entity's pitch
+  pivotDisplays: false
 
   #Determine whether certain animation states will enable/disable this follow property
   #If a state disables this property, the parts in the property will use the stop following
@@ -75,6 +78,7 @@ partFollowProperties:
     entityFollowType: PITCH_AND_YAW
     teleportationDuration: 2
     pivotInteractions: false
+    pivotDisplays: false
     #If a state disables this part follow property, the parts in the property will use the defaultFollowProperty's settings
     stateFilter:
       states: []

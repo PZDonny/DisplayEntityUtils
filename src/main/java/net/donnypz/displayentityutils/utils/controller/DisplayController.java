@@ -343,8 +343,9 @@ public class DisplayController {
         int deathDespawnDelay = defaultPropsSection.getInt("deathDespawnDelay");
         int teleportationDuration = defaultPropsSection.getInt("teleportationDuration");
         boolean pivotInteractions = defaultPropsSection.getBoolean("pivotInteractions");
+        boolean pivotDisplays = defaultPropsSection.getBoolean("pivotDisplays");
 
-        GroupFollowProperties defaultFollowProperties = new GroupFollowProperties(followType, deathDespawnDelay, pivotInteractions, teleportationDuration, null);
+        GroupFollowProperties defaultFollowProperties = new GroupFollowProperties(followType, deathDespawnDelay, pivotInteractions, pivotDisplays, teleportationDuration, null);
         defaultFollowProperties.flip = flip;
         if (defaultPropsSection.contains("stateFilter")){
             for (String state : defaultPropsSection.getStringList("stateFilter.states")){
@@ -367,13 +368,14 @@ public class DisplayController {
                     followType = null;
                 }
                 int duration = propSect.getInt("teleportationDuration");
-                boolean pivot = propSect.getBoolean("pivotInteractions");
+                boolean pivotInteractionsP = propSect.getBoolean("pivotInteractions");
+                boolean pivotDisplaysP = propSect.getBoolean("pivotDisplays");
                 List<String> partTags = propSect.getStringList("partTags");
                 if (partTags.isEmpty()){
                     Bukkit.getConsoleSender().sendMessage(Component.text("Failed to find part tags for part follow property. It will be skipped: "+followProperty, NamedTextColor.YELLOW));
                     continue;
                 }
-                GroupFollowProperties partProperty = new GroupFollowProperties(followType, deathDespawnDelay, pivot, duration, partTags);
+                GroupFollowProperties partProperty = new GroupFollowProperties(followType, deathDespawnDelay, pivotInteractionsP, pivotDisplaysP, duration, partTags);
                 partProperty.flip = flip;
 
                 if (propSect.contains("stateFilter")){
