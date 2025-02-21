@@ -111,16 +111,19 @@ public final class SpawnedPartSelection implements Spawned {
             reset();
         }
 
-        this.partTypes.addAll(filter.partTypes);
+        if (!filter.partTypes.isEmpty()){
+            this.partTypes.clear();
+            this.partTypes.addAll(filter.partTypes);
+        }
         this.includedTags.addAll(filter.includedTags);
         this.excludedTags.addAll(filter.excludedTags);
 
         if (this.itemTypes.isEmpty()){
-            this.includeBlockTypes = filter.includeBlockTypes;
+            this.includeItemTypes = filter.includeItemTypes;
         }
 
         if (this.blockTypes.isEmpty()){
-            this.includeItemTypes = filter.includeItemTypes;
+            this.includeBlockTypes = filter.includeBlockTypes;
         }
 
         this.itemTypes.addAll(filter.itemTypes);
