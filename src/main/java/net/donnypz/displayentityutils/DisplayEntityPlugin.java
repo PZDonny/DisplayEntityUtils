@@ -121,6 +121,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         }
 
         reloadPlugin(true);
+        ConfigUtils.registerDisplayControllers();
 
         getCommand("managedisplays").setExecutor(new DisplayEntityPluginCommand());
         getCommand("managedisplays").setTabCompleter(new DisplayEntityPluginTabCompleter());
@@ -410,14 +411,13 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         }
         reloadConfig();
         ConfigUtils.setConfigVariables(getConfig());
-        ConfigUtils.registerMobControllers();
     }
 
     /**
-     * Reload the registered {@link DisplayController}s from the "mythicgroups.yml" file
+     * Reload the registered {@link DisplayController}s from the "displaycontrollers" folder
      */
     public void reloadControllers(){
-        ConfigUtils.registerMobControllers();
+        ConfigUtils.registerDisplayControllers();
     }
 
     @EventHandler(priority = EventPriority.LOW)

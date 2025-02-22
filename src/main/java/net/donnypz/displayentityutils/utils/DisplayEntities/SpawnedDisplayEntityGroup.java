@@ -1377,7 +1377,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * @throws IllegalArgumentException If followType is to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
      */
     public void followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions, boolean pivotPitch, int teleportationDuration){
-        followEntityDirection(entity, new GroupFollowProperties(followType, unregisterAfterEntityDeathDelay, pivotInteractions, pivotPitch, teleportationDuration, null));
+        followEntityDirection(entity, new GroupFollowProperties("", followType, unregisterAfterEntityDeathDelay, pivotInteractions, pivotPitch, teleportationDuration, null));
     }
 
 

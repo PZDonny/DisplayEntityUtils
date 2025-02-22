@@ -16,11 +16,14 @@ import java.util.Set;
  * Create properties that can be applied when making an {@link SpawnedDisplayEntityGroup} follow/respect an entity's looking direction
  */
 public class GroupFollowProperties{
-    
+
+    String id;
     FollowType followType;
     int unregisterDelay;
     boolean pivotInteractions;
     boolean pivotDisplays;
+    float yPivotOffsetPercentage;
+    float zPivotOffsetPercentage;
     int teleportationDuration;
     Collection<String> partTags;
     Set<String> filteredStates = new HashSet<>();
@@ -29,42 +32,54 @@ public class GroupFollowProperties{
 
     /**
      * Create properties that can be applied when making an {@link SpawnedDisplayEntityGroup} follow/respect an entity's looking direction
+     * @param id the id to set. Must be unique from other follow properties if used in a {@link DisplayController}
      * @param followType the follow type
      * @param unregisterDelay how long until the group should be removed after the entity dies/following is manually stop. -1 to never remove
      * @param pivotInteractions determine if interaction entities should pivot around the group
      * @param pivotDisplays determine if parts should pivot up/down with the entity's pitch, ONLY IF followType is {@link FollowType#PITCH} or {@link FollowType#PITCH_AND_YAW}
      */
-    public GroupFollowProperties(@Nullable FollowType followType, int unregisterDelay, boolean pivotInteractions, boolean pivotDisplays){
-        this(followType, unregisterDelay, pivotInteractions, pivotDisplays, 1, null);
+    public GroupFollowProperties(@NotNull String id, @Nullable FollowType followType, int unregisterDelay, boolean pivotInteractions, boolean pivotDisplays){
+        this(id, followType, unregisterDelay, pivotInteractions, pivotDisplays, 1, null);
     }
 
     /**
      * Create properties that can be applied when making an {@link SpawnedDisplayEntityGroup} follow/respect an entity's looking direction
+     * @param id the id to set. Must be unique from other follow properties if used in a {@link DisplayController}
      * @param followType the follow type
      * @param unregisterDelay how long until the group should be removed after the entity dies/following is manually stop. -1 to never remove
      * @param pivotInteractions determine if interaction entities should pivot around the group
      * @param pivotDisplays determine if parts should pivot up/down with the entity's pitch, ONLY IF followType is {@link FollowType#PITCH} or {@link FollowType#PITCH_AND_YAW}
      * @param teleportationDuration how long it should take for the group to respect the entity's direction in ticks
      */
-    public GroupFollowProperties(@Nullable FollowType followType, int unregisterDelay, boolean pivotInteractions, boolean pivotDisplays, int teleportationDuration){
-        this(followType, unregisterDelay, pivotInteractions, pivotDisplays, teleportationDuration, null);
+    public GroupFollowProperties(@NotNull String id, @Nullable FollowType followType, int unregisterDelay, boolean pivotInteractions, boolean pivotDisplays, int teleportationDuration){
+        this(id, followType, unregisterDelay, pivotInteractions, pivotDisplays, teleportationDuration, null);
     }
 
     /**
      * Create properties that can be applied when making an {@link SpawnedDisplayEntityGroup} follow/respect an entity's looking direction
+     * @param id the id to set. Must be unique from other follow properties if used in a {@link DisplayController}
      * @param followType the follow type
      * @param unregisterDelay how long until the group should be removed after the entity dies/following is manually stop. -1 to never remove
      * @param pivotInteractions determine if interaction entities should pivot around the group
      * @param pivotDisplays determine if parts should pivot up/down with the entity's pitch, ONLY IF followType is {@link FollowType#PITCH} or {@link FollowType#PITCH_AND_YAW}
      * @param teleportationDuration how long it should take for the group to respect the entity's direction in ticks
      */
-    public GroupFollowProperties(@Nullable FollowType followType, int unregisterDelay, boolean pivotInteractions, boolean pivotDisplays, int teleportationDuration, @Nullable Collection<String> partTags){
+    public GroupFollowProperties(@NotNull String id, @Nullable FollowType followType, int unregisterDelay, boolean pivotInteractions, boolean pivotDisplays, int teleportationDuration, @Nullable Collection<String> partTags){
+        this.id = id;
         this.followType = followType;
         this.unregisterDelay = unregisterDelay;
         this.pivotInteractions = pivotInteractions;
         this.teleportationDuration = Math.max(teleportationDuration, 0);
         this.partTags = partTags;
         this.pivotDisplays = pivotDisplays;
+    }
+
+    GroupFollowProperties(){}
+
+    public GroupFollowProperties setDisplayPivotOffsetPercentage(float yPivotOffsetPercentage, float zPivotOffsetPercentage){
+        this.yPivotOffsetPercentage = yPivotOffsetPercentage;
+        this.zPivotOffsetPercentage = zPivotOffsetPercentage;
+        return this;
     }
 
     /**
@@ -75,6 +90,14 @@ public class GroupFollowProperties{
      */
     public void followGroup(@NotNull SpawnedDisplayEntityGroup group, @NotNull Entity entity) {
         group.followEntityDirection(entity, this);
+    }
+
+    /**
+     * Get the ID of this follow property. Null if this is the default follow property of a controller
+     * @return a string
+     */
+    public @Nullable String getID(){
+        return id;
     }
 
     /**
@@ -108,6 +131,14 @@ public class GroupFollowProperties{
      */
     public boolean pivotDisplays(){
         return pivotDisplays;
+    }
+
+    public float getYPivotOffsetPercentage() {
+        return yPivotOffsetPercentage;
+    }
+
+    public float getZPivotOffsetPercentage() {
+        return zPivotOffsetPercentage;
     }
 
     /**

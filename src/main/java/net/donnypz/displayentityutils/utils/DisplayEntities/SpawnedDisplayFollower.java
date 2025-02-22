@@ -169,7 +169,6 @@ class SpawnedDisplayFollower {
         boolean newPositive = newPitch > 0;
 
         if (zero){
-            //pitch = display.getPitch();
             zeroedPivot = true;
         }
         else{
@@ -186,48 +185,40 @@ class SpawnedDisplayFollower {
             typeMultiplier = 1;
         }
 
-        float yMultiplier = Math.abs(newPitch)/180*group.getScaleMultiplier();
-        float zMultiplier = Math.abs(newPitch)/270*group.getScaleMultiplier()*typeMultiplier;
+        float yOffset = Math.abs(newPitch)/180*group.getScaleMultiplier() * (properties.getYPivotOffsetPercentage()/100);
+        float zOffset = Math.abs(newPitch)/270*group.getScaleMultiplier()*typeMultiplier * (properties.getZPivotOffsetPercentage()/100);
 
 
-        //typeMultiplier*=0.75f;
-
-        //Y Axis Changes
         Float[] lastMultipliers = lastPitchMultiplier.getOrDefault(part, new Float[]{0f, 0f});
-        float lastYMultiplier = lastMultipliers[0];
-        float lastZMultiplier = lastMultipliers[1];
+        float lastYOffset = lastMultipliers[0];
+        float lastZOffset = lastMultipliers[1];
         if (lastGroupScaleMultiplier != group.getScaleMultiplier()){
-            lastYMultiplier = (lastYMultiplier/lastGroupScaleMultiplier)*group.getScaleMultiplier();
-            lastZMultiplier = (lastZMultiplier/lastGroupScaleMultiplier)*group.getScaleMultiplier();
+            lastYOffset = (lastYOffset/lastGroupScaleMultiplier)*group.getScaleMultiplier();
+            lastZOffset = (lastZOffset/lastGroupScaleMultiplier)*group.getScaleMultiplier();
         }
 
-        //pitchMultiplier/=typeMultiplier;
-        translation.setY(translation.getY()+yMultiplier-lastYMultiplier);
+        //Reset+Apply Y Offset
+        translation.setY(translation.getY()+yOffset-lastYOffset);
 
-        //Z Axis Changes
-        //float zMultiplier = yMultiplier*typeMultiplier;
-
-
-
-
-        //Reset Last Multiplier
+        //Reset Last Z Offset
         if (pitch < 0) {
-            translation.setZ(translation.getZ()+lastZMultiplier);
+            translation.setZ(translation.getZ()+lastZOffset);
         }
         else{
-            translation.setZ(translation.getZ()-lastZMultiplier);
+            translation.setZ(translation.getZ()-lastZOffset);
         }
 
+        //Apply New Z Offset
         if (newPitch > 0){
-            translation.setZ(translation.getZ()+zMultiplier);
+            translation.setZ(translation.getZ()+zOffset);
         }
         else{
-            translation.setZ(translation.getZ()-zMultiplier);
+            translation.setZ(translation.getZ()-zOffset);
         }
 
 
-        lastMultipliers[0] = yMultiplier;
-        lastMultipliers[1] = zMultiplier;
+        lastMultipliers[0] = yOffset;
+        lastMultipliers[1] = zOffset;
         lastPitchMultiplier.put(part, lastMultipliers);
 
         display.setInterpolationDuration(properties.teleportationDuration());

@@ -17,7 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.List;
+import java.util.Collection;
 
 public class DEUMythicListener implements Listener {
 
@@ -64,7 +64,7 @@ public class DEUMythicListener implements Listener {
             return;
         }
 
-        List<GroupFollowProperties> properties = controller.getFollowProperties();
+        Collection<GroupFollowProperties> properties = controller.getFollowProperties();
 
         DisplayEntityGroup group = controller.getDisplayEntityGroup();
         if (group == null){

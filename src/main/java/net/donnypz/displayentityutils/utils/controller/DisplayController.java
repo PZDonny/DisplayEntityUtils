@@ -28,7 +28,7 @@ public class DisplayController {
 
     DisplayEntityGroup group;
     Collection<String> mythicMobs = new HashSet<>();
-    List<GroupFollowProperties> followProperties = new ArrayList<>();
+    HashMap<String, GroupFollowProperties> followProperties = new HashMap<>();
     DisplayStateMachine stateMachine;
     String controllerID;
     boolean configController;
@@ -173,7 +173,7 @@ public class DisplayController {
      * @return this
      */
     public DisplayController addFollowProperty(@NotNull GroupFollowProperties followProperty){
-        this.followProperties.add(followProperty);
+        this.followProperties.put(followProperty.id, followProperty);
         return this;
     }
 
@@ -216,8 +216,8 @@ public class DisplayController {
      * Get all the {@link GroupFollowProperties} on this controller
      * @return a list of {@link GroupFollowProperties}
      */
-    public @NotNull List<GroupFollowProperties> getFollowProperties() {
-        return List.copyOf(followProperties);
+    public @NotNull Collection<GroupFollowProperties> getFollowProperties() {
+        return Set.copyOf(followProperties.values());
     }
 
     /**
@@ -309,9 +309,13 @@ public class DisplayController {
             return null;
         }
 
-        DisplayController controller = new DisplayController(controllerID);
-        if (fromFile){
-            controller.setConfigController();
+        DisplayController controller;
+        controller = controllers.get(controllerID);
+        if (controller == null) {
+            controller = new DisplayController(controllerID);
+            if (fromFile) {
+                controller.setConfigController();
+            }
         }
 
         //Set Mythic Mobs
@@ -331,62 +335,33 @@ public class DisplayController {
         boolean flip = groupProps.getBoolean("flip");
         controller.verticalOffset = (float) groupProps.getDouble("verticalOffset");
 
-        //Default Follow Properties
-        FollowType followType;
-        ConfigurationSection defaultPropsSection = config.getConfigurationSection("defaultFollowProperties");
-        try{
-            followType = FollowType.valueOf(defaultPropsSection.getString("entityFollowType"));
-        }
-        catch(IllegalArgumentException followingDisabled){
-            followType = null;
-        }
-        int deathDespawnDelay = defaultPropsSection.getInt("deathDespawnDelay");
-        int teleportationDuration = defaultPropsSection.getInt("teleportationDuration");
-        boolean pivotInteractions = defaultPropsSection.getBoolean("pivotInteractions");
-        boolean pivotDisplays = defaultPropsSection.getBoolean("pivotDisplays");
 
-        GroupFollowProperties defaultFollowProperties = new GroupFollowProperties(followType, deathDespawnDelay, pivotInteractions, pivotDisplays, teleportationDuration, null);
-        defaultFollowProperties.flip = flip;
-        if (defaultPropsSection.contains("stateFilter")){
-            for (String state : defaultPropsSection.getStringList("stateFilter.states")){
-                defaultFollowProperties.addFilterState(state);
-            }
-            defaultFollowProperties.filterBlacklist = defaultPropsSection.getBoolean("stateFilter.blacklist");
+        ConfigurationSection defaultPropsSection = config.getConfigurationSection("defaultFollowProperties");
+        int deathDespawnDelay = defaultPropsSection.getInt("deathDespawnDelay");
+
+        HashSet<String> propertiesToRemove = new HashSet<>(controller.followProperties.keySet());
+        //Default Follow Properties
+        GroupFollowProperties properties = configureProperties(controller, null, defaultPropsSection, deathDespawnDelay, flip, false);
+        if (properties != null){
+            propertiesToRemove.remove(null);
         }
-        controller.addFollowProperty(defaultFollowProperties);
 
 
         //Part Follow Properties
         ConfigurationSection partPropsSect = config.getConfigurationSection("partFollowProperties");
         if (partPropsSect != null){
-            for (String followProperty : partPropsSect.getKeys(false)){
-                ConfigurationSection propSect = partPropsSect.getConfigurationSection(followProperty);
-                try{
-                    followType = FollowType.valueOf(propSect.getString("entityFollowType"));
+            for (String followPropertyID : partPropsSect.getKeys(false)){
+                ConfigurationSection propSect = partPropsSect.getConfigurationSection(followPropertyID);
+                GroupFollowProperties props = configureProperties(controller, followPropertyID, propSect, deathDespawnDelay, flip, true);
+                if (props != null){
+                    propertiesToRemove.remove(followPropertyID);
                 }
-                catch(IllegalArgumentException followingDisabled){
-                    followType = null;
-                }
-                int duration = propSect.getInt("teleportationDuration");
-                boolean pivotInteractionsP = propSect.getBoolean("pivotInteractions");
-                boolean pivotDisplaysP = propSect.getBoolean("pivotDisplays");
-                List<String> partTags = propSect.getStringList("partTags");
-                if (partTags.isEmpty()){
-                    Bukkit.getConsoleSender().sendMessage(Component.text("Failed to find part tags for part follow property. It will be skipped: "+followProperty, NamedTextColor.YELLOW));
-                    continue;
-                }
-                GroupFollowProperties partProperty = new GroupFollowProperties(followType, deathDespawnDelay, pivotInteractionsP, pivotDisplaysP, duration, partTags);
-                partProperty.flip = flip;
-
-                if (propSect.contains("stateFilter")){
-                    for (String state : propSect.getStringList("stateFilter.states")){
-                        partProperty.addFilterState(state);
-                    }
-                    partProperty.filterBlacklist = propSect.getBoolean("stateFilter.blacklist");
-                }
-
-                controller.addFollowProperty(partProperty);
             }
+        }
+
+        //Remove old properties that weren't included in the plugin reload
+        for (String propID : propertiesToRemove){
+            controller.followProperties.remove(propID);
         }
 
         //Animation States
@@ -406,6 +381,53 @@ public class DisplayController {
             controller.register();
         }
         return controller;
+    }
+
+    private static GroupFollowProperties configureProperties(DisplayController controller, String id, ConfigurationSection section, int deathDespawnDelay, boolean flip, boolean isPartProperty){
+        FollowType followType = null;
+        try{
+            followType = FollowType.valueOf(section.getString("entityFollowType"));
+        } catch(IllegalArgumentException followingDisabled){}
+
+        int teleportationDuration = section.getInt("teleportationDuration");
+        boolean pivotInteractions = section.getBoolean("pivotInteractions");
+        boolean pivotDisplays = section.getBoolean("pivotDisplays.enabled");
+        double yOffsetPercentage = section.getDouble("pivotDisplays.yOffsetPercentage");
+        double zOffsetPercentage = section.getDouble("pivotDisplays.zOffsetPercentage");
+
+        GroupFollowProperties followProperties;
+        if (isPartProperty){
+            List<String> partTags = section.getStringList("partTags");
+            if (partTags.isEmpty()){
+                Bukkit.getConsoleSender().sendMessage(Component.text("Failed to find part tags for part follow property. It will be skipped: "+id, NamedTextColor.YELLOW));
+                return null;
+            }
+            followProperties = controller.followProperties.getOrDefault(id, new GroupFollowProperties(id, followType, deathDespawnDelay, pivotInteractions, pivotDisplays, teleportationDuration, partTags));
+        }
+        else{
+            followProperties = controller.followProperties.getOrDefault(null, new GroupFollowProperties());
+        }
+
+        //Set Fields
+        followProperties.followType = followType;
+        followProperties.unregisterDelay = deathDespawnDelay;
+        followProperties.teleportationDuration = teleportationDuration;
+        followProperties.pivotInteractions = pivotInteractions;
+        followProperties.pivotDisplays = pivotDisplays;
+        followProperties.yPivotOffsetPercentage = (float) yOffsetPercentage;
+        followProperties.zPivotOffsetPercentage = (float) zOffsetPercentage;
+        followProperties.flip = flip;
+
+        followProperties.filteredStates.clear();
+        if (section.contains("stateFilter")){
+            for (String state : section.getStringList("stateFilter.states")){
+                followProperties.addFilterState(state);
+            }
+            followProperties.filterBlacklist = section.getBoolean("stateFilter.blacklist");
+        }
+
+        controller.addFollowProperty(followProperties);
+        return followProperties;
     }
 
 

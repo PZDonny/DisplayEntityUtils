@@ -18,7 +18,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.UUID;
 
 class GroupRideCMD implements ConsoleUsableSubCommand {
@@ -111,7 +111,7 @@ class GroupRideCMD implements ConsoleUsableSubCommand {
         }
         sender.sendMessage(Component.text("Applied controller properties!", NamedTextColor.YELLOW));
 
-        List<GroupFollowProperties> properties = controller.getFollowProperties();
+        Collection<GroupFollowProperties> properties = controller.getFollowProperties();
         for (GroupFollowProperties property : properties){
             property.followGroup(group, vehicle);
         }
