@@ -19,7 +19,7 @@ final class ConfigUtils {
     
     private ConfigUtils(){}
 
-    static void registerMobControllers(){
+    static void registerDisplayControllers(){
         DisplayController.unregisterConfigControllers();
         File controllerFolder = LocalManager.getDisplayControllerFolder();
         if (!controllerFolder.exists()){
@@ -27,7 +27,7 @@ final class ConfigUtils {
                 controllerFolder.mkdirs();
             }
             catch(SecurityException e){
-                Bukkit.getLogger().severe("Failed to find \"displaycontrollers\" folder for MythicMobs!");
+                Bukkit.getLogger().severe("Failed to find \"displaycontrollers\" folder!");
                 return;
             }
         }
