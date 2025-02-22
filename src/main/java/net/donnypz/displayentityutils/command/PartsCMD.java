@@ -36,6 +36,7 @@ class PartsCMD implements ConsoleUsableSubCommand {
         subCommands.put("seeduuids", new PartsSeedUUIDsCMD());
         subCommands.put("setblock", new PartsSetBlockCMD());
         subCommands.put("billboard", new PartsBillboardCMD());
+        subCommands.put("viewrange", new PartsViewRangeCMD());
         subCommands.put("brightness", new PartsBrightnessCMD());
     }
 
@@ -88,13 +89,16 @@ class PartsCMD implements ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis parts reset", " (Reset your part selection and any filters)");
             CMDUtils.sendCMD(sender, "/mdis parts remove [-all]", " (Despawn and remove your selected part from a group)");
         }
-        else{
+        else if (page == 3){
             CMDUtils.sendCMD(sender, "/mdis parts glow [-all]", " (Make your selected part glow)");
             CMDUtils.sendCMD(sender, "/mdis parts unglow [-all]", " (Remove the glow from your selected part)");
             CMDUtils.sendCMD(sender, "/mdis parts glowcolor <color | hex-code> [-all]", " (Set your selected part's glow color)");
             CMDUtils.sendCMD(sender, "/mdis parts brightness <block> <sky> [-all]", "(Set your selected part's brightness. Enter values between 0-15. -1 resets)");
+            CMDUtils.sendCMD(sender, "/mdis parts viewrange <view-range-multiplier> [-all]", "(Set the view range multiplier for your selected part)");
             CMDUtils.sendCMD(sender, "/mdis parts billboard <fixed | vertical | horizontal | center> [-all]", " (Set the billboard of your selected part)");
             CMDUtils.sendCMD(sender, "/mdis parts translate <direction> <distance> <tick-duration> [-all]", " (Translate your selected part)");
+        }
+        else{
             CMDUtils.sendCMD(sender, "/mdis parts setblock <\"-held\" | \"-target\" | block-id> [-all]", " (Change the block of a block display part)");
             CMDUtils.sendCMD(sender, "/mdis parts seeduuids <group | selection> <seed>"," (Useful when wanting to use the same animation on similar groups.)");
         }

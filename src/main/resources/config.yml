@@ -33,9 +33,11 @@ mysql:
 #This feature can also be disabled and the command "/mdis parts randomizeuuids <seed>" can be used instead
 seededPartUUIDs: true
 
-
 #Automatically select groups when using the command "/mdis group spawn"
 autoSelectGroups: false
+
+#The default persistence value that should be applied when spawning a group
+defaultPersistence: true
 
 #Attempts to automatically detect Spawned Display Entity Groups on Server Start
 #Also attempts to asynchronously detect groups when a chunk loads
@@ -43,9 +45,21 @@ autoSelectGroups: false
 automaticGroupDetection:
   enabled: true
 
-  #Maximum Range to Search for Interaction Entities in a Group
-  #High values with frequent searches may lead to lag spikes and/or unexpected results
-  #This will not work if (automaticGroupDetection is false)
+  #Override the persistence value of detected groups
+  #This is only really useful when existing groups/models are present, in abundance
+  persistenceOverride:
+    #Whether to override the persistence value of detected groups
+    enabled: false
+
+    #The overriding persistence value to set for a detected group
+    persistent: true
+
+    #Whether groups, when spawned, should automatically apply the "persistent" value, overriding its existing persistence
+    #Manually toggle overriding for a group with "/mdis group togglepersistoverride"
+    overrideByDefault: false
+
+  #Maximum Search range for Interaction Entities in a Group
+  #High values with frequent searches may lead to lag spikes and/or undesired results
   #Setting this value to 0 will effectively disable this feature
   maximumInteractionSearchRange: 7
 
@@ -67,6 +81,7 @@ automaticGroupDetection:
   #If true, groups in the listed worlds will not be unregistered
   #If false, groups in the listed worlds will be unregistered
     blacklist: true
+
 
 #Automatically Pivot Interaction Entity when a DisplayEntityGroup is spawned
 #in order to match the group's yaw

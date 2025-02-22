@@ -23,6 +23,7 @@ class AnimCMD implements ConsoleUsableSubCommand{
         subCommands.put("info", new AnimInfoCMD());
         subCommands.put("frameinfo", new AnimFrameInfoCMD());
         subCommands.put("usefilter", new AnimUseFilterCMD());
+        subCommands.put("unfilter", new AnimUnfilterCMD());
         subCommands.put("addframe", new AnimAddFrameCMD());
         subCommands.put("addframeafter", new AnimAddFrameAfterCMD());
         subCommands.put("removeframe", new AnimRemoveFrameCMD());
@@ -36,6 +37,7 @@ class AnimCMD implements ConsoleUsableSubCommand{
         subCommands.put("cancelparticles", new AnimCancelParticlesCMD());
         subCommands.put("reverse", new AnimReverseCMD());
         subCommands.put("togglescalerespect", new AnimScaleRespectCMD());
+        subCommands.put("toggledatachanges", new AnimDataChangesCMD());
         subCommands.put("settag", new AnimSetTagCMD());
         subCommands.put("setframetag", new AnimSetFrameTagCMD());
         subCommands.put("play", new AnimPlayCMD());
@@ -75,29 +77,33 @@ class AnimCMD implements ConsoleUsableSubCommand{
                     "\"/mdis bdengine convertanim\""));
             CMDUtils.sendCMD(sender,"/mdis anim help <page-number>", " (Get help for animations)");
             CMDUtils.sendCMD(sender,"/mdis anim new", " (Manually create a new animation)");
+            CMDUtils.sendCMD(sender, "/mdis anim select <anim-tag> <storage-location>", " (Select a saved animation)");
             CMDUtils.sendCMD(sender,"/mdis anim info", " (List information about your selected animation)");
             CMDUtils.sendCMD(sender, "/mdis anim frameinfo <frame-id>", " (List information about a frame in your animation)");
-            CMDUtils.sendCMD(sender, "/mdis anim usefilter", " (Animate only your selected, filtered parts.)");
-            CMDUtils.sendCMD(sender, "/mdis anim addframe <tick-delay> <tick-duration>", " (Add a frame to your selected animation)");
-
         }
         else if (page == 2){
+            CMDUtils.sendCMD(sender, "/mdis anim usefilter [-trim]", " (Apply your part filter/selection to an animation. Optionally, and irreversibly remove data of unfiltered parts)");
+            CMDUtils.sendCMD(sender, "/mdis anim unfilter", " (Remove your part filter/selection from an animation)");
+            CMDUtils.sendCMD(sender, "/mdis anim addframe <tick-delay> <tick-duration>", " (Add a frame to your selected animation)");
             CMDUtils.sendCMD(sender, "/mdis anim addframeafter <frame-id> <tick-delay> <tick-duration>", " (Add a frame after another frame to your selected animation)");
             CMDUtils.sendCMD(sender, "/mdis anim removeframe <frame-id>", " (Remove a frame from your selected animation)");
             CMDUtils.sendCMD(sender, "/mdis anim editframe <frame-id> <tick-delay> <tick-duration>", " (Edit properties of a single frame)");
             CMDUtils.sendCMD(sender, "/mdis anim editallframes <tick-delay> <tick-duration>", " (Edit properties of all frames)");
+
+        }
+        else if (page == 3){
             CMDUtils.sendCMD(sender, "/mdis anim addsound <frame-id> <sound> <volume> <pitch> <start | end>", " (Add a sound to a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim removesound <frame-id> <sound | -all> <start | end>", " (Remove a sound from a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim addparticle <frame-id> <start | end>", " (Add a particle to a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim overwriteframe <frame-id>", " (Overwrite the transformation data of a frame)");
-        }
-        else{
             CMDUtils.sendCMD(sender, "/mdis anim reverse", " (Reverse the order of frames in your selected animation)");
             CMDUtils.sendCMD(sender, "/mdis anim togglescalerespect", " (Toggle whether your selected animation should respect the group's scale)");
+            CMDUtils.sendCMD(sender, "/mdis anim toggledatachanges", " (Toggle whether your selected animation can change block display blocks, item display items, and text display text)");
+        }
+        else{
             CMDUtils.sendCMD(sender, "/mdis anim showframe <frame-id>", " (Displays a frame on your selected group)");
             CMDUtils.sendCMD(sender, "/mdis anim play [-loop]", " (Play your selected animation on your selected group. Include \"-loop\" to loop the animation)");
             CMDUtils.sendCMD(sender, "/mdis anim stop", " (Stop an animation playing on a group)");
-            CMDUtils.sendCMD(sender, "/mdis anim select <anim-tag> <storage-location>", " (Select a saved animation)");
             CMDUtils.sendCMD(sender, "/mdis anim save <storage-location>", " (Save your selected animation and any changes made)");
             CMDUtils.sendCMD(sender, "/mdis anim delete <anim-tag> <storage-location>", " (Delete a saved animation)");
         }

@@ -10,6 +10,7 @@ public final class DisplayAnimation implements Serializable {
     ArrayList<DisplayAnimationFrame> frames = new ArrayList<>();
     String partTag;
     boolean respectGroupScale = true;
+    boolean dataChanges = true;
     PartFilter filter;
 
     DisplayAnimation(){}
@@ -27,6 +28,7 @@ public final class DisplayAnimation implements Serializable {
      * Get the part tag applied to this animation, before the addition of part filters
      * @return a string or null
      */
+    @Deprecated(since = "2.6.3")
     public String getPartTag() {
         return partTag;
     }
@@ -63,6 +65,14 @@ public final class DisplayAnimation implements Serializable {
         frames.remove(frame);
     }
 
+    /**
+     * Get if this animation allows for data changes (texture changes to block/item displays and text display text)
+     * @return a boolean
+     */
+    public boolean allowsTextureChanges(){
+        return dataChanges;
+    }
+
     @ApiStatus.Internal
     public void adaptOldSounds(){
         for (DisplayAnimationFrame frame: frames){
@@ -74,6 +84,7 @@ public final class DisplayAnimation implements Serializable {
         SpawnedDisplayAnimation anim = new SpawnedDisplayAnimation(filter);
         anim.animationTag = this.animationTag;
         anim.respectGroupScale = this.respectGroupScale;
+        anim.dataChanges = this.dataChanges;
 
         if (this.filter != null){
             anim.filter = this.filter.clone();

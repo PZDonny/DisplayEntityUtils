@@ -51,6 +51,6 @@ class AnimSelectCMD implements PlayerSubCommand {
             return;
         }
         DisplayAnimationManager.setSelectedSpawnedAnimation(p, anim.toSpawnedDisplayAnimation());
-        p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully selected display animation! <white>(Tagged: "+tag+")")));
+        p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully selected display animation! <white>(Tagged: "+anim.getAnimationTag()+")")));
     }
 }

@@ -13,36 +13,38 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Stop All Animations ")
-@Description("Stop all animations playing on a spawned group")
-@Examples({"stop all animations on {_spawnedgroup}", "stop animations on {_spawnedgroup} and remove from state machine"})
-@Since("2.6.2")
-public class EffSpawnedGroupStopAllAnimations extends Effect {
+@Name("Spawned Group Persistence")
+@Description("Change the persistence state of a spawned group")
+@Examples({"set {_spawnedgroup} to not persistent"})
+@Since("2.6.3")
+public class EffSpawnedGroupPersistence extends Effect {
     static {
-        Skript.registerEffect(EffSpawnedGroupStopAllAnimations.class,"stop [all] animations on %spawnedgroup% [r:[and ]remove from [state] machine]");
+        Skript.registerEffect(EffSpawnedGroupPersistence.class,"(make|set) %spawnedgroups% [to] [:not] persistent");
     }
 
-    Expression<SpawnedDisplayEntityGroup> group;
-    boolean remove;
+    Expression<SpawnedDisplayEntityGroup> object;
+    boolean persistent;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        group = (Expression<SpawnedDisplayEntityGroup>) expressions[0];
-        remove = parseResult.hasTag("r");
+        object = (Expression<SpawnedDisplayEntityGroup>) expressions[0];
+        persistent = !parseResult.hasTag("not");
         return true;
     }
 
     @Override
     protected void execute(Event event) {
-        SpawnedDisplayEntityGroup g = group.getSingle(event);
-        if (g == null){
-            return;
+        SpawnedDisplayEntityGroup[] groups = object.getArray(event);
+        if (groups == null) return;
+        for (SpawnedDisplayEntityGroup g : groups){
+            if (g != null){
+                g.setPersistent(persistent);
+            }
         }
-        g.stopAnimations(remove);
     }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "stop all animations: "+group.toString(event, debug);
+        return "spawned group persistence: "+object.toString(event, debug);
     }
 }

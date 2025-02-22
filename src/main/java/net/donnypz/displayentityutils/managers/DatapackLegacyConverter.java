@@ -79,19 +79,17 @@ public class DatapackLegacyConverter {
         DEUEntitySpawned.finalizeAnimationPreparation(timeStamp);
         createdGroup.seedPartUUIDs(SpawnedDisplayEntityGroup.defaultPartUUIDSeed);
         final SpawnedDisplayAnimation anim = new SpawnedDisplayAnimation();
-        SpawnedDisplayAnimationFrame initialFrame = new SpawnedDisplayAnimationFrame(-1, -1).setTransformation(createdGroup);
 
         new BukkitRunnable(){
             int i = 0;
             @Override
             public void run() {
                 if (i == frames.size()){
-                    SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(0, 2).setTransformation(createdGroup);
-                    if (!frame.isEmptyFrame()){
-                        anim.addFrame(frame);
+                    try{
+                        createdGroup.setToFrame(anim, anim.getFrames().getFirst(), false);
                     }
+                    catch(IndexOutOfBoundsException ignored){}
 
-                    createdGroup.setToFrame(anim, initialFrame, false);
 
                     //Save with first frame applied to group
                     Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {

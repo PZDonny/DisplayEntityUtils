@@ -16,7 +16,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Saved Animation to Spawned")
+@Name("Saved Animation from Cache")
 @Description("Get a spawned animation that has been cached")
 @Examples({"set {_spawnedanim} to cached spawned anim tagged \"myanimation\"",
 "set {_spawnedanim} to cached spawned anim tagged \"myotheranim\" or fallback with local storage"})

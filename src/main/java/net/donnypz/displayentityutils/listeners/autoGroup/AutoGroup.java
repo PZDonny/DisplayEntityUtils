@@ -131,7 +131,7 @@ final class AutoGroup {
             //Data is controllerID from rework
             if (controller != null){
 
-                List<GroupFollowProperties> properties = controller.getFollowProperties();
+                Collection<GroupFollowProperties> properties = controller.getFollowProperties();
                 for (GroupFollowProperties property : properties){
                     property.followGroup(group, vehicle);
                 }
@@ -157,7 +157,15 @@ final class AutoGroup {
             DisplayControllerManager.registerEntity(vehicle, group);
         }
 
+        //Call Events
         for (ChunkRegisterGroupEvent event : events.values()){
+            //Persistence Override
+            if (DisplayEntityPlugin.persistenceOverride()){
+                SpawnedDisplayEntityGroup g = event.getGroup();
+                if (g.allowsPersistenceOverriding()){
+                    g.setPersistent(DisplayEntityPlugin.persistenceValue());
+                }
+            }
             event.callEvent();
         }
 

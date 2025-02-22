@@ -28,6 +28,7 @@ public enum Permission {
     GROUP_SET_SPAWN_ANIM("deu.group.spawnanim"),
     GROUP_TOGGLE_PERSIST("deu.group.persist"),
     GROUP_BILLBOARD("deu.group.billboard"),
+    GROUP_VIEWRANGE("deu.group.viewrange"),
 
 
     PARTS_CYCLE("deu.parts.cycle"),
@@ -42,6 +43,7 @@ public enum Permission {
     PARTS_SET_BLOCK("deu.parts.setblock"),
     PARTS_BILLBOARD("deu.parts.billboard"),
     PARTS_BRIGHTNESS("deu.parts.brightness"),
+    PARTS_VIEWRANGE("deu.parts.viewrange"),
 
 
     TEXT_SET_TEXT("deu.text.set"),
@@ -73,6 +75,7 @@ public enum Permission {
     ANIM_INFO("deu.anim.info"),
     ANIM_FRAME_INFO("deu.anim.info"),
     ANIM_USE_FILTER("deu.anim.usefilter"),
+    ANIM_UNFILTER("deu.anim.unfilter"),
     ANIM_ADD_FRAME("deu.anim.addframe"),
     ANIM_REMOVE_FRAME("deu.anim.removeframe"),
     ANIM_OVERWRITE_FRAME("deu.anim.overwriteframe"),
@@ -84,6 +87,7 @@ public enum Permission {
     ANIM_REMOVE_PARTICLE("deu.anim.removeparticle"),
     ANIM_REVERSE("deu.anim.reverse"),
     ANIM_TOGGLE_SCALE("deu.anim.scale"),
+    ANIM_TOGGLE_DATA_CHANGES("deu.anim.datachanges"),
     ANIM_SET_TAG("deu.anim.settag"),
     ANIM_SET_FRAME_TAG("deu.anim.setframetag"),
     ANIM_PLAY("deu.anim.play"),

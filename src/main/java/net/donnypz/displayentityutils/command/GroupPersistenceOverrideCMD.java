@@ -7,7 +7,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class GroupPersistCMD implements PlayerSubCommand {
+class GroupPersistenceOverrideCMD implements PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_TOGGLE_PERSIST)){
@@ -19,8 +19,8 @@ class GroupPersistCMD implements PlayerSubCommand {
             DisplayEntityPluginCommand.noGroupSelection(player);
             return;
         }
-        boolean oldPersist = group.isPersistent();
-        group.setPersistent(!oldPersist);
+        boolean oldPersist = group.allowsPersistenceOverriding();
+        group.setPersistenceOverride(!oldPersist);
         Component persist;
         if (oldPersist){
             persist = Component.text("DISABLED", NamedTextColor.RED);
@@ -28,7 +28,10 @@ class GroupPersistCMD implements PlayerSubCommand {
         else{
             persist = Component.text("ENABLED", NamedTextColor.GREEN);
         }
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Persistence: ", NamedTextColor.WHITE)).append(persist));
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Chunk Persistence Override: ", NamedTextColor.WHITE)).append(persist));
 
+        if (!DisplayEntityPlugin.persistenceOverride()){
+            player.sendMessage(Component.text("| \"automaticGroupDetection.persistenceOverride.enabled\" is false in the plugin's config", NamedTextColor.GRAY));
+        }
     }
 }

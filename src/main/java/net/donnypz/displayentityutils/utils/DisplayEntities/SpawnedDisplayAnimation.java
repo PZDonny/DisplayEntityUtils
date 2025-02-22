@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -11,6 +12,7 @@ public final class SpawnedDisplayAnimation{
     List<SpawnedDisplayAnimationFrame> frames = new ArrayList<>();
     PartFilter filter;
     boolean respectGroupScale = true;
+    boolean dataChanges = true;
 
     @ApiStatus.Internal
     public SpawnedDisplayAnimation(){}
@@ -37,12 +39,80 @@ public final class SpawnedDisplayAnimation{
     }
 
     /**
-     * Set the filter this animation should use when animating
-     * @param filter the filter to use or null to unfilter
+     * Get if this animation allows for data changes (texture changes to block/item displays, text display text and interaction size)
+     * @return a boolean
+     */
+    public boolean allowsDataChanges(){
+        return dataChanges;
+    }
+
+    /**
+     * Set whether this animation should allow data changes (texture changes to block/item displays and text display text)
+     * @param dataChanges
      * @return this
      */
-    public SpawnedDisplayAnimation setFilter(@Nullable PartFilter filter){
-        this.filter = filter;
+    public SpawnedDisplayAnimation allowDataChanges(boolean dataChanges){
+        this.dataChanges = dataChanges;
+        return this;
+    }
+
+    /**
+     * Set the filter this animation should use when animating
+     * @param group the group that contains the parts to be filtered
+     * @param filter the filter to use
+     * @param trim <u>IRREVERSIBLY</u> remove the animation data of parts that the part filter doesn't apply to
+     * @return this
+     */
+    public SpawnedDisplayAnimation setFilter(@NotNull SpawnedDisplayEntityGroup group, @NotNull PartFilter filter, boolean trim){
+        SpawnedPartSelection sel = new SpawnedPartSelection(group, filter);
+        return setFilter(sel, filter, trim);
+    }
+
+    /**
+     * Set the filter this animation should use when animating
+     * @param spawnedPartSelection the selection with filtered parts
+     * @param trim <u>IRREVERSIBLY</u> remove the animation data of parts that the part filter doesn't apply to
+     * @return this
+     */
+    public SpawnedDisplayAnimation setFilter(@NotNull SpawnedPartSelection spawnedPartSelection, boolean trim){
+        PartFilter partFilter = spawnedPartSelection.toFilter();
+        return setFilter(spawnedPartSelection, partFilter, trim);
+    }
+
+    private SpawnedDisplayAnimation setFilter(SpawnedPartSelection selection, PartFilter partFilter, boolean trim){
+
+        this.filter = partFilter;
+        if (!trim){
+            return this;
+        }
+        for (SpawnedDisplayAnimationFrame frame : frames){
+            HashMap<UUID, DisplayTransformation> displayTransformations = new HashMap<>();
+            HashMap<UUID, Vector3f> interactionTransformations = new HashMap<>();
+            for (SpawnedDisplayEntityPart part : selection.selectedParts){
+                UUID partUUID = part.getPartUUID();
+
+                DisplayTransformation dt = frame.displayTransformations.get(partUUID);
+                if (dt != null){
+                    displayTransformations.put(partUUID, dt);
+                    continue;
+                }
+
+                Vector3f v = frame.interactionTransformations.get(partUUID);
+                if (v != null){
+                    interactionTransformations.put(partUUID, v);
+                }
+            }
+            frame.displayTransformations.clear();
+            frame.displayTransformations = displayTransformations;
+
+            frame.interactionTransformations.clear();
+            frame.interactionTransformations = interactionTransformations;
+        }
+        return this;
+    }
+
+    public SpawnedDisplayAnimation unfilter(){
+        this.filter = null;
         return this;
     }
 
@@ -230,6 +300,7 @@ public final class SpawnedDisplayAnimation{
             anim.filter = this.filter.clone();
         }
         anim.respectGroupScale = this.respectGroupScale;
+        anim.dataChanges = this.dataChanges;
         for (SpawnedDisplayAnimationFrame frame : frames){
             anim.addFrame(frame.toDisplayAnimationFrame());
         }

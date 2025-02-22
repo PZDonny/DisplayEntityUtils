@@ -30,7 +30,7 @@ class GroupCloneCMD implements PlayerSubCommand {
         }
         else{
             p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully cloned your selected group", NamedTextColor.GREEN)));
-            p.sendMessage(Component.text("- Your group selection has been changes to the newly created group", NamedTextColor.GRAY, TextDecoration.ITALIC));
+            p.sendMessage(Component.text("- Your group selection has been changed to the newly created group", NamedTextColor.GRAY, TextDecoration.ITALIC));
             DisplayGroupManager.setSelectedSpawnedGroup(p, clonedGroup);
             clonedGroup.glow(80, true, true);
         }

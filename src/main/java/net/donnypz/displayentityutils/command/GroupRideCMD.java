@@ -18,7 +18,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.UUID;
 
 class GroupRideCMD implements ConsoleUsableSubCommand {
@@ -42,7 +42,7 @@ class GroupRideCMD implements ConsoleUsableSubCommand {
         //Use Selected Group
         if (args.length < 5) {
             if (!(sender instanceof Player player)){
-                sender.sendMessage(Component.text("Incorrect Console Usage! /mdis group ride <-target | player-name | entity-uuid> <group-tag> <storage> [controller-id]", NamedTextColor.RED));
+                sender.sendMessage(Component.text("Incorrect Console Usage! /mdis group ride <-target | player-name | entity-uuid> [group-tag] [storage] [controller-id]", NamedTextColor.RED));
                 return;
             }
 
@@ -111,7 +111,7 @@ class GroupRideCMD implements ConsoleUsableSubCommand {
         }
         sender.sendMessage(Component.text("Applied controller properties!", NamedTextColor.YELLOW));
 
-        List<GroupFollowProperties> properties = controller.getFollowProperties();
+        Collection<GroupFollowProperties> properties = controller.getFollowProperties();
         for (GroupFollowProperties property : properties){
             property.followGroup(group, vehicle);
         }
@@ -132,7 +132,7 @@ class GroupRideCMD implements ConsoleUsableSubCommand {
             //Apply to Target
             vehicle = player.getTargetEntity(5);
             if (vehicle == null){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You are not targeting an entity!", NamedTextColor.RED)));
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You are not targeting an entity within 5 blocks!", NamedTextColor.RED)));
                 return null;
             }
             if (DisplayUtils.isInGroup(vehicle)){

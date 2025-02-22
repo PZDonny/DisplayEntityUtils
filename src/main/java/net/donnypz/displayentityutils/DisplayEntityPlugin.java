@@ -68,6 +68,10 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     static boolean seededPartUUIDs;
     static boolean automaticGroupDetection;
+    static boolean defaultPersistence;
+    static boolean persistenceOverride;
+    static boolean persistenceValue;
+    static boolean overrideByDefault;
     static double maximumInteractionSearchRange;
     static boolean readSameChunks = true;
     static boolean autoPivotInteractions;
@@ -117,6 +121,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         }
 
         reloadPlugin(true);
+        ConfigUtils.registerDisplayControllers();
 
         getCommand("managedisplays").setExecutor(new DisplayEntityPluginCommand());
         getCommand("managedisplays").setTabCompleter(new DisplayEntityPluginTabCompleter());
@@ -220,6 +225,39 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     public static boolean automaticGroupDetection() {
         return automaticGroupDetection;
     }
+
+    /**
+     * Gets the value of "defaultPersistence" in the config
+     * @return the boolean value set in config
+     */
+    public static boolean defaultPersistence(){
+        return defaultPersistence;
+    }
+
+    /**
+     * Gets the value of "automaticGroupDetection.persistenceOverride.enabled" in the config
+     * @return the boolean value set in config
+     */
+    public static boolean persistenceOverride() {
+        return persistenceOverride;
+    }
+
+    /**
+     * Gets the value of "automaticGroupDetection.persistenceOverride.persistent" in the config
+     * @return the boolean value set in config
+     */
+    public static boolean persistenceValue() {
+        return persistenceValue;
+    }
+
+    /**
+     * Gets the value of "automaticGroupDetection.persistenceOverride.allowOverrideByDefault" in the config
+     * @return the boolean value set in config
+     */
+    public static boolean overrideByDefault() {
+        return overrideByDefault;
+    }
+
 
     /**
      * Gets the value of "automaticGroupDetection.maximumInteractionSearchRange" in the config
@@ -373,14 +411,13 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         }
         reloadConfig();
         ConfigUtils.setConfigVariables(getConfig());
-        ConfigUtils.registerMobControllers();
     }
 
     /**
-     * Reload the registered {@link DisplayController}s from the "mythicgroups.yml" file
+     * Reload the registered {@link DisplayController}s from the "displaycontrollers" folder
      */
     public void reloadControllers(){
-        ConfigUtils.registerMobControllers();
+        ConfigUtils.registerDisplayControllers();
     }
 
     @EventHandler(priority = EventPriority.LOW)

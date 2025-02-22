@@ -34,8 +34,12 @@ class AnimUseFilterCMD implements PlayerSubCommand {
             PartsCMD.noPartSelection(player);
             return;
         }
-        anim.setFilter(selection.toFilter());
+        boolean trim = args.length > 0 && args[0].equalsIgnoreCase("-trim");
+        anim.setFilter(selection, trim);
 
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your selected animation will use your part section's filter", NamedTextColor.GREEN)));
+        if (trim){
+            player.sendMessage(Component.text("Trimmed redundant data (IRREVERSIBLE)", NamedTextColor.GRAY));
+        }
     }
 }

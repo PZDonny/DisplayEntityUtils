@@ -24,6 +24,8 @@ public class GroupSpawnSettings {
     HashMap<String, Set<UUID>> hiddenPartTags = new HashMap<>(); //Tag , Player UUIDs
     HashMap<String, Display.Brightness> brightness = new HashMap<>();
     HashMap<String, Display.Billboard> billboard = new HashMap<>();
+    boolean persistentByDefault = DisplayEntityPlugin.defaultPersistence();
+    boolean persistenceOverride = DisplayEntityPlugin.overrideByDefault();
     boolean visibleByDefault = true;
     Set<UUID> visiblePlayers = new HashSet<>();
     boolean hideInteractions = false;
@@ -83,6 +85,26 @@ public class GroupSpawnSettings {
     }
 
     /**
+     * Determine if the {@link SpawnedDisplayEntityGroup} will be persistent by default when spawned
+     * @param persistentByDefault
+     * @return
+     */
+    public GroupSpawnSettings persistentByDefault(boolean persistentByDefault){
+        this.persistentByDefault = persistentByDefault;
+        return this;
+    }
+
+    /**
+     * Determine if the {@link SpawnedDisplayEntityGroup} can have its persistence overriden when loaded by a chunk, based on config values
+     * @param allowPersistenceOverride
+     * @return
+     */
+    public GroupSpawnSettings allowPersistenceOverride(boolean allowPersistenceOverride){
+        persistenceOverride = allowPersistenceOverride;
+        return this;
+    }
+
+    /**
      * Determine if the {@link SpawnedDisplayEntityGroup} will be visible by default when spawned
      * @param visible the visibility
      * @param visiblePlayers the players that can see the group even if visibility is false
@@ -131,8 +153,6 @@ public class GroupSpawnSettings {
             }
         }
 
-
-
     //Teleport Duration
         display.setTeleportDuration(teleportationDuration);
 
@@ -165,6 +185,7 @@ public class GroupSpawnSettings {
                 }
             }
         }
+        display.setPersistent(persistentByDefault);
     }
 
     void apply(Interaction interaction){
@@ -188,8 +209,7 @@ public class GroupSpawnSettings {
                 determineVisibleByDefault(interaction);
             }
         }
-
-
+        interaction.setPersistent(persistentByDefault);
     }
 
     private void determineVisibleByDefault(Display display){

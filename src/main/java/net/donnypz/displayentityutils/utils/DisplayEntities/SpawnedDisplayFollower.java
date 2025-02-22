@@ -8,8 +8,11 @@ import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Transformation;
+import org.bukkit.util.Vector;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.UUID;
 
 class SpawnedDisplayFollower {
@@ -19,6 +22,9 @@ class SpawnedDisplayFollower {
     boolean isDefaultFollower;
     SpawnedPartSelection selection;
     boolean stopped = false;
+    boolean zeroedPivot = false;
+    float lastGroupScaleMultiplier = 0;
+    HashMap<SpawnedDisplayEntityPart, Float[]> lastPitchMultiplier = new HashMap<>();
 
     SpawnedDisplayFollower(SpawnedDisplayEntityGroup group, GroupFollowProperties followProperties){
         this.group = group;
@@ -44,9 +50,6 @@ class SpawnedDisplayFollower {
 
         int teleportationDuration = properties.teleportationDuration();
 
-        if (teleportationDuration < 0){
-            teleportationDuration = 0;
-        }
         Collection<String> partTags = properties.partTags();
         if (partTags != null && !partTags.isEmpty()){
             selection = new SpawnedPartSelection(group, partTags);
@@ -68,7 +71,7 @@ class SpawnedDisplayFollower {
         new BukkitRunnable(){
             @Override
             public void run() {
-                if ((!group.followers.contains(SpawnedDisplayFollower.this) && !isDefaultFollower) || stopped){
+                if ((!group.followers.contains(SpawnedDisplayFollower.this) && !isDefaultFollower) || stopped || !group.isSpawned()){
                     cancel();
                     return;
                 }
@@ -83,30 +86,22 @@ class SpawnedDisplayFollower {
                     return;
                 }
 
-                if (isDefaultFollower && group.defaultFollower != SpawnedDisplayFollower.this){
-                    //group.defaultFollower = null;
+                if ((isDefaultFollower && group.defaultFollower != SpawnedDisplayFollower.this)){
                     cancel();
                     remove();
                     return;
                 }
-
-                if (!group.isSpawned()){
-                    cancel();
-                    remove();
-                    return;
-                }
-
 
                 if (!group.isInLoadedChunk()){
                     return;
                 }
 
-                FollowType follow = followType;
+                FollowType finalFollowType = followType;
                 if (!properties.shouldPropertiesApply(group)){
                     if (group.defaultFollower == null || isDefaultFollower){
                         return;
                     }
-                    follow = group.defaultFollower.properties.followType();
+                    finalFollowType = group.defaultFollower.properties.followType();
                 }
 
                 if (group.defaultFollower != null && !isDefaultFollower){ //Stop part follow if default follower can't follow
@@ -123,27 +118,112 @@ class SpawnedDisplayFollower {
                     yaw += 180;
                     pitch*=-1;
                 }
+                apply(entity, selection, yaw, pitch, finalFollowType, followType);
+            }
+        }.runTaskTimer(DisplayEntityPlugin.getInstance(), 1, teleportationDuration);
+    }
 
-                if (follow == FollowType.BODY){
+    private void apply(Entity entity, SpawnedPartSelection selection, float newYaw, float newPitch, FollowType finalFollowType, FollowType realFollowType){
+        if (lastGroupScaleMultiplier == 0){
+            lastGroupScaleMultiplier = group.getScaleMultiplier();
+        }
+
+        for (SpawnedDisplayEntityPart part : selection.selectedParts){
+            switch(finalFollowType){
+                case YAW -> {
+                    part.setYaw(newYaw, properties.pivotInteractions());
+                }
+                case PITCH -> {
+                    pivotDisplayPitch(part, !zeroedPivot, newPitch);
+                    part.setPitch(newPitch);
+                }
+                case PITCH_AND_YAW -> {
+                    pivotDisplayPitch(part, !zeroedPivot, newPitch);
+                    part.setPitch(newPitch);
+                    part.setYaw(newYaw, properties.pivotInteractions());
+                }
+                case BODY -> {
                     LivingEntity e = (LivingEntity) entity;
-                    yaw = flip ? e.getBodyYaw()+180 : e.getBodyYaw();
-                    selection.setYaw(yaw, properties.pivotInteractions());
-                    if (followType == FollowType.PITCH || followType == FollowType.PITCH_AND_YAW){
-                        selection.setPitch(pitch);
+                    part.setYaw(properties.flip() ? e.getBodyYaw()+180 : e.getBodyYaw(), properties.pivotInteractions());
+                    if (realFollowType == FollowType.PITCH || realFollowType == FollowType.PITCH_AND_YAW){
+                        pivotDisplayPitch(part, !zeroedPivot, newPitch);
+                        part.setPitch(newPitch);
                     }
                 }
-                else if (follow == FollowType.PITCH){
-                    selection.setPitch(pitch);
-                }
-                else if (follow == FollowType.YAW) {
-                    selection.setYaw(yaw, properties.pivotInteractions());
-                }
-                else if (follow == FollowType.PITCH_AND_YAW){
-                    selection.setPitch(pitch);
-                    selection.setYaw(yaw, properties.pivotInteractions());
-                }
             }
-        }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, teleportationDuration);
+        }
+
+        lastGroupScaleMultiplier = group.getScaleMultiplier();
+    }
+
+    private void pivotDisplayPitch(SpawnedDisplayEntityPart part, boolean zero, float newPitch){
+        if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            return;
+        }
+        Display display = (Display) part.getEntity();
+        Transformation t = display.getTransformation();
+        Vector translation = Vector.fromJOML(t.getTranslation());
+
+        float pitch = display.getPitch();
+        boolean oldPositive = pitch > 0;
+        boolean newPositive = newPitch > 0;
+
+        if (zero){
+            zeroedPivot = true;
+        }
+        else{
+            if (Math.abs(pitch-newPitch) <= 0.75f && oldPositive == newPositive){
+                return;
+            }
+        }
+
+        float typeMultiplier;
+        if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY){
+            typeMultiplier = 1.5f;
+        }
+        else{
+            typeMultiplier = 1;
+        }
+
+        float yOffset = Math.abs(newPitch)/180*group.getScaleMultiplier() * (properties.getYPivotOffsetPercentage()/100);
+        float zOffset = Math.abs(newPitch)/270*group.getScaleMultiplier()*typeMultiplier * (properties.getZPivotOffsetPercentage()/100);
+
+
+        Float[] lastMultipliers = lastPitchMultiplier.getOrDefault(part, new Float[]{0f, 0f});
+        float lastYOffset = lastMultipliers[0];
+        float lastZOffset = lastMultipliers[1];
+        if (lastGroupScaleMultiplier != group.getScaleMultiplier()){
+            lastYOffset = (lastYOffset/lastGroupScaleMultiplier)*group.getScaleMultiplier();
+            lastZOffset = (lastZOffset/lastGroupScaleMultiplier)*group.getScaleMultiplier();
+        }
+
+        //Reset+Apply Y Offset
+        translation.setY(translation.getY()+yOffset-lastYOffset);
+
+        //Reset Last Z Offset
+        if (pitch < 0) {
+            translation.setZ(translation.getZ()+lastZOffset);
+        }
+        else{
+            translation.setZ(translation.getZ()-lastZOffset);
+        }
+
+        //Apply New Z Offset
+        if (newPitch > 0){
+            translation.setZ(translation.getZ()+zOffset);
+        }
+        else{
+            translation.setZ(translation.getZ()-zOffset);
+        }
+
+
+        lastMultipliers[0] = yOffset;
+        lastMultipliers[1] = zOffset;
+        lastPitchMultiplier.put(part, lastMultipliers);
+
+        display.setInterpolationDuration(properties.teleportationDuration());
+        display.setInterpolationDelay(0);
+        display.setTransformation(new Transformation(translation.toVector3f(), t.getLeftRotation(), t.getScale(), t.getRightRotation()));
     }
 
     void remove(){
@@ -152,5 +232,6 @@ class SpawnedDisplayFollower {
         if (isDefaultFollower){
             group.defaultFollower = null;
         }
+        lastPitchMultiplier.clear();
     }
 }

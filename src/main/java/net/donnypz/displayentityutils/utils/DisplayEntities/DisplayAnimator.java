@@ -44,7 +44,7 @@ public class DisplayAnimator {
         }
 
         SpawnedDisplayAnimationFrame frame = animation.frames.get(frameIndex);
-        int delay = frame.delay+ frame.duration;
+        int delay = frame.delay;
         new DisplayAnimatorExecutor(this, animation, group, frame, delay, DisplayEntityPlugin.asynchronousAnimations(), false);
         return true;
     }

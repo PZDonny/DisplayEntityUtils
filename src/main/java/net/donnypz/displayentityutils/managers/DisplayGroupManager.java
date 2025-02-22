@@ -476,13 +476,12 @@ public final class DisplayGroupManager {
 
     /**
      * Gets the nearest Spawned Display Entity Group near a location
-     *
      * @param location Center of the search location
      * @param radius The radius to check for a spawned display entity group
      * @return A {@link GroupResult}. Null if not found.
      */
     public static GroupResult getSpawnedGroupNearLocation(Location location, double radius) {
-        Display master = getNearestDisplayEntity(location, radius);
+        Display master = getNearestPotentialMasterDisplay(location, radius);
         if (master == null) {
             return null;
         }
@@ -513,12 +512,12 @@ public final class DisplayGroupManager {
      * Gets the nearest Spawned Display Entity Group near a location
      *
      * @param location Center of the search location
-     * @param radius   The radius to check for a spawned display entity group
-     * @param getter   Player who is getting the spawned group
+     * @param radius The radius to check for a spawned display entity group
+     * @param getter Player who is getting the spawned group
      * @return A {@link GroupResult}. Null if not found.
      */
     public static @Nullable GroupResult getSpawnedGroupNearLocation(Location location, double radius, @Nullable Player getter) {
-        Display master = getNearestDisplayEntity(location, radius);
+        Display master = getNearestPotentialMasterDisplay(location, radius);
         if (master == null){
             if (getter != null) {
                 getter.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You are not near any spawned display entity groups!", NamedTextColor.RED)));
@@ -590,12 +589,11 @@ public final class DisplayGroupManager {
         return nearest;
     }
 
-    private static Display getNearestDisplayEntity(Location loc, double radius) {
-
+    private static Display getNearestPotentialMasterDisplay(Location loc, double radius) {
         Display nearest = null;
         double lastDistance = Double.MAX_VALUE;
         for (Entity e : loc.getNearbyEntities(radius, radius, radius)) {
-            if (!(e instanceof Display)) {
+            if (!(e instanceof Display d) || d.getPassengers().isEmpty()) {
                 continue;
             }
 

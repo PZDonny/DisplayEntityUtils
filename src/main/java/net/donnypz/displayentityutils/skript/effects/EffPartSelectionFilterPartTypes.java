@@ -1,7 +1,6 @@
 package net.donnypz.displayentityutils.skript.effects;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -11,34 +10,33 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PartFilter;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
-import org.bukkit.Material;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-@Name("Part Selection Filter Set Items/Blocks")
-@Description("Set the items/blocks that should be filtered in a part selection")
-@Examples({"set block filter of {_selection} with stone"})
+@Name("Part Selection Filter Set Part Types")
+@Description("Set the part types that should be filtered in a part selection")
+@Examples({"set part type filter of {_selection} to parttype_text_display",
+        "set type filter of {_selection} to exclude parttype_block_display and parttype_item_display"})
 @Since("2.6.2")
-public class EffPartSelectionFilterItemsBlocks extends Effect {
+public class EffPartSelectionFilterPartTypes extends Effect {
     static {
-        Skript.registerEffect(EffPartSelectionFilterItemsBlocks.class,"set (:block|item)[s] filter (for|of) %partselection% with[:out] %itemtypes%");
+        Skript.registerEffect(EffPartSelectionFilterPartTypes.class,"set [part] type[s] filter (for|of) %partselection% (with[:out]|to [out:exclude]) %parttypes%");
     }
 
     Expression<SpawnedPartSelection> selection;
-    Expression<ItemType> itemTypes;
+    Expression<SpawnedDisplayEntityPart.PartType> partTypes;
     boolean exclude;
-    boolean isBlock;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         selection = (Expression<SpawnedPartSelection>) expressions[0];
-        itemTypes = (Expression<ItemType>) expressions[1];
+        partTypes = (Expression<SpawnedDisplayEntityPart.PartType>) expressions[1];
         exclude = parseResult.hasTag("out");
-        isBlock = parseResult.hasTag("block");
         return true;
     }
 
@@ -49,28 +47,27 @@ public class EffPartSelectionFilterItemsBlocks extends Effect {
             return;
         }
         PartFilter builder = new PartFilter();
-        ItemType[] types = itemTypes.getArray(event);
+        SpawnedDisplayEntityPart.PartType[] types = partTypes.getArray(event);
         if (types == null){
             return;
         }
-        Set<Material> materials = new HashSet<>();
-        for (ItemType type : types){
-            materials.add(type.getMaterial());
-        }
 
-        if (isBlock){
-            builder.setBlockTypes(materials, !exclude);
+        if (exclude){
+            ArrayList<SpawnedDisplayEntityPart.PartType> list = new ArrayList<>(Arrays.stream(SpawnedDisplayEntityPart.PartType.values()).toList());
+            for (SpawnedDisplayEntityPart.PartType type : types){
+                list.remove(type);
+            }
+            builder.setPartTypes(list);
         }
         else{
-            builder.setItemTypes(materials, !exclude);
+            builder.setPartTypes(types);
         }
-
 
         sel.applyFilter(builder, false);
     }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "set part selection items/blocks: "+selection.toString(event, debug);
+        return "set part selection part types: "+selection.toString(event, debug);
     }
 }

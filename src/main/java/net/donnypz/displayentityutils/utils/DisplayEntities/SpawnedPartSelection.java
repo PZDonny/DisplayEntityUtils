@@ -111,16 +111,19 @@ public final class SpawnedPartSelection implements Spawned {
             reset();
         }
 
-        this.partTypes.addAll(filter.partTypes);
+        if (!filter.partTypes.isEmpty()){
+            this.partTypes.clear();
+            this.partTypes.addAll(filter.partTypes);
+        }
         this.includedTags.addAll(filter.includedTags);
         this.excludedTags.addAll(filter.excludedTags);
 
         if (this.itemTypes.isEmpty()){
-            this.includeBlockTypes = filter.includeBlockTypes;
+            this.includeItemTypes = filter.includeItemTypes;
         }
 
         if (this.blockTypes.isEmpty()){
-            this.includeItemTypes = filter.includeItemTypes;
+            this.includeBlockTypes = filter.includeBlockTypes;
         }
 
         this.itemTypes.addAll(filter.itemTypes);
@@ -223,7 +226,12 @@ public final class SpawnedPartSelection implements Spawned {
         return true;
     }
 
-    public void unfilter(@NotNull PartFilter.FilterType filterType, boolean reselect){
+    /**
+     * Remove any filters applied, based on the {@link PartFilter.FilterType}.
+     * @param filterType the type that should be unfiltered
+     * @param refresh true if the parts in the selection should be updated
+     */
+    public void unfilter(@NotNull PartFilter.FilterType filterType, boolean refresh){
         switch (filterType){
             case PART_TYPE -> partTypes.clear();
             case INCLUDED_TAGS -> includedTags.clear();
@@ -231,7 +239,7 @@ public final class SpawnedPartSelection implements Spawned {
             case ITEM_TYPE -> itemTypes.clear();
             case BLOCK_TYPE -> blockTypes.clear();
         }
-        if (reselect) refresh();
+        if (refresh) refresh();
     }
 
     /**
@@ -540,6 +548,7 @@ public final class SpawnedPartSelection implements Spawned {
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results
      * @param distance How far the part should be translated
      * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
      * @param direction The direction to translate the parts
      */
     public void translate(float distance, int durationInTicks, int delayInTicks, Vector direction){
@@ -554,6 +563,7 @@ public final class SpawnedPartSelection implements Spawned {
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results
      * @param distance How far the part should be translated
      * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
      * @param direction The direction to translate the parts
      */
     public void translate(float distance, int durationInTicks, int delayInTicks, Direction direction){
