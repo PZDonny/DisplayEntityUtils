@@ -84,6 +84,7 @@ public final class DisplayAnimation implements Serializable {
         SpawnedDisplayAnimation anim = new SpawnedDisplayAnimation(filter);
         anim.animationTag = this.animationTag;
         anim.respectGroupScale = this.respectGroupScale;
+        anim.dataChanges = this.dataChanges;
 
         if (this.filter != null){
             anim.filter = this.filter.clone();
