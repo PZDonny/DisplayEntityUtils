@@ -1344,9 +1344,10 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * @param unregisterAfterEntityDeathDelay How long after an entity dies to despawn the group, in ticks. -1 to never despawn
      * @param pivotInteractions determine if interaction entities should pivot when following an entity's yaw
      * @throws IllegalArgumentException If followType is to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
+     * @return the resulting {@link GroupFollowProperties}
      */
-    public void followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions){
-        followEntityDirection(entity, followType, unregisterAfterEntityDeathDelay, pivotInteractions, getTeleportDuration());
+    public @NotNull GroupFollowProperties followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions){
+        return followEntityDirection(entity, followType, unregisterAfterEntityDeathDelay, pivotInteractions, getTeleportDuration());
     }
 
     /**
@@ -1359,9 +1360,10 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * @param pivotInteractions determine if interaction entities should pivot when following an entity's yaw
      * @param teleportationDuration Set the teleportationDuration (rotation smoothness) of all parts within this group
      * @throws IllegalArgumentException If followType is to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
+      @return the resulting {@link GroupFollowProperties}
      */
-    public void followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions, int teleportationDuration){
-        followEntityDirection(entity, followType, unregisterAfterEntityDeathDelay, pivotInteractions, false, teleportationDuration);
+    public @NotNull GroupFollowProperties followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions, int teleportationDuration){
+        return followEntityDirection(entity, followType, unregisterAfterEntityDeathDelay, pivotInteractions, false, teleportationDuration);
     }
 
     /**
@@ -1375,9 +1377,10 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * @param pivotPitch determine if display entities should pivot when following an entity's pitch. ONLY applies if followType is {@link FollowType#PITCH} or {@link FollowType#PITCH_AND_YAW}
      * @param teleportationDuration Set the teleportationDuration (rotation smoothness) of all parts within this group
      * @throws IllegalArgumentException If followType is to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
+      @return the resulting {@link GroupFollowProperties}
      */
-    public void followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions, boolean pivotPitch, int teleportationDuration){
-        followEntityDirection(entity, new GroupFollowProperties("", followType, unregisterAfterEntityDeathDelay, pivotInteractions, pivotPitch, teleportationDuration, null));
+    public @NotNull GroupFollowProperties followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions, boolean pivotPitch, int teleportationDuration){
+        return followEntityDirection(entity, new GroupFollowProperties("", followType, unregisterAfterEntityDeathDelay, pivotInteractions, pivotPitch, teleportationDuration, null));
     }
 
 
@@ -1389,10 +1392,11 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * @param properties The properties to use when following the entity's direction
      * @throws IllegalArgumentException If followType is to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
      */
-    public void followEntityDirection(@NotNull Entity entity, @NotNull GroupFollowProperties properties){
+    public @NotNull GroupFollowProperties followEntityDirection(@NotNull Entity entity, @NotNull GroupFollowProperties properties){
         SpawnedDisplayFollower follower = new SpawnedDisplayFollower(this, properties);
         followers.add(follower);
         follower.follow(entity);
+        return properties;
     }
 
 

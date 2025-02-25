@@ -22,8 +22,8 @@ public class GroupFollowProperties{
     int unregisterDelay;
     boolean pivotInteractions;
     boolean pivotDisplays;
-    float yPivotOffsetPercentage;
-    float zPivotOffsetPercentage;
+    float yPivotOffsetPercentage = 100;
+    float zPivotOffsetPercentage = 100;
     int teleportationDuration;
     Collection<String> partTags;
     Set<String> filteredStates = new HashSet<>();
