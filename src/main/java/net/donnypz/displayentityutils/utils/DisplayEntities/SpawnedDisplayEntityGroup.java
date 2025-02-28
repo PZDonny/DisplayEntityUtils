@@ -37,6 +37,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
     private String tag;
     SpawnedDisplayEntityPart masterPart;
     long creationTime = System.currentTimeMillis();
+    int lastAnimatedTick = -1;
 
     boolean isVisibleByDefault;
     private float scaleMultiplier = 1;
@@ -1704,6 +1705,19 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
     public boolean isAnimating(){
         //return lastAnimationTimeStamp != -1;
         return !activeAnimators.isEmpty();
+    }
+
+    void setLastAnimatedTick(){
+        lastAnimatedTick = Bukkit.getCurrentTick();
+    }
+
+
+    /**
+     * Check if this group has completed its animation frame in the game's current tick
+     * @return a boolean
+     */
+    public boolean hasAnimated(){
+        return lastAnimatedTick == Bukkit.getCurrentTick();
     }
 
 

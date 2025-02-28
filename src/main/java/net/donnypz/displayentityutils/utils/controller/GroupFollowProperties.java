@@ -76,6 +76,15 @@ public class GroupFollowProperties{
 
     GroupFollowProperties(){}
 
+    /**
+     * Change how extreme the display pivot offsets are by setting the y and z pivot offset percentages. Default percentages are 100%.
+     * <br>
+     * <br>
+     * Increased percentages adjust the group farther from the pivot point, while decreased values reduce the pivot's effect
+     * @param yPivotOffsetPercentage
+     * @param zPivotOffsetPercentage
+     * @return this
+     */
     public GroupFollowProperties setDisplayPivotOffsetPercentage(float yPivotOffsetPercentage, float zPivotOffsetPercentage){
         this.yPivotOffsetPercentage = yPivotOffsetPercentage;
         this.zPivotOffsetPercentage = zPivotOffsetPercentage;

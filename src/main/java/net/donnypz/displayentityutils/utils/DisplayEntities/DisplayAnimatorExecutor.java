@@ -105,6 +105,8 @@ final class DisplayAnimatorExecutor {
             animateDisplays(frame, group, selection, animation);
         }
 
+        group.setLastAnimatedTick();
+
         if (playSingleFrame){
             return;
         }
@@ -258,15 +260,15 @@ final class DisplayAnimatorExecutor {
 
         if (isAsync){ //Asynchronously apply transformation changes
             Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
-                applyDisplayTransformation(display, frame, animation, group, transformation, applyDataOnly);
+                applyDisplayTransformation(display, part, frame, animation, group, transformation, applyDataOnly);
             });
         }
         else{
-            applyDisplayTransformation(display, frame, animation, group, transformation, applyDataOnly);
+            applyDisplayTransformation(display, part, frame, animation, group, transformation, applyDataOnly);
         }
     }
 
-    private void applyDisplayTransformation(Display display, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, SpawnedDisplayEntityGroup group, DisplayTransformation transformation, boolean applyDataOnly){
+    private void applyDisplayTransformation(Display display, SpawnedDisplayEntityPart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, SpawnedDisplayEntityGroup group, DisplayTransformation transformation, boolean applyDataOnly){
         if (!DisplayUtils.isInLoadedChunk(display)) {
             return;
         }
@@ -290,13 +292,18 @@ final class DisplayAnimatorExecutor {
                 translationVector.mul(group.getScaleMultiplier());
                 scaleVector.mul(group.getScaleMultiplier());
             }
+
             if (group.canApplyVerticalOffset()){
                 translationVector.add(0, group.getVerticalOffset(), 0);
             }
+            displayPivotTranslation(group, part, translationVector);
+
             Transformation respectTransform = new DisplayTransformation(translationVector, transformation.getLeftRotation(), scaleVector, transformation.getRightRotation());
             display.setTransformation(respectTransform);
         }
         else{
+            displayPivotTranslation(group, part, translationVector);
+
             if (group.canApplyVerticalOffset()){
                 translationVector.add(0, group.getVerticalOffset(), 0);
                 Transformation offsetTransformation = new DisplayTransformation(translationVector, transformation.getLeftRotation(), transformation.getScale(), transformation.getRightRotation());
@@ -309,6 +316,15 @@ final class DisplayAnimatorExecutor {
 
         if (animation.allowsDataChanges()){
             transformation.applyData(display);
+        }
+    }
+
+    private void displayPivotTranslation(SpawnedDisplayEntityGroup group, SpawnedDisplayEntityPart part, Vector3f translationVector){
+        for (SpawnedDisplayFollower follower : group.followers){
+            if (!follower.hasSetDisplayPivotData()){
+                continue;
+            }
+            follower.laterManualPivot(part, translationVector);
         }
     }
 }
