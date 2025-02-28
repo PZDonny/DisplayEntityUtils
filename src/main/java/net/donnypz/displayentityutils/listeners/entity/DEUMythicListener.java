@@ -76,6 +76,7 @@ public class DEUMythicListener implements Listener {
         spawned.setVerticalOffset(controller.getVerticalOffset());
         spawned.rideEntity(e.getEntity());
         spawned.setPersistent(persistGroupAfterRestart);
+        spawned.setPersistenceOverride(false);
 
         Entity masterEntity = spawned.getMasterPart().getEntity();
         PersistentDataContainer pdc = masterEntity.getPersistentDataContainer();
