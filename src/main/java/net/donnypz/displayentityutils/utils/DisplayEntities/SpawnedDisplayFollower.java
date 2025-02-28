@@ -241,7 +241,7 @@ class SpawnedDisplayFollower {
     void laterManualPivot(SpawnedDisplayEntityPart part, Vector3f translationVector){
         PartFollowData data = lastDisplayPivotData.get(part);
         if (data != null){
-            data.apply(part, translationVector);
+            data.apply(translationVector);
             //translationVector.add(data.translation);
         }
     }
@@ -264,9 +264,7 @@ class SpawnedDisplayFollower {
         float lastZOffset = 0;
         boolean addZ;
 
-        void apply(SpawnedDisplayEntityPart part, Vector3f translationVector){
-            Display display = (Display) part.getEntity();
-            Transformation t = display.getTransformation();
+        void apply(Vector3f translationVector){
             translationVector.y+=lastYOffset;
             if (addZ){
                 translationVector.z+=lastZOffset;
