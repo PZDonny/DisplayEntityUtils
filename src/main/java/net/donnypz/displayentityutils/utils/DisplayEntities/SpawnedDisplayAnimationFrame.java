@@ -372,14 +372,18 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     @ApiStatus.Internal
     public DisplayAnimationFrame toDisplayAnimationFrame(){
         DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, framePoints, startCommands, endCommands, tag);
-        for (UUID uuid : displayTransformations.keySet()){
-            DisplayTransformation transform = displayTransformations.get(uuid);
-            if (transform != null){
-                frame.setDisplayEntityTransformation(uuid, new SerialTransformation(transform));
+        for (Map.Entry<UUID, DisplayTransformation> entry : displayTransformations.entrySet()){
+            UUID uuid = entry.getKey();
+            DisplayTransformation transformation = entry.getValue();
+            if (transformation != null){
+                frame.setDisplayEntityTransformation(uuid, new SerialTransformation(transformation));
             }
         }
-        for (UUID uuid : interactionTransformations.keySet()){
-            frame.setInteractionTransformation(uuid, interactionTransformations.get(uuid));
+
+        for (Map.Entry<UUID, Vector3f> entry : interactionTransformations.entrySet()){
+            UUID uuid = entry.getKey();
+            Vector3f vector = entry.getValue();
+            frame.setInteractionTransformation(uuid, vector);
         }
         return frame;
     }

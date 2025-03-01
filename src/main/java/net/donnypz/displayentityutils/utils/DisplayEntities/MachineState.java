@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class MachineState {
 
@@ -102,8 +103,9 @@ public class MachineState {
 
     @ApiStatus.Internal
     public static void registerNullLoaderStates(){
-        for (MachineState state : animationlessStates.keySet()){
-            AnimatorData data = animationlessStates.get(state);
+        for (Map.Entry<MachineState, AnimatorData> entry : animationlessStates.entrySet()){
+            MachineState state = entry.getKey();
+            AnimatorData data = entry.getValue();
             NullAnimationLoaderEvent e = new NullAnimationLoaderEvent(data.animTag, state);
             e.callEvent();
             SpawnedDisplayAnimation animation = e.getAnimation();

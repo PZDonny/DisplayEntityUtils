@@ -1739,8 +1739,10 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
 
             DisplayEntityGroup group = toDisplayEntityGroup();
             SpawnedDisplayEntityGroup cloned = group.spawn(location, GroupSpawnedEvent.SpawnReason.CLONE);
-            for (SpawnedDisplayEntityPart part : oldYaws.keySet()){
-                part.pivot(oldYaws.get(part));
+            for (Map.Entry<SpawnedDisplayEntityPart, Float> entry : oldYaws.entrySet()){
+                SpawnedDisplayEntityPart part = entry.getKey();
+                float oldYaw = entry.getValue();
+                part.pivot(oldYaw);
             }
             oldYaws.clear();
             return cloned;

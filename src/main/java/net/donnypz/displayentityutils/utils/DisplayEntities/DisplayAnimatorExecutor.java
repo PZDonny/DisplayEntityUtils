@@ -15,6 +15,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
+import java.util.Map;
 import java.util.UUID;
 
 final class DisplayAnimatorExecutor {
@@ -170,7 +171,14 @@ final class DisplayAnimatorExecutor {
     }
 
     private void animateInteractions(Location groupLoc, SpawnedDisplayAnimationFrame frame, SpawnedDisplayEntityGroup group, SpawnedPartSelection selection, SpawnedDisplayAnimation animation){
-        for (UUID partUUID : frame.interactionTransformations.keySet()){
+        for (Map.Entry<UUID, Vector3f> entry : frame.interactionTransformations.entrySet()){
+            UUID partUUID = entry.getKey();
+
+            Vector3f transform = entry.getValue();
+            if (transform == null){
+                continue;
+            }
+
             SpawnedDisplayEntityPart part = group.getSpawnedPart(partUUID);
             if (part == null || !selection.contains(part)){
                 continue;
@@ -179,11 +187,6 @@ final class DisplayAnimatorExecutor {
             Interaction i = (Interaction) part.getEntity();
             Vector currentVector = DisplayUtils.getInteractionTranslation(i);
             if (currentVector == null){
-                continue;
-            }
-
-            Vector3f transform = frame.interactionTransformations.get(partUUID);
-            if (transform == null){
                 continue;
             }
 
@@ -227,8 +230,9 @@ final class DisplayAnimatorExecutor {
 
     private void animateDisplays(SpawnedDisplayAnimationFrame frame, SpawnedDisplayEntityGroup group, SpawnedPartSelection selection, SpawnedDisplayAnimation animation){
         if (selection.selectedParts.size() >= frame.displayTransformations.size()){
-            for (UUID partUUID : frame.displayTransformations.keySet()){
-                DisplayTransformation transformation = frame.displayTransformations.get(partUUID);
+            for (Map.Entry<UUID, DisplayTransformation> entry : frame.displayTransformations.entrySet()){
+                UUID partUUID = entry.getKey();
+                DisplayTransformation transformation = entry.getValue();
                 if (transformation == null){ //Part does not change transformation
                     continue;
                 }
