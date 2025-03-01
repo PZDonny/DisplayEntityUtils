@@ -99,7 +99,7 @@ final class DisplayAnimatorExecutor {
         Location groupLoc = group.getLocation();
         if (group.isInLoadedChunk()){
             new GroupAnimateFrameStartEvent(group, animator, animation, frame).callEvent();
-            frame.playStartEffects(group, animator);
+            frame.playEffects(group, animator);
 
             animateInteractions(groupLoc, frame, group, selection, animation);
             animateDisplays(frame, group, selection, animation);
@@ -121,12 +121,12 @@ final class DisplayAnimatorExecutor {
             }
             if (frame.duration > 0){
                 Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                    frame.playEndEffects(group, animator);
+                    frame.executeEndCommands(group.getLocation());
                     new GroupAnimateFrameEndEvent(group, animator, animation, frame).callEvent();
                 }, frame.duration);
             }
             else{
-                frame.playEndEffects(group, animator);
+                frame.executeEndCommands(group.getLocation());
                 new GroupAnimateFrameEndEvent(group, animator, animation, frame).callEvent();
             }
 
@@ -141,13 +141,13 @@ final class DisplayAnimatorExecutor {
             if (animator.type != DisplayAnimator.AnimationType.LOOP) {
                 if (frame.duration > 0) {
                     Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                        if (group.isSpawned()) frame.playEndEffects(group, animator);
+                        if (group.isSpawned()) frame.executeEndCommands(group.getLocation());
                         new GroupAnimationCompleteEvent(group, animator, animation).callEvent();
                         group.stopAnimation(animator);
                         selection.remove();
                     }, frame.duration);
                 } else {
-                    if (group.isSpawned()) frame.playEndEffects(group, animator);
+                    if (group.isSpawned()) frame.executeEndCommands(group.getLocation());
                     new GroupAnimationCompleteEvent(group, animator, animation).callEvent();
                     group.stopAnimation(animator);
                     selection.remove();
@@ -158,11 +158,11 @@ final class DisplayAnimatorExecutor {
             else {
                 if (frame.duration > 0) {
                     Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                        frame.playEndEffects(group, animator);
+                        frame.executeEndCommands(group.getLocation());
                         executeAnimation(animation, group, selection, animation.frames.getFirst(), false);
                     }, frame.duration);
                 } else {
-                    frame.playEndEffects(group, animator);
+                    frame.executeEndCommands(group.getLocation());
                     executeAnimation(animation, group, selection, animation.frames.getFirst(), false);
                 }
             }

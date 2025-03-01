@@ -30,11 +30,12 @@ class AnimCMD implements ConsoleUsableSubCommand{
         subCommands.put("overwriteframe", new AnimOverwriteFrameCMD());
         subCommands.put("editframe", new AnimEditFrameCMD());
         subCommands.put("editallframes", new AnimEditAllFramesCMD());
+        subCommands.put("addpoint", new AnimAddPointCMD());
         subCommands.put("showframe", new AnimShowFrameCMD());
         subCommands.put("addsound", new AnimAddSoundCMD());
         subCommands.put("removesound", new AnimRemoveSoundCMD());
         subCommands.put("addparticle", new AnimAddParticleCMD());
-        subCommands.put("cancelparticles", new AnimCancelParticlesCMD());
+        subCommands.put("cancelpoints", new AnimCancelPointsCMD());
         subCommands.put("reverse", new AnimReverseCMD());
         subCommands.put("togglescalerespect", new AnimScaleRespectCMD());
         subCommands.put("toggledatachanges", new AnimDataChangesCMD());
@@ -89,18 +90,18 @@ class AnimCMD implements ConsoleUsableSubCommand{
             CMDUtils.sendCMD(sender, "/mdis anim removeframe <frame-id>", " (Remove a frame from your selected animation)");
             CMDUtils.sendCMD(sender, "/mdis anim editframe <frame-id> <tick-delay> <tick-duration>", " (Edit properties of a single frame)");
             CMDUtils.sendCMD(sender, "/mdis anim editallframes <tick-delay> <tick-duration>", " (Edit properties of all frames)");
-
         }
         else if (page == 3){
-            CMDUtils.sendCMD(sender, "/mdis anim addsound <frame-id> <sound> <volume> <pitch> <start | end>", " (Add a sound to a frame)");
-            CMDUtils.sendCMD(sender, "/mdis anim removesound <frame-id> <sound | -all> <start | end>", " (Remove a sound from a frame)");
-            CMDUtils.sendCMD(sender, "/mdis anim addparticle <frame-id> <start | end>", " (Add a particle to a frame)");
+            CMDUtils.sendCMD(sender, "/mdis anim addpoint <frame-id>", " (Add a point relative to a group and your location for a frame)");
+            CMDUtils.sendCMD(sender, "/mdis anim addsound <sound> <volume> <pitch>", " (Add a sound to play at a frame point)");
+            CMDUtils.sendCMD(sender, "/mdis anim removesound <sound | -all>", " (Remove a sound from a frame point)");
+            CMDUtils.sendCMD(sender, "/mdis anim addparticle", " (Add a particle to play at a frame point)");
             CMDUtils.sendCMD(sender, "/mdis anim overwriteframe <frame-id>", " (Overwrite the transformation data of a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim reverse", " (Reverse the order of frames in your selected animation)");
-            CMDUtils.sendCMD(sender, "/mdis anim togglescalerespect", " (Toggle whether your selected animation should respect the group's scale)");
-            CMDUtils.sendCMD(sender, "/mdis anim toggledatachanges", " (Toggle whether your selected animation can change block display blocks, item display items, and text display text)");
         }
         else{
+            CMDUtils.sendCMD(sender, "/mdis anim togglescalerespect", " (Toggle whether your selected animation should respect the group's scale)");
+            CMDUtils.sendCMD(sender, "/mdis anim toggledatachanges", " (Toggle whether your selected animation can change block display blocks, item display items, and text display text)");
             CMDUtils.sendCMD(sender, "/mdis anim showframe <frame-id>", " (Displays a frame on your selected group)");
             CMDUtils.sendCMD(sender, "/mdis anim play [-loop]", " (Play your selected animation on your selected group. Include \"-loop\" to loop the animation)");
             CMDUtils.sendCMD(sender, "/mdis anim stop", " (Stop an animation playing on a group)");
@@ -111,8 +112,13 @@ class AnimCMD implements ConsoleUsableSubCommand{
     }
 
     static void noAnimationSelection(Player player){
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You have not have an animation selected!", NamedTextColor.RED)));
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You do not have an animation selected!", NamedTextColor.RED)));
         player.sendMessage(Component.text("/mdis anim select <animation-tag>", NamedTextColor.GRAY));
+    }
+
+    static void noFramePointSelection(Player player){
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You do not have an frame point selected!", NamedTextColor.RED)));
+        player.sendMessage(Component.text("/mdis anim frameinfo <frame-id>", NamedTextColor.GRAY));
     }
 
     static void hasNoFrames(Player player){

@@ -1,12 +1,12 @@
 package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
+import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class AnimCancelParticlesCMD implements PlayerSubCommand {
+class AnimCancelPointsCMD implements PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
@@ -14,7 +14,7 @@ class AnimCancelParticlesCMD implements PlayerSubCommand {
             return;
         }
 
-        DEUCommandUtils.removeParticleDisplays(player);
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Removed all visible frame particles!", NamedTextColor.GREEN)));
+        DEUCommandUtils.removeRelativePoints(player);
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Removed all visible frame points!", NamedTextColor.GREEN)));
     }
 }

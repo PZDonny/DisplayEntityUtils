@@ -9,9 +9,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
@@ -27,7 +25,8 @@ public abstract class AnimationParticle implements Externalizable {
     @Serial
     private static final long serialVersionUID = 99L;
 
-    Particle particle;
+    transient Particle particle;
+    String particleName;
     int count;
     double extra;
 
@@ -35,14 +34,12 @@ public abstract class AnimationParticle implements Externalizable {
     double yOffset;
     double zOffset;
     transient Vector vectorFromOrigin;
-    Vector3f vector;
+    Vector3f vector = null;
 
     float groupYawAtCreation;
     float groupPitchAtCreation;
 
     int delayInTicks = 0;
-
-    boolean isStartFrame;
 
     @ApiStatus.Internal
     public AnimationParticle(){}
@@ -50,47 +47,38 @@ public abstract class AnimationParticle implements Externalizable {
 
     AnimationParticle(AnimationParticleBuilder builder, Particle particle){
         this.particle = particle;
+        this.particleName = particle.getKey().getKey();
         this.extra = builder.extra();
         this.count = builder.count();
         this.xOffset = builder.offsetX();
         this.yOffset = builder.offsetY();
         this.zOffset = builder.offsetZ();
-        this.isStartFrame = builder.isStartAdd;
     }
 
-    void setVectorFromOrigin(Vector vector, float initialYaw, float initialPitch){
-        this.vectorFromOrigin = vector;
-        this.groupYawAtCreation = initialYaw;
-        this.groupPitchAtCreation = initialPitch;
-        this.vector = vector.toVector3f();
-    }
-
-    void setDelayInTicks(int delayInTicks){
+    public void setDelayInTicks(int delayInTicks){
         this.delayInTicks = delayInTicks;
     }
 
-    public void spawn(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
-        Location spawnLoc = getSpawnLocation(group);
+    public void spawn(@NotNull Location location, @NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
         if (delayInTicks == 0){
-            spawn(spawnLoc);
+            spawn(location);
         }
         else{
-
             Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                 if (!group.isSpawned()){
                     return;
                 }
                 if (animator == null){
-                    spawn(getSpawnLocation(group));
+                    spawn(location);
                 }
                 else if (group.isActiveAnimator(animator)){
-                    spawn(getSpawnLocation(group));
+                    spawn(location);
                 }
             }, delayInTicks);
         }
     }
 
-    public Location getSpawnLocation(SpawnedDisplayEntityGroup group){
+    /*public Location getSpawnLocation(SpawnedDisplayEntityGroup group){
         Vector v = vectorFromOrigin.clone();
         Location groupLoc = group.getLocation();
 
@@ -104,13 +92,26 @@ public abstract class AnimationParticle implements Externalizable {
 
         groupLoc.add(v);
         return groupLoc;
-    }
+    }*/
 
     public abstract void spawn(Location location);
 
     @ApiStatus.Internal
-    public void applyVector(){
-        vectorFromOrigin = Vector.fromJOML(vector);
+    public void initializeParticle(){
+        //Post 2.7.0
+        if (particle == null){
+            particle = Registry.PARTICLE_TYPE.get(new NamespacedKey("minecraft", particleName));
+        }
+        //Pre 2.7.0
+        else{
+            particleName = particle.getKey().getKey();
+        }
+
+        //Pre 2.7.0
+        if (vector != null){
+            vectorFromOrigin = Vector.fromJOML(vector);
+        }
+
         initalize();
     }
 
@@ -118,7 +119,7 @@ public abstract class AnimationParticle implements Externalizable {
 
     public void sendInfo(Player player){
         player.sendMessage(Component.empty());
-        player.sendMessage(Component.text("Particle General Info:", NamedTextColor.AQUA));
+        player.sendMessage(Component.text("Particle Info:", NamedTextColor.AQUA));
         player.sendMessage(Component.text("Click a value to edit it", NamedTextColor.YELLOW));
         sendEditMSG(player, "| Particle: "+particle.name(), AnimationParticleBuilder.Step.PARTICLE);
         sendEditMSG(player, "| Count: "+count,  AnimationParticleBuilder.Step.COUNT);
@@ -132,10 +133,6 @@ public abstract class AnimationParticle implements Externalizable {
         if (unique != null){
             player.sendMessage(unique);
         }
-
-        player.sendMessage(Component.text("Right Click to PREVIEW this particle", NamedTextColor.YELLOW, TextDecoration.BOLD));
-        player.sendMessage(Component.text("Sneak+Right Click to DELETE this particle", NamedTextColor.RED, TextDecoration.BOLD));
-        player.sendMessage(Component.text("Use \"/mdis anim cancelparticles\" to hide revealed particles", NamedTextColor.GRAY, TextDecoration.ITALIC));
     }
 
     private void sendEditMSG(Player player, String info, AnimationParticleBuilder.Step step){
@@ -146,7 +143,7 @@ public abstract class AnimationParticle implements Externalizable {
        return Component.text(info, NamedTextColor.GREEN)
                 .hoverEvent(HoverEvent.showText(Component.text("Click to edit this value", NamedTextColor.YELLOW, TextDecoration.ITALIC)))
                 .clickEvent(ClickEvent.callback(p -> {
-                    new AnimationParticleBuilder((Player) p, isStartFrame, this, step);
+                    new AnimationParticleBuilder((Player) p, this, step);
                 }, ClickCallback.Options.builder().uses(-1).build()));
     }
 
@@ -158,7 +155,7 @@ public abstract class AnimationParticle implements Externalizable {
         switch (step){
             case PARTICLE -> {
                 if (this.particle.getDataType() == builder.particle().getDataType()){
-                    builder.player.sendMessage(Component.text("Particle Type could not be changed! Previous particle has unique data.", NamedTextColor.RED));
+                    builder.player.sendMessage(Component.text("Failed to change particle type!", NamedTextColor.RED));
                     builder.player.sendMessage(Component.text("Particles that have particle specific data, such as block, item, or color data, cannot be replaced with another particle.", NamedTextColor.GRAY));
                     return false;
                 }
@@ -174,6 +171,11 @@ public abstract class AnimationParticle implements Externalizable {
             }
             case DELAY -> {
                 this.delayInTicks = builder.delayInTicks;
+            }
+            case OFFSETS -> {
+                this.xOffset = builder.offsetX();
+                this.yOffset = builder.offsetY();
+                this.zOffset = builder.offsetZ();
             }
             default -> {
                 return editUniqueParticle(builder, step);
@@ -200,7 +202,7 @@ public abstract class AnimationParticle implements Externalizable {
 
         out.writeInt(delayInTicks);
 
-        out.writeBoolean(isStartFrame);
+        out.writeBoolean(false); //out.writeBoolean(isStartFrame);
 
         out.writeFloat(groupYawAtCreation);
         out.writeFloat(groupPitchAtCreation);
@@ -236,17 +238,40 @@ public abstract class AnimationParticle implements Externalizable {
         this.zOffset = in.readDouble();
 
         this.vector = (Vector3f) in.readObject();
-        this.vectorFromOrigin = Vector.fromJOML(vector);
+
+        if (vector != null){
+            this.vectorFromOrigin = Vector.fromJOML(vector);
+        }
 
         this.delayInTicks = in.readInt();
 
-        this.isStartFrame = in.readBoolean();
+        //boolean isStartFrame =
+                in.readBoolean();
 
         this.groupYawAtCreation = in.readFloat();
         this.groupPitchAtCreation = in.readFloat();
+    }
 
+    @ApiStatus.Internal
+    public float getGroupYawAtCreation() {
+        return groupYawAtCreation;
+    }
 
+    @ApiStatus.Internal
+    public float getGroupPitchAtCreation() {
+        return groupPitchAtCreation;
+    }
 
+    @ApiStatus.Internal
+    public Vector3f getVector() {
+        return vector;
+    }
 
+    public Particle getParticle() {
+        return particle;
+    }
+
+    public String getParticleName() {
+        return particleName;
     }
 }

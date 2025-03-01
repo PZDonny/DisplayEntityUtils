@@ -2,7 +2,7 @@ package net.donnypz.displayentityutils.listeners.player;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
-import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
+import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;

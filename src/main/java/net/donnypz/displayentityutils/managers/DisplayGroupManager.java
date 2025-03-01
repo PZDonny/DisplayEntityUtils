@@ -6,7 +6,7 @@ import net.donnypz.displayentityutils.events.GroupRegisteredEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.GroupResult;
-import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
+import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -86,7 +86,7 @@ public final class DisplayGroupManager {
      */
     public static void deselectSpawnedGroup(Player player) {
         selectedGroup.remove(player.getUniqueId());
-        DEUCommandUtils.removeParticleDisplays(player);
+        DEUCommandUtils.removeRelativePoints(player);
     }
 
 

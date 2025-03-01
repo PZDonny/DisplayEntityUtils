@@ -254,10 +254,13 @@ public final class DisplayAnimationManager {
             inputStream.close();
             for (DisplayAnimationFrame f : anim.getFrames()){
                 for (AnimationParticle p : f.getFrameStartParticles()){
-                    p.applyVector();
+                    p.initializeParticle();
                 }
                 for (AnimationParticle p : f.getFrameEndParticles()){
-                    p.applyVector();
+                    p.initializeParticle();
+                }
+                for (FramePoint p : f.getFramePoints()){
+                    p.initialize();
                 }
             }
             return anim;
