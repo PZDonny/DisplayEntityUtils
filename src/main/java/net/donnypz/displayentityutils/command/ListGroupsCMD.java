@@ -5,10 +5,11 @@ import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.List;
 
@@ -77,8 +78,28 @@ class ListGroupsCMD implements ConsoleUsableSubCommand {
             if (i >= tags.size()){
                 break;
             }
-            sender.sendMessage(MiniMessage.miniMessage().deserialize("- <yellow>"+tags.get(i)));
+            Component message;
+            String tag = tags.get(i);
+            if (isListingGroups){
+                message = spawnGroup(tag, method);
+            }
+            else{
+                message = selectAnimation(tag, method);
+            }
+            sender.sendMessage(message);
         }
         sender.sendMessage("------------------------");
+    }
+
+    private static Component spawnGroup(String tag, LoadMethod loadMethod){
+        return MiniMessage.miniMessage().deserialize("- <yellow>"+tag)
+                .hoverEvent(HoverEvent.showText(Component.text("Click to spawn", NamedTextColor.AQUA)))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/mdis group spawn "+tag+" "+loadMethod.name()));
+    }
+
+    private static Component selectAnimation(String tag, LoadMethod loadMethod){
+        return MiniMessage.miniMessage().deserialize("- <yellow>"+tag)
+                .hoverEvent(HoverEvent.showText(Component.text("Click to select", NamedTextColor.AQUA)))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/mdis anim select "+tag+" "+loadMethod.name()));
     }
 }
