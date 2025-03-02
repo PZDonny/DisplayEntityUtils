@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
@@ -105,8 +106,37 @@ public class DEUCommandUtils {
         return arr;
     }
 
-    public static Collection<SpawnedDisplayAnimationFrame> getFrames(String arg, SpawnedDisplayAnimation animation){
+    public static Collection<SpawnedDisplayAnimationFrame> getFrames(String arg, SpawnedDisplayAnimation animation) throws IllegalArgumentException{
+        //Single Frame ID in arg
         try{
+            int index = Integer.parseInt(arg);
+            return Set.of(animation.getFrame(index));
+        }
+
+
+        catch(NumberFormatException ignored){}
+        catch(IndexOutOfBoundsException e){ //Single Frame ID Out of Bounds
+            throw new IllegalArgumentException(e);
+        }
+
+        //Multiple Frame IDs
+        try{
+            int[] ids = commaSeparatedIDs(arg);
+            Set<SpawnedDisplayAnimationFrame> frames = new HashSet<>();
+            for (int i = 0; i < ids.length; i++){
+                try{
+                    frames.add(animation.getFrame(i));
+                }
+                catch(IndexOutOfBoundsException ignored1){}
+            }
+            return frames;
+        }
+        //Single Frame Tag
+        catch (IllegalArgumentException ex){
+            if (!DisplayUtils.isValidTag(arg)){
+                throw ex;
+            }
+
             Set<SpawnedDisplayAnimationFrame> frames = new HashSet<>();
             for (SpawnedDisplayAnimationFrame frame : animation.getFrames()){
                 if (arg.equals(frame.getTag())){
@@ -114,9 +144,6 @@ public class DEUCommandUtils {
                 }
             }
             return frames;
-        }
-        catch(IllegalArgumentException ex){
-            return null;
         }
     }
 

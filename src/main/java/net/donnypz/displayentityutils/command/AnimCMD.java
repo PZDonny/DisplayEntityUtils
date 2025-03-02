@@ -75,6 +75,7 @@ class AnimCMD implements ConsoleUsableSubCommand{
         if (page <= 1){
             sender.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Convert animations from <yellow>\"block-display.com\" <aqua> with " +
                     "\"/mdis bdengine convertanim\""));
+            sender.sendMessage(Component.text("Commands allowing multiple <frame-ids> are comma separated", NamedTextColor.GRAY));
             CMDUtils.sendCMD(sender,"/mdis anim help <page-number>", " (Get help for animations)");
             CMDUtils.sendCMD(sender,"/mdis anim new", " (Manually create a new animation)");
             CMDUtils.sendCMD(sender, "/mdis anim select <anim-tag> <storage-location>", " (Select a saved animation)");
@@ -92,7 +93,7 @@ class AnimCMD implements ConsoleUsableSubCommand{
             CMDUtils.sendCMD(sender, "/mdis anim overwriteframe <frame-id>", " (Overwrite the transformation data of a frame)");
         }
         else if (page == 3){
-            CMDUtils.sendCMD(sender, "/mdis anim editframe <frame-id> <tick-delay> <tick-duration>", " (Edit properties of a frame)");
+            CMDUtils.sendCMD(sender, "/mdis anim editframe <frame-ids | frame-tag> <tick-delay> <tick-duration>", " (Edit properties of a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim editallframes <tick-delay> <tick-duration>", " (Edit properties of all frames)");
             CMDUtils.sendCMD(sender, "/mdis anim addpoint <frame-id>", " (Add a point relative to a group and your location for a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim addsound <sound> <volume> <pitch>", " (Add a sound to play at a frame point)");

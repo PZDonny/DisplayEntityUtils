@@ -141,6 +141,16 @@ public final class SpawnedDisplayAnimation{
     }
 
     /**
+     * Get a frame by its index
+     * @param index the frame's index
+     * @return a {@link SpawnedDisplayAnimationFrame}
+     * @throws IndexOutOfBoundsException
+     */
+    public SpawnedDisplayAnimationFrame getFrame(int index){
+        return frames.get(index);
+    }
+
+    /**
      * Get the full duration of this animation from the delays and durations of every {@link SpawnedDisplayAnimationFrame} in this animation.
      * @return the animation length in ticks
      */
