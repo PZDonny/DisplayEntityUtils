@@ -31,6 +31,7 @@ class AnimCMD implements ConsoleUsableSubCommand{
         subCommands.put("editframe", new AnimEditFrameCMD());
         subCommands.put("editallframes", new AnimEditAllFramesCMD());
         subCommands.put("addpoint", new AnimAddPointCMD());
+        subCommands.put("copypoint", new AnimCopyPointCMD());
         subCommands.put("showframe", new AnimShowFrameCMD());
         subCommands.put("addsound", new AnimAddSoundCMD());
         subCommands.put("removesound", new AnimRemoveSoundCMD());
@@ -96,6 +97,7 @@ class AnimCMD implements ConsoleUsableSubCommand{
             CMDUtils.sendCMD(sender, "/mdis anim editframe <frame-ids | frame-tag> <tick-delay> <tick-duration>", " (Edit properties of a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim editallframes <tick-delay> <tick-duration>", " (Edit properties of all frames)");
             CMDUtils.sendCMD(sender, "/mdis anim addpoint <frame-id>", " (Add a point relative to a group and your location for a frame)");
+            CMDUtils.sendCMD(sender, "/mdis anim copypoint <frame-ids | frame-tag>", " (Copy a selected frame point to other frames)");
             CMDUtils.sendCMD(sender, "/mdis anim addsound <sound> <volume> <pitch>", " (Add a sound to play at a frame point)");
             CMDUtils.sendCMD(sender, "/mdis anim removesound <sound | -all>", " (Remove a sound from a frame point)");
             CMDUtils.sendCMD(sender, "/mdis anim addparticle", " (Add a particle to play at a frame point)");

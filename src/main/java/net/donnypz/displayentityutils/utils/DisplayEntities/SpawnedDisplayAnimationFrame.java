@@ -161,8 +161,18 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param location the relative location that the frame point represents
      * @return this
      */
-    public SpawnedDisplayAnimationFrame addFramePoint(@NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
+    public @NotNull SpawnedDisplayAnimationFrame addFramePoint(@NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
         framePoints.add(new FramePoint(group, location));
+        return this;
+    }
+
+    /**
+     * Add a {@link FramePoint} that will be held for this frame
+     * @param framePoint the point to add
+     * @return this
+     */
+    public @NotNull SpawnedDisplayAnimationFrame addFramePoint(@NotNull FramePoint framePoint){
+        framePoints.add(framePoint);
         return this;
     }
 

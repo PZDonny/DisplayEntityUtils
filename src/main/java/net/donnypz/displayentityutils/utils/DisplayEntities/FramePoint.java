@@ -43,7 +43,7 @@ public class FramePoint extends RelativePoint implements Serializable {
     public FramePoint(FramePoint point) {
         super(point);
         for (AnimationParticle p : point.particles){
-            particles.add(p.clone());
+            this.particles.add(p.clone());
         }
         for (Map.Entry<String, AnimationSound> entry : point.sounds.entrySet()){
             this.sounds.put(entry.getKey(), entry.getValue().clone());
