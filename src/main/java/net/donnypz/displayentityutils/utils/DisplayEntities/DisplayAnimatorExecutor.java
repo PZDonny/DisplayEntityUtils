@@ -276,8 +276,11 @@ final class DisplayAnimatorExecutor {
         if (!DisplayUtils.isInLoadedChunk(display)) {
             return;
         }
-        if (applyDataOnly && animation.allowsDataChanges()){
-            transformation.applyData(display);
+        if (applyDataOnly){
+            if (animation.allowsDataChanges()){
+                transformation.applyData(display);
+            }
+
             return;
         }
 
