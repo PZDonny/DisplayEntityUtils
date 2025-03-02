@@ -56,7 +56,7 @@ public class EffSpawnedGroupSetFrame extends Effect {
             return;
         }
         try{
-            SpawnedDisplayAnimationFrame frame = a.getFrames().get(n.intValue());
+            SpawnedDisplayAnimationFrame frame = a.getFrame(n.intValue());
             if (duration == null){
                 g.setToFrame(a, frame, async);
             }

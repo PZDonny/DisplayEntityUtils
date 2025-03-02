@@ -46,7 +46,7 @@ class AnimOverwriteFrameCMD implements PlayerSubCommand {
                 return;
             }
 
-            SpawnedDisplayAnimationFrame frame = anim.getFrames().get(id);
+            SpawnedDisplayAnimationFrame frame = anim.getFrame(id);
 
             frame.setTransformation(group);
             frame.setDelay(delay);

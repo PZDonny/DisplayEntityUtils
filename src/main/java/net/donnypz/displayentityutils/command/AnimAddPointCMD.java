@@ -42,7 +42,7 @@ class AnimAddPointCMD implements PlayerSubCommand {
         }
         try {
             int id = Integer.parseInt(args[2]);
-            SpawnedDisplayAnimationFrame frame = anim.getFrames().get(id);
+            SpawnedDisplayAnimationFrame frame = anim.getFrame(id);
             frame.addFramePoint(group, player.getLocation());
 
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Frame Point Added!", NamedTextColor.GREEN)));

@@ -44,7 +44,7 @@ class AnimFrameInfoCMD implements PlayerSubCommand {
                 return;
             }
             player.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-            SpawnedDisplayAnimationFrame frame = animation.getFrames().get(id);
+            SpawnedDisplayAnimationFrame frame = animation.getFrame(id);
             player.sendMessage(MiniMessage.miniMessage().deserialize("Frame ID: <yellow>"+id));
             player.sendMessage(MiniMessage.miniMessage().deserialize("Duration: <yellow>"+frame.getDuration()));
             player.sendMessage(MiniMessage.miniMessage().deserialize("Delay: <yellow>"+frame.getDelay()));
