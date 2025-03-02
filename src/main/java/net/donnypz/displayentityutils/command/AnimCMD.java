@@ -83,29 +83,33 @@ class AnimCMD implements ConsoleUsableSubCommand{
             CMDUtils.sendCMD(sender, "/mdis anim frameinfo <frame-id>", " (List information about a frame in your animation)");
         }
         else if (page == 2){
+            CMDUtils.sendCMD(sender, "/mdis anim settag <frame-id>", " (List information about a frame in your animation)");
+            CMDUtils.sendCMD(sender, "/mdis anim setframetag <frame-id>", " (List information about a frame in your animation)");
             CMDUtils.sendCMD(sender, "/mdis anim usefilter [-trim]", " (Apply your part filter/selection to an animation. Optionally, and irreversibly remove data of unfiltered parts)");
             CMDUtils.sendCMD(sender, "/mdis anim unfilter", " (Remove your part filter/selection from an animation)");
             CMDUtils.sendCMD(sender, "/mdis anim addframe <tick-delay> <tick-duration>", " (Add a frame to your selected animation)");
             CMDUtils.sendCMD(sender, "/mdis anim addframeafter <frame-id> <tick-delay> <tick-duration>", " (Add a frame after another frame to your selected animation)");
             CMDUtils.sendCMD(sender, "/mdis anim removeframe <frame-id>", " (Remove a frame from your selected animation)");
-            CMDUtils.sendCMD(sender, "/mdis anim editframe <frame-id> <tick-delay> <tick-duration>", " (Edit properties of a single frame)");
-            CMDUtils.sendCMD(sender, "/mdis anim editallframes <tick-delay> <tick-duration>", " (Edit properties of all frames)");
         }
         else if (page == 3){
+            CMDUtils.sendCMD(sender, "/mdis anim editframe <frame-id> <tick-delay> <tick-duration>", " (Edit properties of a single frame)");
+            CMDUtils.sendCMD(sender, "/mdis anim editallframes <tick-delay> <tick-duration>", " (Edit properties of all frames)");
             CMDUtils.sendCMD(sender, "/mdis anim addpoint <frame-id>", " (Add a point relative to a group and your location for a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim addsound <sound> <volume> <pitch>", " (Add a sound to play at a frame point)");
             CMDUtils.sendCMD(sender, "/mdis anim removesound <sound | -all>", " (Remove a sound from a frame point)");
             CMDUtils.sendCMD(sender, "/mdis anim addparticle", " (Add a particle to play at a frame point)");
             CMDUtils.sendCMD(sender, "/mdis anim overwriteframe <frame-id>", " (Overwrite the transformation data of a frame)");
-            CMDUtils.sendCMD(sender, "/mdis anim reverse", " (Reverse the order of frames in your selected animation)");
         }
-        else{
+        else if (page == 4){
+            CMDUtils.sendCMD(sender, "/mdis anim reverse", " (Reverse the order of frames in your selected animation)");
             CMDUtils.sendCMD(sender, "/mdis anim togglescalerespect", " (Toggle whether your selected animation should respect the group's scale)");
             CMDUtils.sendCMD(sender, "/mdis anim toggledatachanges", " (Toggle whether your selected animation can change block display blocks, item display items, and text display text)");
             CMDUtils.sendCMD(sender, "/mdis anim showframe <frame-id>", " (Displays a frame on your selected group)");
             CMDUtils.sendCMD(sender, "/mdis anim play [-loop]", " (Play your selected animation on your selected group. Include \"-loop\" to loop the animation)");
             CMDUtils.sendCMD(sender, "/mdis anim stop", " (Stop an animation playing on a group)");
             CMDUtils.sendCMD(sender, "/mdis anim save <storage-location>", " (Save your selected animation and any changes made)");
+        }
+        else{
             CMDUtils.sendCMD(sender, "/mdis anim delete <anim-tag> <storage-location>", " (Delete a saved animation)");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
