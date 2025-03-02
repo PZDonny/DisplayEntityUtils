@@ -26,8 +26,9 @@ class AnimEditFrameCMD implements PlayerSubCommand {
         }
 
         if (args.length < 5) {
-            player.sendMessage(Component.text("/mdis anim editframe <frame-ids | frame-tag> <tick-delay> <tick-duration>", NamedTextColor.RED));
-            player.sendMessage(Component.text("First frame is 0, Second frame is 1, and so on...", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("Incorrect Usage! /mdis anim editframe <frame-ids | frame-tag> <tick-delay> <tick-duration>", NamedTextColor.RED));
+            player.sendMessage(Component.text("| Enter a frame-tag, a single frame-id, or multiple commas separated ids.", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| First frame is 0, Second frame is 1, and so on...", NamedTextColor.GRAY));
             return;
         }
 
