@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -88,6 +89,11 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You must look at the interaction you wish to add the command to, or select a part!", NamedTextColor.RED)));
         player.sendMessage(Component.text("/mdis parts cycle <first | prev | next>", NamedTextColor.GRAY));
         player.sendMessage(Component.text("/mdis parts select <part-tag>", NamedTextColor.GRAY));
+    }
+
+    static void invalidTag(Player player, String tag){
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to add part tag: "+tag, NamedTextColor.RED)));
+        player.sendMessage(Component.text("The tag can not start with an \"!\", include commas, nor be empty!", NamedTextColor.GRAY, TextDecoration.ITALIC));
     }
 
     static void suggestUpdateSelection(Player player){

@@ -5,7 +5,6 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
@@ -35,7 +34,7 @@ class PartsAddTagCMD implements PlayerSubCommand {
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Adding part tag to ALL selected parts! <white>(Added Tag: "+tag+")")));
             }
             else{
-                fail(player, tag);
+                DisplayEntityPluginCommand.invalidTag(player, tag);
             }
 
         }
@@ -44,15 +43,8 @@ class PartsAddTagCMD implements PlayerSubCommand {
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Adding part tag to selected part! <white>(Added Tag: "+tag+")")));
             }
             else{
-                fail(player, tag);
+                DisplayEntityPluginCommand.invalidTag(player, tag);
             }
         }
     }
-
-    private void fail(Player player, String tag){
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to add part tag: "+tag, NamedTextColor.RED)));
-        player.sendMessage(Component.text("The tag can not start with an \"!\", nor be empty!", NamedTextColor.GRAY, TextDecoration.ITALIC));
-    }
-
-
 }

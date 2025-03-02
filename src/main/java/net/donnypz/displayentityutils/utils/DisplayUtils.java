@@ -517,26 +517,26 @@ public final class DisplayUtils {
     }
 
     /**
-     * Add a tag to a part entity. The tag will not be added if it starts with an "!" or is blank
+     * Add a part tag to a part entity. The tag will not be added if it starts with an "!" or is blank
      * @param entity The entity to add a tag to
-     * @param tag The tag to add to this part
+     * @param partTag The tag to add to this part
      * @return true if the tag was added successfully
      */
-    public static boolean addTag(@NotNull Entity entity, @NotNull String tag){
-        return addToPDCList(entity, tag, DisplayEntityPlugin.getPartPDCTagKey());
+    public static boolean addTag(@NotNull Entity entity, @NotNull String partTag){
+        return addToPDCList(entity, partTag, DisplayEntityPlugin.getPartPDCTagKey());
     }
 
     /**
-     * Add a tag to a part entity
+     * Add part tags to a part entity
      * @param entity The entity to add a tag to
-     * @param tags The tags to add to this part
+     * @param partTags The tags to add to this part
      */
-    public static void addTags(@NotNull Entity entity, @NotNull List<String> tags){
-        addManyToPDCList(entity, tags, DisplayEntityPlugin.getPartPDCTagKey());
+    public static void addTags(@NotNull Entity entity, @NotNull List<String> partTags){
+        addManyToPDCList(entity, partTags, DisplayEntityPlugin.getPartPDCTagKey());
     }
 
     static boolean addToPDCList(@NotNull Entity entity, @NotNull String element, NamespacedKey key){
-        boolean isPartTag = DisplayEntityPlugin.getPartPDCTagKey() == key;
+        boolean isGroupTag = DisplayEntityPlugin.getGroupTagKey() != key;
         PersistentDataContainer container = entity.getPersistentDataContainer();
         List<String> tags;
         if (!container.has(key)){
@@ -546,7 +546,7 @@ public final class DisplayUtils {
             tags = new ArrayList<>(container.get(key, tagPDCType));
         }
 
-        if (!tags.contains(element) && (isPartTag && isValidPartTag(element))){
+        if (!tags.contains(element) && (!isGroupTag && isValidTag(element))){
             tags.add(element);
             container.set(key, tagPDCType, tags);
             return true;
@@ -557,7 +557,7 @@ public final class DisplayUtils {
     }
 
     static void addManyToPDCList(@NotNull Entity entity, @NotNull List<String> elements, NamespacedKey key){
-        boolean isPartTag = DisplayEntityPlugin.getPartPDCTagKey() == key;
+        boolean isGroupTag = DisplayEntityPlugin.getGroupTagKey() == key;
         if (elements.isEmpty()){
             return;
         }
@@ -570,7 +570,7 @@ public final class DisplayUtils {
             existing = new ArrayList<>(container.get(key, tagPDCType));
         }
         for (String element : elements){
-            if (!existing.contains(element) && (isPartTag && isValidPartTag(element))) {
+            if (!existing.contains(element) && (!isGroupTag && isValidTag(element))) {
                 existing.add(element);
             }
         }
@@ -579,12 +579,12 @@ public final class DisplayUtils {
 
 
     /**
-     * Check if a part tag is valid and can be added to a part
-     * @param partTag
+     * Check if a tag is valid and can be used
+     * @param tag
      * @return a boolean
      */
-    public static boolean isValidPartTag(@NotNull String partTag){
-        return !partTag.contains(",") && !partTag.startsWith("!") && !partTag.isBlank();
+    public static boolean isValidTag(@NotNull String tag){
+        return !tag.contains(",") && !tag.startsWith("!") && !tag.isBlank();
     }
 
 

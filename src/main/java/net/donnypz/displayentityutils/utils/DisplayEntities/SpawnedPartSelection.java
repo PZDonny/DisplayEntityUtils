@@ -288,7 +288,7 @@ public final class SpawnedPartSelection implements Spawned {
      * @return true if the tag was successfully added
      */
     public boolean addTag(@NotNull String partTag){
-        if (!DisplayUtils.isValidPartTag(partTag)){
+        if (!DisplayUtils.isValidTag(partTag)){
             return false;
         }
         for (SpawnedDisplayEntityPart part : selectedParts){
