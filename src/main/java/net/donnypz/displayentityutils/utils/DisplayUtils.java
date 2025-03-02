@@ -536,7 +536,7 @@ public final class DisplayUtils {
     }
 
     static boolean addToPDCList(@NotNull Entity entity, @NotNull String element, NamespacedKey key){
-        boolean isGroupTag = DisplayEntityPlugin.getGroupTagKey() != key;
+        boolean isGroupTag = DisplayEntityPlugin.getGroupTagKey() == key;
         PersistentDataContainer container = entity.getPersistentDataContainer();
         List<String> tags;
         if (!container.has(key)){
