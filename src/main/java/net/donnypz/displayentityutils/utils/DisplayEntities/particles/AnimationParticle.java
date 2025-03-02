@@ -20,7 +20,7 @@ import org.joml.Vector3f;
 import java.io.*;
 
 @ApiStatus.Internal
-public abstract class AnimationParticle implements Externalizable {
+public abstract class AnimationParticle implements Externalizable, Cloneable {
 
     @Serial
     private static final long serialVersionUID = 99L;
@@ -273,5 +273,14 @@ public abstract class AnimationParticle implements Externalizable {
 
     public String getParticleName() {
         return particleName;
+    }
+
+    @Override
+    public AnimationParticle clone() {
+        try {
+            return (AnimationParticle) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

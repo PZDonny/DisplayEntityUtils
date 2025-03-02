@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.*;
 
 @ApiStatus.Internal
-public class AnimationSound implements Externalizable {
+public class AnimationSound implements Externalizable, Cloneable {
     transient Sound sound;
     String soundName;
     float volume;
@@ -22,6 +22,7 @@ public class AnimationSound implements Externalizable {
     @Serial
     private static final long serialVersionUID = 0;
 
+    @ApiStatus.Internal
     public AnimationSound(){}
 
     public AnimationSound(String soundName, float volume, float pitch, int delayInTicks){
@@ -36,6 +37,15 @@ public class AnimationSound implements Externalizable {
         this(sound.getKey().getKey(), volume, pitch, delayInTicks);
         this.sound = sound;
         existsInGameVersion = true;
+    }
+
+    public AnimationSound(AnimationSound sound){
+        this.sound = sound.sound;
+        this.soundName = sound.soundName;
+        this.volume = sound.volume;
+        this.pitch = sound.pitch;
+        this.delay = sound.delay;
+        this.existsInGameVersion = sound.existsInGameVersion;
     }
 
     public void playSound(@NotNull Location location, @NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
@@ -110,5 +120,14 @@ public class AnimationSound implements Externalizable {
 
     public boolean existsInGameVersion() {
         return existsInGameVersion;
+    }
+
+    @Override
+    public AnimationSound clone() {
+        try {
+            return (AnimationSound) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

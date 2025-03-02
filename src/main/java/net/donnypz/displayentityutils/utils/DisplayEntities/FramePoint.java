@@ -40,6 +40,16 @@ public class FramePoint extends RelativePoint implements Serializable {
         super(vector, initialYaw, initialPitch);
     }
 
+    public FramePoint(FramePoint point) {
+        super(point);
+        for (AnimationParticle p : point.particles){
+            particles.add(p.clone());
+        }
+        for (Map.Entry<String, AnimationSound> entry : point.sounds.entrySet()){
+            this.sounds.put(entry.getKey(), entry.getValue().clone());
+        }
+    }
+
     /**
      * Play the effects of this point at a specified location, with their intended delays.
      * Effects include sounds and particles
@@ -265,4 +275,5 @@ public class FramePoint extends RelativePoint implements Serializable {
         player.sendMessage(Component.text("Sneak+Right Click to DELETE", NamedTextColor.RED));
         player.sendMessage(Component.text("| Use \"/mdis anim cancelpoints\" to hide revealed points", NamedTextColor.GRAY));
     }
+
 }

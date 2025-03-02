@@ -43,6 +43,14 @@ public abstract class RelativePoint implements Serializable {
         this.groupPitchAtCreation = initialPitch;
     }
 
+    protected RelativePoint(RelativePoint point){
+        this.tag = point.tag;
+        this.vector = new Vector3f(point.vector);
+        this.vectorFromOrigin = Vector.fromJOML(vector);
+        this.groupYawAtCreation = point.groupYawAtCreation;
+        this.groupPitchAtCreation = point.groupPitchAtCreation;;
+    }
+
     public String getTag() {
         return tag;
     }
