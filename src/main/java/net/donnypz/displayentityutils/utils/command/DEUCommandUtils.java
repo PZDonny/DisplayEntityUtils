@@ -1,10 +1,7 @@
 package net.donnypz.displayentityutils.utils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
-import net.donnypz.displayentityutils.utils.DisplayEntities.RelativePoint;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
@@ -93,6 +90,34 @@ public class DEUCommandUtils {
 
     private static void deselectRelativePoint(Player player){
         selectedRelativePoint.remove(player.getUniqueId());
+    }
+
+    public static int[] commaSeparatedIDs(String idString) throws IllegalArgumentException{
+        String[] split = idString.split(",");
+        if (split.length == 0){
+            return new int[]{Integer.parseInt(idString)};
+        }
+
+        int[] arr = new int[split.length];
+        for (int i = 0; i < split.length; i++){
+            arr[i] = Integer.parseInt(split[i]);
+        }
+        return arr;
+    }
+
+    public static Collection<SpawnedDisplayAnimationFrame> getFrames(String arg, SpawnedDisplayAnimation animation){
+        try{
+            Set<SpawnedDisplayAnimationFrame> frames = new HashSet<>();
+            for (SpawnedDisplayAnimationFrame frame : animation.getFrames()){
+                if (arg.equals(frame.getTag())){
+                    frames.add(frame);
+                }
+            }
+            return frames;
+        }
+        catch(IllegalArgumentException ex){
+            return null;
+        }
     }
 
 

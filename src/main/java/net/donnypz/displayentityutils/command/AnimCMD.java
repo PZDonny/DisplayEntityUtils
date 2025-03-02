@@ -83,7 +83,7 @@ class AnimCMD implements ConsoleUsableSubCommand{
             CMDUtils.sendCMD(sender, "/mdis anim settag", " (Set the tag to identify this animation)");
         }
         else if (page == 2){
-            CMDUtils.sendCMD(sender, "/mdis anim setframetag <frame-id> <frame-tag>", " (Set the tag to identify a frame)");
+            CMDUtils.sendCMD(sender, "/mdis anim setframetag <frame-ids> <frame-tag>", " (Set the tag to identify a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim usefilter [-trim]", " (Apply your part filter/selection to an animation. Optionally, and irreversibly remove data of unfiltered parts)");
             CMDUtils.sendCMD(sender, "/mdis anim unfilter", " (Remove your part filter/selection from an animation)");
             CMDUtils.sendCMD(sender, "/mdis anim addframe <tick-delay> <tick-duration>", " (Add a frame to your selected animation)");
@@ -92,7 +92,7 @@ class AnimCMD implements ConsoleUsableSubCommand{
             CMDUtils.sendCMD(sender, "/mdis anim overwriteframe <frame-id>", " (Overwrite the transformation data of a frame)");
         }
         else if (page == 3){
-            CMDUtils.sendCMD(sender, "/mdis anim editframe <frame-id> <tick-delay> <tick-duration>", " (Edit properties of a single frame)");
+            CMDUtils.sendCMD(sender, "/mdis anim editframe <frame-id> <tick-delay> <tick-duration>", " (Edit properties of a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim editallframes <tick-delay> <tick-duration>", " (Edit properties of all frames)");
             CMDUtils.sendCMD(sender, "/mdis anim addpoint <frame-id>", " (Add a point relative to a group and your location for a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim addsound <sound> <volume> <pitch>", " (Add a sound to play at a frame point)");
