@@ -4,6 +4,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationP
 import net.donnypz.displayentityutils.utils.OldSound;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.io.*;
@@ -24,7 +26,7 @@ public final class DisplayAnimationFrame implements Serializable {
     Set<AnimationParticle> frameStartParticles;
     Set<AnimationParticle> frameEndParticles;
 
-    Set<FramePoint> framePoints;
+    Map<String, FramePoint> framePoints;
 
     List<String> startCommands;
     List<String> endCommands;
@@ -36,13 +38,13 @@ public final class DisplayAnimationFrame implements Serializable {
 
     DisplayAnimationFrame(
             int delay, int duration,
-            Set<FramePoint> framePoints,
+            Map<String, FramePoint> framePoints,
             List<String> startCommands,
             List<String> endCommands,
             String frameTag){
         this.delay = delay;
         this.duration = duration;
-        this.framePoints = new HashSet<>(framePoints);
+        this.framePoints = new HashMap<>(framePoints);
         this.startCommands = new ArrayList<>(startCommands);
         this.endCommands = new ArrayList<>(endCommands);
         this.frameTag = frameTag;
@@ -64,7 +66,8 @@ public final class DisplayAnimationFrame implements Serializable {
 
         //Old Sound Maps
         if (startSounds != null || endSounds != null){
-            FramePoint point = new FramePoint(new Vector(0,0,0), 0,0);
+            String oldSoundTag = "deu_old_sounds";
+            FramePoint point = new FramePoint(oldSoundTag, new Vector(0,0,0), 0,0);
 
             //Start Sounds
             if (startSounds != null){
@@ -87,27 +90,32 @@ public final class DisplayAnimationFrame implements Serializable {
             }
 
             if (!point.sounds.isEmpty()){
-                frame.framePoints.add(point);
+                frame.framePoints.put(oldSoundTag, point);
             }
         }
 
         //Old Start Particles
+        int animationParticle = 0;
         if (frameStartParticles != null){
             for (AnimationParticle particle : frameStartParticles){
-                FramePoint point = new FramePoint(particle.getVector(), particle.getGroupYawAtCreation(), particle.getGroupPitchAtCreation());
+                String pointTag = "deu_anim_particle_"+animationParticle;
+                FramePoint point = new FramePoint(pointTag, particle.getVector(), particle.getGroupYawAtCreation(), particle.getGroupPitchAtCreation());
                 particle.setDelayInTicks(0);
                 point.particles.add(particle);
-                frame.framePoints.add(point);
+                frame.framePoints.put(pointTag, point);
+                animationParticle++;
             }
         }
 
         //Old End Particles
         if (frameEndParticles != null){
             for (AnimationParticle particle : frameEndParticles){
-                FramePoint point = new FramePoint(particle.getVector(), particle.getGroupYawAtCreation(), particle.getGroupPitchAtCreation());
+                String pointTag = "deu_anim_particle_"+animationParticle;
+                FramePoint point = new FramePoint(pointTag, particle.getVector(), particle.getGroupYawAtCreation(), particle.getGroupPitchAtCreation());
                 particle.setDelayInTicks(duration);
                 point.particles.add(particle);
-                frame.framePoints.add(point);
+                frame.framePoints.put(pointTag, point);
+                animationParticle++;
             }
         }
 
@@ -117,9 +125,11 @@ public final class DisplayAnimationFrame implements Serializable {
         //End Commands
         if (endCommands != null) frame.setEndCommands(endCommands);
 
-        //Framee Points
+        //Frame Points
         if (framePoints != null){
-            frame.framePoints.addAll(framePoints);
+            for (FramePoint fp : framePoints.values()){
+                frame.framePoints.put(fp.tag, new FramePoint(fp));
+            }
         }
 
 
@@ -147,19 +157,19 @@ public final class DisplayAnimationFrame implements Serializable {
     }
 
 
-    public Set<AnimationParticle> getFrameStartParticles() {
+    public @NotNull Set<AnimationParticle> getFrameStartParticles() {
         return frameStartParticles == null ? new HashSet<>() : new HashSet<>(frameStartParticles);
     }
 
-    public Set<AnimationParticle> getFrameEndParticles() {
+    public @NotNull Set<AnimationParticle> getFrameEndParticles() {
         return frameEndParticles == null ? new HashSet<>() : new HashSet<>(frameEndParticles);
     }
 
-    public Set<FramePoint> getFramePoints(){
-        return framePoints == null ? new HashSet<>() : new HashSet<>(framePoints);
+    public @NotNull Set<FramePoint> getFramePoints(){
+        return framePoints == null ? new HashSet<>() : new HashSet<>(framePoints.values());
     }
 
-    public String getTag(){
+    public @Nullable String getTag(){
         return frameTag;
     }
 

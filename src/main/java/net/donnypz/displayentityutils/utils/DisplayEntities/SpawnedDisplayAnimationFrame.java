@@ -21,7 +21,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     int delay;
     int duration;
     String tag;
-    Set<FramePoint> framePoints = new HashSet<>();
+    Map<String, FramePoint> framePoints = new HashMap<>();
     List<String> startCommands = new ArrayList<>();
     List<String> endCommands = new ArrayList<>();
 
@@ -155,25 +155,36 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
         return this;
     }
 
+    public boolean hasPointWithTag(@NotNull String pointTag){
+        return framePoints.containsKey(pointTag);
+    }
+
     /**
      * Add a {@link FramePoint} that will be held for this frame
+     * @param pointTag The tag to give the point
      * @param group the group that the point relative to
      * @param location the relative location that the frame point represents
-     * @return this
+     * @return true if a point with the given tag doesn't already exist. false if it exists or the tag is invalid
      */
-    public @NotNull SpawnedDisplayAnimationFrame addFramePoint(@NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
-        framePoints.add(new FramePoint(group, location));
-        return this;
+    public @NotNull boolean addFramePoint(@NotNull String pointTag, @NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
+        if (!DisplayUtils.isValidTag(pointTag)) {
+            return false;
+        }
+        FramePoint existing = framePoints.putIfAbsent(pointTag, new FramePoint(pointTag, group, location));
+        return existing == null;
     }
 
     /**
      * Add a {@link FramePoint} that will be held for this frame
      * @param framePoint the point to add
-     * @return this
+     * @return true if a point with the same pointTag as the provided point doesn't exist. false if it exists or the tag is invalid
      */
-    public @NotNull SpawnedDisplayAnimationFrame addFramePoint(@NotNull FramePoint framePoint){
-        framePoints.add(framePoint);
-        return this;
+    public @NotNull boolean addFramePoint(@NotNull FramePoint framePoint){
+        if (!DisplayUtils.isValidTag(framePoint.tag)) {
+            return false;
+        }
+        FramePoint existing = framePoints.putIfAbsent(framePoint.getTag(), framePoint);
+        return existing == null;
     }
 
     /**
@@ -182,7 +193,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @return true if the point was contained in this frame
      */
     public boolean removeFramePoint(FramePoint framePoint){
-        return framePoints.remove(framePoint);
+        return framePoints.remove(framePoint.tag) != null;
     }
 
 
@@ -243,11 +254,20 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     }
 
     /**
+     * Get a {@link FramePoint} by its tag
+     * @param framePointTag
+     * @return a {@link FramePoint} or null
+     */
+    public @Nullable FramePoint getFramePoint(@NotNull String framePointTag){
+        return framePoints.get(framePointTag);
+    }
+
+    /**
      * Get the {@link FramePoint}s contained in this frame
      * @return a set of {@link FramePoint}
      */
     public Set<FramePoint> getFramePoints(){
-        return new HashSet<>(framePoints);
+        return new HashSet<>(framePoints.values());
     }
 
     /**
@@ -267,7 +287,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
         if (!location.isChunkLoaded()){
             return;
         }
-        for (FramePoint framePoint : framePoints){
+        for (FramePoint framePoint : framePoints.values()){
             framePoint.playSounds(location);
         }
     }
@@ -280,7 +300,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
         if (!group.isInLoadedChunk()){
             return;
         }
-        for (FramePoint framePoint : framePoints){
+        for (FramePoint framePoint : framePoints.values()){
             framePoint.playSounds(group);
         }
     }
@@ -294,7 +314,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
         if (!group.isInLoadedChunk()){
             return;
         }
-        for (FramePoint framePoint : framePoints){
+        for (FramePoint framePoint : framePoints.values()){
             framePoint.playSounds(group, animator);
         }
     }
@@ -306,7 +326,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param animator the animator attempting to show the particles
      */
     public void showParticles(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
-        for (FramePoint framePoint : framePoints){
+        for (FramePoint framePoint : framePoints.values()){
             framePoint.showParticles(group, animator);
         }
     }
@@ -405,7 +425,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
 
             cloned.displayTransformations = new HashMap<>(this.displayTransformations);
             cloned.interactionTransformations = new HashMap<>(this.interactionTransformations);
-            cloned.framePoints = new HashSet<>(this.framePoints);
+            cloned.framePoints = new HashMap<>(this.framePoints);
             cloned.startCommands = new ArrayList<>(this.startCommands);
             cloned.endCommands = new ArrayList<>(this.endCommands);
 

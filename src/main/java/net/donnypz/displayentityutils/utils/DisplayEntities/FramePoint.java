@@ -28,16 +28,16 @@ public class FramePoint extends RelativePoint implements Serializable {
     @Serial
     private static final long serialVersionUID = 99L;
 
-    public FramePoint(@NotNull SpawnedDisplayEntityGroup group, @NotNull Location location) {
-        super(group, location);
+    public FramePoint(@NotNull String pointTag, @NotNull SpawnedDisplayEntityGroup group, @NotNull Location location) {
+        super(pointTag, group, location);
     }
 
-    FramePoint(@NotNull Vector vector, float initialYaw, float initialPitch) {
-        super(vector, initialYaw, initialPitch);
+    FramePoint(@NotNull String pointTag, @NotNull Vector vector, float initialYaw, float initialPitch) {
+        super(pointTag, vector, initialYaw, initialPitch);
     }
 
-    FramePoint(@NotNull Vector3f vector, float initialYaw, float initialPitch) {
-        super(vector, initialYaw, initialPitch);
+    FramePoint(@NotNull String pointTag, @NotNull Vector3f vector, float initialYaw, float initialPitch) {
+        super(pointTag, vector, initialYaw, initialPitch);
     }
 
     public FramePoint(FramePoint point) {
@@ -230,6 +230,7 @@ public class FramePoint extends RelativePoint implements Serializable {
     public void sendInfo(Player player){
         player.sendMessage(Component.empty());
         player.sendMessage(Component.text("-------=Point Info=-------", NamedTextColor.AQUA, TextDecoration.BOLD));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Tag: <yellow>"+tag));
 
         //Particles
         player.sendMessage(MiniMessage.miniMessage().deserialize("Particles: <yellow>"+particles.size()));

@@ -96,7 +96,7 @@ class AnimCMD implements ConsoleUsableSubCommand{
         else if (page == 3){
             CMDUtils.sendCMD(sender, "/mdis anim editframe <frame-ids | frame-tag> <tick-delay> <tick-duration>", " (Edit properties of a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim editallframes <tick-delay> <tick-duration>", " (Edit properties of all frames)");
-            CMDUtils.sendCMD(sender, "/mdis anim addpoint <frame-id>", " (Add a point relative to a group and your location for a frame)");
+            CMDUtils.sendCMD(sender, "/mdis anim addpoint <frame-id> <point-tag>", " (Add a point relative to a group and your location for a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim copypoint <frame-ids | frame-tag>", " (Copy a selected frame point to other frames)");
             CMDUtils.sendCMD(sender, "/mdis anim addsound <sound> <volume> <pitch>", " (Add a sound to play at a frame point)");
             CMDUtils.sendCMD(sender, "/mdis anim removesound <sound | -all>", " (Remove a sound from a frame point)");

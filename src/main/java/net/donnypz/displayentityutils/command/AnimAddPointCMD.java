@@ -36,17 +36,25 @@ class AnimAddPointCMD implements PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis anim addpoint <frame-id>", NamedTextColor.RED));
+        if (args.length < 4) {
+            player.sendMessage(Component.text("Incorrect Usage! /mdis anim addpoint <frame-id> <point-tag>", NamedTextColor.RED));
+            player.sendMessage(Component.text("| \"point-tag\" is the tag you want to represent the new point", NamedTextColor.GRAY));
             return;
         }
         try {
             int id = Integer.parseInt(args[2]);
             SpawnedDisplayAnimationFrame frame = anim.getFrame(id);
-            frame.addFramePoint(group, player.getLocation());
+            boolean result = frame.addFramePoint(args[3], group, player.getLocation());
+            if (result){
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Frame Point Added!", NamedTextColor.GREEN)));
+                player.sendMessage(Component.text("| Frame ID: "+id, NamedTextColor.GRAY));
+            }
+            else{
+                player.sendMessage(Component.text("Failed to add Frame Point. One with the given tag already exists or the tag is invalid!", NamedTextColor.RED));
+                DisplayEntityPluginCommand.invalidTagRestrictions(player);
+            }
 
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Frame Point Added!", NamedTextColor.GREEN)));
-            player.sendMessage(Component.text("| Frame ID: "+id, NamedTextColor.GRAY));
+
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             player.sendMessage(Component.text("Invalid Frame ID! Enter a number >= 0", NamedTextColor.RED));
         }

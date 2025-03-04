@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.io.Serial;
@@ -25,18 +26,20 @@ public abstract class RelativePoint implements Serializable {
      * @param group the group that the point relative to
      * @param location the relative location that the point represents
      */
-    public RelativePoint(@NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
-        this(location.toVector().subtract(group.getLocation().toVector()), group.getLocation().getYaw(), group.getLocation().getPitch());
+    public RelativePoint(@NotNull String pointTag, @NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
+        this(pointTag, location.toVector().subtract(group.getLocation().toVector()), group.getLocation().getYaw(), group.getLocation().getPitch());
     }
 
-    RelativePoint(@NotNull Vector vector, float initialYaw, float initialPitch){
+    RelativePoint(@NotNull String pointTag, @NotNull Vector vector, float initialYaw, float initialPitch){
+        this.tag = pointTag;
         this.vectorFromOrigin = vector;
         this.vector = vector.toVector3f();
         this.groupYawAtCreation = initialYaw;
         this.groupPitchAtCreation = initialPitch;
     }
 
-    RelativePoint(@NotNull Vector3f vector, float initialYaw, float initialPitch){
+    RelativePoint(@NotNull String pointTag, @NotNull Vector3f vector, float initialYaw, float initialPitch){
+        this.tag = pointTag;
         this.vectorFromOrigin = Vector.fromJOML(vector);
         this.vector = vector;
         this.groupYawAtCreation = initialYaw;
@@ -51,7 +54,21 @@ public abstract class RelativePoint implements Serializable {
         this.groupPitchAtCreation = point.groupPitchAtCreation;;
     }
 
-    public String getTag() {
+    /**
+     * Set the tag of this {@link RelativePoint}
+     * @param pointTag
+     * @return this
+     */
+    public RelativePoint setTag(String pointTag){
+        this.tag = pointTag;
+        return this;
+    }
+
+    /**
+     * Get the tag of this {@link RelativePoint}
+     * @return the point's tag or null if not set
+     */
+    public @Nullable String getTag() {
         return tag;
     }
 
