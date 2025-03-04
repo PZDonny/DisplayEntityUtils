@@ -33,11 +33,10 @@ public final class DisplayGroupManager {
 
 
     /**
-     * This will NEVER have to be called since it is already done automatically when a SpawnedDisplayEntityGroup is created
-     *
-     * @param part partKey
-     * @param spawnedGroup spawnedGroupValue
+     * This will NEVER have to be called since it is already done automatically when a SpawnedDisplayEntityGroup is created.
+     * DO NOT CALL THIS METHOD
      */
+    @ApiStatus.Internal
     public static void addSpawnedGroup(SpawnedDisplayEntityPart part, SpawnedDisplayEntityGroup spawnedGroup) {
         allSpawnedGroups.put(part, spawnedGroup);
     }
