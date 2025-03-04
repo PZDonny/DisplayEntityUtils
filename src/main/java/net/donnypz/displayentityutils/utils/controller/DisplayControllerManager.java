@@ -33,7 +33,7 @@ public final class DisplayControllerManager {
     }
 
     /**
-     * Assign a mob controller with a mythic mob.
+     * Assign a {@link DisplayController} to a MythicMob by the mob's ID
      * @param mythicMobID identifier of a MythicMob
      * @param controller the mob controller
      */
@@ -42,7 +42,7 @@ public final class DisplayControllerManager {
 
 
         //Update Existing
-        /*if (mythicSpawnedGroups.containsKey(mythicMobID)){
+        /*\\if (mythicSpawnedGroups.containsKey(mythicMobID)){
             for (SpawnedDisplayEntityGroup g : mythicSpawnedGroups.get(mythicMobID)){
                 GroupFollowProperties properties = controller.followProperties;
                 g.setUnregisterAfterDeathDelay(properties.getUnregisterDelay());
@@ -67,11 +67,11 @@ public final class DisplayControllerManager {
     }
 
     /**
-     * Get the assigned {@link DisplayController} for a MythicMob
+     * Get the assigned {@link DisplayController} for a MythicMob by the mob's ID
      * @param mythicMobID identifier for a MythicMob
      * @return a {@link DisplayController} or null
      */
-    public static @Nullable DisplayController getMythicMobController(@NotNull String mythicMobID){
+    public static @Nullable DisplayController getControllerOfMythicMob(@NotNull String mythicMobID){
         return mythicControllers.get(mythicMobID);
     }
 

@@ -59,7 +59,7 @@ public class DEUMythicListener implements Listener {
     public void onMythicSpawn(MythicMobSpawnEvent e){
         Entity mythicMob = e.getEntity();
         String mobID = e.getMobType().getInternalName();
-        DisplayController controller = DisplayControllerManager.getMythicMobController(mobID);
+        DisplayController controller = DisplayControllerManager.getControllerOfMythicMob(mobID);
         if (controller == null){
             return;
         }
