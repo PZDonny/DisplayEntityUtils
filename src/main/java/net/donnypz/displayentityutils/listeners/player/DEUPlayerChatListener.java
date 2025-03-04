@@ -15,8 +15,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 
-public class DEUPlayerChatListener implements Listener {
+@ApiStatus.Internal
+public final class DEUPlayerChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChat(AsyncChatEvent event){

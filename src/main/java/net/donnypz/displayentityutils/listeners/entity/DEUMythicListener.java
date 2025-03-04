@@ -16,10 +16,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
 
-public class DEUMythicListener implements Listener {
+@ApiStatus.Internal
+public final class DEUMythicListener implements Listener {
 
     //Create MythicMob Mechanic
     @EventHandler
