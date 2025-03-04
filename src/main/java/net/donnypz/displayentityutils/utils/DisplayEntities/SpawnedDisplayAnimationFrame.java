@@ -155,6 +155,11 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
         return this;
     }
 
+    /**
+     * Check if a {@link FramePoint} with the given tag already exists in this frame
+     * @param pointTag
+     * @return a boolean
+     */
     public boolean hasPointWithTag(@NotNull String pointTag){
         return framePoints.containsKey(pointTag);
     }
