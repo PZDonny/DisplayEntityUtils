@@ -470,6 +470,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
                             .clickEvent(ClickEvent.callback(a -> {
                                 Player p = (Player) a;
                                 boolean result = point.removeFromPointHolder();
+                                DEUCommandUtils.deselectRelativePoint(p);
                                 if (result){
                                     p.sendMessage(pluginPrefix.append(Component.text("Successfully removed point from frame!", NamedTextColor.YELLOW)));
                                     point.despawn();

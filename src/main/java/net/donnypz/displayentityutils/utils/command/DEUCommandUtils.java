@@ -89,7 +89,7 @@ public class DEUCommandUtils {
         player.sendMessage(Component.text("Clicked Point Selected!", NamedTextColor.GREEN));
     }
 
-    private static void deselectRelativePoint(Player player){
+    public static void deselectRelativePoint(Player player){
         selectedRelativePoint.remove(player.getUniqueId());
     }
 
