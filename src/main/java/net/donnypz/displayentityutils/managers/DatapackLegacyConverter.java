@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class DatapackLegacyConverter {
+class DatapackLegacyConverter {
     static void saveDatapackAnimation(Player player, String datapackName, @NotNull String groupSaveTag, @NotNull String animationSaveTag){
         player.sendMessage(Component.text("Legacy Conversion - If no model/group/result is present, the datapack is likely a modern one", NamedTextColor.LIGHT_PURPLE));
         try{
