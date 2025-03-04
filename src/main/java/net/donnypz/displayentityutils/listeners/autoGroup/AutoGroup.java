@@ -169,12 +169,13 @@ final class AutoGroup {
             event.callEvent();
         }
 
-        for (SpawnedDisplayEntityGroup g : addedInteractionsForEvent.keySet()){
+        for (Map.Entry<SpawnedDisplayEntityGroup, Collection<Interaction>> entry : addedInteractionsForEvent.entrySet()){
+            SpawnedDisplayEntityGroup g = entry.getKey();
             if (!g.isSpawned()){
                 continue;
             }
 
-            Collection<Interaction> coll = addedInteractionsForEvent.get(g);
+            Collection<Interaction> coll = entry.getValue();
             if (!coll.isEmpty()){
                 new ChunkAddGroupInteractionsEvent(g, addedInteractionsForEvent.get(g), chunk).callEvent();
             }

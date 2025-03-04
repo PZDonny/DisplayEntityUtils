@@ -19,6 +19,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.io.*;
@@ -221,6 +222,7 @@ public final class MongoManager{
         return tags;
     }
 
+    @ApiStatus.Internal
     public static void createConnection(String connectionString, String databaseName, String groupColl, String animColl) {
         if (isConnected()){
             return;
@@ -293,7 +295,7 @@ public final class MongoManager{
 
     /**
      * Check whether MongoDB is connected
-     * @return boolean of MongoDB connection status
+     * @return a boolean
      */
     public static boolean isConnected(){
         return isConnected;

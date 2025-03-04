@@ -2,18 +2,13 @@ package net.donnypz.displayentityutils.utils.DisplayEntities.particles;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,8 +21,7 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     private static final HashMap<UUID, AnimationParticleBuilder> builders = new HashMap<>();
 
     Player player;
-    SpawnedDisplayAnimationFrame frame;
-    final boolean isStartAdd;
+    FramePoint framePoint;
     Step step;
     int delayInTicks = 0;
     AnimationParticle editParticle = null;
@@ -45,20 +39,18 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     Component separatedMSG = Component.text("All values should be entered separated by spaces.", NamedTextColor.GRAY, TextDecoration.ITALIC);
 
     @ApiStatus.Internal
-    public AnimationParticleBuilder(@NotNull Player player, @NotNull SpawnedDisplayAnimationFrame frame, boolean isStartAdd){
+    public AnimationParticleBuilder(@NotNull Player player, @NotNull FramePoint framePoint){
         super(Particle.FLAME);
         this.player = player;
-        this.frame = frame;
-        this.isStartAdd = isStartAdd;
+        this.framePoint = framePoint;
         builders.put(player.getUniqueId(), this);
         advanceStep(Step.PARTICLE);
     }
 
     @ApiStatus.Internal
-    public AnimationParticleBuilder(@NotNull Player player, boolean isStartAdd, AnimationParticle editParticle, Step step){
+    public AnimationParticleBuilder(@NotNull Player player, AnimationParticle editParticle, Step step){
         super(Particle.FLAME);
         this.player = player;
-        this.isStartAdd = isStartAdd;
         builders.put(player.getUniqueId(), this);
         advanceStep(step);
         this.editParticle = editParticle;
@@ -74,21 +66,11 @@ public class AnimationParticleBuilder extends ParticleBuilder{
             if (updateParticle()){
                 player.sendMessage(prefix.append(Component.text("Particle Changes applied successfully!", NamedTextColor.GREEN)));
             }
-            else{
-                player.sendMessage(prefix.append(Component.text("Particle Changed failed to apply!", NamedTextColor.RED)));
-            }
             return;
         }
         if (nextStep == null){
-            SpawnedDisplayEntityGroup selectedGroup = DisplayGroupManager.getSelectedSpawnedGroup(player);
-            if (selectedGroup == null){
-                player.sendMessage(Component.text("Failed to create animation particle! You do not have a group selected!", NamedTextColor.RED));
-                return;
-            }
-            else{
-                build(selectedGroup, player.getLocation());
-                player.sendMessage(prefix.append(Component.text("Successfully created an animation particle!", NamedTextColor.GREEN)));
-            }
+            build();
+            player.sendMessage(prefix.append(Component.text("Successfully created an animation particle!", NamedTextColor.GREEN)));
             remove();
             return;
         }
@@ -165,11 +147,11 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     void remove(){
         builders.remove(player.getUniqueId());
         editParticle = null;
-        frame = null;
+        framePoint = null;
         player = null;
     }
 
-    public AnimationParticle build(SpawnedDisplayEntityGroup group, Location targetLocation){
+    public AnimationParticle build(){
         AnimationParticle animParticle;
         if (isBlockDataParticle()){
             animParticle = new BlockAnimationParticle(this, data());
@@ -189,17 +171,9 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         else{
             animParticle = new GeneralAnimationParticle(this, particle());
         }
-        Location groupLoc = group.getLocation();
-        Vector v = targetLocation.toVector().subtract(groupLoc.toVector());
 
-        animParticle.setVectorFromOrigin(v, groupLoc.getYaw(), groupLoc.getPitch());
         animParticle.setDelayInTicks(delayInTicks);
-        if (isStartAdd){
-            frame.addFrameStartParticle(animParticle);
-        }
-        else{
-            frame.addFrameEndParticle(animParticle);
-        }
+        framePoint.addParticle(animParticle);
 
         return animParticle;
     }

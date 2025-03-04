@@ -94,8 +94,9 @@ public class DisplayController {
 
     @ApiStatus.Internal
     public static void registerNullLoaderControllers(){
-        for (DisplayController controller : grouplessControllers.keySet()){
-            String groupTag = grouplessControllers.get(controller);
+        for (Map.Entry<DisplayController, String> entry : grouplessControllers.entrySet()){
+            DisplayController controller = entry.getKey();
+            String groupTag = entry.getValue();
             NullGroupLoaderEvent e = new NullGroupLoaderEvent(controller, groupTag);
             e.callEvent();
             DisplayEntityGroup group = e.getGroup();

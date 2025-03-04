@@ -4,8 +4,10 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
+import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
@@ -52,5 +54,9 @@ class AnimSelectCMD implements PlayerSubCommand {
         }
         DisplayAnimationManager.setSelectedSpawnedAnimation(p, anim.toSpawnedDisplayAnimation());
         p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully selected display animation! <white>(Tagged: "+anim.getAnimationTag()+")")));
+
+        if (DEUCommandUtils.removeRelativePoints(p)){
+            p.sendMessage(Component.text("Your previewed points have been despawned since you have changed your selected animation", NamedTextColor.GRAY, TextDecoration.ITALIC));
+        }
     }
 }

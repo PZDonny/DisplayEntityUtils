@@ -1,12 +1,12 @@
 package net.donnypz.displayentityutils.managers;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.listeners.bdengine.DEUEntitySpawned;
+import net.donnypz.displayentityutils.listeners.bdengine.DatapackEntitySpawned;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.VersionUtils;
-import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
+import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class DatapackLegacyConverter {
+class DatapackLegacyConverter {
     static void saveDatapackAnimation(Player player, String datapackName, @NotNull String groupSaveTag, @NotNull String animationSaveTag){
         player.sendMessage(Component.text("Legacy Conversion - If no model/group/result is present, the datapack is likely a modern one", NamedTextColor.LIGHT_PURPLE));
         try{
@@ -69,14 +69,14 @@ public class DatapackLegacyConverter {
     }
 
     private static void readAnimationFiles(long timeStamp, int totalGroups, ZipFile zipFile, List<ZipEntry> frames, String datapackName, @NotNull Player player, @NotNull String groupSaveTag, @NotNull String animationSaveTag){
-        SpawnedDisplayEntityGroup createdGroup = DEUEntitySpawned.getTimestampGroup(timeStamp);
+        SpawnedDisplayEntityGroup createdGroup = DatapackEntitySpawned.getTimestampGroup(timeStamp);
         if (createdGroup == null){
             player.sendMessage(Component.text("Failed to find model/group created from datapack!", NamedTextColor.RED));
             player.sendMessage(Component.text("| The datapack may be a modern one (v1.13+ of BDEngine). Try using /mdis bdengine convertanimleg"));
             return;
         }
 
-        DEUEntitySpawned.finalizeAnimationPreparation(timeStamp);
+        DatapackEntitySpawned.finalizeAnimationPreparation(timeStamp);
         createdGroup.seedPartUUIDs(SpawnedDisplayEntityGroup.defaultPartUUIDSeed);
         final SpawnedDisplayAnimation anim = new SpawnedDisplayAnimation();
 
@@ -205,7 +205,7 @@ public class DatapackLegacyConverter {
                         String[] timestampSplit = line.split(":\\[\""+projectName.replace("_", ""));
                         try{
                             value = Long.parseLong(timestampSplit[1].replace("\"]}", ""));
-                            DEUEntitySpawned.prepareAnimationMaster(value);
+                            DatapackEntitySpawned.prepareAnimationMaster(value);
                         }
                         catch(NumberFormatException e){
                             br.close();

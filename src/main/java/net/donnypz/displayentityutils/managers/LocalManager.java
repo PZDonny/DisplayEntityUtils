@@ -10,6 +10,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -149,14 +150,16 @@ public final class LocalManager {
         }
     }
 
-    public static void saveDatapackAnimation(Player player, String datapackName, @NotNull String groupSaveTag, @NotNull String animationSaveTag){
+    @ApiStatus.Internal
+    public static void saveDatapackAnimation(@NotNull Player player, @NotNull String datapackName, @NotNull String groupSaveTag, @NotNull String animationSaveTag){
         if (!datapackName.endsWith(".zip")){
             datapackName = datapackName+".zip";
         }
         new DatapackConverter(player, datapackName, groupSaveTag, animationSaveTag);
     }
 
-    public static void saveDatapackLegacyAnimation(Player player, String datapackName, @NotNull String groupSaveTag, @NotNull String animationSaveTag){
+    @ApiStatus.Internal
+    public static void saveDatapackLegacyAnimation(@NotNull Player player, @NotNull String datapackName, @NotNull String groupSaveTag, @NotNull String animationSaveTag){
         if (!datapackName.endsWith(".zip")){
             datapackName = datapackName+".zip";
         }

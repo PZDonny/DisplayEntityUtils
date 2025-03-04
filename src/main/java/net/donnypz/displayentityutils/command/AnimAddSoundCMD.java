@@ -2,10 +2,13 @@ package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
+import net.donnypz.displayentityutils.utils.command.FramePointDisplay;
+import net.donnypz.displayentityutils.utils.command.RelativePointDisplay;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -21,32 +24,34 @@ class AnimAddSoundCMD implements PlayerSubCommand {
             AnimCMD.noAnimationSelection(player);
             return;
         }
-        if (args.length < 7) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis anim addsound <frame-id> <sound> <volume> <pitch> <start | end>", NamedTextColor.RED));
+
+        RelativePointDisplay rp = DEUCommandUtils.getSelectedRelativePoint(player);
+        if (!(rp instanceof FramePointDisplay display)){
+            AnimCMD.noFramePointSelection(player);
+            return;
+        }
+
+        if (args.length < 6) {
+            player.sendMessage(Component.text("Incorrect Usage! /mdis anim addsound <sound> <volume> <pitch> <delay-in-ticks>", NamedTextColor.RED));
             return;
         }
         try {
-            int id = Integer.parseInt(args[2]);
-            String soundString = args[3];
-            soundString = soundString.replace(".", "_").toUpperCase();
+            String soundString = args[2].replace(".", "_").toUpperCase();
             Sound sound = Sound.valueOf(soundString);
-            float volume = Float.parseFloat(args[4]);
-            float pitch = Float.parseFloat(args[5]);
-            String placement = args[6];
-            SpawnedDisplayAnimationFrame frame = anim.getFrames().get(id);
-            if (placement.equalsIgnoreCase("start")){
-                frame.addFrameStartSound(sound, volume, pitch);
-            }
-            else if (placement.equalsIgnoreCase("end")){
-                frame.addFrameEndSound(sound, volume, pitch);
-            }
-            else{
-                player.sendMessage(Component.text("Invalid Option! Choose between \"start\" and \"end\"", NamedTextColor.RED));
-            }
+            float volume = Float.parseFloat(args[3]);
+            float pitch = Float.parseFloat(args[4]);
+            int delayInTicks = Integer.parseInt(args[5]);
 
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully added sound to frame's "+placement, NamedTextColor.GREEN)));
+            ((FramePoint)display.getRelativePoint()).addSound(new AnimationSound(sound, volume, pitch, delayInTicks));
+
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Sound Added to Frame Point!", NamedTextColor.GREEN)));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("| Sound: <yellow>"+sound));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("| Volume: <yellow>"+volume));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("| Pitch: <yellow>"+pitch));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("| Delay: <yellow>"+delayInTicks));
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
-            player.sendMessage(Component.text("Invalid value entered for frame-id, volume, or pitch! Enter a number >= 0", NamedTextColor.RED));
+            player.sendMessage(Component.text("Invalid number entered! Enter a number >= 0", NamedTextColor.RED));
+            player.sendMessage(Component.text("| Delay must be a whole number", NamedTextColor.GRAY));
         }
         catch (IllegalArgumentException e){
             player.sendMessage(Component.text("Invalid Sound Name!", NamedTextColor.RED));

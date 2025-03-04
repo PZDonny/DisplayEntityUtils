@@ -1,12 +1,12 @@
 package net.donnypz.displayentityutils.managers;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.listeners.bdengine.DEUEntitySpawned;
+import net.donnypz.displayentityutils.listeners.bdengine.DatapackEntitySpawned;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.VersionUtils;
-import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
+import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -109,7 +109,7 @@ class DatapackConverter {
 
     //Save Animations
         Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () ->{
-            SpawnedDisplayEntityGroup createdGroup = DEUEntitySpawned.getProjectGroup(projectName);
+            SpawnedDisplayEntityGroup createdGroup = DatapackEntitySpawned.getProjectGroup(projectName);
 
             if (createdGroup == null){
                 player.sendMessage(Component.text("Failed to find model/group created from datapack!", NamedTextColor.RED));
@@ -117,7 +117,7 @@ class DatapackConverter {
                 return;
             }
 
-            DEUEntitySpawned.finalizeAnimationPreparation(projectName);
+            DatapackEntitySpawned.finalizeAnimationPreparation(projectName);
             createdGroup.seedPartUUIDs(SpawnedDisplayEntityGroup.defaultPartUUIDSeed);
 
             player.sendMessage(Component.empty());
@@ -246,7 +246,7 @@ class DatapackConverter {
                         String replacement = "execute at "+player.getName()+" run summon block_display "+coordinates;
                         line = line.replace("summon block_display ~ ~ ~", replacement);
                         try{
-                            DEUEntitySpawned.prepareAnimationMaster(projectName);
+                            DatapackEntitySpawned.prepareAnimationMaster(projectName);
                         }
                         catch(NumberFormatException e){
                             br.close();

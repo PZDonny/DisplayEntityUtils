@@ -163,9 +163,11 @@ public class GroupSpawnSettings {
                 display.setBrightness(b);
             }
 
-            for (String tag : brightness.keySet()){
+            for (Map.Entry<String, Display.Brightness> entry : brightness.entrySet()){
+                String tag = entry.getKey();
+                Display.Brightness br = entry.getValue();
                 if (DisplayUtils.hasPartTag(display, tag)){
-                    display.setBrightness(brightness.get(tag));
+                    display.setBrightness(br);
                     break;
                 }
             }
@@ -178,9 +180,11 @@ public class GroupSpawnSettings {
                 display.setBillboard(b);
             }
 
-            for (String tag : billboard.keySet()){
+            for (Map.Entry<String, Display.Billboard> entry : billboard.entrySet()){
+                String tag = entry.getKey();
+                Display.Billboard bb = entry.getValue();
                 if (DisplayUtils.hasPartTag(display, tag)){
-                    display.setBillboard(billboard.get(tag));
+                    display.setBillboard(bb);
                     break;
                 }
             }

@@ -20,7 +20,6 @@ public class DisplayStateMachine {
     private final Map<String, MachineState> states = new HashMap<>();
 
     private Consumer<SpawnedDisplayEntityGroup> customStateTask = null;
-    private int stateTransitionTaskDelay;
     private boolean overrideDefaultTask = false;
     String id;
 
@@ -151,14 +150,13 @@ public class DisplayStateMachine {
     }
 
     /**
-     * Set a task that will be run within a BukkitRunnable by this DisplayStateMachine, for every SpawnedDisplayEntityGroup added to this DisplayStateMachine after this is called.
-     * In other words, you do NOT have to put a {@link BukkitRunnable} in your task.
+     * Set a task that will be run within a {@link BukkitRunnable} by this DisplayStateMachine.
+     * You do NOT have to put a {@link BukkitRunnable} in your task.
      * @param stateTransitionTask a consumer with conditions to manage state changes
-     * @param taskTickDelay how often the task should be run in ticks. Values below 1 are not permitted.
+     * @param overrideDefaultTask whether the default task should be overridden in place of the custom transition task. If false, this task will run then continue with the default task
      */
-    public void setCustomStateTransitionTask(@NotNull Consumer<SpawnedDisplayEntityGroup> stateTransitionTask, int taskTickDelay, boolean overrideDefaultTask){
+    public void setCustomStateTransitionTask(@NotNull Consumer<SpawnedDisplayEntityGroup> stateTransitionTask, boolean overrideDefaultTask){
         this.customStateTask = stateTransitionTask;
-        this.stateTransitionTaskDelay = Math.max(taskTickDelay, 1);
         this.overrideDefaultTask = overrideDefaultTask;
     }
 

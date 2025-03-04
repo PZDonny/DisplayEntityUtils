@@ -12,6 +12,7 @@ import org.apache.commons.dbutils.DbUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.io.*;
@@ -27,6 +28,8 @@ public final class MYSQLManager {
     private static HikariDataSource dataSource;
 
     private MYSQLManager(){}
+
+    @ApiStatus.Internal
     public static void createConnection(String host, int port, String database, String username, String password, boolean usessl){
         if (connected){
             return;
@@ -35,6 +38,7 @@ public final class MYSQLManager {
         createConnection(url, username, password);
     }
 
+    @ApiStatus.Internal
     public static void createConnection(String url, String username, String password){
         if (connected){
             return;
@@ -75,6 +79,7 @@ public final class MYSQLManager {
         });
     }
 
+    @ApiStatus.Internal
     public static void closeConnection(){
         try{
             if (dataSource != null){
@@ -93,7 +98,7 @@ public final class MYSQLManager {
 
     /**
      * Check whether MySQL is connected
-     * @return boolean of MySQL connection status
+     * @return a boolean
      */
     public static boolean isConnected() {
         return connected;

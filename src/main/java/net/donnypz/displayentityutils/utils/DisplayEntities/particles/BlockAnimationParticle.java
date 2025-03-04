@@ -41,7 +41,7 @@ public class BlockAnimationParticle extends AnimationParticle implements Seriali
 
     @Override
     protected Component getUniqueInfo() {
-        return getEditMSG("| Block"+blockData.getMaterial().name(), AnimationParticleBuilder.Step.BLOCK);
+        return getEditMSG("| Block: "+blockData.getMaterial().name(), AnimationParticleBuilder.Step.BLOCK);
     }
 
     @Override

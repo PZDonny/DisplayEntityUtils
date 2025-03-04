@@ -37,6 +37,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
     private String tag;
     SpawnedDisplayEntityPart masterPart;
     long creationTime = System.currentTimeMillis();
+    int lastAnimatedTick = -1;
 
     boolean isVisibleByDefault;
     private float scaleMultiplier = 1;
@@ -1706,6 +1707,19 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
         return !activeAnimators.isEmpty();
     }
 
+    void setLastAnimatedTick(){
+        lastAnimatedTick = Bukkit.getCurrentTick();
+    }
+
+
+    /**
+     * Check if this group has completed its animation frame in the game's current tick
+     * @return a boolean
+     */
+    public boolean hasAnimated(){
+        return lastAnimatedTick == Bukkit.getCurrentTick();
+    }
+
 
 
     /**
@@ -1725,8 +1739,10 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
 
             DisplayEntityGroup group = toDisplayEntityGroup();
             SpawnedDisplayEntityGroup cloned = group.spawn(location, GroupSpawnedEvent.SpawnReason.CLONE);
-            for (SpawnedDisplayEntityPart part : oldYaws.keySet()){
-                part.pivot(oldYaws.get(part));
+            for (Map.Entry<SpawnedDisplayEntityPart, Float> entry : oldYaws.entrySet()){
+                SpawnedDisplayEntityPart part = entry.getKey();
+                float oldYaw = entry.getValue();
+                part.pivot(oldYaw);
             }
             oldYaws.clear();
             return cloned;

@@ -1,11 +1,9 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticle;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
+import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
@@ -23,10 +21,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     int delay;
     int duration;
     String tag;
-    HashMap<String, AnimationSound> frameStartSounds;
-    HashMap<String, AnimationSound> frameEndSounds;
-    Set<AnimationParticle> frameStartParticles = new HashSet<>();
-    Set<AnimationParticle> frameEndParticles = new HashSet<>();
+    Map<String, FramePoint> framePoints = new HashMap<>();
     List<String> startCommands = new ArrayList<>();
     List<String> endCommands = new ArrayList<>();
 
@@ -35,28 +30,9 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     public SpawnedDisplayAnimationFrame(int delay, int duration){
         this.delay = delay;
         this.duration = duration;
-        this.frameStartSounds = new HashMap<>();
-        this.frameEndSounds = new HashMap<>();
     }
 
-    SpawnedDisplayAnimationFrame(
-            int delay, int duration,
-            HashMap<String, AnimationSound> frameStartSounds,
-            HashMap<String, AnimationSound> frameEndSounds,
-            Set<AnimationParticle> frameStartParticles,
-            Set<AnimationParticle> frameEndParticles,
-            List<String> startCommands,
-            List<String> endCommands){
-        this.delay = delay;
-        this.duration = duration;
-        this.frameStartSounds = frameStartSounds == null ? new HashMap<>() : frameStartSounds;
-        this.frameEndSounds = frameEndSounds == null ? new HashMap<>() : frameEndSounds;
-        this.frameStartParticles = frameStartParticles == null ? new HashSet<>() : frameStartParticles;
-        this.frameEndParticles = frameEndParticles == null ? new HashSet<>() : frameEndParticles;
-        this.startCommands = startCommands == null ? new ArrayList<>() : startCommands;
-        this.endCommands = endCommands == null ? new ArrayList<>() : endCommands;
-    }
-
+    SpawnedDisplayAnimationFrame(){}
 
     /**
      * Set the delay of this frame.
@@ -118,13 +94,9 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @return a boolean
      */
     public boolean isEmptyFrame(){
-
         return displayTransformations.isEmpty()
                 && interactionTransformations.isEmpty()
-                && frameStartSounds.isEmpty()
-                && frameEndSounds.isEmpty()
-                && frameStartParticles.isEmpty()
-                && frameEndParticles.isEmpty()
+                && framePoints.isEmpty()
                 && startCommands.isEmpty();
     }
 
@@ -184,99 +156,49 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     }
 
     /**
-     * Add a sound that will be played at the start of this frame
-     * @param sound the sound
-     * @param volume the volume
-     * @param pitch the pitch
-     * @return this
+     * Check if a {@link FramePoint} with the given tag already exists in this frame
+     * @param pointTag
+     * @return a boolean
      */
-    public SpawnedDisplayAnimationFrame addFrameStartSound(Sound sound, float volume, float pitch){
-        frameStartSounds.put(sound.getKey().getKey(), new AnimationSound(sound, volume, pitch));
-        return this;
+    public boolean hasPointWithTag(@NotNull String pointTag){
+        return framePoints.containsKey(pointTag);
     }
 
     /**
-     * Add a sound that will be played at the end of this frame
-     * @param sound the sound
-     * @param volume the volume
-     * @param pitch the pitch
-     * @return this
+     * Add a {@link FramePoint} that will be held for this frame
+     * @param pointTag The tag to give the point
+     * @param group the group that the point relative to
+     * @param location the relative location that the frame point represents
+     * @return true if a point with the given tag doesn't already exist. false if it exists or the tag is invalid
      */
-    public SpawnedDisplayAnimationFrame addFrameEndSound(Sound sound, float volume, float pitch){
-        frameEndSounds.put(sound.getKey().getKey(), new AnimationSound(sound, volume, pitch));
-        return this;
+    public @NotNull boolean addFramePoint(@NotNull String pointTag, @NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
+        if (!DisplayUtils.isValidTag(pointTag)) {
+            return false;
+        }
+        FramePoint existing = framePoints.putIfAbsent(pointTag, new FramePoint(pointTag, group, location));
+        return existing == null;
     }
 
     /**
-     * Remove a sound that would be played at the start of this frame
-     * @param sound the sound to remove
-     * @return true if the sound was removed
+     * Add a {@link FramePoint} that will be held for this frame
+     * @param framePoint the point to add
+     * @return true if a point with the same pointTag as the provided point doesn't exist. false if it exists or the tag is invalid
      */
-    public boolean removeFrameStartSound(Sound sound){
-        return removeFrameStartSound(sound.getKey().getKey());
+    public @NotNull boolean addFramePoint(@NotNull FramePoint framePoint){
+        if (!DisplayUtils.isValidTag(framePoint.tag)) {
+            return false;
+        }
+        FramePoint existing = framePoints.putIfAbsent(framePoint.getTag(), framePoint);
+        return existing == null;
     }
 
     /**
-     * Remove a sound that would be played at the start of this frame
-     * @param soundName name of the sound to remove
-     * @return true if the sound was removed
+     * Remove a {@link FramePoint} from this frame
+     * @param framePoint the frame point to remove
+     * @return true if the point was contained in this frame
      */
-    public boolean removeFrameStartSound(String soundName){
-        return frameStartSounds.remove(soundName) != null;
-    }
-
-    /**
-     * Remove all sounds that would be played at the start of this frame
-     * @return this
-     */
-    public SpawnedDisplayAnimationFrame removeAllFrameStartSounds(){
-        frameStartSounds.clear();
-        return this;
-    }
-
-    /**
-     * Remove a sound that would be played at the end of this frame
-     * @param sound the sound to remove
-     * @return true if the sound was removed
-     */
-    public boolean removeFrameEndSound(Sound sound){
-        return removeFrameEndSound(sound.getKey().getKey());
-    }
-
-    /**
-     * Remove a sound that would be played at the end of this frame
-     * @param soundName name of the sound to remove
-     * @return true if the sound was removed
-     */
-    public boolean removeFrameEndSound(String soundName){
-        return frameEndSounds.remove(soundName) != null;
-    }
-
-    /**
-     * Remove all sounds that would be played at the end of this frame
-     * @return this
-     */
-    public SpawnedDisplayAnimationFrame removeAllFrameEndSounds(){
-        frameEndSounds.clear();
-        return this;
-    }
-
-    /**
-     * Get a map containing all Sounds that will play at the start of this frame.
-     * Each Float[] contains 2 elements, being the volume and pitch in that respective order.
-     * @return a map
-     */
-    public HashMap<String, AnimationSound> getFrameStartSounds(){
-        return new HashMap<>(frameStartSounds);
-    }
-
-    /**
-     * Get a map containing all Sounds that will play at the end of this frame.
-     * Each Float[] contains 2 elements, being the volume and pitch in that respective order.
-     * @return a map
-     */
-    public HashMap<String, AnimationSound> getFrameEndSounds(){
-        return new HashMap<>(frameEndSounds);
+    public boolean removeFramePoint(FramePoint framePoint){
+        return framePoints.remove(framePoint.tag) != null;
     }
 
 
@@ -336,85 +258,69 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
         return new ArrayList<>(endCommands);
     }
 
-    @ApiStatus.Internal
-    public SpawnedDisplayAnimationFrame addFrameStartParticle(AnimationParticle animationParticle){
-        frameStartParticles.add(animationParticle);
-        return this;
-    }
-
-    @ApiStatus.Internal
-    public SpawnedDisplayAnimationFrame addFrameEndParticle(AnimationParticle animationParticle){
-        frameEndParticles.add(animationParticle);
-        return this;
-    }
-
-    @ApiStatus.Internal
-    public SpawnedDisplayAnimationFrame removeFrameStartParticle(AnimationParticle animationParticle){
-        frameStartParticles.remove(animationParticle);
-        return this;
-    }
-
-    @ApiStatus.Internal
-    public SpawnedDisplayAnimationFrame removeFrameEndParticle(AnimationParticle animationParticle){
-        frameEndParticles.remove(animationParticle);
-        return this;
+    /**
+     * Get a {@link FramePoint} by its tag
+     * @param framePointTag
+     * @return a {@link FramePoint} or null
+     */
+    public @Nullable FramePoint getFramePoint(@NotNull String framePointTag){
+        return framePoints.get(framePointTag);
     }
 
     /**
-     * Get the particles that will be spawned when this frame starts
-     * @return a list of {@link AnimationParticle}
+     * Get the {@link FramePoint}s contained in this frame
+     * @return a set of {@link FramePoint}
      */
-    public List<AnimationParticle> getFrameStartParticles(){
-        return new ArrayList<>(frameStartParticles);
+    public Set<FramePoint> getFramePoints(){
+        return new HashSet<>(framePoints.values());
     }
 
     /**
-     * Get the particles that will be spawned when this frame ends
-     * @return a list of {@link AnimationParticle}
+     * Check if this frame contains any {@link FramePoint}s.
+     * @return a boolean
      */
-    public List<AnimationParticle> getFrameEndParticles(){
-        return new ArrayList<>(frameEndParticles);
+    public boolean hasFramePoints(){
+        return !framePoints.isEmpty();
     }
 
-    /**
-     * Check if this frame will display particles when the frame begins playing, or simply if it contains {@link AnimationParticle} for the start.
-     * @return true if particles will be displayed.
-     */
-    public boolean hasFrameStartParticles(){
-        return !frameStartParticles.isEmpty();
-    }
 
     /**
-     * Check if this frame will display particles when the frame emds, or simply if it contains {@link AnimationParticle} for the end.
-     * @return true if particles will be displayed.
+     * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a specified location
+     * @param location the location to play the sound
      */
-    public boolean hasFrameEndParticles(){
-        return !frameEndParticles.isEmpty();
-    }
-
-    /**
-     * Play the sounds that will play at the start of this frame at a specified location
-     * @param location
-     */
-    public void playStartSounds(@NotNull Location location){
+    public void playSounds(@NotNull Location location){
         if (!location.isChunkLoaded()){
             return;
         }
-        for (AnimationSound sound : frameStartSounds.values()){
-            location.getWorld().playSound(location, sound.sound, sound.volume, sound.pitch);
+        for (FramePoint framePoint : framePoints.values()){
+            framePoint.playSounds(location);
         }
     }
 
     /**
-     * Play the sounds that will play at the end of this frame at a specified location
-     * @param location
+     * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a location relative to a {@link SpawnedDisplayEntityGroup}
+     * @param group the relative group
      */
-    public void playEndSounds(@NotNull Location location){
-        if (!location.isChunkLoaded()){
+    public void playSounds(@NotNull SpawnedDisplayEntityGroup group){
+        if (!group.isInLoadedChunk()){
             return;
         }
-        for (AnimationSound sound : frameEndSounds.values()){
-            location.getWorld().playSound(location, sound.sound, sound.volume, sound.pitch);
+        for (FramePoint framePoint : framePoints.values()){
+            framePoint.playSounds(group);
+        }
+    }
+
+    /**
+     * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a location relative to a {@link SpawnedDisplayEntityGroup}
+     * @param group the relative group
+     * @param animator the animator attempting to play the sounds
+     */
+    public void playSounds(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
+        if (!group.isInLoadedChunk()){
+            return;
+        }
+        for (FramePoint framePoint : framePoints.values()){
+            framePoint.playSounds(group, animator);
         }
     }
 
@@ -422,24 +328,14 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     /**
      * Show the particles that will be displayed at the start of this frame
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
-     * @param animator the animator attempting to play the particles
+     * @param animator the animator attempting to show the particles
      */
-    public void showStartParticles(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
-        for (AnimationParticle particle : frameStartParticles){
-            particle.spawn(group, animator);
+    public void showParticles(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
+        for (FramePoint framePoint : framePoints.values()){
+            framePoint.showParticles(group, animator);
         }
     }
 
-    /**
-     * Show the particles that will be displayed at the end of this frame
-     * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
-     * @param animator the animator attempting to play the particles
-     */
-    public void showEndParticles(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
-        for (AnimationParticle particle : frameEndParticles){
-            particle.spawn(group, animator);
-        }
-    }
 
     /**
      * Execute the commands that are expected to run at the start of this frame from a specified location
@@ -458,7 +354,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     }
 
     private void executeCommands(Location location, List<String> commands){
-        if (!location.isChunkLoaded() || endCommands.isEmpty()) {
+        if (location == null || !location.isChunkLoaded() || endCommands.isEmpty()) {
             return;
         }
         String coordinates = DEUCommandUtils.getCoordinateString(location);
@@ -469,43 +365,24 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     }
 
     /**
-     * Play all effects that are expected at the start of this frame (e.g. sounds, particles, commands)
+     * Play all effects that are contained within every {@link FramePoint} and the commands of this frame.
+     * Effects include sounds, particles, commands.
      * @param group the group to play these effects for
      * @param animator the animator attempting to play the effects
      */
-    public void playStartEffects(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
+    public void playEffects(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
         Location groupLoc = group.getLocation();
         if (groupLoc != null){
-            playStartSounds(groupLoc);
             executeStartCommands(groupLoc);
         }
-        showStartParticles(group, animator);
+        playSounds(group, animator);
+        showParticles(group, animator);
     }
-
-    /**
-     * Play all effects that are expected at the end of this frame (e.g. sounds, particles, commands)
-     * @param group the group to play these effects for
-     * @param animator the animator attempting to play the effects
-     */
-    public void playEndEffects(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
-        Location groupLoc = group.getLocation();
-        if (groupLoc != null){
-            playEndSounds(groupLoc);
-            executeEndCommands(groupLoc);
-        }
-        showEndParticles(group, animator);
-    }
-
 
 
     @ApiStatus.Internal
-    public void visuallyEditStartParticles(@NotNull Player player, @NotNull SpawnedDisplayEntityGroup group){
-        DEUCommandUtils.spawnParticleDisplays(group, player, this, true);
-    }
-
-    @ApiStatus.Internal
-    public void visuallyEditEndParticles(@NotNull Player player, @NotNull SpawnedDisplayEntityGroup group){
-        DEUCommandUtils.spawnParticleDisplays(group, player, this, false);
+    public void visuallyEditFramePoints(@NotNull Player player, @NotNull SpawnedDisplayEntityGroup group){
+        DEUCommandUtils.spawnFramePointDisplays(group, player, this);
     }
 
     void setDisplayEntityTransformation(SpawnedDisplayEntityPart part, DisplayTransformation transformation){
@@ -529,15 +406,19 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
 
     @ApiStatus.Internal
     public DisplayAnimationFrame toDisplayAnimationFrame(){
-        DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, frameStartSounds, frameEndSounds, frameStartParticles, frameEndParticles, startCommands, endCommands, tag);
-        for (UUID uuid : displayTransformations.keySet()){
-            DisplayTransformation transform = displayTransformations.get(uuid);
-            if (transform != null){
-                frame.setDisplayEntityTransformation(uuid, new SerialTransformation(transform));
+        DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, framePoints, startCommands, endCommands, tag);
+        for (Map.Entry<UUID, DisplayTransformation> entry : displayTransformations.entrySet()){
+            UUID uuid = entry.getKey();
+            DisplayTransformation transformation = entry.getValue();
+            if (transformation != null){
+                frame.setDisplayEntityTransformation(uuid, new SerialTransformation(transformation));
             }
         }
-        for (UUID uuid : interactionTransformations.keySet()){
-            frame.setInteractionTransformation(uuid, interactionTransformations.get(uuid));
+
+        for (Map.Entry<UUID, Vector3f> entry : interactionTransformations.entrySet()){
+            UUID uuid = entry.getKey();
+            Vector3f vector = entry.getValue();
+            frame.setInteractionTransformation(uuid, vector);
         }
         return frame;
     }
@@ -549,10 +430,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
 
             cloned.displayTransformations = new HashMap<>(this.displayTransformations);
             cloned.interactionTransformations = new HashMap<>(this.interactionTransformations);
-            cloned.frameStartSounds = new HashMap<>(this.frameStartSounds);
-            cloned.frameEndSounds = new HashMap<>(this.frameEndSounds);
-            cloned.frameStartParticles = new HashSet<>(this.frameStartParticles);
-            cloned.frameEndParticles = new HashSet<>(this.frameEndParticles);
+            cloned.framePoints = new HashMap<>(this.framePoints);
             cloned.startCommands = new ArrayList<>(this.startCommands);
             cloned.endCommands = new ArrayList<>(this.endCommands);
 

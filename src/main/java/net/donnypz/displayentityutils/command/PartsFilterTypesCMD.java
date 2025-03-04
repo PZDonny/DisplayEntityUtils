@@ -58,17 +58,20 @@ class PartsFilterTypesCMD implements PlayerSubCommand {
         }
 
         for (String typeText : args[2].split(",")){
+            if (typeText.startsWith("!")){
+                typeText = typeText.substring(1).toUpperCase();
+            }
+            else{
+                typeText = typeText.toUpperCase();
+            }
+
             try{
-                if (!typeText.equalsIgnoreCase("interaction")){
-                    typeText = typeText+"_display";
+                if (!typeText.equals(SpawnedDisplayEntityPart.PartType.INTERACTION.name())){
+                    typeText = typeText+"_DISPLAY";
                 }
-                SpawnedDisplayEntityPart.PartType type;
-                if (typeText.startsWith("!")){
-                    type = SpawnedDisplayEntityPart.PartType.valueOf(typeText.substring(1).toUpperCase());
-                }
-                else{
-                    type = SpawnedDisplayEntityPart.PartType.valueOf(typeText.toUpperCase());
-                }
+
+                SpawnedDisplayEntityPart.PartType type = SpawnedDisplayEntityPart.PartType.valueOf(typeText);
+
                 if (exclude){
                     types.remove(type);
                 }

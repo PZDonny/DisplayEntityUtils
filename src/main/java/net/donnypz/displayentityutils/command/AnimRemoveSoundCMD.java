@@ -2,8 +2,11 @@ package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
+import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
+import net.donnypz.displayentityutils.utils.command.FramePointDisplay;
+import net.donnypz.displayentityutils.utils.command.RelativePointDisplay;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -20,48 +23,35 @@ class AnimRemoveSoundCMD implements PlayerSubCommand {
             AnimCMD.noAnimationSelection(player);
             return;
         }
-        if (args.length < 5) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis anim removesound <frame-id> <sound | -all> <start | end>", NamedTextColor.RED));
+
+        RelativePointDisplay rp = DEUCommandUtils.getSelectedRelativePoint(player);
+        if (!(rp instanceof FramePointDisplay display)){
+            AnimCMD.noFramePointSelection(player);
+            return;
+        }
+
+        if (args.length < 3) {
+            player.sendMessage(Component.text("Incorrect Usage! /mdis anim removesound <sound | -all>", NamedTextColor.RED));
             return;
         }
         try {
-            int id = Integer.parseInt(args[2]);
-            String soundName = args[3];
+            String soundName = args[2];
             boolean isRemoveAll = soundName.equalsIgnoreCase("-all");
-            String placement = args[4];
-            SpawnedDisplayAnimationFrame frame = anim.getFrames().get(id);
-            boolean success = true;
-            if (placement.equalsIgnoreCase("start")){
-                if (isRemoveAll){
-                    frame.removeAllFrameStartSounds();
-                }
-                else{
-                    success = frame.removeFrameStartSound(soundName);
-                }
-
-            }
-            else if (placement.equalsIgnoreCase("end")){
-                if (isRemoveAll){
-                    frame.removeAllFrameEndSounds();
-                }
-                else{
-                    success = frame.removeFrameEndSound(soundName);
-                }
-            }
-            else{
-                player.sendMessage(Component.text("Invalid Option! Choose between \"start\" and \"end\"", NamedTextColor.RED));
-            }
+            FramePoint point = (FramePoint) display.getRelativePoint();
             if (isRemoveAll){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Removed all sounds from frame's "+placement, NamedTextColor.YELLOW)));
+                point.removeAllSounds();
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("All Sounds Removed from Frame Point!", NamedTextColor.YELLOW)));
+                return;
+            }
+
+
+            if (point.removeSound(soundName)){
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Sound Removed from Frame Point!", NamedTextColor.YELLOW)));
             }
             else{
-                if (success){
-                    player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully removed sound from frame's "+placement, NamedTextColor.YELLOW)));
-                }
-                else{
-                    player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Sound does not exist for frame's "+placement, NamedTextColor.RED)));
-                }
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Sound does not exist in Frame Point!", NamedTextColor.RED)));
             }
+
         }
         catch (NumberFormatException | IndexOutOfBoundsException e) {
             player.sendMessage(Component.text("Invalid value entered for frame-id! Enter a whole number >= 0", NamedTextColor.RED));

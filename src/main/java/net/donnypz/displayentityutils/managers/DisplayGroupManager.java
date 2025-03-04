@@ -6,7 +6,7 @@ import net.donnypz.displayentityutils.events.GroupRegisteredEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.GroupResult;
-import net.donnypz.displayentityutils.utils.deu.DEUCommandUtils;
+import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -33,11 +33,10 @@ public final class DisplayGroupManager {
 
 
     /**
-     * This will NEVER have to be called since it is already done automatically when a SpawnedDisplayEntityGroup is created
-     *
-     * @param part partKey
-     * @param spawnedGroup spawnedGroupValue
+     * This will NEVER have to be called since it is already done automatically when a SpawnedDisplayEntityGroup is created.
+     * DO NOT CALL THIS METHOD
      */
+    @ApiStatus.Internal
     public static void addSpawnedGroup(SpawnedDisplayEntityPart part, SpawnedDisplayEntityGroup spawnedGroup) {
         allSpawnedGroups.put(part, spawnedGroup);
     }
@@ -76,7 +75,7 @@ public final class DisplayGroupManager {
      * @param player Player to get the group of
      * @return The SpawnedDisplayEntityGroup that the player has selected. Null if player does not have a selection.
      */
-    public static SpawnedDisplayEntityGroup getSelectedSpawnedGroup(Player player) {
+    public static SpawnedDisplayEntityGroup getSelectedSpawnedGroup(@NotNull Player player) {
         return selectedGroup.get(player.getUniqueId());
     }
 
@@ -84,9 +83,9 @@ public final class DisplayGroupManager {
      * Remove a player's SpawnedDisplayEntityGroup selection
      * @param player Player to remove selection from
      */
-    public static void deselectSpawnedGroup(Player player) {
+    public static void deselectSpawnedGroup(@NotNull Player player) {
         selectedGroup.remove(player.getUniqueId());
-        DEUCommandUtils.removeParticleDisplays(player);
+        DEUCommandUtils.removeRelativePoints(player);
     }
 
 
@@ -97,7 +96,7 @@ public final class DisplayGroupManager {
      * @param parts The SpawnedPartSelection for the player to have selected
      * @param setGroup Whether to set the player's selected group to the group of the parts
      */
-    public static void setPartSelection(Player player, SpawnedPartSelection parts, boolean setGroup) {
+    public static void setPartSelection(@NotNull Player player, @NotNull SpawnedPartSelection parts, boolean setGroup) {
         selectedPartSelection.put(player.getUniqueId(), parts);
         if (setGroup) {
             selectedGroup.put(player.getUniqueId(), parts.getGroup());
@@ -111,7 +110,7 @@ public final class DisplayGroupManager {
      * @param player Player to get the selection of
      * @return The SpawnedPartSelection that the player has. Null if player does not have a selection.
      */
-    public static SpawnedPartSelection getPartSelection(Player player) {
+    public static SpawnedPartSelection getPartSelection(@NotNull Player player) {
         return selectedPartSelection.get(player.getUniqueId());
     }
 
@@ -121,7 +120,7 @@ public final class DisplayGroupManager {
      *
      * @param player Player to remove the selection from
      */
-    public static void removePartSelection(Player player) {
+    public static void removePartSelection(@NotNull Player player) {
         SpawnedPartSelection partSelection = selectedPartSelection.remove(player.getUniqueId());
         if (partSelection != null) {
             partSelection.getGroup().removePartSelection(partSelection);
@@ -134,7 +133,7 @@ public final class DisplayGroupManager {
      *
      * @param partSelection The part selection to remove
      */
-    public static void removePartSelection(SpawnedPartSelection partSelection) {
+    public static void removePartSelection(@NotNull SpawnedPartSelection partSelection) {
         Set<UUID> uuids = new HashSet<>(selectedPartSelection.keySet());
         for (UUID uuid : uuids) {
             if (selectedPartSelection.get(uuid).equals(partSelection)) {
@@ -196,7 +195,7 @@ public final class DisplayGroupManager {
         }
     }
 
-    public static boolean isGroupRegistered(SpawnedDisplayEntityGroup spawnedGroup) {
+    public static boolean isGroupRegistered(@NotNull SpawnedDisplayEntityGroup spawnedGroup) {
         return allSpawnedGroups.containsKey(spawnedGroup.getMasterPart());
     }
 
@@ -209,7 +208,7 @@ public final class DisplayGroupManager {
      * @param saver              Player who is saving the group (Nullable)
      * @return boolean whether the save was successful
      */
-    public static boolean saveDisplayEntityGroup(LoadMethod loadMethod, DisplayEntityGroup displayEntityGroup, @Nullable Player saver) {
+    public static boolean saveDisplayEntityGroup(@NotNull LoadMethod loadMethod, @NotNull DisplayEntityGroup displayEntityGroup, @Nullable Player saver) {
         if (displayEntityGroup.getTag() == null) {
             return false;
         }
@@ -240,7 +239,7 @@ public final class DisplayGroupManager {
      * @param tag Tag of the group to be deleted
      * @param deleter Player who is deleting the group (Nullable)
      */
-    public static void deleteDisplayEntityGroup(LoadMethod loadMethod, String tag, @Nullable Player deleter) {
+    public static void deleteDisplayEntityGroup(@NotNull LoadMethod loadMethod, @NotNull String tag, @Nullable Player deleter) {
         switch (loadMethod) {
             case LOCAL -> {
                 LocalManager.deleteDisplayEntityGroup(tag, deleter);
@@ -262,7 +261,7 @@ public final class DisplayGroupManager {
      * @param tag The tag of the {@link DisplayEntityGroup} to be retrieved
      * @return The found {@link DisplayEntityGroup}. Null if not found.
      */
-    public static DisplayEntityGroup getGroup(String tag){
+    public static DisplayEntityGroup getGroup(@NotNull String tag){
         DisplayEntityGroup group = getGroup(LoadMethod.LOCAL, tag);
         if (group == null){
             group = getGroup(LoadMethod.MONGODB, tag);
@@ -281,7 +280,7 @@ public final class DisplayGroupManager {
      * @param tag The tag of the {@link DisplayEntityGroup} to be retrieved
      * @return The found {@link DisplayEntityGroup}. Null if not found.
      */
-    public static DisplayEntityGroup getGroup(LoadMethod loadMethod, String tag) {
+    public static DisplayEntityGroup getGroup(@NotNull LoadMethod loadMethod, @NotNull String tag) {
         switch (loadMethod) {
             case LOCAL -> {
                 return LocalManager.retrieveDisplayEntityGroup(tag);
@@ -302,7 +301,7 @@ public final class DisplayGroupManager {
      * @param file File of a saved {@link DisplayEntityGroup}
      * @return The found {@link DisplayEntityGroup}. Null if not found.
      */
-    public static DisplayEntityGroup getGroup(File file) {
+    public static DisplayEntityGroup getGroup(@NotNull File file) {
         try {
             return getGroup(new FileInputStream(file));
         } catch (IOException ex) {
@@ -317,7 +316,7 @@ public final class DisplayGroupManager {
      * @param inputStream InputStream containing a saved Display Entity Group
      * @return The found DisplayEntityGroup. Null if not found.
      */
-    public static DisplayEntityGroup getGroup(InputStream inputStream) {
+    public static DisplayEntityGroup getGroup(@NotNull InputStream inputStream) {
         byte[] bytes;
         try{
             bytes = inputStream.readAllBytes();
@@ -368,7 +367,7 @@ public final class DisplayGroupManager {
      * @param resourcePath The path of the DisplayEntityGroup
      * @return The found DisplayEntityGroup. Null if not found.
      */
-    public static DisplayEntityGroup getGroup(JavaPlugin plugin, String resourcePath) {
+    public static DisplayEntityGroup getGroup(@NotNull JavaPlugin plugin, @NotNull String resourcePath) {
         InputStream modelStream;
         if (resourcePath.contains(DisplayEntityGroup.fileExtension)) {
             modelStream = plugin.getResource(resourcePath);
@@ -480,12 +479,13 @@ public final class DisplayGroupManager {
      * @param radius The radius to check for a spawned display entity group
      * @return A {@link GroupResult}. Null if not found.
      */
-    public static GroupResult getSpawnedGroupNearLocation(Location location, double radius) {
-        Display master = getNearestPotentialMasterDisplay(location, radius);
+    public static @Nullable GroupResult getSpawnedGroupNearLocation(@NotNull Location location, double radius) {
+        /*Display master = getNearestPotentialMasterDisplay(location, radius, null);
         if (master == null) {
             return null;
         }
-        return getSpawnedGroup(master, null);
+        return getSpawnedGroup(master, null);*/
+        return getSpawnedGroupNearLocation(location, radius, null);
     }
 
     /**
@@ -493,15 +493,17 @@ public final class DisplayGroupManager {
      *
      * @param location Center of the search location
      * @param radius The radius to check for a spawned display entity group
-     * @param tag Tag of the groups to searched for
+     * @param groupTag Tag of the groups to searched for
      * @param getter Player who is getting the spawned group
      * @return A {@link GroupResult}. Null if not found.
      */
-    public static GroupResult getSpawnedGroupNearLocation(Location location, double radius, String tag, @Nullable Player getter) {
-        Display master = getNearestDisplayEntity(location, radius, tag);
+    public static @Nullable GroupResult getSpawnedGroupNearLocation(@NotNull Location location, double radius, @NotNull String groupTag, @Nullable Player getter) {
+        Display master = getNearestPotentialMasterDisplay(location, radius, groupTag);
         if (master == null) {
             if (getter != null) {
-                getter.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Could not find display entities within " + radius + " blocks of you, with the tag, \"" + tag + "\"", NamedTextColor.RED)));
+                getter
+                        .sendMessage(DisplayEntityPlugin.pluginPrefix
+                        .append(Component.text("Could not find display entities within "+radius+" blocks of you, with the tag, \""+groupTag+"\"", NamedTextColor.RED)));
             }
             return null;
         }
@@ -516,8 +518,8 @@ public final class DisplayGroupManager {
      * @param getter Player who is getting the spawned group
      * @return A {@link GroupResult}. Null if not found.
      */
-    public static @Nullable GroupResult getSpawnedGroupNearLocation(Location location, double radius, @Nullable Player getter) {
-        Display master = getNearestPotentialMasterDisplay(location, radius);
+    public static @Nullable GroupResult getSpawnedGroupNearLocation(@NotNull Location location, double radius, @Nullable Player getter) {
+        Display master = getNearestPotentialMasterDisplay(location, radius, null);
         if (master == null){
             if (getter != null) {
                 getter.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You are not near any spawned display entity groups!", NamedTextColor.RED)));
@@ -534,7 +536,7 @@ public final class DisplayGroupManager {
      * @param radius The radius to check for {@link SpawnedDisplayEntityGroup}s
      * @return A list of {@link GroupResult}
      */
-    public static List<GroupResult> getSpawnedGroupsNearLocation(Location location, double radius) {
+    public static @NotNull List<GroupResult> getSpawnedGroupsNearLocation(@NotNull Location location, double radius) {
         List<GroupResult> results = new ArrayList<>();
         for (BlockDisplay display : location.getNearbyEntitiesByType(BlockDisplay.class, radius)) {
         //Check if found display is a part of a group
@@ -552,7 +554,7 @@ public final class DisplayGroupManager {
      *
      * @return List of all the SpawnedDisplayEntityGroups spawned during this play session by world name.
      */
-    public static List<SpawnedDisplayEntityGroup> getSpawnedGroups(String worldName) {
+    public static List<SpawnedDisplayEntityGroup> getSpawnedGroups(@NotNull String worldName) {
         ArrayList<SpawnedDisplayEntityGroup> groups = new ArrayList<>();
         for (SpawnedDisplayEntityGroup group : allSpawnedGroups.values()) {
             if (group.getWorldName().equals(worldName)) {
@@ -571,25 +573,24 @@ public final class DisplayGroupManager {
         return new ArrayList<>(allSpawnedGroups.values());
     }
 
-    private static Display getNearestDisplayEntity(Location loc, double radius, String tag) {
-
+    private static Display getNearestPotentialMasterDisplay(Location loc, double radius, String groupTag) {
         Display nearest = null;
         double lastDistance = Double.MAX_VALUE;
         for (Entity e : loc.getNearbyEntities(radius, radius, radius)) {
-            if (!(e instanceof Display display) || !DisplayUtils.isGroupTag(display, tag)) {
+            if (!(e instanceof Display d) || d.getPassengers().isEmpty() || (groupTag != null && !DisplayUtils.isGroupTag(d, groupTag))) {
                 continue;
             }
 
             double distance = loc.distanceSquared(e.getLocation());
             if (distance < lastDistance) {
                 lastDistance = distance;
-                nearest = (Display) e;
+                nearest = d;
             }
         }
         return nearest;
     }
 
-    private static Display getNearestPotentialMasterDisplay(Location loc, double radius) {
+    /*private static Display getNearestPotentialMasterDisplay(Location loc, double radius) {
         Display nearest = null;
         double lastDistance = Double.MAX_VALUE;
         for (Entity e : loc.getNearbyEntities(radius, radius, radius)) {
@@ -600,11 +601,11 @@ public final class DisplayGroupManager {
             double distance = loc.distanceSquared(e.getLocation());
             if (distance < lastDistance) {
                 lastDistance = distance;
-                nearest = (Display) e;
+                nearest = d;
             }
         }
         return nearest;
-    }
+    }*/
 
     /**
      * Get the group tags of all saved {@link DisplayEntityGroup}s in a storage location.
@@ -628,8 +629,4 @@ public final class DisplayGroupManager {
             }
         }
     }
-
-
-
-
 }

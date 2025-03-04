@@ -8,7 +8,7 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.events.InteractionClickEvent;
 import net.donnypz.displayentityutils.events.PreInteractionClickEvent;
 import net.donnypz.displayentityutils.listeners.autoGroup.DEULoadingListeners;
-import net.donnypz.displayentityutils.listeners.bdengine.DEUEntitySpawned;
+import net.donnypz.displayentityutils.listeners.bdengine.DatapackEntitySpawned;
 import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUMythicListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerChatListener;
@@ -23,13 +23,17 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
-import net.donnypz.displayentityutils.utils.deu.ParticleDisplay;
+import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
+import net.donnypz.displayentityutils.utils.command.RelativePointDisplay;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -129,7 +133,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
 
         Bukkit.getPluginManager().registerEvents(this, this);
-        Bukkit.getPluginManager().registerEvents(new DEUEntitySpawned(), this);
+        Bukkit.getPluginManager().registerEvents(new DatapackEntitySpawned(), this);
         if (automaticGroupDetection){
             Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
         }
@@ -450,33 +454,42 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     }
 
     private void determineAction(Interaction interaction, Player player, InteractionClickEvent.ClickType clickType){
-        //Particle Displays
-        if (ParticleDisplay.isParticleDisplay(interaction)){
+        //Point Displays
+        if (RelativePointDisplay.isRelativePointEntity(interaction)){
+            RelativePointDisplay point = RelativePointDisplay.get(interaction.getUniqueId());
+            if (point == null){
+                player.sendMessage(Component.text("Failed to get point!", NamedTextColor.RED));
+                return;
+            }
             if (clickType == InteractionClickEvent.ClickType.RIGHT){
                 if (player.isSneaking()){
                     if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_REMOVE_PARTICLE)){
                         return;
                     }
-                    boolean result = ParticleDisplay.delete(interaction.getUniqueId());
-                    if (result){
-                        player.sendMessage(pluginPrefix.append(Component.text("Successfully removed particle from frame!", NamedTextColor.YELLOW)));
-                    }
-                    else{
-                        player.sendMessage(pluginPrefix.append(Component.text("This particle has already been removed by another player or other methods!", NamedTextColor.RED)));
-                    }
+                    Component comp = Component.text("Click here to confirm point REMOVAL", NamedTextColor.DARK_RED, TextDecoration.UNDERLINED)
+                            .clickEvent(ClickEvent.callback(a -> {
+                                Player p = (Player) a;
+                                boolean result = point.removeFromPointHolder();
+                                DEUCommandUtils.deselectRelativePoint(p);
+                                if (result){
+                                    p.sendMessage(pluginPrefix.append(Component.text("Successfully removed point from frame!", NamedTextColor.YELLOW)));
+                                    point.despawn();
+                                }
+                                else{
+                                    p.sendMessage(pluginPrefix.append(Component.text("This point has already been removed by another player or other methods!", NamedTextColor.RED)));
+                                }
+                            }));
+                    player.sendMessage(comp);
+                    player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+
                 }
                 else{
-                    ParticleDisplay particle = ParticleDisplay.get(interaction.getUniqueId());
-                    if (particle == null){
-                        player.sendMessage(Component.text("Failed to get particle", NamedTextColor.RED));
-                        return;
-                    }
-                    particle.spawn();
-                    player.sendMessage(Component.text("Particle Spawned", NamedTextColor.GREEN));
+                    point.rightClick(player);
                 }
             }
             else{
-                ParticleDisplay.sendInfo(interaction.getUniqueId(), player);
+                point.leftClick(player);
+                DEUCommandUtils.selectRelativePoint(player, point);
             }
             return;
         }

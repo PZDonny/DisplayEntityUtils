@@ -16,10 +16,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
 
-public class DEUMythicListener implements Listener {
+@ApiStatus.Internal
+public final class DEUMythicListener implements Listener {
 
     //Create MythicMob Mechanic
     @EventHandler
@@ -59,7 +61,7 @@ public class DEUMythicListener implements Listener {
     public void onMythicSpawn(MythicMobSpawnEvent e){
         Entity mythicMob = e.getEntity();
         String mobID = e.getMobType().getInternalName();
-        DisplayController controller = DisplayControllerManager.getMythicMobController(mobID);
+        DisplayController controller = DisplayControllerManager.getControllerOfMythicMob(mobID);
         if (controller == null){
             return;
         }
@@ -76,6 +78,7 @@ public class DEUMythicListener implements Listener {
         spawned.setVerticalOffset(controller.getVerticalOffset());
         spawned.rideEntity(e.getEntity());
         spawned.setPersistent(persistGroupAfterRestart);
+        spawned.setPersistenceOverride(false);
 
         Entity masterEntity = spawned.getMasterPart().getEntity();
         PersistentDataContainer pdc = masterEntity.getPersistentDataContainer();
@@ -94,59 +97,4 @@ public class DEUMythicListener implements Listener {
 
         DisplayControllerManager.registerEntity(mythicMob, spawned);
     }
-
-
-
-
-
-
-
-    //Skill Animations With MythicMob Variables
-    /*@EventHandler(priority = EventPriority.HIGHEST)
-    public void onTrigger(MythicTriggerEvent e){
-        AbstractEntity entity = e.getSkillMetadata().getTrigger();
-        if (entity == null){
-            return;
-        }
-
-        MythicBukkit mythic = MythicBukkit.inst();
-
-        MythicMob mob = mythic.getMobManager().determineMobType(entity);
-        if (mob == null){
-            return;
-        }
-
-        VariableRegistry registry = mythic.getVariableManager().getRegistry(VariableScope.CASTER, entity);
-        if (registry == null){
-            return;
-        }
-
-        String animationTag;
-        //Linear Animations
-        if (registry.has(animationLinearVariable)){
-            Variable v = registry.get(animationLinearVariable);
-            animationTag = (String) v.get();
-            registry.remove(animationLinearVariable);
-        }
-        else{ //No Variable Found
-            return;
-        }
-
-        SpawnedDisplayEntityGroup group = DisplayControllerManager.getControllerGroup(entity.getBukkitEntity());
-        if (group == null){
-            return;
-        }
-
-        String mobID = mob.getInternalName();
-        DisplayController controller = DisplayControllerManager.getMythicMobController(mobID);
-        if (controller == null){
-            return;
-        }
-        DisplayStateMachine machine = controller.getStateMachine();
-        if (machine == null || !machine.hasState(animationTag)){
-            return;
-        }
-        MachineState state = machine.getState(animationTag);
-        group.setMachineState(state, machine);
-    }*/
 }

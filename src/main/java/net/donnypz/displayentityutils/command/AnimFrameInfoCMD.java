@@ -3,7 +3,6 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationSound;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -13,8 +12,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-
-import java.util.HashMap;
 
 class AnimFrameInfoCMD implements PlayerSubCommand {
 
@@ -47,61 +44,29 @@ class AnimFrameInfoCMD implements PlayerSubCommand {
                 return;
             }
             player.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-            SpawnedDisplayAnimationFrame frame = animation.getFrames().get(id);
+            SpawnedDisplayAnimationFrame frame = animation.getFrame(id);
             player.sendMessage(MiniMessage.miniMessage().deserialize("Frame ID: <yellow>"+id));
             player.sendMessage(MiniMessage.miniMessage().deserialize("Duration: <yellow>"+frame.getDuration()));
             player.sendMessage(MiniMessage.miniMessage().deserialize("Delay: <yellow>"+frame.getDelay()));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Frame Points: <yellow>"+frame.getFramePoints().size()));
 
-            sendSounds(player, "Start Sounds: ", frame.getFrameStartSounds());
             player.sendMessage(Component.empty());
-            sendSounds(player, "End Sounds: ", frame.getFrameEndSounds());
-            player.sendMessage(Component.empty());
-            Component editStartParticles = MiniMessage.miniMessage().deserialize("<aqua>Click here to view frame <green>START <aqua>particles").clickEvent(ClickEvent.callback(f -> {
+
+            Component editPoints = MiniMessage.miniMessage().deserialize("<aqua>Click here to view frame points").clickEvent(ClickEvent.callback(f -> {
                 if (group == null){
                     player.sendMessage(Component.text("You must have a group selected to do this action!", NamedTextColor.RED));
                     return;
                 }
                 player.sendMessage(Component.empty());
-                player.sendMessage(Component.text("Showing START particles for frame "+id, NamedTextColor.YELLOW));
+                player.sendMessage(Component.text("Frame Points for Frame: "+id, NamedTextColor.YELLOW));
                 player.playSound(player, Sound.ENTITY_ITEM_FRAME_PLACE, 1, 2);
-                frame.visuallyEditStartParticles(player, group);
+                frame.visuallyEditFramePoints(player, group);
             }));
 
-            Component editEndParticles = MiniMessage.miniMessage().deserialize("<aqua>Click here to view frame <gold>END <aqua>particles").clickEvent(ClickEvent.callback(f -> {
-                if (group == null){
-                    player.sendMessage(Component.text("You must have a group selected to do this action!", NamedTextColor.RED));
-                    return;
-                }
-                player.sendMessage(Component.empty());
-                player.sendMessage(Component.text("Showing END particles for frame "+id, NamedTextColor.YELLOW));
-                player.playSound(player, Sound.ENTITY_ITEM_FRAME_PLACE, 1, 2);
-                frame.visuallyEditEndParticles(player, group);
-            }));
-            player.sendMessage(editStartParticles);
-            player.sendMessage(editEndParticles);
+            player.sendMessage(editPoints);
 
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid frame ID! Enter whole numbers >= 0", NamedTextColor.RED));
-        }
-    }
-
-
-    private void sendSounds(Player player, String prefix, HashMap<String, AnimationSound> sounds){
-        if (sounds.isEmpty()){
-            player.sendMessage(Component.text(prefix).append(Component.text("NONE", NamedTextColor.GRAY)));
-        }
-        else{
-            player.sendMessage(Component.text(prefix));
-            for (AnimationSound sound : sounds.values()){
-                if (sound.existsInGameVersion()){
-                    player.sendMessage(Component.text("- "+sound.getSoundName()+": ", NamedTextColor.YELLOW));
-                }
-                else{
-                    player.sendMessage(Component.text("- "+sound.getSoundName()+": ", NamedTextColor.YELLOW).append(Component.text(" (Invalid)", NamedTextColor.RED)));
-                }
-
-                player.sendMessage(Component.text("| Vol: "+sound.getVolume()+", Pitch: "+sound.getPitch(), NamedTextColor.GRAY));
-            }
         }
     }
 }

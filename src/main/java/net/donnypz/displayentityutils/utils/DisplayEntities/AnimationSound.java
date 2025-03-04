@@ -1,36 +1,74 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 
 @ApiStatus.Internal
-public class AnimationSound implements Externalizable {
+public class AnimationSound implements Externalizable, Cloneable {
     transient Sound sound;
     String soundName;
     float volume;
     float pitch;
+    int delay;
     transient private boolean existsInGameVersion = true;
 
     @Serial
     private static final long serialVersionUID = 0;
 
+    @ApiStatus.Internal
     public AnimationSound(){}
 
-    public AnimationSound(String soundName, float volume, float pitch){
+    public AnimationSound(String soundName, float volume, float pitch, int delayInTicks){
         this.soundName = soundName;
         this.volume = volume;
         this.pitch = pitch;
+        this.delay = delayInTicks;
         existsInGameVersion = false;
     }
 
-    public AnimationSound(Sound sound, float volume, float pitch){
-        this(sound.getKey().getKey(), volume, pitch);
+    public AnimationSound(Sound sound, float volume, float pitch, int delayInTicks){
+        this(sound.getKey().getKey(), volume, pitch, delayInTicks);
         this.sound = sound;
         existsInGameVersion = true;
+    }
 
+    public AnimationSound(AnimationSound sound){
+        this.sound = sound.sound;
+        this.soundName = sound.soundName;
+        this.volume = sound.volume;
+        this.pitch = sound.pitch;
+        this.delay = sound.delay;
+        this.existsInGameVersion = sound.existsInGameVersion;
+    }
 
+    public void playSound(@NotNull Location location, @NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
+        if (delay == 0){
+            playSound(location);
+        }
+        else{
+            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                if (!group.isSpawned()){
+                    return;
+                }
+                if (animator == null){
+                    playSound(location);
+                }
+                else if (group.isActiveAnimator(animator)){
+                    playSound(location);
+                }
+            }, delay);
+        }
+    }
+
+    public void playSound(@NotNull Location location){
+        location.getWorld().playSound(location, sound, volume, pitch);
     }
 
     @Override
@@ -38,6 +76,7 @@ public class AnimationSound implements Externalizable {
         out.writeObject(soundName);
         out.writeFloat(volume);
         out.writeFloat(pitch);
+        out.writeInt(delay);
     }
 
     @Override
@@ -51,6 +90,12 @@ public class AnimationSound implements Externalizable {
         }
         volume = in.readFloat();
         pitch = in.readFloat();
+        try{
+            delay = in.readInt();
+        }
+        catch(IOException ignored){
+            delay = 0;
+        }
     }
 
     public Sound getSound() {
@@ -69,7 +114,20 @@ public class AnimationSound implements Externalizable {
         return pitch;
     }
 
+    public int getDelay() {
+        return delay;
+    }
+
     public boolean existsInGameVersion() {
         return existsInGameVersion;
+    }
+
+    @Override
+    public AnimationSound clone() {
+        try {
+            return (AnimationSound) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

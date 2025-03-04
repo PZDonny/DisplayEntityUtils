@@ -1,9 +1,8 @@
-package net.donnypz.displayentityutils.utils.deu;
+package net.donnypz.displayentityutils.utils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticle;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
@@ -19,61 +18,137 @@ import java.util.*;
 @ApiStatus.Internal
 public class DEUCommandUtils {
 
-    private static final HashMap<UUID, Set<ParticleDisplay>> particleDisplays = new HashMap<>();
+    private static final HashMap<UUID, Set<RelativePointDisplay>> relativePointDisplays = new HashMap<>();
+    private static final HashMap<UUID, RelativePointDisplay> selectedRelativePoint = new HashMap<>();
 
     @ApiStatus.Internal
-    public static void spawnParticleDisplays(SpawnedDisplayEntityGroup group, Player player, SpawnedDisplayAnimationFrame frame, boolean isStartParticle){
-        if (isViewingParticleDisplays(player)) {
-            player.sendMessage(Component.text("You are already viewing frame particles!!", NamedTextColor.RED));
-            player.sendMessage(Component.text("Run \"/mdis anim cancelparticles\" to stop viewing particles", NamedTextColor.YELLOW));
+    public static void spawnFramePointDisplays(SpawnedDisplayEntityGroup group, Player player, SpawnedDisplayAnimationFrame frame){
+        if (isViewingRelativePoints(player)) {
+            player.sendMessage(Component.text("You are already viewing points!", NamedTextColor.RED));
+            player.sendMessage(Component.text("| Run \"/mdis anim cancelpoints\" to stop viewing points", NamedTextColor.GRAY));
             return;
         }
 
-        if (isStartParticle && !frame.hasFrameStartParticles()){
-            player.sendMessage(Component.text("Failed to view particles! The frame does not have any START particles!", NamedTextColor.RED));
-            return;
-        }
-        else if (!isStartParticle && !frame.hasFrameEndParticles()){
-            player.sendMessage(Component.text("Failed to view particles! The frame does not have any END particles!", NamedTextColor.RED));
+        if (!frame.hasFramePoints()){
+            player.sendMessage(Component.text("Failed to view points! The frame does not have any frame points!", NamedTextColor.RED));
             return;
         }
 
-        Set<ParticleDisplay> displays = new HashSet<>();
-        List<AnimationParticle> particles = isStartParticle ? frame.getFrameStartParticles() : frame.getFrameEndParticles();
+        Set<RelativePointDisplay> displays = new HashSet<>();
+        Set<FramePoint> points = frame.getFramePoints();
 
-        for (AnimationParticle particle : particles){
-            Location spawnLoc = particle.getSpawnLocation(group);
-            ParticleDisplay pd = new ParticleDisplay(spawnLoc, particle, frame, isStartParticle);
+        for (FramePoint point : points){
+            Location spawnLoc = point.getLocation(group);
+            spawnLoc.setPitch(0);
+            FramePointDisplay pd = new FramePointDisplay(spawnLoc, point, frame);
             displays.add(pd);
             pd.reveal(player);
         }
-        particleDisplays.put(player.getUniqueId(), displays);
+
+        relativePointDisplays.put(player.getUniqueId(), displays);
         player.sendMessage(Component.text("Click a particle to edit/view it", NamedTextColor.YELLOW));
-        player.sendMessage(Component.text("| Run \"/mdis anim cancelparticles\" to stop viewing particles", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("| Run \"/mdis anim cancelpoints\" to stop viewing points", NamedTextColor.GRAY));
     }
 
     /**
-     * Remove the visual representation of particles for animation frames,
-     * after a player performs "/mdis anim frameinfo" then selects a prompt to view start/end particles
+     * Remove the visual representation of {@link RelativePoint}s,
+     * after command execution from a player
+     * @param player
+     * @return true if the player was viewing points
+     */
+    public static boolean removeRelativePoints(Player player){
+        Set<RelativePointDisplay> displays = relativePointDisplays.remove(player.getUniqueId());
+        if (displays != null){
+            for (RelativePointDisplay d : displays){
+                d.despawn();
+            }
+        }
+        deselectRelativePoint(player);
+        return displays != null;
+    }
+
+    /**
+     * Check if a player has the visual representation of {@link RelativePoint}s, which are visible after command execution from a player
      * @param player
      */
-    public static void removeParticleDisplays(Player player){
-        Set<ParticleDisplay> displays = particleDisplays.remove(player.getUniqueId());
-        if (displays != null){
-            for (ParticleDisplay d : displays){
-                d.remove();
+    public static boolean isViewingRelativePoints(Player player){
+        return relativePointDisplays.containsKey(player.getUniqueId());
+    }
+
+
+    public static RelativePointDisplay getSelectedRelativePoint(Player player){
+        return selectedRelativePoint.get(player.getUniqueId());
+    }
+
+    public static void selectRelativePoint(Player player, RelativePointDisplay relativePoint){
+        RelativePointDisplay oldPoint = selectedRelativePoint.put(player.getUniqueId(), relativePoint);
+        if (oldPoint != null){
+            oldPoint.deselect();
+        }
+        relativePoint.select();
+        player.sendMessage(Component.text("Clicked Point Selected!", NamedTextColor.GREEN));
+    }
+
+    public static void deselectRelativePoint(Player player){
+        selectedRelativePoint.remove(player.getUniqueId());
+    }
+
+    public static int[] commaSeparatedIDs(String idString) throws IllegalArgumentException{
+        String[] split = idString.split(",");
+        if (split.length == 0){
+            return new int[]{Integer.parseInt(idString)};
+        }
+
+        int[] arr = new int[split.length];
+        for (int i = 0; i < split.length; i++){
+            arr[i] = Integer.parseInt(split[i]);
+        }
+        return arr;
+    }
+
+    public static Collection<SpawnedDisplayAnimationFrame> getFrames(String arg, SpawnedDisplayAnimation animation) throws IllegalArgumentException{
+        //Single Frame ID in arg
+        try{
+            int index = Integer.parseInt(arg);
+            return Set.of(animation.getFrame(index));
+        }
+
+
+        catch(NumberFormatException ignored){}
+        catch(IndexOutOfBoundsException e){ //Single Frame ID Out of Bounds
+            throw new IllegalArgumentException(e);
+        }
+
+        //Multiple Frame IDs
+        try{
+            int[] ids = commaSeparatedIDs(arg);
+            Set<SpawnedDisplayAnimationFrame> frames = new HashSet<>();
+            for (int i = 0; i < ids.length; i++){
+                try{
+                    frames.add(animation.getFrame(i));
+                }
+                catch(IndexOutOfBoundsException ignored1){}
             }
+            return frames;
+        }
+        //Single Frame Tag
+        catch (IllegalArgumentException ex){
+            if (!DisplayUtils.isValidTag(arg)){
+                throw ex;
+            }
+
+            Set<SpawnedDisplayAnimationFrame> frames = new HashSet<>();
+            for (SpawnedDisplayAnimationFrame frame : animation.getFrames()){
+                if (arg.equals(frame.getTag())){
+                    frames.add(frame);
+                }
+            }
+            return frames;
         }
     }
 
-    /**
-     * Check if a player has the visual representation of particles for animation frames.
-     * The particles are visiable after a player performs "/mdis anim frameinfo" then selects a prompt to view start/end particles
-     * @param player
-     */
-    public static boolean isViewingParticleDisplays(Player player){
-        return particleDisplays.containsKey(player.getUniqueId());
-    }
+
+
 
     public static BlockData getBlockFromText(String block, Player player){
         BlockData blockData;
