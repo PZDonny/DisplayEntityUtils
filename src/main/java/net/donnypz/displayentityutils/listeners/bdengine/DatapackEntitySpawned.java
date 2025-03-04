@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @ApiStatus.Internal
-public final class DEUEntitySpawned implements Listener {
+public final class DatapackEntitySpawned implements Listener {
     private static final HashMap<Object, SpawnedDisplayEntityGroup> groups = new HashMap<>();
     private static final HashSet<Object> incomingAnimationValue = new HashSet<>();
 
