@@ -27,7 +27,7 @@ public final class DisplayAnimationManager {
      * @param player Player to set the selection to
      * @param spawnedDisplayAnimation SpawnedDisplayAnimation to be set to the player
      */
-    public static void setSelectedSpawnedAnimation(Player player, SpawnedDisplayAnimation spawnedDisplayAnimation){
+    public static void setSelectedSpawnedAnimation(@NotNull Player player, @NotNull SpawnedDisplayAnimation spawnedDisplayAnimation){
         if (selectedAnimation.get(player.getUniqueId()) != null){
             SpawnedDisplayAnimation lastAnim = selectedAnimation.get(player.getUniqueId());
             if (lastAnim == spawnedDisplayAnimation){
@@ -54,7 +54,7 @@ public final class DisplayAnimationManager {
      * @param player Player to get the animation of
      * @return The SpawnedDisplayAnimation that the player has selected. Null if player does not have a selection.
      */
-    public static SpawnedDisplayAnimation getSelectedSpawnedAnimation(Player player) {
+    public static @Nullable SpawnedDisplayAnimation getSelectedSpawnedAnimation(@NotNull Player player) {
         return selectedAnimation.get(player.getUniqueId());
     }
 
@@ -62,7 +62,7 @@ public final class DisplayAnimationManager {
      * Remove a player's SpawnedDisplayAnimation selection
      * @param player Player to remove selection from
      */
-    public static void deselectSpawnedAnimation(Player player){
+    public static void deselectSpawnedAnimation(@NotNull Player player){
         selectedAnimation.remove(player.getUniqueId());
     }
 
@@ -74,7 +74,7 @@ public final class DisplayAnimationManager {
      * @param saver Player who is saving the animation
      * @return boolean whether the save was successful
      */
-    public static boolean saveDisplayAnimation(@NotNull LoadMethod loadMethod, DisplayAnimation displayAnimation, @Nullable Player saver){
+    public static boolean saveDisplayAnimation(@NotNull LoadMethod loadMethod, @NotNull DisplayAnimation displayAnimation, @Nullable Player saver){
         if (displayAnimation.getAnimationTag() == null){
             return false;
         }
@@ -108,7 +108,7 @@ public final class DisplayAnimationManager {
      * @param tag Tag of the animation to be deleted
      * @param deleter Player who is deleting the animation (Nullable)
      */
-    public static void deleteDisplayAnimation(LoadMethod loadMethod, String tag, @Nullable Player deleter) {
+    public static void deleteDisplayAnimation(@NotNull LoadMethod loadMethod, @NotNull String tag, @Nullable Player deleter) {
         switch (loadMethod) {
             case LOCAL -> {
                 LocalManager.deleteDisplayAnimation(tag, deleter);
@@ -129,7 +129,7 @@ public final class DisplayAnimationManager {
      * @param animationTag the tag of the animation
      * @return a {@link SpawnedDisplayAnimation} or null if not cached
      */
-    public static SpawnedDisplayAnimation getCachedAnimation(String animationTag){
+    public static @Nullable SpawnedDisplayAnimation getCachedAnimation(@NotNull String animationTag){
         return cachedAnimations.get(animationTag);
     }
 
@@ -141,7 +141,7 @@ public final class DisplayAnimationManager {
      * <p>If an animation is not already cached, an attempt will be made to retrieve from the desired storage location</p>
      * @return a {@link SpawnedDisplayAnimation}, or null if the animation is not cached and does not exist in any storage location.
      */
-    public static SpawnedDisplayAnimation getSpawnedDisplayAnimation(String animationTag, @Nullable LoadMethod loadMethod){
+    public static @Nullable SpawnedDisplayAnimation getSpawnedDisplayAnimation(@NotNull String animationTag, @Nullable LoadMethod loadMethod){
     //Check Cache
         SpawnedDisplayAnimation spawnedAnim = getCachedAnimation(animationTag);
         if (spawnedAnim != null){
@@ -177,7 +177,7 @@ public final class DisplayAnimationManager {
      * @param tag The tag of the {@link DisplayAnimation} to be retrieved
      * @return The found {@link DisplayAnimation}. Null if not found.
      */
-    public static DisplayAnimation getAnimation(String tag){
+    public static @Nullable DisplayAnimation getAnimation(@NotNull String tag){
         DisplayAnimation anim = getAnimation(LoadMethod.LOCAL, tag);
         if (anim == null){
             anim = getAnimation(LoadMethod.MONGODB, tag);
@@ -195,7 +195,7 @@ public final class DisplayAnimationManager {
      * @param tag The tag of the {@link DisplayAnimation} to be retrieved
      * @return The found {@link DisplayAnimation}. Null if not found.
      */
-    public static DisplayAnimation getAnimation(LoadMethod loadMethod, String tag){
+    public static @Nullable DisplayAnimation getAnimation(@NotNull LoadMethod loadMethod, @NotNull String tag){
         switch(loadMethod){
             case LOCAL ->{
                 return LocalManager.retrieveDisplayAnimation(tag);
@@ -215,7 +215,7 @@ public final class DisplayAnimationManager {
      * @param file File of a saved {@link DisplayAnimation}
      * @return The found {@link DisplayAnimation}. Null if not found.
      */
-    public static DisplayAnimation getAnimation(File file){
+    public static @Nullable DisplayAnimation getAnimation(@NotNull File file){
         try{
             return getAnimation(new FileInputStream(file));
         }
@@ -230,7 +230,7 @@ public final class DisplayAnimationManager {
      * @param inputStream InputStream containing a saved {@link DisplayAnimation}.
      * @return The found {@link DisplayAnimation}. Null if not found.
      */
-    public static DisplayAnimation getAnimation(InputStream inputStream){
+    public static @Nullable DisplayAnimation getAnimation(@NotNull InputStream inputStream){
         byte[] bytes;
         try{
             bytes = inputStream.readAllBytes();
@@ -295,13 +295,16 @@ public final class DisplayAnimationManager {
      * @param resourcePath The path of the {@link DisplayAnimation}
      * @return The found {@link DisplayAnimation}. Null if not found.
      */
-    public static DisplayAnimation getAnimation(JavaPlugin plugin, String resourcePath){
+    public static @Nullable DisplayAnimation getAnimation(@NotNull JavaPlugin plugin, @NotNull String resourcePath){
         InputStream modelStream;
         if (resourcePath.contains(DisplayAnimation.fileExtension)){
             modelStream = plugin.getResource(resourcePath);
         }
         else{
             modelStream = plugin.getResource(resourcePath+DisplayAnimation.fileExtension);
+        }
+        if (modelStream == null){
+            return null;
         }
         return getAnimation(modelStream);
     }
