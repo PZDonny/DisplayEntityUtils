@@ -92,8 +92,12 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
     }
 
     static void invalidTag(Player player, String tag){
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to add part tag: "+tag, NamedTextColor.RED)));
-        player.sendMessage(Component.text("The tag can not start with an \"!\", include commas, nor be empty!", NamedTextColor.GRAY, TextDecoration.ITALIC));
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to add tag: "+tag, NamedTextColor.RED)));
+        invalidTagRestrictions(player);
+    }
+
+    static void invalidTagRestrictions(Player player){
+        player.sendMessage(Component.text("Valid tags do not start with an \"!\" and do not contain commas.", NamedTextColor.GRAY, TextDecoration.ITALIC));
     }
 
     static void suggestUpdateSelection(Player player){
