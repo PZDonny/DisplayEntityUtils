@@ -18,7 +18,7 @@ import java.util.*;
 @ApiStatus.Internal
 public class DEUCommandUtils {
 
-    private static final HashMap<UUID, Set<FramePointDisplay>> relativePointDisplays = new HashMap<>();
+    private static final HashMap<UUID, Set<RelativePointDisplay>> relativePointDisplays = new HashMap<>();
     private static final HashMap<UUID, RelativePointDisplay> selectedRelativePoint = new HashMap<>();
 
     @ApiStatus.Internal
@@ -34,7 +34,7 @@ public class DEUCommandUtils {
             return;
         }
 
-        Set<FramePointDisplay> displays = new HashSet<>();
+        Set<RelativePointDisplay> displays = new HashSet<>();
         Set<FramePoint> points = frame.getFramePoints();
 
         for (FramePoint point : points){
@@ -57,9 +57,9 @@ public class DEUCommandUtils {
      * @return true if the player was viewing points
      */
     public static boolean removeRelativePoints(Player player){
-        Set<FramePointDisplay> displays = relativePointDisplays.remove(player.getUniqueId());
+        Set<RelativePointDisplay> displays = relativePointDisplays.remove(player.getUniqueId());
         if (displays != null){
-            for (FramePointDisplay d : displays){
+            for (RelativePointDisplay d : displays){
                 d.despawn();
             }
         }
