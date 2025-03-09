@@ -6,19 +6,16 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import ch.njol.skript.util.Color;
 import ch.njol.skript.util.Timespan;
 import ch.njol.util.coll.CollectionUtils;
-import net.donnypz.displayentityutils.utils.DisplayEntities.Spawned;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Spawned Group Teleportation Duration")
-@Description("Get or Set the teleporation duration of a spawned group")
-@Examples({"set {_spawnedgroup}'s teleporation duration to 5 ticks", "reset {_spawnedgroup}'s teleportation duration"})
-@Since("2.6.2")
+@Description("Get or Set the teleportation duration of a spawned group")
+@Examples({"set {_spawnedgroup}'s deu teleportation duration to 5 ticks", "reset {_spawnedgroup}'s deu teleport duration"})
+@Since("2.7.2")
 public class ExprSpawnedTeleportDuration extends SimplePropertyExpression<SpawnedDisplayEntityGroup, Number> {
 
     static {
@@ -74,7 +71,7 @@ public class ExprSpawnedTeleportDuration extends SimplePropertyExpression<Spawne
     @Override
     public Class<?>[] acceptChange(final Changer.ChangeMode mode) {
         if (mode == Changer.ChangeMode.SET || mode == Changer.ChangeMode.RESET) {
-            return CollectionUtils.array(Color.class);
+            return CollectionUtils.array(Timespan.class);
         }
         return null;
     }
