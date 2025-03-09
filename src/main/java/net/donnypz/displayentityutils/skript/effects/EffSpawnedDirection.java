@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Set Direction (Pitch, Yaw, Pivot)")
 @Description("Set the pitch and yaw of a spawned group/part/selection. Optionally pivot interactions")
-@Examples({"set {_spawnedgroup}'s yaw to 35 with interaction pivot", "set {_spawnedpart}'s pitch to -90"})
+@Examples({"set {_spawnedgroup}'s yaw with interaction pivot to 35 ", "set {_spawnedpart}'s pitch to -90"})
 @Since("2.6.2")
 public class EffSpawnedDirection extends Effect {
     static {
