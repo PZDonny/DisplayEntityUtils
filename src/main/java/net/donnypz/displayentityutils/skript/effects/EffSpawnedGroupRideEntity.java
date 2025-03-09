@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class EffSpawnedGroupRideEntity extends Effect {
     static {
-        Skript.registerEffect(EffSpawnedGroupRideEntity.class,"[deu] make %spawnedgroup% (mount|ride) %entity% [c:using controller [with id] %string%]");
+        Skript.registerEffect(EffSpawnedGroupRideEntity.class,"[deu] make %spawnedgroup% (mount|ride) %entity% [c:using controller [with id] %-string%]");
     }
 
     Expression<SpawnedDisplayEntityGroup> group;
