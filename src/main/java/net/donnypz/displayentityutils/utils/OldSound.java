@@ -1512,14 +1512,8 @@ public enum OldSound implements Keyed, net.kyori.adventure.sound.Sound.Type { //
     ITEM_BUCKET_FILL_LAVA("item.bucket.fill_lava"),
     ITEM_BUCKET_FILL_POWDER_SNOW("item.bucket.fill_powder_snow"),
     ITEM_BUCKET_FILL_TADPOLE("item.bucket.fill_tadpole"),
-    @MinecraftExperimental(MinecraftExperimental.Requires.BUNDLE) // Paper - add missing annotation
-    @org.jetbrains.annotations.ApiStatus.Experimental // Paper - add missing annotation
     ITEM_BUNDLE_DROP_CONTENTS("item.bundle.drop_contents"),
-    @MinecraftExperimental(MinecraftExperimental.Requires.BUNDLE) // Paper - add missing annotation
-    @org.jetbrains.annotations.ApiStatus.Experimental // Paper - add missing annotation
     ITEM_BUNDLE_INSERT("item.bundle.insert"),
-    @MinecraftExperimental(MinecraftExperimental.Requires.BUNDLE) // Paper - add missing annotation
-    @org.jetbrains.annotations.ApiStatus.Experimental // Paper - add missing annotation
     ITEM_BUNDLE_REMOVE_ONE("item.bundle.remove_one"),
     ITEM_CHORUS_FRUIT_TELEPORT("item.chorus_fruit.teleport"),
     ITEM_CROP_PLANT("item.crop.plant"),
