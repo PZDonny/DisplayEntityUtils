@@ -16,7 +16,7 @@ class GroupDeselectCMD extends PlayerSubCommand {
     public void execute(Player player, String[] args) {
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your group selection is already cleared!", NamedTextColor.YELLOW)));
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your group selection is already cleared!", NamedTextColor.RED)));
             return;
         }
 
