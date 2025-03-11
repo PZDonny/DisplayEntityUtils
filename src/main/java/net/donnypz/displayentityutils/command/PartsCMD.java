@@ -10,12 +10,13 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.List;
 
-class PartsCMD implements ConsoleUsableSubCommand {
+class PartsCMD extends ConsoleUsableSubCommand {
 
     private static final HashMap<String, SubCommand> subCommands = new HashMap<>();
 
 
     PartsCMD(){
+        super(Permission.HELP);
         subCommands.put("help", new PartsHelpCMD());
         subCommands.put("cycle", new PartsCycleCMD());
         subCommands.put("glow", new PartsGlowCMD());
@@ -53,9 +54,6 @@ class PartsCMD implements ConsoleUsableSubCommand {
         String arg = args[1];
         SubCommand subCommand = subCommands.get(arg);
         if (subCommand == null){
-            if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.HELP)){
-                return;
-            }
             partsHelp(sender, 1);
         }
         else{

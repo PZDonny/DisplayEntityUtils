@@ -1,8 +1,13 @@
 package net.donnypz.displayentityutils.command;
 
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
-interface PlayerSubCommand extends SubCommand{
-    void execute(Player player, String[] args);
+abstract class PlayerSubCommand extends SubCommand{
+    PlayerSubCommand(@NotNull Permission permission) {
+        super(permission);
+    }
+
+    abstract void execute(Player sender, String[] args);
 
 }

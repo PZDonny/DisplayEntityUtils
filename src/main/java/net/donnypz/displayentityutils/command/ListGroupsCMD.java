@@ -13,13 +13,13 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-class ListGroupsCMD implements ConsoleUsableSubCommand {
+class ListGroupsCMD extends ConsoleUsableSubCommand {
+    ListGroupsCMD() {
+        super(Permission.LIST_GROUPS);
+    }
+
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.LIST_GROUPS)){
-            return;
-        }
-
         if (args.length == 1){
             sender.sendMessage(Component.text("Incorrect Usage! /mdis listgroups <storage> [page-number]", NamedTextColor.RED));
             return;

@@ -10,13 +10,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
-class GroupSaveCMD implements PlayerSubCommand {
+class GroupSaveCMD extends PlayerSubCommand {
+    GroupSaveCMD() {
+        super(Permission.GROUP_SAVE);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_SAVE)){
-            return;
-        }
-
         if (args.length < 3) {
             player.sendMessage(Component.text("Incorrect Usage /mdis group save <storage>", NamedTextColor.RED));
             return;

@@ -15,16 +15,16 @@ import org.bukkit.entity.Player;
 import java.util.Arrays;
 import java.util.HashSet;
 
-class PartsFilterTypesCMD implements PlayerSubCommand {
+class PartsFilterTypesCMD extends PlayerSubCommand {
 
     private static final HashSet<SpawnedDisplayEntityPart.PartType> partTypes = new HashSet<>(Arrays.stream(SpawnedDisplayEntityPart.PartType.values()).toList());
 
+    PartsFilterTypesCMD() {
+        super(Permission.PARTS_SELECT);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_SELECT)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);

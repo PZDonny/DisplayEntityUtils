@@ -6,13 +6,13 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
-class GroupUnglowCMD implements PlayerSubCommand {
+class GroupUnglowCMD extends PlayerSubCommand {
+    GroupUnglowCMD() {
+        super(Permission.GROUP_GLOW);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_GLOW)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);

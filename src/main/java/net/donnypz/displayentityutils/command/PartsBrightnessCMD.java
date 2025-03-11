@@ -9,13 +9,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 
-class PartsBrightnessCMD implements PlayerSubCommand {
+class PartsBrightnessCMD extends PlayerSubCommand {
+    PartsBrightnessCMD() {
+        super(Permission.PARTS_BRIGHTNESS);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_BRIGHTNESS)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);

@@ -6,14 +6,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class AnimDataChangesCMD implements PlayerSubCommand {
+class AnimDataChangesCMD extends PlayerSubCommand {
+    AnimDataChangesCMD() {
+        super(Permission.ANIM_TOGGLE_DATA_CHANGES);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_TOGGLE_DATA_CHANGES)){
-            return;
-        }
-
-
         SpawnedDisplayAnimation anim = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
         if (anim == null) {
             AnimCMD.noAnimationSelection(player);

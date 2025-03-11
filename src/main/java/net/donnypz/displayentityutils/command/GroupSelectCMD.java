@@ -10,13 +10,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 
-class GroupSelectCMD implements PlayerSubCommand {
+class GroupSelectCMD extends PlayerSubCommand {
+    GroupSelectCMD() {
+        super(Permission.GROUP_SELECT);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_SELECT)){
-            return;
-        }
-
         if (args.length < 3) {
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a number for the distance to select interaction entities", NamedTextColor.RED)));
             player.sendMessage(Component.text("/mdis group selectnearest <interaction-distance>", NamedTextColor.GRAY));

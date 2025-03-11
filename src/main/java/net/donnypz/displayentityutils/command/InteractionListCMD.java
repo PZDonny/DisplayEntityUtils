@@ -14,12 +14,13 @@ import org.bukkit.entity.Player;
 import java.time.Duration;
 import java.util.List;
 
-class InteractionListCMD implements PlayerSubCommand {
+class InteractionListCMD extends PlayerSubCommand {
+    InteractionListCMD() {
+        super(Permission.INTERACTION_LIST_CMD);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.INTERACTION_LIST_CMD)){
-            return;
-        }
 
         Interaction interaction = InteractionCMD.getInteraction(player, true);
         if (interaction == null){

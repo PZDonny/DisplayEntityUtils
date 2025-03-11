@@ -7,12 +7,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class PartsSeedUUIDsCMD implements PlayerSubCommand {
+class PartsSeedUUIDsCMD extends PlayerSubCommand {
+    PartsSeedUUIDsCMD() {
+        super(Permission.PARTS_SEED_UUIDS);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_SEED_UUIDS)){
-            return;
-        }
 
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {

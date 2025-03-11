@@ -7,13 +7,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class GroupDeselectCMD implements PlayerSubCommand {
+class GroupDeselectCMD extends PlayerSubCommand {
+    GroupDeselectCMD() {
+        super(Permission.GROUP_SELECT);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_SELECT)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your group selection is already cleared!", NamedTextColor.YELLOW)));

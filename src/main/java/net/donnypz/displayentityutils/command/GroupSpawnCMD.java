@@ -15,14 +15,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-class GroupSpawnCMD implements PlayerSubCommand {
+class GroupSpawnCMD extends PlayerSubCommand {
+    GroupSpawnCMD() {
+        super(Permission.GROUP_SPAWN);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_SPAWN)){
-            return;
-        }
-
-
         if (args.length < 4) {
             player.sendMessage(Component.text("Incorrect Usage! /mdis group spawn <group-tag> <storage>", NamedTextColor.RED));
             return;

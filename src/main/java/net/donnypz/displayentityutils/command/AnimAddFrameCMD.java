@@ -11,14 +11,14 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-class AnimAddFrameCMD implements PlayerSubCommand {
+class AnimAddFrameCMD extends PlayerSubCommand {
+
+    AnimAddFrameCMD(){
+        super(Permission.ANIM_ADD_FRAME);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_ADD_FRAME)){
-            return;
-        }
-
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             player.sendMessage(Component.text("You must have a group selected to do this animation command!", NamedTextColor.RED));

@@ -5,19 +5,17 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 
-class AnimRemoveFrameCMD implements PlayerSubCommand {
+class AnimRemoveFrameCMD extends PlayerSubCommand {
+    AnimRemoveFrameCMD() {
+        super(Permission.ANIM_REMOVE_FRAME);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_REMOVE_FRAME)){
-            return;
-        }
-
-
         SpawnedDisplayAnimation anim = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
         if (anim == null) {
             AnimCMD.noAnimationSelection(player);
@@ -39,13 +37,13 @@ class AnimRemoveFrameCMD implements PlayerSubCommand {
                 throw new NumberFormatException();
             }
             if (id >= anim.getFrames().size()) {
-                player.sendMessage(ChatColor.RED + "Invalid ID! The ID cannot be >= the amount of frames!");
+                player.sendMessage(Component.text("Invalid ID! The ID cannot be >= the amount of frames!", NamedTextColor.RED));
                 return;
             }
             anim.removeFrame(frames.get(id));
-            player.sendMessage(ChatColor.GREEN + "Frame successfully removed!");
+            player.sendMessage(Component.text("Frame successfully removed!", NamedTextColor.GREEN));
         } catch (NumberFormatException e) {
-            player.sendMessage(ChatColor.RED + "Invalid ID! ID's must be 0 or larger");
+            player.sendMessage(Component.text("Invalid ID! ID's must be 0 or larger", NamedTextColor.RED));
         }
     }
 }

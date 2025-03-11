@@ -10,13 +10,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
-class PartsFilterTagsCMD implements PlayerSubCommand {
+class PartsFilterTagsCMD extends PlayerSubCommand {
+    PartsFilterTagsCMD() {
+        super(Permission.PARTS_SELECT);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_SELECT)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);

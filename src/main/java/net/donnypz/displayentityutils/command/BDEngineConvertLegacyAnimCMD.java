@@ -6,12 +6,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class BDEngineConvertLegacyAnimCMD implements PlayerSubCommand {
+class BDEngineConvertLegacyAnimCMD extends PlayerSubCommand {
+    BDEngineConvertLegacyAnimCMD() {
+        super(Permission.BDENGINE_CONVERT_ANIM);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.BDENGINE_CONVERT_ANIM)){
-            return;
-        }
         if (args.length < 5) {
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Incorrect Usage! /mdis bdengine convertanimleg <datapack-name> <group-tag-to-set> <anim-tag-to-set>", NamedTextColor.RED)));
             player.sendMessage(Component.text("Use \"-\" for the group tag if you do not want to save the group", NamedTextColor.GRAY));

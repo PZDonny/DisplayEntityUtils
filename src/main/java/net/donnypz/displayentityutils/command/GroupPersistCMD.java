@@ -7,13 +7,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class GroupPersistCMD implements PlayerSubCommand {
+class GroupPersistCMD extends PlayerSubCommand {
+    GroupPersistCMD() {
+        super(Permission.GROUP_TOGGLE_PERSIST);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_TOGGLE_PERSIST)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);

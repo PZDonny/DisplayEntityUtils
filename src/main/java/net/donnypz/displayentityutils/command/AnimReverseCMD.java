@@ -9,13 +9,13 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-class AnimReverseCMD implements PlayerSubCommand {
+class AnimReverseCMD extends PlayerSubCommand {
+    AnimReverseCMD() {
+        super(Permission.ANIM_REVERSE);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_REVERSE)){
-            return;
-        }
-
         SpawnedDisplayAnimation anim = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
         if (anim == null) {
             AnimCMD.noAnimationSelection(player);

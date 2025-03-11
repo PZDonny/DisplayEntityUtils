@@ -9,13 +9,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.entity.Player;
 
-class GroupGlowColorCMD implements PlayerSubCommand {
+class GroupGlowColorCMD extends PlayerSubCommand {
+    GroupGlowColorCMD() {
+        super(Permission.GROUP_GLOW_COLOR);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_GLOW_COLOR)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);

@@ -21,13 +21,13 @@ import org.bukkit.entity.Player;
 import java.util.Collection;
 import java.util.UUID;
 
-class GroupRideCMD implements ConsoleUsableSubCommand {
+class GroupRideCMD extends ConsoleUsableSubCommand {
+    GroupRideCMD() {
+        super(Permission.GROUP_RIDE);
+    }
+
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.GROUP_RIDE)){
-            return;
-        }
-
         if (args.length == 2){
             sender.sendMessage(Component.text("Incorrect Usage! /mdis group ride <-target | player-name | entity-uuid> [group-tag] [storage] [controller-id]", NamedTextColor.RED));
             return;

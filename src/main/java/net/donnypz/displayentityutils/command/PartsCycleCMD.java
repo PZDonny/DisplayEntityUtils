@@ -13,13 +13,13 @@ import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
-class PartsCycleCMD implements PlayerSubCommand {
+class PartsCycleCMD extends PlayerSubCommand {
+    PartsCycleCMD() {
+        super(Permission.PARTS_CYCLE);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_CYCLE)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);

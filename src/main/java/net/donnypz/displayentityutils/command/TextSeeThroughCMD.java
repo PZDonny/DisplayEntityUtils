@@ -9,14 +9,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
-class TextSeeThroughCMD implements PlayerSubCommand {
+class TextSeeThroughCMD extends PlayerSubCommand {
+    TextSeeThroughCMD() {
+        super(Permission.TEXT_TOGGLE_SEE_THROUGH);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.TEXT_TOGGLE_SEE_THROUGH)){
-            return;
-        }
-
-
         SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){
             DisplayEntityPluginCommand.noPartSelection(player);

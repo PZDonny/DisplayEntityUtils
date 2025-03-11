@@ -14,9 +14,12 @@ import java.util.List;
 @ApiStatus.Internal
 public final class DisplayEntityPluginTabCompleter implements TabCompleter {
 
+    private final List<String> empty = List.of();
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-
+        if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.HELP)){
+            return empty;
+        }
         if (args.length == 1) {
             return DisplayEntityPluginCommand.getTabComplete();
         }

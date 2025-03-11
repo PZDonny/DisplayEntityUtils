@@ -9,13 +9,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
-class TextLineWidthCMD implements PlayerSubCommand {
+class TextLineWidthCMD extends PlayerSubCommand {
+    TextLineWidthCMD() {
+        super(Permission.TEXT_SET_LINE_WIDTH);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.TEXT_SET_LINE_WIDTH)){
-            return;
-        }
-
         if (args.length < 3){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Incorrect Usage! /mdis text linewidth <width>", NamedTextColor.RED)));
             return;

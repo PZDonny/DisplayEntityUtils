@@ -12,13 +12,13 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-class AnimAddFrameAfterCMD implements PlayerSubCommand {
+class AnimAddFrameAfterCMD extends PlayerSubCommand {
+    AnimAddFrameAfterCMD() {
+        super(Permission.ANIM_ADD_FRAME);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_ADD_FRAME)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);

@@ -9,13 +9,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class AnimPlayCMD implements PlayerSubCommand {
+class AnimPlayCMD extends PlayerSubCommand {
+    AnimPlayCMD() {
+        super(Permission.ANIM_PLAY);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_PLAY)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             player.sendMessage(Component.text("You must have a group selected to do this animation command!", NamedTextColor.RED));

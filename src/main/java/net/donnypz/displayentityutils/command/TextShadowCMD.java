@@ -9,14 +9,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
-class TextShadowCMD implements PlayerSubCommand {
+class TextShadowCMD extends PlayerSubCommand {
+    TextShadowCMD() {
+        super(Permission.TEXT_TOGGLE_SHADOW);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.TEXT_TOGGLE_SHADOW)){
-            return;
-        }
-
-
         SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){
             DisplayEntityPluginCommand.noPartSelection(player);

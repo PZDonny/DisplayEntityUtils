@@ -10,13 +10,13 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-class GroupMergeCMD implements PlayerSubCommand {
+class GroupMergeCMD extends PlayerSubCommand {
+    GroupMergeCMD() {
+        super(Permission.GROUP_MERGE);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_MERGE)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);

@@ -9,13 +9,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class GroupUnsetSpawnAnimationCMD implements PlayerSubCommand {
+class GroupUnsetSpawnAnimationCMD extends PlayerSubCommand {
+    GroupUnsetSpawnAnimationCMD() {
+        super(Permission.GROUP_SET_SPAWN_ANIM);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_SET_SPAWN_ANIM)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);
@@ -23,11 +23,11 @@ class GroupUnsetSpawnAnimationCMD implements PlayerSubCommand {
         }
 
         if (group.getSpawnAnimationTag() == null){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your selected group does not have a spawn animation!", NamedTextColor.RED)));
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your selected group does not have a spawn/load animation!", NamedTextColor.RED)));
             return;
         }
 
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully unset your group's spawn animation!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully unset your group's spawn/load animation!", NamedTextColor.GREEN)));
         group.setSpawnAnimationTag(null, DisplayAnimator.AnimationType.LINEAR, LoadMethod.LOCAL);
 
     }

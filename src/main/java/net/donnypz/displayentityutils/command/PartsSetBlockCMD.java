@@ -12,13 +12,13 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Player;
 
-class PartsSetBlockCMD implements PlayerSubCommand {
+class PartsSetBlockCMD extends PlayerSubCommand {
+    PartsSetBlockCMD() {
+        super(Permission.PARTS_SET_BLOCK);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_SET_BLOCK)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);

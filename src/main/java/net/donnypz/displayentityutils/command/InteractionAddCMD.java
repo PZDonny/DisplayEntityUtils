@@ -8,13 +8,13 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 
-class InteractionAddCMD implements PlayerSubCommand {
+class InteractionAddCMD extends PlayerSubCommand {
+    InteractionAddCMD() {
+        super(Permission.INTERACTION_ADD_CMD);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.INTERACTION_ADD_CMD)){
-            return;
-        }
-
         if (args.length < 5){
             player.sendMessage(Component.text("/mdis interaction addcmd <player | console> <left | right | both> <command>", NamedTextColor.RED));
             return;

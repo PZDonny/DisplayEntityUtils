@@ -8,12 +8,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
-class PartsRemoveTagCMD implements PlayerSubCommand {
+class PartsRemoveTagCMD extends PlayerSubCommand {
+    PartsRemoveTagCMD() {
+        super(Permission.PARTS_TAG);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_TAG)){
-            return;
-        }
 
         SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){

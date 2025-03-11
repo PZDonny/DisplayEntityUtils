@@ -11,13 +11,13 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
-class TextSetCMD implements PlayerSubCommand {
+class TextSetCMD extends PlayerSubCommand {
+    TextSetCMD() {
+        super(Permission.TEXT_SET_TEXT);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.TEXT_SET_TEXT)){
-            return;
-        }
-
         if (args.length < 3){
             player.sendMessage(Component.text("Incorrect Usage! /mdis text set <text>", NamedTextColor.RED));
             return;

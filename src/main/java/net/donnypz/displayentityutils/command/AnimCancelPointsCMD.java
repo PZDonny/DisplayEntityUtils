@@ -6,13 +6,14 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class AnimCancelPointsCMD implements PlayerSubCommand {
+class AnimCancelPointsCMD extends PlayerSubCommand {
+
+    AnimCancelPointsCMD() {
+        super(Permission.ANIM_FRAME_INFO);
+    }
 
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_FRAME_INFO)) {
-            return;
-        }
 
         DEUCommandUtils.removeRelativePoints(player);
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Removed all visible frame points!", NamedTextColor.GREEN)));

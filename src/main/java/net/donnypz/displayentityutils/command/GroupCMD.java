@@ -7,12 +7,13 @@ import org.bukkit.command.CommandSender;
 import java.util.HashMap;
 import java.util.List;
 
-class GroupCMD implements ConsoleUsableSubCommand {
+class GroupCMD extends ConsoleUsableSubCommand {
 
     private static final HashMap<String, SubCommand> subCommands = new HashMap<>();
 
 
     GroupCMD(){
+        super(Permission.HELP);
         subCommands.put("help", new GroupHelpCMD());
         subCommands.put("selectnearest", new GroupSelectCMD());
         subCommands.put("deselect", new GroupDeselectCMD());
@@ -62,9 +63,6 @@ class GroupCMD implements ConsoleUsableSubCommand {
         String arg = args[1];
         SubCommand subCommand = subCommands.get(arg);
         if (subCommand == null){
-            if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.HELP)){
-                return;
-            }
             groupHelp(sender, 1);
         }
         else{

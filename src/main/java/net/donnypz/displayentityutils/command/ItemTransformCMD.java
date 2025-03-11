@@ -10,13 +10,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 
-class ItemTransformCMD implements PlayerSubCommand {
+class ItemTransformCMD extends PlayerSubCommand {
+    ItemTransformCMD() {
+        super(Permission.ITEM_TRANSFORM);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ITEM_TRANSFORM)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);

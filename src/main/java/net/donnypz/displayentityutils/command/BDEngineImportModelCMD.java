@@ -14,13 +14,14 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 
-class BDEngineImportModelCMD implements PlayerSubCommand {
+class BDEngineImportModelCMD extends PlayerSubCommand {
+
+    BDEngineImportModelCMD() {
+        super(Permission.BDENGINE_SPAWN_MODEL);
+    }
 
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.BDENGINE_SPAWN_MODEL)){
-            return;
-        }
         if (args.length < 3) {
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Incorrect Usage! /mdis bdengine importmodel <model-id>", NamedTextColor.RED)));
             return;

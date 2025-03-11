@@ -2,14 +2,14 @@ package net.donnypz.displayentityutils.command;
 
 import org.bukkit.command.CommandSender;
 
-class PartsHelpCMD implements ConsoleUsableSubCommand {
+class PartsHelpCMD extends ConsoleUsableSubCommand {
+
+    PartsHelpCMD() {
+        super(Permission.HELP);
+    }
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.HELP)){
-            return;
-        }
-
         if (args.length < 3){
             PartsCMD.partsHelp(sender, 1);
         }

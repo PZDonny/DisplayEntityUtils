@@ -9,13 +9,13 @@ import net.donnypz.displayentityutils.utils.command.FramePointDisplay;
 import net.donnypz.displayentityutils.utils.command.RelativePointDisplay;
 import org.bukkit.entity.Player;
 
-class AnimAddParticleCMD implements PlayerSubCommand {
+class AnimAddParticleCMD extends PlayerSubCommand {
+    AnimAddParticleCMD() {
+        super(Permission.ANIM_ADD_PARTICLE);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_ADD_PARTICLE)){
-            return;
-        }
-
         SpawnedDisplayAnimation anim = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
         if (anim == null) {
             AnimCMD.noAnimationSelection(player);

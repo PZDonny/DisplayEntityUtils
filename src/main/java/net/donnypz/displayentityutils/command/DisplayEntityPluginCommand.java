@@ -10,6 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -105,14 +106,6 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
         player.sendMessage(Component.text("| Quickly reset with \"/mdis parts reselect", NamedTextColor.GRAY));
     }
 
-    public static boolean hasPermission(CommandSender sender, Permission permission){
-        if (!sender.hasPermission(permission.getPermission())){
-            sender.sendMessage(Component.text("You do not have permission to do that!", NamedTextColor.RED));
-            return false;
-        }
-        return true;
-    }
-
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
@@ -131,6 +124,9 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
     }
 
     static void executeCommand(SubCommand subCommand, CommandSender sender, String[] args){
+        if (!hasPermission(sender, subCommand.getPermission())){
+            return;
+        }
         if (subCommand instanceof ConsoleUsableSubCommand c){
             c.execute(sender, args);
         }
@@ -143,8 +139,19 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
         }
     }
 
+    public static boolean hasPermission(@NotNull CommandSender sender, @NotNull Permission permission){
+        if (!sender.hasPermission(permission.getPermission())){
+            sender.sendMessage(Component.text("You do not have permission to do that!", NamedTextColor.RED));
+            return false;
+        }
+        return true;
+    }
+
 
     static void mainCommandHelp(CommandSender sender){
+        if (!hasPermission(sender, Permission.HELP)) {
+            return;
+        }
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         //sender.sendMessage(Component.text("Valid storage is \"local\", \"mongodb\", \"mysql\", and \"all\"", NamedTextColor.DARK_AQUA));
         CMDUtils.sendCMD(sender, "/mdis group");

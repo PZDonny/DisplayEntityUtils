@@ -13,12 +13,13 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-class GroupInfoCMD implements PlayerSubCommand {
+class GroupInfoCMD extends PlayerSubCommand {
+    GroupInfoCMD() {
+        super(Permission.GROUP_INFO);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_INFO)){
-            return;
-        }
 
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {

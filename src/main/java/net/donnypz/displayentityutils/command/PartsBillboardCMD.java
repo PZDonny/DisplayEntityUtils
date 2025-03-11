@@ -10,13 +10,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 
-class PartsBillboardCMD implements PlayerSubCommand {
+class PartsBillboardCMD extends PlayerSubCommand {
+    PartsBillboardCMD() {
+        super(Permission.PARTS_BILLBOARD);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_BILLBOARD)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);

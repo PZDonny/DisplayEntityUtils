@@ -7,13 +7,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 
-class InteractionScaleCMD implements PlayerSubCommand {
+class InteractionScaleCMD extends PlayerSubCommand {
+    InteractionScaleCMD() {
+        super(Permission.INTERACTION_DIMENSION);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.INTERACTION_DIMENSION)){
-            return;
-        }
-
         if (args.length < 6){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Incorrect Usage! /mdis interaction scale <height> <width> <tick-duration> <tick-delay>", NamedTextColor.RED)));
             return;

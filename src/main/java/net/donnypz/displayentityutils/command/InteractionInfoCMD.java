@@ -6,13 +6,13 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 
-class InteractionInfoCMD implements PlayerSubCommand {
+class InteractionInfoCMD extends PlayerSubCommand {
+    InteractionInfoCMD() {
+        super(Permission.INTERACTION_INFO);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.INTERACTION_INFO)){
-            return;
-        }
-
         Interaction interaction = InteractionCMD.getInteraction(player, true);
         if (interaction == null){
             return;

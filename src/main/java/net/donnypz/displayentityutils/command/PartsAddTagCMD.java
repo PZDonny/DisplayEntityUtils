@@ -8,13 +8,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
-class PartsAddTagCMD implements PlayerSubCommand {
+class PartsAddTagCMD extends PlayerSubCommand {
+    PartsAddTagCMD() {
+        super(Permission.PARTS_TAG);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_TAG)){
-            return;
-        }
-
         SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){
             PartsCMD.noPartSelection(player);
