@@ -10,13 +10,13 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 
-class GroupAddTargetCMD implements PlayerSubCommand {
+class GroupAddTargetCMD extends PlayerSubCommand {
+    GroupAddTargetCMD() {
+        super(Permission.GROUP_ADD_TARGET);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_ADD_TARGET)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);

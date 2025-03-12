@@ -169,7 +169,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             LocalManager.getDisplayControllerFolder().mkdirs();
             String exampleController = "examplecontroller.yml";
             File exampleFile = new File(LocalManager.getDisplayControllerFolder(), exampleController);
-            InputStream stream = DisplayEntityPlugin.getInstance().getResource(exampleController);
+            InputStream stream = getResource(exampleController);
             try {
                 Files.copy(stream, exampleFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 stream.close();

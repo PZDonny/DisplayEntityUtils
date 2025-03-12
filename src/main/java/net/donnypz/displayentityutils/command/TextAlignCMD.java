@@ -9,13 +9,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
-class TextAlignCMD implements PlayerSubCommand {
+class TextAlignCMD extends PlayerSubCommand {
+    TextAlignCMD() {
+        super(Permission.TEXT_SET_ALIGNMENT);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.TEXT_SET_ALIGNMENT)){
-            return;
-        }
-
         SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){
             DisplayEntityPluginCommand.noPartSelection(player);

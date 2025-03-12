@@ -6,14 +6,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 
-class InteractionResponsiveCMD implements PlayerSubCommand {
+class InteractionResponsiveCMD extends PlayerSubCommand {
+    InteractionResponsiveCMD() {
+        super(Permission.INTERACTION_RESPONSIVE);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.INTERACTION_RESPONSIVE)){
-            return;
-        }
-
-
         Component result;
         Interaction interaction = InteractionCMD.getInteraction(player, true);
         if (interaction == null){

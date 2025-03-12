@@ -9,13 +9,13 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-class AnimEditAllFramesCMD implements PlayerSubCommand {
+class AnimEditAllFramesCMD extends PlayerSubCommand {
+    AnimEditAllFramesCMD() {
+        super(Permission.ANIM_EDIT_FRAME);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_EDIT_FRAME)){
-            return;
-        }
-
         SpawnedDisplayAnimation anim = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
         if (anim == null) {
             AnimCMD.noAnimationSelection(player);

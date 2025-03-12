@@ -14,14 +14,13 @@ import org.bukkit.entity.Player;
 
 import java.util.Collection;
 
-class AnimCopyPointCMD implements PlayerSubCommand {
+class AnimCopyPointCMD extends PlayerSubCommand {
+    AnimCopyPointCMD() {
+        super(Permission.ANIM_COPY_FRAME_POINT);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_COPY_FRAME_POINT)){
-            return;
-        }
-
-
         SpawnedDisplayAnimation anim = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
         if (anim == null) {
             AnimCMD.noAnimationSelection(player);

@@ -12,12 +12,13 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-class AnimSetFrameTagCMD implements PlayerSubCommand {
+class AnimSetFrameTagCMD extends PlayerSubCommand {
+    AnimSetFrameTagCMD() {
+        super(Permission.ANIM_SET_FRAME_TAG);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_SET_FRAME_TAG)){
-            return;
-        }
         if (args.length < 4) {
             player.sendMessage(Component.text("Incorrect Usage! /mdis anim setframetag <frame-ids> <frame-tag>", NamedTextColor.RED));
             return;

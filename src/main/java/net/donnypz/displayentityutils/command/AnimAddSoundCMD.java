@@ -2,7 +2,9 @@ package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationSound;
+import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.donnypz.displayentityutils.utils.command.FramePointDisplay;
 import net.donnypz.displayentityutils.utils.command.RelativePointDisplay;
@@ -12,12 +14,13 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-class AnimAddSoundCMD implements PlayerSubCommand {
+class AnimAddSoundCMD extends PlayerSubCommand {
+    AnimAddSoundCMD() {
+        super(Permission.ANIM_ADD_SOUND);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_ADD_SOUND)){
-            return;
-        }
 
         SpawnedDisplayAnimation anim = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
         if (anim == null) {

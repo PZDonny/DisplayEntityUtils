@@ -10,13 +10,13 @@ import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-class ItemToggleGlintCMD implements PlayerSubCommand {
+class ItemToggleGlintCMD extends PlayerSubCommand {
+    ItemToggleGlintCMD() {
+        super(Permission.ITEM_TOGGLE_GLINT);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ITEM_TOGGLE_GLINT)){
-            return;
-        }
-
         SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){
             DisplayEntityPluginCommand.noPartSelection(player);

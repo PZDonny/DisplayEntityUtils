@@ -11,12 +11,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 
-class PartsTranslateCMD implements PlayerSubCommand {
+class PartsTranslateCMD extends PlayerSubCommand {
+    PartsTranslateCMD() {
+        super(Permission.PARTS_TRANSLATE);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_TRANSLATE)){
-            return;
-        }
 
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {

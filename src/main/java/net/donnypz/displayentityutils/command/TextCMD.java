@@ -6,12 +6,13 @@ import org.bukkit.command.CommandSender;
 import java.util.HashMap;
 import java.util.List;
 
-class TextCMD implements ConsoleUsableSubCommand {
+class TextCMD extends ConsoleUsableSubCommand {
 
     private static final HashMap<String, PlayerSubCommand> subCommands = new HashMap<>();
 
 
     TextCMD(){
+        super(Permission.HELP);
         subCommands.put("help", null);
         subCommands.put("set", new TextSetCMD());
         subCommands.put("font", new TextFontCMD());
@@ -36,9 +37,6 @@ class TextCMD implements ConsoleUsableSubCommand {
         String arg = args[1];
         SubCommand subCommand = subCommands.get(arg);
         if (subCommand == null){
-            if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.HELP)){
-                return;
-            }
             textHelp(sender);
         }
         else{

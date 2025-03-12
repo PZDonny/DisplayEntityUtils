@@ -8,13 +8,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.command.CommandSender;
 
-class ReloadCMD implements ConsoleUsableSubCommand {
+class ReloadCMD extends ConsoleUsableSubCommand {
+    ReloadCMD() {
+        super(Permission.RELOAD);
+    }
+
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.RELOAD)){
-            return;
-        }
-
         if (args.length < 2){
             sender.sendMessage(Component.text("Incorrect Usage! /mdis reload <config | controllers>", NamedTextColor.RED));
             return;

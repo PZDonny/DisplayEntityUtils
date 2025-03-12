@@ -6,8 +6,7 @@
 
     <groupId>net.donnypz</groupId>
     <artifactId>displayentityutils</artifactId>
-    <version>2.7.1</version>
-    <packaging>jar</packaging>
+    <version>2.7.2</version>
 
     <name>DisplayEntityUtils</name>
 
@@ -96,6 +95,7 @@
             <id>sk89q-repo</id>
             <url>https://maven.enginehub.org/repo/</url>
         </repository>
+
         <repository>
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
@@ -112,11 +112,9 @@
             <name>Skript Repository</name>
             <url>https://repo.skriptlang.org/releases</url>
         </repository>
-
     </repositories>
 
     <dependencies>
-
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
@@ -133,7 +131,7 @@
         <dependency>
             <groupId>io.lumine</groupId>
             <artifactId>Mythic-Dist</artifactId>
-            <version>5.6.1</version>
+            <version>5.8.1</version>
             <scope>provided</scope>
         </dependency>
 

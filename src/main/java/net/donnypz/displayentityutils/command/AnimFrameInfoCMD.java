@@ -13,17 +13,17 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-class AnimFrameInfoCMD implements PlayerSubCommand {
+class AnimFrameInfoCMD extends PlayerSubCommand {
+
+    AnimFrameInfoCMD() {
+        super(Permission.ANIM_FRAME_INFO);
+    }
 
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_FRAME_INFO)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
-
         SpawnedDisplayAnimation animation = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
+
         if (animation == null) {
             AnimCMD.noAnimationSelection(player);
             return;

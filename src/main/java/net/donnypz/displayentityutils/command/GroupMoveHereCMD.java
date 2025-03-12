@@ -7,12 +7,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class GroupMoveHereCMD implements PlayerSubCommand {
+class GroupMoveHereCMD extends PlayerSubCommand {
+    GroupMoveHereCMD() {
+        super(Permission.GROUP_TRANSFORM);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_TRANSFORM)){
-            return;
-        }
 
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {

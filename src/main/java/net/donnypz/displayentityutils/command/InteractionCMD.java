@@ -15,12 +15,13 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.List;
 
-class InteractionCMD implements ConsoleUsableSubCommand {
+class InteractionCMD extends ConsoleUsableSubCommand {
 
     private static final HashMap<String, SubCommand> subCommands = new HashMap<>();
 
 
     InteractionCMD(){
+        super(Permission.HELP);
         subCommands.put("help", new InteractionHelpCMD());
         subCommands.put("addcmd", new InteractionAddCMD());
         subCommands.put("listcmd", new InteractionListCMD());
@@ -48,9 +49,6 @@ class InteractionCMD implements ConsoleUsableSubCommand {
         String arg = args[1];
         SubCommand subCommand = subCommands.get(arg);
         if (subCommand == null){
-            if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.HELP)){
-                return;
-            }
             interactionHelp(sender, 1);
         }
         else{

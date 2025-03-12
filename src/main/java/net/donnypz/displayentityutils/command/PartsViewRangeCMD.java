@@ -7,12 +7,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class PartsViewRangeCMD implements PlayerSubCommand {
+class PartsViewRangeCMD extends PlayerSubCommand {
+    PartsViewRangeCMD() {
+        super(Permission.PARTS_VIEWRANGE);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_VIEWRANGE)){
-            return;
-        }
 
         SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){

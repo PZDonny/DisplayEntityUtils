@@ -14,14 +14,15 @@ import org.bukkit.entity.Player;
 
 import java.util.HashSet;
 
-class PartsFilterBlocksCMD implements PlayerSubCommand {
+class PartsFilterBlocksCMD extends PlayerSubCommand {
 
+
+    PartsFilterBlocksCMD() {
+        super(Permission.PARTS_SELECT);
+    }
 
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_SELECT)){
-            return;
-        }
 
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {

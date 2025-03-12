@@ -8,13 +8,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
-class GroupDeleteCMD implements PlayerSubCommand {
+class GroupDeleteCMD extends PlayerSubCommand {
+    GroupDeleteCMD() {
+        super(Permission.GROUP_DELETE);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_DELETE)){
-            return;
-        }
-
         if (args.length < 4) {
             player.sendMessage(Component.text("/mdis group delete <anim-tag> <storage-location>", NamedTextColor.RED));
             return;

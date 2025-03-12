@@ -8,12 +8,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
-class AnimDeleteCMD implements PlayerSubCommand {
+class AnimDeleteCMD extends PlayerSubCommand {
+    AnimDeleteCMD() {
+        super(Permission.ANIM_DELETE);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_DELETE)){
-            return;
-        }
         if (args.length < 4) {
             player.sendMessage(Component.text("/mdis anim delete <anim-tag> <storage-location>", NamedTextColor.RED));
             return;

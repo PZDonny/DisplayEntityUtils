@@ -11,13 +11,13 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
-class AnimSelectCMD implements PlayerSubCommand {
+class AnimSelectCMD extends PlayerSubCommand {
+    AnimSelectCMD() {
+        super(Permission.ANIM_SELECT);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_SELECT)){
-            return;
-        }
-
         if (args.length < 4) {
             player.sendMessage(Component.text("Incorrect Usage! /mdis anim select <anim-tag> <storage>", NamedTextColor.RED));
             return;

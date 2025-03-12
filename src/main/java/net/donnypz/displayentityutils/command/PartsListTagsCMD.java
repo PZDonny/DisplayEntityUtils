@@ -10,13 +10,13 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-class PartsListTagsCMD implements PlayerSubCommand {
+class PartsListTagsCMD extends PlayerSubCommand {
+    PartsListTagsCMD() {
+        super(Permission.PARTS_LIST_TAGS);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_LIST_TAGS)){
-            return;
-        }
-
         SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){
             PartsCMD.noPartSelection(player);

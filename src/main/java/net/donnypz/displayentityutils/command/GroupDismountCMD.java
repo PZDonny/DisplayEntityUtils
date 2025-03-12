@@ -10,13 +10,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-class GroupDismountCMD implements ConsoleUsableSubCommand {
+class GroupDismountCMD extends ConsoleUsableSubCommand {
+    GroupDismountCMD() {
+        super(Permission.GROUP_DISMOUNT);
+    }
+
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.GROUP_DISMOUNT)){
-            return;
-        }
-
         if (args.length < 3){
             sender.sendMessage("Incorrect Usage! /mdis group dismount <keep | despawn> [-target | player-name | entity-uuid]");
             return;

@@ -5,17 +5,17 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.List;
 
-class ItemCMD implements ConsoleUsableSubCommand{
+class ItemCMD extends ConsoleUsableSubCommand{
 
     private static final HashMap<String, SubCommand> subCommands = new HashMap<>();
 
 
     ItemCMD(){
+        super(Permission.HELP);
         subCommands.put("help", new ItemHelpCMD());
         subCommands.put("set", new ItemSetCMD());
         subCommands.put("toggleglint", new ItemToggleGlintCMD());
@@ -35,9 +35,6 @@ class ItemCMD implements ConsoleUsableSubCommand{
         String arg = args[1];
         SubCommand subCommand = subCommands.get(arg);
         if (subCommand == null){
-            if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.HELP)){
-                return;
-            }
             itemHelp(sender);
         }
         else{

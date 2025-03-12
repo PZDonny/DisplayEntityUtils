@@ -10,6 +10,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.entity.Entity;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class EffEntityRideSpawnedGroup extends Effect {
     static {
-        Skript.registerEffect(EffEntityRideSpawnedGroup.class,"[deu] make %entity% (mount|ride) %spawnedgroup% [c:using controller [with id] %string%]");
+        Skript.registerEffect(EffEntityRideSpawnedGroup.class,"[deu] make %entity% (mount|ride) %spawnedgroup% [c:using controller [with id] %-string%]");
     }
 
     Expression<Entity> entity;
@@ -46,7 +47,15 @@ public class EffEntityRideSpawnedGroup extends Effect {
         if (g == null || e == null){
             return;
         }
-        g.rideEntity(e);
+        SpawnedDisplayEntityPart masterPart = g.getMasterPart();
+        if (masterPart == null){
+            return;
+        }
+        Entity masterEntity = masterPart.getEntity();
+        if (masterEntity == null){
+            return;
+        }
+        masterEntity.addPassenger(e);
         if (controllerID != null){
             DisplayController controller = DisplayController.getController(controllerID.getSingle(event));
             if (controller == null){
@@ -64,6 +73,6 @@ public class EffEntityRideSpawnedGroup extends Effect {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return group.toString(event, debug)+" ride entity: "+entity.toString(event, debug);
+        return entity.toString(event, debug)+" ride group: "+group.toString(event, debug);
     }
 }

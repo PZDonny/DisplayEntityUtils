@@ -9,16 +9,17 @@ import org.bukkit.Location;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 
-class InteractionSpawnCMD implements PlayerSubCommand {
+class InteractionSpawnCMD extends PlayerSubCommand {
+    InteractionSpawnCMD() {
+        super(Permission.INTERACTION_SPAWN);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
         spawnForGroup(player, null, args);
     }
 
     static void spawnForGroup(Player player, Location spawnLocation, String[] args){
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.INTERACTION_SPAWN)){
-            return;
-        }
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);

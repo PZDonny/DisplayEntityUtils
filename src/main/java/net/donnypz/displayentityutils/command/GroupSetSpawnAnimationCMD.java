@@ -10,13 +10,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 
-class GroupSetSpawnAnimationCMD implements PlayerSubCommand {
+class GroupSetSpawnAnimationCMD extends PlayerSubCommand {
+    GroupSetSpawnAnimationCMD() {
+        super(Permission.GROUP_SET_SPAWN_ANIM);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.GROUP_SET_SPAWN_ANIM)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);

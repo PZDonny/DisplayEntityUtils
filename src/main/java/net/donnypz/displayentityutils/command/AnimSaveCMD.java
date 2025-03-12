@@ -10,12 +10,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
-class AnimSaveCMD implements PlayerSubCommand {
+class AnimSaveCMD extends PlayerSubCommand {
+    AnimSaveCMD() {
+        super(Permission.ANIM_SAVE);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_SAVE)){
-            return;
-        }
         SpawnedDisplayAnimation animation = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
         if (animation == null) {
             AnimCMD.noAnimationSelection(player);

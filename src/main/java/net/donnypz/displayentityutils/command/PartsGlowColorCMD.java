@@ -11,13 +11,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.entity.Player;
 
-class PartsGlowColorCMD implements PlayerSubCommand {
+class PartsGlowColorCMD extends PlayerSubCommand {
+    PartsGlowColorCMD() {
+        super(Permission.PARTS_GLOW_COLOR);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.PARTS_GLOW_COLOR)){
-            return;
-        }
-
         SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);

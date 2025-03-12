@@ -7,12 +7,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class AnimSetTagCMD implements PlayerSubCommand {
+class AnimSetTagCMD extends PlayerSubCommand {
+    AnimSetTagCMD() {
+        super(Permission.ANIM_SET_TAG);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_SET_TAG)){
-            return;
-        }
         if (args.length < 3) {
             player.sendMessage(Component.text("Incorrect Usage! /mdis anim settag <anim-tag>", NamedTextColor.RED));
             return;

@@ -9,12 +9,13 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.List;
 
-class BDEngineCMD implements PlayerSubCommand {
+class BDEngineCMD extends PlayerSubCommand {
 
     private static final HashMap<String, PlayerSubCommand> subCommands = new HashMap<>();
 
 
     BDEngineCMD(){
+        super(Permission.HELP);
         subCommands.put("convertanim", new BDEngineConvertAnimCMD());
         subCommands.put("convertanimleg", new BDEngineConvertLegacyAnimCMD());
         subCommands.put("importmodel", new BDEngineImportModelCMD());
@@ -33,9 +34,6 @@ class BDEngineCMD implements PlayerSubCommand {
         String arg = args[1];
         PlayerSubCommand playerSubCommand = subCommands.get(arg);
         if (playerSubCommand == null){
-            if (!DisplayEntityPluginCommand.hasPermission(player, Permission.HELP)){
-                return;
-            }
             conversionHelp(player);
         }
         else{

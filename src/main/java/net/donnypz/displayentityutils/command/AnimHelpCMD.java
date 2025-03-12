@@ -2,14 +2,14 @@ package net.donnypz.displayentityutils.command;
 
 import org.bukkit.command.CommandSender;
 
-class AnimHelpCMD implements ConsoleUsableSubCommand {
+class AnimHelpCMD extends ConsoleUsableSubCommand {
+
+    AnimHelpCMD() {
+        super(Permission.HELP);
+    }
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.HELP)){
-            return;
-        }
-
         if (args.length < 3){
             AnimCMD.animationHelp(sender, 1);
         }

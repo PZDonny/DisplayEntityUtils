@@ -11,13 +11,13 @@ import org.bukkit.Color;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
-class TextBackgroundCMD implements PlayerSubCommand {
+class TextBackgroundCMD extends PlayerSubCommand {
+    TextBackgroundCMD() {
+        super(Permission.TEXT_BACKGROUND);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.TEXT_BACKGROUND)){
-            return;
-        }
-
         if (args.length < 4){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Incorrect Usage! /mdis text background <color | hex-code> <0-1>", NamedTextColor.RED)));
             return;

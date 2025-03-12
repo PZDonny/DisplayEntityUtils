@@ -10,12 +10,13 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.List;
 
-class AnimCMD implements ConsoleUsableSubCommand{
+class AnimCMD extends ConsoleUsableSubCommand{
 
     private static final HashMap<String, SubCommand> subCommands = new HashMap<>();
 
 
     AnimCMD(){
+        super(Permission.HELP);
         subCommands.put("help", new AnimHelpCMD());
         subCommands.put("new", new AnimNewCMD());
         subCommands.put("save", new AnimSaveCMD());

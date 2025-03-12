@@ -9,13 +9,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
-class TextOpacityCMD implements PlayerSubCommand {
+class TextOpacityCMD extends PlayerSubCommand {
+    TextOpacityCMD() {
+        super(Permission.TEXT_OPACITY);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.TEXT_OPACITY)){
-            return;
-        }
-
         if (args.length < 3){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Incorrect Usage! /mdis text opacity <0-1>", NamedTextColor.RED)));
             return;

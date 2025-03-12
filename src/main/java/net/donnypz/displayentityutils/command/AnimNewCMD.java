@@ -7,12 +7,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
-class AnimNewCMD implements PlayerSubCommand {
+class AnimNewCMD extends PlayerSubCommand {
+    AnimNewCMD() {
+        super(Permission.ANIM_NEW);
+    }
+
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_NEW)){
-            return;
-        }
         SpawnedDisplayAnimation animation = new SpawnedDisplayAnimation();
 
         DisplayAnimationManager.setSelectedSpawnedAnimation(player, animation);
