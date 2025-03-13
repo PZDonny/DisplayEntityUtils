@@ -29,32 +29,48 @@ public final class DEUMythicListener implements Listener {
     public void onMythicMechanicLoad(MythicMechanicLoadEvent event)	{
         Bukkit.getLogger().info("MythicMechanicLoadEvent called for mechanic " + event.getMechanicName());
 
+        String mechanicName = event.getMechanicName().toLowerCase();
 
-        String mechanicName = event.getMechanicName();
-        if (mechanicName.equalsIgnoreCase(DEUAnimationMythicMechanic.mechanicName))	{
-            DEUAnimationMythicMechanic mechanic = DEUAnimationMythicMechanic.create(event.getConfig());
-            if (mechanic != null){
+        switch(mechanicName){
+            case DEUAnimationMythicMechanic.mechanicName -> {
+                DEUAnimationMythicMechanic mechanic = DEUAnimationMythicMechanic.create(event.getConfig());
+                if (mechanic != null){
+                    event.register(mechanic);
+                    Bukkit.getLogger().info("-- Registered DEUAnimationMythicMechanic mechanic! (deuanimate)");
+                }
+                else{
+                    Bukkit.getLogger().severe("-- Failed to register DEUAnimationMythicMechanic (deuanimate): "+event.getConfig().getLine());
+                }
+            }
+
+            case DEUStateMythicMechanic.mechanicName -> {
+                DEUStateMythicMechanic mechanic = DEUStateMythicMechanic.create(event.getConfig());
+                if (mechanic != null){
+                    event.register(mechanic);
+                    Bukkit.getLogger().info("-- Registered DEUStateMythicMechanic mechanic! (deustate)");
+                }
+                else{
+                    Bukkit.getLogger().severe("-- Failed to register DEUStateMythicMechanic (deustate): "+event.getConfig().getLine());
+                }
+            }
+
+            case DEUStopMythicMechanic.mechanicName -> {
+                DEUStopMythicMechanic mechanic = DEUStopMythicMechanic.create();
                 event.register(mechanic);
-                Bukkit.getLogger().info("-- Registered DEUAnimationMythicMechanic mechanic! (deuanimate)");
+                Bukkit.getLogger().info("-- Registered DEUStopMythicMechanic mechanic! (deustop)");
             }
-            else{
-                Bukkit.getLogger().severe("-- Failed to register DEUAnimationMythicMechanic (deuanimate): "+event.getConfig().getLine());
-            }
-        }
-        else if (mechanicName.equalsIgnoreCase(DEUStateMythicMechanic.mechanicName)){
-            DEUStateMythicMechanic mechanic = DEUStateMythicMechanic.create(event.getConfig());
-            if (mechanic != null){
+
+            case DEUShowGroupMythicMechanic.mechanicName ->  {
+                DEUShowGroupMythicMechanic mechanic = DEUShowGroupMythicMechanic.create();
                 event.register(mechanic);
-                Bukkit.getLogger().info("-- Registered DEUStateMythicMechanic mechanic! (deustate)");
+                Bukkit.getLogger().info("-- Registered DEUShowGroupMythicMechanic mechanic! (deushow)");
             }
-            else{
-                Bukkit.getLogger().severe("-- Failed to register DEUStateMythicMechanic (deustate): "+event.getConfig().getLine());
+
+            case DEUHideGroupMythicMechanic.mechanicName ->  {
+                DEUHideGroupMythicMechanic mechanic = DEUHideGroupMythicMechanic.create();
+                event.register(mechanic);
+                Bukkit.getLogger().info("-- Registered DEUHideGroupMythicMechanic mechanic! (deuhide)");
             }
-        }
-        else if (mechanicName.equalsIgnoreCase(DEUStopMythicMechanic.mechanicName)){
-            DEUStopMythicMechanic mechanic = DEUStopMythicMechanic.create();
-            event.register(mechanic);
-            Bukkit.getLogger().info("-- Registered DEUStopMythicMechanic mechanic! (deustop)");
         }
     }
 
