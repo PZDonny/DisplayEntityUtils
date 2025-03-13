@@ -8,12 +8,19 @@ import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandMap;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.*;
 
 final class ConfigUtils {
     
@@ -108,7 +115,7 @@ final class ConfigUtils {
 
         if (DisplayEntityPlugin.cullOption != CullOption.NONE){
             DisplayEntityPlugin.widthCullingAdder = (float) config.getDouble("widthCullingAdder");
-            DisplayEntityPlugin.heightCullingAdder = (float) config.getDouble("heightCullingAdder");;
+            DisplayEntityPlugin.heightCullingAdder = (float) config.getDouble("heightCullingAdder");
         }
         else{
             DisplayEntityPlugin.widthCullingAdder = 0;
@@ -116,6 +123,10 @@ final class ConfigUtils {
         }
 
         DisplayEntityPlugin.asynchronousAnimations = config.getBoolean("asynchronousAnimations");
+        DisplayEntityPlugin.registerPluginCommands = config.getBoolean("registerCommands");
+        if (!DisplayEntityPlugin.registerPluginCommands){
+            unregisterCommand(Bukkit.getPluginCommand("managedisplays"));
+        }
     }
     
     
@@ -144,6 +155,59 @@ final class ConfigUtils {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+
+
+    public static void unregisterCommand(Command command) {
+        if (command == null) return;
+        CommandMap commandMap = getCommandMap();
+        Map<String, Command> knownCmds = getKnownCommands(commandMap);
+
+        for (String alias : command.getAliases()){
+            knownCmds.remove(alias);
+        }
+        knownCmds.remove(command.getName());
+
+        if (command instanceof PluginCommand pCmd) {
+            pCmd.setExecutor(null);
+            pCmd.setTabCompleter(null);
+        }
+        command.unregister(commandMap);
+    }
+
+    public static CommandMap getCommandMap() {
+        Server server = Bukkit.getServer();
+        try {
+            Method m = server.getClass().getDeclaredMethod("getCommandMap");
+            m.setAccessible(true);
+            return (CommandMap) m.invoke(Bukkit.getServer());
+        } catch (Exception ignored) {
+        }
+        try {
+            Field commandMapField = server.getClass().getDeclaredField("commandMap");
+            commandMapField.setAccessible(true);
+            return (CommandMap) commandMapField.get(server);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve commandMap", e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Map<String, Command> getKnownCommands(CommandMap m) {
+        try {
+            Method me = m.getClass().getDeclaredMethod("getKnownCommands");
+            me.setAccessible(true);
+            return (Map<String, Command>) me.invoke(m);
+        } catch (Exception ignored) {
+        }
+        try {
+            Field knownCommandsField = m.getClass().getDeclaredField("knownCommands");
+            knownCommandsField.setAccessible(true);
+            return (Map<String, Command>) knownCommandsField.get(m);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Failed to retrieve knownCommands", e);
         }
     }
 }

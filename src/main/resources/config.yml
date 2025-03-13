@@ -24,6 +24,10 @@ mysql:
 #Using connection url will override settings above
   connectionURL: ""
 
+#Determine whether plugin commands should be registered and usable
+#Plugin commands can only be re-enabled after a server restart
+registerCommands: true
+
 #Determine whether the seed used to generate random part uuids should stay consistent with every group
 #This is useful when wanting to use the same animation on different groups
 
