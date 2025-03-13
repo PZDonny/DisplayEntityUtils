@@ -10,11 +10,11 @@
 controllerID: "example"
 
 #----------------------------------------------------
-#Mobs:
+#Mythic Mobs:
 #Associate a group with mythic mobs of the specified type(s)
 #The group will be associated to the mythic mob when spawned
 #
-#NOTE: If planning to use this mob handler internally, without MythicMobs,
+#NOTE: If planning to use this controller through the API, without MythicMobs,
 #simply set "mythicMobs" to []
 #----------------------------------------------------
 mythicMobs: ["ExampleMythicMob", "ExampleMythicMob2"]
@@ -31,6 +31,8 @@ groupProperties:
   flip: false
   #Set the vertical offset that this group should have when attached to an entity
   verticalOffset: 0
+  #Determine if the group should be visible by default when spawned
+  visibleByDefault: true
 
 
 #-----------------------------------------------------------------------

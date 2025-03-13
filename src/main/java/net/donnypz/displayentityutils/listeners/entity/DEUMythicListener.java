@@ -5,6 +5,7 @@ import io.lumine.mythic.bukkit.events.MythicMobSpawnEvent;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayStateMachine;
+import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
@@ -74,11 +75,14 @@ public final class DEUMythicListener implements Listener {
         }
 
         boolean persistGroupAfterRestart = e.getMob().getDespawnMode().getSavesToDisk();
-        SpawnedDisplayEntityGroup spawned = group.spawn(e.getLocation(), GroupSpawnedEvent.SpawnReason.DISPLAY_CONTROLLER);
+        GroupSpawnSettings settings = new GroupSpawnSettings()
+                .persistentByDefault(persistGroupAfterRestart)
+                .allowPersistenceOverride(false)
+                .visibleByDefault(controller.isVisibleByDefault(), null);
+
+        SpawnedDisplayEntityGroup spawned = group.spawn(e.getLocation(), GroupSpawnedEvent.SpawnReason.DISPLAY_CONTROLLER, settings);
         spawned.setVerticalOffset(controller.getVerticalOffset());
         spawned.rideEntity(e.getEntity());
-        spawned.setPersistent(persistGroupAfterRestart);
-        spawned.setPersistenceOverride(false);
 
         Entity masterEntity = spawned.getMasterPart().getEntity();
         PersistentDataContainer pdc = masterEntity.getPersistentDataContainer();
