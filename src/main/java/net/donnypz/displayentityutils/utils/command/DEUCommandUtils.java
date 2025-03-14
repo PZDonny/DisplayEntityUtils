@@ -65,7 +65,7 @@ public class DEUCommandUtils {
     public static void removeRelativePoint(Player player, RelativePointDisplay point){
         UUID playerUUID = player.getUniqueId();
         selectedRelativePoint.remove(playerUUID, point);
-        Set<RelativePointDisplay> displays = relativePointDisplays.remove(playerUUID);
+        Set<RelativePointDisplay> displays = relativePointDisplays.get(playerUUID);
         displays.remove(point);
         if (displays.isEmpty()){
             relativePointDisplays.remove(playerUUID);
