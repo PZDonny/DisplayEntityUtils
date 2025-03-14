@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticle;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,20 +28,21 @@ public final class DisplayAnimationManager {
      * @param player Player to set the selection to
      * @param spawnedDisplayAnimation SpawnedDisplayAnimation to be set to the player
      */
+    @ApiStatus.Internal
     public static void setSelectedSpawnedAnimation(@NotNull Player player, @NotNull SpawnedDisplayAnimation spawnedDisplayAnimation){
-        if (selectedAnimation.get(player.getUniqueId()) != null){
-            SpawnedDisplayAnimation lastAnim = selectedAnimation.get(player.getUniqueId());
+        SpawnedDisplayAnimation lastAnim = selectedAnimation.get(player.getUniqueId());
+        if (lastAnim != null){
             if (lastAnim == spawnedDisplayAnimation){
                 return;
             }
 
             //boolean otherPlayersHaveSelected = false;
-            for (UUID uuid : selectedAnimation.keySet()){
+            /*for (UUID uuid : selectedAnimation.keySet()){
                 if (uuid != player.getUniqueId() && selectedAnimation.get(uuid) == lastAnim){
                     //otherPlayersHaveSelected = true;
                     break;
                 }
-            }
+            }*/
 
             /*if (!otherPlayersHaveSelected){
                 lastAnim.remove();
