@@ -99,6 +99,7 @@ final class ConfigUtils {
         DisplayEntityPlugin.autoPivotInteractions = config.getBoolean("autoPivotInteractionsOnSpawn");
         DisplayEntityPlugin.overwriteExistingSaves = config.getBoolean("overwriteExistingSaves");
         DisplayEntityPlugin.autoSelectGroups = config.getBoolean("autoSelectGroups");
+        DisplayEntityPlugin.limitGroupSelections = config.getBoolean("limitGroupSelections");
 
         String cull = config.getString("cullOption");
         try{

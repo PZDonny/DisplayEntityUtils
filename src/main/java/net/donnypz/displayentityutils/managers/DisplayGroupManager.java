@@ -46,28 +46,35 @@ public final class DisplayGroupManager {
      *
      * @param player Player to set the selection to
      * @param spawnedDisplayEntityGroup SpawnedDisplayEntityGroup to be set to the player
+     * @return false if {@link DisplayEntityPlugin#limitGroupSelections()} is true and a player already has the group selected
      */
     @ApiStatus.Internal
-    public static void setSelectedSpawnedGroup(Player player, SpawnedDisplayEntityGroup spawnedDisplayEntityGroup) {
-        if (selectedGroup.get(player.getUniqueId()) != null) {
-            SpawnedDisplayEntityGroup lastGroup = selectedGroup.get(player.getUniqueId());
+    public static boolean setSelectedSpawnedGroup(Player player, SpawnedDisplayEntityGroup spawnedDisplayEntityGroup) {
+        SpawnedDisplayEntityGroup lastGroup = selectedGroup.get(player.getUniqueId());
+        if (lastGroup != null) {
             if (lastGroup == spawnedDisplayEntityGroup) {
-                return;
+                return true;
             }
 
             //boolean otherPlayersHaveSelected = false;
-            for (UUID uuid : selectedGroup.keySet()) {
+            /*for (UUID uuid : selectedGroup.keySet()) {
                 if (uuid != player.getUniqueId() && selectedGroup.get(uuid) == lastGroup) {
                     //otherPlayersHaveSelected = true;
                     break;
                 }
-            }
+            }*/
 
             /*if (!otherPlayersHaveSelected){
                 lastGroup.unregister(false);
             }*/
         }
+
+        if (selectedGroup.containsValue(spawnedDisplayEntityGroup) && DisplayEntityPlugin.limitGroupSelections()){
+            return false;
+        }
+
         setPartSelection(player, new SpawnedPartSelection(spawnedDisplayEntityGroup),true);
+        return true;
     }
 
     /**
@@ -101,7 +108,6 @@ public final class DisplayGroupManager {
         if (setGroup) {
             selectedGroup.put(player.getUniqueId(), parts.getGroup());
         }
-
     }
 
     /**

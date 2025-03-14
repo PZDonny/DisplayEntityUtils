@@ -30,8 +30,15 @@ class GroupSelectCMD extends PlayerSubCommand {
                 return;
             }
             SpawnedDisplayEntityGroup group = result.group();
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Selection made!", NamedTextColor.GREEN)));
-            DisplayGroupManager.setSelectedSpawnedGroup(player, group);
+
+            boolean selectResult = DisplayGroupManager.setSelectedSpawnedGroup(player, group);
+            if (selectResult){
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully selected group!", NamedTextColor.GREEN)));
+            }
+            else{
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to select group! Another player already has that group selected!", NamedTextColor.RED)));
+                return;
+            }
 
             group.getUnaddedInteractionEntitiesInRange(interactionDistance, true);
             if (!group.getMasterPart().getEntity().isGlowing()){

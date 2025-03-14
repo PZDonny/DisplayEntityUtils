@@ -85,6 +85,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     static boolean isUnregisterOnUnloadBlacklist;
     static List<String> unregisterUnloadWorlds;
     static boolean autoSelectGroups;
+    static boolean limitGroupSelections;
     static CullOption cullOption;
     static boolean cacheAnimations;
     static float widthCullingAdder;
@@ -366,6 +367,14 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
      */
     public static boolean registerCommands() {
         return registerPluginCommands;
+    }
+
+    /**
+     * Gets the value of "limitGroupSelections" in the config
+     * @return the boolean value set in config
+     */
+    public static boolean limitGroupSelections() {
+        return limitGroupSelections;
     }
 
     /**
