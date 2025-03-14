@@ -171,7 +171,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param location the relative location that the frame point represents
      * @return true if a point with the given tag doesn't already exist. false if it exists or the tag is invalid
      */
-    public @NotNull boolean addFramePoint(@NotNull String pointTag, @NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
+    public boolean addFramePoint(@NotNull String pointTag, @NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
         if (!DisplayUtils.isValidTag(pointTag)) {
             return false;
         }
@@ -184,7 +184,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param framePoint the point to add
      * @return true if a point with the same pointTag as the provided point doesn't exist. false if it exists or the tag is invalid
      */
-    public @NotNull boolean addFramePoint(@NotNull FramePoint framePoint){
+    public boolean addFramePoint(@NotNull FramePoint framePoint){
         if (!DisplayUtils.isValidTag(framePoint.tag)) {
             return false;
         }
