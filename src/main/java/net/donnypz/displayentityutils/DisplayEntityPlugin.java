@@ -34,6 +34,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -84,11 +85,13 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     static boolean isUnregisterOnUnloadBlacklist;
     static List<String> unregisterUnloadWorlds;
     static boolean autoSelectGroups;
+    static boolean limitGroupSelections;
     static CullOption cullOption;
     static boolean cacheAnimations;
     static float widthCullingAdder;
     static float heightCullingAdder;
     static boolean asynchronousAnimations;
+    static boolean registerPluginCommands;
 
     private static boolean isMythicMobsInstalled;
     private static boolean isSkriptInstalled;
@@ -127,19 +130,15 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         reloadPlugin(true);
         ConfigUtils.registerDisplayControllers();
 
-        getCommand("managedisplays").setExecutor(new DisplayEntityPluginCommand());
-        getCommand("managedisplays").setTabCompleter(new DisplayEntityPluginTabCompleter());
-        getServer().getConsoleSender().sendMessage(pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
-
-
+        //Listeners
         Bukkit.getPluginManager().registerEvents(this, this);
         Bukkit.getPluginManager().registerEvents(new DatapackEntitySpawned(), this);
-        if (automaticGroupDetection){
-            Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
-        }
         Bukkit.getPluginManager().registerEvents(new DEUPlayerConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerChatListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUEntityListener(), this);
+        if (automaticGroupDetection){
+            Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
+        }
 
 
 
@@ -147,6 +146,8 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         partPDCTagKey = new NamespacedKey(this, "pdcTag");
         groupTagKey = new NamespacedKey(this, "groupTag");
         masterKey = new NamespacedKey(this, "isMaster"); //DO NOT CHANGE
+
+        getServer().getConsoleSender().sendMessage(pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
     }
 
     @Override
@@ -361,6 +362,22 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     }
 
     /**
+     * Gets the value of "registerCommands" in the config
+     * @return the boolean value set in config
+     */
+    public static boolean registerCommands() {
+        return registerPluginCommands;
+    }
+
+    /**
+     * Gets the value of "limitGroupSelections" in the config
+     * @return the boolean value set in config
+     */
+    public static boolean limitGroupSelections() {
+        return limitGroupSelections;
+    }
+
+    /**
      * Get whether MythicMobs is installed on this server
      * @return true if MythicMobs is present
      */
@@ -402,6 +419,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     /**
      * Reload the plugin's config
      */
+    @ApiStatus.Internal
     public void reloadPlugin(boolean isOnEnable){
         createLocalSaveFolders();
 
@@ -413,8 +431,17 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             saveDefaultConfig();
             ConfigUtils.updateConfig();
         }
+
         reloadConfig();
         ConfigUtils.setConfigVariables(getConfig());
+        
+        PluginCommand command = getCommand("managedisplays");
+        if (command != null){
+            if (registerPluginCommands && isOnEnable) {
+                command.setExecutor(new DisplayEntityPluginCommand());
+                command.setTabCompleter(new DisplayEntityPluginTabCompleter());
+            }
+        }
     }
 
     /**
@@ -470,7 +497,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
                             .clickEvent(ClickEvent.callback(a -> {
                                 Player p = (Player) a;
                                 boolean result = point.removeFromPointHolder();
-                                DEUCommandUtils.deselectRelativePoint(p);
+                                DEUCommandUtils.removeRelativePoint(p, point);
                                 if (result){
                                     p.sendMessage(pluginPrefix.append(Component.text("Successfully removed point from frame!", NamedTextColor.YELLOW)));
                                     point.despawn();

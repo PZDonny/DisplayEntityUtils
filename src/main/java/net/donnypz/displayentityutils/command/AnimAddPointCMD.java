@@ -43,11 +43,13 @@ class AnimAddPointCMD extends PlayerSubCommand {
         }
         try {
             int id = Integer.parseInt(args[2]);
+            String pointTag = args[3];
             SpawnedDisplayAnimationFrame frame = anim.getFrame(id);
-            boolean result = frame.addFramePoint(args[3], group, player.getLocation());
+            boolean result = frame.addFramePoint(pointTag, group, player.getLocation());
             if (result){
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Frame Point Added!", NamedTextColor.GREEN)));
                 player.sendMessage(Component.text("| Frame ID: "+id, NamedTextColor.GRAY));
+                player.sendMessage(Component.text("| Point Tag: "+pointTag, NamedTextColor.GRAY));
             }
             else{
                 player.sendMessage(Component.text("Failed to add Frame Point. One with the given tag already exists or the tag is invalid!", NamedTextColor.RED));

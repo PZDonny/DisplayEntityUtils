@@ -46,16 +46,11 @@ public class DEUCommandUtils {
         }
 
         relativePointDisplays.put(player.getUniqueId(), displays);
-        player.sendMessage(Component.text("Click a particle to edit/view it", NamedTextColor.YELLOW));
+        player.sendMessage(Component.text("Left click a point to select it", NamedTextColor.YELLOW));
         player.sendMessage(Component.text("| Run \"/mdis anim cancelpoints\" to stop viewing points", NamedTextColor.GRAY));
     }
 
-    /**
-     * Remove the visual representation of {@link RelativePoint}s,
-     * after command execution from a player
-     * @param player
-     * @return true if the player was viewing points
-     */
+    //Remove the visual representation of RelativePoints
     public static boolean removeRelativePoints(Player player){
         Set<RelativePointDisplay> displays = relativePointDisplays.remove(player.getUniqueId());
         if (displays != null){
@@ -66,6 +61,17 @@ public class DEUCommandUtils {
         deselectRelativePoint(player);
         return displays != null;
     }
+
+    public static void removeRelativePoint(Player player, RelativePointDisplay point){
+        UUID playerUUID = player.getUniqueId();
+        selectedRelativePoint.remove(playerUUID, point);
+        Set<RelativePointDisplay> displays = relativePointDisplays.get(playerUUID);
+        displays.remove(point);
+        if (displays.isEmpty()){
+            relativePointDisplays.remove(playerUUID);
+        }
+    }
+
 
     /**
      * Check if a player has the visual representation of {@link RelativePoint}s, which are visible after command execution from a player

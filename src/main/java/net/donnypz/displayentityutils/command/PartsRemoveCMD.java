@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -54,6 +55,7 @@ class PartsRemoveCMD extends PlayerSubCommand {
 
         if (group.getSpawnedParts().size() <= 1){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Despawning your group, not enough parts remain", NamedTextColor.YELLOW)));
+            DEUCommandUtils.removeRelativePoints(player);
             group.unregister(true, true);
         }
     }

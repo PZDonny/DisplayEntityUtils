@@ -33,6 +33,7 @@ public class DisplayController {
     String controllerID;
     boolean configController;
     float verticalOffset = 0;
+    boolean groupVisibleByDefault;
 
     public DisplayController(@NotNull String controllerID) {
         this.controllerID = controllerID;
@@ -129,6 +130,17 @@ public class DisplayController {
     }
 
     /**
+     * Set whether the {@link DisplayEntityGroup} of this controller should be visible by default when spawned
+     * for an entity
+     * @param visibleByDefault
+     * @return this
+     */
+    public DisplayController setVisibleByDefault(boolean visibleByDefault){
+        this.groupVisibleByDefault = visibleByDefault;
+        return this;
+    }
+
+    /**
      * Set the vertical offset for the {@link SpawnedDisplayEntityGroup} that will be spawned for entities using this controller.
      * The value is offset from the entity's passenger position
      * @param verticalOffset
@@ -203,6 +215,14 @@ public class DisplayController {
      */
     public DisplayEntityGroup getDisplayEntityGroup(){
         return group;
+    }
+
+    /**
+     * Get whether the {@link SpawnedDisplayEntityGroup} created from this controller will be visible by default
+     * @return a boolean
+     */
+    public boolean isVisibleByDefault() {
+        return groupVisibleByDefault;
     }
 
     /**
@@ -322,9 +342,8 @@ public class DisplayController {
         //Set Mythic Mobs
         controller.setMythicMobs(config.getStringList("mythicMobs"));
 
-        ConfigurationSection groupProps = config.getConfigurationSection("groupProperties");
-
         //Group Properties
+        ConfigurationSection groupProps = config.getConfigurationSection("groupProperties");
         String groupTag = groupProps.getString("tag");
         try{ //Set with Config
             LoadMethod method = LoadMethod.valueOf(groupProps.getString("storage").toUpperCase());
@@ -335,6 +354,7 @@ public class DisplayController {
         }
         boolean flip = groupProps.getBoolean("flip");
         controller.verticalOffset = (float) groupProps.getDouble("verticalOffset");
+        controller.groupVisibleByDefault = groupProps.getBoolean("visibleByDefault", true);
 
 
         ConfigurationSection defaultPropsSection = config.getConfigurationSection("defaultFollowProperties");

@@ -86,8 +86,9 @@ public abstract class RelativePoint implements Serializable {
      * @param group
      * @return a location
      */
-    public @NotNull Location getLocation(SpawnedDisplayEntityGroup group){
+    public @NotNull Location getLocation(@NotNull SpawnedDisplayEntityGroup group){
         Vector v = vectorFromOrigin.clone();
+        v.multiply(group.getScaleMultiplier());
         Location groupLoc = group.getLocation();
 
         double pitchDiff = groupLoc.getPitch() - groupPitchAtCreation;
@@ -100,5 +101,25 @@ public abstract class RelativePoint implements Serializable {
 
         groupLoc.add(v);
         return groupLoc;
+    }
+
+    /**
+     * Set the vector offset of this point, based on a {@link SpawnedDisplayEntityGroup}'s origin and a relative location
+     * @param group
+     * @param location
+     * @return this
+     */
+    public @NotNull RelativePoint setLocation(@NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
+        Location groupLoc = group.getLocation();
+        groupPitchAtCreation = groupLoc.getPitch();
+        groupYawAtCreation = groupLoc.getYaw();
+        Vector v = location.toVector().subtract(groupLoc.toVector());
+        float scaleMultiplier = group.getScaleMultiplier();
+        v.setX(v.getX()/scaleMultiplier);
+        v.setY(v.getY()/scaleMultiplier);
+        v.setZ(v.getZ()/scaleMultiplier);
+        vectorFromOrigin = v;
+        vector = vectorFromOrigin.toVector3f();
+        return this;
     }
 }

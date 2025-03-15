@@ -5,6 +5,7 @@ import io.lumine.mythic.bukkit.events.MythicMobSpawnEvent;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayStateMachine;
+import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
@@ -28,32 +29,48 @@ public final class DEUMythicListener implements Listener {
     public void onMythicMechanicLoad(MythicMechanicLoadEvent event)	{
         Bukkit.getLogger().info("MythicMechanicLoadEvent called for mechanic " + event.getMechanicName());
 
+        String mechanicName = event.getMechanicName().toLowerCase();
 
-        String mechanicName = event.getMechanicName();
-        if (mechanicName.equalsIgnoreCase(DEUAnimationMythicMechanic.mechanicName))	{
-            DEUAnimationMythicMechanic mechanic = DEUAnimationMythicMechanic.create(event.getConfig());
-            if (mechanic != null){
+        switch(mechanicName){
+            case DEUAnimationMythicMechanic.mechanicName -> {
+                DEUAnimationMythicMechanic mechanic = DEUAnimationMythicMechanic.create(event.getConfig());
+                if (mechanic != null){
+                    event.register(mechanic);
+                    Bukkit.getLogger().info("-- Registered DEUAnimationMythicMechanic mechanic! (deuanimate)");
+                }
+                else{
+                    Bukkit.getLogger().severe("-- Failed to register DEUAnimationMythicMechanic (deuanimate): "+event.getConfig().getLine());
+                }
+            }
+
+            case DEUStateMythicMechanic.mechanicName -> {
+                DEUStateMythicMechanic mechanic = DEUStateMythicMechanic.create(event.getConfig());
+                if (mechanic != null){
+                    event.register(mechanic);
+                    Bukkit.getLogger().info("-- Registered DEUStateMythicMechanic mechanic! (deustate)");
+                }
+                else{
+                    Bukkit.getLogger().severe("-- Failed to register DEUStateMythicMechanic (deustate): "+event.getConfig().getLine());
+                }
+            }
+
+            case DEUStopMythicMechanic.mechanicName -> {
+                DEUStopMythicMechanic mechanic = DEUStopMythicMechanic.create();
                 event.register(mechanic);
-                Bukkit.getLogger().info("-- Registered DEUAnimationMythicMechanic mechanic! (deuanimate)");
+                Bukkit.getLogger().info("-- Registered DEUStopMythicMechanic mechanic! (deustop)");
             }
-            else{
-                Bukkit.getLogger().severe("-- Failed to register DEUAnimationMythicMechanic (deuanimate): "+event.getConfig().getLine());
-            }
-        }
-        else if (mechanicName.equalsIgnoreCase(DEUStateMythicMechanic.mechanicName)){
-            DEUStateMythicMechanic mechanic = DEUStateMythicMechanic.create(event.getConfig());
-            if (mechanic != null){
+
+            case DEUShowGroupMythicMechanic.mechanicName ->  {
+                DEUShowGroupMythicMechanic mechanic = DEUShowGroupMythicMechanic.create();
                 event.register(mechanic);
-                Bukkit.getLogger().info("-- Registered DEUStateMythicMechanic mechanic! (deustate)");
+                Bukkit.getLogger().info("-- Registered DEUShowGroupMythicMechanic mechanic! (deushow)");
             }
-            else{
-                Bukkit.getLogger().severe("-- Failed to register DEUStateMythicMechanic (deustate): "+event.getConfig().getLine());
+
+            case DEUHideGroupMythicMechanic.mechanicName ->  {
+                DEUHideGroupMythicMechanic mechanic = DEUHideGroupMythicMechanic.create();
+                event.register(mechanic);
+                Bukkit.getLogger().info("-- Registered DEUHideGroupMythicMechanic mechanic! (deuhide)");
             }
-        }
-        else if (mechanicName.equalsIgnoreCase(DEUStopMythicMechanic.mechanicName)){
-            DEUStopMythicMechanic mechanic = DEUStopMythicMechanic.create();
-            event.register(mechanic);
-            Bukkit.getLogger().info("-- Registered DEUStopMythicMechanic mechanic! (deustop)");
         }
     }
 
@@ -74,11 +91,14 @@ public final class DEUMythicListener implements Listener {
         }
 
         boolean persistGroupAfterRestart = e.getMob().getDespawnMode().getSavesToDisk();
-        SpawnedDisplayEntityGroup spawned = group.spawn(e.getLocation(), GroupSpawnedEvent.SpawnReason.DISPLAY_CONTROLLER);
+        GroupSpawnSettings settings = new GroupSpawnSettings()
+                .persistentByDefault(persistGroupAfterRestart)
+                .allowPersistenceOverride(false)
+                .visibleByDefault(controller.isVisibleByDefault(), null);
+
+        SpawnedDisplayEntityGroup spawned = group.spawn(e.getLocation(), GroupSpawnedEvent.SpawnReason.DISPLAY_CONTROLLER, settings);
         spawned.setVerticalOffset(controller.getVerticalOffset());
         spawned.rideEntity(e.getEntity());
-        spawned.setPersistent(persistGroupAfterRestart);
-        spawned.setPersistenceOverride(false);
 
         Entity masterEntity = spawned.getMasterPart().getEntity();
         PersistentDataContainer pdc = masterEntity.getPersistentDataContainer();

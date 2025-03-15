@@ -33,6 +33,7 @@ class AnimCMD extends ConsoleUsableSubCommand{
         subCommands.put("editallframes", new AnimEditAllFramesCMD());
         subCommands.put("addpoint", new AnimAddPointCMD());
         subCommands.put("copypoint", new AnimCopyPointCMD());
+        subCommands.put("movepoint", new AnimMovePointCMD());
         subCommands.put("showframe", new AnimShowFrameCMD());
         subCommands.put("addsound", new AnimAddSoundCMD());
         subCommands.put("removesound", new AnimRemoveSoundCMD());
@@ -99,12 +100,13 @@ class AnimCMD extends ConsoleUsableSubCommand{
             CMDUtils.sendCMD(sender, "/mdis anim editallframes <tick-delay> <tick-duration>", " (Edit properties of all frames)");
             CMDUtils.sendCMD(sender, "/mdis anim addpoint <frame-id> <point-tag>", " (Add a point relative to a group and your location for a frame)");
             CMDUtils.sendCMD(sender, "/mdis anim copypoint <frame-ids | frame-tag>", " (Copy a selected frame point to other frames)");
+            CMDUtils.sendCMD(sender, "/mdis anim movepoint", "(Move a frame point to your location, relative to your selected group)");
             CMDUtils.sendCMD(sender, "/mdis anim addsound <sound> <volume> <pitch>", " (Add a sound to play at a frame point)");
             CMDUtils.sendCMD(sender, "/mdis anim removesound <sound | -all>", " (Remove a sound from a frame point)");
             CMDUtils.sendCMD(sender, "/mdis anim addparticle", " (Add a particle to play at a frame point)");
-            CMDUtils.sendCMD(sender, "/mdis anim reverse", " (Reverse the order of frames in your selected animation)");
         }
         else{
+            CMDUtils.sendCMD(sender, "/mdis anim reverse", " (Reverse the order of frames in your selected animation)");
             CMDUtils.sendCMD(sender, "/mdis anim togglescalerespect", " (Toggle whether your selected animation should respect the group's scale)");
             CMDUtils.sendCMD(sender, "/mdis anim toggledatachanges", " (Toggle whether your selected animation can change block display blocks, item display items, and text display text)");
             CMDUtils.sendCMD(sender, "/mdis anim showframe <frame-id>", " (Displays a frame on your selected group)");
