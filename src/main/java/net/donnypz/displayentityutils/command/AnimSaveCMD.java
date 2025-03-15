@@ -24,7 +24,7 @@ class AnimSaveCMD extends PlayerSubCommand {
         }
 
         if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage /mdis anim save <storage>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage /mdis anim save <storage-location>", NamedTextColor.RED));
             return;
         }
 
