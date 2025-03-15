@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -28,6 +29,11 @@ class PartsTranslateCMD extends PlayerSubCommand {
         SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){
             PartsCMD.noPartSelection(player);
+            return;
+        }
+
+        if (DEUCommandUtils.isViewingRelativePoints(player)){
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You cannot play do that while viewing points!", NamedTextColor.RED)));
             return;
         }
 
