@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayEntities.RelativePoint;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -11,6 +12,7 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
@@ -83,6 +85,18 @@ public abstract class RelativePointDisplay {
         if (!isValid) return;
         Display d = (Display) Bukkit.getEntity(display);
         d.setGlowColorOverride(Color.BLACK);
+    }
+
+    public void setLocation(@NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
+        if (!isValid){
+            return;
+        }
+        Entity i = Bukkit.getEntity(interaction);
+        Entity d = Bukkit.getEntity(display);
+        i.teleport(location);
+        d.teleport(location);
+        spawnLocation = location;
+        relativePoint.setLocation(group, location);
     }
 
 
