@@ -1257,7 +1257,6 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
         for (SpawnedDisplayEntityPart interactionPart: getSpawnedParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
             alignInteractionWithMountedGroup(interactionPart, vehicle);
         }
-
         return true;
     }
 

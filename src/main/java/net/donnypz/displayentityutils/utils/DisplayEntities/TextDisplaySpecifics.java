@@ -27,10 +27,10 @@ final class TextDisplaySpecifics extends DisplayEntitySpecifics implements Seria
     TextDisplaySpecifics(TextDisplay textDisplay) {
         super(textDisplay);
 
-        this.text = MiniMessage.miniMessage().serialize(textDisplay.text());
-        //this.text = textDisplay.getText();
+        Component comp = textDisplay.text();
+        this.text = MiniMessage.miniMessage().serialize(comp);
         try{
-            this.font = textDisplay.text().font().asString();
+            this.font = comp.font().asString();
         }
         catch(NullPointerException ignored){}
 
@@ -47,7 +47,6 @@ final class TextDisplaySpecifics extends DisplayEntitySpecifics implements Seria
 
     Component getText() {
         Component comp = MiniMessage.miniMessage().deserialize(text);
-        //Component comp = Component.text(text);
         return comp.font(Key.key(font));
     }
 

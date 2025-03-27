@@ -31,6 +31,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -148,6 +149,11 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         masterKey = new NamespacedKey(this, "isMaster"); //DO NOT CHANGE
 
         getServer().getConsoleSender().sendMessage(pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
+
+        //bStats
+        int pluginID = 24875;
+        new Metrics(this, pluginID);
+
     }
 
     @Override
