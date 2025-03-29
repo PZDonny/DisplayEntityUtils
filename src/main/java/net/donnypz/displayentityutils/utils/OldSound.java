@@ -1,7 +1,6 @@
 package net.donnypz.displayentityutils.utils;
 
 import org.bukkit.Keyed;
-import org.bukkit.MinecraftExperimental;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;

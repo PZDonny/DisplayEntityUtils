@@ -413,12 +413,13 @@ public final class DisplayGroupManager {
 
         //Check for non-existing group on new session
         SpawnedDisplayEntityGroup group;
-        if (displayEntity.getVehicle() != null && displayEntity.getVehicle() instanceof Display) {
-            displayEntity = (Display) displayEntity.getVehicle();
+        if (displayEntity.getVehicle() != null && displayEntity.getVehicle() instanceof Display vehicle) {
+            displayEntity = vehicle;
         }
         else if (displayEntity.getPassengers().isEmpty()) {
             if (getter != null) {
-                getter.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("The found display entity is not grouped", NamedTextColor.RED)));
+                getter.sendMessage(DisplayEntityPlugin.pluginPrefix
+                        .append(Component.text("The found display entity is not grouped", NamedTextColor.RED)));
             }
             return null;
         }
@@ -433,6 +434,7 @@ public final class DisplayGroupManager {
         if (!containsDisplay) {
             return null;
         }
+
         group = new SpawnedDisplayEntityGroup(displayEntity);
         new GroupRegisteredEvent(group).callEvent();
         if (!group.isSpawned()){
@@ -526,13 +528,15 @@ public final class DisplayGroupManager {
      */
     public static @Nullable GroupResult getSpawnedGroupNearLocation(@NotNull Location location, double radius, @Nullable Player getter) {
         Display master = getNearestPotentialMasterDisplay(location, radius, null);
-        if (master == null){
-            if (getter != null) {
-                getter.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You are not near any spawned display entity groups!", NamedTextColor.RED)));
-            }
-            return null;
+        if (master != null){
+            return getSpawnedGroup(master, getter);
         }
-        return getSpawnedGroup(master, getter);
+
+        if (getter != null) {
+            getter.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You are not near any spawned display entity groups!", NamedTextColor.RED)));
+        }
+        return null;
+
     }
 
     /**
