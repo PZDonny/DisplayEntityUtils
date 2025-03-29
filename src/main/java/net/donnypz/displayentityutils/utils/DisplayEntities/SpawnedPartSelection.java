@@ -385,6 +385,20 @@ public final class SpawnedPartSelection implements Spawned {
         }
     }
 
+    /**
+     * Check if all selected parts are within a loaded chunk
+     * @return true if all parts are in a loaded chunk
+     */
+    @Override
+    public boolean isInLoadedChunk(){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            if (!part.isInLoadedChunk()){
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     /**
      * Randomize the part uuids of all parts in this SpawnedPartSelection.
@@ -546,30 +560,34 @@ public final class SpawnedPartSelection implements Spawned {
      * Change the translation of the SpawnedDisplayEntityParts in this SpawnedPartSelection.
      * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param direction The direction to translate the parts
      * @param distance How far the part should be translated
      * @param durationInTicks How long it should take for the translation to complete
      * @param delayInTicks How long before the translation should begin
-     * @param direction The direction to translate the parts
      */
-    public void translate(float distance, int durationInTicks, int delayInTicks, Vector direction){
+    @Override
+    public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            part.translate(distance, durationInTicks, delayInTicks, direction);
+            part.translate(direction, distance, durationInTicks, delayInTicks);
         }
+        return true;
     }
 
     /**
      * Change the translation of the SpawnedDisplayEntityParts in this SpawnedPartSelection.
      * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param direction The direction to translate the parts
      * @param distance How far the part should be translated
      * @param durationInTicks How long it should take for the translation to complete
      * @param delayInTicks How long before the translation should begin
-     * @param direction The direction to translate the parts
      */
-    public void translate(float distance, int durationInTicks, int delayInTicks, Direction direction){
+    @Override
+    public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            part.translate(distance, durationInTicks, delayInTicks, direction);
+            part.translate(direction, distance, durationInTicks, delayInTicks);
         }
+        return true;
     }
 
     /**

@@ -54,12 +54,12 @@ class PartsTranslateCMD extends PlayerSubCommand {
                 duration = 0;
             }
             if (args.length >= 6 && args[5].equalsIgnoreCase("-all")){
-                partSelection.translate(distance, duration, -1, direction);
+                partSelection.translate(direction, distance, duration, -1);
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Translating all selected parts!", NamedTextColor.GREEN)));
             }
             else{
                 SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
-                selected.translate(distance, duration, -1, direction);
+                selected.translate(direction, distance, duration, -1);
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Translating your selected part!", NamedTextColor.GREEN)));
             }
 

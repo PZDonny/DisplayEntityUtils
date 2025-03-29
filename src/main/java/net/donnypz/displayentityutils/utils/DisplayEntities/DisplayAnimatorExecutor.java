@@ -221,7 +221,7 @@ final class DisplayAnimatorExecutor {
 
             if (!currentVector.equals(v)) {
                 Vector moveVector = currentVector.subtract(v);
-                part.translate((float) moveVector.length(), frame.duration, 0, moveVector);
+                part.translate(moveVector, (float) moveVector.length(), frame.duration, 0);
             }
 
             DisplayUtils.scaleInteraction(i, height, width, frame.duration, 0);

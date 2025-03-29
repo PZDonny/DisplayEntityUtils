@@ -112,6 +112,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * Get whether this group is within a loaded chunk
      * @return true if the group is in a loaded chunk
      */
+    @Override
     public boolean isInLoadedChunk(){
         return DisplayUtils.isInLoadedChunk(masterPart);
     }
@@ -742,7 +743,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
                 translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
 
                 Vector moveVector = oldVector.subtract(translationVector);
-                part.translateForce((float) moveVector.length(), durationInTicks, 0, moveVector);
+                part.translateForce(moveVector, (float) moveVector.length(), durationInTicks, 0);
             }
         }
 
@@ -1005,7 +1006,6 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * @param heightAdder The amount of height to be added to the culling range
      * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
      */
-    @ApiStatus.Experimental
     public void autoSetCulling(CullOption cullOption, float widthAdder, float heightAdder){
         if (!isInLoadedChunk()){
             return;
@@ -1077,6 +1077,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * @param delayInTicks How long before the translation should begin
      * @return false if the {@link GroupTranslateEvent} is cancelled or if the group is in an unloaded chunk
      */
+    @Override
     public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks){
         if (!isInLoadedChunk()){
             return false;
@@ -1088,7 +1089,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
             return false;
         }
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.translateForce(distance, durationInTicks, delayInTicks, direction);
+            part.translateForce(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }
@@ -1103,6 +1104,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * @param delayInTicks How long before the translation should begin
      * @return false if the {@link GroupTranslateEvent} is cancelled or if the group is in an unloaded chunk
      */
+    @Override
     public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks){
         if (!isInLoadedChunk()){
             return false;
@@ -1114,7 +1116,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
             return false;
         }
         for(SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.translateForce(distance, durationInTicks, delayInTicks, direction);
+            part.translateForce(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }
@@ -1136,9 +1138,19 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
     /**
      * Get the name of this group's world
      * @return name of group's world
+     * @throws NullPointerException if group is despawned or invalid
      */
     public String getWorldName(){
-        return masterPart.getEntity().getWorld().getName();
+        return getWorld().getName();
+    }
+
+    /**
+     * Get the world that this group resides in
+     * @return a {@link World}
+     * @throws NullPointerException if group is despawned or invalid
+     */
+    public @NotNull World getWorld(){
+        return masterPart.getEntity().getWorld();
     }
 
     /**
