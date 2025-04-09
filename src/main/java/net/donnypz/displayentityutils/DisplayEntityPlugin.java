@@ -496,7 +496,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             }
             if (clickType == InteractionClickEvent.ClickType.RIGHT){
                 if (player.isSneaking()){
-                    if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_REMOVE_PARTICLE)){
+                    if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_REMOVE_FRAME_POINT)){
                         return;
                     }
                     Component comp = Component.text("Click here to confirm point REMOVAL", NamedTextColor.DARK_RED, TextDecoration.UNDERLINED)
