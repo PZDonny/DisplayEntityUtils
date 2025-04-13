@@ -123,11 +123,14 @@ autoCulling: NONE
 widthCullingAdder: 1.5
 heightCullingAdder: 1.5
 
+#Optionally cache animations after retrieving them from a storage location.
+#This option prevents constant server freezes/lag when retrieving animations at the cost of using more memory
+cacheAnimations:
+  enabled: true
 
-#This setting automatically caches animations. Keep this enabled if SpawnedEntityGroups use animations when they spawn and
-#those animations are saved on a database like MongoDB or MySQL. This will help prevent server lag/freezes, but also takes up
-#more memory.
-cacheAnimations: true
+  #How long an animation must be unused before it's uncached
+  #-1 to disable expiration
+  expireTimeInSeconds: 900
 
 #Attempt to improve server performance by playing animations asynchronously
 #Keep this value as false if animations do not display as intended or are choppy

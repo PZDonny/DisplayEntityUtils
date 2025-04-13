@@ -1,5 +1,7 @@
 package net.donnypz.displayentityutils.managers;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticle;
@@ -10,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +24,16 @@ public final class DisplayAnimationManager {
 
     private DisplayAnimationManager(){}
     private static final HashMap<UUID, SpawnedDisplayAnimation> selectedAnimation = new HashMap<>();
-    private static final HashMap<String, SpawnedDisplayAnimation> cachedAnimations = new HashMap<>();
+    private static Cache<String, SpawnedDisplayAnimation> cachedAnimations;
+
+    @ApiStatus.Internal
+    public static void createExpirationMap(int expireTime){
+        CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
+        if (expireTime > -1){
+            builder.expireAfterAccess(Duration.ofSeconds(expireTime));
+        }
+        cachedAnimations = builder.build();
+    }
 
     /**
      * Set the selected SpawnedDisplayAnimation of a player to the specified animation
@@ -132,7 +144,7 @@ public final class DisplayAnimationManager {
      * @return a {@link SpawnedDisplayAnimation} or null if not cached
      */
     public static @Nullable SpawnedDisplayAnimation getCachedAnimation(@NotNull String animationTag){
-        return cachedAnimations.get(animationTag);
+        return cachedAnimations.getIfPresent(animationTag);
     }
 
     /**

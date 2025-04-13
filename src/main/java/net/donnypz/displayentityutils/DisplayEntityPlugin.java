@@ -89,6 +89,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     static boolean limitGroupSelections;
     static CullOption cullOption;
     static boolean cacheAnimations;
+    static int cacheAnimationExpiration;
     static float widthCullingAdder;
     static float heightCullingAdder;
     static boolean asynchronousAnimations;
@@ -336,11 +337,19 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     }
 
     /**
-     * Gets the value of "cacheAnimations" in the config
+     * Gets the value of "cacheAnimations.enabled" in the config
      * @return the boolean value set in config
      */
     public static boolean cacheAnimations() {
         return cacheAnimations;
+    }
+
+    /**
+     * Gets the value of "cacheAnimations.expireTimeInSeconds" in the config
+     * @return the boolean value set in config
+     */
+    public static int cacheAnimationExpiration() {
+        return cacheAnimationExpiration;
     }
 
     /**
