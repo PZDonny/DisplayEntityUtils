@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -29,15 +30,15 @@ public final class DisplayAnimation implements Serializable {
      * @return a string or null
      */
     @Deprecated(since = "2.6.3")
-    public String getPartTag() {
+    public @Nullable String getPartTag() {
         return partTag;
     }
 
     /**
      * Get the filter that will be used when animating
-     * @return
+     * @return {@link PartFilter} or null if not set
      */
-    public PartFilter getPartFilter(){
+    public @Nullable PartFilter getPartFilter(){
         return filter;
     }
 

@@ -40,7 +40,7 @@ public class FramePoint extends RelativePoint implements Serializable {
         super(pointTag, vector, initialYaw, initialPitch);
     }
 
-    public FramePoint(FramePoint point) {
+    public FramePoint(@NotNull FramePoint point) {
         super(point);
         for (AnimationParticle p : point.particles){
             this.particles.add(p.clone());

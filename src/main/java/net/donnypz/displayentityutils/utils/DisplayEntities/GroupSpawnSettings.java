@@ -72,7 +72,7 @@ public class GroupSpawnSettings {
      * @param partTag the part tag
      * @return this
      */
-    public GroupSpawnSettings addHiddenPartTag(String partTag, @Nullable Collection<Player> visiblePlayers){
+    public GroupSpawnSettings addHiddenPartTag(@NotNull String partTag, @Nullable Collection<Player> visiblePlayers){
 
         Set<UUID> players = new HashSet<>();
         if (visiblePlayers != null && !visiblePlayers.isEmpty()){
