@@ -280,7 +280,6 @@ final class DisplayAnimatorExecutor {
             if (animation.allowsDataChanges()){
                 transformation.applyData(display);
             }
-
             return;
         }
 
