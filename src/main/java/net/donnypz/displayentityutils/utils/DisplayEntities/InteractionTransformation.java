@@ -7,7 +7,7 @@ import org.joml.Vector3f;
 import java.io.*;
 
 @ApiStatus.Internal
-public class InteractionTransformation extends Vector3f implements Externalizable {
+class InteractionTransformation extends Vector3f implements Externalizable {
     transient Vector vector;
     float height = -1;
     float width = -1;
