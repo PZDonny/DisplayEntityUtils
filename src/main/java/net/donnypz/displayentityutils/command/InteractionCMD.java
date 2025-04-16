@@ -108,7 +108,6 @@ class InteractionCMD extends ConsoleUsableSubCommand {
     private static void noPartSelectionInteraction(Player player){
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You must look at the interaction you wish to add the command to, or select a part!", NamedTextColor.RED)));
         player.sendMessage(Component.text("/mdis parts cycle <first | prev | next | last>", NamedTextColor.GRAY));
-        player.sendMessage(Component.text("/mdis parts select <part-tag>", NamedTextColor.GRAY));
     }
 
 }

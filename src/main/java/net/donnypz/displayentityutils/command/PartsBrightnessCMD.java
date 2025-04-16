@@ -16,8 +16,7 @@ class PartsBrightnessCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
-        if (group == null) {
+        if (DisplayGroupManager.getSelectedSpawnedGroup(player)== null){
             DisplayEntityPluginCommand.noGroupSelection(player);
             return;
         }
