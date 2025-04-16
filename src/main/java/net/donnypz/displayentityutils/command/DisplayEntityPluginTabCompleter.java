@@ -49,7 +49,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                 case "item" -> {
                     return DisplayEntityPluginCommand.getItemTabComplete();
                 }
-                case "listgroups", "listanim" -> addStorages(suggestions);
+                case "listgroups", "listanims" -> addStorages(suggestions);
                 case "reload" -> {
                     suggestions.add("config");
                     suggestions.add("controllers");
