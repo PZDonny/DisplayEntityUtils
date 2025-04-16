@@ -677,6 +677,18 @@ public final class SpawnedDisplayEntityPart implements Spawned {
     }
 
     /**
+     * Get the brightness of this part
+     * @return a color, or null if not set or if this part's type is {@link PartType#INTERACTION}
+     */
+    public @Nullable Display.Brightness getBrightness(){
+        if (type == PartType.INTERACTION){
+            return null;
+        }
+        Entity entity = getEntity();
+        return ((Display) entity).getBrightness();
+    }
+
+    /**
      * Set the billboard of this part
      * @param billboard the billboard to set
      */
@@ -703,6 +715,18 @@ public final class SpawnedDisplayEntityPart implements Spawned {
         }
         Display display = (Display) entity;
         display.setViewRange(viewRangeMultiplier);
+    }
+
+    /**
+     * Get this part's view range multiplier
+     * @return a float. -1 if the part is an interaction
+     */
+    public float getViewRange(){
+        Entity entity = getEntity();
+        if (entity instanceof Interaction){
+            return -1;
+        }
+        return ((Display)entity).getViewRange();
     }
 
 
