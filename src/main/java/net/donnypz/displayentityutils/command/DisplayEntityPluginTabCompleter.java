@@ -112,7 +112,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                             suggestions.add("-held");
                             suggestions.add("block-id");
                         }
-                        case "listtags" -> {
+                        case "info" -> {
                             suggestions.add("part");
                             suggestions.add("selection");
                         }

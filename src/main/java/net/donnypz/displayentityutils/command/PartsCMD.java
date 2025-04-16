@@ -18,6 +18,7 @@ class PartsCMD extends ConsoleUsableSubCommand {
     PartsCMD(){
         super(Permission.HELP);
         subCommands.put("help", new PartsHelpCMD());
+        subCommands.put("info", new PartsInfoCMD());
         subCommands.put("cycle", new PartsCycleCMD());
         subCommands.put("glow", new PartsGlowCMD());
         subCommands.put("unglow", new PartsUnglowCMD());
