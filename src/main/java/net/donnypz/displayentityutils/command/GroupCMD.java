@@ -107,7 +107,7 @@ class GroupCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group unglow", " (Remove the glowing effect from all parts in this group)");
             CMDUtils.sendCMD(sender, "/mdis group glowcolor <color | hex-code>", " (Set the glow color for all parts in this group)");
             CMDUtils.sendCMD(sender, "/mdis group ride <-target | player-name | entity-uuid> [group-tag] [storage] [controller-id]", " (Make a group ride an entity. Values in brackets [] are optional)");
-            CMDUtils.sendCMD(sender, "/mdis group dismount <keep | despawn> [-target | player-name | entity-uuid]", " (Dismount a group from an entity, and choose to keep or despawn it");
+            CMDUtils.sendCMD(sender, "/mdis group dismount <-target | -selected | player-name | entity-uuid> [-despawn]", " (Dismount a group from an entity, with optional despawning");
         }
         else{
             CMDUtils.sendCMD(sender, "/mdis group viewrange <view-range-multiplier>", " (Set the view range multiplier for your selected group)");

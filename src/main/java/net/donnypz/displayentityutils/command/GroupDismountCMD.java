@@ -17,65 +17,67 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (args.length < 3){
-            sender.sendMessage("Incorrect Usage! /mdis group dismount <keep | despawn> [-target | player-name | entity-uuid]");
-            return;
-        }
-        if (args.length < 4) {
-            if (!(sender instanceof Player player)){
-                sender.sendMessage(Component.text("Incorrect Console Usage! /mdis group dismount <keep | despawn> <player-name | entity-uuid>", NamedTextColor.RED));
+        if (args.length < 3) {
+            if (!(sender instanceof Player)){
+                sender.sendMessage(Component.text("Incorrect Console Usage! /mdis group dismount <player-name | entity-uuid> [-despawn]", NamedTextColor.RED));
                 return;
-            }
-
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
-            if (group == null) {
-                DisplayEntityPluginCommand.noGroupSelection(player);
-                return;
-            }
-            Entity vehicle = group.dismount();
-            if (vehicle == null){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your selected group is not riding an entity!", NamedTextColor.RED)));
             }
             else{
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully dismounted your selected group!", NamedTextColor.GREEN)));
+                sender.sendMessage(Component.text("Incorrect Usage! /mdis group dismount <-target | -selected | player-name | entity-uuid> [-despawn]", NamedTextColor.RED));
             }
             return;
         }
 
-        String value = args[3];
-        if (!(sender instanceof Player) && value.equalsIgnoreCase("-target")){
-            sender.sendMessage(Component.text("You cannot use \"-target\" in console!", NamedTextColor.RED));
+        boolean despawn = args.length == 4 && args[3].equalsIgnoreCase("-despawn");
+
+        String type = args[2];
+        if (type.equalsIgnoreCase("-selected")){
+            if (!(sender instanceof Player p)){
+                sender.sendMessage(Component.text("You cannot use \"-selected\" in console!", NamedTextColor.RED));
+                return;
+            }
+
+            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
+            if (group == null) {
+                DisplayEntityPluginCommand.noGroupSelection(p);
+                return;
+            }
+
+            if (group.dismount() == null){
+                sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your selected group is not riding an entity!", NamedTextColor.RED)));
+            }
+            else{
+                sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully dismounted your selected group!", NamedTextColor.GREEN)));
+                if (despawn){
+                    group.unregister(true, true);
+                    despawnMessage(sender);
+                }
+            }
             return;
         }
 
-        String retainOption = args[2];
-        boolean keep;
-        if (retainOption.equalsIgnoreCase("keep")){
-            keep = true;
-        }
-        else if (retainOption.equalsIgnoreCase("despawn")){
-            keep = false;
-        }
-        else{
-            sender.sendMessage("Incorrect Usage! /mdis group dismount <keep | despawn> [-target | player-name | entity-uuid]");
-            return;
-        }
-
-
-        Entity vehicle = GroupRideCMD.getVehicle(sender, value);
+        Entity vehicle = GroupRideCMD.getVehicle(sender, type);
         if (vehicle == null){
             return;
         }
 
 
         for (SpawnedDisplayEntityGroup g : DisplayUtils.getGroupPassengers(vehicle)){
-            g.dismount();
-            g.stopFollowingEntity();
-            if (!keep){
+
+            if (despawn){
                 g.unregister(true, true);
+            }
+            else{
+                g.dismount();
+                g.stopFollowingEntity();
             }
         }
 
         sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully dismounted all groups riding the entity!", NamedTextColor.GREEN)));
+        if (despawn) despawnMessage(sender);
+    }
+
+    private void despawnMessage(CommandSender sender){
+        sender.sendMessage(Component.text("| Despawned dismounted group(s)", NamedTextColor.GRAY));
     }
 }

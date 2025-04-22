@@ -75,12 +75,8 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                         case "billboard" -> {
                             addBillboard(suggestions);
                         }
-                        case "ride" -> {
+                        case "ride", "dismount" -> {
                             return null;
-                        }
-                        case "dismount" -> {
-                            suggestions.add("keep");
-                            suggestions.add("despawn");
                         }
                     }
                 }
