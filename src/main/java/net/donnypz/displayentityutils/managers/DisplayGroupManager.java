@@ -6,7 +6,6 @@ import net.donnypz.displayentityutils.events.GroupRegisteredEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.GroupResult;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -28,8 +27,6 @@ public final class DisplayGroupManager {
     private DisplayGroupManager() {}
 
     private static final Map<SpawnedDisplayEntityPart, SpawnedDisplayEntityGroup> allSpawnedGroups = new HashMap<>();
-    private static final HashMap<UUID, SpawnedDisplayEntityGroup> selectedGroup = new HashMap<>();
-    private static final HashMap<UUID, SpawnedPartSelection> selectedPartSelection = new HashMap<>();
 
 
     /**
@@ -48,33 +45,8 @@ public final class DisplayGroupManager {
      * @param spawnedDisplayEntityGroup SpawnedDisplayEntityGroup to be set to the player
      * @return false if {@link DisplayEntityPlugin#limitGroupSelections()} is true and a player already has the group selected
      */
-    @ApiStatus.Internal
-    public static boolean setSelectedSpawnedGroup(Player player, SpawnedDisplayEntityGroup spawnedDisplayEntityGroup) {
-        SpawnedDisplayEntityGroup lastGroup = selectedGroup.get(player.getUniqueId());
-        if (lastGroup != null) {
-            if (lastGroup == spawnedDisplayEntityGroup) {
-                return true;
-            }
-
-            //boolean otherPlayersHaveSelected = false;
-            /*for (UUID uuid : selectedGroup.keySet()) {
-                if (uuid != player.getUniqueId() && selectedGroup.get(uuid) == lastGroup) {
-                    //otherPlayersHaveSelected = true;
-                    break;
-                }
-            }*/
-
-            /*if (!otherPlayersHaveSelected){
-                lastGroup.unregister(false);
-            }*/
-        }
-
-        if (selectedGroup.containsValue(spawnedDisplayEntityGroup) && DisplayEntityPlugin.limitGroupSelections()){
-            return false;
-        }
-
-        setPartSelection(player, new SpawnedPartSelection(spawnedDisplayEntityGroup),true);
-        return true;
+    public static boolean setSelectedSpawnedGroup(@NotNull Player player, @NotNull SpawnedDisplayEntityGroup spawnedDisplayEntityGroup) {
+        return DEUUser.getOrCreateUser(player).setSelectedSpawnedGroup(spawnedDisplayEntityGroup);
     }
 
     /**
@@ -82,8 +54,10 @@ public final class DisplayGroupManager {
      * @param player Player to get the group of
      * @return The SpawnedDisplayEntityGroup that the player has selected. Null if player does not have a selection.
      */
-    public static SpawnedDisplayEntityGroup getSelectedSpawnedGroup(@NotNull Player player) {
-        return selectedGroup.get(player.getUniqueId());
+    public static @Nullable SpawnedDisplayEntityGroup getSelectedSpawnedGroup(@NotNull Player player) {
+        DEUUser user = DEUUser.getUser(player);
+        if (user != null) return user.getSelectedGroup();
+        return null;
     }
 
     /**
@@ -91,62 +65,44 @@ public final class DisplayGroupManager {
      * @param player Player to remove selection from
      */
     public static void deselectSpawnedGroup(@NotNull Player player) {
-        selectedGroup.remove(player.getUniqueId());
-        DEUCommandUtils.removeRelativePoints(player);
+        DEUUser user = DEUUser.getUser(player);
+        if (user != null) user.deselectSpawnedGroup();
     }
-
 
     /**
      * Set a player's part selection and their group to the part's group
      *
      * @param player Player to set the selection to
-     * @param parts The SpawnedPartSelection for the player to have selected
-     * @param setGroup Whether to set the player's selected group to the group of the parts
+     * @param selection The SpawnedPartSelection for the player to have selected
+     * @param setGroup Whether to set the player's selected group to the selection's group
      */
-    public static void setPartSelection(@NotNull Player player, @NotNull SpawnedPartSelection parts, boolean setGroup) {
-        selectedPartSelection.put(player.getUniqueId(), parts);
-        if (setGroup) {
-            selectedGroup.put(player.getUniqueId(), parts.getGroup());
-        }
+    public static void setPartSelection(@NotNull Player player, @NotNull SpawnedPartSelection selection, boolean setGroup) {
+        DEUUser.getOrCreateUser(player).setSelectedPartSelection(selection, setGroup);
     }
 
     /**
      * Gets the SpawnedPartSelection a player has selected
      *
      * @param player Player to get the selection of
-     * @return The SpawnedPartSelection that the player has. Null if player does not have a selection.
+     * @return The SpawnedPartSelection that the player has. Null if player does not have a selection or their selection is invalid.
      */
     public static SpawnedPartSelection getPartSelection(@NotNull Player player) {
-        return selectedPartSelection.get(player.getUniqueId());
-    }
-
-    /**
-     * Removes the spawned part selection that is associated to the player, from the player and the group associated.
-     * The SpawnedPartSelection will not be usable afterwards.
-     *
-     * @param player Player to remove the selection from
-     */
-    public static void removePartSelection(@NotNull Player player) {
-        SpawnedPartSelection partSelection = selectedPartSelection.remove(player.getUniqueId());
-        if (partSelection != null) {
-            partSelection.getGroup().removePartSelection(partSelection);
+        DEUUser user = DEUUser.getUser(player);
+        if (user == null){
+            return null;
         }
+        SpawnedPartSelection sel = user.getSelectedPartSelection();
+        if (sel != null && sel.isValid()) return sel;
+        return null;
     }
 
     /**
-     * Removes the part selection from its associated group and from any player(s) using this part selection.
+     * Removes the part selection from its associated group
      * The SpawnedPartSelection will not be usable afterwards.
      *
      * @param partSelection The part selection to remove
      */
     public static void removePartSelection(@NotNull SpawnedPartSelection partSelection) {
-        Set<UUID> uuids = new HashSet<>(selectedPartSelection.keySet());
-        for (UUID uuid : uuids) {
-            if (selectedPartSelection.get(uuid).equals(partSelection)) {
-                selectedPartSelection.remove(uuid);
-                break;
-            }
-        }
         SpawnedDisplayEntityGroup g = partSelection.getGroup();
         if (g != null){
             g.removePartSelection(partSelection);

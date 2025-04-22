@@ -14,16 +14,13 @@ import org.jetbrains.annotations.Nullable;
 import java.io.*;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipException;
 
 public final class DisplayAnimationManager {
 
     private DisplayAnimationManager(){}
-    private static final HashMap<UUID, SpawnedDisplayAnimation> selectedAnimation = new HashMap<>();
     private static Cache<String, SpawnedDisplayAnimation> cachedAnimations;
 
     @ApiStatus.Internal
@@ -38,29 +35,10 @@ public final class DisplayAnimationManager {
     /**
      * Set the selected SpawnedDisplayAnimation of a player to the specified animation
      * @param player Player to set the selection to
-     * @param spawnedDisplayAnimation SpawnedDisplayAnimation to be set to the player
+     * @param spawnedDisplayAnimation the animation the player should have selected
      */
-    @ApiStatus.Internal
     public static void setSelectedSpawnedAnimation(@NotNull Player player, @NotNull SpawnedDisplayAnimation spawnedDisplayAnimation){
-        SpawnedDisplayAnimation lastAnim = selectedAnimation.get(player.getUniqueId());
-        if (lastAnim != null){
-            if (lastAnim == spawnedDisplayAnimation){
-                return;
-            }
-
-            //boolean otherPlayersHaveSelected = false;
-            /*for (UUID uuid : selectedAnimation.keySet()){
-                if (uuid != player.getUniqueId() && selectedAnimation.get(uuid) == lastAnim){
-                    //otherPlayersHaveSelected = true;
-                    break;
-                }
-            }*/
-
-            /*if (!otherPlayersHaveSelected){
-                lastAnim.remove();
-            }*/
-        }
-        selectedAnimation.put(player.getUniqueId(), spawnedDisplayAnimation);
+        DEUUser.getOrCreateUser(player).setSelectedSpawnedAnimation(spawnedDisplayAnimation);
     }
 
     /**
@@ -69,7 +47,9 @@ public final class DisplayAnimationManager {
      * @return The SpawnedDisplayAnimation that the player has selected. Null if player does not have a selection.
      */
     public static @Nullable SpawnedDisplayAnimation getSelectedSpawnedAnimation(@NotNull Player player) {
-        return selectedAnimation.get(player.getUniqueId());
+        DEUUser user = DEUUser.getUser(player);
+        if (user != null) return user.getSelectedAnimation();
+        return null;
     }
 
     /**
@@ -77,7 +57,8 @@ public final class DisplayAnimationManager {
      * @param player Player to remove selection from
      */
     public static void deselectSpawnedAnimation(@NotNull Player player){
-        selectedAnimation.remove(player.getUniqueId());
+        DEUUser user = DEUUser.getUser(player);
+        if (user != null) user.deselectSpawnedAnimation();
     }
 
 

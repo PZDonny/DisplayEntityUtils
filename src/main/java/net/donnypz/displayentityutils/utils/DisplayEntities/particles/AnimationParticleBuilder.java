@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities.particles;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -12,14 +13,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.UUID;
-
 @ApiStatus.Internal
 public class AnimationParticleBuilder extends ParticleBuilder{
-
-    private static final HashMap<UUID, AnimationParticleBuilder> builders = new HashMap<>();
-
     Player player;
     FramePoint framePoint;
     Step step;
@@ -43,7 +38,7 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         super(Particle.FLAME);
         this.player = player;
         this.framePoint = framePoint;
-        builders.put(player.getUniqueId(), this);
+        DEUUser.getOrCreateUser(player).setAnimationParticleBuilder(this);
         advanceStep(Step.PARTICLE);
     }
 
@@ -51,7 +46,7 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     public AnimationParticleBuilder(@NotNull Player player, AnimationParticle editParticle, Step step){
         super(Particle.FLAME);
         this.player = player;
-        builders.put(player.getUniqueId(), this);
+        DEUUser.getOrCreateUser(player).setAnimationParticleBuilder(this);
         advanceStep(step);
         this.editParticle = editParticle;
     }
@@ -71,7 +66,7 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         if (nextStep == null){
             build();
             player.sendMessage(prefix.append(Component.text("Successfully created an animation particle!", NamedTextColor.GREEN)));
-            remove();
+            DEUUser.getUser(player).removeAnimationParticleBuilder();
             return;
         }
 
@@ -133,19 +128,9 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         return step;
     }
 
-    public static AnimationParticleBuilder getBuilder(Player player){
-        return builders.get(player.getUniqueId());
-    }
 
-    public static void removeParticleBuilder(Player player){
-        AnimationParticleBuilder builder = builders.get(player.getUniqueId());
-        if (builder != null){
-            builder.remove();
-        }
-    }
-
-    void remove(){
-        builders.remove(player.getUniqueId());
+    @ApiStatus.Internal
+    public void remove(){
         editParticle = null;
         framePoint = null;
         player = null;
@@ -180,7 +165,7 @@ public class AnimationParticleBuilder extends ParticleBuilder{
 
     private boolean updateParticle(){
         boolean result = editParticle.editParticle(this);
-        remove();
+        DEUUser.getUser(player).removeAnimationParticleBuilder();
         return result;
     }
 

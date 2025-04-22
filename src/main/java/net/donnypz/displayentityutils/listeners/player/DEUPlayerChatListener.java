@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.listeners.player;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
+import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
@@ -23,7 +24,9 @@ public final class DEUPlayerChatListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChat(AsyncChatEvent event){
         Player p = event.getPlayer();
-        AnimationParticleBuilder builder = AnimationParticleBuilder.getBuilder(p);
+        DEUUser user = DEUUser.getUser(p);
+        if (user == null) return;
+        AnimationParticleBuilder builder = user.getAnimationParticleBuilder();
         if (builder == null){
             return;
         }
