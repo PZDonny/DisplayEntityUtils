@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Spawned Group Scale Multiplier")
 @Description("Change the scale multiplier of a spawned group")
-@Examples({"set {_spawnedgroup}'s scale multiplier to 7", "make {_spawnedgroup}'s scale multiplier 0.5"})
+@Examples({"set {_spawnedgroup}'s scale multiplier to 7 over 0 ticks", "make {_spawnedgroup}'s scale multiplier 0.5 over 10 ticks"})
 @Since("2.6.3")
 public class EffSpawnedGroupScaleMultiplier extends Effect {
     static {
@@ -45,7 +45,6 @@ public class EffSpawnedGroupScaleMultiplier extends Effect {
         if (spawned == null || n == null || ts == null) return;
         for (SpawnedDisplayEntityGroup s : spawned){
             s.scale(n.floatValue(), (int) ts.getAs(Timespan.TimePeriod.TICK), scaleInteractions);
-            s.setViewRange(n.floatValue());
         }
     }
 
