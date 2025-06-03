@@ -71,6 +71,7 @@ class PartsCMD extends ConsoleUsableSubCommand {
             sender.sendMessage(Component.text("| \"-all\" will apply the command to all parts within your part selection where valid. By default a selected group's parts is your part selection", NamedTextColor.GOLD));
             sender.sendMessage(Component.empty());
             CMDUtils.sendCMD(sender, "/mdis parts help <page-number>", "Get help for parts");
+            CMDUtils.sendCMD(sender, "/mdis parts info", "Get information about your current part/selection");
             CMDUtils.sendCMD(sender, "/mdis parts cycle <first | prev | next | last> [jump]", "Cycle between parts in your part selection");
             CMDUtils.sendCMD(sender, "/mdis parts addtag <part-tag> [-all]", "Add a tag to your selected part");
             CMDUtils.sendCMD(sender, "/mdis parts removetag <part-tag> [-all]", "Remove a tag from your selected part");
