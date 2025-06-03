@@ -84,6 +84,7 @@ public enum Permission {
     ANIM_SHOW_FRAME("deu.anim.showframe"),
     ANIM_ADD_FRAME_POINT("deu.anim.addpoint"),
     ANIM_REMOVE_FRAME_POINT("deu.anim.removepoint"),
+    ANIM_DRAW_FRAME_POINTS("deu.anim.drawpoints"),
     ANIM_COPY_FRAME_POINT("deu.anim.copypoint"),
     ANIM_MOVE_FRAME_POINT("deu.anim.movepoint"),
     ANIM_ADD_SOUND("deu.anim.addsound"),

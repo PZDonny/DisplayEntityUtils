@@ -7,6 +7,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -19,11 +21,13 @@ import java.util.UUID;
 public class DEUUser {
     static final HashMap<UUID, DEUUser> users = new HashMap<>();
     private final UUID userUUID;
+    private boolean isValid = true;
     private SpawnedDisplayEntityGroup selectedGroup;
     private SpawnedDisplayAnimation selectedAnimation;
     SpawnedPartSelection selectedPartSelection;
     private AnimationParticleBuilder particleBuilder;
-    private boolean isValid = true;
+    private final Location[] pointPositions = new Location[3];
+
 
 
     private DEUUser(Player player){
@@ -85,6 +89,22 @@ public class DEUUser {
         this.particleBuilder = particleBuilder;
     }
 
+    public void setPointPos(Location position, int positionNumber){
+        if (positionNumber < 1 || positionNumber > 3){
+            throw new IllegalArgumentException("positionNumber is less than 1 or greater than 3");
+        }
+        Location pos;
+        if (position != null){
+            pos = position.clone();
+            pos.setWorld(null);
+        }
+        else{
+            pos = null;
+        }
+
+        pointPositions[positionNumber-1] = pos;
+    }
+
     /**
      * Remove a user's {@link SpawnedDisplayEntityGroup} selection
      */
@@ -128,6 +148,33 @@ public class DEUUser {
 
     public @Nullable AnimationParticleBuilder getAnimationParticleBuilder(){
         return particleBuilder;
+    }
+
+    public @NotNull Location[] getPointPositions(){
+        return pointPositions;
+    }
+
+    public @NotNull Location[] getPointPositions(@NotNull World world){
+        Location[] locs = new Location[3];
+        for (int i = 0; i < 3; i++){
+            Location l = pointPositions[i];
+            if (l == null) continue;
+            l = l.clone();
+            l.setWorld(world);
+            locs[i] = l;
+        }
+        return locs;
+    }
+
+    public boolean canDrawPointLinear(){
+        return pointPositions[0] != null && pointPositions[1] != null;
+    }
+
+    public boolean canDrawPointArc(){
+        for (Location l : pointPositions){
+            if (l == null) return false;
+        }
+        return true;
     }
 
     public @NotNull UUID getUserUUID(){

@@ -33,6 +33,7 @@ class AnimCMD extends ConsoleUsableSubCommand{
         subCommands.put("editallframes", new AnimEditAllFramesCMD());
         subCommands.put("addpoint", new AnimAddPointCMD());
         subCommands.put("drawpoints", new AnimDrawPointsCMD());
+        subCommands.put("drawpos", new AnimDrawPosCMD());
         subCommands.put("copypoint", new AnimCopyPointCMD());
         subCommands.put("movepoint", new AnimMovePointCMD());
         subCommands.put("showframe", new AnimShowFrameCMD());
@@ -100,8 +101,8 @@ class AnimCMD extends ConsoleUsableSubCommand{
             CMDUtils.sendCMD(sender, "/mdis anim editframe <frame-ids | frame-tag> <tick-delay> <tick-duration>", "Edit properties of a frame");
             CMDUtils.sendCMD(sender, "/mdis anim editallframes <tick-delay> <tick-duration>", "Edit properties of all frames");
             CMDUtils.sendCMD(sender, "/mdis anim addpoint <frame-id> <point-tag>", "Add a point relative to a group and your location for a frame)");
-            CMDUtils.sendCMD(sender, "/mdis anim drawpos <1 | 2 | 3>", "Set where frame points should be drawn between. Set 3 when drawing curves");
-            CMDUtils.sendCMD(sender, "/mdis anim drawpoints <straight | curve> <point-tag-prefix> <start-frame> <end-frame> [points-per-frame]", "Draw a straight/curved line of frame points between frames");
+            CMDUtils.sendUnsafeCMD(sender, "/mdis anim drawpos <1 | 2 | 3>", "Set where frame points should be drawn between. Set 3 when drawing arcs");
+            CMDUtils.sendUnsafeCMD(sender, "/mdis anim drawpoints <straight | arc> <point-tag> <start-frame> <end-frame> [points-per-frame]", "Draw a straight/arc'd line of frame points between frames");
             CMDUtils.sendCMD(sender, "/mdis anim copypoint <frame-ids | frame-tag>", "Copy a selected frame point to other frames");
             CMDUtils.sendCMD(sender, "/mdis anim movepoint", "Move a frame point to your location, relative to your selected group");
         }
