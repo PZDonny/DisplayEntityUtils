@@ -19,12 +19,15 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Spawned Group Mount/Ride")
 @Description("Make a spawned group ride an entity or vice versa")
-@Examples({"#Spawned Group Ride Entity",
+@Examples({
+        "#Use \"mount\" instead of \"ride\" if you experience unexpected behavior",
+        "",
+        "#Spawned Group Ride Entity",
         "deu make {_spawnedgroup} ride {_entity}",
         "deu make {_spawnedgroup} mount {_entity} using controller with id \"mycontroller\"",
         "",
         "#Entity Ride Spawned Group",
-        "deu make {_entity} ride {_spawnedgroup}",
+        "deu make {_entity} mount {_spawnedgroup}",
         "deu make {_entity} ride {_spawnedgroup} using controller \"mycontroller2\""})
 @Since("2.6.2")
 public class EffSpawnedGroupRideEntity extends Effect {
