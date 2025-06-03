@@ -73,8 +73,13 @@ class SpawnedDisplayFollower {
         new BukkitRunnable(){
             @Override
             public void run() {
-                if ((!group.followers.contains(SpawnedDisplayFollower.this) && !isDefaultFollower) || stopped || !group.isSpawned()){
+                if (!group.followers.contains(SpawnedDisplayFollower.this) && !isDefaultFollower){
                     cancel();
+                    return;
+                }
+                if (stopped || !group.isSpawned()){
+                    cancel();
+                    remove();
                     return;
                 }
                 if (entity.isDead()) {
@@ -88,7 +93,7 @@ class SpawnedDisplayFollower {
                     return;
                 }
 
-                if ((isDefaultFollower && group.defaultFollower != SpawnedDisplayFollower.this)){
+                if (isDefaultFollower && group.defaultFollower != SpawnedDisplayFollower.this){
                     cancel();
                     remove();
                     return;

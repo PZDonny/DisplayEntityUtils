@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils;
 
+import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
@@ -95,7 +96,11 @@ final class ConfigUtils {
             DisplayEntityPlugin.unregisterUnloadWorlds = config.getStringList("automaticGroupDetection.unregisterOnUnload.worlds");
         }
 
-        DisplayEntityPlugin.cacheAnimations = config.getBoolean("cacheAnimations");
+        DisplayEntityPlugin.cacheAnimations = config.getBoolean("cacheAnimations.enabled");
+        int cacheExpiration = config.getInt("cacheAnimations.expireTimeInSeconds");
+        DisplayEntityPlugin.cacheAnimationExpiration = cacheExpiration;
+        DisplayAnimationManager.createExpirationMap(cacheExpiration);
+
         DisplayEntityPlugin.autoPivotInteractions = config.getBoolean("autoPivotInteractionsOnSpawn");
         DisplayEntityPlugin.overwriteExistingSaves = config.getBoolean("overwriteExistingSaves");
         DisplayEntityPlugin.autoSelectGroups = config.getBoolean("autoSelectGroups");

@@ -31,6 +31,7 @@ public enum Permission {
     GROUP_VIEWRANGE("deu.group.viewrange"),
 
 
+    PARTS_INFO("deu.parts.info"),
     PARTS_CYCLE("deu.parts.cycle"),
     PARTS_GLOW("deu.parts.glow"),
     PARTS_GLOW_COLOR("deu.parts.glow.set"),
@@ -82,12 +83,13 @@ public enum Permission {
     ANIM_EDIT_FRAME("deu.anim.editframe"),
     ANIM_SHOW_FRAME("deu.anim.showframe"),
     ANIM_ADD_FRAME_POINT("deu.anim.addpoint"),
+    ANIM_REMOVE_FRAME_POINT("deu.anim.removepoint"),
+    ANIM_DRAW_FRAME_POINTS("deu.anim.drawpoints"),
     ANIM_COPY_FRAME_POINT("deu.anim.copypoint"),
     ANIM_MOVE_FRAME_POINT("deu.anim.movepoint"),
     ANIM_ADD_SOUND("deu.anim.addsound"),
     ANIM_REMOVE_SOUND("deu.anim.removesound"),
     ANIM_ADD_PARTICLE("deu.anim.addparticle"),
-    ANIM_REMOVE_PARTICLE("deu.anim.removeparticle"),
     ANIM_REVERSE("deu.anim.reverse"),
     ANIM_TOGGLE_SCALE("deu.anim.scale"),
     ANIM_TOGGLE_DATA_CHANGES("deu.anim.datachanges"),

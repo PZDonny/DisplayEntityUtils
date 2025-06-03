@@ -3,7 +3,6 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
-import org.bukkit.util.io.BukkitObjectOutputStream;
 
 import java.io.*;
 
@@ -16,17 +15,7 @@ final class ItemDisplaySpecifics extends DisplayEntitySpecifics implements Seria
     ItemDisplaySpecifics(ItemDisplay itemDisplay) {
         super(itemDisplay);
         this.itemDisplayTransform = itemDisplay.getItemDisplayTransform();
-        if (itemDisplay.getItemStack() != null){
-            try{
-                ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                BukkitObjectOutputStream bukkitStream = new BukkitObjectOutputStream(byteStream);
-                bukkitStream.writeObject(itemDisplay.getItemStack());
-                this.itemStack = byteStream.toByteArray();
-            }
-             catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        this.itemStack = itemDisplay.getItemStack().serializeAsBytes();
     }
 
     ItemDisplay.ItemDisplayTransform getItemDisplayTransform() {
@@ -37,12 +26,17 @@ final class ItemDisplaySpecifics extends DisplayEntitySpecifics implements Seria
         if (itemStack == null){
             return null;
         }
+        //Old Method of serialization (Before Deprecation)
         try{
             ByteArrayInputStream byteIn = new ByteArrayInputStream(itemStack);
             BukkitObjectInputStream bukkitIn = new BukkitObjectInputStream(byteIn);
             return (ItemStack) bukkitIn.readObject();
         }
-        catch (IOException | ClassNotFoundException e) {
+        //New Method of serialization (ItemStack#serializeAsBytes())
+        catch (IOException e) {
+            return ItemStack.deserializeBytes(itemStack);
+        }
+        catch (ClassNotFoundException e){
             e.printStackTrace();
             return null;
         }

@@ -222,7 +222,7 @@ public final class SpawnedDisplayEntityPart implements Spawned {
         return partData;
     }
 
-    private static SpawnedDisplayEntityPart getPart(Entity entity){
+    private static SpawnedDisplayEntityPart getPart(@NotNull Entity entity){
         return allParts.get(new PartData(entity));
     }
 
@@ -231,7 +231,7 @@ public final class SpawnedDisplayEntityPart implements Spawned {
      * @param display
      * @return The SpawnedDisplayEntityPart. Null if not created during play session or not a SpawnedDisplayEntityPart
      */
-    public static SpawnedDisplayEntityPart getPart(Display display){
+    public static SpawnedDisplayEntityPart getPart(@NotNull Display display){
         return getPart((Entity) display);
     }
 
@@ -410,6 +410,15 @@ public final class SpawnedDisplayEntityPart implements Spawned {
             return;
         }
         player.hideEntity(DisplayEntityPlugin.getInstance(), getEntity());
+    }
+
+    /**
+     * Get whether this part's entity is in a loaded chunk
+     * @return true if the part is in a loaded chunk
+     */
+    @ApiStatus.Internal
+    public boolean isInLoadedChunk(){
+        return DisplayUtils.isInLoadedChunk(this);
     }
 
     /**
@@ -668,6 +677,18 @@ public final class SpawnedDisplayEntityPart implements Spawned {
     }
 
     /**
+     * Get the brightness of this part
+     * @return a color, or null if not set or if this part's type is {@link PartType#INTERACTION}
+     */
+    public @Nullable Display.Brightness getBrightness(){
+        if (type == PartType.INTERACTION){
+            return null;
+        }
+        Entity entity = getEntity();
+        return ((Display) entity).getBrightness();
+    }
+
+    /**
      * Set the billboard of this part
      * @param billboard the billboard to set
      */
@@ -694,6 +715,18 @@ public final class SpawnedDisplayEntityPart implements Spawned {
         }
         Display display = (Display) entity;
         display.setViewRange(viewRangeMultiplier);
+    }
+
+    /**
+     * Get this part's view range multiplier
+     * @return a float. -1 if the part is an interaction
+     */
+    public float getViewRange(){
+        Entity entity = getEntity();
+        if (entity instanceof Interaction){
+            return -1;
+        }
+        return ((Display)entity).getViewRange();
     }
 
 
@@ -756,42 +789,44 @@ public final class SpawnedDisplayEntityPart implements Spawned {
      * Change the translation of a SpawnedDisplayEntityPart.
      * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param direction The direction to translate the part
      * @param distance How far the part should be translated
      * @param durationInTicks How long it should take for the translation to complete
-     * @param direction The direction to translate the part
+     * @param delayInTicks How long before the translation should begin
      * @return false if this part in an unloaded chunk
      */
-    public boolean translate(float distance, int durationInTicks, int delayInTicks, Vector direction){
-        if (!DisplayUtils.isInLoadedChunk(this)){
+    public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks){
+        if (!isInLoadedChunk()){
             return false;
         }
-        DisplayUtils.translate(this, distance, durationInTicks, delayInTicks, direction);
+        DisplayUtils.translate(this, direction, distance, durationInTicks, delayInTicks);
         return true;
     }
 
-    void translateForce(float distance, int durationInTicks, int delayInTicks, Vector direction){
-        DisplayUtils.translate(this, distance, durationInTicks, delayInTicks, direction);
+    void translateForce(Vector direction, float distance, int durationInTicks, int delayInTicks){
+        DisplayUtils.translate(this, direction, distance, durationInTicks, delayInTicks);
     }
 
     /**
      * Change the translation of this SpawnedDisplayEntityPart.
      * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param direction The direction to translate the part
      * @param distance How far the part should be translated
      * @param durationInTicks How long it should take for the translation to complete
-     * @param direction The direction to translate the part
+     * @param delayInTicks How long before the translation should begin
      * @return false if this part in an unloaded chunk
      */
-    public boolean translate(float distance, int durationInTicks, int delayInTicks, Direction direction){
-        if (!DisplayUtils.isInLoadedChunk(this)){
+    public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks){
+        if (!isInLoadedChunk()){
             return false;
         }
-        DisplayUtils.translate(this, distance, durationInTicks, delayInTicks, direction);
+        DisplayUtils.translate(this, direction, distance, durationInTicks, delayInTicks);
         return true;
     }
 
-    void translateForce(float distance, int durationInTicks, int delayInTicks, Direction direction){
-        DisplayUtils.translate(this, distance, durationInTicks, delayInTicks, direction);
+    void translateForce(Direction direction, float distance, int durationInTicks, int delayInTicks){
+        DisplayUtils.translate(this, direction, distance, durationInTicks, delayInTicks);
     }
 
     /**

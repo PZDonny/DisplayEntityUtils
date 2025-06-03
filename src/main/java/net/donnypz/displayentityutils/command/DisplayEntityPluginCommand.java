@@ -83,13 +83,6 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
     static void noPartSelection(Player player){
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You have not selected a part!", NamedTextColor.RED)));
         player.sendMessage(Component.text("/mdis parts cycle <first | prev | next>", NamedTextColor.GRAY));
-        player.sendMessage(Component.text("/mdis parts select <part-tag>", NamedTextColor.GRAY));
-    }
-
-    static void noPartSelectionInteraction(Player player){
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You must look at the interaction you wish to add the command to, or select a part!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/mdis parts cycle <first | prev | next>", NamedTextColor.GRAY));
-        player.sendMessage(Component.text("/mdis parts select <part-tag>", NamedTextColor.GRAY));
     }
 
     static void invalidTag(Player player, String tag){
@@ -103,7 +96,7 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
 
     static void suggestUpdateSelection(Player player){
         player.sendMessage(Component.text("| It is recommended to update/reset your part selection after adding parts!", NamedTextColor.GRAY));
-        player.sendMessage(Component.text("| Quickly reset with \"/mdis parts reselect", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("| Quickly reset with \"/mdis parts refresh", NamedTextColor.GRAY));
     }
 
     @Override
@@ -153,16 +146,16 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
             return;
         }
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-        //sender.sendMessage(Component.text("Valid storage is \"local\", \"mongodb\", \"mysql\", and \"all\"", NamedTextColor.DARK_AQUA));
-        CMDUtils.sendCMD(sender, "/mdis group");
-        CMDUtils.sendCMD(sender, "/mdis anim");
-        CMDUtils.sendCMD(sender, "/mdis parts");
-        CMDUtils.sendCMD(sender, "/mdis item");
-        CMDUtils.sendCMD(sender, "/mdis text");
-        CMDUtils.sendCMD(sender, "/mdis interaction");
-        CMDUtils.sendCMD(sender, "/mdis listgroups <storage> [page-number]");
-        CMDUtils.sendCMD(sender, "/mdis listanims <storage> [page-number]");
-        CMDUtils.sendCMD(sender, "/mdis bdengine", " (Import models from BDEngine or convert animations)");
-        CMDUtils.sendCMD(sender, "/mdis reload <config | controllers>", " (To reload Local, MySQL or MongoDB config save options, the server must be restarted)");
+        CMDUtils.sendCMD(sender, "/mdis group", "Display Entity Models/Groups related commands");
+        CMDUtils.sendCMD(sender, "/mdis anim", "Animation related commands");
+        CMDUtils.sendCMD(sender, "/mdis parts", "Commands related to the parts (individual display entities) of a Display Entity Model/Group");
+        CMDUtils.sendCMD(sender, "/mdis item", "Commands related to the Item Display parts of a Display Entity Model/Group");
+        CMDUtils.sendCMD(sender, "/mdis text", "Commands related to the Text Display parts of a Display Entity Model/Group");
+        CMDUtils.sendCMD(sender, "/mdis interaction", "Commands related to manipulating Interaction entities");
+        CMDUtils.sendCMD(sender, "/mdis listgroups <storage> [page-number]", "List all saved Display Entity Models/Groups");
+        CMDUtils.sendCMD(sender, "/mdis listanims <storage> [page-number]", "List all saved Animations");
+        CMDUtils.sendCMD(sender, "/mdis bdengine", "Import/Convert models from BDEngine");
+        CMDUtils.sendCMD(sender, "/mdis reload <config | controllers>", "Reload the plugin's config or Display Controllers." +
+                " To reload Local, MySQL or MongoDB config save options, the server must be restarted");
     }
 }

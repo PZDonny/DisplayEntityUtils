@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.listeners.player;
 
+import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
@@ -15,11 +16,11 @@ public final class DEUPlayerConnectionListener implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e){
-        Player p = e.getPlayer();
+        Player player = e.getPlayer();
 
-        DisplayGroupManager.deselectSpawnedGroup(p);
-        DisplayAnimationManager.deselectSpawnedAnimation(p);
-        AnimationParticleBuilder.removeParticleBuilder(p);
-        DEUCommandUtils.removeRelativePoints(p);
+        DEUUser user = DEUUser.getUser(player);
+        if (user != null){
+            user.remove();
+        }
     }
 }

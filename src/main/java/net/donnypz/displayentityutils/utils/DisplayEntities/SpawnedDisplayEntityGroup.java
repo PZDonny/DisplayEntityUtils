@@ -112,6 +112,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * Get whether this group is within a loaded chunk
      * @return true if the group is in a loaded chunk
      */
+    @Override
     public boolean isInLoadedChunk(){
         return DisplayUtils.isInLoadedChunk(masterPart);
     }
@@ -492,7 +493,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * @param partUUID the part uuid of the part
      * @return a {@link SpawnedDisplayEntityPart} or null if no part in this group contains the provided part uuid
      */
-    public @Nullable SpawnedDisplayEntityPart getSpawnedPart(UUID partUUID){
+    public @Nullable SpawnedDisplayEntityPart getSpawnedPart(@NotNull UUID partUUID){
         return spawnedParts.get(partUUID);
     }
 
@@ -508,7 +509,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * Get a list of all parts of a certain type within this group.
      * @return a list of all {@link SpawnedDisplayEntityPart} in this group of a certain part type
      */
-    public List<SpawnedDisplayEntityPart> getSpawnedParts(SpawnedDisplayEntityPart.PartType partType){
+    public List<SpawnedDisplayEntityPart> getSpawnedParts(@NotNull SpawnedDisplayEntityPart.PartType partType){
         List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
         for (SpawnedDisplayEntityPart part : spawnedParts.sequencedValues()){
             if (partType == part.getType()){
@@ -570,7 +571,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * @param partType the type of part to get
      * @return a list
      */
-    public List<Entity> getSpawnedPartEntities(SpawnedDisplayEntityPart.PartType partType){
+    public List<Entity> getSpawnedPartEntities(@NotNull SpawnedDisplayEntityPart.PartType partType){
         List<Entity> partList = new ArrayList<>();
         for (SpawnedDisplayEntityPart part : spawnedParts.sequencedValues()){
             if (partType == part.getType()){
@@ -585,7 +586,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * @param entityClazz the entity class to cast all entities to
      * @return a list
      */
-    public <T> List<T> getSpawnedPartEntities(Class<T> entityClazz){
+    public <T> List<T> getSpawnedPartEntities(@NotNull Class<T> entityClazz){
         List<T> partList = new ArrayList<>();
         for (SpawnedDisplayEntityPart part : spawnedParts.sequencedValues()){
             Entity partEntity = part.getEntity();
@@ -742,7 +743,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
                 translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
 
                 Vector moveVector = oldVector.subtract(translationVector);
-                part.translateForce((float) moveVector.length(), durationInTicks, 0, moveVector);
+                part.translateForce(moveVector, (float) moveVector.length(), durationInTicks, 0);
             }
         }
 
@@ -1005,7 +1006,6 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * @param heightAdder The amount of height to be added to the culling range
      * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
      */
-    @ApiStatus.Experimental
     public void autoSetCulling(CullOption cullOption, float widthAdder, float heightAdder){
         if (!isInLoadedChunk()){
             return;
@@ -1077,6 +1077,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * @param delayInTicks How long before the translation should begin
      * @return false if the {@link GroupTranslateEvent} is cancelled or if the group is in an unloaded chunk
      */
+    @Override
     public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks){
         if (!isInLoadedChunk()){
             return false;
@@ -1088,7 +1089,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
             return false;
         }
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.translateForce(distance, durationInTicks, delayInTicks, direction);
+            part.translateForce(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }
@@ -1103,6 +1104,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
      * @param delayInTicks How long before the translation should begin
      * @return false if the {@link GroupTranslateEvent} is cancelled or if the group is in an unloaded chunk
      */
+    @Override
     public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks){
         if (!isInLoadedChunk()){
             return false;
@@ -1114,7 +1116,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
             return false;
         }
         for(SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.translateForce(distance, durationInTicks, delayInTicks, direction);
+            part.translateForce(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }
@@ -1136,9 +1138,19 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
     /**
      * Get the name of this group's world
      * @return name of group's world
+     * @throws NullPointerException if group is despawned or invalid
      */
     public String getWorldName(){
-        return masterPart.getEntity().getWorld().getName();
+        return getWorld().getName();
+    }
+
+    /**
+     * Get the world that this group resides in
+     * @return a {@link World}
+     * @throws NullPointerException if group is despawned or invalid
+     */
+    public @NotNull World getWorld(){
+        return masterPart.getEntity().getWorld();
     }
 
     /**
@@ -1307,10 +1319,10 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
     }
 
     /**
-     * Get the entity this SpawnedDisplayEntityGroup is riding
+     * Get the entity this group is riding
      * @return an entity. null if this group is not riding an entity
      */
-    public Entity getVehicle(){
+    public @Nullable Entity getVehicle(){
         try{
             return masterPart.getEntity().getVehicle();
         }
@@ -1760,8 +1772,8 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
     }
 
     /**
-     * Removes all part selections from this group and from any player(s) using this part selection.
-     * ALL SpawnedPartSelections in this group will become unusable afterwards.
+     * Removes all {@link SpawnedPartSelection}s from this group and from any player(s) using this part selection.
+     * ALL part selections in this group will become unusable afterwards.
      */
     public void removeAllPartSelections(){
         for (SpawnedPartSelection selection : new ArrayList<>(partSelections)){
@@ -1771,18 +1783,18 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
 
 
     /**
-     * Removes a part selection from this group and from any player(s) using this part selection.
-     * The SpawnedPartSelection will not be usable afterwards.
+     * Removes a {@link SpawnedPartSelection} from this group
+     * The part selection will not be usable afterwards.
      * @param partSelection The part selection to remove
      */
-    public void removePartSelection(SpawnedPartSelection partSelection){
+    public void removePartSelection(@NotNull SpawnedPartSelection partSelection){
         if (partSelections.contains(partSelection)){
             partSelection.removeNoManager();
         }
     }
 
     /**
-     * Removes all stored SpawnedPartSelections and SpawnedDisplayEntityParts
+     * Removes all stored {@link SpawnedPartSelection}s and {@link SpawnedDisplayEntityPart}s
      * <p>
      * This unregisters anything related to the group within the DisplayEntityUtils Plugin
      * This group will be unusable afterwards.

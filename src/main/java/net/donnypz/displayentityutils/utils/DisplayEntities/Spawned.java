@@ -1,8 +1,10 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.utils.Direction;
 import org.bukkit.Color;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,4 +29,10 @@ public interface Spawned {
     void showToPlayer(@NotNull Player player);
 
     void hideFromPlayer(@NotNull Player player);
+
+    boolean isInLoadedChunk();
+
+    boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks);
+
+    boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks);
 }

@@ -6,6 +6,9 @@ import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.ChatColor;
@@ -53,8 +56,11 @@ class GroupInfoCMD extends PlayerSubCommand {
         player.sendMessage(MiniMessage.miniMessage().deserialize("Spawn Animation Tag: "+animTag));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Spawn Animation Type: "+animType));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Spawn Animation Storage: "+animLoadMethod));
+        sendGlowColor(player, group.getGlowColor());
+    }
+
+    static void sendGlowColor(Player player, Color color){
         player.sendMessage(Component.empty());
-        Color color = group.getGlowColor();
         if (color != null) {
             player.sendMessage(Component.text("Glow Color: ").append(Component.text("COLOR", TextColor.color(color.getRed(), color.getGreen(), color.getBlue()))));
             player.sendMessage("| " + ChatColor.RED + "R: " + color.getRed());
@@ -73,10 +79,13 @@ class GroupInfoCMD extends PlayerSubCommand {
             if (blueString.equals("0")) {
                 blueString += "0";
             }
-            player.sendMessage("| " + ChatColor.YELLOW + "HEX: #" + redString + greenString + blueString);
+            String hex = "#"+redString+greenString+blueString;
+            player.sendMessage(Component.text("| HEX: "+hex, NamedTextColor.YELLOW)
+                    .hoverEvent(HoverEvent.showText(Component.text("Click to copy", NamedTextColor.GREEN)))
+                    .clickEvent(ClickEvent.copyToClipboard(hex)));
         }
         else {
-            player.sendMessage("Glow Color: " + ChatColor.RED + "NOT SET");
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Glow Color: <red>NOT SET"));
         }
     }
 }

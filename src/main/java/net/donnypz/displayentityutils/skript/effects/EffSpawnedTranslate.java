@@ -62,10 +62,10 @@ public class EffSpawnedTranslate extends Effect {
                 g.translate(v, distance, ticks, -1);
             }
             else if (s instanceof SpawnedDisplayEntityPart p){
-                p.translate(distance, ticks, -1 , v);
+                p.translate(v, distance, ticks, -1);
             }
             else if (s instanceof SpawnedPartSelection sel){
-                sel.translate(distance, ticks, -1, v);
+                sel.translate(v, distance, ticks, -1);
             }
         }
     }

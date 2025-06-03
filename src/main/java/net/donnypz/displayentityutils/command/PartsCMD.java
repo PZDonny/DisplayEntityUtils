@@ -18,6 +18,7 @@ class PartsCMD extends ConsoleUsableSubCommand {
     PartsCMD(){
         super(Permission.HELP);
         subCommands.put("help", new PartsHelpCMD());
+        subCommands.put("info", new PartsInfoCMD());
         subCommands.put("cycle", new PartsCycleCMD());
         subCommands.put("glow", new PartsGlowCMD());
         subCommands.put("unglow", new PartsUnglowCMD());
@@ -69,36 +70,37 @@ class PartsCMD extends ConsoleUsableSubCommand {
             sender.sendMessage(Component.text("| Add tags to parts to identify each part in a group", NamedTextColor.AQUA));
             sender.sendMessage(Component.text("| \"-all\" will apply the command to all parts within your part selection where valid. By default a selected group's parts is your part selection", NamedTextColor.GOLD));
             sender.sendMessage(Component.empty());
-            CMDUtils.sendCMD(sender, "/mdis parts help <page-number>", " (Get help for parts)");
-            CMDUtils.sendCMD(sender, "/mdis parts cycle <first | prev | next | last> [jump]", " (Cycle between parts in your part selection)");
-            CMDUtils.sendCMD(sender, "/mdis parts addtag <part-tag> [-all]", " (Add a tag to your selected part");
-            CMDUtils.sendCMD(sender, "/mdis parts removetag <part-tag> [-all]", " (Remove a tag from your selected part)");
+            CMDUtils.sendCMD(sender, "/mdis parts help <page-number>", "Get help for parts");
+            CMDUtils.sendCMD(sender, "/mdis parts info", "Get information about your current part/selection");
+            CMDUtils.sendCMD(sender, "/mdis parts cycle <first | prev | next | last> [jump]", "Cycle between parts in your part selection");
+            CMDUtils.sendCMD(sender, "/mdis parts addtag <part-tag> [-all]", "Add a tag to your selected part");
+            CMDUtils.sendCMD(sender, "/mdis parts removetag <part-tag> [-all]", "Remove a tag from your selected part");
             CMDUtils.sendCMD(sender, "/mdis parts adapttags [-remove]",
-                    " (Adapt scoreboard tags to tags usable by DisplayEntityUtils. Applied to selected parts."+
-                            " \"-remove\" removes tag from scoreboard)");
+                    "Adapt scoreboard tags to tags usable by DisplayEntityUtils. Applied to selected parts."+
+                            " \"-remove\" removes tag from scoreboard");
         }
         else if (page == 2) {
-            CMDUtils.sendCMD(sender, "/mdis parts listtags <part | selection>", " (List tags of selected part or filtered part selection tags)");
-            CMDUtils.sendCMD(sender, "/mdis parts filtertags <part-tags>", " (Filter parts by part tags, comma separated. Exclude A tag by prefixing it with \"!\")");
-            CMDUtils.sendCMD(sender, "/mdis parts filtertypes <part-types>", " (Filter parts by their type. Exclude ALL filtered types by prefixing with \"!\")");
-            CMDUtils.sendCMD(sender, "/mdis parts filterblocks <block-ids>", " (Filter blocks of BLOCK parts. Exclude ALL filtered blocks by prefixing with \"!\")");
-            CMDUtils.sendCMD(sender, "/mdis parts filteritems <item-ids>", " (Filter items of ITEM parts. Exclude ALL filtered items by prefixing with \"!\")");
-            CMDUtils.sendCMD(sender, "/mdis parts refresh", " (Refresh your part selection after making some type of change)");
-            CMDUtils.sendCMD(sender, "/mdis parts reset", " (Reset your part selection and any filters)");
-            CMDUtils.sendCMD(sender, "/mdis parts remove [-all]", " (Despawn and remove your selected part from a group)");
+            CMDUtils.sendCMD(sender, "/mdis parts listtags ", "List tags of the currently selected part");
+            CMDUtils.sendCMD(sender, "/mdis parts filtertags <part-tags>", "Filter parts by part tags, comma separated. Exclude A tag by prefixing it with \"!\"");
+            CMDUtils.sendCMD(sender, "/mdis parts filtertypes <part-types>", "Filter parts by their type. Exclude ALL filtered types by prefixing with \"!\"");
+            CMDUtils.sendCMD(sender, "/mdis parts filterblocks <block-ids>", "Filter blocks of BLOCK parts. Exclude ALL filtered blocks by prefixing with \"!\"");
+            CMDUtils.sendCMD(sender, "/mdis parts filteritems <item-ids>", "Filter items of ITEM parts. Exclude ALL filtered items by prefixing with \"!\"");
+            CMDUtils.sendCMD(sender, "/mdis parts refresh", "Refresh your part selection after making some type of change");
+            CMDUtils.sendCMD(sender, "/mdis parts reset", "Reset your part selection and any filters");
+            CMDUtils.sendCMD(sender, "/mdis parts remove [-all]", "Despawn and remove your selected part from a group");
         }
         else if (page == 3){
-            CMDUtils.sendCMD(sender, "/mdis parts glow [-all]", " (Make your selected part glow)");
-            CMDUtils.sendCMD(sender, "/mdis parts unglow [-all]", " (Remove the glow from your selected part)");
-            CMDUtils.sendCMD(sender, "/mdis parts glowcolor <color | hex-code> [-all]", " (Set your selected part's glow color)");
-            CMDUtils.sendCMD(sender, "/mdis parts brightness <block> <sky> [-all]", "(Set your selected part's brightness. Enter values between 0-15. -1 resets)");
-            CMDUtils.sendCMD(sender, "/mdis parts viewrange <view-range-multiplier> [-all]", "(Set the view range multiplier for your selected part)");
-            CMDUtils.sendCMD(sender, "/mdis parts billboard <fixed | vertical | horizontal | center> [-all]", " (Set the billboard of your selected part)");
-            CMDUtils.sendCMD(sender, "/mdis parts translate <direction> <distance> <tick-duration> [-all]", " (Translate your selected part)");
+            CMDUtils.sendCMD(sender, "/mdis parts glow [-all]", "Make your selected part glow");
+            CMDUtils.sendCMD(sender, "/mdis parts unglow [-all]", "Remove the glow from your selected part");
+            CMDUtils.sendCMD(sender, "/mdis parts glowcolor <color | hex-code> [-all]", "Set your selected part's glow color");
+            CMDUtils.sendCMD(sender, "/mdis parts brightness <block> <sky> [-all]", "Set your selected part's brightness. Enter values between 0-15. -1 resets");
+            CMDUtils.sendCMD(sender, "/mdis parts viewrange <view-range-multiplier> [-all]", "Set the view range multiplier for your selected part");
+            CMDUtils.sendCMD(sender, "/mdis parts billboard <fixed | vertical | horizontal | center> [-all]", "Set the billboard of your selected part");
+            CMDUtils.sendCMD(sender, "/mdis parts translate <direction> <distance> <tick-duration> [-all]", "Translate your selected part");
         }
         else{
-            CMDUtils.sendCMD(sender, "/mdis parts setblock <\"-held\" | \"-target\" | block-id> [-all]", " (Change the block of a block display part)");
-            CMDUtils.sendCMD(sender, "/mdis parts seeduuids <group | selection> <seed>"," (Useful when wanting to use the same animation on similar groups.)");
+            CMDUtils.sendCMD(sender, "/mdis parts setblock <\"-held\" | \"-target\" | block-id> [-all]", "Change the block of a block display part");
+            CMDUtils.sendCMD(sender, "/mdis parts seeduuids <group | selection> <seed>","Useful when wanting to use the same animation on similar groups");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }
@@ -106,7 +108,6 @@ class PartsCMD extends ConsoleUsableSubCommand {
     static void noPartSelection(Player player){
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You have not selected any part(s)!", NamedTextColor.RED)));
         player.sendMessage(Component.text("/mdis parts cycle <first | prev | next>", NamedTextColor.GRAY));
-        player.sendMessage(Component.text("/mdis parts select <part-tag>", NamedTextColor.GRAY));
     }
 
     static void invalidPartSelection(CommandSender sender){

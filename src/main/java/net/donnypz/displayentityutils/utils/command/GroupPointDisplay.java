@@ -8,7 +8,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
-abstract class GroupPointDisplay extends RelativePointDisplay{
+@ApiStatus.Experimental
+public class GroupPointDisplay extends RelativePointDisplay{
     SpawnedDisplayEntityGroup group;
 
     GroupPointDisplay(Location spawnLocation, RelativePoint relativePoint, SpawnedDisplayEntityGroup group){

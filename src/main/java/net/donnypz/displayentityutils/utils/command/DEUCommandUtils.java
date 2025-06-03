@@ -52,6 +52,7 @@ public class DEUCommandUtils {
 
     //Remove the visual representation of RelativePoints
     public static boolean removeRelativePoints(Player player){
+        if (player == null) return false;
         Set<RelativePointDisplay> displays = relativePointDisplays.remove(player.getUniqueId());
         if (displays != null){
             for (RelativePointDisplay d : displays){

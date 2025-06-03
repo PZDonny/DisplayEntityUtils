@@ -49,7 +49,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                 case "item" -> {
                     return DisplayEntityPluginCommand.getItemTabComplete();
                 }
-                case "listgroups", "listanim" -> addStorages(suggestions);
+                case "listgroups", "listanims" -> addStorages(suggestions);
                 case "reload" -> {
                     suggestions.add("config");
                     suggestions.add("controllers");
@@ -75,12 +75,8 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                         case "billboard" -> {
                             addBillboard(suggestions);
                         }
-                        case "ride" -> {
+                        case "ride", "dismount" -> {
                             return null;
-                        }
-                        case "dismount" -> {
-                            suggestions.add("keep");
-                            suggestions.add("despawn");
                         }
                     }
                 }
@@ -112,7 +108,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
                             suggestions.add("-held");
                             suggestions.add("block-id");
                         }
-                        case "listtags" -> {
+                        case "info" -> {
                             suggestions.add("part");
                             suggestions.add("selection");
                         }

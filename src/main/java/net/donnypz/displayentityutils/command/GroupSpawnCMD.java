@@ -69,7 +69,13 @@ class GroupSpawnCMD extends PlayerSubCommand {
         LoadMethod nextStorage;
         if (storage == LoadMethod.LOCAL){
             nextStorage = LoadMethod.MONGODB;
-            p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Attempting to spawn group <white>(Tagged: "+tag+")")));
+            if (isGroup){
+                p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Attempting to spawn group <white>(Tagged: "+tag+")")));
+            }
+            else{
+                p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Attempting to select animation <white>(Tagged: "+tag+")")));
+            }
+
             if (!DisplayEntityPlugin.isLocalEnabled()){
                 p.sendMessage(Component.text("- Local storage is disabled, checking MongoDB...", NamedTextColor.GRAY));
                 attemptAll(p, tag, nextStorage, isGroup);
