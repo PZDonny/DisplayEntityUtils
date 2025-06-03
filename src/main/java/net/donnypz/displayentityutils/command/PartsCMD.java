@@ -80,7 +80,7 @@ class PartsCMD extends ConsoleUsableSubCommand {
                             " \"-remove\" removes tag from scoreboard");
         }
         else if (page == 2) {
-            CMDUtils.sendCMD(sender, "/mdis parts listtags <part | selection>", "List tags of selected part or filtered part selection tags");
+            CMDUtils.sendCMD(sender, "/mdis parts listtags ", "List tags of the currently selected part");
             CMDUtils.sendCMD(sender, "/mdis parts filtertags <part-tags>", "Filter parts by part tags, comma separated. Exclude A tag by prefixing it with \"!\"");
             CMDUtils.sendCMD(sender, "/mdis parts filtertypes <part-types>", "Filter parts by their type. Exclude ALL filtered types by prefixing with \"!\"");
             CMDUtils.sendCMD(sender, "/mdis parts filterblocks <block-ids>", "Filter blocks of BLOCK parts. Exclude ALL filtered blocks by prefixing with \"!\"");
