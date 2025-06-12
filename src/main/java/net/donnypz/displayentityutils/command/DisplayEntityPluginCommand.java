@@ -91,7 +91,8 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
     }
 
     static void invalidTagRestrictions(Player player){
-        player.sendMessage(Component.text("Valid tags do not start with an \"!\" and do not contain commas.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+        player.sendMessage(Component.text("| Valid tags do not start with an \"!\" and do not contain commas.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+        player.sendMessage(Component.text("| The tag may also already exist or be set", NamedTextColor.GRAY, TextDecoration.ITALIC));
     }
 
     static void suggestUpdateSelection(Player player){
