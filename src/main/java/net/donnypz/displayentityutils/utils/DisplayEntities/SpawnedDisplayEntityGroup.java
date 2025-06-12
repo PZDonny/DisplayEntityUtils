@@ -1734,11 +1734,21 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
 
 
     /**
-     * Creates a copy of this SpawnedDisplayEntityGroup at a location
+     * Creates a copy of this group at a location
      * @param location Where to spawn the clone
-     * @return Cloned SpawnedDisplayEntityGroup
+     * @return a cloned {@link SpawnedDisplayEntityGroup}
      */
-    public SpawnedDisplayEntityGroup clone(Location location){
+    public SpawnedDisplayEntityGroup clone(@NotNull Location location){
+        return clone(location, new GroupSpawnSettings());
+    }
+
+    /**
+     * Creates a copy of this group at a location with {@link GroupSpawnSettings}
+     * @param location Where to spawn the clone
+     * @param settings the settings to use on the cloned group
+     * @return a cloned {@link SpawnedDisplayEntityGroup}
+     */
+    public SpawnedDisplayEntityGroup clone(@NotNull Location location, @NotNull GroupSpawnSettings settings){
 
         if (DisplayEntityPlugin.autoPivotInteractions()){
             HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
@@ -1749,7 +1759,8 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
             }
 
             DisplayEntityGroup group = toDisplayEntityGroup();
-            SpawnedDisplayEntityGroup cloned = group.spawn(location, GroupSpawnedEvent.SpawnReason.CLONE);
+            SpawnedDisplayEntityGroup cloned = group.spawn(location, GroupSpawnedEvent.SpawnReason.CLONE, settings);
+
             for (Map.Entry<SpawnedDisplayEntityPart, Float> entry : oldYaws.entrySet()){
                 SpawnedDisplayEntityPart part = entry.getKey();
                 float oldYaw = entry.getValue();
