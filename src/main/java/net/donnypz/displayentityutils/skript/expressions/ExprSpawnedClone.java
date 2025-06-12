@@ -24,35 +24,36 @@ import org.jetbrains.annotations.Nullable;
 @Description("Create a clone version of a spawned group/animation")
 @Examples({"set {_groupclone} to a clone of {_spawnedgroup}",
         "",
-        "#Create a clone at a certain location",
+        "#Create a group clone at a certain location",
         "set {_groupclone} to a clone of {_spawnedgroup} at {_location}",
         "",
+        "#Create a group clone with group spawn settings (2.7.7+)",
+        "set {_groupclone} to a clone of {_spawnedgroup} with {_settings}",
+        "",
+        "#Create an animation clone",
         "set {_animclone} to a clone of {_spawnedanimation}"})
 @Since("2.6.2")
 public class ExprSpawnedClone extends SimpleExpression<Object> {
 
     static{
-        Skript.registerExpression(ExprSpawnedClone.class, Object.class, ExpressionType.SIMPLE, "[a] (clone[d version]|cop[y|ied version]) of %spawnedgroup/spawnedanimation% [loc:at %-location%]");
+        Skript.registerExpression(ExprSpawnedClone.class, Object.class, ExpressionType.SIMPLE, "[a] (clone[d version]|cop[y|ied version]) of %spawnedgroup/spawnedanimation% [loc:at %-location%] [s:with %-groupspawnsettings%]");
     }
 
     Expression<?> object;
     Expression<Location> location;
+    Expression<GroupSpawnSettings> settings;
 
     @Override
     protected Object @Nullable [] get(Event event) {
         Object obj = object.getSingle(event);
         if (obj instanceof SpawnedDisplayEntityGroup g){
-            if (location == null){
-                return new SpawnedDisplayEntityGroup[]{g.clone(g.getLocation())};
-            }
-            else{
-                Location loc = location.getSingle(event);
-                if (loc == null){
-                    return null;
-                }
-                return new SpawnedDisplayEntityGroup[]{g.clone(loc)};
-            }
+            Location l = location == null ? g.getLocation() : location.getSingle(event);
+            GroupSpawnSettings s = settings == null ? new GroupSpawnSettings() : settings.getSingle(event);
 
+            if (l == null || s == null){
+                return null;
+            }
+            return new SpawnedDisplayEntityGroup[]{g.clone(l, s)};
         }
         else if (obj instanceof SpawnedDisplayAnimation a){
             return new SpawnedDisplayAnimation[]{a.clone()};
@@ -80,6 +81,9 @@ public class ExprSpawnedClone extends SimpleExpression<Object> {
         object = expressions[0];
         if (parseResult.hasTag("loc")){
             location = (Expression<Location>) expressions[1];
+        }
+        if (parseResult.hasTag("s")){
+            settings = (Expression<GroupSpawnSettings>) expressions[2];
         }
         return true;
     }
