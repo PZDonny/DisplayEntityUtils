@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Group Spawn Settings Persistence")
 @Description("Set the persistence properties of a group spawn setting")
-@Examples({"set {_setting} to persistent by default", "set {_setting} to not persistent by default and no persistence overriding"})
+@Examples({"set {_setting} to persistent by default", "set {_setting} to not persistent by default without persistence overriding"})
 @Since("2.6.3")
 public class EffGroupSpawnSettingPersistence extends Effect {
     static {
