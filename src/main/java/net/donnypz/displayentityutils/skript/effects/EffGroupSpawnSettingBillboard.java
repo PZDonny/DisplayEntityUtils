@@ -10,17 +10,25 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Display;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Group Spawn Settings Billboard")
 @Description("Set the billboard property of a group spawn setting")
-@Examples({"set {_setting}'s billboard to vertical", "set {_setting}'s billboard to center for parts with tag \"pivotpart\""})
+@Examples({
+        "#Set billboard (Before 2.7.7)",
+        "make {_setting}'s billboard to vertical",
+        "make {_setting}'s billboard to center for parts with tag \"pivotpart\"",
+        "",
+        "#Set billboard (2.7.7+)",
+        "deu set {_setting}'s billboard as vertical",
+        "make {_setting}'s billboard as center"})
 @Since("2.6.2")
 public class EffGroupSpawnSettingBillboard extends Effect {
     static {
-        Skript.registerEffect(EffGroupSpawnSettingBillboard.class,"(make|set) %groupspawnsetting%['s] billboard to %billboard% [for parts with tag[s] %strings%]");
+        Skript.registerEffect(EffGroupSpawnSettingBillboard.class,"(make|deu set) %groupspawnsetting%['s] billboard (to|as) %billboard% [tags:for parts with tag[s] %-strings%]");
     }
 
     Expression<GroupSpawnSettings> settings;
@@ -31,7 +39,7 @@ public class EffGroupSpawnSettingBillboard extends Effect {
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         settings = (Expression<GroupSpawnSettings>) expressions[0];
         billboard = (Expression<Display.Billboard>) expressions[1];
-        if (expressions.length == 3){
+        if (parseResult.hasTag("tags")){
             tags = (Expression<String>) expressions[2];
         }
         return true;
@@ -54,6 +62,6 @@ public class EffGroupSpawnSettingBillboard extends Effect {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "visible by default for spawn settings: "+settings.toString(event, debug);
+        return "billboard spawn settings: "+settings.toString(event, debug);
     }
 }
