@@ -45,7 +45,7 @@ class DatapackConverter {
 
     private String getAnimationName(String entryName, String folder){
         String animName;
-        if (VersionUtils.is1_21){
+        if (VersionUtils.IS_1_21){
             animName = entryName.split("function/"+folder+"/")[1];
         }
         else{
@@ -64,7 +64,7 @@ class DatapackConverter {
         if (projectName == null){
             String projectName;
 
-            if (VersionUtils.is1_21){
+            if (VersionUtils.IS_1_21){
                 projectName = entryName.split("/function/")[0];
             }
             else{
@@ -87,7 +87,7 @@ class DatapackConverter {
 
             entryName = entry.getName();
             if (!entryName.endsWith(".mcfunction") &&
-                    ((VersionUtils.is1_21 && entryName.contains("/function/a/") && !entryName.endsWith("/function/a/")) || ((entryName.contains("/functions/a/") && !entryName.endsWith("/functions/a/"))))){
+                    ((VersionUtils.IS_1_21 && entryName.contains("/function/a/") && !entryName.endsWith("/function/a/")) || ((entryName.contains("/functions/a/") && !entryName.endsWith("/functions/a/"))))){
                 animations.putIfAbsent(getAnimationName(entryName, "a"), new ArrayList<>());
             }
             else if (entryName.endsWith(createModelPath)) { //Summon Model for animation

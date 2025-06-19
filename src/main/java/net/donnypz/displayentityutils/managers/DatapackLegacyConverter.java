@@ -186,7 +186,7 @@ class DatapackLegacyConverter {
 
                 if (zipEntry.getName().contains("summon")){
                     String projectName = zipEntry.getName();
-                    if (VersionUtils.is1_21){
+                    if (VersionUtils.IS_1_21){
                         projectName = projectName.replace("function/summon.mcfunction", "");
                     }
                     else{
