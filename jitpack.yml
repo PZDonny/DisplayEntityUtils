@@ -1,3 +1,6 @@
+jdk:
+  version: 17
+  
 install:
   - sdk install maven 3.8.5
   - mvn install -DskipTests=true
