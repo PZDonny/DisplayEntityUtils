@@ -1,9 +1,2 @@
 jdk:
   version: 21
-  
-install:
-  - sdk install maven 3.8.5
-  - mvn install -DskipTests=true
-
-build:
-  - mvn -X package
