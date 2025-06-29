@@ -6,4 +6,4 @@ install:
   - mvn install -DskipTests=true
 
 build:
-  - mvn package
+  - mvn -X package
