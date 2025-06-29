@@ -36,12 +36,7 @@ final class SerialTransformation implements Serializable {
 
 
     public DisplayTransformation toTransformation(){
-        /*if (type == null || data == null){
-            return new Transformation(translation, leftRotation, scale, rightRotation);
-        }*/
-
         return DisplayTransformation.get(translation, leftRotation, scale, rightRotation, data, type);
-
     }
 
 }
