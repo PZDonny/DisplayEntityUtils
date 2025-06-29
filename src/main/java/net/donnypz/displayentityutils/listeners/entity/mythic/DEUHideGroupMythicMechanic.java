@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.listeners.entity;
+package net.donnypz.displayentityutils.listeners.entity.mythic;
 
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.skills.ITargetedEntitySkill;
