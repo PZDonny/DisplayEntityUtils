@@ -1,5 +1,5 @@
 jdk:
-  version: 17
+  version: 21
   
 install:
   - sdk install maven 3.8.5
