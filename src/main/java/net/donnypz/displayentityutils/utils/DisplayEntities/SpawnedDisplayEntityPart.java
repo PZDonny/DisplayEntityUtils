@@ -19,7 +19,7 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-public final class SpawnedDisplayEntityPart implements Spawned {
+public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawned {
 
     private static final HashMap<PartData, SpawnedDisplayEntityPart> allParts = new HashMap<>();
     private SpawnedDisplayEntityGroup group;
