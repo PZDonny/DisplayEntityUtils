@@ -1,2 +1,2 @@
 jdk:
-  version: 21
+  - openjdk21
