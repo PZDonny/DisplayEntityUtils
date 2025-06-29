@@ -1,9 +1,12 @@
-package net.donnypz.displayentityutils.utils.DisplayEntities;
+package net.donnypz.displayentityutils.utils.DisplayEntities.machine;
 
 import net.donnypz.displayentityutils.events.NullAnimationLoaderEvent;
 import net.donnypz.displayentityutils.events.NullGroupLoaderEvent;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
+import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

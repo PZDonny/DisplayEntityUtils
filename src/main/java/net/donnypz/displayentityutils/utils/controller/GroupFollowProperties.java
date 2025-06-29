@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.utils.controller;
 
-import net.donnypz.displayentityutils.utils.DisplayEntities.MachineState;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.FollowType;
 import org.bukkit.entity.Entity;

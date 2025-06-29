@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 
 public class DisplayAnimator {
     SpawnedDisplayAnimation animation;
