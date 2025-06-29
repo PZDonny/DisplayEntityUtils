@@ -5,6 +5,8 @@ import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import org.bukkit.Bukkit;

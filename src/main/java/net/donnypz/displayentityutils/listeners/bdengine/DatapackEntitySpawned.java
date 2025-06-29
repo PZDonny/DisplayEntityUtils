@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.jetbrains.annotations.ApiStatus;
@@ -21,7 +22,7 @@ public final class DatapackEntitySpawned implements Listener {
     private static final HashMap<Object, SpawnedDisplayEntityGroup> groups = new HashMap<>();
     private static final HashSet<Object> incomingAnimationValue = new HashSet<>();
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onSpawn(EntitySpawnEvent e){
         if (!(e.getEntity() instanceof Display display)){
             return;

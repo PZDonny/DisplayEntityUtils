@@ -5,6 +5,8 @@ import net.donnypz.displayentityutils.events.NullGroupLoaderEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.FollowType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

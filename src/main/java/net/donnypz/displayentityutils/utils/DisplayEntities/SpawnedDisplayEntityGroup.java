@@ -7,6 +7,8 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.FollowType;
 import io.papermc.paper.entity.TeleportFlag;
@@ -25,7 +27,7 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-public final class SpawnedDisplayEntityGroup implements Spawned {
+public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spawned {
     public static final long defaultPartUUIDSeed = 99;
     final Random partUUIDRandom = new Random(defaultPartUUIDSeed);
 
@@ -186,7 +188,7 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
 
 
         if (currentMachineState != null){
-            DisplayAnimator animator = currentMachineState.animator;
+            DisplayAnimator animator = currentMachineState.getDisplayAnimator();
             if (animator != null){
                 animator.stop(this);
             }
@@ -518,7 +520,6 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
         }
         return partList;
     }
-
 
     /**
      * Get a list of all display entity parts within this group
@@ -1734,11 +1735,21 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
 
 
     /**
-     * Creates a copy of this SpawnedDisplayEntityGroup at a location
+     * Creates a copy of this group at a location
      * @param location Where to spawn the clone
-     * @return Cloned SpawnedDisplayEntityGroup
+     * @return a cloned {@link SpawnedDisplayEntityGroup}
      */
-    public SpawnedDisplayEntityGroup clone(Location location){
+    public SpawnedDisplayEntityGroup clone(@NotNull Location location){
+        return clone(location, new GroupSpawnSettings());
+    }
+
+    /**
+     * Creates a copy of this group at a location with {@link GroupSpawnSettings}
+     * @param location Where to spawn the clone
+     * @param settings the settings to use on the cloned group
+     * @return a cloned {@link SpawnedDisplayEntityGroup}
+     */
+    public SpawnedDisplayEntityGroup clone(@NotNull Location location, @NotNull GroupSpawnSettings settings){
 
         if (DisplayEntityPlugin.autoPivotInteractions()){
             HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
@@ -1749,7 +1760,8 @@ public final class SpawnedDisplayEntityGroup implements Spawned {
             }
 
             DisplayEntityGroup group = toDisplayEntityGroup();
-            SpawnedDisplayEntityGroup cloned = group.spawn(location, GroupSpawnedEvent.SpawnReason.CLONE);
+            SpawnedDisplayEntityGroup cloned = group.spawn(location, GroupSpawnedEvent.SpawnReason.CLONE, settings);
+
             for (Map.Entry<SpawnedDisplayEntityPart, Float> entry : oldYaws.entrySet()){
                 SpawnedDisplayEntityPart part = entry.getKey();
                 float oldYaw = entry.getValue();

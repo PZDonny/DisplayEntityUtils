@@ -2,8 +2,8 @@ package net.donnypz.displayentityutils.events;
 
 import jdk.jfr.Experimental;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayStateMachine;
-import net.donnypz.displayentityutils.utils.DisplayEntities.MachineState;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

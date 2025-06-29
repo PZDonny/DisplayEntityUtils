@@ -1,9 +1,9 @@
 package net.donnypz.displayentityutils.events;
 
 import jdk.jfr.Experimental;
-import net.donnypz.displayentityutils.utils.DisplayEntities.MachineState;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayStateMachine;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

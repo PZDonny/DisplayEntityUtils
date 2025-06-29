@@ -19,7 +19,7 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-public final class SpawnedDisplayEntityPart implements Spawned {
+public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawned {
 
     private static final HashMap<PartData, SpawnedDisplayEntityPart> allParts = new HashMap<>();
     private SpawnedDisplayEntityGroup group;
@@ -342,7 +342,7 @@ public final class SpawnedDisplayEntityPart implements Spawned {
 
             Vector translation;
             if (!isMaster()){
-                Vector worldPos = DisplayUtils.getModelLocation(display).toVector();
+                Vector worldPos = DisplayUtils.getModelLocation(display, false).toVector();
                 translation = worldPos.subtract(master.getLocation().toVector());
                 master.addPassenger(getEntity());
             }
@@ -623,7 +623,7 @@ public final class SpawnedDisplayEntityPart implements Spawned {
 
 
                 if (entity instanceof Display d){
-                    loc = DisplayUtils.getModelLocation(d);
+                    loc = DisplayUtils.getModelLocation(d, true);
                 }
                 else{
                     loc = entity.getLocation();
@@ -861,7 +861,7 @@ public final class SpawnedDisplayEntityPart implements Spawned {
 
         float width = scale.x;
         float height = scale.y;
-        Location spawnLoc = DisplayUtils.getModelLocation(display);
+        Location spawnLoc = DisplayUtils.getModelLocation(display, true);
         Interaction interaction = display.getWorld().spawn(spawnLoc, Interaction.class, i -> {
             i.setInteractionWidth(width);
             i.setInteractionHeight(height);

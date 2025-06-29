@@ -41,12 +41,21 @@ public final class DisplayUtils {
      * based off of its transformation
      * This may not be a perfect representation of where the model's location actually is, due to the shape of models varying (e.g.: Stone Block vs Stone Pressure Plate)
      * @param display The entity to get the location from
+     * @param includeRotation Determine if calculations should be made for the entity's yaw
      * @return Model's World Location
      */
-    public static Location getModelLocation(@NotNull Display display){
+    public static Location getModelLocation(@NotNull Display display, boolean includeRotation){
         Transformation transformation = display.getTransformation();
         Location translationLoc = display.getLocation();
-        translationLoc.add(Vector.fromJOML(transformation.getTranslation()));
+        Vector translationVector = Vector.fromJOML(transformation.getTranslation());
+
+        if (includeRotation){
+            //Pivot with yaw
+            translationVector.rotateAroundY(Math.toRadians(display.getYaw()*-1));
+        }
+
+
+        translationLoc.add(translationVector);
         return translationLoc;
     }
 

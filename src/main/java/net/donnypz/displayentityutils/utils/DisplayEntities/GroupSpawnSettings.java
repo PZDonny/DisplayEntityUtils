@@ -165,6 +165,7 @@ public class GroupSpawnSettings {
 
             for (Map.Entry<String, Display.Brightness> entry : brightness.entrySet()){
                 String tag = entry.getKey();
+                if (tag == null) continue;
                 Display.Brightness br = entry.getValue();
                 if (DisplayUtils.hasPartTag(display, tag)){
                     display.setBrightness(br);
@@ -182,6 +183,7 @@ public class GroupSpawnSettings {
 
             for (Map.Entry<String, Display.Billboard> entry : billboard.entrySet()){
                 String tag = entry.getKey();
+                if (tag == null) continue;
                 Display.Billboard bb = entry.getValue();
                 if (DisplayUtils.hasPartTag(display, tag)){
                     display.setBillboard(bb);

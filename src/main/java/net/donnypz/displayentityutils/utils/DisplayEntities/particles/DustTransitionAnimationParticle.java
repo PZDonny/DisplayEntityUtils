@@ -1,7 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities.particles;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -12,7 +11,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 @ApiStatus.Internal
-public class DustTransitionAnimationParticle extends AnimationParticle implements Serializable {
+class DustTransitionAnimationParticle extends AnimationParticle implements Serializable {
 
     transient Color color1;
     Map<String, Object> color1AsMap;

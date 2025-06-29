@@ -1,7 +1,8 @@
-package net.donnypz.displayentityutils.utils.DisplayEntities;
+package net.donnypz.displayentityutils.utils.DisplayEntities.machine;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupAnimationStateChangeEvent;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -281,7 +282,7 @@ public class DisplayStateMachine {
     }
 
     /**
-     * Check if this state machine contains a state with the specified {@link net.donnypz.displayentityutils.utils.DisplayEntities.MachineState.StateType}
+     * Check if this state machine contains a state with the specified {@link MachineState.StateType}
      * @param stateType
      * @return a boolean
      */
