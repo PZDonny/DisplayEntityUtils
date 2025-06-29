@@ -10,7 +10,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @ApiStatus.Internal
-public class BlockAnimationParticle extends AnimationParticle implements Serializable {
+class BlockAnimationParticle extends AnimationParticle implements Serializable {
 
 
     transient BlockData blockData;

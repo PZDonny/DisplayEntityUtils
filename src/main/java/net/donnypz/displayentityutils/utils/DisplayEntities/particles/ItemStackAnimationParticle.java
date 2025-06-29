@@ -10,7 +10,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @ApiStatus.Internal
-public class ItemStackAnimationParticle extends AnimationParticle implements Serializable {
+class ItemStackAnimationParticle extends AnimationParticle implements Serializable {
 
     byte[] itemStackAsBytes;
     transient ItemStack itemStack;
