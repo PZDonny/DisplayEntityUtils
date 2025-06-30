@@ -4,12 +4,10 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
 import ch.njol.skript.util.Version;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginTabCompleter;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.events.InteractionClickEvent;
-import net.donnypz.displayentityutils.events.PreInteractionClickEvent;
 import net.donnypz.displayentityutils.listeners.autoGroup.DEULoadingListeners;
 import net.donnypz.displayentityutils.listeners.bdengine.DatapackEntitySpawned;
 import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
+import net.donnypz.displayentityutils.listeners.entity.DEUInteractionListener;
 import net.donnypz.displayentityutils.listeners.entity.mythic.DEUMythicListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerChatListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerConnectionListener;
@@ -20,29 +18,18 @@ import net.donnypz.displayentityutils.skript.SkriptTypes;
 import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
-import net.donnypz.displayentityutils.utils.InteractionCommand;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
-import net.donnypz.displayentityutils.utils.command.RelativePointDisplay;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.entity.Interaction;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
@@ -104,12 +91,32 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     public void onEnable() {
         instance = this;
         getConfig().options().copyDefaults(true);
+        reloadPlugin(true);
+        ConfigUtils.registerDisplayControllers();
+        initializeDependencies();
+        registerListeners();
+        initializeNamespacedKeys();
+        initializeBStats();
+        getServer().getConsoleSender().sendMessage(pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
+    }
 
+
+    private void initializeNamespacedKeys(){
+        partUUIDKey = new NamespacedKey(this, "partUUID");
+        partPDCTagKey = new NamespacedKey(this, "pdcTag");
+        groupTagKey = new NamespacedKey(this, "groupTag");
+        masterKey = new NamespacedKey(this, "isMaster"); //DO NOT CHANGE
+    }
+
+    private void initializeDependencies(){
+        //MythicMobs
         isMythicMobsInstalled = Bukkit.getPluginManager().isPluginEnabled("MythicMobs");
         if (isMythicMobsInstalled){
             Bukkit.getPluginManager().registerEvents(new DEUMythicListener(), this);
         }
 
+
+        //Skript
         isSkriptInstalled = Bukkit.getPluginManager().isPluginEnabled("Skript");
         if (isSkriptInstalled){
             if (Skript.getVersion().isSmallerThan(new Version(2,10,0))){
@@ -128,33 +135,21 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
                 getServer().getConsoleSender().sendMessage(pluginPrefix.append(Component.text("Skript Syntax Enabled!", NamedTextColor.GREEN)));
             }
         }
+    }
 
-        reloadPlugin(true);
-        ConfigUtils.registerDisplayControllers();
-
-        //Listeners
+    private void registerListeners(){
         Bukkit.getPluginManager().registerEvents(this, this);
         Bukkit.getPluginManager().registerEvents(new DatapackEntitySpawned(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerChatListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUEntityListener(), this);
-        if (automaticGroupDetection){
-            Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
-        }
+        Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
+        Bukkit.getPluginManager().registerEvents(new DEUInteractionListener(), this);
+    }
 
-
-
-        partUUIDKey = new NamespacedKey(this, "partUUID");
-        partPDCTagKey = new NamespacedKey(this, "pdcTag");
-        groupTagKey = new NamespacedKey(this, "groupTag");
-        masterKey = new NamespacedKey(this, "isMaster"); //DO NOT CHANGE
-
-        getServer().getConsoleSender().sendMessage(pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
-
-        //bStats
+    private void initializeBStats(){
         int pluginID = 24875;
         new Metrics(this, pluginID);
-
     }
 
     @Override
@@ -448,7 +443,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         }
 
         reloadConfig();
-        ConfigUtils.setConfigVariables(getConfig());
+        ConfigUtils.read(getConfig());
         
         PluginCommand command = getCommand("managedisplays");
         if (command != null){
@@ -473,98 +468,5 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         }
         MachineState.registerNullLoaderStates();
         DisplayController.registerNullLoaderControllers();
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    private void rClick(PlayerInteractEntityEvent e){
-        if (e.isCancelled()){
-            return;
-        }
-        if (e.getRightClicked() instanceof Interaction entity){
-            determineAction(entity, e.getPlayer(), InteractionClickEvent.ClickType.RIGHT);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    private void lClick(EntityDamageByEntityEvent e){
-        if (e.isCancelled()){
-            return;
-        }
-        if (e.getEntity() instanceof Interaction entity){
-            determineAction(entity, (Player) e.getDamager(), InteractionClickEvent.ClickType.LEFT);
-        }
-    }
-
-    private void determineAction(Interaction interaction, Player player, InteractionClickEvent.ClickType clickType){
-        //Point Displays
-        if (RelativePointDisplay.isRelativePointEntity(interaction)){
-            RelativePointDisplay point = RelativePointDisplay.get(interaction.getUniqueId());
-            if (point == null){
-                player.sendMessage(Component.text("Failed to get point!", NamedTextColor.RED));
-                return;
-            }
-            if (clickType == InteractionClickEvent.ClickType.RIGHT){
-                if (player.isSneaking()){
-                    if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_REMOVE_FRAME_POINT)){
-                        return;
-                    }
-                    Component comp = Component.text("Click here to confirm point REMOVAL", NamedTextColor.DARK_RED, TextDecoration.UNDERLINED)
-                            .clickEvent(ClickEvent.callback(a -> {
-                                Player p = (Player) a;
-                                boolean result = point.removeFromPointHolder();
-                                DEUCommandUtils.removeRelativePoint(p, point);
-                                if (result){
-                                    p.sendMessage(pluginPrefix.append(Component.text("Successfully removed point from frame!", NamedTextColor.YELLOW)));
-                                    point.despawn();
-                                }
-                                else{
-                                    p.sendMessage(pluginPrefix.append(Component.text("This point has already been removed by another player or other methods!", NamedTextColor.RED)));
-                                }
-                            }));
-                    player.sendMessage(comp);
-                    player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
-
-                }
-                else{
-                    point.rightClick(player);
-                }
-            }
-            else{
-                point.leftClick(player);
-                DEUCommandUtils.selectRelativePoint(player, point);
-            }
-            return;
-        }
-
-        if (!new PreInteractionClickEvent(player, interaction, clickType).callEvent()){
-            return;
-        }
-
-        List<InteractionCommand> commands = DisplayUtils.getInteractionCommandsWithData(interaction);
-        InteractionClickEvent event = new InteractionClickEvent(player, interaction, clickType, commands);
-
-        if (!event.callEvent()){
-            return;
-        }
-
-        //Commands
-        Player p = event.getPlayer();
-        for (InteractionCommand cmd : event.getCommands()){
-            if (cmd.isLeftClick() && event.getClickType() == InteractionClickEvent.ClickType.LEFT){
-                runCommand(cmd, p);
-            }
-            else if (!cmd.isLeftClick() && event.getClickType() == InteractionClickEvent.ClickType.RIGHT){
-                runCommand(cmd, p);
-            }
-        }
-    }
-
-    private void runCommand(InteractionCommand command, Player player){
-        if (!command.isConsoleCommand()){
-            player.performCommand(command.getCommand());
-        }
-        else{
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.getCommand());
-        }
     }
 }

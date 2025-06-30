@@ -22,6 +22,8 @@ import java.util.concurrent.CompletableFuture;
 public final class DEULoadingListeners implements Listener {
     @EventHandler(priority =  EventPriority.HIGHEST)
     public void onEntityLoad(EntitiesLoadEvent e){
+        if (!DisplayEntityPlugin.automaticGroupDetection()) return;
+
         Chunk chunk = e.getChunk();
         if (e.getChunk().isLoaded()){
             AutoGroup.detectGroups(chunk, e.getEntities());
@@ -36,6 +38,8 @@ public final class DEULoadingListeners implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWorldUnload(WorldUnloadEvent e){
+        if (!DisplayEntityPlugin.automaticGroupDetection()) return;
+
         String worldName = e.getWorld().getName();
         ArrayList<Long> storedChunks = AutoGroup.readChunks.get(worldName);
         if (storedChunks != null){
@@ -52,9 +56,8 @@ public final class DEULoadingListeners implements Listener {
 
     @EventHandler
     public void onServerLoad(ServerLoadEvent e){
-        if (e.getType() == ServerLoadEvent.LoadType.RELOAD){
-            return;
-        }
+        if (!DisplayEntityPlugin.automaticGroupDetection() || e.getType() == ServerLoadEvent.LoadType.RELOAD) return;
+
         for (World world : Bukkit.getWorlds()){
             for (Chunk chunk : world.getLoadedChunks()){
                 AutoGroup.detectGroups(chunk, Arrays.asList(chunk.getEntities()));

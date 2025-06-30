@@ -49,7 +49,7 @@ final class ConfigUtils {
         }
     }
 
-    static void setConfigVariables(FileConfiguration config){
+    static void read(FileConfiguration config){
         DisplayEntityPlugin.isLocalEnabled = config.getBoolean("localStorageEnabled");
         if (config.getBoolean("mongodb.enabled")){
             DisplayEntityPlugin.isMongoEnabled = true;
