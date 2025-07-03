@@ -23,12 +23,9 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
 
     private static final HashMap<PartData, SpawnedDisplayEntityPart> allParts = new HashMap<>();
     private SpawnedDisplayEntityGroup group;
-    private final PartType type;
     private Entity entity;
     private PartData partData;
-    private UUID partUUID;
     private boolean isInteractionOutlined;
-    boolean valid = true;
 
 
 
@@ -537,7 +534,7 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
      * Stops this part from glowing
      */
     @Override
-    public SpawnedDisplayEntityPart unglow(){
+    public void unglow(){
         if (type == PartType.INTERACTION) {
             //temporaryParticles(entity, durationInTicks, Particle.COMPOSTER);
             isInteractionOutlined = false;
@@ -545,7 +542,6 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
         else{
             getEntity().setGlowing(false);
         }
-        return this;
     }
 
     private void interactionOutline(Interaction interaction, long durationInTicks){

@@ -12,7 +12,7 @@ public interface Spawned {
 
     void setGlowColor(@Nullable Color color);
 
-    Spawned unglow();
+    void unglow();
 
     void setViewRange(float viewRangeMultiplier);
 

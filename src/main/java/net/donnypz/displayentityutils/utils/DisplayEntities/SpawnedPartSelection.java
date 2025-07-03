@@ -458,11 +458,10 @@ public final class SpawnedPartSelection implements Spawned {
      * @return this
      */
     @Override
-    public SpawnedPartSelection unglow(){
+    public void unglow(){
         for (SpawnedDisplayEntityPart part : selectedParts){
             part.unglow();
         }
-        return this;
     }
 
 

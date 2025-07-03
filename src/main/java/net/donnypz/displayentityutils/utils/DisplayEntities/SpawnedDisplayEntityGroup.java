@@ -36,7 +36,6 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
     List<SpawnedDisplayFollower> followers = new ArrayList<>();
     SpawnedDisplayFollower defaultFollower;
 
-    private String tag;
     SpawnedDisplayEntityPart masterPart;
     long creationTime = System.currentTimeMillis();
     int lastAnimatedTick = -1;
@@ -1155,14 +1154,6 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
     }
 
     /**
-     * Get this group's tag
-     * @return This group's tag. Null if it was not set
-     */
-    public @Nullable String getTag() {
-        return tag;
-    }
-
-    /**
      * Get whether this group has a tag set
      * @return true if a tag has been set for this group
      */
@@ -1237,11 +1228,10 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * @return this
      */
     @Override
-    public SpawnedDisplayEntityGroup unglow(){
+    public void unglow(){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.unglow();
         }
-        return this;
     }
 
     /**
