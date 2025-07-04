@@ -27,7 +27,7 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spawned {
+public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spawned {
     public static final long defaultPartUUIDSeed = 99;
     final Random partUUIDRandom = new Random(defaultPartUUIDSeed);
 

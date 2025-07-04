@@ -2,7 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import java.util.UUID;
 
-public abstract class SpawnedPart {
+public abstract class ActivePart {
 
     protected SpawnedDisplayEntityPart.PartType type;
     protected UUID partUUID;
