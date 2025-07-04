@@ -27,8 +27,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     private PartData partData;
     private boolean isInteractionOutlined;
 
-
-
     SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Display displayEntity, Random random){
         this.group = group;
         this.entity = displayEntity;
@@ -132,13 +130,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     private boolean groupContainsUUID(UUID partUUID){
         return group.spawnedParts.containsKey(partUUID);
-    }
-
-    /** Get this part's UUID, used for animations and identifying parts
-     * @return a uuid
-     */
-    public UUID getPartUUID() {
-        return partUUID;
     }
 
     private void removeFromPreviousGroup(Display display){
