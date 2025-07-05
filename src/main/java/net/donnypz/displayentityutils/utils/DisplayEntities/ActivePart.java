@@ -16,4 +16,13 @@ public abstract class ActivePart {
     public @Nullable UUID getPartUUID() {
         return partUUID;
     }
+
+    /**
+     * Get this part's type
+     * @return a {@link SpawnedDisplayEntityPart.PartType}
+     */
+    public SpawnedDisplayEntityPart.PartType getType(){
+        return type;
+    }
+
 }

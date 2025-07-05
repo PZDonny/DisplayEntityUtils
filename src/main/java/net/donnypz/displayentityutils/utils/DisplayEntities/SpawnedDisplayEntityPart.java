@@ -161,13 +161,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return getEntity().getPersistentDataContainer().get(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG);
     }
 
-    /**
-     * Get the type of part this is
-     * @return This part's type
-     */
-    public PartType getType(){
-        return type;
-    }
 
     /**
      * Get the entity of that this part represents
