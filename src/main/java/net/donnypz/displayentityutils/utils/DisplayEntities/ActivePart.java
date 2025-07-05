@@ -10,10 +10,6 @@ public abstract class ActivePart {
     protected UUID partUUID;
     protected boolean valid = true;
 
-    protected void setPartType(SpawnedDisplayEntityPart.PartType partType){
-        this.type = partType;
-    }
-
     /** Get this part's UUID used for animations and uniquely identifying parts
      * @return a {@link UUID}
      */
