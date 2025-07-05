@@ -95,10 +95,11 @@ public final class DisplayUtils {
     /**
      * Get the translation vector from a location to the interaction's location
      * @param interaction the interaction
+     * @param referenceLocation the reference location
      * @return a vector
      */
-    public static Vector getInteractionTranslation(@NotNull Interaction interaction, @NotNull Location location){
-        return location.toVector().subtract(interaction.getLocation().toVector());
+    public static Vector getInteractionTranslation(@NotNull Interaction interaction, @NotNull Location referenceLocation){
+        return referenceLocation.toVector().subtract(interaction.getLocation().toVector());
     }
 
     /**
@@ -347,11 +348,33 @@ public final class DisplayUtils {
      * @param center the location the interaction should pivot around
      * @param angleInDegrees the pivot angle in degrees
      */
-    public static void pivot(Interaction interaction, Location center, double angleInDegrees){
+    public static void pivot(@NotNull Interaction interaction, @NotNull Location center, double angleInDegrees){
         Vector translationVector = DisplayUtils.getInteractionTranslation(interaction, center);
         translationVector.rotateAroundY(Math.toRadians(angleInDegrees*-1));
         Location newLoc = center.clone().subtract(translationVector);
         interaction.teleport(newLoc);
+    }
+
+    /**
+     * Get the location an interaction entity would be pivoted to after using {@link DisplayUtils#pivot(Interaction, Location, double)}
+     * @param interactionLocation the interaction entity's location
+     * @param center the location the interaction should pivot around
+     * @param angleInDegrees the pivot angle in degrees
+     */
+    public static Location getPivotLocation(@NotNull Location interactionLocation, @NotNull Location center, double angleInDegrees){
+        Vector translationVector = center.clone().subtract(interactionLocation).toVector();
+        return getPivotLocation(translationVector, center, angleInDegrees);
+    }
+
+    /**
+     * Get the location an interaction entity would be pivoted to after using {@link DisplayUtils#pivot(Interaction, Location, double)}
+     * @param translationVector the translation offset for an interaction entity from a center location
+     * @param center the location the interaction should pivot around
+     * @param angleInDegrees the pivot angle in degrees
+     */
+    public static Location getPivotLocation(@NotNull Vector translationVector, @NotNull Location center, double angleInDegrees){
+        translationVector.rotateAroundY(Math.toRadians(angleInDegrees*-1));
+        return center.clone().subtract(translationVector);
     }
 
     /**
