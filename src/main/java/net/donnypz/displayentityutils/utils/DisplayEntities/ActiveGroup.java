@@ -16,11 +16,11 @@ public abstract class ActiveGroup {
         return tag;
     }
 
-    abstract ActivePart getSpawnedPart(@NotNull UUID partUUID);
+    public abstract ActivePart getSpawnedPart(@NotNull UUID partUUID);
 
-    abstract SequencedCollection<? extends ActivePart> getSpawnedParts();
+    public abstract SequencedCollection<? extends ActivePart> getSpawnedParts();
 
-    abstract SequencedCollection<? extends ActivePart> getSpawnedParts(@NotNull SpawnedDisplayEntityPart.PartType partType);
+    public abstract SequencedCollection<? extends ActivePart> getSpawnedParts(@NotNull SpawnedDisplayEntityPart.PartType partType);
 
-    abstract SequencedCollection<? extends ActivePart> getSpawnedDisplayParts();
+    public abstract SequencedCollection<? extends ActivePart> getSpawnedDisplayParts();
 }
