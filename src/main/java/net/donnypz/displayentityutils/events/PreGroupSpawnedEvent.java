@@ -7,7 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Called before a {@link SpawnedDisplayEntityGroup}
@@ -56,7 +55,6 @@ public class PreGroupSpawnedEvent extends Event implements Cancellable {
      * Get the settings set with {@link  PreGroupSpawnedEvent#setGroupSpawnSettings(GroupSpawnSettings)}
      * @return {@link GroupSpawnSettings} or null
      */
-    @ApiStatus.Internal
     public GroupSpawnSettings getNewSettings() {
         return newSettings;
     }
