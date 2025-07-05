@@ -6,13 +6,12 @@ import ch.njol.skript.registrations.EventValues;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.InteractionCommand;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
-
-import java.util.List;
 
 @ApiStatus.Internal
 public class SimpleEvents extends SimpleEvent {
@@ -107,12 +106,12 @@ public class SimpleEvents extends SimpleEvent {
 
             //Interaction Click Event
             Skript.registerEvent("Interaction Click", SimpleEvents.class, InteractionClickEvent.class, "interaction [entity] click[ed]")
-                    .description("Called when an interaction entity is clicked, providing information stored on the interaction entity")
+                    .description("Called when an interaction entity is clicked. Interaction commands can only be retrieved AFTER version 2.7.7")
                     .since("2.6.2");
             EventValues.registerEventValue(InteractionClickEvent.class, Player.class, e -> e.getPlayer());
             EventValues.registerEventValue(InteractionClickEvent.class, Interaction.class, e -> e.getInteraction());
             EventValues.registerEventValue(InteractionClickEvent.class, InteractionClickEvent.ClickType.class, e -> e.getClickType());
-            EventValues.registerEventValue(InteractionClickEvent.class, List.class, InteractionClickEvent::getCommands);
+            EventValues.registerEventValue(InteractionClickEvent.class, InteractionCommand[].class, e -> e.getCommands().toArray(new InteractionCommand[0]));
 
             //Entity Ride Group Event
             Skript.registerEvent("Entity Ride Group", SimpleEvents.class, EntityRideGroupEvent.class, "entity (mount|ride) [spawned[-| ]]group")
