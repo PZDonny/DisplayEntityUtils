@@ -251,8 +251,8 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void hideFromPlayer(@NotNull Player player) {
-        untrack(player.getUniqueId());
         PacketUtils.destroyEntity(player, this);
+        untrack(player.getUniqueId());
     }
 
     /**
