@@ -1,6 +1,5 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import io.papermc.paper.persistence.PersistentDataContainerView;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import org.bukkit.*;
@@ -122,21 +121,21 @@ final class DisplayEntity implements Serializable {
         return part;
     }
 
-    static @NotNull List<String> getListFromPDC(@NotNull PersistentDataContainerView pdc, NamespacedKey key){
+    static @NotNull List<String> getListFromPDC(@NotNull PersistentDataContainer pdc, NamespacedKey key){
         if (!pdc.has(key, PersistentDataType.LIST.strings())){
             return new ArrayList<>();
         }
         return pdc.get(key, PersistentDataType.LIST.strings());
     }
 
-    static @NotNull HashSet<String> getSetFromPDC(@NotNull PersistentDataContainerView pdc, NamespacedKey key){
+    static @NotNull HashSet<String> getSetFromPDC(@NotNull PersistentDataContainer pdc, NamespacedKey key){
         if (!pdc.has(key, PersistentDataType.LIST.strings())){
             return new HashSet<>();
         }
         return new HashSet<>(pdc.get(key, PersistentDataType.LIST.strings()));
     }
 
-    static UUID getPDCPartUUID(PersistentDataContainerView pdc){
+    static UUID getPDCPartUUID(PersistentDataContainer pdc){
         String value = pdc.get(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING);
         if (value != null){
             return UUID.fromString(value);
@@ -144,7 +143,7 @@ final class DisplayEntity implements Serializable {
         return null;
     }
 
-    static boolean getMasterPart(PersistentDataContainerView pdc){
+    static boolean getMasterPart(PersistentDataContainer pdc){
         Boolean value = pdc.get(DisplayEntityPlugin.getMasterKey(), PersistentDataType.BOOLEAN);
         if (value != null){
             return value;
