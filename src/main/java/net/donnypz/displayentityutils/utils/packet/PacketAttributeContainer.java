@@ -289,25 +289,18 @@ public class PacketAttributeContainer implements Cloneable{
     }
 
     private void sendAttributes(@NotNull Player player, int entityId, List<EntityData<?>> data){
-        WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata(entityId, data);
-        if (DEUUser.getOrCreateUser(player).isTrackingPacketEntity(entityId)){
-            PacketEvents.getAPI().getPlayerManager().sendPacket(player, metadataPacket);
-        }
+        PacketEvents.getAPI().getPlayerManager().sendPacket(player, new WrapperPlayServerEntityMetadata(entityId, data));
     }
 
     private void sendAttributesToPlayers(@NotNull Collection<Player> players, int entityId, List<EntityData<?>> data){
         for (Player player : players){
-            if (DEUUser.getOrCreateUser(player).isTrackingPacketEntity(entityId)){
-                PacketEvents.getAPI().getPlayerManager().sendPacket(player, new WrapperPlayServerEntityMetadata(entityId, data));
-            }
+            PacketEvents.getAPI().getPlayerManager().sendPacket(player, new WrapperPlayServerEntityMetadata(entityId, data));
         }
     }
 
     private void sendAttributesToUUIDs(@NotNull Collection<UUID> playerUUIDs, int entityId, List<EntityData<?>> data){
         for (UUID uuid : playerUUIDs){
-            if (DEUUser.getOrCreateUser(uuid).isTrackingPacketEntity(entityId)){
-                PacketEvents.getAPI().getPlayerManager().sendPacket(Bukkit.getPlayer(uuid), new WrapperPlayServerEntityMetadata(entityId, data));
-            }
+            PacketEvents.getAPI().getPlayerManager().sendPacket(Bukkit.getPlayer(uuid), new WrapperPlayServerEntityMetadata(entityId, data));
         }
     }
 
