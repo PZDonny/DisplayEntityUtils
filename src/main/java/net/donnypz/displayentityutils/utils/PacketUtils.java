@@ -8,11 +8,13 @@ import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
+import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockType;
@@ -158,6 +160,13 @@ public final class PacketUtils {
         new PacketAttributeContainer()
                 .setAttribute(DisplayAttributes.GLOWING, glowing)
                 .sendAttributes(player, entityId);
+    }
+
+    public static void setGlowing(@NotNull Player player, int entityId, long durationInTicks){
+        setGlowing(player, entityId, true);
+        Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+            setGlowing(player, entityId, false);
+        }, durationInTicks);
     }
 
     public static void setTextDisplayText(@NotNull Player player, @NotNull TextDisplay textDisplay, @NotNull Component text){
