@@ -416,52 +416,68 @@ public final class SpawnedPartSelection implements Spawned {
     }
 
     /**
-     * Adds the glow effect the parts within this selection
-     * @param ignoreInteractions choose if interaction entities should be outlined with particles
-     * @param particleHidden don't show parts with particles if it's the master part or has no visible material
+     * Adds the glow effect to the block and item display parts within this selection
      * @return this
      */
-    public SpawnedPartSelection glow(boolean ignoreInteractions, boolean particleHidden){
+    public SpawnedPartSelection glow(){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                if (ignoreInteractions){
-                    continue;
-                }
-                part.glow(false);
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
+                continue;
             }
-            part.glow(particleHidden);
+            part.glow();
         }
         return this;
     }
 
     /**
-     * Adds the glow effect the parts within this selection
-     * @param ignoreInteractions choose if interaction entities should be outlined with particles
-     * @param particleHidden don't show parts with particles if it's the master part or has no visible material
+     * Adds the glow effect to the block and item display parts within this selection
+     * @param durationInTicks how long the glow should last
      * @return this
      */
-    public SpawnedPartSelection glow(long durationInTicks, boolean ignoreInteractions, boolean particleHidden){
+    public SpawnedPartSelection glow(long durationInTicks){
         for (SpawnedDisplayEntityPart part : selectedParts){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                if (ignoreInteractions){
-                    continue;
-                }
-                part.glow(durationInTicks, false);
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
+                continue;
             }
-            part.glow(durationInTicks, particleHidden);
+            part.glow(durationInTicks);
         }
         return this;
     }
 
     /**
-     * Removes the glow effect from all the parts in this selection
+     * Make this part glow for a player for a set period of time, if it's a block or item display
+     * @param player the player
+     * @param durationInTicks how long the glowing should last. -1 to last forever
+     * @return this
+     */
+    public SpawnedPartSelection glow(@NotNull Player player, long durationInTicks){
+        SpawnedDisplayEntityGroup.glowMany(player, durationInTicks, selectedParts);
+        return this;
+    }
+
+    /**
+     * Removes the glow effect from all the display parts in this selection
      * @return this
      */
     @Override
-    public void unglow(){
+    public SpawnedPartSelection unglow(){
         for (SpawnedDisplayEntityPart part : selectedParts){
             part.unglow();
         }
+        return this;
+    }
+
+    /**
+     * Removes the glow effect from all the display parts in this selection, for the specified player
+     * @param player the player
+     * @return this
+     */
+    @Override
+    public SpawnedPartSelection unglow(@NotNull Player player){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            part.unglow(player);
+        }
+        return this;
     }
 
 

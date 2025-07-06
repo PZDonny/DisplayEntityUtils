@@ -1,9 +1,13 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
@@ -25,7 +29,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     private SpawnedDisplayEntityGroup group;
     private Entity entity;
     private PartData partData;
-    private boolean isInteractionOutlined;
 
     SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Display displayEntity, Random random){
         this.group = group;
@@ -424,86 +427,33 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
 
     /**
-     * Adds the glow effect to this SpawnDisplayEntityPart.
-     * Outlined with soul fire flame particles if Interaction.
-     * Cloud Particle if it's the master part
-     * @param particleHidden don't show parts with particles if it's the master part or has no visible material
+     * Adds the glow effect to this SpawnDisplayEntityPart. This does <b><u>NOT</u></b> apply to Interaction or Text Display entities. Use {@link #spawnInteractionOutline(Player, long)} to show an outline of
+     * an interaction for a specific player.
      * @return this
      */
 
-    public SpawnedDisplayEntityPart glow(boolean particleHidden){
+    public SpawnedDisplayEntityPart glow(){
         Entity entity = getEntity();
-        if (type == PartType.INTERACTION) {
-            interactionOutline((Interaction) entity, Long.MAX_VALUE);
+        if (type == PartType.INTERACTION || type == PartType.TEXT_DISPLAY) {
+            return this;
         }
 
-        if (!particleHidden){
-            Material material = getMaterial();
-            if (material == null){
-                entity.setGlowing(true);
-            }
-            else{
-                switch (material){
-                    case AIR, CAVE_AIR, VOID_AIR -> {
-                        temporaryParticles(entity, -1, Particle.CLOUD);
-                    }
-                    default -> {
-                        entity.setGlowing(true);
-                    }
-                }
-            }
-        }
-        else{
-            entity.setGlowing(true);
-        }
+        entity.setGlowing(true);
         return this;
     }
 
     /**
-     * Adds the glow effect to SpawnDisplayEntityPart.
+     * Adds the glow effect to this SpawnDisplayEntityPart.
      * It will glow if it's a Block/Item Display.
-     * Outlined with soul fire flame particles if Interaction.
-     * Cloud Particle if it's the master part
-     * @param durationInTicks How long to glow this selection
-     * @param particleHidden don't show parts with particles if it's the master part or has no visible material
+     * @param durationInTicks How long to glow this part
      * @return this
      */
-    public SpawnedDisplayEntityPart glow(long durationInTicks, boolean particleHidden){
+    public SpawnedDisplayEntityPart glow(long durationInTicks){
         Entity entity = getEntity();
-        if (type == PartType.INTERACTION) {
-            if (particleHidden){
-                return this;
-            }
-            interactionOutline((Interaction) entity, durationInTicks);
+        if (type == PartType.INTERACTION || type == PartType.TEXT_DISPLAY) {
             return this;
         }
-        if (this.equals(group.getMasterPart())){
-            if (!particleHidden){
-                temporaryParticles(entity, durationInTicks, Particle.FLAME);
-            }
-            entity.setGlowing(true);
-        }
-        else{
-            Material material = getMaterial();
-            if (material != null){
-                switch (material){
-                    case AIR, CAVE_AIR, VOID_AIR -> {
-                        if (!particleHidden){
-                            temporaryParticles(entity, durationInTicks, Particle.CLOUD);
-                        }
-                        entity.setGlowing(true);
-                    }
-                    default -> {
-                        entity.setGlowing(true);
-                    }
-                }
-            }
-            else{
-                entity.setGlowing(true);
-            }
-        }
-
-
+        entity.setGlowing(true);
 
         new BukkitRunnable(){
             @Override
@@ -515,77 +465,77 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     /**
-     * Stops this part from glowing
+     * Make this part glow for a player for a set period of time, if it's a block or item display
+     * @param player the player
+     * @param durationInTicks how long the glowing should last. -1 to last forever
+     * @return this
      */
-    @Override
-    public void unglow(){
-        if (type == PartType.INTERACTION) {
-            //temporaryParticles(entity, durationInTicks, Particle.COMPOSTER);
-            isInteractionOutlined = false;
+    public SpawnedDisplayEntityPart glow(@NotNull Player player, long durationInTicks){
+        if (type == PartType.BLOCK_DISPLAY || type == PartType.ITEM_DISPLAY){
+            if (durationInTicks == -1){
+                PacketUtils.setGlowing(player, getEntity().getEntityId(), true);
+            }
+            else{
+                PacketUtils.setGlowing(player, getEntity().getEntityId(), durationInTicks);
+            }
+
+        }
+        return this;
+    }
+
+    public void spawnInteractionOutline(Player player, long durationInTicks){
+        Interaction i = (Interaction) getEntity();
+        float width = i.getInteractionWidth();
+        float height = i.getInteractionHeight();
+        Location spawnLoc = i.getLocation();
+        spawnLoc.setPitch(0);
+        spawnLoc.setYaw(0);
+
+        PacketDisplayEntityPart part = new PacketAttributeContainer()
+                .setAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK, new ItemStack(Material.TARGET))
+                .setAttribute(DisplayAttributes.Transform.TRANSLATION, new Vector3f(0, height/2, 0))
+                .setAttribute(DisplayAttributes.Transform.SCALE, new Vector3f(width, height, width))
+                .setAttribute(DisplayAttributes.BRIGHTNESS, new Display.Brightness(0, 15))
+                .createPart(PartType.ITEM_DISPLAY);
+        part.setLocation(spawnLoc);
+        part.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
+
+        if (durationInTicks == -1) {
+            if (player.isConnected()){
+                part.hideFromPlayer(player);
+            }
         }
         else{
+            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                if (player.isConnected()){
+                    part.hideFromPlayer(player);
+                }
+            }, durationInTicks);
+        }
+
+    }
+
+    /**
+     * Stops this part from glowing if it's a display entity
+     */
+    @Override
+    public SpawnedDisplayEntityPart unglow(){
+        if (type != PartType.INTERACTION) {
             getEntity().setGlowing(false);
         }
+        return this;
     }
 
-    private void interactionOutline(Interaction interaction, long durationInTicks){
-        isInteractionOutlined = true;
-        float height = interaction.getInteractionHeight();
-        float width = interaction.getInteractionWidth();
-        if (height == 0 || width == 0){
-            return;
+    /**
+     * Stops this part from glowing for a specific player, if the part is a display entity
+     * @param player the player
+     */
+    @Override
+    public SpawnedDisplayEntityPart unglow(@NotNull Player player){
+        if (type != PartType.INTERACTION) {
+            PacketUtils.setGlowing(player, getEntity().getEntityId(), false);
         }
-        Location origin = interaction.getLocation().clone();
-        origin.setPitch(0);
-        origin.setYaw(0);
-        Location pointA = origin.clone();
-        pointA.add(width/2, 0, width/2);
-
-        Location pointB = origin.clone();
-        pointB.add((width/2)*-1, 0, width/2);
-
-        Location pointC = origin.clone();
-        pointC.add((width/2)*-1, 0, (width/2)*-1);
-
-        Location pointD = origin.clone();
-        pointD.add(width/2, 0, (width/2)*-1);
-        final int tickIncrement = 8;
-        new BukkitRunnable(){
-            int currentTick = 0;
-            @Override
-            public void run() {
-                if (group == null || !group.isSpawned() || group.getSpawnedParts().isEmpty() || !interaction.isValid()){
-                    cancel();
-                    return;
-                }
-                if (!isInteractionOutlined || currentTick >= durationInTicks){
-                    cancel();
-                    return;
-                }
-                particleLine(pointA.clone(), pointB.clone(), width, height);
-                particleLine(pointB.clone(), pointC.clone(), width, height);
-                particleLine(pointC.clone(), pointD.clone(), width, height);
-                particleLine(pointD.clone(), pointA.clone(), width, height);
-                currentTick+=tickIncrement;
-
-            }
-        }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, tickIncrement);
-    }
-
-
-    private static void particleLine(Location from, Location to, float width, float height) {
-        double heightIncrease = height/(2.5*width);
-        double currentHeight = 0;
-        while(currentHeight <= height){
-            for(double i = 0; i<from.distance(to); i+=0.4) {
-                Vector vector  = from.clone().toVector().subtract(to.toVector()).normalize().multiply(-i);
-                Location loc = from.clone().add(vector);
-                loc.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 1, 0, 0, 0, 0);
-            }
-            currentHeight+=heightIncrease;
-            from.add(0, heightIncrease, 0);
-            to.add(0, heightIncrease, 0);
-        }
+        return this;
     }
 
     private void temporaryParticles(Entity entity, long durationInTicks, Particle particle){

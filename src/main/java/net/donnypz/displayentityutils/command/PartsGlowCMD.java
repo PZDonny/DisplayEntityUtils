@@ -38,11 +38,11 @@ class PartsGlowCMD extends PlayerSubCommand {
 
         if (isAll){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Glowing applied to your selection!", NamedTextColor.GREEN)));
-            partSelection.glow(false, true);
+            partSelection.glow();
         }
         else{
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Glowing applied to your selected part!", NamedTextColor.GREEN)));
-            partSelection.getSelectedPart().glow(true);
+            partSelection.getSelectedPart().glow();
         }
 
     }

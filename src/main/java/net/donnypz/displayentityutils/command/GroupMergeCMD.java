@@ -47,7 +47,7 @@ class GroupMergeCMD extends PlayerSubCommand {
                 group.merge(result.group());
             }
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully merged nearby groups", NamedTextColor.GREEN)));
-            group.glow(60, true, true);
+            group.glowAndOutline(player, 60);
         }
         catch(NumberFormatException e){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a valid number for the merging distance!", NamedTextColor.RED)));

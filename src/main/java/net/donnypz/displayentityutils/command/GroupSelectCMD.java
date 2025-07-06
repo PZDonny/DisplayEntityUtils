@@ -3,11 +3,14 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.GroupResult;
+import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 
 class GroupSelectCMD extends PlayerSubCommand {
@@ -41,12 +44,7 @@ class GroupSelectCMD extends PlayerSubCommand {
             }
 
             group.getUnaddedInteractionEntitiesInRange(interactionDistance, true);
-            if (!group.getMasterPart().getEntity().isGlowing()){
-                group.glow(50, false, false);
-            }
-            else{
-                player.sendMessage(Component.text("Your selected group's glowing was not effected!", NamedTextColor.GRAY, TextDecoration.ITALIC));
-            }
+            group.glowAndOutline(player, 50);
 
             if (DEUCommandUtils.removeRelativePoints(player)){
                 player.sendMessage(Component.text("Your previewed points have been despawned since you have changed your selected group", NamedTextColor.GRAY, TextDecoration.ITALIC));

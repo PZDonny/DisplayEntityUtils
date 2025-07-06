@@ -101,7 +101,7 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
         }
 
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Part Type Filters Applied!")));
-        partSelection.glow(30, false, false);
+        partSelection.glow(player, 30);
     }
 
 }

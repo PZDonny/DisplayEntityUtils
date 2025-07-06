@@ -5,12 +5,9 @@ import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
-import net.donnypz.displayentityutils.utils.CullOption;
-import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.donnypz.displayentityutils.utils.FollowType;
 import io.papermc.paper.entity.TeleportFlag;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.*;
@@ -1169,12 +1166,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      */
     public @Nullable SpawnedDisplayEntityPart getMasterPart(){
         return masterPart;
-        /*for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            if (part.isMaster()){
-                return part;
-            }
-        }
-        return null;*/
     }
 
     /**
@@ -1187,51 +1178,108 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     /**
-     * Adds the glow effect the parts within this group
-     * @param ignoreInteractions choose if interaction entities should be outlined with particles
-     * @param particleHidden show parts with particles if it's the master part or has no material
+     * Adds the glow effect to all the block and item display parts in this group
      * @return this
      */
-    public SpawnedDisplayEntityGroup glow(boolean ignoreInteractions, boolean particleHidden){
+    public SpawnedDisplayEntityGroup glow(){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                if (ignoreInteractions){
-                    continue;
-                }
-                part.glow(false);
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || part.type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
+                part.glow();
             }
-            part.glow(particleHidden);
         }
         return this;
     }
 
     /**
-     * Adds the glow effect to all the parts in this group
+     * Adds the glow effect to all the block and item display parts in this group
      * @param durationInTicks How long to highlight this selection
      * @return this
      */
-    public SpawnedDisplayEntityGroup glow(long durationInTicks, boolean ignoreInteractions, boolean particleHidden){
+    public SpawnedDisplayEntityGroup glow(long durationInTicks){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                if (ignoreInteractions){
-                    continue;
-                }
-                part.glow(durationInTicks, false);
-            }
-            part.glow(durationInTicks, particleHidden);
+            part.glow(durationInTicks);
         }
         return this;
     }
 
     /**
-     * Removes the glow effect from all the parts in this group
+     * Make this group's block and item display entities glow for a player for a set period of time
+     * @param player the player
+     * @param durationInTicks how long the glowing should last
+     * @return this
+     */
+    public SpawnedDisplayEntityGroup glow(@NotNull Player player, long durationInTicks){
+        glowMany(player, durationInTicks, spawnedParts.values());
+        return this;
+    }
+
+    static void glowMany(Player player, long durationInTicks, Collection<SpawnedDisplayEntityPart> parts){
+        for (SpawnedDisplayEntityPart part : parts){
+            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
+                continue;
+            }
+            part.glow(player, durationInTicks);
+        }
+    }
+
+    /**
+     * Make this group's display entities glow, and interactions be outlined, for a player for a set period of time
+     * @param player the player
+     * @param durationInTicks how long the glowing should last. -1 to last forever
+     * @return this
+     */
+    public SpawnedDisplayEntityGroup glowAndOutline(@NotNull Player player, long durationInTicks){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
+            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                part.spawnInteractionOutline(player, durationInTicks);
+            }
+            else {
+                Display display = (Display) part.getEntity();
+                if (display.isGlowing()){
+                    continue;
+                }
+                PacketUtils.setGlowing(player, display.getEntityId(), true);
+                if (durationInTicks > -1){
+                    Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                        if (!display.isGlowing()){
+                            PacketUtils.setGlowing(player, display.getEntityId(), false);
+                        }
+                    }, durationInTicks);
+                }
+                else{
+                    if (!display.isGlowing()){
+                        PacketUtils.setGlowing(player, display.getEntityId(), false);
+                    }
+                }
+
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Removes the glow effect from all the display parts in this group
      * @return this
      */
     @Override
-    public void unglow(){
+    public SpawnedDisplayEntityGroup unglow(){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.unglow();
         }
+        return this;
+    }
+
+    /**
+     * Removes the glow effect from all the display parts in this group, for the specified player
+     * @param player the player
+     * @return this
+     */
+    @Override
+    public SpawnedDisplayEntityGroup unglow(@NotNull Player player){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
+            part.unglow(player);
+        }
+        return this;
     }
 
     /**

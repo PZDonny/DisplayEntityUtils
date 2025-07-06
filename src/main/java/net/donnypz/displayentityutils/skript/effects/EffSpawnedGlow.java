@@ -11,27 +11,30 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.util.Timespan;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.Spawned;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
-import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Glow")
 @Description("Set the glowing of a spawned group/part/selection")
-@Examples({"make {_spawnedgroup} glow for 35 ticks", "make {_partselection} glow with interactions and with marker particles", "set {_spawnedpart} to unglowing"})
+@Examples({"#Before 2.8.0",
+            "make {_spawnedgroup} glow for 35 ticks", "make {_partselection} glow with interactions and with marker particles",
+            "set {_spawnedpart} to unglowing"
+            ,""
+            ,"#2.8.0 and Later"
+            ,"make {_spawnedgroup} glow for 35 ticks"
+            ,"make {_spawnedgroup} glow for 20 ticks for {_players}"
+            ,"set {_part} to unglowing for {_player}"})
 @Since("2.6.2")
 public class EffSpawnedGlow extends Effect {
     static {
-        Skript.registerEffect(EffSpawnedGlow.class,"[deu ](make|set) %spawnedgroups/spawnedparts/partselections% (1¦glow[ing] [t:for %-timespan%] [i:[and ]with interaction[s]] [p:[and ]with [marker] particle[s]]|2¦unglow[ing])");
+        Skript.registerEffect(EffSpawnedGlow.class,"[deu ](make|set) %spawnedgroups/spawnedparts/partselections% (1¦glow[ing] [t:for %-timespan%] [p:for %-players%]|2¦unglow[ing] [p:for %-players%])");
     }
 
     Expression<Object> object;
     Expression<Timespan> timespan;
+    Expression<Player> players;
     boolean glow;
-    boolean withInteractions = false;
-    boolean withParticles = false;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
@@ -41,9 +44,14 @@ public class EffSpawnedGlow extends Effect {
             if (parseResult.hasTag("t")){
                 timespan = (Expression<Timespan>) expressions[1];
             }
-
-            withInteractions = parseResult.hasTag("i");
-            withParticles = parseResult.hasTag("p");
+            if (parseResult.hasTag("p")){
+                players = (Expression<Player>) expressions[2];
+            }
+        }
+        else{
+            if (parseResult.hasTag("p")){
+                players = (Expression<Player>) expressions[1];
+            }
         }
         return true;
     }
@@ -57,36 +65,31 @@ public class EffSpawnedGlow extends Effect {
         }
 
         Spawned[] objects = (Spawned[]) object.getArray(event);
-        if (!glow){
-            for (Spawned s : objects){
-                if (s == null) continue;
-                s.unglow();
-            }
-            return;
-        }
         for (Spawned s : objects){
-            if (s instanceof SpawnedDisplayEntityGroup group){
-                if (ticks == -1){
-                    group.glow(!withInteractions, !withParticles);
+            if (s == null) continue;
+            if (!glow){
+                if (players == null){
+                    s.unglow();
                 }
                 else{
-                    group.glow(ticks, !withInteractions, !withParticles);
+                    for (Player p : players.getArray(event)){
+                        s.unglow(p);
+                    }
                 }
             }
-            else if (s instanceof SpawnedPartSelection sel){
-                if (ticks == -1){
-                    sel.glow(!withInteractions, !withParticles);
+            else{
+                if (players == null){
+                    if (ticks == -1){
+                        s.glow();
+                    }
+                    else{
+                        s.glow(ticks);
+                    }
                 }
                 else{
-                    sel.glow(ticks, !withInteractions, !withParticles);
-                }
-            }
-            else if (s instanceof SpawnedDisplayEntityPart part){
-                if (ticks == -1){
-                    part.glow(!withParticles);
-                }
-                else{
-                    part.glow(ticks, !withParticles);
+                    for (Player player : players.getArray(event)){
+                        s.glow(player, Math.max(-1, ticks));
+                    }
                 }
             }
         }
