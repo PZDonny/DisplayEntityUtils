@@ -18,7 +18,7 @@ public final class PacketLocation {
     }
 
     PacketLocation(Location location, Vector3f vector){
-        this(DisplayUtils.getPivotLocation(Vector.fromJOML(vector), location, location.getYaw()));
+        this(vector == null ? location : DisplayUtils.getPivotLocation(Vector.fromJOML(vector), location, location.getYaw()));
     }
 
     String worldName;
