@@ -174,6 +174,7 @@ public class DEUUser {
         while (iter.hasNext()) {
             Map.Entry<Integer, PacketDisplayEntityPart> entry = iter.next();
             PacketDisplayEntityPart part = entry.getValue();
+            if (part == null) continue;
             if (!worldName.equals(part.getWorldName())){
                 part.untrack(userUUID);
             }
@@ -277,7 +278,10 @@ public class DEUUser {
         Iterator<Map.Entry<Integer, PacketDisplayEntityPart>> iter = trackedPacketEntities.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<Integer, PacketDisplayEntityPart> entry = iter.next();
-            entry.getValue().untrack(userUUID);
+            PacketDisplayEntityPart part = entry.getValue();
+            if (part != null){
+                part.untrack(userUUID);
+            }
             iter.remove();
         }
 
