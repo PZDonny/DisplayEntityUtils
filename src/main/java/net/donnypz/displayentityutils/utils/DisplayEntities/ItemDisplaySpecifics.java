@@ -25,23 +25,23 @@ final class ItemDisplaySpecifics extends DisplayEntitySpecifics implements Seria
     }
 
     ItemStack getItemStack(){
-        if (itemStack == null){
-            return null;
+        if (itemStack != null){
+            //Old Method of serialization (Before Deprecation)
+            try{
+                ByteArrayInputStream byteIn = new ByteArrayInputStream(itemStack);
+                BukkitObjectInputStream bukkitIn = new BukkitObjectInputStream(byteIn);
+                return (ItemStack) bukkitIn.readObject();
+            }
+            //New Method of serialization (ItemStack#serializeAsBytes())
+            catch (IOException e) {
+                return ItemStack.deserializeBytes(itemStack);
+            }
+            catch (ClassNotFoundException e){
+                e.printStackTrace();
+                return null;
+            }
         }
-        //Old Method of serialization (Before Deprecation)
-        try{
-            ByteArrayInputStream byteIn = new ByteArrayInputStream(itemStack);
-            BukkitObjectInputStream bukkitIn = new BukkitObjectInputStream(byteIn);
-            return (ItemStack) bukkitIn.readObject();
-        }
-        //New Method of serialization (ItemStack#serializeAsBytes())
-        catch (IOException e) {
-            return ItemStack.deserializeBytes(itemStack);
-        }
-        catch (ClassNotFoundException e){
-            e.printStackTrace();
-            return null;
-        }
+        return null;
     }
 
     @Override
