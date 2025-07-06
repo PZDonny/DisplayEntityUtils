@@ -123,6 +123,26 @@ public class PacketAttributeContainer implements Cloneable{
         return new PacketDisplayEntityPart(partType, SpigotReflectionUtil.generateEntityId(), this);
     }
 
+    /**
+     * Create a {@link PacketDisplayEntityPart} with data representative of this container
+     * @param partType the type of entity this container represents
+     * @param partTag a part tag to add to the returned part
+     * @return a {@link PacketDisplayEntityPart}
+     */
+    public PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull String partTag){
+        return new PacketDisplayEntityPart(partType, SpigotReflectionUtil.generateEntityId(), this, partTag);
+    }
+
+    /**
+     * Create a {@link PacketDisplayEntityPart} with data representative of this container
+     * @param partType the type of entity this container represents
+     * @param partTags part tags to add to the returned part
+     * @return a {@link PacketDisplayEntityPart}
+     */
+    public PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Set<String> partTags){
+        return new PacketDisplayEntityPart(partType, SpigotReflectionUtil.generateEntityId(), this, partTags);
+    }
+
 
     /**
      * Spawn a packet entity for a given player at a location with the given attributes of this container

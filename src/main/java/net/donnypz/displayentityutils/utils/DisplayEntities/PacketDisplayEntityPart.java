@@ -43,6 +43,16 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         this.attributeContainer = attributeContainer;
     }
 
+    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull String partTag){
+        this(partType, entityId, attributeContainer);
+        this.partTags.add(partTag);
+    }
+
+    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull Set<String> partTags){
+        this(partType, entityId, attributeContainer);
+        this.partTags.addAll(partTags);
+    }
+
 
     public int getEntityId(){
         return entityId;
