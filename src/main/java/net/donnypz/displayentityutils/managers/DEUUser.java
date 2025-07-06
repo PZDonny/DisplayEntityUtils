@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.managers;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
@@ -14,12 +15,12 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DEUUser {
     static final HashMap<UUID, DEUUser> users = new HashMap<>();
+
     private final UUID userUUID;
     private boolean isValid = true;
     private SpawnedDisplayEntityGroup selectedGroup;
@@ -27,17 +28,23 @@ public class DEUUser {
     SpawnedPartSelection selectedPartSelection;
     private AnimationParticleBuilder particleBuilder;
     private final Location[] pointPositions = new Location[3];
+    private final ConcurrentHashMap<Integer, PacketDisplayEntityPart> trackedPacketEntities = new ConcurrentHashMap<>();
 
 
 
-    private DEUUser(Player player){
-        userUUID = player.getUniqueId();
+    private DEUUser(UUID userUUID){
+        this.userUUID = userUUID;
         users.put(userUUID, this);
     }
 
+
+    public static @NotNull DEUUser getOrCreateUser(@NotNull UUID userUUID){
+        DEUUser user = getUser(userUUID);
+        return Objects.requireNonNullElseGet(user, () -> new DEUUser(userUUID));
+    }
+
     public static @NotNull DEUUser getOrCreateUser(@NotNull Player player){
-        DEUUser user = getUser(player);
-        return Objects.requireNonNullElseGet(user, () -> new DEUUser(player));
+        return getOrCreateUser(player.getUniqueId());
     }
 
     public static @Nullable DEUUser getUser(@NotNull Player player){
@@ -130,6 +137,81 @@ public class DEUUser {
         }
     }
 
+    @ApiStatus.Internal
+    public void trackPacketEntity(@NotNull PacketDisplayEntityPart part){
+        trackPacketEntity(part.getEntityId(), part);
+    }
+
+    @ApiStatus.Internal
+    public void trackPacketEntity(int entityId, @Nullable PacketDisplayEntityPart part){
+        trackedPacketEntities.put(entityId, part);
+    }
+
+    @ApiStatus.Internal
+    public void untrackPacketEntity(@NotNull PacketDisplayEntityPart part){
+        untrackPacketEntity(part.getEntityId());
+    }
+
+    @ApiStatus.Internal
+    public void untrackPacketEntity(int entityId){
+        trackedPacketEntities.remove(entityId);
+    }
+
+    @ApiStatus.Internal
+    public void untrackPacketEntities(int @NotNull [] entityIds){
+        for (int i : entityIds){
+            trackedPacketEntities.remove(i);
+        }
+    }
+
+    @ApiStatus.Internal
+    public void refreshTrackedPacketEntities(@NotNull Player player){
+        if (trackedPacketEntities.isEmpty()) return;
+
+        String worldName = player.getWorld().getName();
+
+        Iterator<Map.Entry<Integer, PacketDisplayEntityPart>> iter = trackedPacketEntities.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<Integer, PacketDisplayEntityPart> entry = iter.next();
+            PacketDisplayEntityPart part = entry.getValue();
+            if (!worldName.equals(part.getWorldName())){
+                part.untrack(userUUID);
+            }
+            iter.remove();
+        }
+    }
+
+    /**
+     * Check if this user is tracking a {@link PacketDisplayEntityPart}
+     * @param part the {@link PacketDisplayEntityPart}
+     * @return a boolean
+     */
+    public boolean isTrackingPacketEntity(@NotNull PacketDisplayEntityPart part){
+        return isTrackingPacketEntity(part.getEntityId());
+    }
+
+    /**
+     * Check if this user is tracking a packet-based entity
+     * @param entityId the entity's entity id
+     * @return a boolean
+     */
+    public boolean isTrackingPacketEntity(int entityId){
+        return trackedPacketEntities.containsKey(entityId);
+    }
+
+    /**
+     * Get a {@link PacketDisplayEntityPart} a player is tracking by its entity id
+     * @param entityId the part's entity id
+     * @return a {@link PacketDisplayEntityPart} if present
+     */
+    public @Nullable PacketDisplayEntityPart getPacketDisplayEntityPart(int entityId){
+        return trackedPacketEntities.get(entityId);
+    }
+
+    public int getTrackedPacketEntityCount(){
+        return trackedPacketEntities.size();
+    }
+
     public @Nullable SpawnedDisplayEntityGroup getSelectedGroup(){
         return selectedGroup;
     }
@@ -191,6 +273,13 @@ public class DEUUser {
         selectedGroup = null;
         if (selectedPartSelection != null) selectedPartSelection.remove();
         if (particleBuilder != null) particleBuilder.remove();
+
+        Iterator<Map.Entry<Integer, PacketDisplayEntityPart>> iter = trackedPacketEntities.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<Integer, PacketDisplayEntityPart> entry = iter.next();
+            entry.getValue().untrack(userUUID);
+            iter.remove();
+        }
 
         Player player = Bukkit.getPlayer(userUUID);
         if (player != null){

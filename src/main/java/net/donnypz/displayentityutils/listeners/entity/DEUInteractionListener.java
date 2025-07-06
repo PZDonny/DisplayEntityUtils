@@ -1,10 +1,18 @@
 package net.donnypz.displayentityutils.listeners.entity;
 
+import com.github.retrooper.packetevents.event.PacketListener;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.events.InteractionClickEvent;
+import net.donnypz.displayentityutils.events.PacketInteractionClickEvent;
 import net.donnypz.displayentityutils.events.PreInteractionClickEvent;
+import net.donnypz.displayentityutils.managers.DEUUser;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
@@ -25,7 +33,56 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 
 import java.util.List;
 
-public class DEUInteractionListener implements Listener {
+public class DEUInteractionListener implements Listener, PacketListener {
+
+    //PacketEvents
+    @Override
+    public void onPacketReceive(PacketReceiveEvent event) {
+        User user = event.getUser();
+        if (event.getPacketType() != PacketType.Play.Client.INTERACT_ENTITY)
+            return;
+
+        WrapperPlayClientInteractEntity interact = new WrapperPlayClientInteractEntity(event);
+        if (interact.getAction() == WrapperPlayClientInteractEntity.InteractAction.INTERACT){
+            return;
+        }
+        InteractionClickEvent.ClickType clickType =
+                    interact.getAction() == WrapperPlayClientInteractEntity.InteractAction.ATTACK
+                        ?
+                            InteractionClickEvent.ClickType.LEFT :
+                            InteractionClickEvent.ClickType.RIGHT;
+
+        int entityId = interact.getEntityId();
+        Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
+            PacketDisplayEntityPart part = DEUUser
+                    .getOrCreateUser(user.getUUID())
+                    .getPacketDisplayEntityPart(entityId);
+            if (part == null) return;
+            Player player = Bukkit.getPlayer(user.getUUID());
+            if (!new PacketInteractionClickEvent(player, part, clickType).callEvent()){
+                return;
+            }
+
+
+            //Execute Commands
+            if (clickType == InteractionClickEvent.ClickType.LEFT){
+                for (String cmd : part.getLeftConsoleInteractionCommands()){
+                    runConsoleCommand(cmd);
+                }
+                for (String cmd : part.getLeftPlayerInteractionCommands()){
+                    runPlayerCommand(cmd, player);
+                }
+            }
+            else{
+                for (String cmd : part.getRightConsoleInteractionCommands()){
+                    runConsoleCommand(cmd);
+                }
+                for (String cmd : part.getRightPlayerInteractionCommands()){
+                    runPlayerCommand(cmd, player);
+                }
+            }
+        });
+    }
 
     //Right Click
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -120,5 +177,13 @@ public class DEUInteractionListener implements Listener {
         else{
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.getCommand());
         }
+    }
+
+    private void runPlayerCommand(String command, Player player){
+        player.performCommand(command);
+    }
+
+    private void runConsoleCommand(String command){
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
     }
 }

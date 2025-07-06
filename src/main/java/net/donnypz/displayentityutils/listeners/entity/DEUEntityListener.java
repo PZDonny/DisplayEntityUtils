@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.listeners.entity;
 import com.destroystokyo.paper.event.entity.EntityJumpEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
@@ -18,11 +19,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 @ApiStatus.Internal
 public final class DEUEntityListener implements Listener {
 
+    //============Mythic====================
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntitySpawn(EntitySpawnEvent e){
         applyState(e.getEntity(), MachineState.StateType.SPAWN);
@@ -107,8 +111,6 @@ public final class DEUEntityListener implements Listener {
         }
     }
 
-
-
     private DisplayStateMachine applyState(Entity entity, MachineState.StateType stateType){
         SpawnedDisplayEntityGroup group = DisplayControllerManager.getControllerGroup(entity);
         if (group == null){
@@ -120,5 +122,13 @@ public final class DEUEntityListener implements Listener {
         }
         stateMachine.setStateIfPresent(stateType, group);
         return stateMachine;
+    }
+
+
+    //===========Packet Entities=================
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerTeleport(@NotNull PlayerChangedWorldEvent e){
+        DEUUser user = DEUUser.getOrCreateUser(e.getPlayer());
+        user.refreshTrackedPacketEntities(e.getPlayer());
     }
 }

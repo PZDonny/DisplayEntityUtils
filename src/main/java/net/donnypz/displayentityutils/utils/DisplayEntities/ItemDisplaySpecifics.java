@@ -1,5 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
@@ -40,5 +42,11 @@ final class ItemDisplaySpecifics extends DisplayEntitySpecifics implements Seria
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    protected void applyToAttributeContainer(PacketAttributeContainer attributeContainer) {
+        attributeContainer.setAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK, getItemStack())
+                .setAttribute(DisplayAttributes.ItemDisplay.ITEM_DISPLAY_TRANSFORM, itemDisplayTransform);
     }
 }

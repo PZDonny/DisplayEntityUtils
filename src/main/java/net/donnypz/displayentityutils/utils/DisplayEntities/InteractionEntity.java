@@ -3,15 +3,20 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Interaction;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 import org.joml.Vector3f;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.UUID;
+import java.util.*;
 
 final class InteractionEntity implements Serializable {
     @Serial
@@ -64,6 +69,41 @@ final class InteractionEntity implements Serializable {
 
             settings.apply(spawn);
         });
+    }
+
+    PacketDisplayEntityPart createPacketPart(){
+        PacketAttributeContainer attributeContainer = new PacketAttributeContainer()
+                .setAttribute(DisplayAttributes.Interaction.WIDTH, width)
+                .setAttribute(DisplayAttributes.Interaction.HEIGHT, height)
+                .setAttribute(DisplayAttributes.Interaction.RESPONSIVE, isResponsive)
+                .setAttribute(DisplayAttributes.Transform.TRANSLATION, new Vector3f(vector));
+
+        PacketDisplayEntityPart part = attributeContainer.createPart(SpawnedDisplayEntityPart.PartType.INTERACTION);
+        if (persistentDataContainer != null){
+            ItemStack i = new ItemStack(Material.STICK);
+            PersistentDataContainer pdc = i.getItemMeta().getPersistentDataContainer();
+
+            try {
+                pdc.readFromBytes(persistentDataContainer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            part.partTags = DisplayEntity.getSetFromPDC(pdc, DisplayEntityPlugin.getPartPDCTagKey());
+            part.partUUID = DisplayEntity.getPDCPartUUID(pdc);
+            part.interactionCommands = getInteractionCommands(pdc);
+        }
+
+        return part;
+    }
+
+    private HashMap<NamespacedKey, List<String>> getInteractionCommands(PersistentDataContainer pdc){
+        HashMap<NamespacedKey, List<String>> commands = new HashMap<>();
+        commands.put(DisplayUtils.leftClickConsole, DisplayEntity.getListFromPDC(pdc, DisplayUtils.leftClickConsole));
+        commands.put(DisplayUtils.leftClickPlayer, DisplayEntity.getListFromPDC(pdc, DisplayUtils.leftClickPlayer));
+        commands.put(DisplayUtils.rightClickConsole, DisplayEntity.getListFromPDC(pdc, DisplayUtils.rightClickConsole));
+        commands.put(DisplayUtils.rightClickPlayer, DisplayEntity.getListFromPDC(pdc, DisplayUtils.rightClickPlayer));
+        return commands;
     }
 
      Vector getVector(){

@@ -1,5 +1,8 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.donnypz.displayentityutils.utils.packet.attributes.TextDisplayOptions;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -76,5 +79,14 @@ final class TextDisplaySpecifics extends DisplayEntitySpecifics implements Seria
 
     TextDisplay.TextAlignment getAlignment() {
         return alignment;
+    }
+
+    @Override
+    protected void applyToAttributeContainer(PacketAttributeContainer attributeContainer) {
+        attributeContainer.setAttribute(DisplayAttributes.TextDisplay.TEXT, getText())
+                .setAttribute(DisplayAttributes.TextDisplay.LINE_WIDTH, lineWidth)
+                .setAttribute(DisplayAttributes.TextDisplay.BACKGROUND_COLOR, Color.fromARGB(backgroundColorARGB))
+                .setAttribute(DisplayAttributes.TextDisplay.TEXT_OPACITY_PERCENTAGE, textOpacity)
+                .setAttribute(DisplayAttributes.TextDisplay.EXTRA_TEXT_OPTIONS, new TextDisplayOptions(shadowed, seeThrough, defaultBackground, alignment));
     }
 }

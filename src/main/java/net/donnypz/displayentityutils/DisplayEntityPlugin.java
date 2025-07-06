@@ -3,6 +3,9 @@ package net.donnypz.displayentityutils;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
 import ch.njol.skript.util.Version;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginTabCompleter;
 import net.donnypz.displayentityutils.listeners.autoGroup.DEULoadingListeners;
 import net.donnypz.displayentityutils.listeners.bdengine.DatapackEntitySpawned;
@@ -87,6 +90,15 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     SkriptAddon addon;
 
+
+    @Override
+    public void onLoad() {
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+        PacketEvents.getAPI().load();
+        PacketEvents.getAPI().getEventManager().registerListener(
+                new DEUInteractionListener(), PacketListenerPriority.NORMAL);
+    }
+
     @Override
     public void onEnable() {
         instance = this;
@@ -97,7 +109,15 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         registerListeners();
         initializeNamespacedKeys();
         initializeBStats();
+        PacketEvents.getAPI().init();
         getServer().getConsoleSender().sendMessage(pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
+    }
+
+    @Override
+    public void onDisable() {
+        MYSQLManager.closeConnection();
+        MongoManager.closeConnection();
+        PacketEvents.getAPI().terminate();
     }
 
 
@@ -150,12 +170,6 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     private void initializeBStats(){
         int pluginID = 24875;
         new Metrics(this, pluginID);
-    }
-
-    @Override
-    public void onDisable() {
-        MYSQLManager.closeConnection();
-        MongoManager.closeConnection();
     }
 
     private void createLocalSaveFolders(){

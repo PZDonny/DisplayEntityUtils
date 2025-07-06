@@ -1,5 +1,8 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.BlockDisplay;
 
 import java.io.Serial;
@@ -18,5 +21,10 @@ final class BlockDisplaySpecifics extends DisplayEntitySpecifics implements Seri
 
     String getBlockData() {
         return blockData;
+    }
+
+    @Override
+    protected void applyToAttributeContainer(PacketAttributeContainer attributeContainer) {
+        attributeContainer.setAttribute(DisplayAttributes.BlockDisplay.BLOCK_STATE, Bukkit.createBlockData(blockData));
     }
 }
