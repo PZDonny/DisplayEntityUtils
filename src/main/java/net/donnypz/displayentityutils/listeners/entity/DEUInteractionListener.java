@@ -59,10 +59,41 @@ public class DEUInteractionListener implements Listener, PacketListener {
                     .getPacketDisplayEntityPart(entityId);
             if (part == null) return;
             Player player = Bukkit.getPlayer(user.getUUID());
-            if (!new PacketInteractionClickEvent(player, part, clickType).callEvent()){
+
+            //Point Displays
+
+            if (RelativePointDisplay.isRelativePointPart(part)){
+                RelativePointDisplay pointDisplay = RelativePointDisplay.get(part);
+                if (pointDisplay == null){
+                    player.sendMessage(Component.text("Failed to get point!", NamedTextColor.RED));
+                    return;
+                }
+
+                //Left Click Action
+                if (clickType == InteractionClickEvent.ClickType.LEFT){
+                    pointDisplay.leftClick(player);
+                    DEUCommandUtils.selectRelativePoint(player, pointDisplay);
+                    return;
+                }
+
+                //Right Click Action
+                if (!player.isSneaking()){
+                    pointDisplay.rightClick(player);
+                    return;
+                }
+
+                //Right Click Action (Remove Point)
+                if (DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_REMOVE_FRAME_POINT)){
+                    player.sendMessage(buildPointRemovalComponent(pointDisplay));
+                    player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+                }
                 return;
             }
 
+
+            if (!new PacketInteractionClickEvent(player, part, clickType).callEvent()){
+                return;
+            }
 
             //Execute Commands
             if (clickType == InteractionClickEvent.ClickType.LEFT){
@@ -88,7 +119,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void rClick(PlayerInteractEntityEvent e){
         if (e.getRightClicked() instanceof Interaction entity){
-            determineAction(entity, e.getPlayer(), InteractionClickEvent.ClickType.RIGHT);
+            determineBukkitAction(entity, e.getPlayer(), InteractionClickEvent.ClickType.RIGHT);
         }
     }
 
@@ -96,41 +127,11 @@ public class DEUInteractionListener implements Listener, PacketListener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void lClick(EntityDamageByEntityEvent e){
         if (e.getEntity() instanceof Interaction entity){
-            determineAction(entity, (Player) e.getDamager(), InteractionClickEvent.ClickType.LEFT);
+            determineBukkitAction(entity, (Player) e.getDamager(), InteractionClickEvent.ClickType.LEFT);
         }
     }
 
-    private void determineAction(Interaction interaction, Player player, InteractionClickEvent.ClickType clickType){
-        //Point Displays
-        if (RelativePointDisplay.isRelativePointEntity(interaction)){
-            RelativePointDisplay point = RelativePointDisplay.get(interaction.getUniqueId());
-            if (point == null){
-                player.sendMessage(Component.text("Failed to get point!", NamedTextColor.RED));
-                return;
-            }
-
-            //Left Click Action
-            if (clickType == InteractionClickEvent.ClickType.LEFT){
-                point.leftClick(player);
-                DEUCommandUtils.selectRelativePoint(player, point);
-                return;
-            }
-
-            //Right Click Action
-            if (!player.isSneaking()){
-                point.rightClick(player);
-                return;
-            }
-
-            //Right Click Action (Remove Point)
-            if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_REMOVE_FRAME_POINT)){
-                return;
-            }
-
-            player.sendMessage(buildPointRemovalComponent(point));
-            player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
-        }
-
+    private void determineBukkitAction(Interaction interaction, Player player, InteractionClickEvent.ClickType clickType){
         if (!new PreInteractionClickEvent(player, interaction, clickType).callEvent()){
             return;
         }
@@ -153,6 +154,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
             }
         }
     }
+
 
     private Component buildPointRemovalComponent(RelativePointDisplay point){
         return Component.text("Click here to confirm point REMOVAL", NamedTextColor.DARK_RED, TextDecoration.UNDERLINED)

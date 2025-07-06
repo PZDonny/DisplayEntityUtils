@@ -1,20 +1,22 @@
 package net.donnypz.displayentityutils.utils.command;
 
-import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.RelativePoint;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
-import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -23,91 +25,75 @@ import java.util.UUID;
 public abstract class RelativePointDisplay {
 
     private static final float scale  = 0.25f;
-    private static final String pointDisplayTag = "deu_point_display";
-    private static final HashMap<UUID, RelativePointDisplay> interactions = new HashMap<>();
+    private static final String pointDisplayTag = "deu_point_display_internal";
+    private static final HashMap<PacketDisplayEntityPart, RelativePointDisplay> interactionParts = new HashMap<>();
 
-    private UUID interaction;
-    private UUID display;
+    private UUID playerUUID;
+    private PacketDisplayEntityPart interactionPart;
+    private PacketDisplayEntityPart displayPart;
 
     RelativePoint relativePoint;
-
     Location spawnLocation;
 
     protected boolean isValid = true;
 
 
-    RelativePointDisplay(Location spawnLocation, RelativePoint relativePoint, Material itemType){
+    RelativePointDisplay(Player player, Location spawnLocation, RelativePoint relativePoint, Material itemType){
+        this.playerUUID = player.getUniqueId();
         ItemStack stack = new ItemStack(itemType);
-        ItemDisplay d = spawnLocation.getWorld().spawn(spawnLocation, ItemDisplay.class, id -> {
-            id.setItemStack(stack);
-            id.setVisibleByDefault(false);
-            id.setTransformation(new Transformation(new Vector3f(0, scale/2, 0), new AxisAngle4f(), new Vector3f(scale, scale, scale), new AxisAngle4f()));
-            id.setPersistent(false);
-            id.setGlowColorOverride(Color.BLACK);
-            id.setBrightness(new Display.Brightness(15, 15));
-            id.setGlowing(true);
-        });
+        displayPart = new PacketAttributeContainer()
+                .setAttribute(DisplayAttributes.Transform.TRANSLATION, new Vector3f(0, scale/2, 0))
+                .setAttribute(DisplayAttributes.Transform.SCALE, new Vector3f(scale, scale, scale))
+                .setAttribute(DisplayAttributes.GLOW_COLOR_OVERRIDE, Color.BLACK)
+                .setAttribute(DisplayAttributes.GLOWING, true)
+                .setAttribute(DisplayAttributes.BRIGHTNESS, new Display.Brightness(15,15))
+                .setAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK, stack)
+                .createPart(SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY, pointDisplayTag);
+        displayPart.setLocation(spawnLocation);
+        displayPart.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
 
+        interactionPart = new PacketAttributeContainer()
+                .setAttribute(DisplayAttributes.Interaction.WIDTH, scale)
+                .setAttribute(DisplayAttributes.Interaction.HEIGHT, scale)
+                .createPart(SpawnedDisplayEntityPart.PartType.INTERACTION, pointDisplayTag);
+        interactionPart.setLocation(spawnLocation);
+        interactionPart.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
 
-
-        Interaction i = spawnLocation.getWorld().spawn(spawnLocation, Interaction.class, e -> {
-           e.setVisibleByDefault(false);
-           e.setInteractionHeight(scale);
-           e.setInteractionWidth(scale);
-           e.setPersistent(false);
-        });
-
-        display = d.getUniqueId();
-        interaction = i.getUniqueId();
-
-        interactions.put(i.getUniqueId(), this);
-
-        DisplayUtils.addTag(d, pointDisplayTag);
-        DisplayUtils.addTag(i, pointDisplayTag);
+        interactionParts.put(interactionPart, this);
 
         this.spawnLocation = spawnLocation;
         this.relativePoint = relativePoint;
     }
 
-    void reveal(Player player){
-        if (!isValid) return;
-        player.showEntity(DisplayEntityPlugin.getInstance(), Bukkit.getEntity(display));
-        player.showEntity(DisplayEntityPlugin.getInstance(), Bukkit.getEntity(interaction));
-    }
 
     public void select(){
         if (!isValid) return;
-        Display d = (Display) Bukkit.getEntity(display);
-        d.setGlowColorOverride(Color.YELLOW);
+        displayPart.setGlowColor(Color.YELLOW);
     }
 
     public void deselect(){
         if (!isValid) return;
-        Display d = (Display) Bukkit.getEntity(display);
-        d.setGlowColorOverride(Color.BLACK);
+        displayPart.setGlowColor(Color.BLACK);
     }
 
     public void setLocation(@NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
         if (!isValid){
             return;
         }
-        Entity i = Bukkit.getEntity(interaction);
-        Entity d = Bukkit.getEntity(display);
-        i.teleport(location);
-        d.teleport(location);
+        displayPart.setLocation(location);
+        interactionPart.setLocation(location);
         spawnLocation = location;
         relativePoint.setLocation(group, location);
     }
 
-
     public abstract boolean removeFromPointHolder();
 
-    public static RelativePointDisplay get(UUID uuid){
-        return interactions.get(uuid);
+    public static @Nullable RelativePointDisplay get(@NotNull PacketDisplayEntityPart part){
+        return interactionParts.get(part);
     }
 
-    public static boolean isRelativePointEntity(Entity entity){
-        return DisplayUtils.hasPartTag(entity, pointDisplayTag);
+    public static boolean isRelativePointPart(@NotNull PacketDisplayEntityPart part){
+        return part.getTags().contains(pointDisplayTag);
     }
 
     public RelativePoint getRelativePoint() {
@@ -123,17 +109,13 @@ public abstract class RelativePointDisplay {
             return;
         }
         spawnLocation = null;
-        interactions.remove(interaction);
+        interactionParts.remove(interactionPart);
         relativePoint = null;
-        despawnEntity(display);
-        despawnEntity(interaction);
-        display = null;
-        interaction = null;
+        Player player = Bukkit.getPlayer(playerUUID);
+        if (player != null){
+            displayPart.hideFromPlayer(player);
+            interactionPart.hideFromPlayer(player);
+        }
         isValid = false;
-    }
-
-    private void despawnEntity(UUID uuid){
-        Entity entity = Bukkit.getEntity(uuid);
-        if (entity != null) entity.remove();
     }
 }

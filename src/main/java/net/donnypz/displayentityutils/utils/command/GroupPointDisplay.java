@@ -12,8 +12,8 @@ import org.jetbrains.annotations.ApiStatus;
 public class GroupPointDisplay extends RelativePointDisplay{
     SpawnedDisplayEntityGroup group;
 
-    GroupPointDisplay(Location spawnLocation, RelativePoint relativePoint, SpawnedDisplayEntityGroup group){
-        super(spawnLocation, relativePoint, Material.ORANGE_CONCRETE);
+    GroupPointDisplay(Player player, Location spawnLocation, RelativePoint relativePoint, SpawnedDisplayEntityGroup group){
+        super(player, spawnLocation, relativePoint, Material.ORANGE_CONCRETE);
         this.group = group;
     }
 

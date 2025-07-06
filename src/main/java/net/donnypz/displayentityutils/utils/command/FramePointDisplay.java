@@ -12,8 +12,8 @@ import org.jetbrains.annotations.ApiStatus;
 public class FramePointDisplay extends RelativePointDisplay{
     SpawnedDisplayAnimationFrame frame;
 
-    FramePointDisplay(Location spawnLocation, FramePoint framePoint, SpawnedDisplayAnimationFrame frame){
-        super(spawnLocation, framePoint, Material.LIGHT_BLUE_CONCRETE);
+    FramePointDisplay(Player player, Location spawnLocation, FramePoint framePoint, SpawnedDisplayAnimationFrame frame){
+        super(player, spawnLocation, framePoint, Material.LIGHT_BLUE_CONCRETE);
         this.frame = frame;
     }
 

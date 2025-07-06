@@ -40,9 +40,8 @@ public class DEUCommandUtils {
         for (FramePoint point : points){
             Location spawnLoc = point.getLocation(group);
             spawnLoc.setPitch(0);
-            FramePointDisplay pd = new FramePointDisplay(spawnLoc, point, frame);
+            FramePointDisplay pd = new FramePointDisplay(player, spawnLoc, point, frame);
             displays.add(pd);
-            pd.reveal(player);
         }
 
         relativePointDisplays.put(player.getUniqueId(), displays);
