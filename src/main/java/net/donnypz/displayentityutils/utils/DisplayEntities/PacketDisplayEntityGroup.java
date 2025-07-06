@@ -42,6 +42,16 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
 
 
     @Override
+    public PacketDisplayEntityPart getMasterPart(){
+        return masterPart;
+    }
+
+    @Override
+    public void playSpawnAnimation() {
+
+    }
+
+    @Override
     public PacketDisplayEntityPart getSpawnedPart(@NotNull UUID partUUID) {
         return packetParts.get(partUUID);
     }

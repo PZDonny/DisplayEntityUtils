@@ -4,9 +4,9 @@ import net.donnypz.displayentityutils.events.NullAnimationLoaderEvent;
 import net.donnypz.displayentityutils.events.NullGroupLoaderEvent;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -216,7 +216,7 @@ public class MachineState {
      * @param newState the state to be transitioned to
      * @return a boolean
      */
-    public boolean canTransitionFrom(SpawnedDisplayEntityGroup group, MachineState newState){
+    public boolean canTransitionFrom(ActiveGroup group, MachineState newState){
         if (newState.ignoreOtherLocks){
             return true;
         }

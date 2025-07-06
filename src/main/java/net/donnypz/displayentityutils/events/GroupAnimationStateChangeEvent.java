@@ -1,6 +1,8 @@
 package net.donnypz.displayentityutils.events;
 
 import jdk.jfr.Experimental;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
@@ -19,12 +21,12 @@ import org.jetbrains.annotations.Nullable;
 public class GroupAnimationStateChangeEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private boolean isCancelled = false;
-    private final SpawnedDisplayEntityGroup group;
+    private final ActiveGroup group;
     private final DisplayStateMachine stateMachine;
     private final MachineState newState;
     private final MachineState oldState;
     
-    public GroupAnimationStateChangeEvent(@NotNull SpawnedDisplayEntityGroup group, @NotNull DisplayStateMachine stateMachine, @Nullable MachineState newState, @Nullable MachineState oldState){
+    public GroupAnimationStateChangeEvent(@NotNull ActiveGroup group, @NotNull DisplayStateMachine stateMachine, @Nullable MachineState newState, @Nullable MachineState oldState){
         this.group = group;
         this.stateMachine = stateMachine;
         this.newState = newState;
@@ -32,11 +34,19 @@ public class GroupAnimationStateChangeEvent extends Event implements Cancellable
     }
 
     /**
-     * Get the {@link SpawnedDisplayEntityGroup} involved in this event
+     * Get the {@link ActiveGroup} involved in this event
      * @return a group
      */
-    public SpawnedDisplayEntityGroup getGroup() {
+    public ActiveGroup getGroup() {
         return group;
+    }
+
+    /**
+     * Get whether this group is packet-based or not
+     * @return a boolean
+     */
+    public boolean isPacketGroup(){
+        return group instanceof PacketDisplayEntityGroup;
     }
 
     /**

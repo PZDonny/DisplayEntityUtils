@@ -25,7 +25,7 @@ final class DisplayAnimatorExecutor {
 
     DisplayAnimatorExecutor(@NotNull DisplayAnimator animator,
                             @NotNull SpawnedDisplayAnimation animation,
-                            @NotNull SpawnedDisplayEntityGroup group,
+                            @NotNull ActiveGroup group,
                             @NotNull SpawnedDisplayAnimationFrame frame,
                             int delay,
                             boolean isAsync,
@@ -34,7 +34,7 @@ final class DisplayAnimatorExecutor {
         this.animator = animator;
         this.isAsync = isAsync;
         this.playSingleFrame = playSingleFrame;
-        prepareAnimation(animation, group, frame, delay);
+        prepareAnimation(animation, (SpawnedDisplayEntityGroup) group, frame, delay);
     }
 
 
@@ -45,7 +45,7 @@ final class DisplayAnimatorExecutor {
      * @param frame the frame to display
      * @param isAsync whether this should be done asynchronously
      */
-    public static void setGroupToFrame(@NotNull SpawnedDisplayEntityGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, boolean isAsync){
+    public static void setGroupToFrame(@NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, boolean isAsync){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
         new DisplayAnimatorExecutor(animator, animation, group, frame,0, isAsync, true);
     }
@@ -59,7 +59,7 @@ final class DisplayAnimatorExecutor {
      * @param delay how long until the frame should start playing
      * @param isAsync whether this should be done asynchronously
      */
-    public static void setGroupToFrame(@NotNull SpawnedDisplayEntityGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay, boolean isAsync){
+    public static void setGroupToFrame(@NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay, boolean isAsync){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
         SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
         clonedFrame.duration = duration;

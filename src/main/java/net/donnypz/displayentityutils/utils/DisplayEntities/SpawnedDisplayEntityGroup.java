@@ -35,15 +35,12 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
 
     SpawnedDisplayEntityPart masterPart;
     long creationTime = System.currentTimeMillis();
-    int lastAnimatedTick = -1;
 
     boolean isVisibleByDefault;
     private float scaleMultiplier = 1;
     private boolean isPersistent = DisplayEntityPlugin.defaultPersistence();
     private boolean persistenceOverride = DisplayEntityPlugin.persistenceOverride();
-    private MachineState currentMachineState;
     private float verticalOffset = 0;
-    private final HashSet<DisplayAnimator> activeAnimators = new HashSet<>();
 
     public static final NamespacedKey creationTimeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "creationtime");
     static final NamespacedKey scaleKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "scale");
@@ -136,103 +133,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
 
-
-    /**
-     * Get this group's current animation state, respective of its {@link DisplayStateMachine}
-     * @return a {@link MachineState} or null
-     */
-    public @Nullable MachineState getMachineState(){
-        return currentMachineState;
-    }
-
-    /**
-     * Get the {@link DisplayStateMachine} this group is associated with
-     * @return a {@link DisplayStateMachine} or null
-     */
-    public @Nullable DisplayStateMachine getDisplayStateMachine(){
-        return DisplayStateMachine.getStateMachine(this);
-    }
-
-    /**
-     * Set the animation state of a group in its {@link DisplayStateMachine}
-     * @param state
-     * @param stateMachine
-     * @return false if:
-     * <p>- This group's state machine is locked by a MythicMobs skill</p>
-     * <p>- Group is not contained in the state machine</p>
-     * <p>- The state is part of a different state machine</p>
-     * <p>- GroupAnimationStateChangeEvent is cancelled</p>
-     * <p>- The current state has a transition lock and the new state cannot ignore it</p>
-     */
-    public boolean setMachineState(@NotNull MachineState state, @NotNull DisplayStateMachine stateMachine){
-        if (currentMachineState == state){
-            return false;
-        }
-
-        if (!stateMachine.contains(this) || state.getStateMachine() != stateMachine){
-            return false;
-        }
-
-        if (currentMachineState != null && !currentMachineState.canTransitionFrom(this, state)){
-            return false;
-        }
-
-        if (!new GroupAnimationStateChangeEvent(this, stateMachine, state, currentMachineState).callEvent()){
-            return false;
-        }
-
-
-
-        if (currentMachineState != null){
-            DisplayAnimator animator = currentMachineState.getDisplayAnimator();
-            if (animator != null){
-                animator.stop(this);
-            }
-        }
-        currentMachineState = state;
-
-        DisplayAnimator animator = state.getDisplayAnimator();
-
-        if (animator != null){
-            animator.play(this);
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    /**
-     * Unset this group's {@link DisplayStateMachine}'s animation state
-     */
-    public void unsetMachineState(){
-        DisplayStateMachine machine = getDisplayStateMachine();
-        if (machine == null || currentMachineState == null){
-            return;
-        }
-
-        DisplayAnimator animator = currentMachineState.getDisplayAnimator();
-        if (animator != null){
-            animator.stop(this);
-        }
-        currentMachineState = null;
-    }
-
-    /**
-     * Unset this group's state machine state if the provided state is the group's current state
-     * @param state
-     * @return true if the state was unset
-     */
-    public boolean unsetIfCurrentMachineState(MachineState state){
-        if (currentMachineState == null){
-            return false;
-        }
-        if (currentMachineState == state){
-            unsetMachineState();
-            return true;
-        }
-        return false;
-    }
 
 
     /**
@@ -1630,13 +1530,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         }
     }
 
-
-    /**
-     * Start playing this group's looping spawn animation. This will do nothing if the spawn animation was never set with {@link #setSpawnAnimationTag(String, DisplayAnimator.AnimationType, LoadMethod)}
-     * or through plugin commands.
-     */
-    public void playSpawnAnimation(){
-        PersistentDataContainer c = masterPart.getEntity().getPersistentDataContainer();
+    @Override
+    public void playSpawnAnimation() {
+        PersistentDataContainer c = getMasterPart().getEntity().getPersistentDataContainer();
         String spawnAnimationTag = c.get(spawnAnimationKey, PersistentDataType.STRING);
         if (spawnAnimationTag == null){
             return;
@@ -1649,51 +1545,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
                 return;
             }
             switch(type){
-                case LINEAR -> animate(anim);
-                case LOOP -> animateLooping(anim);
+                case LINEAR -> this.animate(anim);
+                case LOOP -> this.animateLooping(anim);
                 //case PING_PONG -> animatePingPong(anim);
             }
-        }
-    }
-
-    /**
-     * Make a group perform an animation
-     * @param animation the animation this group should play
-     * @return the {@link DisplayAnimator} that will control the playing of the given animation
-     */
-    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation){
-        return DisplayAnimator.play(this, animation);
-    }
-
-    /**
-     * Make a group perform a looping animation.
-     * @param animation the animation this group should play
-     * @return the {@link DisplayAnimator} that will control the playing of the given animation
-     */
-    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation){
-        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
-        animator.play(this);
-        return animator;
-    }
-
-    /**
-     * Manually stop an animation from playing on this group
-     * @param displayAnimator the display animator controlling an animation
-     * @return this
-     */
-    public @NotNull SpawnedDisplayEntityGroup stopAnimation(@NotNull DisplayAnimator displayAnimator){
-        removeActiveAnimator(displayAnimator);
-        return this;
-    }
-
-    /**
-     * Manually stop all animations playing on this group
-     * @param removeFromStateMachine removes this animation from its state machine if true
-     */
-    public void stopAnimations(boolean removeFromStateMachine){
-        activeAnimators.clear();
-        if (removeFromStateMachine){
-            DisplayStateMachine.unregisterFromStateMachine(this);
         }
     }
 
@@ -1728,48 +1583,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         DisplayAnimatorExecutor.setGroupToFrame(this, animation, frame, duration, delay, isAsync);
         return true;
     }
-
-    SpawnedDisplayEntityGroup addActiveAnimator(DisplayAnimator animator){
-        activeAnimators.add(animator);
-        return this;
-    }
-
-    SpawnedDisplayEntityGroup removeActiveAnimator(DisplayAnimator animator){
-        activeAnimators.remove(animator);
-        return this;
-    }
-
-    /**
-     * Check if an animator is animating on this group
-     * @param animator
-     * @return a boolean
-     */
-    public boolean isActiveAnimator(@NotNull DisplayAnimator animator){
-        return activeAnimators.contains(animator);
-    }
-
-    /**
-     * Check if this group's is being animated by any {@link DisplayAnimator}s
-     * @return a boolean
-     */
-    public boolean isAnimating(){
-        //return lastAnimationTimeStamp != -1;
-        return !activeAnimators.isEmpty();
-    }
-
-    void setLastAnimatedTick(){
-        lastAnimatedTick = Bukkit.getCurrentTick();
-    }
-
-
-    /**
-     * Check if this group has completed its animation frame in the game's current tick
-     * @return a boolean
-     */
-    public boolean hasAnimated(){
-        return lastAnimatedTick == Bukkit.getCurrentTick();
-    }
-
 
 
     /**

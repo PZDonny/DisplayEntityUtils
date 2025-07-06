@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities.machine;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupAnimationStateChangeEvent;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -16,11 +17,11 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class DisplayStateMachine {
-    private static final Map<SpawnedDisplayEntityGroup, DisplayStateMachine> groupMachines = new HashMap<>();
+    private static final Map<ActiveGroup, DisplayStateMachine> groupMachines = new HashMap<>();
 
     private final Map<String, MachineState> states = new HashMap<>();
 
-    private Consumer<SpawnedDisplayEntityGroup> customStateTask = null;
+    private Consumer<ActiveGroup> customStateTask = null;
     private boolean overrideDefaultTask = false;
     String id;
 
@@ -44,7 +45,7 @@ public class DisplayStateMachine {
      * @param group the group to check
      * @return a {@link DisplayStateMachine} or null
      */
-    public static DisplayStateMachine getStateMachine(SpawnedDisplayEntityGroup group){
+    public static DisplayStateMachine getStateMachine(ActiveGroup group){
         return groupMachines.get(group);
     }
 
@@ -132,12 +133,12 @@ public class DisplayStateMachine {
      * Remove a group from this state machine
      * @param group the group to remove
      */
-    public void removeGroup(@NotNull SpawnedDisplayEntityGroup group){
+    public void removeGroup(@NotNull ActiveGroup group){
         groupMachines.remove(group);
         removeGroupConcurrent(group);
     }
 
-    private void removeGroupConcurrent(SpawnedDisplayEntityGroup group){
+    private void removeGroupConcurrent(ActiveGroup group){
         group.unsetMachineState();
     }
 
@@ -146,7 +147,7 @@ public class DisplayStateMachine {
      * @param group the group to check for
      * @return a boolean
      */
-    public boolean contains(@NotNull SpawnedDisplayEntityGroup group){
+    public boolean contains(@NotNull ActiveGroup group){
         return groupMachines.containsKey(group);
     }
 
@@ -156,7 +157,7 @@ public class DisplayStateMachine {
      * @param stateTransitionTask a consumer with conditions to manage state changes
      * @param overrideDefaultTask whether the default task should be overridden in place of the custom transition task. If false, this task will run then continue with the default task
      */
-    public void setCustomStateTransitionTask(@NotNull Consumer<SpawnedDisplayEntityGroup> stateTransitionTask, boolean overrideDefaultTask){
+    public void setCustomStateTransitionTask(@NotNull Consumer<ActiveGroup> stateTransitionTask, boolean overrideDefaultTask){
         this.customStateTask = stateTransitionTask;
         this.overrideDefaultTask = overrideDefaultTask;
     }
@@ -259,7 +260,7 @@ public class DisplayStateMachine {
      * @param state
      * @return true if the state was unset
      */
-    public boolean unsetIfState(@NotNull SpawnedDisplayEntityGroup group, MachineState state){
+    public boolean unsetIfState(@NotNull ActiveGroup group, MachineState state){
         return group.unsetIfCurrentMachineState(state);
     }
 
@@ -311,7 +312,7 @@ public class DisplayStateMachine {
      * Unregisters this DisplayStateMachine, removing all states and stopping animations on every group added to this state machine
      */
     public void unregister(){
-        for (SpawnedDisplayEntityGroup group : groupMachines.keySet()){
+        for (ActiveGroup group : groupMachines.keySet()){
             removeGroupConcurrent(group);
         }
 
@@ -320,7 +321,7 @@ public class DisplayStateMachine {
     }
 
 
-    public static void unregisterFromStateMachine(@NotNull SpawnedDisplayEntityGroup group){
+    public static void unregisterFromStateMachine(@NotNull ActiveGroup group){
         DisplayStateMachine stateAnimator = groupMachines.get(group);
         if (stateAnimator != null){
             stateAnimator.removeGroup(group);

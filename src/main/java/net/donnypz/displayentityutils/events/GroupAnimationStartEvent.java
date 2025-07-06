@@ -1,8 +1,6 @@
 package net.donnypz.displayentityutils.events;
 
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -14,23 +12,31 @@ import org.jetbrains.annotations.NotNull;
  */
 public class GroupAnimationStartEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-    SpawnedDisplayEntityGroup spawnedDisplayEntityGroup;
+    ActiveGroup group;
     SpawnedDisplayAnimation animation;
     DisplayAnimator animator;
     private boolean isCancelled = false;
 
-    public GroupAnimationStartEvent(SpawnedDisplayEntityGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation){
-        this.spawnedDisplayEntityGroup = group;
+    public GroupAnimationStartEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation){
+        this.group = group;
         this.animation = animation;
         this.animator = animator;
     }
 
     /**
-     * Get the {@link SpawnedDisplayEntityGroup} involved in this event
+     * Get the {@link ActiveGroup} involved in this event
      * @return a group
      */
-    public SpawnedDisplayEntityGroup getGroup() {
-        return spawnedDisplayEntityGroup;
+    public ActiveGroup getGroup() {
+        return group;
+    }
+
+    /**
+     * Get whether this group is packet-based or not
+     * @return a boolean
+     */
+    public boolean isPacketGroup(){
+        return group instanceof PacketDisplayEntityGroup;
     }
 
     /**

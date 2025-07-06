@@ -26,7 +26,7 @@ public class DisplayAnimator {
      * @param animation The animation to play
      * @return False if the playing was cancelled through the {@link GroupAnimationStartEvent}.
      */
-    public static DisplayAnimator play(SpawnedDisplayEntityGroup group, SpawnedDisplayAnimation animation){
+    public static DisplayAnimator play(ActiveGroup group, SpawnedDisplayAnimation animation){
         DisplayAnimator animator = new DisplayAnimator(animation, AnimationType.LINEAR);
         animator.play(group);
         return animator;
@@ -34,12 +34,12 @@ public class DisplayAnimator {
 
     /**
      * Plays an animation for a {@link SpawnedDisplayEntityGroup}.
-     * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(SpawnedDisplayEntityGroup)} is called.
+     * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(ActiveGroup)} is called.
      * If a group was paused then this is called, the group will play the animation from the last frame before the pause.
      * @param group The group to play the animation
      * @return False if the playing was cancelled through the {@link GroupAnimationStartEvent}.
      */
-    public boolean play(SpawnedDisplayEntityGroup group, int frameIndex){
+    public boolean play(ActiveGroup group, int frameIndex){
         if (!new GroupAnimationStartEvent(group, this, animation).callEvent()) {
             return false;
         }
@@ -52,12 +52,12 @@ public class DisplayAnimator {
 
     /**
      * Plays an animation for a {@link SpawnedDisplayEntityGroup}.
-     * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(SpawnedDisplayEntityGroup)} is called.
+     * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(ActiveGroup)} is called.
      * Plays the animation from the first frame regardless of the frame the group showed when it was paused.
      * @param group The group to play the animation
      * @return False if the playing was cancelled through the {@link GroupAnimationStartEvent}.
      */
-    public boolean play(SpawnedDisplayEntityGroup group){
+    public boolean play(ActiveGroup group){
         return play(group, 0);
     }
 
@@ -67,7 +67,7 @@ public class DisplayAnimator {
      * The group's translation will be representative of the frame the animation was stopped at.
      * @param group the group to stop animating
      */
-    public void stop(SpawnedDisplayEntityGroup group){
+    public void stop(ActiveGroup group){
         group.removeActiveAnimator(this);
     }
 
