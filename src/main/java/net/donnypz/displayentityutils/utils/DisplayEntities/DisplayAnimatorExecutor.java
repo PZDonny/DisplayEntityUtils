@@ -246,12 +246,12 @@ final class DisplayAnimatorExecutor {
             }
         }
         else{
-            for (SpawnedDisplayEntityPart part : selection.selectedParts){
+            for (ActivePart part : selection.selectedParts){
                 DisplayTransformation transformation = frame.displayTransformations.get(part.getPartUUID());
                 if (transformation == null){ //Part does not change transformation
                     continue;
                 }
-                animateDisplay(part, transformation, group, animation, frame);
+                animateDisplay((SpawnedDisplayEntityPart) part, transformation, group, animation, frame);
             }
         }
     }

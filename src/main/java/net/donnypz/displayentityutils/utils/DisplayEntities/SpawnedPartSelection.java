@@ -4,7 +4,6 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Color;
-import org.bukkit.Material;
 import org.bukkit.block.BlockType;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemType;
@@ -14,38 +13,23 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public final class SpawnedPartSelection implements Spawned {
-    LinkedHashSet<SpawnedDisplayEntityPart> selectedParts = new LinkedHashSet<>();
-
-    Set<SpawnedDisplayEntityPart.PartType> partTypes = new HashSet<>();
-
-    Set<ItemType> itemTypes = new HashSet<>();
-    boolean includeItemTypes;
-
-    Set<BlockType> blockTypes = new HashSet<>();
-    boolean includeBlockTypes;
-
-    Collection<String> includedTags = new HashSet<>();
-    Collection<String> excludedTags = new HashSet<>();
-
-    SpawnedDisplayEntityGroup group;
-    SpawnedDisplayEntityPart selectedPart = null;
+public final class SpawnedPartSelection extends ActiveSelection implements Spawned{
 
     /**
      * Create a SpawnedPartSelection for parts with the specified part tag from a group.
      * @param group The group to get the parts from
-     * @param partTag The part tag to check for
+     * @param partTag The part tag to include in the filter
      */
-    public SpawnedPartSelection(SpawnedDisplayEntityGroup group, String partTag){
+    public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull String partTag){
         this(group, Set.of(partTag));
     }
 
     /**
      * Create a SpawnedPartSelection for parts with the specified part tags from a group.
      * @param group The group to get the parts from
-     * @param partTags The part tags to check for
+     * @param partTags The part tags to include in the filter
      */
-    public SpawnedPartSelection(SpawnedDisplayEntityGroup group, Collection<String> partTags){
+    public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull Collection<String> partTags){
         this(group, new PartFilter().includePartTags(partTags));
     }
 
@@ -53,7 +37,7 @@ public final class SpawnedPartSelection implements Spawned {
      * Create a SpawnedPartSelection containing all parts from a group.
      * @param group The group to cycle through for this selection.
      */
-    public SpawnedPartSelection(SpawnedDisplayEntityGroup group){
+    public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group){
         this(group, new PartFilter());
     }
 
@@ -63,13 +47,9 @@ public final class SpawnedPartSelection implements Spawned {
      * @param filter The filter used to filter parts
      */
     public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull PartFilter filter){
-        this.group = group;
-
+        super(group, filter);
         applyFilter(filter, false);
         group.partSelections.add(this);
-
-        this.includeBlockTypes = filter.includeBlockTypes;
-        this.includeItemTypes = filter.includeItemTypes;
     }
 
     /**
@@ -81,19 +61,6 @@ public final class SpawnedPartSelection implements Spawned {
         return selectedParts.contains(part);
     }
 
-
-    /**
-     * Check if this selection has any filters applied to it
-     * @return a boolean
-     */
-    public boolean hasFilters(){
-        return
-                !(partTypes.isEmpty()
-                && includedTags.isEmpty()
-                && excludedTags.isEmpty()
-                && itemTypes.isEmpty()
-                && blockTypes.isEmpty());
-    }
 
 
     /**
@@ -134,84 +101,10 @@ public final class SpawnedPartSelection implements Spawned {
     }
 
     /**
-     * Cycle through the part's of this selection's group and reselect the parts based on the filters applied
-     */
-    public void refresh(){
-        selectedParts.clear();
-
-        filter:
-        for (SpawnedDisplayEntityPart part : group.getSpawnedParts()){
-            SpawnedDisplayEntityPart.PartType type = part.getType();
-
-            //Part Types not contained
-            if (!partTypes.isEmpty() && !partTypes.contains(type)){
-                continue;
-            }
-
-
-            //Block Display Material
-            if (type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY && !blockTypes.isEmpty()){
-                BlockDisplay bd = (BlockDisplay) part.getEntity();
-                Material material = bd.getBlock().getMaterial();
-                boolean contains = blockTypes.contains(material);
-                if ((contains && !includeBlockTypes) || (!contains && includeBlockTypes)){
-                    continue;
-                }
-            }
-
-            //Item Display Material
-            if (type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY && !itemTypes.isEmpty()){
-                ItemDisplay id = (ItemDisplay) part.getEntity();
-                Material material = id.getItemStack().getType();
-                boolean contains = itemTypes.contains(material);
-                if ((contains && !includeItemTypes) || (!contains && includeItemTypes)){
-                    continue;
-                }
-            }
-
-            List<String> list = part.getTags();
-
-            //Part has no tags, but tags are required for filtering
-            if (list.isEmpty() && !includedTags.isEmpty()){
-                continue;
-            }
-
-            Set<String> tags = new HashSet<>(list); //For faster searches
-
-            //Part Has Excluded Tag (Don't Filter Part)
-            boolean filterable = true;
-            for (String excluded : excludedTags){
-                if (tags.contains(excluded)) {
-                    filterable = false;
-                    break;
-                    //continue filter;
-                }
-            }
-
-            //No Included Tags for filtering and still filterable
-            if (includedTags.isEmpty() && filterable){
-                selectedParts.add(part);
-            }
-            //Part Has Included Tag (Filter Part)
-            else{
-                for (String included : includedTags){
-                    if (tags.contains(included)){
-                        selectedParts.add(part);
-                        continue filter;
-                    }
-                }
-            }
-        }
-
-        if (!selectedParts.isEmpty()){
-            selectedPart = selectedParts.getFirst();
-        }
-    }
-
-    /**
      * Reset this part selection back to all the parts in this selection's group, removing all filters
      * @return true if the selection's group is still valid
      */
+    @Override
     public boolean reset(){
         if (group == null){
             return false;
@@ -227,55 +120,44 @@ public final class SpawnedPartSelection implements Spawned {
     }
 
     /**
-     * Remove any filters applied, based on the {@link PartFilter.FilterType}.
-     * @param filterType the type that should be unfiltered
-     * @param refresh true if the parts in the selection should be updated
-     */
-    public void unfilter(@NotNull PartFilter.FilterType filterType, boolean refresh){
-        switch (filterType){
-            case PART_TYPE -> partTypes.clear();
-            case INCLUDED_TAGS -> includedTags.clear();
-            case EXCLUDED_TAGS ->  excludedTags.clear();
-            case ITEM_TYPE -> itemTypes.clear();
-            case BLOCK_TYPE -> blockTypes.clear();
-        }
-        if (refresh) refresh();
-    }
-
-    /**
      * Get the SpawnedDisplayEntityParts within this SpawnedPartSelection
      * @return List of the parts in this selection
      */
     public SequencedCollection<SpawnedDisplayEntityPart> getSelectedParts() {
-        return new ArrayList<>(selectedParts);
+        List<SpawnedDisplayEntityPart> parts = new ArrayList<>();
+        for (ActivePart part : selectedParts){
+            if (part instanceof SpawnedDisplayEntityPart p){
+                parts.add(p);
+            }
+        }
+        return parts;
+    }
+
+    @Override
+    BlockType getBlockType(ActivePart part) {
+        SpawnedDisplayEntityPart blockPart = (SpawnedDisplayEntityPart) part;
+        BlockDisplay display = (BlockDisplay) blockPart.getEntity();
+        return display.getBlock().getMaterial().asBlockType();
+    }
+
+    @Override
+    ItemType getItemType(ActivePart part) {
+        SpawnedDisplayEntityPart itemPart = (SpawnedDisplayEntityPart) part;
+        ItemDisplay display = (ItemDisplay) itemPart.getEntity();
+        return display.getItemStack().getType().asItemType();
     }
 
     /**
      * Get the part that is selected out of all the parts within this SpawnedPartSelection
      * @return a {@link SpawnedDisplayEntityPart}. Null if a part is not selected
      */
+    @Override
     public SpawnedDisplayEntityPart getSelectedPart() {
-        return selectedPart;
+        return (SpawnedDisplayEntityPart) selectedPart;
     }
 
     /**
-     * Get the index of a part in this SpawnedPartSelection
-     * @param part
-     * @return an integer. -1 if the part is not contained in this SpawnedPartSelection
-     */
-    public int indexOf(@NotNull SpawnedDisplayEntityPart part){
-        int i = 0;
-        for (SpawnedDisplayEntityPart p : selectedParts){
-            if (part.equals(p)){
-                return i;
-            }
-            i++;
-        }
-        return -1;
-    }
-
-    /**
-     * Get the total number of parts within this SpawnedPartSelection
+     * Get the total number of parts within this part selection
      * @return an integer
      */
     public int getSize(){
@@ -291,8 +173,8 @@ public final class SpawnedPartSelection implements Spawned {
         if (!DisplayUtils.isValidTag(partTag)){
             return false;
         }
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            part.addTag(partTag);
+        for (ActivePart part : selectedParts){
+            ((SpawnedDisplayEntityPart) part).addTag(partTag);
         }
         return true;
     }
@@ -303,63 +185,9 @@ public final class SpawnedPartSelection implements Spawned {
      * @return this
      */
     public SpawnedPartSelection removeTag(@NotNull String partTag){
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            part.removeTag(partTag);
+        for (ActivePart part : selectedParts){
+            ((SpawnedDisplayEntityPart) part).removeTag(partTag);
         }
-        return this;
-    }
-
-    /**
-     * Cycles to a next part within this selection's group.
-     * If it attempts to go past the last part, it will wrap from the first part
-     * The selected part of this SpawnedPartSelection will be set to the resulting part
-     * @param jump how many parts to skip, a positive number
-     * @return this
-     */
-    public SpawnedPartSelection setToNextPart(int jump){
-        if (!selectedParts.isEmpty()){
-            List<SpawnedDisplayEntityPart> parts = new ArrayList<>(selectedParts);
-            int index = indexOf(selectedPart)+jump;
-            while (index >= selectedParts.size()){
-                index-=selectedParts.size();
-            }
-            selectedPart = parts.get(index);
-        }
-        return this;
-    }
-
-    /**
-     * Cycles to a previous part within this selection's group.
-     * If it attempts to go past the first part, it will wrap from the last part
-     * The selected part of this SpawnedPartSelection will be set to the resulting part
-     * @param jump how many parts to skip, a positive number
-     * @return this
-     */
-    public SpawnedPartSelection setToPreviousPart(int jump){
-        if (!selectedParts.isEmpty()){
-            List<SpawnedDisplayEntityPart> parts = new ArrayList<>(selectedParts);
-            int index = (indexOf(selectedPart) - Math.abs(jump)) % selectedParts.size();
-            if (index < 0) index += selectedParts.size();
-            selectedPart = parts.get(index);
-        }
-        return this;
-    }
-
-    /**
-     * Set's the selected part of this SpawnedPartSelection to the first part within this selection.
-     * @return this
-     */
-    public SpawnedPartSelection setToFirstPart(){
-        selectedPart = selectedParts.getFirst();
-        return this;
-    }
-
-    /**
-     * Set's the selected part of this SpawnedPartSelection to the last part within this selection.
-     * @return this
-     */
-    public SpawnedPartSelection setToLastPart(){
-        selectedPart = selectedParts.getLast();
         return this;
     }
 
@@ -369,8 +197,8 @@ public final class SpawnedPartSelection implements Spawned {
      */
     @Override
     public void showToPlayer(@NotNull Player player){
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            part.showToPlayer(player);
+        for (ActivePart part : selectedParts){
+            ((SpawnedDisplayEntityPart) part).showToPlayer(player);
         }
     }
 
@@ -380,8 +208,8 @@ public final class SpawnedPartSelection implements Spawned {
      */
     @Override
     public void hideFromPlayer(@NotNull Player player){
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            part.hideFromPlayer(player);
+        for (ActivePart part : selectedParts){
+            ((SpawnedDisplayEntityPart) part).hideFromPlayer(player);
         }
     }
 
@@ -391,8 +219,8 @@ public final class SpawnedPartSelection implements Spawned {
      */
     @Override
     public boolean isInLoadedChunk(){
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            if (!part.isInLoadedChunk()){
+        for (ActivePart part : selectedParts){
+            if (!((SpawnedDisplayEntityPart) part).isInLoadedChunk()){
                 return false;
             }
         }
@@ -408,10 +236,10 @@ public final class SpawnedPartSelection implements Spawned {
     public void randomizePartUUIDs(long seed){
         byte[] byteArray;
         Random random = new Random(seed);
-        for (SpawnedDisplayEntityPart part : selectedParts){
+        for (ActivePart part : selectedParts){
             byteArray = new byte[16];
             random.nextBytes(byteArray);
-            part.setPartUUID(UUID.nameUUIDFromBytes(byteArray));
+            ((SpawnedDisplayEntityPart) part).setPartUUID(UUID.nameUUIDFromBytes(byteArray));
         }
     }
 
@@ -419,12 +247,13 @@ public final class SpawnedPartSelection implements Spawned {
      * Adds the glow effect to the block and item display parts within this selection
      * @return this
      */
+    @Override
     public SpawnedPartSelection glow(){
-        for (SpawnedDisplayEntityPart part : selectedParts){
+        for (ActivePart part : selectedParts){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
                 continue;
             }
-            part.glow();
+            ((SpawnedDisplayEntityPart) part).glow();
         }
         return this;
     }
@@ -435,11 +264,11 @@ public final class SpawnedPartSelection implements Spawned {
      * @return this
      */
     public SpawnedPartSelection glow(long durationInTicks){
-        for (SpawnedDisplayEntityPart part : selectedParts){
+        for (ActivePart part : selectedParts){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
                 continue;
             }
-            part.glow(durationInTicks);
+            ((SpawnedDisplayEntityPart) part).glow(durationInTicks);
         }
         return this;
     }
@@ -451,7 +280,7 @@ public final class SpawnedPartSelection implements Spawned {
      * @return this
      */
     public SpawnedPartSelection glow(@NotNull Player player, long durationInTicks){
-        SpawnedDisplayEntityGroup.glowMany(player, durationInTicks, selectedParts);
+        SpawnedDisplayEntityGroup.glowMany(player, durationInTicks, getSelectedParts());
         return this;
     }
 
@@ -461,8 +290,8 @@ public final class SpawnedPartSelection implements Spawned {
      */
     @Override
     public SpawnedPartSelection unglow(){
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            part.unglow();
+        for (ActivePart part : selectedParts){
+            ((SpawnedDisplayEntityPart) part).unglow();
         }
         return this;
     }
@@ -474,34 +303,14 @@ public final class SpawnedPartSelection implements Spawned {
      */
     @Override
     public SpawnedPartSelection unglow(@NotNull Player player){
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            part.unglow(player);
+        for (ActivePart part : selectedParts){
+            ((SpawnedDisplayEntityPart) part).unglow(player);
         }
         return this;
     }
 
 
-    /**
-     * Gets the included part tags of this part selection
-     * @return The included part tags.
-     */
-    public @NotNull Collection<String> getIncludedPartTags(){
-        if (includedTags.isEmpty()){
-            return new HashSet<>();
-        }
-        return new HashSet<>(includedTags);
-    }
 
-    /**
-     * Gets the excluded part tags of this part selection
-     * @return The excluded part tags.
-     */
-    public @NotNull Collection<String> getExcludedPartTags(){
-        if (excludedTags.isEmpty()){
-            return new HashSet<>();
-        }
-        return new HashSet<>(excludedTags);
-    }
 
     /**
      * Remove a {@link SpawnedDisplayEntityPart} from this selection
@@ -529,7 +338,7 @@ public final class SpawnedPartSelection implements Spawned {
         if (selection == this){
             remove();
         }
-        for (SpawnedDisplayEntityPart part : selection.selectedParts){
+        for (ActivePart part : selection.selectedParts){
             selectedParts.remove(part);
             if (selectedPart == part){
                 selectedPart = null;
@@ -554,8 +363,8 @@ public final class SpawnedPartSelection implements Spawned {
      */
     @Override
     public void setGlowColor(@Nullable Color color){
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            part.setGlowColor(color);
+        for (ActivePart part : selectedParts){
+            ((SpawnedDisplayEntityPart) part).setGlowColor(color);
         }
     }
 
@@ -565,8 +374,8 @@ public final class SpawnedPartSelection implements Spawned {
      */
     @Override
     public void setBrightness(@Nullable Display.Brightness brightness){
-        for (SpawnedDisplayEntityPart  part: selectedParts){
-            part.setBrightness(brightness);
+        for (ActivePart part : selectedParts){
+            ((SpawnedDisplayEntityPart) part).setBrightness(brightness);
         }
     }
 
@@ -582,8 +391,8 @@ public final class SpawnedPartSelection implements Spawned {
      */
     @Override
     public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks){
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            part.translate(direction, distance, durationInTicks, delayInTicks);
+        for (ActivePart part : selectedParts){
+            ((SpawnedDisplayEntityPart) part).translate(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }
@@ -599,22 +408,20 @@ public final class SpawnedPartSelection implements Spawned {
      */
     @Override
     public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks){
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            part.translate(direction, distance, durationInTicks, delayInTicks);
+        for (ActivePart part : selectedParts){
+            ((SpawnedDisplayEntityPart) part).translate(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }
 
     /**
      * Pivot all Interaction parts in this selection around the SpawnedDisplayEntityGroup's master part
-     * @param angle the pivot angle
+     * @param angleInDegrees the pivot angle
      */
     @Override
-    public void pivot(double angle){
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                part.pivot(angle);
-            }
+    public void pivot(double angleInDegrees){
+        for (ActivePart part : selectedParts){
+            ((SpawnedDisplayEntityPart) part).pivot(angleInDegrees);
         }
     }
 
@@ -624,8 +431,8 @@ public final class SpawnedPartSelection implements Spawned {
      */
     @Override
     public void setYaw(float yaw, boolean pivotInteractions){
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            part.setYaw(yaw, pivotInteractions);
+        for (ActivePart part : selectedParts){
+            ((SpawnedDisplayEntityPart) part).setYaw(yaw, pivotInteractions);
         }
     }
 
@@ -635,8 +442,8 @@ public final class SpawnedPartSelection implements Spawned {
      */
     @Override
     public void setPitch(float pitch){
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            part.setPitch(pitch);
+        for (ActivePart part : selectedParts){
+            ((SpawnedDisplayEntityPart) part).setPitch(pitch);
         }
     }
 
@@ -646,8 +453,8 @@ public final class SpawnedPartSelection implements Spawned {
      */
     @Override
     public void setViewRange(float viewRangeMultiplier){
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            part.setViewRange(viewRangeMultiplier);
+        for (ActivePart part : selectedParts){
+            ((SpawnedDisplayEntityPart) part).setViewRange(viewRangeMultiplier);
         }
     }
 
@@ -657,14 +464,14 @@ public final class SpawnedPartSelection implements Spawned {
      */
     @Override
     public void setBillboard(@NotNull Display.Billboard billboard){
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            part.setBillboard(billboard);
+        for (ActivePart part : selectedParts){
+            ((SpawnedDisplayEntityPart) part).setBillboard(billboard);
         }
     }
 
     void removeNoManager(){
         reset();
-        group.partSelections.remove(this);
+        ((SpawnedDisplayEntityGroup) group).partSelections.remove(this);
         group = null;
     }
 
@@ -678,23 +485,11 @@ public final class SpawnedPartSelection implements Spawned {
 
 
     /**
-     * Gets the SpawnedDisplayEntityGroup of this selection
-     * @return SpawnedDisplayEntityGroup
+     * Gets the {@link SpawnedDisplayEntityGroup} of this selection
+     * @return a {@link SpawnedDisplayEntityGroup}
      */
+    @Override
     public SpawnedDisplayEntityGroup getGroup() {
-        return group;
-    }
-
-    /**
-     * Create a {@link PartFilter} based on all filters previously applied to this selection
-     * @return a {@link PartFilter}
-     */
-    public PartFilter toFilter(){
-        return new PartFilter()
-                .setPartTypes(partTypes)
-                .setItemTypes(itemTypes, includeItemTypes)
-                .setBlockTypes(blockTypes, includeBlockTypes)
-                .includePartTags(includedTags)
-                .excludePartTags(excludedTags);
+        return (SpawnedDisplayEntityGroup) group;
     }
 }
