@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils;
 
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -77,7 +78,7 @@ public enum Direction {
      * @return A vector
      */
     @ApiStatus.Internal
-    public Vector getVector(Entity entity) {
+    public Vector getVector(@NotNull Entity entity) {
         return getVector(entity.getLocation());
     }
 
@@ -87,8 +88,13 @@ public enum Direction {
      * @return A vector
      */
     @ApiStatus.Internal
-    public Vector getVector(SpawnedDisplayEntityPart part) {
+    public Vector getVector(@NotNull SpawnedDisplayEntityPart part) {
         return getVector(part.getEntity());
+    }
+
+    @ApiStatus.Internal
+    public Vector getVector(@NotNull PacketDisplayEntityPart part){
+        return getVector(part.getLocation());
     }
 
 }
