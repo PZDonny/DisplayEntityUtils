@@ -71,14 +71,14 @@ final class InteractionEntity implements Serializable {
         });
     }
 
-    PacketDisplayEntityPart createPacketPart(){
+    PacketDisplayEntityPart createPacketPart(Location spawnLocation){
         PacketAttributeContainer attributeContainer = new PacketAttributeContainer()
                 .setAttribute(DisplayAttributes.Interaction.WIDTH, width)
                 .setAttribute(DisplayAttributes.Interaction.HEIGHT, height)
                 .setAttribute(DisplayAttributes.Interaction.RESPONSIVE, isResponsive)
                 .setAttribute(DisplayAttributes.Transform.TRANSLATION, new Vector3f(vector));
 
-        PacketDisplayEntityPart part = attributeContainer.createPart(SpawnedDisplayEntityPart.PartType.INTERACTION);
+        PacketDisplayEntityPart part = attributeContainer.createPart(SpawnedDisplayEntityPart.PartType.INTERACTION, spawnLocation);
         if (persistentDataContainer != null){
             ItemStack i = new ItemStack(Material.STICK);
             PersistentDataContainer pdc = i.getItemMeta().getPersistentDataContainer();

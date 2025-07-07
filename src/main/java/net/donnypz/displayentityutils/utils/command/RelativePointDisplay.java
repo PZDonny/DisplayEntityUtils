@@ -48,15 +48,13 @@ public abstract class RelativePointDisplay {
                 .setAttribute(DisplayAttributes.GLOWING, true)
                 .setAttribute(DisplayAttributes.BRIGHTNESS, new Display.Brightness(15,15))
                 .setAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK, stack)
-                .createPart(SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY, pointDisplayTag);
-        displayPart.teleport(spawnLocation);
+                .createPart(SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY, spawnLocation, pointDisplayTag);
         displayPart.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
 
         interactionPart = new PacketAttributeContainer()
                 .setAttribute(DisplayAttributes.Interaction.WIDTH, scale)
                 .setAttribute(DisplayAttributes.Interaction.HEIGHT, scale)
-                .createPart(SpawnedDisplayEntityPart.PartType.INTERACTION, pointDisplayTag);
-        interactionPart.teleport(spawnLocation);
+                .createPart(SpawnedDisplayEntityPart.PartType.INTERACTION, spawnLocation, pointDisplayTag);
         interactionPart.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
 
         interactionParts.put(interactionPart, this);

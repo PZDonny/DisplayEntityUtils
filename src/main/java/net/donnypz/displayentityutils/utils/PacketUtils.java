@@ -19,11 +19,10 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockType;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.BlockDisplay;
-import org.bukkit.entity.ItemDisplay;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -103,6 +102,66 @@ public final class PacketUtils {
             PacketEvents.getAPI().getPlayerManager().sendPacket(player, rotationPacket);
         }
     }
+
+
+    /**
+     * Attempts to change the translation of a packet-based interaction entity similar
+     * to a Display Entity, through smooth teleportation.
+     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param part the interaction part
+     * @param direction The direction to translate the interaction entity
+     * @param distance How far the interaction entity should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
+     */
+    public static void translateInteraction(@NotNull PacketDisplayEntityPart part, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
+        Location destination = part.getLocation().clone().add(direction.clone().normalize().multiply(distance));
+
+        double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
+        Vector incrementVector = direction
+                .clone()
+                .normalize()
+                .multiply(movementIncrement);
+
+        new BukkitRunnable(){
+            double currentDistance = 0;
+            float lastYaw = part.getYaw();
+            @Override
+            public void run() {
+                float newYaw = part.getYaw();
+                if (newYaw != lastYaw){
+                    incrementVector.rotateAroundY(Math.toRadians(lastYaw-newYaw));
+                    lastYaw = newYaw;
+                }
+                currentDistance+=Math.abs(movementIncrement);
+                Location tpLoc = part.getLocation().clone().add(incrementVector);
+
+                if (currentDistance >= distance){
+                    part.teleport(destination);
+                    cancel();
+                }
+                else{
+                    part.teleport(tpLoc);
+                }
+            }
+        }.runTaskTimerAsynchronously(DisplayEntityPlugin.getInstance(), delayInTicks, 1);
+    }
+
+
+    /**
+     * Attempts to change the translation of a packet-based interaction entity similar
+     * to a Display Entity, through smooth teleportation.
+     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param part the interaction part
+     * @param direction The direction to translate the interaction entity
+     * @param distance How far the interaction entity should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
+     */
+    public static void translateInteraction(@NotNull PacketDisplayEntityPart part, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
+        translateInteraction(part, direction.getVector(part), distance, durationInTicks, delayInTicks);
+    }
+
 
 
     public static void destroyEntity(@NotNull Player player, @NotNull PacketDisplayEntityPart part){

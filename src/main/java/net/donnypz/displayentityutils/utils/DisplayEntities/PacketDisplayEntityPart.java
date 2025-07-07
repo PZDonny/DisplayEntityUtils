@@ -4,8 +4,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityRotation;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport;
-import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
+import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -24,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     Set<UUID> viewers = new HashSet<>();
@@ -37,19 +37,20 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
 
 
-    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull PacketAttributeContainer attributeContainer){
+    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer){
         this.type = partType;
         this.entityId = entityId;
         this.attributeContainer = attributeContainer;
+        this.teleport(location);
     }
 
-    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull String partTag){
-        this(partType, entityId, attributeContainer);
+    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull String partTag){
+        this(partType, location, entityId, attributeContainer);
         this.partTags.add(partTag);
     }
 
-    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull Set<String> partTags){
-        this(partType, entityId, attributeContainer);
+    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull Set<String> partTags){
+        this(partType, location, entityId, attributeContainer);
         this.partTags.addAll(partTags);
     }
 
@@ -181,6 +182,11 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         else{
             packetLocation = new PacketLocation(location);
         }
+        for (UUID uuid : viewers){
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null) continue;
+            PacketUtils.setLocation(player, entityId, getLocation());
+        }
     }
 
     /**
@@ -205,7 +211,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * Show this part to a player as a packet-based entity
      * @param player the player
      * @param spawnReason the spawn reason
-     * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#setLocation(Location)}, or if when created for a group, the group's location was null.
      */
     @Override
     public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
@@ -217,13 +222,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * @param player the player
      * @param spawnReason the spawn reason
      * @param groupSpawnSettings the spawn settings to apply
-     * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#setLocation(Location)}, or if when created for a group, the group's location was null.
      */
     @Override
     public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
-        if (packetLocation == null){
-            throw new RuntimeException("Location must be set for packet-based part before showing it to players.");
-        }
         viewers.add(player.getUniqueId());
         attributeContainer.sendEntity(type, this, player, getLocation(), true);
     }
@@ -232,7 +233,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * Show this part to players as a packet-based entity.
      * @param players the players
      * @param spawnReason the spawn reason
-     * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#setLocation(Location)}, or if when created for a group, the group's location was null.
+     * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#teleport(Location)} (Location)}, or if when created for a group, the group's location was null.
      */
     public void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
         showToPlayers(players, spawnReason, new GroupSpawnSettings());
@@ -243,7 +244,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * @param players the players
      * @param spawnReason the spawn reason
      * @param groupSpawnSettings the spawn settings to apply
-     * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#setLocation(Location)}, or if when created for a group, the group's location was null.
+     * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#teleport(Location)} (Location)}, or if when created for a group, the group's location was null.
      */
     public void showToPlayers(@NotNull Collection<Player> players,  @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
         if (packetLocation == null){
@@ -302,27 +303,47 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
 
+    /**
+     * Change the translation of this part's entity.
+     * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
+     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param direction The direction to translate the part
+     * @param distance How far the part should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
+     */
     @Override
     public void translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks) {
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-
+            PacketUtils.translateInteraction(this, direction, distance, durationInTicks, delayInTicks);
         }
         else{
-            Vector3f translation = attributeContainer.getAttribute(DisplayAttributes.Transform.TRANSLATION)
-                    .add(direction.toVector3f());
-            attributeContainer
-                    .setAttributesAndSend(new DisplayAttributeMap()
-                                    .add(DisplayAttributes.Transform.TRANSLATION, translation)
-                                    .add(DisplayAttributes.Interpolation.DURATION, durationInTicks)
-                                    .add(DisplayAttributes.Interpolation.DELAY, delayInTicks),
-                            entityId,
-                            viewers);
+            Bukkit.getAsyncScheduler().runDelayed(DisplayEntityPlugin.getInstance(), task -> {
+                Vector3f translation = attributeContainer.getAttribute(DisplayAttributes.Transform.TRANSLATION)
+                        .add(direction.toVector3f());
+                attributeContainer
+                        .setAttributesAndSend(new DisplayAttributeMap()
+                                        .add(DisplayAttributes.Transform.TRANSLATION, translation)
+                                        .add(DisplayAttributes.Interpolation.DURATION, durationInTicks)
+                                        .add(DisplayAttributes.Interpolation.DELAY, delayInTicks),
+                                entityId,
+                                viewers);
+            }, delayInTicks*50L, TimeUnit.MILLISECONDS);
         }
     }
 
+    /**
+     * Change the translation of this part's entity.
+     * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
+     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param direction The direction to translate the part
+     * @param distance How far the part should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
+     */
     @Override
     public void translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks) {
-        translate(direction.getVector(getLocation()), distance, durationInTicks, delayInTicks);
+        translate(direction.getVector(this), distance, durationInTicks, delayInTicks);
     }
 
     /**

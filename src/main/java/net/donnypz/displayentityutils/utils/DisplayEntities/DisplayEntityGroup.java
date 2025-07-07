@@ -253,7 +253,7 @@ public final class DisplayEntityGroup implements Serializable{
         int i = 0;
 
         for (DisplayEntity entity : displayEntities){
-            PacketDisplayEntityPart part = entity.createPacketPart(packetGroup);
+            PacketDisplayEntityPart part = entity.createPacketPart(packetGroup, spawnLocation);
             packetGroup.addPart(part);
             if (!part.isMaster){
                 passengerIds[i] = part.entityId;
@@ -264,9 +264,8 @@ public final class DisplayEntityGroup implements Serializable{
         packetGroup.passengerIds = passengerIds;
 
         for (InteractionEntity entity : interactionEntities){
-            PacketDisplayEntityPart part = entity.createPacketPart();
+            PacketDisplayEntityPart part = entity.createPacketPart(spawnLocation);
             packetGroup.addPart(part);
-            part.teleport(spawnLocation);
         }
 
         return packetGroup;

@@ -119,8 +119,8 @@ public class PacketAttributeContainer implements Cloneable{
      * @param partType the type of entity this container represents
      * @return a {@link PacketDisplayEntityPart}
      */
-    public PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType){
-        return new PacketDisplayEntityPart(partType, SpigotReflectionUtil.generateEntityId(), this);
+    public PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location){
+        return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this);
     }
 
     /**
@@ -129,8 +129,8 @@ public class PacketAttributeContainer implements Cloneable{
      * @param partTag a part tag to add to the returned part
      * @return a {@link PacketDisplayEntityPart}
      */
-    public PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull String partTag){
-        return new PacketDisplayEntityPart(partType, SpigotReflectionUtil.generateEntityId(), this, partTag);
+    public PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location, @NotNull String partTag){
+        return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this, partTag);
     }
 
     /**
@@ -139,8 +139,8 @@ public class PacketAttributeContainer implements Cloneable{
      * @param partTags part tags to add to the returned part
      * @return a {@link PacketDisplayEntityPart}
      */
-    public PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Set<String> partTags){
-        return new PacketDisplayEntityPart(partType, SpigotReflectionUtil.generateEntityId(), this, partTags);
+    public PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location, @NotNull Set<String> partTags){
+        return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this, partTags);
     }
 
 

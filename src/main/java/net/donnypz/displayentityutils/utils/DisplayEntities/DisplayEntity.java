@@ -100,9 +100,9 @@ final class DisplayEntity implements Serializable {
         }
     }
 
-    PacketDisplayEntityPart createPacketPart(PacketDisplayEntityGroup group){
+    PacketDisplayEntityPart createPacketPart(PacketDisplayEntityGroup group, Location spawnLocation){
         PacketAttributeContainer attributeContainer = specifics.getAttributeContainer();
-        PacketDisplayEntityPart part = attributeContainer.createPart(type.toPartType());
+        PacketDisplayEntityPart part = attributeContainer.createPart(type.toPartType(), spawnLocation);
         if (persistentDataContainer != null){
             ItemStack i = new ItemStack(Material.STICK);
             PersistentDataContainer pdc = i.getItemMeta().getPersistentDataContainer();
