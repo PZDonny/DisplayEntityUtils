@@ -100,7 +100,7 @@ final class DisplayAnimatorExecutor {
         Location groupLoc = group.getLocation();
         if (group.isInLoadedChunk()){
             new GroupAnimateFrameStartEvent(group, animator, animation, frame).callEvent();
-            frame.playEffects(group, animator);
+            frame.playEffects(group, animator, true);
 
             animateInteractions(groupLoc, frame, group, selection, animation);
             animateDisplays(frame, group, selection, animation);

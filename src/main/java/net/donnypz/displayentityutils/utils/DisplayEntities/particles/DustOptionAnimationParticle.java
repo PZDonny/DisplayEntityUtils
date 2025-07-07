@@ -4,7 +4,9 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -35,6 +37,11 @@ class DustOptionAnimationParticle extends AnimationParticle implements Serializa
     @Override
     public void spawn(Location location) {
         location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, options);
+    }
+
+    @Override
+    public void spawn(Location location, @NotNull Player player) {
+        player.spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, options);
     }
 
     @Override

@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.io.*;
+import java.util.Collection;
 
 @ApiStatus.Internal
 public abstract class AnimationParticle implements Externalizable, Cloneable {
@@ -59,6 +60,23 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
         this.delayInTicks = delayInTicks;
     }
 
+
+    /*public Location getSpawnLocation(SpawnedDisplayEntityGroup group){
+        Vector v = vectorFromOrigin.clone();
+        Location groupLoc = group.getLocation();
+
+        double pitchDiff = groupLoc.getPitch() - groupPitchAtCreation;
+        double pitchAsRad = Math.toRadians(pitchDiff);
+        double sin = Math.sin(pitchAsRad);
+        double cos = Math.cos(pitchAsRad);
+
+        v.setY(-1*(v.length() * sin - v.getY() * cos)); //Adjust for pitch
+        v.rotateAroundY(Math.toRadians(groupYawAtCreation - groupLoc.getYaw())); //Pivot
+
+        groupLoc.add(v);
+        return groupLoc;
+    }*/
+
     public void spawn(@NotNull Location location, @NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
         if (delayInTicks == 0){
             spawn(location);
@@ -78,23 +96,55 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
         }
     }
 
-    /*public Location getSpawnLocation(SpawnedDisplayEntityGroup group){
-        Vector v = vectorFromOrigin.clone();
-        Location groupLoc = group.getLocation();
+    public void spawn(@NotNull Location location, @NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator, Player player){
+        if (delayInTicks == 0){
+            spawn(location, player);
+        }
+        else{
+            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                if (!group.isSpawned()){
+                    return;
+                }
+                if (animator == null){
+                    spawn(location, player);
+                }
+                else if (group.isActiveAnimator(animator)){
+                    spawn(location, player);
+                }
+            }, delayInTicks);
+        }
+    }
 
-        double pitchDiff = groupLoc.getPitch() - groupPitchAtCreation;
-        double pitchAsRad = Math.toRadians(pitchDiff);
-        double sin = Math.sin(pitchAsRad);
-        double cos = Math.cos(pitchAsRad);
+    public void spawn(@NotNull Location location, @NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator, Collection<Player> players){
+        if (delayInTicks == 0){
+            spawn(location, players);
+        }
+        else{
+            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                if (!group.isSpawned()){
+                    return;
+                }
+                if (animator == null){
+                    spawn(location, players);
+                }
+                else if (group.isActiveAnimator(animator)){
+                    spawn(location, players);
+                }
+            }, delayInTicks);
+        }
+    }
 
-        v.setY(-1*(v.length() * sin - v.getY() * cos)); //Adjust for pitch
-        v.rotateAroundY(Math.toRadians(groupYawAtCreation - groupLoc.getYaw())); //Pivot
 
-        groupLoc.add(v);
-        return groupLoc;
-    }*/
 
     public abstract void spawn(Location location);
+
+    public abstract void spawn(Location location, @NotNull Player player);
+
+    public void spawn(Location location, @NotNull Collection<Player> players){
+        for (Player player : players){
+            spawn(location, player);
+        }
+    }
 
     @ApiStatus.Internal
     public void initializeParticle(){

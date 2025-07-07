@@ -55,24 +55,53 @@ public class FramePoint extends RelativePoint implements Serializable {
      * Effects include sounds and particles
      * @param group the relative group
      * @param animator the animator attempting to play group effects
+     * @param limited whether to spawn the effects only to players who can visibly see the group
      */
-    public void playEffects(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
-        showParticles(group, animator);
-        playSounds(group, animator);
+    public void playEffects(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator, boolean limited){
+        showParticles(group, animator, limited);
+        playSounds(group, animator, limited);
     }
 
     /**
      * Immediately play the effects of this point at this point's location relative to a {@link SpawnedDisplayEntityGroup}
      * Effects include sounds and particles
      * @param group the relative group
+     * @param limited whether to spawn the effects only to players who can visibly see the group
      */
-    public void playEffects(@NotNull SpawnedDisplayEntityGroup group){
+    public void playEffects(@NotNull SpawnedDisplayEntityGroup group, boolean limited){
         Location location = getLocation(group);
-        playEffects(location);
+        if (limited){
+            playEffects(location, getPlayers(group));
+        }
+        else {
+            playEffects(location);
+        }
     }
 
     /**
-     * Immediately play the effects of this point at a specified location.
+     * Immediately play the effects of this point at a specified location to a player.
+     * Effects include sounds and particles
+     * @param location the location to play the effects
+     * @param player the player
+     */
+    public void playEffects(@NotNull Location location, @NotNull Player player){
+        showParticles(location, player);
+        playSounds(location, player);
+    }
+
+    /**
+     * Immediately play the effects of this point at a specified location to players.
+     * Effects include sounds and particles
+     * @param location the location to play the effects
+     * @param players the players
+     */
+    public void playEffects(@NotNull Location location, @NotNull Collection<Player> players){
+        showParticles(location, players);
+        playSounds(location, players);
+    }
+
+    /**
+     * Immediately play the effects of this point at a specified location to players.
      * Effects include sounds and particles
      * @param location the location to play the effects
      */
@@ -81,25 +110,68 @@ public class FramePoint extends RelativePoint implements Serializable {
         playSounds(location);
     }
 
+    private Set<Player> getPlayers(SpawnedDisplayEntityGroup group){
+        return group.masterPart.getEntity().getTrackedBy();
+    }
+
     /**
      * Show the particles of this point at a specified location, with their intended delays.
      * @param group the relative group
      * @param animator the animator attempting to play group effects
+     * @param limited whether to spawn the particles only to players who can visibly see the group
      */
-    public void showParticles(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
+    public void showParticles(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator, boolean limited){
         Location spawnLoc = getLocation(group);
         for (AnimationParticle particle : particles){
-            particle.spawn(spawnLoc, group, animator);
+            if (limited){
+                particle.spawn(spawnLoc, group, animator, getPlayers(group));
+            }
+            else{
+                particle.spawn(spawnLoc, group, animator);
+            }
         }
     }
 
     /**
      * Immediately show the particles of this point at this point's location relative to a {@link SpawnedDisplayEntityGroup}
      * @param group the relative group
+     * @param limited whether to spawn the effects only to players who can visibly see the group
      */
-    public void showParticles(@NotNull SpawnedDisplayEntityGroup group){
+    public void showParticles(@NotNull SpawnedDisplayEntityGroup group, boolean limited){
         Location location = getLocation(group);
-        showParticles(location);
+        if (limited){
+            showParticles(location, getPlayers(group));
+        }
+        else{
+            showParticles(location);
+        }
+    }
+
+    /**
+     * Immediately show the particles of this point at a specified location to a player
+     * @param location the location to show the particles
+     * @param player the player that can see the particles
+     */
+    public void showParticles(@NotNull Location location, @NotNull Player player){
+        for (AnimationParticle particle : particles){
+            particle.spawn(location, player);
+        }
+    }
+
+    /**
+     * Immediately show the particles of this point at a specified location to players
+     * @param location the location to show the particles
+     * @param players the players
+     */
+    public void showParticles(@NotNull Location location, @NotNull Collection<Player> players){
+        for (AnimationParticle particle : particles){
+            if (players != null){
+                particle.spawn(location, players);
+            }
+            else{
+                particle.spawn(location);
+            }
+        }
     }
 
     /**
@@ -116,24 +188,60 @@ public class FramePoint extends RelativePoint implements Serializable {
      * Play the sounds of this point at a specified location, with their intended delays.
      * @param group the relative group
      * @param animator the animator attempting to play group effects
+     * @param limited whether to limit the played audio only to players who can visibly see the group
      */
-    public void playSounds(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
+    public void playSounds(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator, boolean limited){
         for (AnimationSound sound : sounds.values()){
-            sound.playSound(getLocation(group), group, animator);
+            if (limited){
+                sound.playSound(getLocation(group), group, animator, getPlayers(group));
+            }
+            else{
+                sound.playSound(getLocation(group), group, animator);
+            }
+
         }
     }
 
     /**
      * Immediately play the sounds of this point at this point's location relative to a {@link SpawnedDisplayEntityGroup}
      * @param group the relative group
+     * @param limited whether to limit the played audio only to players who can visibly see the group
      */
-    public void playSounds(@NotNull SpawnedDisplayEntityGroup group){
+    public void playSounds(@NotNull SpawnedDisplayEntityGroup group, boolean limited){
         Location location = getLocation(group);
-        playSounds(location);
+        if (limited){
+            playSounds(location, getPlayers(group));
+        }
+        else{
+            playSounds(location);
+        }
+
     }
 
     /**
-     * Immediately play the sounds of this point at a specified location
+     * Immediately play the sounds of this point at a specified location to a player
+     * @param location the location to play the sounds
+     * @param player the player
+     */
+    public void playSounds(@NotNull Location location, @NotNull Player player){
+        for (AnimationSound sound : sounds.values()){
+            sound.playSound(location, player);
+        }
+    }
+
+    /**
+     * Immediately play the sounds of this point at a specified location to players
+     * @param location the location to play the sounds
+     * @param players the players
+     */
+    public void playSounds(@NotNull Location location, @NotNull Collection<Player> players){
+        for (AnimationSound sound : sounds.values()){
+            sound.playSound(location, players);
+        }
+    }
+
+    /**
+     * Immediately play the sounds of this point at a specified location to players
      * @param location the location to play the sounds
      */
     public void playSounds(@NotNull Location location){
