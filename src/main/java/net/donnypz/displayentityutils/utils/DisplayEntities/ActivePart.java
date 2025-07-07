@@ -4,6 +4,7 @@ import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -33,6 +34,8 @@ public abstract class ActivePart {
     public SpawnedDisplayEntityPart.PartType getType(){
         return type;
     }
+
+    public abstract Collection<String> getTags();
 
     static class PartData {
 
