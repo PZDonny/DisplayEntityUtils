@@ -21,6 +21,12 @@ public abstract class ActivePart {
     }
 
     /**
+     * Get this part's entity id
+     * @return the entity id
+     */
+    public abstract int getEntityId();
+
+    /**
      * Get this part's type
      * @return a {@link SpawnedDisplayEntityPart.PartType}
      */
@@ -48,7 +54,6 @@ public abstract class ActivePart {
 
         /**
          * Get the UUID of the entity this PartData represents
-         *
          * @return a UUID
          */
         public UUID getUUID() {

@@ -473,10 +473,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     public SpawnedDisplayEntityPart glow(@NotNull Player player, long durationInTicks){
         if (type == PartType.BLOCK_DISPLAY || type == PartType.ITEM_DISPLAY){
             if (durationInTicks == -1){
-                PacketUtils.setGlowing(player, getEntity().getEntityId(), true);
+                PacketUtils.setGlowing(player, getEntityId(), true);
             }
             else{
-                PacketUtils.setGlowing(player, getEntity().getEntityId(), durationInTicks);
+                PacketUtils.setGlowing(player, getEntityId(), durationInTicks);
             }
 
         }
@@ -800,6 +800,11 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return interaction;
     }
 
+    @Override
+    public int getEntityId() {
+        return getEntity().getEntityId();
+    }
+
     public enum PartType{
         BLOCK_DISPLAY,
         ITEM_DISPLAY,
@@ -810,9 +815,9 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     /**
      * Removes this SpawnedDisplayEntityPart from it's SpawnedDisplayEntityGroup, without dismounting the part from the group.
      * This makes this part invalid and unusable after removal. If the part needs to be reused, see {@link #removeFromGroup()}
-     * <p>
-     *     The part may not be killed if the part's entity is within an unloaded chunk
-     *     Create a chunk ticket for this entity's chunk to guarantee removal
+     * <br><br>
+     * The part may not be killed if the part's entity is within an unloaded chunk.
+     * Create a chunk ticket for this entity's chunk to guarantee removal
      * @param kill Whether to kill this part when removed.
      * @return Returns the part's entity.
      */
