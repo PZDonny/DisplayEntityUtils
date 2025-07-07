@@ -49,14 +49,14 @@ public abstract class RelativePointDisplay {
                 .setAttribute(DisplayAttributes.BRIGHTNESS, new Display.Brightness(15,15))
                 .setAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK, stack)
                 .createPart(SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY, pointDisplayTag);
-        displayPart.setLocation(spawnLocation);
+        displayPart.teleport(spawnLocation);
         displayPart.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
 
         interactionPart = new PacketAttributeContainer()
                 .setAttribute(DisplayAttributes.Interaction.WIDTH, scale)
                 .setAttribute(DisplayAttributes.Interaction.HEIGHT, scale)
                 .createPart(SpawnedDisplayEntityPart.PartType.INTERACTION, pointDisplayTag);
-        interactionPart.setLocation(spawnLocation);
+        interactionPart.teleport(spawnLocation);
         interactionPart.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
 
         interactionParts.put(interactionPart, this);
@@ -80,8 +80,8 @@ public abstract class RelativePointDisplay {
         if (!isValid){
             return;
         }
-        displayPart.setLocation(location);
-        interactionPart.setLocation(location);
+        displayPart.teleport(location);
+        interactionPart.teleport(location);
         spawnLocation = location;
         relativePoint.setLocation(group, location);
     }

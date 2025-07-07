@@ -497,7 +497,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                 .setAttribute(DisplayAttributes.Transform.SCALE, new Vector3f(width, height, width))
                 .setAttribute(DisplayAttributes.BRIGHTNESS, new Display.Brightness(0, 15))
                 .createPart(PartType.ITEM_DISPLAY);
-        part.setLocation(spawnLoc);
+        part.teleport(spawnLoc);
         part.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
 
         if (durationInTicks == -1) {

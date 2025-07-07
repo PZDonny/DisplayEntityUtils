@@ -259,14 +259,14 @@ public final class DisplayEntityGroup implements Serializable{
                 passengerIds[i] = part.entityId;
                 i++;
             }
-            part.setLocation(spawnLocation);
+            part.teleport(spawnLocation);
         }
         packetGroup.passengerIds = passengerIds;
 
         for (InteractionEntity entity : interactionEntities){
             PacketDisplayEntityPart part = entity.createPacketPart();
             packetGroup.addPart(part);
-            part.setLocation(spawnLocation);
+            part.teleport(spawnLocation);
         }
 
         return packetGroup;

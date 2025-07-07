@@ -173,7 +173,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * Set the location of this packet-based entity.
      * @param location the location
      */
-    public void setLocation(@NotNull Location location){
+    public void teleport(@NotNull Location location){
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
             packetLocation = new PacketLocation(location, attributeContainer
                     .getAttribute(DisplayAttributes.Transform.TRANSLATION));
