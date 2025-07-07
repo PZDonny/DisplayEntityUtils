@@ -176,7 +176,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     public void setLocation(@NotNull Location location, boolean pivotInteractions){
         for (PacketDisplayEntityPart part : packetParts.values()){
             if (part.isMaster){
-                masterPart.setLocation(location);
+                masterPart.teleport(location);
             }
             else if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION && pivotInteractions){
                 part.setRotation(location.getPitch(), location.getYaw(), true);
