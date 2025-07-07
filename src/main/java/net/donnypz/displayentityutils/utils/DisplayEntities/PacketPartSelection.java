@@ -75,6 +75,15 @@ public class PacketPartSelection extends ActivePartSelection implements Packeted
         return true;
     }
 
+    /**
+     * Remove this part selection, making it invalid and unusable.
+     */
+    @Override
+    public void remove() {
+        reset();
+        group = null;
+    }
+
     @Override
     public void setGlowColor(@Nullable Color color) {
         for (ActivePart part : selectedParts){

@@ -339,6 +339,7 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
      * Remove this part selection.
      * Players with this SpawnedPartSelection selection will have it deselected, and this selection will become invalid and unusable.
      */
+    @Override
     public void remove(){
         DisplayGroupManager.removePartSelection(this);
     }
@@ -460,14 +461,6 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
         reset();
         ((SpawnedDisplayEntityGroup) group).partSelections.remove(this);
         group = null;
-    }
-
-    /**
-     * Get the validity and usability of this selection
-     * @return boolean whether this selection is valid and usable
-     */
-    public boolean isValid(){
-        return group != null;
     }
 
 

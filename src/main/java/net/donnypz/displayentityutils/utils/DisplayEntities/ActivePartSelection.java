@@ -274,9 +274,19 @@ public abstract class ActivePartSelection {
                 .excludePartTags(excludedTags);
     }
 
+    /**
+     * Get the validity and usability of this selection
+     * @return a boolean
+     */
+    public boolean isValid(){
+        return group != null;
+    }
+
     public abstract ActivePart getSelectedPart();
 
     public abstract ActiveGroup getGroup();
 
     public abstract boolean reset();
+
+    public abstract void remove();
 }
