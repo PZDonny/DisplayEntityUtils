@@ -1,10 +1,10 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.events.GroupAnimationStateChangeEvent;
-import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,6 +33,12 @@ public abstract class ActiveGroup {
     public abstract SequencedCollection<? extends ActivePart> getSpawnedDisplayParts();
 
     public abstract ActivePart getMasterPart();
+
+    public abstract ActivePartSelection createPartSelection();
+
+    public abstract ActivePartSelection createPartSelection(@NotNull PartFilter partFilter);
+
+    public abstract Location getLocation();
 
     void addActiveAnimator(DisplayAnimator animator){
         activeAnimators.add(animator);
