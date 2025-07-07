@@ -215,6 +215,15 @@ public abstract class ActivePartSelection {
 
 
     /**
+     * Determine whether a {@link ActivePart} is contained in this selection
+     * @param part the part
+     * @return a boolean
+     */
+    public boolean contains(@NotNull ActivePart part){
+        return selectedParts.contains(part);
+    }
+
+    /**
      * Get the index of a part in this part selection
      * @param part the part
      * @return an integer. -1 if the part is not contained in this selection

@@ -52,15 +52,6 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
         group.partSelections.add(this);
     }
 
-    /**
-     * Determine whether a {@link SpawnedDisplayEntityPart} is contained in this selection
-     * @param part
-     * @return a boolean
-     */
-    public boolean contains(@NotNull SpawnedDisplayEntityPart part){
-        return selectedParts.contains(part);
-    }
-
 
 
     /**
@@ -245,17 +236,15 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
 
     /**
      * Adds the glow effect to the block and item display parts within this selection
-     * @return this
      */
     @Override
-    public SpawnedPartSelection glow(){
+    public void glow(){
         for (ActivePart part : selectedParts){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
                 continue;
             }
             ((SpawnedDisplayEntityPart) part).glow();
         }
-        return this;
     }
 
     /**
@@ -286,14 +275,12 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
 
     /**
      * Removes the glow effect from all the display parts in this selection
-     * @return this
      */
     @Override
-    public SpawnedPartSelection unglow(){
+    public void unglow(){
         for (ActivePart part : selectedParts){
             ((SpawnedDisplayEntityPart) part).unglow();
         }
-        return this;
     }
 
     /**
@@ -419,7 +406,7 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
      * @param angleInDegrees the pivot angle
      */
     @Override
-    public void pivot(double angleInDegrees){
+    public void pivot(float angleInDegrees){
         for (ActivePart part : selectedParts){
             ((SpawnedDisplayEntityPart) part).pivot(angleInDegrees);
         }

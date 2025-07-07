@@ -206,16 +206,18 @@ public class PacketPartSelection extends ActivePartSelection implements Packeted
     }
 
     @Override
-    public void translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks) {
+    public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks) {
         for (ActivePart part : selectedParts){
             ((PacketDisplayEntityPart) part).translate(direction, distance, durationInTicks, delayInTicks);
         }
+        return true;
     }
 
     @Override
-    public void translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks) {
+    public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks) {
         for (ActivePart part : selectedParts){
             ((PacketDisplayEntityPart) part).translate(direction, distance, durationInTicks, delayInTicks);
         }
+        return true;
     }
 }
