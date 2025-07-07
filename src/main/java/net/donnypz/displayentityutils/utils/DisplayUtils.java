@@ -243,28 +243,16 @@ public final class DisplayUtils {
      */
     public static void translate(@NotNull Interaction interaction, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
         Location destination = interaction.getLocation().clone().add(direction.clone().normalize().multiply(distance));
-        PartTranslateEvent event = new PartTranslateEvent(interaction, destination, null,null);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()){
+        if (!new PartTranslateEvent(interaction, destination, null,null).callEvent()){
             return;
         }
-        if (durationInTicks < 0){
-            durationInTicks = 1;
-        }
 
-        direction = direction.clone();
-        direction.normalize();
+        double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
+        Vector incrementVector = direction
+                .clone()
+                .normalize()
+                .multiply(movementIncrement);
 
-        double movementIncrement;
-        if (durationInTicks == 0 || durationInTicks == 1){
-            movementIncrement = distance;
-        }
-        else{
-            movementIncrement = distance/(double) durationInTicks;
-        }
-        direction.multiply(movementIncrement);
-
-        Vector finalDirection = direction;
         new BukkitRunnable(){
             double currentDistance = 0;
             float lastYaw = interaction.getYaw();
@@ -272,17 +260,18 @@ public final class DisplayUtils {
             public void run() {
                 float newYaw = interaction.getYaw();
                 if (newYaw != lastYaw){
-                    finalDirection.rotateAroundY(Math.toRadians(lastYaw-newYaw));
+                    incrementVector.rotateAroundY(Math.toRadians(lastYaw-newYaw));
                     lastYaw = newYaw;
                 }
                 currentDistance+=Math.abs(movementIncrement);
-                Location tpLoc = interaction.getLocation().clone().add(finalDirection);
-                interaction.teleport(tpLoc);
+                Location tpLoc = interaction.getLocation().clone().add(incrementVector);
+
                 if (currentDistance >= distance){
-                    /*if (!interaction.getLocation().equals(destination)){
-                        interaction.teleport(destination);
-                    }*/
+                    interaction.teleport(destination);
                     cancel();
+                }
+                else{
+                    interaction.teleport(tpLoc);
                 }
             }
         }.runTaskTimer(DisplayEntityPlugin.getInstance(), delayInTicks, 1);

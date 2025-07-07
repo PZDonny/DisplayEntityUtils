@@ -705,6 +705,38 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         }
     }
 
+    public static void translateInteractionEventless(@NotNull Interaction interaction, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
+        Location destination = interaction.getLocation().clone().add(direction.clone().normalize().multiply(distance));
+        double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
+        Vector incrementVector = direction
+                .clone()
+                .normalize()
+                .multiply(movementIncrement);
+
+        new BukkitRunnable(){
+            double currentDistance = 0;
+            float lastYaw = interaction.getYaw();
+            @Override
+            public void run() {
+                float newYaw = interaction.getYaw();
+                if (newYaw != lastYaw){
+                    incrementVector.rotateAroundY(Math.toRadians(lastYaw-newYaw));
+                    lastYaw = newYaw;
+                }
+                currentDistance+=Math.abs(movementIncrement);
+                Location tpLoc = interaction.getLocation().clone().add(incrementVector);
+
+                if (currentDistance >= distance){
+                    interaction.teleport(destination);
+                    cancel();
+                }
+                else{
+                    interaction.teleport(tpLoc);
+                }
+            }
+        }.runTaskTimer(DisplayEntityPlugin.getInstance(), delayInTicks, 1);
+    }
+
     /**
      * Move the actual location of all the SpawnedDisplayEntityParts in this group through smooth teleportation.
      * Doing this multiple times in a short amount of time may bring unexpected results.
@@ -714,36 +746,49 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      */
     public void teleportMove(Vector direction, double distance, int durationInTicks){
         Location destination = masterPart.getEntity().getLocation().clone().add(direction.clone().normalize().multiply(distance));
-        GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()){
+        if (!new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent()){
             return;
         }
-        if (durationInTicks <= 0){
-            durationInTicks = 1;
-        }
-        direction.normalize();
-        double movementIncrement = distance/(double) durationInTicks;
-        direction.multiply(movementIncrement);
-        Entity master = masterPart.getEntity();
 
-        new BukkitRunnable(){
-            double currentDistance = 0;
-            @Override
-            public void run() {
-                if (!isSpawned()){
-                    cancel();
-                    return;
-                }
-                currentDistance+=Math.abs(movementIncrement);
-                Location tpLoc = master.getLocation().clone().add(direction);
-                teleportWithoutEvent(tpLoc, false);
-                if (currentDistance >= distance){
-                    new GroupTeleportMoveEndEvent(SpawnedDisplayEntityGroup.this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent();
-                    cancel();
-                }
+        double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
+        Vector incrementVector = direction
+                .clone()
+                .normalize()
+                .multiply(movementIncrement);
+
+        Entity master = masterPart.getEntity();
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
+            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                translateInteractionEventless((Interaction) part.getEntity(), direction, distance, durationInTicks, 0);
             }
-        }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, 1);
+            else{
+                new BukkitRunnable(){
+                    double currentDistance = 0;
+                    @Override
+                    public void run() {
+                        if (!isSpawned()){
+                            cancel();
+                            return;
+                        }
+                        currentDistance+=Math.abs(movementIncrement);
+                        Location tpLoc = master.getLocation().clone().add(incrementVector);
+
+                        part.getEntity().setRotation(tpLoc.getYaw(), tpLoc.getPitch());
+                        if (currentDistance >= distance){
+                            if (part.isMaster()){
+                                master.teleport(destination);
+                            }
+                            new GroupTeleportMoveEndEvent(SpawnedDisplayEntityGroup.this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent();
+                            cancel();
+                        }
+                        else if (part.isMaster()){
+                            master.teleport(tpLoc, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                        }
+
+                    }
+                }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, 1);
+            }
+        }
     }
 
     /**
