@@ -225,7 +225,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             throw new RuntimeException("Location must be set for packet-based part before showing it to players.");
         }
         viewers.add(player.getUniqueId());
-        attributeContainer.sendEntity(type, this, player, getLocation());
+        attributeContainer.sendEntity(type, this, player, getLocation(), true);
     }
 
     /**
@@ -252,7 +252,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         for (Player p : players){
             viewers.add(p.getUniqueId());
         }
-        attributeContainer.sendEntityUsingPlayers(type, this, players, getLocation());
+        attributeContainer.sendEntityUsingPlayers(type, this, players, getLocation(), true);
     }
 
     /**

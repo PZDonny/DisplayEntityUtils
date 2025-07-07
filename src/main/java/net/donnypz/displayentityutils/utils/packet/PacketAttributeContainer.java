@@ -149,11 +149,12 @@ public class PacketAttributeContainer implements Cloneable{
      * @param partType the type of entity this container represents
      * @param player the player
      * @param location the spawn location
+     * @param track whether this entity should be tracked internally
      * @return the entity's entity id
      */
-    public int sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Player player, @NotNull Location location){
+    public int sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Player player, @NotNull Location location, boolean track){
         int entityId = SpigotReflectionUtil.generateEntityId();
-        sendEntity(partType, entityId, player, location);
+        sendEntity(partType, entityId, player, location, track);
         return entityId;
     }
 
@@ -163,9 +164,12 @@ public class PacketAttributeContainer implements Cloneable{
      * @param entityId the entity id of the packet entity
      * @param player the player
      * @param location the spawn location
+     * @param track whether this entity should be tracked internally
      */
-    public void sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Player player, @NotNull Location location){
-        DEUUser.getOrCreateUser(player).trackPacketEntity(entityId, null);
+    public void sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Player player, @NotNull Location location, boolean track){
+        if (track) {
+            DEUUser.getOrCreateUser(player).trackPacketEntity(entityId, null);
+        }
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, createEntityPacket(entityId, partType, location));
         sendAttributes(partType, player, entityId);
     }
@@ -176,10 +180,13 @@ public class PacketAttributeContainer implements Cloneable{
      * @param part the packet display entity part
      * @param player the player
      * @param location the spawn location
+     * @param track whether this entity should be tracked internally
      */
-    public void sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull PacketDisplayEntityPart part, @NotNull Player player, @NotNull Location location){
+    public void sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull PacketDisplayEntityPart part, @NotNull Player player, @NotNull Location location, boolean track){
         int entityId = part.getEntityId();
-        DEUUser.getOrCreateUser(player).trackPacketEntity(part);
+        if (track) {
+            DEUUser.getOrCreateUser(player).trackPacketEntity(part);
+        }
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, createEntityPacket(entityId, part.getType(), location));
         sendAttributes(partType, player, entityId);
     }
@@ -189,10 +196,11 @@ public class PacketAttributeContainer implements Cloneable{
      * @param partType the type of entity this container represents
      * @param players the players
      * @param location the spawn location
+     * @param track whether this entity should be tracked internally
      */
-    public int sendEntityUsingPlayers(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Collection<Player> players, @NotNull Location location){
+    public int sendEntityUsingPlayers(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Collection<Player> players, @NotNull Location location, boolean track){
         int entityId = SpigotReflectionUtil.generateEntityId();
-        sendEntityUsingPlayers(partType, SpigotReflectionUtil.generateEntityId(), players, location);
+        sendEntityUsingPlayers(partType, SpigotReflectionUtil.generateEntityId(), players, location, track);
         return entityId;
     }
 
@@ -202,10 +210,11 @@ public class PacketAttributeContainer implements Cloneable{
      * @param entityId the entity id of the packet entity
      * @param players the players
      * @param location the spawn location
+     * @param track whether this entity should be tracked internally
      */
-    public void sendEntityUsingPlayers(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Collection<Player> players, @NotNull Location location){
+    public void sendEntityUsingPlayers(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Collection<Player> players, @NotNull Location location, boolean track){
         for (Player player : players){
-            sendEntity(partType, entityId, player, location);
+            sendEntity(partType, entityId, player, location, track);
         }
     }
 
@@ -215,10 +224,11 @@ public class PacketAttributeContainer implements Cloneable{
      * @param part the packet display entity part
      * @param players the players
      * @param location the spawn location
+     * @param track whether this entity should be tracked internally
      */
-    public void sendEntityUsingPlayers(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull PacketDisplayEntityPart part, @NotNull Collection<Player> players, @NotNull Location location){
+    public void sendEntityUsingPlayers(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull PacketDisplayEntityPart part, @NotNull Collection<Player> players, @NotNull Location location, boolean track){
         for (Player player : players){
-            sendEntity(partType, part, player, location);
+            sendEntity(partType, part, player, location, track);
         }
     }
 
@@ -228,10 +238,11 @@ public class PacketAttributeContainer implements Cloneable{
      * @param partType the type of entity this container represents
      * @param playerUUIDs the players
      * @param location the spawn location
+     * @param track whether this entity should be tracked internally
      */
-    public int sendEntityUsingUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location){
+    public int sendEntityUsingUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location, boolean track){
         int entityId = SpigotReflectionUtil.generateEntityId();
-        sendEntityUsingUUIDs(partType, SpigotReflectionUtil.generateEntityId(), playerUUIDs, location);
+        sendEntityUsingUUIDs(partType, SpigotReflectionUtil.generateEntityId(), playerUUIDs, location, track);
         return entityId;
     }
 
@@ -241,12 +252,13 @@ public class PacketAttributeContainer implements Cloneable{
      * @param entityId the entity id of the packet entity
      * @param playerUUIDs the players
      * @param location the spawn location
+     * @param track whether this entity should be tracked internally
      */
-    public void sendEntityUsingUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location){
+    public void sendEntityUsingUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location, boolean track){
         for (UUID uuid : playerUUIDs){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
-            sendEntity(partType, entityId, player, location);
+            sendEntity(partType, entityId, player, location, track);
         }
     }
 
@@ -256,12 +268,13 @@ public class PacketAttributeContainer implements Cloneable{
      * @param part the packet display entity part
      * @param playerUUIDs the players
      * @param location the spawn location
+     * @param track whether this entity should be tracked internally
      */
-    public void sendEntityUsingUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull PacketDisplayEntityPart part, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location){
+    public void sendEntityUsingUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull PacketDisplayEntityPart part, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location, boolean track){
         for (UUID uuid : playerUUIDs){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
-            sendEntity(partType, part, player, location);
+            sendEntity(partType, part, player, location, track);
         }
     }
 
