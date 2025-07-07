@@ -38,6 +38,9 @@ public abstract class ActivePart {
 
     public abstract @Nullable Vector getInteractionTranslation();
 
+    public abstract float getInteractionHeight();
+
+    public abstract float getInteractionWidth();
 
     public abstract Collection<String> getTags();
 

@@ -813,6 +813,30 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return DisplayUtils.getInteractionTranslation((Interaction) getEntity());
     }
 
+    /**
+     * Get the interaction height of this part if it is an interaction
+     * @return the height or -1 if the part is not an interaction
+     */
+    @Override
+    public float getInteractionHeight() {
+        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
+            return -1;
+        }
+        return ((Interaction) getEntity()).getInteractionHeight();
+    }
+
+    /**
+     * Get the interaction width of this part if it is an interaction
+     * @return the width or -1 if the part is not an interaction
+     */
+    @Override
+    public float getInteractionWidth() {
+        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
+            return -1;
+        }
+        return ((Interaction) getEntity()).getInteractionWidth();
+    }
+
     public enum PartType{
         BLOCK_DISPLAY,
         ITEM_DISPLAY,

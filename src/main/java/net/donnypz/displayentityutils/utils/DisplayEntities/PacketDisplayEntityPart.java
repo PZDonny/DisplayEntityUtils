@@ -73,6 +73,30 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         return v != null ? Vector.fromJOML(v) : null;
     }
 
+    /**
+     * Get the interaction height of this part if it is an interaction
+     * @return the height or -1 if the part is not an interaction
+     */
+    @Override
+    public float getInteractionHeight() {
+        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
+            return -1;
+        }
+        return attributeContainer.getAttribute(DisplayAttributes.Interaction.HEIGHT);
+    }
+
+    /**
+     * Get the interaction width of this part if it is an interaction
+     * @return the width or -1 if the part is not an interaction
+     */
+    @Override
+    public float getInteractionWidth() {
+        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
+            return -1;
+        }
+        return attributeContainer.getAttribute(DisplayAttributes.Interaction.WIDTH);
+    }
+
 
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap){
         this.attributeContainer.setAttributesAndSend(attributeMap, entityId, viewers);
