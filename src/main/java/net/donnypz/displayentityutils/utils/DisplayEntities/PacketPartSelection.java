@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
-public class PacketPartSelection extends ActiveSelection implements Packeted{
+public class PacketPartSelection extends ActivePartSelection implements Packeted{
     public PacketPartSelection(@NotNull PacketDisplayEntityGroup group, @NotNull String partTag) {
         super(group, partTag);
     }

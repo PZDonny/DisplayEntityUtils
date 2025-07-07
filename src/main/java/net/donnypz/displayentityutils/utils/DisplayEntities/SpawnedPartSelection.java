@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public final class SpawnedPartSelection extends ActiveSelection implements Spawned{
+public final class SpawnedPartSelection extends ActivePartSelection implements Spawned{
 
     /**
      * Create a SpawnedPartSelection for parts with the specified part tag from a group.

@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public abstract class ActiveSelection {
+public abstract class ActivePartSelection {
     ActiveGroup group;
     LinkedHashSet<ActivePart> selectedParts = new LinkedHashSet<>();
 
@@ -28,7 +28,7 @@ public abstract class ActiveSelection {
      * @param group The group to get the parts from
      * @param partTag The part tag to include in the filter
      */
-    public ActiveSelection(ActiveGroup group, @NotNull String partTag){
+    public ActivePartSelection(ActiveGroup group, @NotNull String partTag){
         this(group, Set.of(partTag));
     }
 
@@ -37,7 +37,7 @@ public abstract class ActiveSelection {
      * @param group The group to get the parts from
      * @param partTags The part tags to include in the filter
      */
-    public ActiveSelection(ActiveGroup group, @NotNull Collection<String> partTags){
+    public ActivePartSelection(ActiveGroup group, @NotNull Collection<String> partTags){
         this(group, new PartFilter().includePartTags(partTags));
     }
 
@@ -45,7 +45,7 @@ public abstract class ActiveSelection {
      * Create a SpawnedPartSelection containing all parts from a group.
      * @param group The group to cycle through for this selection.
      */
-    public ActiveSelection(ActiveGroup group){
+    public ActivePartSelection(ActiveGroup group){
         this(group, new PartFilter());
     }
 
@@ -54,7 +54,7 @@ public abstract class ActiveSelection {
      * @param group The group to cycle through for this selection.
      * @param filter The filter used to filter parts
      */
-    public ActiveSelection(@NotNull ActiveGroup group, @NotNull PartFilter filter){
+    public ActivePartSelection(@NotNull ActiveGroup group, @NotNull PartFilter filter){
         this.group = group;
         this.includeBlockTypes = filter.includeBlockTypes;
         this.includeItemTypes = filter.includeItemTypes;
