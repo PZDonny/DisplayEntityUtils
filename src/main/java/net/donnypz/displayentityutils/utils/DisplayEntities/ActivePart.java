@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,6 +35,9 @@ public abstract class ActivePart {
     public SpawnedDisplayEntityPart.PartType getType(){
         return type;
     }
+
+    public abstract @Nullable Vector getInteractionTranslation();
+
 
     public abstract Collection<String> getTags();
 

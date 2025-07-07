@@ -16,6 +16,7 @@ import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.*;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -58,6 +59,20 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public int getEntityId(){
         return entityId;
     }
+
+    /**
+     * Get the interaction translation of this part, relative to the group's location <bold><u>only</u></bold> if the part is an interaction.
+     * @return a vector. Null if the part is not an interaction or if its TRANSLATE attribute is not set
+     */
+    @Override
+    public @Nullable Vector getInteractionTranslation() {
+        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
+            return null;
+        }
+        Vector3f v = attributeContainer.getAttribute(DisplayAttributes.Transform.TRANSLATION);
+        return v != null ? Vector.fromJOML(v) : null;
+    }
+
 
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap){
         this.attributeContainer.setAttributesAndSend(attributeMap, entityId, viewers);
@@ -132,6 +147,23 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     public float getYaw(){
         return packetLocation.yaw;
+    }
+
+    /**
+     * Get the transformation of this part if its type of not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * @return a {@link Transformation}
+     * @throws RuntimeException if called for an interaction part
+     */
+    public Transformation getTransformation(){
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            throw new RuntimeException("Cannot create transformation for packet-based interaction entity.");
+        }
+        return new Transformation(
+                attributeContainer.getAttribute(DisplayAttributes.Transform.TRANSLATION),
+                attributeContainer.getAttribute(DisplayAttributes.Transform.LEFT_ROTATION),
+                attributeContainer.getAttribute(DisplayAttributes.Transform.SCALE),
+                attributeContainer.getAttribute(DisplayAttributes.Transform.RIGHT_ROTATION)
+        );
     }
 
     /**
@@ -298,8 +330,23 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * Get the {@link UUID}s of players who can see this part
      * @return a set of uuids
      */
-    public @NotNull Set<UUID> getViewers(){
+    public @NotNull Collection<UUID> getViewers(){
         return new HashSet<>(viewers);
+    }
+
+    /**
+     * Get the {@link UUID}s of players who can see this part
+     * @return a set of uuids
+     */
+    public @NotNull Collection<Player> getViewersAsPlayers(){
+        HashSet<Player> players = new HashSet<>();
+        for (UUID uuid : viewers){
+            Player p = Bukkit.getPlayer(uuid);
+            if (p != null){
+                players.add(p);
+            }
+        }
+        return players;
     }
 
 
@@ -313,7 +360,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * @param delayInTicks How long before the translation should begin
      */
     @Override
-    public void translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks) {
+    public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks) {
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
             PacketUtils.translateInteraction(this, direction, distance, durationInTicks, delayInTicks);
         }
@@ -330,6 +377,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
                                 viewers);
             }, delayInTicks*50L, TimeUnit.MILLISECONDS);
         }
+        return true;
     }
 
     /**
@@ -342,8 +390,8 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * @param delayInTicks How long before the translation should begin
      */
     @Override
-    public void translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks) {
-        translate(direction.getVector(this), distance, durationInTicks, delayInTicks);
+    public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks) {
+        return translate(direction.getVector(this), distance, durationInTicks, delayInTicks);
     }
 
     /**

@@ -429,17 +429,14 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     /**
      * Adds the glow effect to this SpawnDisplayEntityPart. This does <b><u>NOT</u></b> apply to Interaction or Text Display entities. Use {@link #spawnInteractionOutline(Player, long)} to show an outline of
      * an interaction for a specific player.
-     * @return this
      */
 
-    public SpawnedDisplayEntityPart glow(){
+    public void glow(){
         Entity entity = getEntity();
         if (type == PartType.INTERACTION || type == PartType.TEXT_DISPLAY) {
-            return this;
+            return;
         }
-
         entity.setGlowing(true);
-        return this;
     }
 
     /**
@@ -518,11 +515,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * Stops this part from glowing if it's a display entity
      */
     @Override
-    public SpawnedDisplayEntityPart unglow(){
+    public void unglow(){
         if (type != PartType.INTERACTION) {
             getEntity().setGlowing(false);
         }
-        return this;
     }
 
     /**
@@ -763,7 +759,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @param angleInDegrees the pivot angle
      */
     @Override
-    public void pivot(double angleInDegrees){
+    public void pivot(float angleInDegrees){
         Entity entity = getEntity();
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION){
             return;
@@ -803,6 +799,18 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public int getEntityId() {
         return getEntity().getEntityId();
+    }
+
+    /**
+     * Get the interaction translation of this part, relative to the group's location <bold><u>only</u></bold> if the part is an interaction.
+     * @return a vector or null if the part is not an interaction
+     */
+    @Override
+    public @Nullable Vector getInteractionTranslation() {
+        if (type != PartType.INTERACTION) {
+            return null;
+        }
+        return DisplayUtils.getInteractionTranslation((Interaction) getEntity());
     }
 
     public enum PartType{
