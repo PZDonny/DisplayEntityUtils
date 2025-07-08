@@ -247,6 +247,11 @@ public final class DisplayUtils {
             return;
         }
 
+        if (durationInTicks <= 0 && delayInTicks <= 0){
+            interaction.teleport(destination);
+            return;
+        }
+
         double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
         Vector incrementVector = direction
                 .clone()
