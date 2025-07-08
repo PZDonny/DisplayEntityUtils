@@ -18,7 +18,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -35,6 +38,19 @@ public class PacketAttributeContainer implements Cloneable{
      */
     public <T, V> PacketAttributeContainer setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value){
         attributes.put(attribute, value);
+        return this;
+    }
+
+    /**
+     * Set the values of a transformation through this single method instead of chaining
+     * @param transformation the transformation
+     * @return this
+     */
+    public PacketAttributeContainer setTransformation(@NotNull Transformation transformation){
+        setAttribute(DisplayAttributes.Transform.TRANSLATION, new Vector3f(transformation.getTranslation()));
+        setAttribute(DisplayAttributes.Transform.LEFT_ROTATION, new Quaternionf(transformation.getLeftRotation()));
+        setAttribute(DisplayAttributes.Transform.SCALE, new Vector3f(transformation.getScale()));
+        setAttribute(DisplayAttributes.Transform.RIGHT_ROTATION, new Quaternionf(transformation.getRightRotation()));
         return this;
     }
 

@@ -1,7 +1,11 @@
 package net.donnypz.displayentityutils.utils.packet;
 
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,6 +34,19 @@ public class DisplayAttributeMap {
      */
     public DisplayAttributeMap add(@NotNull DisplayAttributeMap map){
         this.attributes.putAll(map.attributes);
+        return this;
+    }
+
+    /**
+     * Set the values of a transformation through this single method instead of chaining
+     * @param transformation the transformation
+     * @return this
+     */
+    public DisplayAttributeMap addTransformation(@NotNull Transformation transformation){
+        add(DisplayAttributes.Transform.TRANSLATION, new Vector3f(transformation.getTranslation()));
+        add(DisplayAttributes.Transform.LEFT_ROTATION, new Quaternionf(transformation.getLeftRotation()));
+        add(DisplayAttributes.Transform.SCALE, new Vector3f(transformation.getScale()));
+        add(DisplayAttributes.Transform.RIGHT_ROTATION, new Quaternionf(transformation.getRightRotation()));
         return this;
     }
 }
