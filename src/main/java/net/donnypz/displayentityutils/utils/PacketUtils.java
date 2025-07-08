@@ -11,6 +11,8 @@ import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import net.kyori.adventure.text.Component;
@@ -103,6 +105,34 @@ public final class PacketUtils {
         }
     }
 
+    public static void scaleInteraction(@NotNull PacketDisplayEntityPart part, float newHeight, float newWidth, int durationInTicks, int delayInTicks){
+        if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION) return;
+        if (durationInTicks <= 0 && delayInTicks <= 0){
+            sendInteractionPacket(part, newHeight, newWidth);
+            return;
+        }
+
+        float heightChange = (part.getInteractionHeight()-newHeight)/durationInTicks;
+        float widthChange = (part.getInteractionWidth()-newWidth)/durationInTicks;
+        new BukkitRunnable(){
+            int timeRan = 0;
+            @Override
+            public void run() {
+                if (timeRan == durationInTicks){
+                    cancel();
+                    return;
+                }
+                sendInteractionPacket(part, part.getInteractionHeight()-heightChange, part.getInteractionHeight()-widthChange);
+                timeRan++;
+            }
+        }.runTaskTimerAsynchronously(DisplayEntityPlugin.getInstance(), delayInTicks, 1);
+    }
+
+    static void sendInteractionPacket(PacketDisplayEntityPart part, float newHeight, float newWidth){
+        part.setAttributes(new DisplayAttributeMap()
+                .add(DisplayAttributes.Interaction.HEIGHT, newHeight)
+                .add(DisplayAttributes.Interaction.WIDTH, newWidth));
+    }
 
     /**
      * Attempts to change the translation of a packet-based interaction entity similar
@@ -115,6 +145,7 @@ public final class PacketUtils {
      * @param delayInTicks How long before the translation should begin
      */
     public static void translateInteraction(@NotNull PacketDisplayEntityPart part, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
+        if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION) return;
         Location destination = part.getLocation().clone().add(direction.clone().normalize().multiply(distance));
 
         double movementIncrement = distance/(double) Math.max(durationInTicks, 1);

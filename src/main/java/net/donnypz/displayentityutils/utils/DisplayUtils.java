@@ -369,24 +369,26 @@ public final class DisplayUtils {
     /**
      * Scale an Interaction entity over a period of time
      * @param interaction the interaction entity
-     * @param height the height to set
-     * @param width the width to set
+     * @param newHeight the height to set
+     * @param newWidth the width to set
      * @param durationInTicks how long the scaling should take
      * @param delayInTicks how long before the scaling should start
      */
-    public static void scaleInteraction(Interaction interaction, float height, float width, int durationInTicks, int delayInTicks){
+    public static void scaleInteraction(Interaction interaction, float newHeight, float newWidth, int durationInTicks, int delayInTicks){
         if (durationInTicks <= 0 && delayInTicks <= 0){
-            interaction.setInteractionHeight(height);
-            interaction.setInteractionWidth(width);
+            interaction.setInteractionHeight(newHeight);
+            interaction.setInteractionWidth(newWidth);
             return;
         }
-        float heightChange = (interaction.getInteractionHeight()-height)/durationInTicks;
-        float widthChange = (interaction.getInteractionWidth()-width)/durationInTicks;
+        float heightChange = (interaction.getInteractionHeight()-newHeight)/durationInTicks;
+        float widthChange = (interaction.getInteractionWidth()-newWidth)/durationInTicks;
         new BukkitRunnable(){
             int timeRan = 0;
             @Override
             public void run() {
                 if (timeRan == durationInTicks){
+                    interaction.setInteractionHeight(newHeight);
+                    interaction.setInteractionWidth(newWidth);
                     cancel();
                     return;
                 }
