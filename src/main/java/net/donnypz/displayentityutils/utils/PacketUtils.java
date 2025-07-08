@@ -148,6 +148,11 @@ public final class PacketUtils {
         if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION) return;
         Location destination = part.getLocation().clone().add(direction.clone().normalize().multiply(distance));
 
+        if (durationInTicks <= 0 && delayInTicks <= 0){
+            part.teleport(destination);
+            return;
+        }
+
         double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
         Vector incrementVector = direction
                 .clone()
