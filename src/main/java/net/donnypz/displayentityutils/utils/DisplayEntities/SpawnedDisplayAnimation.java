@@ -88,7 +88,7 @@ public final class SpawnedDisplayAnimation{
         for (SpawnedDisplayAnimationFrame frame : frames){
             HashMap<UUID, DisplayTransformation> displayTransformations = new HashMap<>();
             HashMap<UUID, Vector3f> interactionTransformations = new HashMap<>();
-            for (SpawnedDisplayEntityPart part : selection.selectedParts){
+            for (ActivePart part : selection.selectedParts){
                 UUID partUUID = part.getPartUUID();
 
                 DisplayTransformation dt = frame.displayTransformations.get(partUUID);
