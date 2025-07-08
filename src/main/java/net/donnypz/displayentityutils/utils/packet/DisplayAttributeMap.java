@@ -16,6 +16,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DisplayAttributeMap {
     Map<DisplayAttribute<?, ?>, Object> attributes = new ConcurrentHashMap<>();
 
+
+    public DisplayAttributeMap(){}
+
+    public <T, V> DisplayAttributeMap(@NotNull DisplayAttribute<T, V> attribute, T value){
+        add(attribute, value);
+    }
     /**
      * Add an attribute and a corresponding value to this updater
      * @param attribute the attribute
