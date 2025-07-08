@@ -9,11 +9,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import net.donnypz.displayentityutils.utils.DisplayEntities.Spawned;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
-import org.bukkit.Bukkit;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import org.bukkit.entity.Display;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +35,7 @@ public class EffSpawnedBillboard extends Effect {
 
     @Override
     protected void execute(Event event) {
-        Spawned spawned = (Spawned) object.getSingle(event);
+        Active spawned = (Active) object.getSingle(event);
         Display.Billboard b = billboard.getSingle(event);
         if (spawned != null && b != null) {
             spawned.setBillboard(b);

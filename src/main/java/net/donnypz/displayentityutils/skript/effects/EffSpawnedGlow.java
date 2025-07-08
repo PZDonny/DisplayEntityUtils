@@ -10,6 +10,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.util.Timespan;
 import ch.njol.util.Kleenean;
+import net.donnypz.displayentityutils.utils.DisplayEntities.Active;
 import net.donnypz.displayentityutils.utils.DisplayEntities.Spawned;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -64,8 +65,8 @@ public class EffSpawnedGlow extends Effect {
             if (ts != null) ticks = ts.getAs(Timespan.TimePeriod.TICK);
         }
 
-        Spawned[] objects = (Spawned[]) object.getArray(event);
-        for (Spawned s : objects){
+        Active[] objects = (Active[]) object.getArray(event);
+        for (Active s : objects){
             if (s == null) continue;
             if (!glow){
                 if (players == null){
@@ -73,7 +74,7 @@ public class EffSpawnedGlow extends Effect {
                 }
                 else{
                     for (Player p : players.getArray(event)){
-                        s.unglow(p);
+                        ((Spawned) s).unglow(p);
                     }
                 }
             }
@@ -83,12 +84,12 @@ public class EffSpawnedGlow extends Effect {
                         s.glow();
                     }
                     else{
-                        s.glow(ticks);
+                        ((Spawned) s).glow(ticks);
                     }
                 }
                 else{
                     for (Player player : players.getArray(event)){
-                        s.glow(player, Math.max(-1, ticks));
+                        ((Spawned) s).glow(player, Math.max(-1, ticks));
                     }
                 }
             }

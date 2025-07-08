@@ -11,7 +11,7 @@ import ch.njol.skript.util.Color;
 import ch.njol.skript.util.ColorRGB;
 import ch.njol.util.coll.CollectionUtils;
 import ch.njol.skript.doc.Name;
-import net.donnypz.displayentityutils.utils.DisplayEntities.Spawned;
+import net.donnypz.displayentityutils.utils.DisplayEntities.Active;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import org.bukkit.event.Event;
@@ -70,7 +70,7 @@ public class ExprSpawnedGlowColor extends SimplePropertyExpression<Object, Color
         if (o == null){
             return;
         }
-        Spawned spawned = (Spawned) o;
+        Active spawned = (Active) o;
 
         switch (mode) {
             case SET -> {

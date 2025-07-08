@@ -9,6 +9,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
+import net.donnypz.displayentityutils.utils.DisplayEntities.Active;
 import net.donnypz.displayentityutils.utils.DisplayEntities.Spawned;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -34,10 +35,10 @@ public class EffSpawnedViewRange extends Effect {
 
     @Override
     protected void execute(Event event) {
-        Spawned[] spawned = (Spawned[]) object.getArray(event);
+        Active[] spawned = (Active[]) object.getArray(event);
         Number n = range.getSingle(event);
         if (spawned == null || n == null) return;
-        for (Spawned s : spawned){
+        for (Active s : spawned){
             s.setViewRange(n.floatValue());
         }
     }

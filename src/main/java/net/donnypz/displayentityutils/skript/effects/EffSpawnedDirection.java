@@ -9,7 +9,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import net.donnypz.displayentityutils.utils.DisplayEntities.Spawned;
+import net.donnypz.displayentityutils.utils.DisplayEntities.Active;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,15 +44,15 @@ public class EffSpawnedDirection extends Effect {
         if (n == null) return;
 
         float value = n.floatValue();
-        Spawned[] objects = (Spawned[]) object.getArray(event);
+        Active[] objects = (Active[]) object.getArray(event);
         if (yaw){
-            for (Spawned s : objects){
+            for (Active s : objects){
                 if (s == null) continue;
                 s.setYaw(value, pivot);
             }
         }
         else{
-            for (Spawned s : objects){
+            for (Active s : objects){
                 if (s == null) continue;
                 s.setPitch(value);
             }
