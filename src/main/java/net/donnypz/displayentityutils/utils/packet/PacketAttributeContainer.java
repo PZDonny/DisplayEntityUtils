@@ -315,20 +315,6 @@ public class PacketAttributeContainer implements Cloneable{
         }
     }
 
-    /*private Location getTrueLocation(SpawnedDisplayEntityPart.PartType partType, Location location){
-        Vector3f vector = getAttribute(DisplayAttributes.Transform.TRANSLATION);
-        if (partType == SpawnedDisplayEntityPart.PartType.INTERACTION && vector != null){
-            Vector translationVector = Vector.fromJOML(vector);
-
-            if (DisplayEntityPlugin.autoPivotInteractions()){
-                return DisplayUtils.getPivotLocation(translationVector, location, location.getYaw());
-            }
-            else{
-                return location.clone().subtract(translationVector);
-            }
-        }
-        return location;
-    }*/
 
     /**
      * Send attribute data to a player for a specific entity
@@ -433,10 +419,6 @@ public class PacketAttributeContainer implements Cloneable{
             DisplayAttribute<?, ?> attr = entry.getKey();
             Object val = entry.getValue();
 
-            //Interaction entity offset
-            if (partType == SpawnedDisplayEntityPart.PartType.INTERACTION && attr == DisplayAttributes.Transform.TRANSLATION){
-                continue;
-            }
 
             DisplayAttribute<Object, Object> castedAttr = (DisplayAttribute<Object, Object>) attr;
 
