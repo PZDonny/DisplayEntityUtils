@@ -65,20 +65,20 @@ public final class PacketUtils {
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, metadataPacket);
     }
 
-    public static void setLocation(@NotNull Player player, @NotNull PacketDisplayEntityPart part, @NotNull Location location){
-        setLocation(player, part.getEntityId(), location);
+    public static void teleport(@NotNull Player player, @NotNull PacketDisplayEntityPart part, @NotNull Location location){
+        teleport(player, part.getEntityId(), location);
     }
 
-    public static void setLocation(@NotNull Player player, int entityId, @NotNull Location location){
+    public static void teleport(@NotNull Player player, int entityId, @NotNull Location location){
         WrapperPlayServerEntityTeleport telPacket = new WrapperPlayServerEntityTeleport(entityId, SpigotConversionUtil.fromBukkitLocation(location), false);
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, telPacket);
     }
 
-    public static void setLocation(@NotNull Collection<Player> players, @NotNull PacketDisplayEntityPart part, @NotNull Location location){
-        setLocation(players, part.getEntityId(), location);
+    public static void teleport(@NotNull Collection<Player> players, @NotNull PacketDisplayEntityPart part, @NotNull Location location){
+        teleport(players, part.getEntityId(), location);
     }
 
-    public static void setLocation(@NotNull Collection<Player> players, int entityId, @NotNull Location location){
+    public static void teleport(@NotNull Collection<Player> players, int entityId, @NotNull Location location){
         WrapperPlayServerEntityTeleport telPacket = new WrapperPlayServerEntityTeleport(entityId, SpigotConversionUtil.fromBukkitLocation(location), false);
         for (Player player : players){
             PacketEvents.getAPI().getPlayerManager().sendPacket(player, telPacket);
