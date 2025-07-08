@@ -97,12 +97,23 @@ public class PacketAttributeContainer implements Cloneable{
     }
 
     /**
-     * Ge the value stored on a given attribute
+     * Get the value stored on a given attribute
      * @param attribute the attribute
      * @return the value stored for the given attribute
      */
     public <T, V> T getAttribute(DisplayAttribute<T, V> attribute){
         return (T) attributes.get(attribute);
+    }
+
+    /**
+     * Get the value stored on a given attribute or, if null, return the given default value
+     * @param attribute the attribute
+     * @param defaultValue the default return value
+     * @return the value or null
+     */
+    public <T,V> T getAttributeOrDefault(DisplayAttribute<T, V> attribute, @NotNull T defaultValue){
+        T value = getAttribute(attribute);
+        return value == null ? defaultValue : value;
     }
 
     /**
@@ -327,8 +338,17 @@ public class PacketAttributeContainer implements Cloneable{
      * @param playerUUIDs the players
      * @param entityId the entity's entity id
      */
-    public void sendAttributes(@NotNull Collection<UUID> playerUUIDs, int entityId){
+    public void sendAttributesUsingUUIDs(@NotNull Collection<UUID> playerUUIDs, int entityId){
         sendAttributesToUUIDs(playerUUIDs, entityId, getMetadataList(attributes));
+    }
+
+    /**
+     * Send attribute data to players for a specific entity
+     * @param players the players
+     * @param entityId the entity's entity id
+     */
+    public void sendAttributesUsingPlayers(@NotNull Collection<Player> players, int entityId){
+        sendAttributesToPlayers(players, entityId, getMetadataList(attributes));
     }
 
     private void sendAttributes(@NotNull Player player, int entityId, List<EntityData<?>> data){
