@@ -22,4 +22,14 @@ public class DisplayAttributeMap {
         this.attributes.put(attribute, value);
         return this;
     }
+
+    /**
+     * Add the attribute from one {@link DisplayAttributeMap} to this updater
+     * @param map the object that will add its attributes to this
+     * @return this
+     */
+    public DisplayAttributeMap add(@NotNull DisplayAttributeMap map){
+        this.attributes.putAll(map.attributes);
+        return this;
+    }
 }
