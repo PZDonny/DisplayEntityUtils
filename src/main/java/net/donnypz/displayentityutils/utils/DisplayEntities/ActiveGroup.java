@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.events.GroupAnimationStateChangeEvent;
+import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
 import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
@@ -244,7 +244,7 @@ public abstract class ActiveGroup implements Active{
             return false;
         }
 
-        if (!new GroupAnimationStateChangeEvent(this, stateMachine, state, currentMachineState).callEvent()){
+        if (!new AnimationStateChangeEvent(this, stateMachine, state, currentMachineState).callEvent()){
             return false;
         }
 

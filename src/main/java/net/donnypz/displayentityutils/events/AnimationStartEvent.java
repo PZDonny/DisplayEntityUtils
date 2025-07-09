@@ -10,14 +10,14 @@ import org.jetbrains.annotations.NotNull;
  * Called when a {@link DisplayAnimator} starts playing a {@link SpawnedDisplayAnimation}.
  * This is called once on an animator of the type {@link DisplayAnimator.AnimationType#LOOP}.
  */
-public class GroupAnimationStartEvent extends Event implements Cancellable {
+public class AnimationStartEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     ActiveGroup group;
     SpawnedDisplayAnimation animation;
     DisplayAnimator animator;
     private boolean isCancelled = false;
 
-    public GroupAnimationStartEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation){
+    public AnimationStartEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation){
         this.group = group;
         this.animation = animation;
         this.animator = animator;

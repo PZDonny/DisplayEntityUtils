@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities.machine;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.events.GroupAnimationStateChangeEvent;
+import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.Material;
@@ -167,7 +167,7 @@ public class DisplayStateMachine {
      * Set the state of a group. This method will check if the state and the group exists within this state machine, and execute without throwing exceptions
      * @param stateID the name of the state
      * @param group the group to apply the new state to
-     * @return false if {@link GroupAnimationStateChangeEvent} is cancelled, the state doesn't exist, or the group is not contained in this state machine.
+     * @return false if {@link AnimationStateChangeEvent} is cancelled, the state doesn't exist, or the group is not contained in this state machine.
      */
     public boolean setStateIfPresent(@NotNull String stateID, @NotNull SpawnedDisplayEntityGroup group){
         if (hasState(stateID) && contains(group)){
@@ -180,7 +180,7 @@ public class DisplayStateMachine {
      * Set the state of a group. This method will check if the state and the group exists within this state machine, and execute without throwing exceptions
      * @param state the state
      * @param group the group to apply the new state to
-     * @return false if {@link GroupAnimationStateChangeEvent} is cancelled, the state doesn't exist, or the group is not contained in this state machine.
+     * @return false if {@link AnimationStateChangeEvent} is cancelled, the state doesn't exist, or the group is not contained in this state machine.
      */
     public boolean setStateIfPresent(@NotNull MachineState state, @NotNull SpawnedDisplayEntityGroup group){
         return setStateIfPresent(state.stateID, group);
@@ -190,7 +190,7 @@ public class DisplayStateMachine {
      * Set the state of a group. This method will check if the state and the group exists within this state machine, and execute without throwing exceptions
      * @param stateType the state
      * @param group the group to apply the new state to
-     * @return false if {@link GroupAnimationStateChangeEvent} is cancelled, the state doesn't exist, or the group is not contained in this state machine.
+     * @return false if {@link AnimationStateChangeEvent} is cancelled, the state doesn't exist, or the group is not contained in this state machine.
      */
     public boolean setStateIfPresent(@NotNull MachineState.StateType stateType, @NotNull SpawnedDisplayEntityGroup group){
         return setStateIfPresent(stateType.getStateID(), group);
@@ -199,12 +199,12 @@ public class DisplayStateMachine {
     /**
      * Set the state of a group contained in this state machine.
      * This will automatically update the SpawnedDisplayEntityGroup associated with this, and play animations from the first frame.
-     * This will NOT call the {@link GroupAnimationStateChangeEvent} if the new state is the same as the group's current state.
+     * This will NOT call the {@link AnimationStateChangeEvent} if the new state is the same as the group's current state.
      * @param stateID the name of the state
      * @param group the group to apply the new state to
      * @throws IllegalArgumentException if a {@link MachineState} with the given stateID could not be found
      * or if the group is not contained in this state machine
-     * @return false if {@link GroupAnimationStateChangeEvent} is cancelled or the group is not contained in this state machine.
+     * @return false if {@link AnimationStateChangeEvent} is cancelled or the group is not contained in this state machine.
      */
     public boolean setState(@NotNull String stateID, @NotNull SpawnedDisplayEntityGroup group){
         if (this != groupMachines.get(group)){
@@ -221,12 +221,12 @@ public class DisplayStateMachine {
     /**
      * Set the state of a group contained in this state machine.
      * This will automatically update the SpawnedDisplayEntityGroup associated with this, and play animations from the first frame.
-     * This will NOT call the {@link GroupAnimationStateChangeEvent} if the new state is the same as the group's current state.
+     * This will NOT call the {@link AnimationStateChangeEvent} if the new state is the same as the group's current state.
      * @param machineState the name the state
      * @param group the group to apply the new state to
      * @throws IllegalArgumentException if a {@link MachineState} with the given MachineState's ID could not be found
      * or if the group is not contained in this state machine
-     * @return false if {@link GroupAnimationStateChangeEvent} is cancelled or the group is not contained in this state machine.
+     * @return false if {@link AnimationStateChangeEvent} is cancelled or the group is not contained in this state machine.
      */
     public boolean setState(@NotNull MachineState machineState, @NotNull SpawnedDisplayEntityGroup group){
         return setState(machineState.stateID, group);
@@ -235,12 +235,12 @@ public class DisplayStateMachine {
     /**
      * Set the state of a group contained in this state machine.
      * This will automatically update the SpawnedDisplayEntityGroup associated with this, and play animations from the first frame.
-     * This will NOT call the {@link GroupAnimationStateChangeEvent} if the new state is the same as the group's current state.
+     * This will NOT call the {@link AnimationStateChangeEvent} if the new state is the same as the group's current state.
      * @param stateType the state
      * @param group the group to apply the new state to
      * @throws IllegalArgumentException if a {@link MachineState} with the given state type could not be found
      * or if the group is not contained in this state machine
-     * @return false if {@link GroupAnimationStateChangeEvent} is cancelled or the group is not contained in this state machine.
+     * @return false if {@link AnimationStateChangeEvent} is cancelled or the group is not contained in this state machine.
      */
     public boolean setState(@NotNull MachineState.StateType stateType, @NotNull SpawnedDisplayEntityGroup group){
         return setState(stateType.getStateID(), group);

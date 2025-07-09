@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
  * Can be cancelled.
  */
 @Experimental
-public class GroupAnimationStateChangeEvent extends Event implements Cancellable {
+public class AnimationStateChangeEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private boolean isCancelled = false;
     private final ActiveGroup group;
@@ -26,7 +26,7 @@ public class GroupAnimationStateChangeEvent extends Event implements Cancellable
     private final MachineState newState;
     private final MachineState oldState;
     
-    public GroupAnimationStateChangeEvent(@NotNull ActiveGroup group, @NotNull DisplayStateMachine stateMachine, @Nullable MachineState newState, @Nullable MachineState oldState){
+    public AnimationStateChangeEvent(@NotNull ActiveGroup group, @NotNull DisplayStateMachine stateMachine, @Nullable MachineState newState, @Nullable MachineState oldState){
         this.group = group;
         this.stateMachine = stateMachine;
         this.newState = newState;

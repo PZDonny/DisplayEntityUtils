@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
  * Called when a {@link SpawnedDisplayAnimationFrame} ends in an animation
  * This ignores the frame's delay and is called after translation of parts in the group.
  */
-public class GroupAnimateFrameEndEvent extends Event {
+public class AnimationFrameEndEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
 
@@ -18,7 +18,7 @@ public class GroupAnimateFrameEndEvent extends Event {
     private SpawnedDisplayAnimationFrame frame;
     private DisplayAnimator animator;
 
-    public GroupAnimateFrameEndEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame, boolean isAsync){
+    public AnimationFrameEndEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame, boolean isAsync){
         super(isAsync);
         this.group = group;
         this.animation = animation;

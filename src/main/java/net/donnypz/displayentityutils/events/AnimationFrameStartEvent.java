@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Called when a {@link SpawnedDisplayAnimationFrame} begins for an animation
  */
-public class GroupAnimateFrameStartEvent extends Event {
+public class AnimationFrameStartEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
 
@@ -18,8 +18,7 @@ public class GroupAnimateFrameStartEvent extends Event {
     private SpawnedDisplayAnimationFrame frame;
     private DisplayAnimator animator;
 
-    public GroupAnimateFrameStartEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame, boolean isAsync){
-        super(isAsync);
+    public AnimationFrameStartEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame, boolean isAsync){
         this.group = group;
         this.animation = animation;
         this.frame = frame;

@@ -1,10 +1,10 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.events.GroupAnimateFrameEndEvent;
-import net.donnypz.displayentityutils.events.GroupAnimateFrameStartEvent;
-import net.donnypz.displayentityutils.events.GroupAnimationCompleteEvent;
-import net.donnypz.displayentityutils.events.GroupAnimationLoopStartEvent;
+import net.donnypz.displayentityutils.events.AnimationFrameEndEvent;
+import net.donnypz.displayentityutils.events.AnimationFrameStartEvent;
+import net.donnypz.displayentityutils.events.AnimationCompleteEvent;
+import net.donnypz.displayentityutils.events.AnimationLoopStartEvent;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
@@ -86,12 +86,12 @@ final class PacketDisplayAnimationExecutor {
 
         if (animator.type == DisplayAnimator.AnimationType.LOOP){
             if (animation.frames.getFirst() == frame){
-                new GroupAnimationLoopStartEvent(group, animator, true).callEvent();
+                new AnimationLoopStartEvent(group, animator, true).callEvent();
             }
         }
 
         Location groupLoc = group.getLocation();
-        new GroupAnimateFrameStartEvent(group, animator, animation, frame, true).callEvent();
+        new AnimationFrameStartEvent(group, animator, animation, frame, true).callEvent();
         frame.playEffects(group, animator, true);
 
         if (group.hasTrackingPlayers()){
@@ -116,12 +116,12 @@ final class PacketDisplayAnimationExecutor {
             if (frame.duration > 0){
                 Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                     frame.executeEndCommands(group.getLocation());
-                    new GroupAnimateFrameEndEvent(group, animator, animation, frame, false).callEvent();
+                    new AnimationFrameEndEvent(group, animator, animation, frame, false).callEvent();
                 }, frame.duration);
             }
             else{
                 frame.executeEndCommands(group.getLocation());
-                new GroupAnimateFrameEndEvent(group, animator, animation, frame, false).callEvent();
+                new AnimationFrameEndEvent(group, animator, animation, frame, false).callEvent();
             }
 
             Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
@@ -136,13 +136,13 @@ final class PacketDisplayAnimationExecutor {
                 if (frame.duration > 0) {
                     Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
                         if (group.getMasterPart() != null) frame.executeEndCommands(group.getLocation());
-                        new GroupAnimationCompleteEvent(group, animator, animation, false).callEvent();
+                        new AnimationCompleteEvent(group, animator, animation, false).callEvent();
                         group.stopAnimation(animator);
                         selection.remove();
                     }, frame.duration);
                 } else {
                     if (group.getMasterPart() != null) frame.executeEndCommands(group.getLocation());
-                    new GroupAnimationCompleteEvent(group, animator, animation, true).callEvent();
+                    new AnimationCompleteEvent(group, animator, animation, true).callEvent();
                     group.stopAnimation(animator);
                     selection.remove();
                 }

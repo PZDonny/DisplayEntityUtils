@@ -26,7 +26,7 @@ public class DisplayAnimator {
      * @param group The group to play the animation
      * @param animation The animation to play
      * @param packetBased Whether the played animation should be packet-based
-     * @return false if the playing was cancelled through the {@link GroupAnimationStartEvent}.
+     * @return false if the playing was cancelled through the {@link AnimationStartEvent}.
      * @throws IllegalArgumentException if the group is a {@link PacketDisplayEntityGroup} and packetBased is false
      */
     public static DisplayAnimator play(@NotNull ActiveGroup group, SpawnedDisplayAnimation animation, boolean packetBased){
@@ -41,11 +41,11 @@ public class DisplayAnimator {
      * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(ActiveGroup)} is called.
      * If a group was paused then this is called, the group will play the animation from the last frame before the pause.
      * @param group The group to play the animation
-     * @return false if the playing was cancelled through the {@link GroupAnimationStartEvent}.
+     * @return false if the playing was cancelled through the {@link AnimationStartEvent}.
      * @throws IllegalArgumentException if the group is a {@link PacketDisplayEntityGroup} and packetBased is false
      */
     public boolean play(@NotNull ActiveGroup group, boolean packetBased, int frameIndex){
-        if (!new GroupAnimationStartEvent(group, this, animation).callEvent()) {
+        if (!new AnimationStartEvent(group, this, animation).callEvent()) {
             return false;
         }
 
@@ -69,7 +69,7 @@ public class DisplayAnimator {
      * Plays the animation from the first frame regardless of the frame the group showed when it was paused.
      * @param group The group to play the animation
      * @param packetBased Whether the played animation should be packet-based
-     * @return false if the playing was cancelled through the {@link GroupAnimationStartEvent}.
+     * @return false if the playing was cancelled through the {@link AnimationStartEvent}.
      * @throws IllegalArgumentException if the group is a {@link PacketDisplayEntityGroup} and packetBased is false
      */
     public boolean play(@NotNull ActiveGroup group, boolean packetBased){

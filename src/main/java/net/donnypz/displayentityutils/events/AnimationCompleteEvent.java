@@ -3,27 +3,34 @@ package net.donnypz.displayentityutils.events;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Called when {@link DisplayAnimator} begins an animation loop.
- * This is only called on animators with a type of {@link DisplayAnimator.AnimationType#LOOP}
- * Refer to {@link GroupAnimationStartEvent} for linear animations
+ * Called at the completion of a {@link SpawnedDisplayAnimation}'s animation.
+ * This is not called for looping animations unless the {@link DisplayAnimator}'s type is changed from LOOPING to LINEAR.
+ * Refer to {@link AnimationLoopStartEvent} for looping animations instead.
  */
-public class GroupAnimationLoopStartEvent extends Event{
+public class AnimationCompleteEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
-    ActiveGroup group;
-    DisplayAnimator animator;
+    ActiveGroup spawnedDisplayEntityGroup;
     SpawnedDisplayAnimation animation;
+    DisplayAnimator animator;
 
-    public GroupAnimationLoopStartEvent(ActiveGroup group, DisplayAnimator animator, boolean isAsync){
+    public AnimationCompleteEvent(ActiveGroup group, @NotNull DisplayAnimator animator, SpawnedDisplayAnimation animation, boolean isAsync){
         super(isAsync);
-        this.group = group;
+        this.spawnedDisplayEntityGroup = group;
+        this.animation = animation;
         this.animator = animator;
-        this.animation = animator.getAnimation();
+    }
+
+    public AnimationCompleteEvent(ActiveGroup group, SpawnedDisplayAnimation animation, boolean isAsync){
+        super(isAsync);
+        this.spawnedDisplayEntityGroup = group;
+        this.animation = animation;
+        this.animator = null;
     }
 
     /**
@@ -31,7 +38,7 @@ public class GroupAnimationLoopStartEvent extends Event{
      * @return a group
      */
     public ActiveGroup getGroup() {
-        return group;
+        return spawnedDisplayEntityGroup;
     }
 
     /**
@@ -44,9 +51,9 @@ public class GroupAnimationLoopStartEvent extends Event{
 
     /**
      * Get the {@link DisplayAnimator} involved in this event
-     * @return a DisplayAnimator
+     * @return a DisplayAnimator. Null if the group animated without creating a DisplayAnimator
      */
-    public @NotNull DisplayAnimator getAnimator() {
+    public @Nullable DisplayAnimator getAnimator() {
         return animator;
     }
 
@@ -58,4 +65,6 @@ public class GroupAnimationLoopStartEvent extends Event{
     public static HandlerList getHandlerList() {
         return handlers;
     }
+
+
 }
