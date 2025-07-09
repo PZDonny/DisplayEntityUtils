@@ -70,10 +70,12 @@ public class PacketAttributeContainer implements Cloneable{
      * @param value the value corresponding to the provided {@link DisplayAttribute}
      * @param entityId the entity's entity id
      * @param player the player
+     * @return this
      */
-    public <T, V> void setAttributeAndSend(@NotNull DisplayAttribute<T, V> attribute, T value, int entityId, @NotNull Player player){
+    public <T, V> PacketAttributeContainer setAttributeAndSend(@NotNull DisplayAttribute<T, V> attribute, T value, int entityId, @NotNull Player player){
         this.attributes.put(attribute, value);
         sendAttributes(player, entityId, getMetadataList(Map.of(attribute, value)));
+        return this;
     }
 
     /**
@@ -94,10 +96,12 @@ public class PacketAttributeContainer implements Cloneable{
      * @param attributeMap the attribute setter
      * @param entityId the entity's entity id
      * @param player the player
+     * @return this
      */
-    public void setAttributesAndSend(@NotNull DisplayAttributeMap attributeMap, int entityId, @NotNull Player player){
+    public PacketAttributeContainer setAttributesAndSend(@NotNull DisplayAttributeMap attributeMap, int entityId, @NotNull Player player){
         this.attributes.putAll(attributeMap.attributes);
         sendAttributes(player, entityId, getMetadataList(attributeMap.attributes));
+        return this;
     }
 
     /**
@@ -320,9 +324,11 @@ public class PacketAttributeContainer implements Cloneable{
      * Send attribute data to a player for a specific entity
      * @param player the player
      * @param entityId the entity's entity id
+     * @return this
      */
-    private void sendAttributes(SpawnedDisplayEntityPart.PartType partType, Player player, int entityId){
+    private PacketAttributeContainer sendAttributes(SpawnedDisplayEntityPart.PartType partType, Player player, int entityId){
         sendAttributes(player, entityId, getMetadataList(attributes, partType));
+        return this;
     }
 
 
@@ -330,27 +336,33 @@ public class PacketAttributeContainer implements Cloneable{
      * Send attribute data to a player for a specific entity
      * @param player the player
      * @param entityId the entity's entity id
+     * @return this
      */
-    public void sendAttributes(@NotNull Player player, int entityId){
+    public PacketAttributeContainer sendAttributes(@NotNull Player player, int entityId){
         sendAttributes(player, entityId, getMetadataList(attributes));
+        return this;
     }
 
     /**
      * Send attribute data to players for a specific entity
      * @param playerUUIDs the players
      * @param entityId the entity's entity id
+     * @return this
      */
-    public void sendAttributesUsingUUIDs(@NotNull Collection<UUID> playerUUIDs, int entityId){
+    public PacketAttributeContainer sendAttributesUsingUUIDs(@NotNull Collection<UUID> playerUUIDs, int entityId){
         sendAttributesToUUIDs(playerUUIDs, entityId, getMetadataList(attributes));
+        return this;
     }
 
     /**
      * Send attribute data to players for a specific entity
      * @param players the players
      * @param entityId the entity's entity id
+     * @return this
      */
-    public void sendAttributesUsingPlayers(@NotNull Collection<Player> players, int entityId){
+    public PacketAttributeContainer sendAttributesUsingPlayers(@NotNull Collection<Player> players, int entityId){
         sendAttributesToPlayers(players, entityId, getMetadataList(attributes));
+        return this;
     }
 
     private void sendAttributes(@NotNull Player player, int entityId, List<EntityData<?>> data){

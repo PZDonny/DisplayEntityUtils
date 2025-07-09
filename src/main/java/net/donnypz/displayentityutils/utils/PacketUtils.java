@@ -1,69 +1,57 @@
 package net.donnypz.displayentityutils.utils;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
-import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
-import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
-import com.github.retrooper.packetevents.protocol.world.states.type.StateTypes;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.BlockType;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.SequencedCollection;
-import java.util.UUID;
 
 public final class PacketUtils {
 
     private PacketUtils(){}
 
-    public static void spawnBlockDisplay(@NotNull Player player, @NotNull Location location, @NotNull Material material){
-        spawnBlockDisplay(player, location, material.asBlockType());
+    /**
+     * Send a {@link DisplayAttribute} change for a display entity to the specified player
+     * @param player the player
+     * @param entityId the entityId of the entity to apply the attribute to
+     * @param attribute the attribute
+     * @param value the value corresponding to the attribute
+     * @return the {@link PacketAttributeContainer} used to send this attribute change to the player
+     */
+    public static <T,V> PacketAttributeContainer setAttribute(@NotNull Player player, int entityId, @NotNull DisplayAttribute<T, V> attribute, T value){
+        return new PacketAttributeContainer()
+                .setAttributeAndSend(attribute, value, entityId, player);
     }
 
-    public static void spawnBlockDisplay(@NotNull Player player, @NotNull Location location, @NotNull BlockType blockType){
-        int id = SpigotReflectionUtil.generateEntityId();
-        WrapperPlayServerSpawnEntity entityPacket = new WrapperPlayServerSpawnEntity(
-                id,
-                UUID.randomUUID(),
-                EntityTypes.BLOCK_DISPLAY,
-                SpigotConversionUtil.fromBukkitLocation(location),
-                0,
-                0,
-                null);
-
-        WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata(
-                id,
-                Collections.singletonList(new EntityData<>(
-                                23,
-                                EntityDataTypes.BLOCK_STATE,
-                                StateTypes.getByName(blockType.getKey().getKey()).createBlockState().getGlobalId()
-                        )
-                )
-        );
-        PacketEvents.getAPI().getPlayerManager().sendPacket(player, entityPacket);
-        PacketEvents.getAPI().getPlayerManager().sendPacket(player, metadataPacket);
+    /**
+     * Send a {@link DisplayAttributeMap} change for a display entity to the specified player
+     * @param player the player
+     * @param entityId the entityId of the entity to apply the attributes to
+     * @param attributeMap the attribute map
+     * @return the {@link PacketAttributeContainer} used to send this attribute change to the player
+     */
+    public static PacketAttributeContainer setAttributes(@NotNull Player player, int entityId, @NotNull DisplayAttributeMap attributeMap){
+        return new PacketAttributeContainer()
+                .setAttributesAndSend(attributeMap, entityId, player);
     }
+
+
 
     public static void teleport(@NotNull Player player, @NotNull PacketDisplayEntityPart part, @NotNull Location location){
         teleport(player, part.getEntityId(), location);
@@ -263,24 +251,6 @@ public final class PacketUtils {
         Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
             setGlowing(player, entityId, false);
         }, durationInTicks);
-    }
-
-    public static void setTextDisplayText(@NotNull Player player, @NotNull TextDisplay textDisplay, @NotNull Component text){
-        new PacketAttributeContainer()
-                .setAttribute(DisplayAttributes.TextDisplay.TEXT, text)
-                .sendAttributes(player, textDisplay.getEntityId());
-    }
-
-    public static void setBlockDisplayBlock(@NotNull Player player, @NotNull BlockDisplay blockDisplay, @NotNull BlockData blockData){
-        new PacketAttributeContainer()
-                .setAttribute(DisplayAttributes.BlockDisplay.BLOCK_STATE, blockData)
-                .sendAttributes(player, blockDisplay.getEntityId());
-    }
-
-    public static void setItemDisplayItem(@NotNull Player player, @NotNull ItemDisplay itemDisplay, @NotNull ItemStack item){
-        new PacketAttributeContainer()
-                .setAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK, item)
-                .sendAttributes(player, itemDisplay.getEntityId());
     }
 
     @ApiStatus.Internal
