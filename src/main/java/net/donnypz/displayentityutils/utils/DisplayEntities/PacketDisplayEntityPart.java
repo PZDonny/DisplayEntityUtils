@@ -56,26 +56,157 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         this.partTags.addAll(partTags);
     }
 
+    /**
+     * Show this part to a player as a packet-based entity
+     * @param player the player
+     * @param spawnReason the spawn reason
+     */
+    @Override
+    public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
+        showToPlayer(player, spawnReason, new GroupSpawnSettings());
+    }
+
+    /**
+     * Show this part to a player as a packet-based entity
+     * @param player the player
+     * @param spawnReason the spawn reason
+     * @param groupSpawnSettings the spawn settings to apply
+     */
+    @Override
+    public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
+        viewers.add(player.getUniqueId());
+        attributeContainer.sendEntity(type, this, player, getLocation(), true);
+    }
+
+    /**
+     * Show this part to players as a packet-based entity.
+     * @param players the players
+     * @param spawnReason the spawn reason
+     * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#teleport(Location)}, or if when created for a group, the group's location was null.
+     */
+    public void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
+        showToPlayers(players, spawnReason, new GroupSpawnSettings());
+    }
+
+    /**
+     * Show this part to players as a packet-based entity.
+     * @param players the players
+     * @param spawnReason the spawn reason
+     * @param groupSpawnSettings the spawn settings to apply
+     * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#teleport(Location)}, or if when created for a group, the group's location was null.
+     */
+    public void showToPlayers(@NotNull Collection<Player> players,  @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
+        if (packetLocation == null){
+            throw new RuntimeException("Location must be set for packet-based part before showing it to players.");
+        }
+        for (Player p : players){
+            viewers.add(p.getUniqueId());
+        }
+        attributeContainer.sendEntityUsingPlayers(type, this, players, getLocation(), true);
+    }
+
+    /**
+     * Hide the packet-based entity from a player
+     * @param player the player
+     */
+    @Override
+    public void hideFromPlayer(@NotNull Player player) {
+        PacketUtils.destroyEntity(player, this);
+        untrack(player.getUniqueId());
+    }
+
+    /**
+     * Hide the packet-based entity from players
+     * @param players the players
+     */
+    @Override
+    public void hideFromPlayers(@NotNull Collection<Player> players) {
+        PacketUtils.destroyEntity(players, this);
+    }
+
+    /**
+     * Use {@link #showToPlayer(Player, GroupSpawnedEvent.SpawnReason)} or similar methods to show this part
+     * @param playerUUID
+     */
+    @ApiStatus.Internal
+    public void track(@NotNull UUID playerUUID){
+        viewers.add(playerUUID);
+    }
+
+    /**
+     * Use {@link PacketDisplayEntityPart#hideFromPlayer(Player)} or {@link PacketDisplayEntityPart#hideFromPlayers(Collection)} to hide this part
+     * @param playerUUID
+     */
+    @ApiStatus.Internal
+    public void untrack(@NotNull UUID playerUUID){
+        viewers.remove(playerUUID);
+    }
+
+    /**
+     * Get the {@link UUID}s of players who can see this part
+     * @return a set of uuids
+     */
+    public @NotNull Collection<UUID> getViewers(){
+        return new HashSet<>(viewers);
+    }
+
+    /**
+     * Get the {@link UUID}s of players who can see this part
+     * @return a set of uuids
+     */
+    public @NotNull Collection<Player> getViewersAsPlayers(){
+        HashSet<Player> players = new HashSet<>();
+        for (UUID uuid : viewers){
+            Player p = Bukkit.getPlayer(uuid);
+            if (p != null){
+                players.add(p);
+            }
+        }
+        return players;
+    }
+
+    /**
+     * Set the text of this text display and send the update to viewing players. This has no effect if the part is not a text display.
+     * @param text the text
+     */
     @Override
     public void setTextDisplayText(@NotNull Component text) {
         setAndSend(DisplayAttributes.TextDisplay.TEXT, text);
     }
 
+    /**
+     * Set the block of this block display of this part and send the update to viewing players. This has no effect if the part is not a block display.
+     * @param blockData the block data
+     */
     @Override
     public void setBlockDisplayBlock(@NotNull BlockData blockData) {
         setAndSend(DisplayAttributes.BlockDisplay.BLOCK_STATE, blockData);
     }
 
+    /**
+     * Set the item of this item display and send the update to viewing players. This has no effect if the part is not an item display.
+     * @param itemstack the itemstack
+     */
     @Override
     public void setItemDisplayItem(@NotNull ItemStack itemstack) {
+        if (type != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) return;
         setAndSend(DisplayAttributes.ItemDisplay.ITEMSTACK, itemstack);
     }
 
+    /**
+     * Set an attribute on this part, and send the updated attribute to viewing players.
+     * @param attribute the attribute
+     * @param value the corresponding attribute value
+     */
     @Override
     public <T, V> void setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value) {
         this.attributeContainer.setAttribute(attribute, value);
     }
 
+    /**
+     * Set multiple attributes at once on this part, and send the updated attributes to viewing players.
+     * @param attributeMap the attribute map
+     */
     @Override
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap){
         this.attributeContainer.setAttributesAndSend(attributeMap, entityId, viewers);
@@ -83,6 +214,14 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     private <T, V>void setAndSend(DisplayAttribute<T, V> attribute, T value){
         attributeContainer.setAttributeAndSend(attribute, value, entityId, viewers);
+    }
+
+    /**
+     * Resend the attribute data of this part to a player.
+     * @param player the player
+     */
+    public void resendAttributes(@NotNull Player player){
+        this.attributeContainer.sendAttributes(player, entityId);
     }
 
 
@@ -310,116 +449,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     @Override
     public @Nullable String getWorldName(){
         return packetLocation == null ? null : packetLocation.worldName;
-    }
-
-    /**
-     * Show this part to a player as a packet-based entity
-     * @param player the player
-     * @param spawnReason the spawn reason
-     */
-    @Override
-    public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
-        showToPlayer(player, spawnReason, new GroupSpawnSettings());
-    }
-
-    /**
-     * Show this part to a player as a packet-based entity
-     * @param player the player
-     * @param spawnReason the spawn reason
-     * @param groupSpawnSettings the spawn settings to apply
-     */
-    @Override
-    public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
-        viewers.add(player.getUniqueId());
-        attributeContainer.sendEntity(type, this, player, getLocation(), true);
-    }
-
-    /**
-     * Show this part to players as a packet-based entity.
-     * @param players the players
-     * @param spawnReason the spawn reason
-     * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#teleport(Location)} (Location)}, or if when created for a group, the group's location was null.
-     */
-    public void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
-        showToPlayers(players, spawnReason, new GroupSpawnSettings());
-    }
-
-    /**
-     * Show this part to players as a packet-based entity.
-     * @param players the players
-     * @param spawnReason the spawn reason
-     * @param groupSpawnSettings the spawn settings to apply
-     * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#teleport(Location)} (Location)}, or if when created for a group, the group's location was null.
-     */
-    public void showToPlayers(@NotNull Collection<Player> players,  @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
-        if (packetLocation == null){
-            throw new RuntimeException("Location must be set for packet-based part before showing it to players.");
-        }
-        for (Player p : players){
-            viewers.add(p.getUniqueId());
-        }
-        attributeContainer.sendEntityUsingPlayers(type, this, players, getLocation(), true);
-    }
-
-    /**
-     * Hide the packet-based entity from a player
-     * @param player the player
-     */
-    @Override
-    public void hideFromPlayer(@NotNull Player player) {
-        PacketUtils.destroyEntity(player, this);
-        untrack(player.getUniqueId());
-    }
-
-    /**
-     * Hide the packet-based entity from players
-     * @param players the players
-     */
-    @Override
-    public void hideFromPlayers(@NotNull Collection<Player> players) {
-        PacketUtils.destroyEntity(players, this);
-    }
-
-
-    /**
-     * Use {@link #showToPlayer(Player, GroupSpawnedEvent.SpawnReason)} or similar methods to show this part
-     * @param playerUUID
-     */
-    @ApiStatus.Internal
-    public void track(@NotNull UUID playerUUID){
-        viewers.add(playerUUID);
-    }
-
-    /**
-     * Use {@link PacketDisplayEntityPart#hideFromPlayer(Player)} or {@link PacketDisplayEntityPart#hideFromPlayers(Collection)} to hide this part
-     * @param playerUUID
-     */
-    @ApiStatus.Internal
-    public void untrack(@NotNull UUID playerUUID){
-        viewers.remove(playerUUID);
-    }
-
-    /**
-     * Get the {@link UUID}s of players who can see this part
-     * @return a set of uuids
-     */
-    public @NotNull Collection<UUID> getViewers(){
-        return new HashSet<>(viewers);
-    }
-
-    /**
-     * Get the {@link UUID}s of players who can see this part
-     * @return a set of uuids
-     */
-    public @NotNull Collection<Player> getViewersAsPlayers(){
-        HashSet<Player> players = new HashSet<>();
-        for (UUID uuid : viewers){
-            Player p = Bukkit.getPlayer(uuid);
-            if (p != null){
-                players.add(p);
-            }
-        }
-        return players;
     }
 
 
