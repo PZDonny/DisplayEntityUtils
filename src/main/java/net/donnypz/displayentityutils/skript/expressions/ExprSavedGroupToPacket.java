@@ -36,7 +36,7 @@ public class ExprSavedGroupToPacket extends SimpleExpression<PacketDisplayEntity
         if (saved == null || loc == null){
             return null;
         }
-        return new PacketDisplayEntityGroup[]{saved.createPacketGroup(loc)};
+        return new PacketDisplayEntityGroup[]{saved.createPacketGroup(loc, true)};
     }
 
     @Override
