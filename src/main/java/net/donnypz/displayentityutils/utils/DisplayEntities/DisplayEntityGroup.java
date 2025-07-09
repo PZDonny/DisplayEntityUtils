@@ -149,7 +149,6 @@ public final class DisplayEntityGroup implements Serializable{
 
     /**
      * Spawns this {@link DisplayEntityGroup} at a specified location returning a {@link SpawnedDisplayEntityGroup} that represents this.
-     * This cannot be called asynchronously.
      * @param location The location to spawn the group
      * @param spawnReason The reason for this display entity group to spawn
      * @return A {@link SpawnedDisplayEntityGroup} representative of this DisplayEntityGroup. Null if the {@link PreGroupSpawnedEvent} is cancelled
@@ -160,7 +159,6 @@ public final class DisplayEntityGroup implements Serializable{
 
     /**
      * Spawns this {@link DisplayEntityGroup} at a specified location returning a {@link SpawnedDisplayEntityGroup} that represents this.
-     * This cannot be called asynchronously.
      * @param location The location to spawn the group
      * @param spawnReason The reason for this display entity group to spawn
      * @param settings The settings to apply to every display  and interaction entity created from this. This may be overridden with the {@link PreGroupSpawnedEvent}.
@@ -241,7 +239,6 @@ public final class DisplayEntityGroup implements Serializable{
 
     /**
      * Spawns this {@link DisplayEntityGroup} at a specified location returning a {@link PacketDisplayEntityGroup} that represents this.
-     * This can be called asynchronously.
      * @param spawnLocation The location where this group spawn be spawned for players
      * @return A {@link PacketDisplayEntityGroup} representative of this DisplayEntityGroup.
      */
