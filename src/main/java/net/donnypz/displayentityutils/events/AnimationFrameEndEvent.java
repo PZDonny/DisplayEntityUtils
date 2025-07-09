@@ -13,13 +13,12 @@ public class AnimationFrameEndEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
 
-    private ActiveGroup group;
+    private SpawnedDisplayEntityGroup group;
     private SpawnedDisplayAnimation animation;
     private SpawnedDisplayAnimationFrame frame;
     private DisplayAnimator animator;
 
-    public AnimationFrameEndEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame, boolean isAsync){
-        super(isAsync);
+    public AnimationFrameEndEvent(SpawnedDisplayEntityGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame){
         this.group = group;
         this.animation = animation;
         this.frame = frame;
@@ -27,10 +26,10 @@ public class AnimationFrameEndEvent extends Event {
     }
 
     /**
-     * Get the {@link ActiveGroup} involved in this event
+     * Get the {@link SpawnedDisplayEntityGroup} involved in this event
      * @return a group
      */
-    public ActiveGroup getGroup() {
+    public SpawnedDisplayEntityGroup getGroup() {
         return group;
     }
 

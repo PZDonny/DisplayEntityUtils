@@ -93,13 +93,13 @@ final class DisplayAnimatorExecutor {
 
         if (animator.type == DisplayAnimator.AnimationType.LOOP){
             if (animation.frames.getFirst() == frame){
-                new AnimationLoopStartEvent(group, animator, false).callEvent();
+                new AnimationLoopStartEvent(group, animator).callEvent();
             }
         }
 
         Location groupLoc = group.getLocation();
         if (group.isInLoadedChunk()){
-            new AnimationFrameStartEvent(group, animator, animation, frame, false).callEvent();
+            new AnimationFrameStartEvent(group, animator, animation, frame).callEvent();
             frame.playEffects(group, animator, true);
 
             animateInteractions(groupLoc, frame, group, selection, animation);
@@ -123,12 +123,12 @@ final class DisplayAnimatorExecutor {
             if (frame.duration > 0){
                 Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                     frame.executeEndCommands(group.getLocation());
-                    new AnimationFrameEndEvent(group, animator, animation, frame, false).callEvent();
+                    new AnimationFrameEndEvent(group, animator, animation, frame).callEvent();
                 }, frame.duration);
             }
             else{
                 frame.executeEndCommands(group.getLocation());
-                new AnimationFrameEndEvent(group, animator, animation, frame, false).callEvent();
+                new AnimationFrameEndEvent(group, animator, animation, frame).callEvent();
             }
 
             Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
@@ -143,13 +143,13 @@ final class DisplayAnimatorExecutor {
                 if (frame.duration > 0) {
                     Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                         if (group.isSpawned()) frame.executeEndCommands(group.getLocation());
-                        new AnimationCompleteEvent(group, animator, animation, false).callEvent();
+                        new AnimationCompleteEvent(group, animator, animation).callEvent();
                         group.stopAnimation(animator);
                         selection.remove();
                     }, frame.duration);
                 } else {
                     if (group.isSpawned()) frame.executeEndCommands(group.getLocation());
-                    new AnimationCompleteEvent(group, animator, animation, false).callEvent();
+                    new AnimationCompleteEvent(group, animator, animation).callEvent();
                     group.stopAnimation(animator);
                     selection.remove();
                 }

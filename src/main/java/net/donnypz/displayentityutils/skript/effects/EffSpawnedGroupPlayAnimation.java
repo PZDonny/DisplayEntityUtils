@@ -16,16 +16,20 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Animate Spawned Group")
 @Description("Play an animation on a spawned group with a display animator")
-@Examples({"play animation on {_spawnedgroup} using {_displayanimator}", "start animation on {_spawnedgroup} with {_displayanimator} starting at frame 3"})
+@Examples({"play animation on {_spawnedgroup} using {_displayanimator}",
+        "",
+        "#2.8.0 or later",
+        "start packet animation on {_spawnedgroup} with {_displayanimator} starting at frame 3"})
 @Since("2.6.2")
 public class EffSpawnedGroupPlayAnimation extends Effect {
     static {
-        Skript.registerEffect(EffSpawnedGroupPlayAnimation.class,"(start|play) anim[ation] on %spawnedgroup% (using|with) %displayanimator% [frame:[starting ](at|on) frame %-number%]");
+        Skript.registerEffect(EffSpawnedGroupPlayAnimation.class,"(start|play) [p:packet] anim[ation] on %activegroup% (using|with) %displayanimator% [frame:[starting ](at|on) frame %-number%]");
     }
 
     Expression<SpawnedDisplayEntityGroup> group;
     Expression<DisplayAnimator> animator;
     Expression<Number> frame;
+    boolean packet;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
@@ -34,6 +38,7 @@ public class EffSpawnedGroupPlayAnimation extends Effect {
         if (parseResult.hasTag("frame")){
             frame = (Expression<Number>) expressions[2];
         }
+        packet = parseResult.hasTag("p");
         return true;
     }
 
@@ -52,7 +57,12 @@ public class EffSpawnedGroupPlayAnimation extends Effect {
             a.play(g, n.intValue());
         }
         else{
-            a.play(g);
+            if (packet){
+                a.playUsingPackets(g, 0);
+            }
+            else{
+                a.play(g, 0);
+            }
         }
     }
 

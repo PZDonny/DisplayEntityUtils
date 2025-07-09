@@ -17,6 +17,32 @@ public class SkriptTypes {
 
     static{
 
+        Classes.registerClass(new ClassInfo<>(ActiveGroup.class, "activegroup")
+                .user("active( |-)?(group|model)s?")
+                .name("Active Group")
+                .description("An ambiguous representation of a Spawned Group or Packet Group")
+                .examples()
+                .defaultExpression(new EventValueExpression<>(ActiveGroup.class))
+                .since("2.8.0")
+                .parser(new Parser<>() {
+
+                    @Override
+                    public boolean canParse(ParseContext context) {
+                        return false;
+                    }
+
+                    @Override
+                    public String toString(ActiveGroup o, int flags) {
+                        return toVariableNameString(o);
+                    }
+
+                    @Override
+                    public String toVariableNameString(ActiveGroup o) {
+                        return "activegroup w/ tag: " + o.getTag();
+                    }
+                })
+        );
+
         Classes.registerClass(new ClassInfo<>(SpawnedDisplayEntityGroup.class, "spawnedgroup")
                 .user("spawned( |-)?(group|model)s?")
                 .name("Spawned Group")
@@ -39,6 +65,32 @@ public class SkriptTypes {
                     @Override
                     public String toVariableNameString(SpawnedDisplayEntityGroup o) {
                         return "spawnedgroup w/ tag: " + o.getTag();
+                    }
+                })
+        );
+
+        Classes.registerClass(new ClassInfo<>(PacketDisplayEntityGroup.class, "packetgroup")
+                .user("packet( |-)?(group|model)s?")
+                .name("Packet Group")
+                .description("Represents a Display Entity Group/Model spawned in the game world")
+                .examples()
+                .defaultExpression(new EventValueExpression<>(PacketDisplayEntityGroup.class))
+                .since("2.8.0")
+                .parser(new Parser<>() {
+
+                    @Override
+                    public boolean canParse(ParseContext context) {
+                        return false;
+                    }
+
+                    @Override
+                    public String toString(PacketDisplayEntityGroup o, int flags) {
+                        return toVariableNameString(o);
+                    }
+
+                    @Override
+                    public String toVariableNameString(PacketDisplayEntityGroup o) {
+                        return "packetgroup w/ tag: " + o.getTag();
                     }
                 })
         );
@@ -311,7 +363,8 @@ public class SkriptTypes {
         Classes.registerClass(spawnReasonWrapper.getClassInfo("groupspawnreason")
                 .user("(group( |-)?spawn( |-)?)?reason")
                 .name("Group Spawn Reason")
-                .description("Represents a spawn reason when a saved Group/Model is spawned")
+                .description("Represents a spawn reason when a saved Group/Model is spawned.",
+                            "\"INTERNAL\" spawn reason added in version 2.8.0")
                 .since("2.6.2"));
 
     }

@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.events;
 
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import org.bukkit.event.Event;
@@ -15,29 +15,21 @@ import org.jetbrains.annotations.Nullable;
  */
 public class AnimationCompleteEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
-    ActiveGroup spawnedDisplayEntityGroup;
+    SpawnedDisplayEntityGroup spawnedDisplayEntityGroup;
     SpawnedDisplayAnimation animation;
     DisplayAnimator animator;
 
-    public AnimationCompleteEvent(ActiveGroup group, @NotNull DisplayAnimator animator, SpawnedDisplayAnimation animation, boolean isAsync){
-        super(isAsync);
+    public AnimationCompleteEvent(SpawnedDisplayEntityGroup group, @NotNull DisplayAnimator animator, SpawnedDisplayAnimation animation){
         this.spawnedDisplayEntityGroup = group;
         this.animation = animation;
         this.animator = animator;
     }
 
-    public AnimationCompleteEvent(ActiveGroup group, SpawnedDisplayAnimation animation, boolean isAsync){
-        super(isAsync);
-        this.spawnedDisplayEntityGroup = group;
-        this.animation = animation;
-        this.animator = null;
-    }
-
     /**
-     * Get the {@link ActiveGroup} involved in this event
+     * Get the {@link SpawnedDisplayEntityGroup} involved in this event
      * @return a group
      */
-    public ActiveGroup getGroup() {
+    public SpawnedDisplayEntityGroup getGroup() {
         return spawnedDisplayEntityGroup;
     }
 

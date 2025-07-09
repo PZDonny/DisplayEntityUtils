@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.events;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -25,6 +26,7 @@ public class PacketGroupSendEvent extends Event implements Cancellable {
     private boolean isCancelled = false;
 
     public PacketGroupSendEvent(PacketDisplayEntityGroup group, GroupSpawnedEvent.SpawnReason spawnReason, Collection<Player> players) {
+        super(!Bukkit.isPrimaryThread());
         this.packetDisplayEntityGroup = group;
         this.spawnReason = spawnReason;
         this.players = players;

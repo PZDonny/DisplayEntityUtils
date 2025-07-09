@@ -175,6 +175,26 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
 
     }
 
+    /**
+     * Make a group perform an animation
+     * @param animation the animation this group should play
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
+     */
+    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation){
+        return DisplayAnimator.playUsingPackets(this, animation);
+    }
+
+    /**
+     * Make a group perform a looping animation.
+     * @param animation the animation this group should play
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
+     */
+    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation){
+        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
+        animator.playUsingPackets(this, 0);
+        return animator;
+    }
+
     @Override
     public boolean canApplyVerticalRideOffset() {
         if (verticalRideOffset == 0){

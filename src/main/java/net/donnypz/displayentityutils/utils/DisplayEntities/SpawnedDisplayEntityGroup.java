@@ -1553,11 +1553,53 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
                 return;
             }
             switch(type){
-                case LINEAR -> this.animate(anim, false);
-                case LOOP -> this.animateLooping(anim, false);
+                case LINEAR -> this.animate(anim);
+                case LOOP -> this.animateLooping(anim);
                 //case PING_PONG -> animatePingPong(anim);
             }
         }
+    }
+
+    /**
+     * Make a group perform an animation
+     * @param animation the animation this group should play
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
+     */
+    @Override
+    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation){
+        return DisplayAnimator.play(this, animation);
+    }
+
+    /**
+     * Make a group perform a looping animation.
+     * @param animation the animation this group should play
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
+     */
+    @Override
+    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation){
+        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
+        animator.play(this, 0);
+        return animator;
+    }
+
+    /**
+     * Make a group perform an animation
+     * @param animation the animation this group should play
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
+     */
+    public @NotNull DisplayAnimator animateUsingPackets(@NotNull SpawnedDisplayAnimation animation){
+        return DisplayAnimator.playUsingPackets(this, animation);
+    }
+
+    /**
+     * Make a group perform a looping animation.
+     * @param animation the animation this group should play
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
+     */
+    public @NotNull DisplayAnimator animateLoopingUsingPackets(@NotNull SpawnedDisplayAnimation animation){
+        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
+        animator.playUsingPackets(this, 0);
+        return animator;
     }
 
     /**

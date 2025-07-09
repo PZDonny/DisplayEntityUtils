@@ -261,7 +261,7 @@ public abstract class ActiveGroup implements Active{
         DisplayAnimator animator = state.getDisplayAnimator();
 
         if (animator != null){
-            animator.play(this, true);
+            animator.playUsingPackets(this, 0);
             return true;
         }
         else{
@@ -275,27 +275,9 @@ public abstract class ActiveGroup implements Active{
      */
     public abstract void playSpawnAnimation();
 
-    /**
-     * Make a group perform an animation
-     * @param animation the animation this group should play
-     * @param packetBased whether this animation should be packet based. This should always be true when called for a {@link PacketDisplayEntityGroup}
-     * @return the {@link DisplayAnimator} that will control the playing of the given animation
-     */
-    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation, boolean packetBased){
-        return DisplayAnimator.play(this, animation, packetBased);
-    }
+    public abstract @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation);
 
-    /**
-     * Make a group perform a looping animation.
-     * @param animation the animation this group should play
-     * @param packetBased whether this animation should be packet based. This should always be true when called for a {@link PacketDisplayEntityGroup}
-     * @return the {@link DisplayAnimator} that will control the playing of the given animation
-     */
-    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation, boolean packetBased){
-        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
-        animator.play(this, packetBased);
-        return animator;
-    }
+    public abstract @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation);
 
     /**
      * Manually stop an animation from playing on this group

@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 public class DisplayAnimator {
@@ -25,13 +26,24 @@ public class DisplayAnimator {
      * To control an animation, pausing/playing/looping, create a new {@link DisplayAnimator}.
      * @param group The group to play the animation
      * @param animation The animation to play
-     * @param packetBased Whether the played animation should be packet-based
-     * @return false if the playing was cancelled through the {@link AnimationStartEvent}.
-     * @throws IllegalArgumentException if the group is a {@link PacketDisplayEntityGroup} and packetBased is false
+     * @return the {@link DisplayAnimator} used to play the animation
      */
-    public static DisplayAnimator play(@NotNull ActiveGroup group, SpawnedDisplayAnimation animation, boolean packetBased){
+    public static DisplayAnimator play(@NotNull SpawnedDisplayEntityGroup group, @NotNull SpawnedDisplayAnimation animation){
         DisplayAnimator animator = new DisplayAnimator(animation, AnimationType.LINEAR);
-        animator.play(group, packetBased);
+        animator.play(group, 0);
+        return animator;
+    }
+
+    /**
+     * Plays an animation once for a {@link ActiveGroup} without the use of a {@link DisplayAnimator} instance.
+     * To control an animation, pausing/playing/looping, create a new {@link DisplayAnimator}.
+     * @param group The group to play the animation
+     * @param animation The animation to play
+     * @return the {@link DisplayAnimator} used to play the animation
+     */
+    public static DisplayAnimator playUsingPackets(@NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation){
+        DisplayAnimator animator = new DisplayAnimator(animation, AnimationType.LINEAR);
+        animator.playUsingPackets(group, 0);
         return animator;
     }
 
@@ -42,38 +54,38 @@ public class DisplayAnimator {
      * If a group was paused then this is called, the group will play the animation from the last frame before the pause.
      * @param group The group to play the animation
      * @return false if the playing was cancelled through the {@link AnimationStartEvent}.
-     * @throws IllegalArgumentException if the group is a {@link PacketDisplayEntityGroup} and packetBased is false
      */
-    public boolean play(@NotNull ActiveGroup group, boolean packetBased, int frameIndex){
+    public boolean play(@NotNull SpawnedDisplayEntityGroup group, int frameIndex){
         if (!new AnimationStartEvent(group, this, animation).callEvent()) {
             return false;
         }
 
         SpawnedDisplayAnimationFrame frame = animation.frames.get(frameIndex);
         int delay = frame.delay;
-        if (packetBased){
-            new PacketDisplayAnimationExecutor(this, animation, group, frame, delay, false);
-        }
-        else{
-            if (group instanceof PacketDisplayEntityGroup){
-                throw new IllegalArgumentException("Attempted to play non-packet-based animation of PacketDisplayEntityGroup");
-            }
-            new DisplayAnimatorExecutor(this, animation, group, frame, delay, DisplayEntityPlugin.asynchronousAnimations(), false);
-        }
+        new DisplayAnimatorExecutor(this, animation, group, frame, delay, DisplayEntityPlugin.asynchronousAnimations(), false);
         return true;
     }
 
     /**
-     * Plays an animation for a {@link ActiveGroup}.
+     * Plays an animation for a {@link ActiveGroup} through packets.
      * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(ActiveGroup)} is called.
-     * Plays the animation from the first frame regardless of the frame the group showed when it was paused.
+     * <br>
+     * If a group was paused then this is called, the group will play the animation from the last frame before the pause.
+     * <br>This calls the {@link PacketAnimationStartEvent}
      * @param group The group to play the animation
-     * @param packetBased Whether the played animation should be packet-based
-     * @return false if the playing was cancelled through the {@link AnimationStartEvent}.
+     * @param frameIndex the frame index the animation will start from
      * @throws IllegalArgumentException if the group is a {@link PacketDisplayEntityGroup} and packetBased is false
      */
-    public boolean play(@NotNull ActiveGroup group, boolean packetBased){
-        return play(group, packetBased, 0);
+    public void playUsingPackets(@NotNull ActiveGroup group, int frameIndex){
+        Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+            if (!new PacketAnimationStartEvent(group, this, animation).callEvent()) {
+                return;
+            }
+
+            SpawnedDisplayAnimationFrame frame = animation.frames.get(frameIndex);
+            int delay = frame.delay;
+            new PacketDisplayAnimationExecutor(this, animation, group, frame, delay, false);
+        });
     }
 
 
@@ -100,11 +112,11 @@ public class DisplayAnimator {
      * Get the {@link SpawnedDisplayAnimation} that this animator uses on groups
      * @return a {@link SpawnedDisplayAnimation}
      */
-    public SpawnedDisplayAnimation getAnimation() {
+    public @NotNull SpawnedDisplayAnimation getAnimation() {
         return animation;
     }
 
-    public AnimationType getAnimationType(){
+    public @NotNull AnimationType getAnimationType(){
         return type;
     }
 

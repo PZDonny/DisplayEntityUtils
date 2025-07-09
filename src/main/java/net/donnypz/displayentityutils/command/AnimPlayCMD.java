@@ -40,12 +40,12 @@ class AnimPlayCMD extends PlayerSubCommand {
         }
 
         if (args.length >= 3 && args[2].equalsIgnoreCase("-loop")){
-            group.animateLooping(anim, false);
+            group.animateLooping(anim);
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Playing Animation!", NamedTextColor.GREEN))
                     .append(Component.text(" (LOOPING)", NamedTextColor.YELLOW)));
         }
         else{
-            group.animate(anim, false);
+            group.animate(anim);
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Playing Animation!", NamedTextColor.GREEN)));
         }
     }

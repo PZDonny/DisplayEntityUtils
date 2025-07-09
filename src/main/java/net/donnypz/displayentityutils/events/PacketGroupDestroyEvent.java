@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.events;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -19,6 +20,7 @@ public class PacketGroupDestroyEvent extends Event {
     Collection<Player> players;
 
     public PacketGroupDestroyEvent(PacketDisplayEntityGroup group, Collection<Player> players) {
+        super(!Bukkit.isPrimaryThread());
         this.packetDisplayEntityGroup = group;
         this.players = players;
     }

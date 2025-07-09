@@ -12,31 +12,23 @@ import org.jetbrains.annotations.NotNull;
  */
 public class AnimationStartEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-    ActiveGroup group;
+    SpawnedDisplayEntityGroup group;
     SpawnedDisplayAnimation animation;
     DisplayAnimator animator;
     private boolean isCancelled = false;
 
-    public AnimationStartEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation){
+    public AnimationStartEvent(SpawnedDisplayEntityGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation){
         this.group = group;
         this.animation = animation;
         this.animator = animator;
     }
 
     /**
-     * Get the {@link ActiveGroup} involved in this event
+     * Get the {@link SpawnedDisplayEntityGroup} involved in this event
      * @return a group
      */
-    public ActiveGroup getGroup() {
+    public SpawnedDisplayEntityGroup getGroup() {
         return group;
-    }
-
-    /**
-     * Get whether this group is a {@link PacketDisplayEntityGroup}
-     * @return a boolean
-     */
-    public boolean isPacketGroup(){
-        return group instanceof PacketDisplayEntityGroup;
     }
 
     /**
