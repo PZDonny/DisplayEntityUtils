@@ -35,6 +35,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     private PartData partData;
 
     SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Display displayEntity, Random random){
+        super(displayEntity.getEntityId());
         this.group = group;
         this.entity = displayEntity;
         if (displayEntity instanceof BlockDisplay){
@@ -51,15 +52,17 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (isMaster()){
             group.masterPart = this;
         }
+        partTags.addAll(DisplayUtils.getTags(displayEntity));
     }
 
 
     SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Interaction interactionEntity, Random random){
+        super(interactionEntity.getEntityId());
         this.group = group;
         this.entity = interactionEntity;
         this.type = PartType.INTERACTION;
         applyData(random, interactionEntity);
-
+        partTags.addAll(DisplayUtils.getTags(interactionEntity));
     }
 
     private void applyData(Random random, Entity entity){
@@ -238,7 +241,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @return true if the tag was added successfully
      */
     public boolean addTag(@NotNull String tag){
-        return DisplayUtils.addTag(getEntity(), tag);
+        if (DisplayUtils.addTag(getEntity(), tag)){
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -249,14 +255,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     public SpawnedDisplayEntityPart removeTag(@NotNull String tag){
         DisplayUtils.removeTag(getEntity(), tag);
         return this;
-    }
-
-    /**
-     * Gets the part tags of this SpawnedDisplayEntityPart
-     * @return This part's part tags.
-     */
-    public @NotNull List<String> getTags(){
-        return DisplayUtils.getTags(getEntity());
     }
 
     /**
@@ -797,11 +795,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         group.addInteractionEntity(interaction);
 
         return interaction;
-    }
-
-    @Override
-    public int getEntityId() {
-        return getEntity().getEntityId();
     }
 
     @Override

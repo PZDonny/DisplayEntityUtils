@@ -31,10 +31,8 @@ import java.util.concurrent.TimeUnit;
 
 public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     Set<UUID> viewers = new HashSet<>();
-    final int entityId;
     PacketDisplayEntityGroup group;
     PacketAttributeContainer attributeContainer;
-    Set<String> partTags = new HashSet<>();
     HashMap<NamespacedKey, List<String>> interactionCommands;
     boolean isMaster = false;
     PacketLocation packetLocation;
@@ -42,8 +40,8 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
 
     public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer){
+        super(entityId);
         this.type = partType;
-        this.entityId = entityId;
         this.attributeContainer = attributeContainer;
         this.teleport(location);
     }
@@ -56,10 +54,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull Set<String> partTags){
         this(partType, location, entityId, attributeContainer);
         this.partTags.addAll(partTags);
-    }
-
-    public int getEntityId(){
-        return entityId;
     }
 
     @Override
@@ -479,10 +473,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     public @Nullable PacketDisplayEntityGroup getGroup(){
         return group;
-    }
-
-    public @NotNull Set<String> getTags(){
-        return new HashSet<>(partTags);
     }
 
 

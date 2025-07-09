@@ -11,15 +11,19 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class ActivePart implements Active{
 
     protected SpawnedDisplayEntityPart.PartType type;
     protected UUID partUUID;
+    protected final int entityId;
+    protected Set<String> partTags = new HashSet<>();
     protected boolean valid = true;
+
+    ActivePart(int entityId){
+        this.entityId = entityId;
+    }
 
     protected abstract void cull(float width, float height);
 
@@ -36,7 +40,9 @@ public abstract class ActivePart implements Active{
      * Get this part's entity id
      * @return the entity id
      */
-    public abstract int getEntityId();
+    public int getEntityId(){
+        return entityId;
+    }
 
     /**
      * Get this part's type
@@ -44,6 +50,14 @@ public abstract class ActivePart implements Active{
      */
     public SpawnedDisplayEntityPart.PartType getType(){
         return type;
+    }
+
+    /**
+     * Gets the part tags of this part
+     * @return This part's part tags.
+     */
+    public @NotNull HashSet<String> getTags(){
+        return new HashSet<>(partTags);
     }
 
     public abstract void setTextDisplayText(@NotNull Component text);
@@ -63,8 +77,6 @@ public abstract class ActivePart implements Active{
     public abstract float getInteractionHeight();
 
     public abstract float getInteractionWidth();
-
-    public abstract Collection<String> getTags();
 
     static class PartData {
 
