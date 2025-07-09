@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.events;
 
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -8,28 +9,29 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Called when {@link DisplayAnimator} begins a {@link SpawnedDisplayAnimation} loop.
+ * Called when {@link DisplayAnimator} begins an animation loop.
  * This is only called on animators with a type of {@link DisplayAnimator.AnimationType#LOOP}
  * Refer to {@link GroupAnimationStartEvent} for linear animations
  */
 public class GroupAnimationLoopStartEvent extends Event{
     private static final HandlerList handlers = new HandlerList();
-    SpawnedDisplayEntityGroup spawnedDisplayEntityGroup;
+    ActiveGroup group;
     DisplayAnimator animator;
     SpawnedDisplayAnimation animation;
 
-    public GroupAnimationLoopStartEvent(SpawnedDisplayEntityGroup group, DisplayAnimator animator){
-        this.spawnedDisplayEntityGroup = group;
+    public GroupAnimationLoopStartEvent(ActiveGroup group, DisplayAnimator animator, boolean isAsync){
+        super(isAsync);
+        this.group = group;
         this.animator = animator;
         this.animation = animator.getAnimation();
     }
 
     /**
-     * Get the {@link SpawnedDisplayEntityGroup} involved in this event
+     * Get the {@link ActiveGroup} involved in this event
      * @return a group
      */
-    public SpawnedDisplayEntityGroup getGroup() {
-        return spawnedDisplayEntityGroup;
+    public ActiveGroup getGroup() {
+        return group;
     }
 
     /**

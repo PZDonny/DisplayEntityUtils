@@ -48,48 +48,9 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
      */
     public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull PartFilter filter){
         super(group, filter);
-        applyFilter(filter, false);
         group.partSelections.add(this);
     }
 
-
-
-    /**
-     * Update this selection's parts based on the filters set by a {@link PartFilter}. This builds upon any previous filters applied
-     * @param filter the filter to use
-     * @param reset whether to reset the currently selected parts and all filters
-     * @return true if the selection's group is still valid
-     */
-    public boolean applyFilter(@NotNull PartFilter filter, boolean reset){
-        if (group == null){
-            return false;
-        }
-
-        if (reset){
-            reset();
-        }
-
-        if (!filter.partTypes.isEmpty()){
-            this.partTypes.clear();
-            this.partTypes.addAll(filter.partTypes);
-        }
-        this.includedTags.addAll(filter.includedTags);
-        this.excludedTags.addAll(filter.excludedTags);
-
-        if (this.itemTypes.isEmpty()){
-            this.includeItemTypes = filter.includeItemTypes;
-        }
-
-        if (this.blockTypes.isEmpty()){
-            this.includeBlockTypes = filter.includeBlockTypes;
-        }
-
-        this.itemTypes.addAll(filter.itemTypes);
-        this.blockTypes.addAll(filter.blockTypes);
-
-        refresh();
-        return true;
-    }
 
     /**
      * Reset this part selection back to all the parts in this selection's group, removing all filters

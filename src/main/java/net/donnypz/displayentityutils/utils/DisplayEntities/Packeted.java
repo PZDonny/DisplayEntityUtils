@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
-public interface Packeted extends Active{
+public interface Packeted{
 
     void setRotation(float pitch, float yaw, boolean pivotIfInteraction);
 

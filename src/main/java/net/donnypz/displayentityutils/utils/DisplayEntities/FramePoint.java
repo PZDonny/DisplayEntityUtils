@@ -110,8 +110,8 @@ public class FramePoint extends RelativePoint implements Serializable {
         playSounds(location);
     }
 
-    private Set<Player> getPlayers(SpawnedDisplayEntityGroup group){
-        return group.masterPart.getEntity().getTrackedBy();
+    private Collection<Player> getPlayers(ActiveGroup group){
+        return group.getTrackingPlayers();
     }
 
     /**
@@ -120,7 +120,7 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param animator the animator attempting to play group effects
      * @param limited whether to spawn the particles only to players who can visibly see the group
      */
-    public void showParticles(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator, boolean limited){
+    public void showParticles(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
         Location spawnLoc = getLocation(group);
         for (AnimationParticle particle : particles){
             if (limited){
@@ -133,11 +133,11 @@ public class FramePoint extends RelativePoint implements Serializable {
     }
 
     /**
-     * Immediately show the particles of this point at this point's location relative to a {@link SpawnedDisplayEntityGroup}
+     * Immediately show the particles of this point at this point's location relative to a {@link ActiveGroup}
      * @param group the relative group
      * @param limited whether to spawn the effects only to players who can visibly see the group
      */
-    public void showParticles(@NotNull SpawnedDisplayEntityGroup group, boolean limited){
+    public void showParticles(@NotNull ActiveGroup group, boolean limited){
         Location location = getLocation(group);
         if (limited){
             showParticles(location, getPlayers(group));
@@ -190,7 +190,7 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param animator the animator attempting to play group effects
      * @param limited whether to limit the played audio only to players who can visibly see the group
      */
-    public void playSounds(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator, boolean limited){
+    public void playSounds(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
         for (AnimationSound sound : sounds.values()){
             if (limited){
                 sound.playSound(getLocation(group), group, animator, getPlayers(group));
@@ -203,11 +203,11 @@ public class FramePoint extends RelativePoint implements Serializable {
     }
 
     /**
-     * Immediately play the sounds of this point at this point's location relative to a {@link SpawnedDisplayEntityGroup}
+     * Immediately play the sounds of this point at this point's location relative to a {@link ActiveGroup}
      * @param group the relative group
      * @param limited whether to limit the played audio only to players who can visibly see the group
      */
-    public void playSounds(@NotNull SpawnedDisplayEntityGroup group, boolean limited){
+    public void playSounds(@NotNull ActiveGroup group, boolean limited){
         Location location = getLocation(group);
         if (limited){
             playSounds(location, getPlayers(group));

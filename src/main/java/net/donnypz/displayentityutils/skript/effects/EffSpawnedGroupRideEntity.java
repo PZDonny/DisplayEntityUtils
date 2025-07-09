@@ -105,7 +105,7 @@ public class EffSpawnedGroupRideEntity extends Effect {
             }
             if (controller.hasStateMachine()){
                 controller.getStateMachine().addGroup(g);
-                g.setVerticalOffset(controller.getVerticalOffset());
+                g.setVerticalRideOffset(controller.getVerticalOffset());
             }
         }
     }

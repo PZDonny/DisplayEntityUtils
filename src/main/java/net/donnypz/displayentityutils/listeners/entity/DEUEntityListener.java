@@ -97,8 +97,8 @@ public final class DEUEntityListener implements Listener {
         applyState(e.getEntity(), MachineState.StateType.DEATH);
         //Group Vertical Offset
         for (SpawnedDisplayEntityGroup group : DisplayUtils.getGroupPassengers(e.getEntity())){
-            if (group.getVerticalOffset() == 0) continue;
-            group.translate(Direction.UP, group.getVerticalOffset()*-1, -1, -1);
+            if (group.getVerticalRideOffset() == 0) continue;
+            group.translate(Direction.UP, group.getVerticalRideOffset()*-1, -1, -1);
         }
     }
 

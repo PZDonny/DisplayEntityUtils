@@ -1,39 +1,37 @@
 package net.donnypz.displayentityutils.events;
 
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Called when a {@link SpawnedDisplayAnimationFrame} ends in a {@link SpawnedDisplayAnimation}
+ * Called when a {@link SpawnedDisplayAnimationFrame} ends in an animation
  * This ignores the frame's delay and is called after translation of parts in the group.
  */
 public class GroupAnimateFrameEndEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
 
-    private SpawnedDisplayEntityGroup spawnedDisplayEntityGroup;
+    private ActiveGroup group;
     private SpawnedDisplayAnimation animation;
     private SpawnedDisplayAnimationFrame frame;
     private DisplayAnimator animator;
 
-    public GroupAnimateFrameEndEvent(SpawnedDisplayEntityGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame){
-        this.spawnedDisplayEntityGroup = group;
+    public GroupAnimateFrameEndEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame, boolean isAsync){
+        super(isAsync);
+        this.group = group;
         this.animation = animation;
         this.frame = frame;
         this.animator = animator;
     }
 
     /**
-     * Get the {@link SpawnedDisplayEntityGroup} involved in this event
+     * Get the {@link ActiveGroup} involved in this event
      * @return a group
      */
-    public SpawnedDisplayEntityGroup getGroup() {
-        return spawnedDisplayEntityGroup;
+    public ActiveGroup getGroup() {
+        return group;
     }
 
     /**

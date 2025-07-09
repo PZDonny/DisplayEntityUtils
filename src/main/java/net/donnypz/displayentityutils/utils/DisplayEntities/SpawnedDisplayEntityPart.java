@@ -6,9 +6,13 @@ import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -655,8 +659,8 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
 
-    @ApiStatus.Experimental
-    void cull(float width, float height){
+    @Override
+    protected void cull(float width, float height){
         Entity entity = getEntity();
         if (entity instanceof Display display){
             display.setDisplayHeight(height);
@@ -673,14 +677,13 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @param heightAdder The amount of height to be added to the culling range
      * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
      */
-    @ApiStatus.Experimental
+    @Override
     public void autoCull(float widthAdder, float heightAdder){
         Entity entity = getEntity();
         if (entity instanceof Display display){
             Transformation transformation = display.getTransformation();
             Vector3f scale = transformation.getScale();
-            display.setDisplayHeight(scale.y+heightAdder);
-            display.setDisplayWidth((Math.max(scale.x, scale.z)*2)+widthAdder);
+            cull((Math.max(scale.x, scale.z)*2)+widthAdder, scale.y+heightAdder);
         }
     }
 
@@ -801,8 +804,37 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return getEntity().getEntityId();
     }
 
+    @Override
+    public void setTextDisplayText(@NotNull Component text) {
+        ((TextDisplay) getEntity()).text(text);
+    }
+
+    @Override
+    public void setBlockDisplayBlock(@NotNull BlockData blockData) {
+        ((BlockDisplay) getEntity()).setBlock(blockData);
+    }
+
+    @Override
+    public void setItemDisplayItem(@NotNull ItemStack itemstack) {
+        ((ItemDisplay) getEntity()).setItemStack(itemstack);
+    }
+
+    @Override
+    public <T, V> void setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value) {
+        Entity entity = getEntity();
+        new PacketAttributeContainer().setAttribute(attribute, value)
+                .sendAttributesUsingPlayers(entity.getTrackedBy(), entity.getEntityId());
+    }
+
+    @Override
+    public void setAttributes(@NotNull DisplayAttributeMap attributeMap) {
+        Entity entity = getEntity();
+        new PacketAttributeContainer().setAttributes(attributeMap)
+                .sendAttributesUsingPlayers(entity.getTrackedBy(), entity.getEntityId());
+    }
+
     /**
-     * Get the interaction translation of this part, relative to the group's location <bold><u>only</u></bold> if the part is an interaction.
+     * Get the interaction translation of this part, relative to its group's location <bold><u>only</u></bold> if the part is an interaction.
      * @return a vector or null if the part is not an interaction
      */
     @Override
@@ -810,7 +842,19 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (type != PartType.INTERACTION) {
             return null;
         }
-        return DisplayUtils.getInteractionTranslation((Interaction) getEntity());
+        return DisplayUtils.getInteractionTranslation((Interaction) getEntity(), group.getLocation());
+    }
+
+    /**
+     * Get the transformation of this part if its type of not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * @return a {@link Transformation} or null if the part is an interaction
+     */
+    @Override
+    public Transformation getDisplayTransformation() {
+        if (type == PartType.INTERACTION) {
+            return null;
+        }
+        return ((Display) getEntity()).getTransformation();
     }
 
     /**

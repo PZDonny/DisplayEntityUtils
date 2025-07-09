@@ -118,7 +118,7 @@ class GroupRideCMD extends ConsoleUsableSubCommand {
 
         if (controller.hasStateMachine()){
             controller.getStateMachine().addGroup(group);
-            group.setVerticalOffset(controller.getVerticalOffset());
+            group.setVerticalRideOffset(controller.getVerticalOffset());
         }
     }
 

@@ -50,13 +50,13 @@ public class AnimationSound implements Externalizable, Cloneable {
         this.existsInGameVersion = sound.existsInGameVersion;
     }
 
-    public void playSound(@NotNull Location location, @NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
+    public void playSound(@NotNull Location location, @NotNull ActiveGroup group, @Nullable DisplayAnimator animator){
         if (delay == 0){
             playSound(location);
         }
         else{
             Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                if (!group.isSpawned()){
+                if (group.getMasterPart() == null){
                     return;
                 }
                 if (animator == null){
@@ -69,13 +69,13 @@ public class AnimationSound implements Externalizable, Cloneable {
         }
     }
 
-    public void playSound(@NotNull Location location, @NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator, @NotNull Player player){
+    public void playSound(@NotNull Location location, @NotNull ActiveGroup group, @Nullable DisplayAnimator animator, @NotNull Player player){
         if (delay == 0){
             playSound(location, player);
         }
         else{
             Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                if (!group.isSpawned()){
+                if (group.getMasterPart() == null){
                     return;
                 }
                 if (animator == null){
@@ -88,13 +88,13 @@ public class AnimationSound implements Externalizable, Cloneable {
         }
     }
 
-    public void playSound(@NotNull Location location, @NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator, @NotNull Collection<Player> players){
+    public void playSound(@NotNull Location location, @NotNull ActiveGroup group, @Nullable DisplayAnimator animator, @NotNull Collection<Player> players){
         if (delay == 0){
             playSound(location, players);
         }
         else{
             Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                if (!group.isSpawned()){
+                if (group.getMasterPart() == null){
                     return;
                 }
                 if (animator == null){

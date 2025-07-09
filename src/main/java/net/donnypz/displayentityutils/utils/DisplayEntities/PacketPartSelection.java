@@ -94,35 +94,35 @@ public class PacketPartSelection extends ActivePartSelection implements Packeted
     @Override
     public void glow() {
         for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).glow();
+            part.glow();
         }
     }
 
     @Override
     public void unglow() {
         for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).unglow();
+            part.unglow();
         }
     }
 
     @Override
     public void setViewRange(float viewRangeMultiplier) {
         for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).setViewRange(viewRangeMultiplier);
+            part.setViewRange(viewRangeMultiplier);
         }
     }
 
     @Override
     public void setBillboard(Display.@NotNull Billboard billboard) {
         for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).setBillboard(billboard);
+            part.setBillboard(billboard);
         }
     }
 
     @Override
     public void setBrightness(Display.@Nullable Brightness brightness) {
         for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).setBrightness(brightness);
+            part.setBrightness(brightness);
         }
     }
 
@@ -136,21 +136,21 @@ public class PacketPartSelection extends ActivePartSelection implements Packeted
     @Override
     public void setPitch(float pitch) {
         for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).setPitch(pitch);
+            part.setPitch(pitch);
         }
     }
 
     @Override
     public void setYaw(float yaw, boolean pivot) {
         for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).setYaw(yaw, pivot);
+            part.setYaw(yaw, pivot);
         }
     }
 
     @Override
     public void pivot(float angleInDegrees) {
         for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).pivot(angleInDegrees);
+            part.pivot(angleInDegrees);
         }
     }
 
@@ -217,7 +217,7 @@ public class PacketPartSelection extends ActivePartSelection implements Packeted
     @Override
     public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks) {
         for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).translate(direction, distance, durationInTicks, delayInTicks);
+            part.translate(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }
@@ -225,7 +225,7 @@ public class PacketPartSelection extends ActivePartSelection implements Packeted
     @Override
     public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks) {
         for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).translate(direction, distance, durationInTicks, delayInTicks);
+            part.translate(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }

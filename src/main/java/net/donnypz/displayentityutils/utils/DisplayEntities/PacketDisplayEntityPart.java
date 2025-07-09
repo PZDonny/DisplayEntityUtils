@@ -13,9 +13,12 @@ import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
@@ -55,22 +58,63 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         this.partTags.addAll(partTags);
     }
 
-
     public int getEntityId(){
         return entityId;
     }
 
+    @Override
+    public void setTextDisplayText(@NotNull Component text) {
+        setAndSend(DisplayAttributes.TextDisplay.TEXT, text);
+    }
+
+    @Override
+    public void setBlockDisplayBlock(@NotNull BlockData blockData) {
+        setAndSend(DisplayAttributes.BlockDisplay.BLOCK_STATE, blockData);
+    }
+
+    @Override
+    public void setItemDisplayItem(@NotNull ItemStack itemstack) {
+        setAndSend(DisplayAttributes.ItemDisplay.ITEMSTACK, itemstack);
+    }
+
+    @Override
+    public <T, V> void setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value) {
+        this.attributeContainer.setAttribute(attribute, value);
+    }
+
+    @Override
+    public void setAttributes(@NotNull DisplayAttributeMap attributeMap){
+        this.attributeContainer.setAttributesAndSend(attributeMap, entityId, viewers);
+    }
+
+    private <T, V>void setAndSend(DisplayAttribute<T, V> attribute, T value){
+        attributeContainer.setAttributeAndSend(attribute, value, entityId, viewers);
+    }
+
+
     /**
-     * Get the interaction translation of this part, relative to the group's location <bold><u>only</u></bold> if the part is an interaction.
-     * @return a vector. Null if the part is not an interaction or if its TRANSLATE attribute is not set
+     * Get the interaction translation of this part, relative to its group's location <bold><u>only</u></bold> if the part is an interaction.
+     * @return a vector. Null if the part is not an interaction or not in a group
      */
     @Override
     public @Nullable Vector getInteractionTranslation() {
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
             return null;
         }
-        Vector3f v = attributeContainer.getAttribute(DisplayAttributes.Transform.TRANSLATION);
-        return v != null ? Vector.fromJOML(v) : null;
+        return getInteractionTranslation(group.getLocation());
+    }
+
+    /**
+     * Get the interaction translation of this part, relative to a given location <bold><u>only</u></bold> if the part is an interaction.
+     * @return a vector. Null if the part is not an interaction or not in a group
+     */
+    public @Nullable Vector getInteractionTranslation(@NotNull Location referenceLocation){
+        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
+            return null;
+        }
+        System.out.println("IT:"+getLocation().toVector());
+        System.out.println("RL:"+referenceLocation.toVector());
+        return referenceLocation.toVector().subtract(getLocation().toVector());
     }
 
     /**
@@ -97,14 +141,36 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         return attributeContainer.getAttribute(DisplayAttributes.Interaction.WIDTH);
     }
 
-
-    public void setAttributes(@NotNull DisplayAttributeMap attributeMap){
-        this.attributeContainer.setAttributesAndSend(attributeMap, entityId, viewers);
+    @Override
+    protected void cull(float width, float height) {
+        attributeContainer
+            .setAttributesAndSend(new DisplayAttributeMap()
+                    .add(DisplayAttributes.Culling.HEIGHT, height)
+                    .add(DisplayAttributes.Culling.WIDTH, width),
+            entityId,
+            viewers);
     }
 
-    private <T, V>void setAndSend(DisplayAttribute<T, V> attribute, T value){
-        attributeContainer.setAttributeAndSend(attribute, value, entityId, viewers);
+    @Override
+    public void autoCull(float widthAdder, float heightAdder) {
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            return;
+        }
+        float[] values = getAutoCullValues(widthAdder, heightAdder);
+        cull(values[0], values[1]);
     }
+
+    /**
+     * Get the resulting auto cull width and height value, respectively.
+     * @param widthAdder the width adder
+     * @param heightAdder the height adder
+     * @return a float[]
+     */
+    float[] getAutoCullValues(float widthAdder, float heightAdder){
+        Vector3f scale = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.SCALE, new Vector3f());
+        return new float[]{(Math.max(scale.x, scale.z)*2f)+widthAdder, scale.y+heightAdder};
+    }
+
 
     @Override
     public void setGlowColor(@Nullable Color color) {
@@ -175,12 +241,12 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     /**
      * Get the transformation of this part if its type of not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
-     * @return a {@link Transformation}
-     * @throws RuntimeException if called for an interaction part
+     * @return a {@link Transformation} or null if the part is an interaction
      */
-    public Transformation getTransformation(){
+    @Override
+    public Transformation getDisplayTransformation(){
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            throw new RuntimeException("Cannot create transformation for packet-based interaction entity.");
+            return null;
         }
         return new Transformation(
                 attributeContainer.getAttribute(DisplayAttributes.Transform.TRANSLATION),
@@ -207,13 +273,8 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     private void pivot(float yaw, float pitch, float angleInDegrees){
         Location groupLoc = group.getLocation();
         Location pivotedLoc = DisplayUtils.getPivotLocation(getLocation(), groupLoc, angleInDegrees);
-
-
-        Vector translationVector = groupLoc.clone().subtract(pivotedLoc).toVector();
-
-        pivotedLoc.getWorld().spawnParticle(Particle.WAX_ON, pivotedLoc, 1, 0,0,0,0);
         packetLocation.setCoordinates(pivotedLoc);
-        attributeContainer.setAttribute(DisplayAttributes.Transform.TRANSLATION, translationVector.toVector3f());
+
 
         for (UUID uuid : viewers){
             Player player = Bukkit.getPlayer(uuid);
@@ -231,17 +292,11 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * @param location the location
      */
     public void teleport(@NotNull Location location){
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            packetLocation = new PacketLocation(location, attributeContainer
-                    .getAttribute(DisplayAttributes.Transform.TRANSLATION));
-        }
-        else{
-            packetLocation = new PacketLocation(location);
-        }
+        packetLocation = new PacketLocation(location);
         for (UUID uuid : viewers){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
-            PacketUtils.setLocation(player, entityId, getLocation());
+            PacketUtils.teleport(player, entityId, getLocation());
         }
     }
 

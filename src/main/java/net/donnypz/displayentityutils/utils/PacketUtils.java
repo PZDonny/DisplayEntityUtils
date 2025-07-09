@@ -119,10 +119,11 @@ public final class PacketUtils {
             @Override
             public void run() {
                 if (timeRan == durationInTicks){
+                    sendInteractionPacket(part, newHeight, newWidth);
                     cancel();
                     return;
                 }
-                sendInteractionPacket(part, part.getInteractionHeight()-heightChange, part.getInteractionHeight()-widthChange);
+                sendInteractionPacket(part, part.getInteractionHeight()-heightChange, part.getInteractionWidth()-widthChange);
                 timeRan++;
             }
         }.runTaskTimerAsynchronously(DisplayEntityPlugin.getInstance(), delayInTicks, 1);
@@ -153,7 +154,7 @@ public final class PacketUtils {
             return;
         }
 
-        double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
+        double movementIncrement = distance/Math.max(durationInTicks, 1);
         Vector incrementVector = direction
                 .clone()
                 .normalize()

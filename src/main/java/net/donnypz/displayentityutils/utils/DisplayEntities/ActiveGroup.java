@@ -1,19 +1,26 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.events.GroupAnimationStateChangeEvent;
+import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.*;
 
-public abstract class ActiveGroup {
+public abstract class ActiveGroup implements Active{
     protected String tag;
     protected final HashSet<DisplayAnimator> activeAnimators = new HashSet<>();
     protected MachineState currentMachineState;
+    protected float scaleMultiplier = 1;
+    protected float verticalRideOffset = 0;
     int lastAnimatedTick = -1;
 
     /**
@@ -24,6 +31,76 @@ public abstract class ActiveGroup {
         return tag;
     }
 
+    public abstract ActivePartSelection createPartSelection();
+
+    public abstract ActivePartSelection createPartSelection(@NotNull PartFilter partFilter);
+
+    protected abstract Collection<? extends ActivePart> getParts();
+
+    /**
+     * Attempt to automatically set the culling bounds for all parts within this group.
+     * Results may not be 100% accurate due to the varying shapes of Minecraft blocks.
+     * The culling bounds will be representative of the part's scaling.
+     * @param cullOption The {@link CullOption} to use
+     * @param widthAdder The amount of width to be added to the culling range
+     * @param heightAdder The amount of height to be added to the culling range
+     * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
+     */
+    public void autoSetCulling(@NotNull CullOption cullOption, float widthAdder, float heightAdder){
+        if (this instanceof SpawnedDisplayEntityGroup g){
+            if (!g.isInLoadedChunk()){
+                return;
+            }
+        }
+        switch (cullOption){
+            case LARGEST -> this.largestCulling(widthAdder, heightAdder, getParts());
+            case LOCAL -> this.localCulling(widthAdder, heightAdder, getParts());
+            case NONE -> this.noneCulling(getParts());
+        }
+    }
+
+    protected void largestCulling(float widthAdder, float heightAdder, Collection<? extends ActivePart> parts){
+        float maxWidth = 0;
+        float maxHeight = 0;
+        for (ActivePart part : parts) {
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
+                continue;
+            }
+            Transformation transformation = part.getDisplayTransformation();
+            Vector3f scale = transformation.getScale();
+
+            maxWidth = Math.max(maxWidth, Math.max(scale.x, scale.z));
+            maxHeight = Math.max(maxHeight, scale.y);
+        }
+
+        for (ActivePart part : parts){
+            part.cull(maxWidth + widthAdder, maxHeight + heightAdder);
+        }
+    }
+
+    protected void localCulling(float widthAdder, float heightAdder, Collection<? extends ActivePart> parts){
+        for (ActivePart part : parts){
+            part.autoCull(widthAdder, heightAdder);
+        }
+    }
+
+    protected void noneCulling(Collection<? extends ActivePart> parts){
+        for (ActivePart part : parts){
+            part.cull(0, 0);
+        }
+    }
+
+
+    public abstract boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions);
+
+    /**
+     * Get this group's scale multiplier set after using {@link ActiveGroup#scale(float, int, boolean)} or similar methods
+     * @return the group's scale multiplier
+     */
+    public float getScaleMultiplier(){
+        return scaleMultiplier;
+    }
+
     public abstract ActivePart getSpawnedPart(@NotNull UUID partUUID);
 
     public abstract SequencedCollection<? extends ActivePart> getSpawnedParts();
@@ -32,11 +109,15 @@ public abstract class ActiveGroup {
 
     public abstract SequencedCollection<? extends ActivePart> getSpawnedDisplayParts();
 
+    public abstract Collection<Player> getTrackingPlayers();
+
+    /**
+     * Get whether any players can visibly see this group. This is done by checking if the master (parent) part of the group can be seen.
+     * @return a boolean
+     */
+    public abstract boolean hasTrackingPlayers();
+
     public abstract ActivePart getMasterPart();
-
-    public abstract ActivePartSelection createPartSelection();
-
-    public abstract ActivePartSelection createPartSelection(@NotNull PartFilter partFilter);
 
     public abstract Location getLocation();
 
@@ -180,7 +261,7 @@ public abstract class ActiveGroup {
         DisplayAnimator animator = state.getDisplayAnimator();
 
         if (animator != null){
-            animator.play(this);
+            animator.play(this, true);
             return true;
         }
         else{
@@ -197,29 +278,55 @@ public abstract class ActiveGroup {
     /**
      * Make a group perform an animation
      * @param animation the animation this group should play
+     * @param packetBased whether this animation should be packet based. This should always be true when called for a {@link PacketDisplayEntityGroup}
      * @return the {@link DisplayAnimator} that will control the playing of the given animation
      */
-    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation){
-        return DisplayAnimator.play(this, animation);
+    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation, boolean packetBased){
+        return DisplayAnimator.play(this, animation, packetBased);
     }
 
     /**
      * Make a group perform a looping animation.
      * @param animation the animation this group should play
+     * @param packetBased whether this animation should be packet based. This should always be true when called for a {@link PacketDisplayEntityGroup}
      * @return the {@link DisplayAnimator} that will control the playing of the given animation
      */
-    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation){
+    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation, boolean packetBased){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
-        animator.play(this);
+        animator.play(this, packetBased);
         return animator;
     }
 
     /**
      * Manually stop an animation from playing on this group
      * @param displayAnimator the display animator controlling an animation
-     * @return this
      */
     public void stopAnimation(@NotNull DisplayAnimator displayAnimator){
         removeActiveAnimator(displayAnimator);
     }
+
+    public abstract boolean rideEntity(@NotNull Entity entity);
+
+    public abstract @Nullable Entity dismount();
+
+    public abstract @Nullable Entity getVehicle();
+
+    /**
+     * Set the vertical translation offset of this group riding an entity. This will apply to animations
+     * as long as this group is riding an entity.
+     * @param verticalRideOffset the offset
+     */
+    public void setVerticalRideOffset(float verticalRideOffset) {
+        this.verticalRideOffset = verticalRideOffset;
+    }
+
+    /**
+     * Get the vertical translation offset of this group when riding an entity.
+     * @return a float
+     */
+    public float getVerticalRideOffset() {
+        return verticalRideOffset;
+    }
+
+    public abstract boolean canApplyVerticalRideOffset();
 }

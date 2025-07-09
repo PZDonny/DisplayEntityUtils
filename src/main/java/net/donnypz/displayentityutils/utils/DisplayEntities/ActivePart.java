@@ -1,6 +1,12 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
+import net.kyori.adventure.text.Component;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,11 +15,15 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
 
-public abstract class ActivePart {
+public abstract class ActivePart implements Active{
 
     protected SpawnedDisplayEntityPart.PartType type;
     protected UUID partUUID;
     protected boolean valid = true;
+
+    protected abstract void cull(float width, float height);
+
+    public abstract void autoCull(float widthAdder, float heightAdder);
 
     /** Get this part's UUID used for animations and uniquely identifying parts
      * @return a {@link UUID}
@@ -36,7 +46,19 @@ public abstract class ActivePart {
         return type;
     }
 
+    public abstract void setTextDisplayText(@NotNull Component text);
+
+    public abstract void setBlockDisplayBlock(@NotNull BlockData blockData);
+
+    public abstract void setItemDisplayItem(@NotNull ItemStack itemstack);
+
+    public abstract <T, V> void setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value);
+
+    public abstract void setAttributes(@NotNull DisplayAttributeMap attributeMap);
+
     public abstract @Nullable Vector getInteractionTranslation();
+
+    public abstract Transformation getDisplayTransformation();
 
     public abstract float getInteractionHeight();
 

@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.events;
 
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -9,33 +10,35 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Called at the completion of a {@link SpawnedDisplayAnimation}.
+ * Called at the completion of a {@link SpawnedDisplayAnimation}'s animation.
  * This is not called for looping animations unless the {@link DisplayAnimator}'s type is changed from LOOPING to LINEAR.
- * Refer to {@link GroupAnimationLoopStartEvent} for looping animations instead
+ * Refer to {@link GroupAnimationLoopStartEvent} for looping animations instead.
  */
 public class GroupAnimationCompleteEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
-    SpawnedDisplayEntityGroup spawnedDisplayEntityGroup;
+    ActiveGroup spawnedDisplayEntityGroup;
     SpawnedDisplayAnimation animation;
     DisplayAnimator animator;
 
-    public GroupAnimationCompleteEvent(SpawnedDisplayEntityGroup group, @NotNull DisplayAnimator animator, SpawnedDisplayAnimation animation){
+    public GroupAnimationCompleteEvent(ActiveGroup group, @NotNull DisplayAnimator animator, SpawnedDisplayAnimation animation, boolean isAsync){
+        super(isAsync);
         this.spawnedDisplayEntityGroup = group;
         this.animation = animation;
         this.animator = animator;
     }
 
-    public GroupAnimationCompleteEvent(SpawnedDisplayEntityGroup group, SpawnedDisplayAnimation animation){
+    public GroupAnimationCompleteEvent(ActiveGroup group, SpawnedDisplayAnimation animation, boolean isAsync){
+        super(isAsync);
         this.spawnedDisplayEntityGroup = group;
         this.animation = animation;
         this.animator = null;
     }
 
     /**
-     * Get the {@link SpawnedDisplayEntityGroup} involved in this event
+     * Get the {@link ActiveGroup} involved in this event
      * @return a group
      */
-    public SpawnedDisplayEntityGroup getGroup() {
+    public ActiveGroup getGroup() {
         return spawnedDisplayEntityGroup;
     }
 

@@ -7,6 +7,8 @@ load: POSTWORLD
 softdepend:
   - MythicMobs
   - Skript
+  - packetevents
+  - PassengerAPI
 commands:
   managedisplays:
     aliases: [mdis]

@@ -32,7 +32,7 @@ public class GroupAnimationStartEvent extends Event implements Cancellable {
     }
 
     /**
-     * Get whether this group is packet-based or not
+     * Get whether this group is a {@link PacketDisplayEntityGroup}
      * @return a boolean
      */
     public boolean isPacketGroup(){

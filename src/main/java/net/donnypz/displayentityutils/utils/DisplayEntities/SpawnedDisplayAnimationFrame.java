@@ -295,20 +295,20 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     }
 
     /**
-     * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a location relative to a {@link SpawnedDisplayEntityGroup}
+     * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a location relative to a {@link ActiveGroup}
      * @param group the relative group
      */
-    public void playSounds(@NotNull SpawnedDisplayEntityGroup group){
+    public void playSounds(@NotNull ActiveGroup group){
         playSounds(group, null, true);
     }
 
     /**
-     * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a location relative to a {@link SpawnedDisplayEntityGroup}
+     * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a location relative to a {@link ActiveGroup}
      * @param group the relative group
      * @param animator the animator attempting to play the sounds
      * @param limited whether the effects should only be played to players who can see the group
      */
-    public void playSounds(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator, boolean limited){
+    public void playSounds(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
         for (FramePoint framePoint : framePoints.values()){
             framePoint.playSounds(group, animator, limited);
         }
@@ -329,7 +329,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * Show the particles that will be displayed at the start of this frame
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
      */
-    public void showParticles(@NotNull SpawnedDisplayEntityGroup group){
+    public void showParticles(@NotNull ActiveGroup group){
         showParticles(group, null, true);
     }
 
@@ -340,7 +340,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param animator the animator attempting to show the particles
      * @param limited whether the effects should only be played to players who can see the group
      */
-    public void showParticles(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator, boolean limited){
+    public void showParticles(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
         for (FramePoint framePoint : framePoints.values()){
             framePoint.showParticles(group, animator, limited);
         }
@@ -381,7 +381,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param animator the animator attempting to play the effects
      * @param limited whether the effects should only be played to players who can see the group
      */
-    public void playEffects(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator, boolean limited){
+    public void playEffects(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
         Location groupLoc = group.getLocation();
         if (groupLoc != null){
             executeStartCommands(groupLoc);

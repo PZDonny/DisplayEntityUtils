@@ -7,7 +7,6 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
-import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import io.papermc.paper.entity.TeleportFlag;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.*;
@@ -37,10 +36,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     long creationTime = System.currentTimeMillis();
 
     boolean isVisibleByDefault;
-    private float scaleMultiplier = 1;
     private boolean isPersistent = DisplayEntityPlugin.defaultPersistence();
     private boolean persistenceOverride = DisplayEntityPlugin.persistenceOverride();
-    private float verticalOffset = 0;
+
 
     public static final NamespacedKey creationTimeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "creationtime");
     static final NamespacedKey scaleKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "scale");
@@ -94,6 +92,11 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         autoSetCulling(DisplayEntityPlugin.autoCulling(), widthCullingAdder, heightCullingAdder);
     }
 
+    @Override
+    protected Collection<SpawnedDisplayEntityPart> getParts() {
+        return spawnedParts.values();
+    }
+
     /**
      * Get the unix timestamp that this group was initially created.
      * This is created when a group is selected/grouped for the first time.
@@ -111,28 +114,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     public boolean isInLoadedChunk(){
         return DisplayUtils.isInLoadedChunk(masterPart);
     }
-
-
-
-    /**
-     * Set the vertical translation offset of this group riding an entity. This will apply to animations
-     * as long as this group is riding an entity.
-     * @param verticalOffset
-     */
-    public SpawnedDisplayEntityGroup setVerticalOffset(float verticalOffset) {
-        this.verticalOffset = verticalOffset;
-        return this;
-    }
-
-    /**
-     * Get the vertical translation offset of this group when riding an entity.
-     * @return a float
-     */
-    public float getVerticalOffset() {
-        return verticalOffset;
-    }
-
-
 
 
     /**
@@ -319,7 +300,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
 
     /**
      * Get whether this group is visible to players by default
-     * If not, use showToPlayer() to reveal this group to the player
+     * If not, use {@link #showToPlayer(Player)} to reveal this group to the player
      * and hideFromPlayer() to hide it
      * @return a boolean value
      */
@@ -379,6 +360,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      * Get the location of this group.
      * @return Location of this group's master part. Null if the group is invalid
      */
+    @Override
     public Location getLocation(){
         if (!this.isSpawned()){
             return null;
@@ -429,6 +411,24 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
             }
         }
         return partList;
+    }
+
+    /**
+     * Get the players who can visibly see this group
+     * @return a collection of players
+     */
+    @Override
+    public Collection<Player> getTrackingPlayers() {
+        return masterPart.getEntity().getTrackedBy();
+    }
+
+    /**
+     * Get whether any players can visibly see this group. This is done by checking if the master (parent) part of the group can be seen.
+     * @return a boolean
+     */
+    @Override
+    public boolean hasTrackingPlayers() {
+        return !getTrackingPlayers().isEmpty();
     }
 
     /**
@@ -555,19 +555,12 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     /**
-     * Get this group's scale multiplier set after using {@link SpawnedDisplayEntityGroup#scale(float, int, boolean)}
-     * @return the group's scale multiplier
-     */
-    public float getScaleMultiplier(){
-        return scaleMultiplier;
-    }
-
-    /**
      * Set the scale for all parts within this group
      * @param newScaleMultiplier the scale multiplier to apply to this group
      * @param durationInTicks how long it should take for the group to scale
      * @param scaleInteractions whether interaction entities should be scaled
      * @return false if the {@link GroupScaleEvent} was cancelled or if the group is in an unloaded chunk
+     * * @throws IllegalArgumentException if newScaleMultiplier is less than or equal to 0
      */
     public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions){
         if (newScaleMultiplier <= 0){
@@ -872,13 +865,13 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
 
     /**
      * Pivot all Interaction parts in this selection around the SpawnedDisplayEntityGroup's master part
-     * @param angle the pivot angle
+     * @param angleInDegrees the pivot angle
      */
     @Override
-    public void pivot(double angle){
+    public void pivot(float angleInDegrees){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                part.pivot(angle);
+                part.pivot(angleInDegrees);
             }
         }
     }
@@ -939,56 +932,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         }
     }
 
-    /**
-     * Attempt to automatically set the culling bounds for all parts within this group.
-     * Results may not be 100% accurate due to the varying shapes of Minecraft blocks.
-     * The culling bounds will be representative of the part's scaling.
-     * @param cullOption The {@link CullOption} to use
-     * @param widthAdder The amount of width to be added to the culling range
-     * @param heightAdder The amount of height to be added to the culling range
-     * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
-     */
-    public void autoSetCulling(CullOption cullOption, float widthAdder, float heightAdder){
-        if (!isInLoadedChunk()){
-            return;
-        }
-        switch (cullOption){
-            case LARGEST -> largestCulling(widthAdder, heightAdder);
-            case LOCAL -> localCulling(widthAdder, heightAdder);
-            case NONE -> noneCulling();
-        }
-    }
 
-    private void largestCulling(float widthAdder, float heightAdder){
-        float maxWidth = 0;
-        float maxHeight = 0;
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()) {
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
-                continue;
-            }
-            Transformation transformation = ((Display) part.getEntity()).getTransformation();
-            Vector3f scale = transformation.getScale();
 
-            maxWidth = Math.max(maxWidth, Math.max(scale.x, scale.z));
-            maxHeight = Math.max(maxHeight, scale.y);
-        }
 
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.cull(maxWidth + widthAdder, maxHeight + heightAdder);
-        }
-    }
-
-    private void localCulling(float widthAdder, float heightAdder){
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.autoCull(widthAdder, heightAdder);
-        }
-    }
-
-    private void noneCulling(){
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.cull(0, 0);
-        }
-    }
 
     /**
      * Set the glow color of this group
@@ -1114,6 +1060,25 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     /**
+     * Create a {@link SpawnedPartSelection} containing unfiltered parts from this group
+     * @return a {@link SpawnedPartSelection}
+     */
+    @Override
+    public ActivePartSelection createPartSelection() {
+        return new SpawnedPartSelection(this);
+    }
+
+    /**
+     * Create a {@link SpawnedPartSelection} containing filtered parts from this group
+     * @param partFilter the part filter
+     * @return a {@link SpawnedPartSelection}
+     */
+    @Override
+    public ActivePartSelection createPartSelection(@NotNull PartFilter partFilter) {
+        return new SpawnedPartSelection(this, partFilter);
+    }
+
+    /**
      * Check if a Display is the master part of this group
      * @param display The Display to check
      * @return Whether the display is the master part
@@ -1124,15 +1089,13 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
 
     /**
      * Adds the glow effect to all the block and item display parts in this group
-     * @return this
      */
-    public SpawnedDisplayEntityGroup glow(){
+    public void glow(){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || part.type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
                 part.glow();
             }
         }
-        return this;
     }
 
     /**
@@ -1204,14 +1167,12 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
 
     /**
      * Removes the glow effect from all the display parts in this group
-     * @return this
      */
     @Override
-    public SpawnedDisplayEntityGroup unglow(){
+    public void unglow(){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.unglow();
         }
-        return this;
     }
 
     /**
@@ -1246,8 +1207,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
             return false;
         }
 
-        if (verticalOffset != 0) {
-            translate(Direction.UP, verticalOffset, -1, -1);
+        if (verticalRideOffset != 0) {
+            translate(Direction.UP, verticalRideOffset, -1, -1);
         }
 
         for (SpawnedDisplayEntityPart interactionPart: getSpawnedParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
@@ -1260,13 +1221,14 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      * Make this group stop riding its vehicle
      * @return the entity this group was riding
      */
+    @Override
     public @Nullable Entity dismount(){
         Entity vehicle = getVehicle();
         Entity masterEntity = masterPart.getEntity();
         if (masterEntity != null){
             if (masterPart.getEntity().leaveVehicle()){
-                if (verticalOffset != 0){
-                    translate(Direction.UP, verticalOffset*-1, -1, -1);
+                if (verticalRideOffset != 0){
+                    translate(Direction.UP, verticalRideOffset *-1, -1, -1);
                 }
             }
         }
@@ -1306,6 +1268,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      * Get the entity this group is riding
      * @return an entity. null if this group is not riding an entity
      */
+    @Override
     public @Nullable Entity getVehicle(){
         try{
             return masterPart.getEntity().getVehicle();
@@ -1318,10 +1281,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
 
     /**
      * Determine if this group's vertical offset can be applied, typically when mounted on an entity
-     * @return
+     * @return a boolean
      */
-    public boolean canApplyVerticalOffset(){
-        if (verticalOffset == 0){
+    public boolean canApplyVerticalRideOffset(){
+        if (verticalRideOffset == 0){
             return false;
         }
         Entity vehicle = getVehicle();
@@ -1590,8 +1553,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
                 return;
             }
             switch(type){
-                case LINEAR -> this.animate(anim);
-                case LOOP -> this.animateLooping(anim);
+                case LINEAR -> this.animate(anim, false);
+                case LOOP -> this.animateLooping(anim, false);
                 //case PING_PONG -> animatePingPong(anim);
             }
         }

@@ -97,7 +97,7 @@ public final class DEUMythicListener implements Listener {
                 .visibleByDefault(controller.isVisibleByDefault(), null);
 
         SpawnedDisplayEntityGroup spawned = group.spawn(e.getLocation(), GroupSpawnedEvent.SpawnReason.DISPLAY_CONTROLLER, settings);
-        spawned.setVerticalOffset(controller.getVerticalOffset());
+        spawned.setVerticalRideOffset(controller.getVerticalOffset());
         spawned.rideEntity(e.getEntity());
 
         Entity masterEntity = spawned.getMasterPart().getEntity();

@@ -1,8 +1,8 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities.particles;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -77,13 +77,13 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
         return groupLoc;
     }*/
 
-    public void spawn(@NotNull Location location, @NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
+    public void spawn(@NotNull Location location, @NotNull ActiveGroup group, @Nullable DisplayAnimator animator){
         if (delayInTicks == 0){
             spawn(location);
         }
         else{
             Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                if (!group.isSpawned()){
+                if (group.getMasterPart() == null){
                     return;
                 }
                 if (animator == null){
@@ -96,13 +96,13 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
         }
     }
 
-    public void spawn(@NotNull Location location, @NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator, Player player){
+    public void spawn(@NotNull Location location, @NotNull ActiveGroup group, @Nullable DisplayAnimator animator, Player player){
         if (delayInTicks == 0){
             spawn(location, player);
         }
         else{
             Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                if (!group.isSpawned()){
+                if (group.getMasterPart() == null){
                     return;
                 }
                 if (animator == null){
@@ -115,13 +115,13 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
         }
     }
 
-    public void spawn(@NotNull Location location, @NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator, Collection<Player> players){
+    public void spawn(@NotNull Location location, @NotNull ActiveGroup group, @Nullable DisplayAnimator animator, Collection<Player> players){
         if (delayInTicks == 0){
             spawn(location, players);
         }
         else{
             Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                if (!group.isSpawned()){
+                if (group.getMasterPart() == null){
                     return;
                 }
                 if (animator == null){

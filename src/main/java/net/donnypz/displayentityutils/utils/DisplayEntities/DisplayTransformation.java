@@ -79,6 +79,21 @@ class DisplayTransformation extends Transformation{
         }
     }
 
+    void applyData(ActivePart part){
+        if (type == null || data == null){
+            return;
+        }
+        if (type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
+            part.setTextDisplayText((Component) data);
+        }
+        else if (type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY){
+            part.setBlockDisplayBlock((BlockData) data);
+        }
+        else if (type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
+            part.setItemDisplayItem((ItemStack) data);
+        }
+    }
+
     private void setData(SpawnedDisplayEntityPart.PartType type, Serializable data){
         this.type = type;
         if (data == null){
@@ -136,6 +151,13 @@ class DisplayTransformation extends Transformation{
             return false;
         }
         return Objects.equals(this.getRightRotation(), transformation.getRightRotation());
+    }
+
+    boolean isSimilar(ActivePart part){
+        if (part instanceof PacketDisplayEntityPart p){
+            return isSimilar(p.getDisplayTransformation());
+        }
+        return isSimilar(((Display) ((SpawnedDisplayEntityPart) part).getEntity()).getTransformation());
     }
 
     @Override

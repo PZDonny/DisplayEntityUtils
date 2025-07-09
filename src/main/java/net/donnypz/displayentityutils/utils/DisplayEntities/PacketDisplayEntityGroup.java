@@ -2,19 +2,27 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers;
+import com.maximde.passengerapi.PassengerAPI;
+import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.events.PacketGroupDestroyEvent;
 import net.donnypz.displayentityutils.events.PacketGroupSendEvent;
+import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -25,6 +33,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     int interactionCount;
     PacketDisplayEntityPart masterPart;
     int[] passengerIds;
+    UUID vehicleUUID;
 
 
     PacketDisplayEntityGroup(String tag){
@@ -47,8 +56,169 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     }
 
     @Override
+    protected Collection<PacketDisplayEntityPart> getParts() {
+        return packetParts.values();
+    }
+
+    /**
+     * Create a {@link SpawnedPartSelection} containing unfiltered parts from this group
+     * @return a {@link SpawnedPartSelection}
+     */
+    @Override
+    public ActivePartSelection createPartSelection() {
+        return new PacketPartSelection(this);
+    }
+
+    /**
+     * Create a {@link SpawnedPartSelection} containing filtered parts from this group
+     * @param partFilter the part filter
+     * @return a {@link SpawnedPartSelection}
+     */
+    @Override
+    public ActivePartSelection createPartSelection(@NotNull PartFilter partFilter) {
+        return new PacketPartSelection(this, partFilter);
+    }
+
+    /**
+     * Set the scale for all parts within this group
+     * @param newScaleMultiplier the scale multiplier to apply to this group
+     * @param durationInTicks how long it should take for the group to scale
+     * @param scaleInteractions whether interaction entities should be scaled
+     * @throws IllegalArgumentException if newScaleMultiplier is less than or equal to 0
+     */
+    @Override
+    public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions) {
+        if (newScaleMultiplier <= 0){
+            throw new IllegalArgumentException("New Scale Multiplier cannot be <= 0");
+        }
+        if (newScaleMultiplier == scaleMultiplier){
+            return true;
+        }
+
+        float largestWidth = 0;
+        float largestHeight = 0;
+        CullOption cullOption = DisplayEntityPlugin.autoCulling();
+        for (ActivePart p : packetParts.values()){
+            PacketDisplayEntityPart part = (PacketDisplayEntityPart) p;
+            //Displays
+            if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
+                DisplayAttributeMap attributeMap = new DisplayAttributeMap();
+                Transformation transformation = part.getDisplayTransformation();
+                //Reset Scale then multiply by newScaleMultiplier
+                Vector3f scale = transformation.getScale();
+                scale.x = (scale.x/scaleMultiplier)*newScaleMultiplier;
+                scale.y = (scale.y/scaleMultiplier)*newScaleMultiplier;
+                scale.z = (scale.z/scaleMultiplier)*newScaleMultiplier;
+
+                //Reset Translation then multiply by newScaleMultiplier
+                Vector3f translationVector = transformation.getTranslation();
+                translationVector.x = (translationVector.x/scaleMultiplier)*newScaleMultiplier;
+                translationVector.y = (translationVector.y/scaleMultiplier)*newScaleMultiplier;
+                translationVector.z = (translationVector.z/scaleMultiplier)*newScaleMultiplier;
+
+                if (!transformation.equals(part.getDisplayTransformation())){
+                    attributeMap.add(DisplayAttributes.Interpolation.DURATION, durationInTicks)
+                        .add(DisplayAttributes.Interpolation.DELAY, -1)
+                        .addTransformation(transformation);
+                }
+                //Culling
+                if (cullOption == CullOption.LOCAL){
+                    float[] values = part.getAutoCullValues(DisplayEntityPlugin.widthCullingAdder(), DisplayEntityPlugin.heightCullingAdder());
+                    attributeMap.add(DisplayAttributes.Culling.HEIGHT, values[1])
+                        .add(DisplayAttributes.Culling.WIDTH, values[0]);
+                }
+                else if (cullOption == CullOption.LARGEST){
+                    largestWidth = Math.max(largestWidth, Math.max(scale.x, scale.z));
+                    largestHeight = Math.max(largestHeight, scale.y);
+                }
+
+                part.attributeContainer.setAttributesAndSend(attributeMap, part.entityId, part.viewers);
+            }
+            //Interactions
+            else if (scaleInteractions){
+
+                //Reset Scale then multiply by newScaleMultiplier
+                float newHeight = (part.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier;
+                float newWidth = (part.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier;
+                PacketUtils.scaleInteraction(part, newHeight, newWidth, durationInTicks, 0);
+
+                //Reset Translation then multiply by newScaleMultiplier
+                Vector translationVector = part.getInteractionTranslation();
+                if (translationVector == null){
+                    continue;
+                }
+                Vector oldVector = new Vector(translationVector.getX(), translationVector.getY(), translationVector.getZ());
+                System.out.println("OV: "+oldVector);
+                translationVector.setX((translationVector.getX()/scaleMultiplier)*newScaleMultiplier);
+                translationVector.setY((translationVector.getY()/scaleMultiplier)*newScaleMultiplier);
+                translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
+
+                Vector moveVector = oldVector.subtract(translationVector);
+                System.out.println("MV: "+moveVector);
+                PacketUtils.translateInteraction(part, moveVector, moveVector.length(), durationInTicks, 0);
+            }
+        }
+
+    //Culling
+        if (DisplayEntityPlugin.autoCulling() == CullOption.LARGEST){
+            for (PacketDisplayEntityPart part : packetParts.values()){
+                part.cull(largestWidth+DisplayEntityPlugin.widthCullingAdder(), largestHeight+DisplayEntityPlugin.heightCullingAdder());
+            }
+        }
+
+        scaleMultiplier = newScaleMultiplier;
+        return true;
+    }
+
+    @Override
     public void playSpawnAnimation() {
 
+    }
+
+    @Override
+    public boolean canApplyVerticalRideOffset() {
+        if (verticalRideOffset == 0){
+            return false;
+        }
+        Entity vehicle = Bukkit.getEntity(vehicleUUID);
+        if (vehicle == null || vehicle.isDead()){
+            return false;
+        }
+        return PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).getPassengers(false, vehicle.getEntityId()).contains(masterPart.entityId);
+
+        //return !vehicle.isDead();
+    }
+
+    public boolean rideEntity(@NotNull Entity vehicle){
+        if (vehicle.isDead()){
+            return false;
+        }
+        vehicleUUID = vehicle.getUniqueId();
+        for (UUID uuid : masterPart.viewers){
+            Player p = Bukkit.getPlayer(uuid);
+            if (p == null) continue;
+            PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).addPassenger(false, vehicle.getEntityId(), masterPart.entityId);
+        }
+        return true;
+    }
+
+    @Override
+    public @Nullable Entity dismount(){
+        Entity vehicle = getVehicle();
+        if (vehicle == null) return null;
+
+        for (UUID uuid : masterPart.viewers){
+            Player p = Bukkit.getPlayer(uuid);
+            if (p == null) continue;
+            PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).removePassenger(false, vehicle.getEntityId(), masterPart.entityId);
+        }
+        vehicleUUID = null;
+        return vehicle;
+    }
+
+    @Override
+    public @Nullable Entity getVehicle(){
+        return vehicleUUID == null ? null : Bukkit.getEntity(vehicleUUID);
     }
 
     @Override
@@ -81,6 +251,24 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
             }
         }
         return partList;
+    }
+
+    /**
+     * Get the players who can visibly see this group
+     * @return a collection of players
+     */
+    @Override
+    public Collection<Player> getTrackingPlayers() {
+        return masterPart.getViewersAsPlayers();
+    }
+
+    /**
+     * Get whether any players can visibly see this group. This is done by checking if the master (parent) part of the group can be seen.
+     * @return a boolean
+     */
+    @Override
+    public boolean hasTrackingPlayers() {
+        return !masterPart.viewers.isEmpty();
     }
 
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap, SpawnedDisplayEntityPart.PartType... effectedPartTypes){
@@ -160,12 +348,10 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     }
 
     @Override
-    public void pivot(float angle) {
-        for (PacketDisplayEntityPart part : packetParts.values()){
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                part.pivot(angle);
-            }
-        }
+    public void pivot(float angleInDegrees) {
+        iterateInteractionParts(part -> {
+            part.pivot(angleInDegrees);
+        });
     }
 
 
@@ -306,16 +492,18 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     }
 
     @Override
-    public void translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks) {
+    public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks) {
         for (PacketDisplayEntityPart part : packetParts.values()){
             part.translate(direction, distance, durationInTicks, delayInTicks);
         }
+        return true;
     }
 
     @Override
-    public void translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks) {
+    public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks) {
         for (PacketDisplayEntityPart part : packetParts.values()){
             part.translate(direction, distance, durationInTicks, delayInTicks);
         }
+        return true;
     }
 }
