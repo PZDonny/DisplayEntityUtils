@@ -240,9 +240,10 @@ public final class DisplayEntityGroup implements Serializable{
     /**
      * Spawns this {@link DisplayEntityGroup} at a specified location returning a {@link PacketDisplayEntityGroup} that represents this.
      * @param spawnLocation The location where this group spawn be spawned for players
+     * @param playSpawnAnimation whether this packet group should automatically play its spawn animation when created
      * @return A {@link PacketDisplayEntityGroup} representative of this DisplayEntityGroup.
      */
-    public @NotNull PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation){
+    public @NotNull PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation, boolean playSpawnAnimation){
         PacketDisplayEntityGroup packetGroup = new PacketDisplayEntityGroup(tag);
 
         PacketDisplayEntityPart masterPart = masterEntity.createPacketPart(packetGroup, spawnLocation);
@@ -264,6 +265,10 @@ public final class DisplayEntityGroup implements Serializable{
         for (InteractionEntity entity : interactionEntities){
             PacketDisplayEntityPart part = entity.createPacketPart(spawnLocation);
             packetGroup.addPart(part);
+        }
+
+        if (playSpawnAnimation){
+            packetGroup.playSpawnAnimation();
         }
 
         return packetGroup;
