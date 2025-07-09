@@ -170,10 +170,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         return true;
     }
 
-    @Override
-    public void playSpawnAnimation() {
-
-    }
 
     /**
      * Make a group perform an animation

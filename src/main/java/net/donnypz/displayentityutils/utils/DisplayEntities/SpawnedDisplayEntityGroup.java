@@ -42,9 +42,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
 
     public static final NamespacedKey creationTimeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "creationtime");
     static final NamespacedKey scaleKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "scale");
-    static final NamespacedKey spawnAnimationKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimation");
-    static final NamespacedKey spawnAnimationTypeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimationtype");
-    static final NamespacedKey spawnAnimationLoadMethodKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimationloader");
     static final NamespacedKey persistenceOverrideKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "persistence_override");
 
 
@@ -1471,92 +1468,26 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         }
     }
 
-
-
-    /**
-     * Get the tag of the animation applied to this group when it's spawned/loaded
-     * @return a string or null if not set;
-     */
-    public @Nullable String getSpawnAnimationTag(){
-        PersistentDataContainer c = masterPart.getEntity().getPersistentDataContainer();
-        return c.get(spawnAnimationKey, PersistentDataType.STRING);
-    }
-
-    /**
-     * Get the {@link DisplayAnimator.AnimationType} applied to this group's spawn animation
-     * @return a {@link  DisplayAnimator.AnimationType} or null if not set;
-     */
-    public @Nullable DisplayAnimator.AnimationType getSpawnAnimationType(){
-        PersistentDataContainer c = masterPart.getEntity().getPersistentDataContainer();
-        String type = c.get(spawnAnimationTypeKey, PersistentDataType.STRING);
-        if (type == null){
-            return null;
-        }
-        try{
-            return DisplayAnimator.AnimationType.valueOf(type);
-        }
-        catch(IllegalArgumentException e){
-            return null;
-        }
-    }
-
-    /**
-     * Get the {@link LoadMethod} when fetching the spawn animation for this group
-     * @return a {@link  LoadMethod} or null if not set;
-     */
-    public @Nullable LoadMethod getSpawnAnimationLoadMethod(){
-        PersistentDataContainer c = masterPart.getEntity().getPersistentDataContainer();
-        String method = c.get(spawnAnimationLoadMethodKey, PersistentDataType.STRING);
-        if (method == null){
-            return null;
-        }
-        try{
-            return LoadMethod.valueOf(method);
-        }
-        catch(IllegalArgumentException e){
-            return null;
-        }
-    }
-
     /**
      * Set the animation to apply to a group when it is spawned, by its tag.
-     * A null animation tag will remove any existing spawn animation from this group.
+     * A null animation tag will remove any existing spawn animation from this group. If this is done, the other parameters can be set to any value
      * @param animationTag tag of animation to apply whenever this group is spawned/loaded
      * @param animationType type of animation to be applied
+     * @param loadMethod where the animation should be retrieved from
      */
     public void setSpawnAnimationTag(@Nullable String animationTag, @NotNull DisplayAnimator.AnimationType animationType, @NotNull LoadMethod loadMethod){
         PersistentDataContainer c = masterPart.getEntity().getPersistentDataContainer();
         if (animationTag == null){
-            c.remove(spawnAnimationKey);
-            c.remove(spawnAnimationTypeKey);
-            c.remove(spawnAnimationLoadMethodKey);
+            setSpawnAnimation(null, null, null);
+            c.remove(DisplayEntityPlugin.getSpawnAnimationKey());
+            c.remove(DisplayEntityPlugin.getSpawnAnimationTypeKey());
+            c.remove(DisplayEntityPlugin.getSpawnAnimationLoadMethodKey());
         }
         else{
-            c.set(spawnAnimationKey, PersistentDataType.STRING, animationTag);
-            c.set(spawnAnimationTypeKey, PersistentDataType.STRING, animationType.name());
-            c.set(spawnAnimationLoadMethodKey, PersistentDataType.STRING, loadMethod.name());
-        }
-    }
-
-    @Override
-    public void playSpawnAnimation() {
-        PersistentDataContainer c = getMasterPart().getEntity().getPersistentDataContainer();
-        String spawnAnimationTag = c.get(spawnAnimationKey, PersistentDataType.STRING);
-        if (spawnAnimationTag == null){
-            return;
-        }
-
-        SpawnedDisplayAnimation anim = DisplayAnimationManager.getSpawnedDisplayAnimation(spawnAnimationTag, getSpawnAnimationLoadMethod());
-        if (anim != null){
-            DisplayAnimator.AnimationType type = getSpawnAnimationType();
-            if (type == null){
-                return;
-            }
-            switch(type){
-                case LINEAR -> this.animate(anim);
-                case LOOP -> this.animateLooping(anim);
-                //case PING_PONG -> animatePingPong(anim);
-            }
+            c.set(DisplayEntityPlugin.getSpawnAnimationKey(), PersistentDataType.STRING, animationTag);
+            c.set(DisplayEntityPlugin.getSpawnAnimationTypeKey(), PersistentDataType.STRING, animationType.name());
+            c.set(DisplayEntityPlugin.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING, loadMethod.name());
+            setSpawnAnimation(animationTag, loadMethod, animationType);
         }
     }
 

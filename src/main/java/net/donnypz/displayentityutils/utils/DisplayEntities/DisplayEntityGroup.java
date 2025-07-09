@@ -174,25 +174,25 @@ public final class DisplayEntityGroup implements Serializable{
             settings = newSettings;
         }
 
-        SpawnedDisplayEntityGroup spawnedGroup = new SpawnedDisplayEntityGroup(settings.visibleByDefault);
-        Display blockDisplay = masterEntity.createEntity(location, settings);
+        SpawnedDisplayEntityGroup group = new SpawnedDisplayEntityGroup(settings.visibleByDefault);
+        Display blockDisplay = masterEntity.createEntity(group, location, settings);
         if (isPersistent == null){
-            spawnedGroup.setPersistent(true);
+            group.setPersistent(true);
         }
         else{
-            spawnedGroup.setPersistent(isPersistent);
+            group.setPersistent(isPersistent);
         }
 
 
-        spawnedGroup.setTag(tag);
-        spawnedGroup.addDisplayEntity(blockDisplay).setMaster();
+        group.setTag(tag);
+        group.addDisplayEntity(blockDisplay).setMaster();
 
         for (DisplayEntity entity : displayEntities){ //Summon Display Entities
             if (!entity.equals(masterEntity)){
 
-                Display passenger = entity.createEntity(location, settings);
+                Display passenger = entity.createEntity(group, location, settings);
 
-                SpawnedDisplayEntityPart part = spawnedGroup.addDisplayEntity(passenger);
+                SpawnedDisplayEntityPart part = group.addDisplayEntity(passenger);
                 List<String> legacyPartTags = entity.getLegacyPartTags();
                 if (legacyPartTags != null && !entity.getLegacyPartTags().isEmpty()){
                     part.adaptScoreboardTags(true);
@@ -202,11 +202,11 @@ public final class DisplayEntityGroup implements Serializable{
 
         for (InteractionEntity entity : interactionEntities){ //Summon Interaction Entities
             Vector v = entity.getVector();
-            Location spawnLocation = spawnedGroup.getMasterPart().getEntity().getLocation().clone().subtract(v);
+            Location spawnLocation = group.getMasterPart().getEntity().getLocation().clone().subtract(v);
 
             Interaction interaction = entity.createEntity(spawnLocation, settings);
 
-            SpawnedDisplayEntityPart part = spawnedGroup.addInteractionEntity(interaction);
+            SpawnedDisplayEntityPart part = group.addInteractionEntity(interaction);
             if (!entity.getLegacyPartTags().isEmpty()){
                 part.adaptScoreboardTags(true);
             }
@@ -218,21 +218,21 @@ public final class DisplayEntityGroup implements Serializable{
             }
         }
 
-        spawnedGroup.setPersistenceOverride(settings.persistenceOverride);
+        group.setPersistenceOverride(settings.persistenceOverride);
 
         if (tag != null){
-            spawnedGroup.setTag(tag);
+            group.setTag(tag);
         }
 
-        DisplayGroupManager.addSpawnedGroup(spawnedGroup.getMasterPart(), spawnedGroup);
+        DisplayGroupManager.addSpawnedGroup(group.getMasterPart(), group);
 
         float widthCullingAdder = DisplayEntityPlugin.widthCullingAdder();
         float heightCullingAdder = DisplayEntityPlugin.heightCullingAdder();
-        spawnedGroup.autoSetCulling(DisplayEntityPlugin.autoCulling(), widthCullingAdder, heightCullingAdder);
+        group.autoSetCulling(DisplayEntityPlugin.autoCulling(), widthCullingAdder, heightCullingAdder);
 
-        new GroupSpawnedEvent(spawnedGroup, spawnReason).callEvent();
-        spawnedGroup.playSpawnAnimation();
-        return spawnedGroup;
+        new GroupSpawnedEvent(group, spawnReason).callEvent();
+        group.playSpawnAnimation();
+        return group;
     }
 
 
@@ -245,17 +245,18 @@ public final class DisplayEntityGroup implements Serializable{
     public @NotNull PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation){
         PacketDisplayEntityGroup packetGroup = new PacketDisplayEntityGroup(tag);
 
-        int passengerSize = (displayEntities.size())-1;
+        PacketDisplayEntityPart masterPart = masterEntity.createPacketPart(packetGroup, spawnLocation);
+        packetGroup.addPart(masterPart);
+
+        int passengerSize = displayEntities.size(); //was displayEntities.size()-1;
         int[] passengerIds = new int[passengerSize];
         int i = 0;
 
         for (DisplayEntity entity : displayEntities){
             PacketDisplayEntityPart part = entity.createPacketPart(packetGroup, spawnLocation);
             packetGroup.addPart(part);
-            if (!part.isMaster){
-                passengerIds[i] = part.entityId;
-                i++;
-            }
+            passengerIds[i] = part.entityId;
+            i++;
             part.teleport(spawnLocation);
         }
         packetGroup.passengerIds = passengerIds;

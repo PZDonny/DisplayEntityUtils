@@ -1,6 +1,8 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
+import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
+import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
@@ -18,6 +20,9 @@ import java.util.*;
 public abstract class ActiveGroup implements Active{
     protected String tag;
     protected final HashSet<DisplayAnimator> activeAnimators = new HashSet<>();
+    protected String spawnAnimationTag;
+    protected LoadMethod spawnAnimationLoadMethod;
+    protected DisplayAnimator.AnimationType spawnAnimationType;
     protected MachineState currentMachineState;
     protected float scaleMultiplier = 1;
     protected float verticalRideOffset = 0;
@@ -273,7 +278,22 @@ public abstract class ActiveGroup implements Active{
      * Start playing this group's looping spawn animation.
      * This will do nothing if this group's spawn animation tag was never set.
      */
-    public abstract void playSpawnAnimation();
+    public void playSpawnAnimation() {
+        if (spawnAnimationTag == null){
+            return;
+        }
+
+        SpawnedDisplayAnimation anim = DisplayAnimationManager.getSpawnedDisplayAnimation(spawnAnimationTag, spawnAnimationLoadMethod);
+        if (anim != null){
+            if (spawnAnimationType == null){
+                return;
+            }
+            switch(spawnAnimationType){
+                case LINEAR -> this.animate(anim);
+                case LOOP -> this.animateLooping(anim);
+            }
+        }
+    }
 
     public abstract @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation);
 
@@ -311,4 +331,34 @@ public abstract class ActiveGroup implements Active{
     }
 
     public abstract boolean canApplyVerticalRideOffset();
+
+    void setSpawnAnimation(String animationTag, LoadMethod loadMethod, DisplayAnimator.AnimationType animationType){
+        this.spawnAnimationTag = animationTag;
+        this.spawnAnimationLoadMethod = loadMethod;
+        this.spawnAnimationType = animationType;
+    }
+
+    /**
+     * Get the tag of the spawn animation used when this group is spawned
+     * @return a string or null if unset
+     */
+    public @Nullable String getSpawnAnimationTag() {
+        return spawnAnimationTag;
+    }
+
+    /**
+     * Get the {@link LoadMethod} used to get the spawn animation to be played when this group is spawned
+     * @return a {@link LoadMethod} or null if unset
+     */
+    public @Nullable LoadMethod getSpawnAnimationLoadMethod() {
+        return spawnAnimationLoadMethod;
+    }
+
+    /**
+     * Get the {@link DisplayAnimator.AnimationType} used to when playing this group's spawn animation
+     * @return a {@link DisplayAnimator.AnimationType} or null if unset
+     */
+    public @Nullable DisplayAnimator.AnimationType getSpawnAnimationType() {
+        return spawnAnimationType;
+    }
 }

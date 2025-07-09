@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
@@ -9,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.Serial;
@@ -83,21 +85,30 @@ final class DisplayEntity implements Serializable {
      * @param settings Determines the settings to apply on a group
      * @return The spawned Display
      */
-    Display createEntity(@NotNull Location location, @NotNull GroupSpawnSettings settings){
+    Display createEntity(SpawnedDisplayEntityGroup group, Location location, GroupSpawnSettings settings){
+        Display d;
         switch(type){
             case BLOCK ->{
-                return spawnBlockDisplay(location, settings);
+                d = spawnBlockDisplay(location, settings);
             }
             case ITEM ->{
-                return spawnItemDisplay(location, settings);
+                d = spawnItemDisplay(location, settings);
             }
             case TEXT ->{
-                return spawnTextDisplay(location, settings);
+                d = spawnTextDisplay(location, settings);
             }
             default ->{
                 return null;
             }
         }
+        if (isMaster){
+            PersistentDataContainer pdc = d.getPersistentDataContainer();
+            String animationTag = getSpawnAnimationTag(pdc);
+            LoadMethod loadMethod = getSpawnAnimationLoadMethod(pdc);
+            DisplayAnimator.AnimationType type = getSpawnAnimationType(pdc);
+            group.setSpawnAnimation(animationTag, loadMethod, type);
+        }
+        return d;
     }
 
     PacketDisplayEntityPart createPacketPart(PacketDisplayEntityGroup group, Location spawnLocation){
@@ -115,24 +126,64 @@ final class DisplayEntity implements Serializable {
 
             part.partTags = getSetFromPDC(pdc, DisplayEntityPlugin.getPartPDCTagKey());
             part.partUUID = getPDCPartUUID(pdc);
-            part.isMaster = group.masterPart == null && getMasterPart(pdc);
+            if (group.masterPart == null && isMaster){
+                part.isMaster = true;
+                String animationTag = getSpawnAnimationTag(pdc);
+                LoadMethod loadMethod = getSpawnAnimationLoadMethod(pdc);
+                DisplayAnimator.AnimationType type = getSpawnAnimationType(pdc);
+                group.setSpawnAnimation(animationTag, loadMethod, type);
+            }
         }
 
         return part;
     }
 
-    static @NotNull List<String> getListFromPDC(@NotNull PersistentDataContainer pdc, NamespacedKey key){
+    static @NotNull List<String> getListFromPDC(PersistentDataContainer pdc, NamespacedKey key){
         if (!pdc.has(key, PersistentDataType.LIST.strings())){
             return new ArrayList<>();
         }
         return pdc.get(key, PersistentDataType.LIST.strings());
     }
 
-    static @NotNull HashSet<String> getSetFromPDC(@NotNull PersistentDataContainer pdc, NamespacedKey key){
+    static @NotNull HashSet<String> getSetFromPDC(PersistentDataContainer pdc, NamespacedKey key){
         if (!pdc.has(key, PersistentDataType.LIST.strings())){
             return new HashSet<>();
         }
         return new HashSet<>(pdc.get(key, PersistentDataType.LIST.strings()));
+    }
+
+    /**
+     * Get the tag of the animation applied to this group when it's spawned/loaded
+     * @return a string or null if not set;
+     */
+    public @Nullable String getSpawnAnimationTag(PersistentDataContainer pdc){
+        return pdc.get(DisplayEntityPlugin.getSpawnAnimationKey(), PersistentDataType.STRING);
+    }
+
+    @Nullable DisplayAnimator.AnimationType getSpawnAnimationType(PersistentDataContainer pdc){
+        String type = pdc.get(DisplayEntityPlugin.getSpawnAnimationTypeKey(), PersistentDataType.STRING);
+        if (type == null){
+            return null;
+        }
+        try{
+            return DisplayAnimator.AnimationType.valueOf(type);
+        }
+        catch(IllegalArgumentException e){
+            return null;
+        }
+    }
+
+    @Nullable LoadMethod getSpawnAnimationLoadMethod(PersistentDataContainer pdc){
+        String method = pdc.get(DisplayEntityPlugin.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING);
+        if (method == null){
+            return null;
+        }
+        try{
+            return LoadMethod.valueOf(method);
+        }
+        catch(IllegalArgumentException e){
+            return null;
+        }
     }
 
     static UUID getPDCPartUUID(PersistentDataContainer pdc){
@@ -143,7 +194,7 @@ final class DisplayEntity implements Serializable {
         return null;
     }
 
-    static boolean getMasterPart(PersistentDataContainer pdc){
+    static boolean isMasterPart(PersistentDataContainer pdc){
         Boolean value = pdc.get(DisplayEntityPlugin.getMasterKey(), PersistentDataType.BOOLEAN);
         if (value != null){
             return value;

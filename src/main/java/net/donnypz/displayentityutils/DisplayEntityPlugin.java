@@ -56,6 +56,9 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     private static NamespacedKey partPDCTagKey;
     private static NamespacedKey groupTagKey;
     private static NamespacedKey masterKey;
+    private static NamespacedKey spawnAnimationKey;
+    private static NamespacedKey spawnAnimationTypeKey;
+    private static NamespacedKey spawnAnimationLoadMethodKey;
 
     private static final String legacyPartTagPrefix = "deu.parttag_";
     static boolean isMongoEnabled = false;
@@ -121,11 +124,14 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     }
 
 
-    private void initializeNamespacedKeys(){
+    private void initializeNamespacedKeys(){ //DO NOT CHANGE
         partUUIDKey = new NamespacedKey(this, "partUUID");
         partPDCTagKey = new NamespacedKey(this, "pdcTag");
         groupTagKey = new NamespacedKey(this, "groupTag");
-        masterKey = new NamespacedKey(this, "isMaster"); //DO NOT CHANGE
+        masterKey = new NamespacedKey(this, "isMaster");
+        spawnAnimationKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimation");
+        spawnAnimationTypeKey = new NamespacedKey(this, "spawnanimationtype");
+        spawnAnimationLoadMethodKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimationloader");
     }
 
     private void initializeDependencies(){
@@ -169,7 +175,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     private void initializeBStats(){
         int pluginID = 24875;
-        new Metrics(this, pluginID);
+        //new Metrics(this, pluginID);
     }
 
     private void createLocalSaveFolders(){
@@ -208,6 +214,18 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     public static NamespacedKey getMasterKey() {
         return masterKey;
+    }
+
+    public static NamespacedKey getSpawnAnimationKey() {
+        return spawnAnimationKey;
+    }
+
+    public static NamespacedKey getSpawnAnimationTypeKey() {
+        return spawnAnimationTypeKey;
+    }
+
+    public static NamespacedKey getSpawnAnimationLoadMethodKey() {
+        return spawnAnimationLoadMethodKey;
     }
 
     public static DisplayEntityPlugin getInstance(){
