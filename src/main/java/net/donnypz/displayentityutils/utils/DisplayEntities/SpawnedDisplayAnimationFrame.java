@@ -516,4 +516,24 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
             throw new AssertionError("Clone not supported", e);
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SpawnedDisplayAnimationFrame other)) return false;
+
+        return delay == other.delay &&
+                duration == other.duration &&
+                Objects.equals(tag, other.tag) &&
+                Objects.equals(displayTransformations, other.displayTransformations) &&
+                Objects.equals(interactionTransformations, other.interactionTransformations) &&
+                Objects.equals(framePoints, other.framePoints) &&
+                Objects.equals(startCommands, other.startCommands) &&
+                Objects.equals(endCommands, other.endCommands);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(delay, duration, tag, displayTransformations, interactionTransformations, framePoints, startCommands, endCommands);
+    }
 }

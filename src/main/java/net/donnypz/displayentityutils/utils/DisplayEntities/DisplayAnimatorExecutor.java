@@ -92,8 +92,14 @@ final class DisplayAnimatorExecutor {
         }
 
         if (animator.type == DisplayAnimator.AnimationType.LOOP){
-            if (animation.frames.getFirst() == frame){
+            SpawnedDisplayAnimationFrame startFrame = animation.frames.getFirst();
+            SpawnedDisplayAnimationFrame lastFrame = animation.frames.getLast();
+            if (startFrame == frame){
                 new AnimationLoopStartEvent(group, animator).callEvent();
+            }
+            else if (frame == lastFrame && startFrame.equals(frame) && !playSingleFrame && animation.frames.size() > 1){ //Skip if start and last frame are identical
+                executeAnimation(animation, group, selection, animation.frames.getFirst(), false);
+                return;
             }
         }
 
