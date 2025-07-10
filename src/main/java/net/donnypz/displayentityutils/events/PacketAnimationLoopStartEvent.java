@@ -2,10 +2,10 @@ package net.donnypz.displayentityutils.events;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
+import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
+import org.bukkit.entity.Player;
+
+import java.util.Collection;
 
 /**
  * Called when {@link DisplayAnimator} begins an animation loop.
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class PacketAnimationLoopStartEvent extends PacketAnimationEvent{
 
-    public PacketAnimationLoopStartEvent(ActiveGroup group, DisplayAnimator animator){
-        super(group, animator, animator.getAnimation());
+    public PacketAnimationLoopStartEvent(ActiveGroup group, DisplayAnimator animator, Collection<Player> players){
+        super(group, animator, animator.getAnimation(), players);
     }
 }

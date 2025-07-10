@@ -1,27 +1,39 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.events.*;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.events.PacketAnimationCompleteEvent;
+import net.donnypz.displayentityutils.events.PacketAnimationFrameEndEvent;
+import net.donnypz.displayentityutils.events.PacketAnimationFrameStartEvent;
+import net.donnypz.displayentityutils.events.PacketAnimationLoopStartEvent;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Interaction;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-final class PacketDisplayAnimationExecutor {
+final class PlayerDisplayAnimationExecutor {
     final DisplayAnimator animator;
     private final boolean playSingleFrame;
 
-    PacketDisplayAnimationExecutor(@NotNull DisplayAnimator animator,
+    PlayerDisplayAnimationExecutor(@NotNull Player player,
+                                   @NotNull DisplayAnimator animator,
+                                   @NotNull SpawnedDisplayAnimation animation,
+                                   @NotNull ActiveGroup group,
+                                   @NotNull SpawnedDisplayAnimationFrame frame,
+                                   int delay,
+                                   boolean playSingleFrame) {
+        this(Set.of(player), animator, animation, group, frame, delay, playSingleFrame);
+    }
+
+    PlayerDisplayAnimationExecutor(@NotNull Collection<Player> players,
+                                   @NotNull DisplayAnimator animator,
                                    @NotNull SpawnedDisplayAnimation animation,
                                    @NotNull ActiveGroup group,
                                    @NotNull SpawnedDisplayAnimationFrame frame,
@@ -29,7 +41,7 @@ final class PacketDisplayAnimationExecutor {
                                    boolean playSingleFrame) {
         this.animator = animator;
         this.playSingleFrame = playSingleFrame;
-        prepareAnimation(animation, group, frame, delay);
+        prepareAnimation(players, animation, group, frame, delay);
     }
 
 
@@ -39,9 +51,9 @@ final class PacketDisplayAnimationExecutor {
      * @param animation the animation the frame is from
      * @param frame the frame to display
      */
-    public static void setGroupToFrame(@NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame){
+    static void setGroupToFrame(@NotNull Player player, @NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
-        new PacketDisplayAnimationExecutor(animator, animation, group, frame,0, true);
+        new PlayerDisplayAnimationExecutor(player, animator, animation, group, frame,0, true);
     }
 
     /**
@@ -51,29 +63,39 @@ final class PacketDisplayAnimationExecutor {
      * @param frame the frame to display
      * @param duration how long the frame should play
      * @param delay how long until the frame should start playing
-     * @param isAsync whether this should be done asynchronously
      */
-    public static void setGroupToFrame(@NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay, boolean isAsync){
+    static void setGroupToFrame(@NotNull Player player, @NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
         SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
         clonedFrame.duration = duration;
-        new PacketDisplayAnimationExecutor(animator, animation, group, clonedFrame, delay, true);
+        new PlayerDisplayAnimationExecutor(player, animator, animation, group, clonedFrame, delay, true);
     }
 
-    private void prepareAnimation(SpawnedDisplayAnimation animation, ActiveGroup group, SpawnedDisplayAnimationFrame frame, int delay){
-        group.addActiveAnimator(animator);
+    private void prepareAnimation(Collection<Player> players, SpawnedDisplayAnimation animation, ActiveGroup group, SpawnedDisplayAnimationFrame frame, int delay){
         ActivePartSelection selection = animation.hasFilter() ? group.createPartSelection(animation.filter) : group.createPartSelection();
         Bukkit
                 .getScheduler()
                 .runTaskLaterAsynchronously(DisplayEntityPlugin.getInstance(),
-                        () -> executeAnimation(animation, group, selection, frame, playSingleFrame),
+                        () -> executeAnimation(players, animation, group, selection, frame, playSingleFrame),
                         Math.max(delay, 0));
     }
 
-    private void executeAnimation(SpawnedDisplayAnimation animation, ActiveGroup group, ActivePartSelection selection, SpawnedDisplayAnimationFrame frame, boolean playSingleFrame){
-        if (!group.isActiveAnimator(animator)){
+    private void executeAnimation(Collection<Player> players, SpawnedDisplayAnimation animation, ActiveGroup group, ActivePartSelection selection, SpawnedDisplayAnimationFrame frame, boolean playSingleFrame){
+
+        //Remove disconnected players
+        Iterator<Player> iter = players.iterator();
+        while(iter.hasNext()){
+            Player p = iter.next();
+            if (!p.isConnected()){
+                animator.stop(p);
+                iter.remove();
+            }
+        }
+
+        if (players.isEmpty()){
             return;
         }
+
         if (group instanceof SpawnedDisplayEntityGroup g){
             if (!g.isRegistered()){
                 return;
@@ -83,18 +105,16 @@ final class PacketDisplayAnimationExecutor {
 
         if (animator.type == DisplayAnimator.AnimationType.LOOP){
             if (animation.frames.getFirst() == frame){
-                new PacketAnimationLoopStartEvent(group, animator, null).callEvent();
+                new PacketAnimationLoopStartEvent(group, animator, players).callEvent();
             }
         }
 
         Location groupLoc = group.getLocation();
-        //new PacketAnimationFrameStartEvent(group, animator, animation, frame).callEvent();
-        frame.playEffects(group, animator, true);
+        new PacketAnimationFrameStartEvent(group, animator, animation, frame, players).callEvent();
+        frame.playEffects(players, group);
 
-        if (group.hasTrackingPlayers()){
-            animateInteractions(groupLoc, frame, group, selection, animation);
-            animateDisplays(frame, group, selection, animation);
-        }
+        animateInteractions(players, groupLoc, frame, group, selection, animation);
+        animateDisplays(players, frame, group, selection, animation);
 
         group.setLastAnimatedTick();
 
@@ -116,18 +136,18 @@ final class PacketDisplayAnimationExecutor {
                 }, frame.duration);
 
                 Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
-                    new PacketAnimationFrameEndEvent(group, animator, animation, frame, null).callEvent();
+                    new PacketAnimationFrameEndEvent(group, animator, animation, frame, players).callEvent();
                 }, frame.duration);
             }
             else{
                 Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
                     frame.executeEndCommands(group.getLocation());
                 });
-                new PacketAnimationFrameEndEvent(group, animator, animation, frame, null).callEvent();
+                new PacketAnimationFrameEndEvent(group, animator, animation, frame, players).callEvent();
             }
 
             Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
-                executeAnimation(animation, group, selection, animation.frames.get(index+1), false);
+                executeAnimation(players, animation, group, selection, animation.frames.get(index+1), false);
             }, delay);
         }
 
@@ -138,14 +158,15 @@ final class PacketDisplayAnimationExecutor {
                 if (frame.duration > 0) {
                     Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
                         if (group.getMasterPart() != null) frame.executeEndCommands(group.getLocation());
-                        //new PacketAnimationCompleteEvent(group, animator, animation).callEvent();
-                        group.stopAnimation(animator);
+                        new PacketAnimationCompleteEvent(group, animator, animation, players).callEvent();
+                        animator.stop(players, group);
                         selection.remove();
                     }, frame.duration);
-                } else {
+                }
+                else {
                     if (group.getMasterPart() != null) frame.executeEndCommands(group.getLocation());
-                    //new PacketAnimationCompleteEvent(group, animator, animation).callEvent();
-                    group.stopAnimation(animator);
+                    new PacketAnimationCompleteEvent(group, animator, animation, players).callEvent();
+                    animator.stop(players, group);
                     selection.remove();
                 }
             }
@@ -153,26 +174,18 @@ final class PacketDisplayAnimationExecutor {
             //Loop Animation
             else {
                 if (frame.duration > 0) {
-                    //Play commands
-                    Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                        frame.executeEndCommands(group.getLocation());
-                    }, frame.duration);
-                    //Start next loop
                     Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
-                        executeAnimation(animation, group, selection, animation.frames.getFirst(), false);
+                        executeAnimation(players, animation, group, selection, animation.frames.getFirst(), false);
                     }, frame.duration);
 
                 } else {
-                    Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
-                       frame.executeEndCommands(group.getLocation());
-                    });
-                    executeAnimation(animation, group, selection, animation.frames.getFirst(), false);
+                    executeAnimation(players, animation, group, selection, animation.frames.getFirst(), false);
                 }
             }
         }
     }
 
-    private void animateInteractions(Location groupLoc, SpawnedDisplayAnimationFrame frame, ActiveGroup group, ActivePartSelection selection, SpawnedDisplayAnimation animation){
+    private void animateInteractions(Collection<Player> players, Location groupLoc, SpawnedDisplayAnimationFrame frame, ActiveGroup group, ActivePartSelection selection, SpawnedDisplayAnimation animation){
         for (Map.Entry<UUID, Vector3f> entry : frame.interactionTransformations.entrySet()){
             UUID partUUID = entry.getKey();
 
@@ -222,20 +235,20 @@ final class PacketDisplayAnimationExecutor {
 
             if (!currentVector.equals(v)) {
                 Vector moveVector = currentVector.subtract(v);
-                part.translate(moveVector, (float) moveVector.length(), frame.duration, 0);
+                PacketUtils.translateInteraction(players, part, moveVector, (float) moveVector.length(), frame.duration, 0);
             }
 
-            //Could be a spawned part, so this wouldn't work
-            if (part instanceof SpawnedDisplayEntityPart sp){
-                DisplayUtils.scaleInteraction((Interaction) sp.getEntity(), height, width, frame.duration, 0);
-            }
-            else if (part instanceof PacketDisplayEntityPart pp){
-                PacketUtils.scaleInteraction(pp, height, width, frame.duration, 0);
-            }
+//            if (part instanceof SpawnedDisplayEntityPart sp){
+//                DisplayUtils.scaleInteraction((Interaction) sp.getEntity(), height, width, frame.duration, 0);
+//            }
+//            else if (part instanceof PacketDisplayEntityPart pp){
+//                PacketUtils.scaleInteraction(pp, height, width, frame.duration, 0);
+//            }
+            PacketUtils.scaleInteraction(players, part, height, width, frame.duration, 0);
         }
     }
 
-    private void animateDisplays(SpawnedDisplayAnimationFrame frame, ActiveGroup group, ActivePartSelection selection, SpawnedDisplayAnimation animation){
+    private void animateDisplays(Collection<Player> players, SpawnedDisplayAnimationFrame frame, ActiveGroup group, ActivePartSelection selection, SpawnedDisplayAnimation animation){
         if (selection.selectedParts.size() >= frame.displayTransformations.size()){
             for (Map.Entry<UUID, DisplayTransformation> entry : frame.displayTransformations.entrySet()){
                 UUID partUUID = entry.getKey();
@@ -249,7 +262,7 @@ final class PacketDisplayAnimationExecutor {
                     continue;
                 }
 
-                animateDisplay(part, transformation, group, animation, frame);
+                animateDisplay(players, part, transformation, group, animation, frame);
             }
         }
         else{
@@ -258,19 +271,18 @@ final class PacketDisplayAnimationExecutor {
                 if (transformation == null){ //Part does not change transformation
                     continue;
                 }
-                animateDisplay(part, transformation, group, animation, frame);
+                animateDisplay(players, part, transformation, group, animation, frame);
             }
         }
     }
 
-    private void animateDisplay(ActivePart part, DisplayTransformation transformation, ActiveGroup group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame){
-
+    private void animateDisplay(Collection<Player> players, ActivePart part, DisplayTransformation transformation, ActiveGroup group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame){
         //Prevents jittering in some cases
         boolean applyDataOnly = transformation.isSimilar(part);
-        applyDisplayTransformation(part, frame, animation, group, transformation, applyDataOnly);
+        applyDisplayTransformation(players, part, frame, animation, group, transformation, applyDataOnly);
     }
 
-    private void applyDisplayTransformation(ActivePart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, ActiveGroup group, DisplayTransformation transformation, boolean applyDataOnly){
+    private void applyDisplayTransformation(Collection<Player> players, ActivePart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, ActiveGroup group, DisplayTransformation transformation, boolean applyDataOnly){
         if (applyDataOnly){
             if (animation.allowsDataChanges()){
                 transformation.applyData(part);
@@ -316,7 +328,9 @@ final class PacketDisplayAnimationExecutor {
                 map.addTransformation(transformation);
             }
         }
-        part.setAttributes(map);
+        for (Player p : players){
+            PacketUtils.setAttributes(p, part.entityId, map);
+        }
 
         if (animation.allowsDataChanges()){
             transformation.applyData(part);

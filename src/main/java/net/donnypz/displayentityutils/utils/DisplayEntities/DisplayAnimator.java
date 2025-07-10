@@ -4,14 +4,22 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DisplayAnimator {
     final SpawnedDisplayAnimation animation;
     final AnimationType type;
+    final ConcurrentHashMap<UUID, Set<ActiveGroup>> players = new ConcurrentHashMap<>();
 
     /**
-     * Create a display animator that manages playing and stopping animations for groups.
+     * Create a display animator that manages playing and stopping animations for {@link ActiveGroup}s.
      * A single instance CAN be used for multiple groups. For managing animation states, see {@link DisplayStateMachine}
      * @param animation the animation
      * @param type the animation play type
@@ -22,16 +30,41 @@ public class DisplayAnimator {
     }
 
     /**
-     * Plays an animation once for a {@link ActiveGroup} without the use of a {@link DisplayAnimator} instance.
-     * To control an animation, pausing/playing/looping, create a new {@link DisplayAnimator}.
+     * Plays an animation once for a {@link ActiveGroup}.
      * @param group The group to play the animation
      * @param animation The animation to play
-     * @return the {@link DisplayAnimator} used to play the animation
+     * @param animationType the animation type
+     * @return the {@link DisplayAnimator} used to control the animation
      */
-    public static DisplayAnimator play(@NotNull SpawnedDisplayEntityGroup group, @NotNull SpawnedDisplayAnimation animation){
-        DisplayAnimator animator = new DisplayAnimator(animation, AnimationType.LINEAR);
+    public static DisplayAnimator play(@NotNull SpawnedDisplayEntityGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
+        DisplayAnimator animator = new DisplayAnimator(animation, animationType);
         animator.play(group, 0);
         return animator;
+    }
+
+    /**
+     * Plays an animation once for a {@link ActiveGroup} for a specified player.
+     * @param player the player to play the animation for
+     * @param group the group
+     * @param animation the animation to be played
+     * @param animationType the animation type
+     * @return the {@link DisplayAnimator} used to control the animation
+     */
+    public static DisplayAnimator play(@NotNull Player player, @NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
+        return play(List.of(player), group, animation, animationType);
+    }
+
+    /**
+     * Plays an animation once for a {@link ActiveGroup} for specified players.
+     * @param players the player to play the animation for
+     * @param group the group
+     * @param animation the animation to be played
+     * @param animationType the animation type
+     * @return the {@link DisplayAnimator} used to control the animation
+     */
+    public static DisplayAnimator play(@NotNull Collection<Player> players, @NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
+        return new DisplayAnimator(animation, animationType)
+                .play(players, group, 0);
     }
 
     /**
@@ -47,11 +80,9 @@ public class DisplayAnimator {
         return animator;
     }
 
-
     /**
      * Plays an animation for a {@link ActiveGroup}.
      * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(ActiveGroup)} is called.
-     * If a group was paused then this is called, the group will play the animation from the last frame before the pause.
      * @param group The group to play the animation
      * @return false if the playing was cancelled through the {@link AnimationStartEvent}.
      */
@@ -70,15 +101,14 @@ public class DisplayAnimator {
      * Plays an animation for a {@link ActiveGroup} through packets.
      * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(ActiveGroup)} is called.
      * <br>
-     * If a group was paused then this is called, the group will play the animation from the last frame before the pause.
      * <br>This calls the {@link PacketAnimationStartEvent}
      * @param group The group to play the animation
      * @param frameIndex the frame index the animation will start from
-     * @throws IllegalArgumentException if the group is a {@link PacketDisplayEntityGroup} and packetBased is false
+     * @return this
      */
-    public void playUsingPackets(@NotNull ActiveGroup group, int frameIndex){
+    public DisplayAnimator playUsingPackets(@NotNull ActiveGroup group, int frameIndex){
         Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
-            if (!new PacketAnimationStartEvent(group, this, animation).callEvent()) {
+            if (!new PacketAnimationStartEvent(group, this, animation, null).callEvent()) {
                 return;
             }
 
@@ -86,6 +116,44 @@ public class DisplayAnimator {
             int delay = frame.delay;
             new PacketDisplayAnimationExecutor(this, animation, group, frame, delay, false);
         });
+        return this;
+    }
+
+    /**
+     * Plays an animation for a {@link ActiveGroup} through packets, only for a given player.
+     * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(Player, ActiveGroup)} or similar is called.
+     * <br>
+     * <br>This calls the {@link PacketAnimationStartEvent}
+     * @param player the player
+     * @param group The group to play the animation
+     * @param frameIndex the frame index the animation will start from
+     * @return this
+     */
+    public DisplayAnimator play(@NotNull Player player, @NotNull ActiveGroup group, int frameIndex){
+        return play(List.of(player), group, frameIndex);
+    }
+
+    /**
+     * Plays an animation for a {@link ActiveGroup} through packets, only for the given playesr.
+     * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(Player, ActiveGroup)} or similar is called.
+     * <br>
+     * <br>This calls the {@link PacketAnimationStartEvent}
+     * @param players the players
+     * @param group The group to play the animation
+     * @param frameIndex the frame index the animation will start from
+     * @return this
+     */
+    public DisplayAnimator play(@NotNull Collection<Player> players, @NotNull ActiveGroup group, int frameIndex){
+        Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+            if (!new PacketAnimationStartEvent(group, this, animation, players).callEvent()) {
+                return;
+            }
+
+            SpawnedDisplayAnimationFrame frame = animation.frames.get(frameIndex);
+            int delay = frame.delay;
+            new PlayerDisplayAnimationExecutor(players, this, animation, group, frame, delay, false);
+        });
+        return this;
     }
 
 
@@ -99,8 +167,67 @@ public class DisplayAnimator {
     }
 
     /**
-     * Check if this animator is animating a group
-     * @param group
+     * Stop all individualized, packet-based animations being sent to a player
+     * @param player the player
+     */
+    public void stop(@NotNull Player player){
+        stop(player.getUniqueId());
+    }
+
+    /**
+     * Stop all individualized, packet-based animations being sent to a player
+     * @param playerUUID the player
+     */
+    public void stop(@NotNull UUID playerUUID){
+        Set<ActiveGroup> groups = players.remove(playerUUID);
+        if (groups != null){
+            groups.clear();
+        }
+    }
+
+    /**
+     * Stop the individualized, packet-based animations being sent to a player, only for the given group that is animating
+     * @param player the player
+     * @param group the group to stop animating
+     */
+    public void stop(@NotNull Player player, @NotNull ActiveGroup group){
+        Set<ActiveGroup> groups = players.get(player.getUniqueId());
+        if (groups == null){
+            return;
+        }
+        groups.remove(group);
+        if (groups.isEmpty()){
+            players.remove(player.getUniqueId());
+        }
+    }
+
+    /**
+     * Stop the individualized, packet-based animations being sent to players, only for the given group that is animating.
+     * @param players the players
+     * @param group the group to stop animating
+     */
+    public void stop(@NotNull Collection<Player> players, @NotNull ActiveGroup group){
+        for (Player p : players){
+            stop(p, group);
+        }
+    }
+
+    /**
+     * Check if this animator is animating a group for a player with packets
+     * @param group the group
+     * @return a boolean
+     */
+    public boolean isAnimating(@NotNull Player player, @NotNull ActiveGroup group){
+        Set<ActiveGroup> groups = players.get(player.getUniqueId());
+        if (groups == null){
+            return false;
+        }
+        return groups.contains(group);
+    }
+
+    /**
+     * Check if this animator is animating a group for all of its viewers, and changing its actual values
+     * @param group the group
      * @return a boolean
      */
     public boolean isAnimating(@NotNull ActiveGroup group){
@@ -116,6 +243,10 @@ public class DisplayAnimator {
         return animation;
     }
 
+    /**
+     * Get the animation type used for this animator
+     * @return an {@link AnimationType}
+     */
     public @NotNull AnimationType getAnimationType(){
         return type;
     }

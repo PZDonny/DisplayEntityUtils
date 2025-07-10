@@ -314,6 +314,28 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
         }
     }
 
+    /**
+     * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a location relative to a {@link ActiveGroup}
+     * @param player the player
+     * @param group the relative group
+     */
+    public void playSounds(@NotNull Player player, @NotNull ActiveGroup group){
+        for (FramePoint framePoint : framePoints.values()){
+            framePoint.playSounds(group.getLocation(), player);
+        }
+    }
+
+    /**
+     * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a location relative to a {@link ActiveGroup}
+     * @param players the players
+     * @param group the relative group
+     */
+    public void playSounds(@NotNull Collection<Player> players, @NotNull ActiveGroup group){
+        for (FramePoint framePoint : framePoints.values()){
+            framePoint.playSounds(group.getLocation(), players);
+        }
+    }
+
 
     /**
      * Show the particles that will be displayed at the start of this frame
@@ -343,6 +365,28 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     public void showParticles(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
         for (FramePoint framePoint : framePoints.values()){
             framePoint.showParticles(group, animator, limited);
+        }
+    }
+
+    /**
+     * Show the particles that will be displayed at the start of this frame
+     * @param player
+     * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
+     */
+    public void showParticles(@NotNull Player player, @NotNull ActiveGroup group){
+        for (FramePoint framePoint : framePoints.values()){
+            framePoint.showParticles(group.getLocation(), player);
+        }
+    }
+
+    /**
+     * Show the particles that will be displayed at the start of this frame
+     * @param players
+     * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
+     */
+    public void showParticles(@NotNull Collection<Player> players, @NotNull ActiveGroup group){
+        for (FramePoint framePoint : framePoints.values()){
+            framePoint.showParticles(group.getLocation(), players);
         }
     }
 
@@ -389,6 +433,28 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
         playSounds(group, animator, limited);
         showParticles(group, animator, limited);
     }
+
+    /**
+     * Play all effects that are contained within every {@link FramePoint}
+     * Effects include sounds, particles.
+     * @param player the player to show the effects to
+     * @param group the group to play these effects for
+     */
+    public void playEffects(@NotNull Player player, @NotNull ActiveGroup group){
+        playSounds(player, group);
+        showParticles(player, group);
+    }
+    /**
+     * Play all effects that are contained within every {@link FramePoint}
+     * Effects include sounds, particles.
+     * @param players the players to show the effects to
+     * @param group the group to play these effects for
+     */
+    public void playEffects(@NotNull Collection<Player> players, @NotNull ActiveGroup group){
+        playSounds(players, group);
+        showParticles(players, group);
+    }
+
 
 
     @ApiStatus.Internal

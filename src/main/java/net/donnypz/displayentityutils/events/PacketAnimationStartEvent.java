@@ -1,13 +1,10 @@
 package net.donnypz.displayentityutils.events;
 
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
-import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 
 /**
  * Called when a {@link DisplayAnimator} starts playing a {@link SpawnedDisplayAnimation}.
@@ -16,8 +13,8 @@ import org.jetbrains.annotations.NotNull;
 public class PacketAnimationStartEvent extends PacketAnimationEvent implements Cancellable {
     private boolean isCancelled = false;
 
-    public PacketAnimationStartEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation){
-       super(group, animator, animation);
+    public PacketAnimationStartEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation, Collection<Player> players){
+       super(group, animator, animation, players);
     }
 
     @Override

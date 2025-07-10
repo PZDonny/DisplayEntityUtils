@@ -1,12 +1,9 @@
 package net.donnypz.displayentityutils.events;
 
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.Nullable;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import org.bukkit.entity.Player;
+
+import java.util.Collection;
 
 /**
  * Called when a {@link SpawnedDisplayAnimationFrame} ends in an animation
@@ -16,8 +13,8 @@ public class PacketAnimationFrameEndEvent extends PacketAnimationEvent {
 
     private SpawnedDisplayAnimationFrame frame;
 
-    public PacketAnimationFrameEndEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame){
-        super(group, animator, animation);
+    public PacketAnimationFrameEndEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame, Collection<Player> players){
+        super(group, animator, animation, players);
         this.frame = frame;
     }
 

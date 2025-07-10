@@ -3,10 +3,10 @@ package net.donnypz.displayentityutils.events;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
 
 /**
  * Called at the completion of a {@link SpawnedDisplayAnimation}'s animation.
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class PacketAnimationCompleteEvent extends PacketAnimationEvent{
 
-    public PacketAnimationCompleteEvent(ActiveGroup group, @NotNull DisplayAnimator animator, SpawnedDisplayAnimation animation){
-        super(group, animator, animation);
+    public PacketAnimationCompleteEvent(ActiveGroup group, @NotNull DisplayAnimator animator, SpawnedDisplayAnimation animation, Collection<Player> players){
+        super(group, animator, animation, players);
     }
 }
