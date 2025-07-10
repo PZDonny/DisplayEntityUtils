@@ -57,7 +57,7 @@ class AnimShowFrameCMD extends PlayerSubCommand {
                 player.sendMessage(Component.text("Invalid ID! The ID cannot be >= the amount of frames!", NamedTextColor.RED));
                 return;
             }
-            group.setToFrame(anim, frames.get(id), DisplayEntityPlugin.asynchronousAnimations());
+            group.setToFrame(anim, frames.get(id), id, DisplayEntityPlugin.asynchronousAnimations());
             player.sendMessage(Component.text("Showing your selected display entity group as Frame #" + id, NamedTextColor.GREEN));
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid ID! ID's must be >= 0", NamedTextColor.RED));

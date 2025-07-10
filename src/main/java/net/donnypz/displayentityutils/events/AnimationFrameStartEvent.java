@@ -16,12 +16,14 @@ public class AnimationFrameStartEvent extends Event {
     private SpawnedDisplayEntityGroup group;
     private SpawnedDisplayAnimation animation;
     private SpawnedDisplayAnimationFrame frame;
+    private int frameId;
     private DisplayAnimator animator;
 
-    public AnimationFrameStartEvent(SpawnedDisplayEntityGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame){
+    public AnimationFrameStartEvent(SpawnedDisplayEntityGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation, int frameId, SpawnedDisplayAnimationFrame frame){
         this.group = group;
         this.animation = animation;
         this.frame = frame;
+        this.frameId = frameId;
         this.animator = animator;
     }
 
@@ -55,6 +57,14 @@ public class AnimationFrameStartEvent extends Event {
      */
     public SpawnedDisplayAnimationFrame getFrame() {
         return frame;
+    }
+
+    /**
+     * Get the frame id of the {@link SpawnedDisplayAnimationFrame} involved in this event
+     * @return an int
+     */
+    public int getFrameId(){
+        return frameId;
     }
 
     @Override

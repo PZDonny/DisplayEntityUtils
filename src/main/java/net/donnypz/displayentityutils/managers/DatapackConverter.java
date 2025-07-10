@@ -170,7 +170,7 @@ class DatapackConverter {
             public void run() {
                 if (i == frameCount){
                     try{
-                        createdGroup.setToFrame(anim, anim.getFrames().getFirst(), false);
+                        createdGroup.setToFrame(anim, anim.getFrames().getFirst(), 0,false);
                     }
                     catch(IndexOutOfBoundsException ignored){}
 

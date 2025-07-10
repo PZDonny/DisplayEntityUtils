@@ -55,19 +55,19 @@ public class EffSpawnedGroupSetFrame extends Effect {
         if (n == null || g == null || a == null){
             return;
         }
+        int frameId = n.intValue();
         try{
-            SpawnedDisplayAnimationFrame frame = a.getFrame(n.intValue());
             if (duration == null){
-                g.setToFrame(a, frame, async);
+                g.setToFrame(a, frameId, async);
             }
             else{
                 Timespan dur = duration.getSingle(event);
                 Timespan del = delay.getSingle(event);
                 if (dur == null || del == null){
-                    g.setToFrame(a, frame, async);
+                    g.setToFrame(a, frameId, async);
                 }
                 else{
-                    g.setToFrame(a, frame, (int) dur.getAs(Timespan.TimePeriod.TICK), (int) del.getAs(Timespan.TimePeriod.TICK), async);
+                    g.setToFrame(a, frameId, (int) dur.getAs(Timespan.TimePeriod.TICK), (int) del.getAs(Timespan.TimePeriod.TICK), async);
                 }
             }
         }

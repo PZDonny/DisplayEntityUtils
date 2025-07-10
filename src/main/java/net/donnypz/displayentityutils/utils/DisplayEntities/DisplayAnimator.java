@@ -86,14 +86,14 @@ public class DisplayAnimator {
      * @param group The group to play the animation
      * @return false if the playing was cancelled through the {@link AnimationStartEvent}.
      */
-    public boolean play(@NotNull SpawnedDisplayEntityGroup group, int frameIndex){
+    public boolean play(@NotNull SpawnedDisplayEntityGroup group, int frameId){
         if (!new AnimationStartEvent(group, this, animation).callEvent()) {
             return false;
         }
 
-        SpawnedDisplayAnimationFrame frame = animation.frames.get(frameIndex);
+        SpawnedDisplayAnimationFrame frame = animation.frames.get(frameId);
         int delay = frame.delay;
-        new DisplayAnimatorExecutor(this, animation, group, frame, delay, DisplayEntityPlugin.asynchronousAnimations(), false);
+        new DisplayAnimatorExecutor(this, animation, group, frame, frameId, delay, DisplayEntityPlugin.asynchronousAnimations(), false);
         return true;
     }
 
@@ -103,18 +103,18 @@ public class DisplayAnimator {
      * <br>
      * <br>This calls the {@link PacketAnimationStartEvent}
      * @param group The group to play the animation
-     * @param frameIndex the frame index the animation will start from
+     * @param frameId the frame index the animation will start from
      * @return this
      */
-    public DisplayAnimator playUsingPackets(@NotNull ActiveGroup group, int frameIndex){
+    public DisplayAnimator playUsingPackets(@NotNull ActiveGroup group, int frameId){
         Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
             if (!new PacketAnimationStartEvent(group, this, animation, null).callEvent()) {
                 return;
             }
 
-            SpawnedDisplayAnimationFrame frame = animation.frames.get(frameIndex);
+            SpawnedDisplayAnimationFrame frame = animation.frames.get(frameId);
             int delay = frame.delay;
-            new PacketDisplayAnimationExecutor(this, animation, group, frame, delay, false);
+            new PacketDisplayAnimationExecutor(this, animation, group, frame, frameId, delay, false);
         });
         return this;
     }
@@ -126,11 +126,11 @@ public class DisplayAnimator {
      * <br>This calls the {@link PacketAnimationStartEvent}
      * @param player the player
      * @param group The group to play the animation
-     * @param frameIndex the frame index the animation will start from
+     * @param frameId the frame index the animation will start from
      * @return this
      */
-    public DisplayAnimator play(@NotNull Player player, @NotNull ActiveGroup group, int frameIndex){
-        return play(List.of(player), group, frameIndex);
+    public DisplayAnimator play(@NotNull Player player, @NotNull ActiveGroup group, int frameId){
+        return play(List.of(player), group, frameId);
     }
 
     /**
@@ -140,18 +140,18 @@ public class DisplayAnimator {
      * <br>This calls the {@link PacketAnimationStartEvent}
      * @param players the players
      * @param group The group to play the animation
-     * @param frameIndex the frame index the animation will start from
+     * @param frameId the frame index the animation will start from
      * @return this
      */
-    public DisplayAnimator play(@NotNull Collection<Player> players, @NotNull ActiveGroup group, int frameIndex){
+    public DisplayAnimator play(@NotNull Collection<Player> players, @NotNull ActiveGroup group, int frameId){
         Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
             if (!new PacketAnimationStartEvent(group, this, animation, players).callEvent()) {
                 return;
             }
 
-            SpawnedDisplayAnimationFrame frame = animation.frames.get(frameIndex);
+            SpawnedDisplayAnimationFrame frame = animation.frames.get(frameId);
             int delay = frame.delay;
-            new PlayerDisplayAnimationExecutor(players, this, animation, group, frame, delay, false);
+            new PlayerDisplayAnimationExecutor(players, this, animation, group, frame, frameId, delay, false);
         });
         return this;
     }

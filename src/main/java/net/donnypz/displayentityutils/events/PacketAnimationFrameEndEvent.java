@@ -12,10 +12,12 @@ import java.util.Collection;
 public class PacketAnimationFrameEndEvent extends PacketAnimationEvent {
 
     private SpawnedDisplayAnimationFrame frame;
+    private int frameId;
 
-    public PacketAnimationFrameEndEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame, Collection<Player> players){
+    public PacketAnimationFrameEndEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame, int frameId, Collection<Player> players){
         super(group, animator, animation, players);
         this.frame = frame;
+        this.frameId = frameId;
     }
 
     /**
@@ -24,5 +26,13 @@ public class PacketAnimationFrameEndEvent extends PacketAnimationEvent {
      */
     public SpawnedDisplayAnimationFrame getFrame() {
         return frame;
+    }
+
+    /**
+     * Get the frame id of the {@link SpawnedDisplayAnimationFrame} involved in this event
+     * @return an int
+     */
+    public int getFrameId(){
+        return frameId;
     }
 }
