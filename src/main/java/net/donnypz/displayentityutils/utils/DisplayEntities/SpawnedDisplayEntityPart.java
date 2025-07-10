@@ -175,14 +175,14 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     /**
      * Get the entity of that this part represents
      * @return This part's entity or null if this part has been previously removed.
-     * This may return a stale entity if the part exists in an unloaded chunk
+     * The returned entity will be stale if the part exists in an unloaded chunk or if this is called asynchronously.
      */
     public @Nullable Entity getEntity() {
         if (entity == null){
             return null;
         }
         //Stale Entity
-        if (!entity.getLocation().isChunkLoaded()){
+        if (!entity.getLocation().isChunkLoaded() || !Bukkit.isPrimaryThread()){
             return entity;
         }
         else{
