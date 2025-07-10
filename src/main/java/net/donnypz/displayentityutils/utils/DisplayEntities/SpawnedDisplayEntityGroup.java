@@ -2,7 +2,6 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.*;
-import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.*;
@@ -1498,7 +1497,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      */
     @Override
     public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation){
-        return DisplayAnimator.play(this, animation);
+        return DisplayAnimator.play(this, animation, DisplayAnimator.AnimationType.LINEAR);
     }
 
     /**
