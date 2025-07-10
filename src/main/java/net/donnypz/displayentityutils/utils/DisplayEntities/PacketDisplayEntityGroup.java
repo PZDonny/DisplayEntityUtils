@@ -390,6 +390,20 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     }
 
 
+    public @NotNull Collection<PacketDisplayEntityPart> getInteractionParts(){
+        int i = 0;
+        Set<PacketDisplayEntityPart> parts = new HashSet<>();
+        for (PacketDisplayEntityPart part : packetParts.sequencedValues().reversed()){
+            if (i == interactionCount){
+                return parts;
+            }
+            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                parts.add(part);
+                i++;
+            }
+        }
+        return parts;
+    }
 
     private void iterateInteractionParts(Consumer<PacketDisplayEntityPart> consumer){
         int i = 0;
