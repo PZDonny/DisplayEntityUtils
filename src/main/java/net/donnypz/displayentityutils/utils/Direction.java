@@ -52,7 +52,6 @@ public enum Direction {
             case BACK -> {
                 vector = locVector.multiply(-1);
             }
-
             case NORTH -> { //NORTH
                 vector = new Vector(0, 0, -1);
             }
@@ -77,22 +76,25 @@ public enum Direction {
      * @param entity The entity to base this vector upon
      * @return A vector
      */
-    @ApiStatus.Internal
     public Vector getVector(@NotNull Entity entity) {
         return getVector(entity.getLocation());
     }
 
     /**
      * Get the vector based on the Direction selection
-     * @param part The SpawnedDisplayEntityPart to base this vector upon
+     * @param part The {@link PacketDisplayEntityPart} to base this vector upon
      * @return A vector
      */
-    @ApiStatus.Internal
     public Vector getVector(@NotNull SpawnedDisplayEntityPart part) {
-        return getVector(part.getEntity());
+        return getVector(part.getLocation());
     }
 
-    @ApiStatus.Internal
+
+    /**
+     * Get the vector based on the Direction selection
+     * @param part The {@link SpawnedDisplayEntityPart} to base this vector upon
+     * @return A vector
+     */
     public Vector getVector(@NotNull PacketDisplayEntityPart part){
         return getVector(part.getLocation());
     }
