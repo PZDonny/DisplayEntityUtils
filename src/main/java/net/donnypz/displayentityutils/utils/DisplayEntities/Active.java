@@ -3,9 +3,12 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import net.donnypz.displayentityutils.utils.Direction;
 import org.bukkit.Color;
 import org.bukkit.entity.Display;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
 
 public interface Active {
     void setViewRange(float viewRangeMultiplier);
@@ -29,4 +32,8 @@ public interface Active {
     boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks);
 
     boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks);
+
+    void hideFromPlayer(@NotNull Player player);
+
+    void hideFromPlayers(@NotNull Collection<Player> players);
 }

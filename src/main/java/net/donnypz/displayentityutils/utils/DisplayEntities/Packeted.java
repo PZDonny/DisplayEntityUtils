@@ -23,8 +23,4 @@ public interface Packeted{
     void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason);
 
     void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings);
-
-    void hideFromPlayer(@NotNull Player player);
-
-    void hideFromPlayers(@NotNull Collection<Player> players);
 }

@@ -154,7 +154,18 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
     @Override
     public void hideFromPlayer(@NotNull Player player){
         for (ActivePart part : selectedParts){
-            ((SpawnedDisplayEntityPart) part).hideFromPlayer(player);
+            part.hideFromPlayer(player);
+        }
+    }
+
+    /**
+     * Hide all parts in this selection from players
+     * @param players The players to hide parts from
+     */
+    @Override
+    public void hideFromPlayers(@NotNull Collection<Player> players){
+        for (ActivePart part : selectedParts){
+            part.hideFromPlayers(players);
         }
     }
 

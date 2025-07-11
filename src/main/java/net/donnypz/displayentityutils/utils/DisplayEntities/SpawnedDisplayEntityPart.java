@@ -388,8 +388,8 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     /**
-     * Hide this part's entity from a player. This may produce unexpected results if this part is in an unloaded chunk
-     * @param player
+     * Hide this part's entity from a player. This may produce unexpected results if this part is in an unloaded chunk.
+     * @param player the player
      */
     @Override
     public void hideFromPlayer(@NotNull Player player){
@@ -397,6 +397,17 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             return;
         }
         player.hideEntity(DisplayEntityPlugin.getInstance(), getEntity());
+    }
+
+    /**
+     * Hide this part's entity from players. This may produce unexpected results if this part is in an unloaded chunk.
+     * @param players The players to hide this part from
+     */
+    @Override
+    public void hideFromPlayers(@NotNull Collection<Player> players){
+        for (Player player : players){
+            hideFromPlayer(player);
+        }
     }
 
     /**

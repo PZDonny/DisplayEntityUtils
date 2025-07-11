@@ -7,8 +7,6 @@ public interface Spawned{
 
     void showToPlayer(@NotNull Player player);
 
-    void hideFromPlayer(@NotNull Player player);
-
     Spawned glow(long durationInTicks);
 
     Spawned glow(@NotNull Player player, long durationInTicks);
