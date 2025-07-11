@@ -39,14 +39,14 @@ public class ExprSavedGroupToSpawned extends SimpleExpression<SpawnedDisplayEnti
             return null;
         }
         if (groupSpawnSettings == null){
-            return new SpawnedDisplayEntityGroup[]{saved.spawn(loc, GroupSpawnedEvent.SpawnReason.CUSTOM)};
+            return new SpawnedDisplayEntityGroup[]{saved.spawn(loc, GroupSpawnedEvent.SpawnReason.SKRIPT)};
         }
         else{
             GroupSpawnSettings settings = groupSpawnSettings.getSingle(event);
             if (settings == null){
                 return null;
             }
-            return new SpawnedDisplayEntityGroup[]{saved.spawn(loc, GroupSpawnedEvent.SpawnReason.CUSTOM, settings)};
+            return new SpawnedDisplayEntityGroup[]{saved.spawn(loc, GroupSpawnedEvent.SpawnReason.SKRIPT, settings)};
         }
     }
 
