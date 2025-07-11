@@ -325,9 +325,49 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     }
 
     @Override
+    public void glow(@NotNull Player player){
+        for (PacketDisplayEntityPart part : packetParts.values()){
+            part.glow(player);
+        }
+    }
+
+    /**
+     * Adds the glow effect to all the block and item display parts in this group
+     * @param durationInTicks How long to highlight this selection
+     */
+    @Override
+    public void glow(long durationInTicks){
+        for (PacketDisplayEntityPart part : packetParts.values()){
+            part.glow(durationInTicks);
+        }
+    }
+
+    /**
+     * Make this group's block and item display entities glow for a player for a set period of time
+     * @param player the player
+     * @param durationInTicks how long the glowing should last
+     */
+    @Override
+    public void glow(@NotNull Player player, long durationInTicks){
+        for (PacketDisplayEntityPart part : packetParts.values()){
+            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
+                continue;
+            }
+            part.glow(player, durationInTicks);
+        }
+    }
+
+    @Override
     public void unglow() {
         for (PacketDisplayEntityPart part : packetParts.values()){
             part.unglow();
+        }
+    }
+
+    @Override
+    public void unglow(@NotNull Player player) {
+        for (PacketDisplayEntityPart part : packetParts.values()){
+            part.unglow(player);
         }
     }
 

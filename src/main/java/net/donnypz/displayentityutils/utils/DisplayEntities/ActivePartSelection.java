@@ -331,12 +331,47 @@ public abstract class ActivePartSelection implements Active{
     }
 
     /**
+     * Make all display parts in this selection glow for a player
+     */
+    @Override
+    public void glow(@NotNull Player player){
+        for (ActivePart part : selectedParts){
+            part.glow(player);
+        }
+    }
+
+
+    @Override
+    public void glow(long durationInTicks){
+        for (ActivePart part : selectedParts){
+            part.glow(durationInTicks);
+        }
+    }
+
+    @Override
+    public void glow(@NotNull Player player, long durationInTicks){
+        for (ActivePart part : selectedParts){
+            part.glow(player, durationInTicks);
+        }
+    }
+
+    /**
      * Removes the glow effect from all the display parts in this selection
      */
     @Override
     public void unglow(){
         for (ActivePart part : selectedParts){
             part.unglow();
+        }
+    }
+
+    /**
+     * Removes the glow effect from all the display parts in this selection for a player
+     */
+    @Override
+    public void unglow(@NotNull Player player){
+        for (ActivePart part : selectedParts){
+            part.unglow(player);
         }
     }
 

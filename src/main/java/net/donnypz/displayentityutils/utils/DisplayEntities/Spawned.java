@@ -7,11 +7,5 @@ public interface Spawned{
 
     void showToPlayer(@NotNull Player player);
 
-    Spawned glow(long durationInTicks);
-
-    Spawned glow(@NotNull Player player, long durationInTicks);
-
-    Spawned unglow(@NotNull Player player);
-
     boolean isInLoadedChunk();
 }

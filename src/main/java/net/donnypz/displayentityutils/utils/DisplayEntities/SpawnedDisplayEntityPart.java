@@ -457,12 +457,12 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * Adds the glow effect to this SpawnDisplayEntityPart.
      * It will glow if it's a Block/Item Display.
      * @param durationInTicks How long to glow this part
-     * @return this
      */
-    public SpawnedDisplayEntityPart glow(long durationInTicks){
+    @Override
+    public void glow(long durationInTicks){
         Entity entity = getEntity();
         if (type == PartType.INTERACTION || type == PartType.TEXT_DISPLAY) {
-            return this;
+            return;
         }
         entity.setGlowing(true);
 
@@ -472,27 +472,9 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                 entity.setGlowing(false);
             }
         }.runTaskLater(DisplayEntityPlugin.getInstance(), durationInTicks);
-        return this;
     }
 
-    /**
-     * Make this part glow for a player for a set period of time, if it's a block or item display
-     * @param player the player
-     * @param durationInTicks how long the glowing should last. -1 to last forever
-     * @return this
-     */
-    public SpawnedDisplayEntityPart glow(@NotNull Player player, long durationInTicks){
-        if (type == PartType.BLOCK_DISPLAY || type == PartType.ITEM_DISPLAY){
-            if (durationInTicks == -1){
-                PacketUtils.setGlowing(player, getEntityId(), true);
-            }
-            else{
-                PacketUtils.setGlowing(player, getEntityId(), durationInTicks);
-            }
 
-        }
-        return this;
-    }
 
     public void spawnInteractionOutline(Player player, long durationInTicks){
         Interaction i = (Interaction) getEntity();
@@ -540,11 +522,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @param player the player
      */
     @Override
-    public SpawnedDisplayEntityPart unglow(@NotNull Player player){
+    public void unglow(@NotNull Player player){
         if (type != PartType.INTERACTION) {
             PacketUtils.setGlowing(player, getEntity().getEntityId(), false);
         }
-        return this;
     }
 
     private void temporaryParticles(Entity entity, long durationInTicks, Particle particle){

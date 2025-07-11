@@ -1102,6 +1102,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     /**
      * Adds the glow effect to all the block and item display parts in this group
      */
+    @Override
     public void glow(){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || part.type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
@@ -1111,30 +1112,37 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     /**
+     * Adds the glow effect to all the block and item display parts in this group for a player
+     * @param player the player
+     */
+    @Override
+    public void glow(@NotNull Player player){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || part.type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
+                part.glow(player);
+            }
+        }
+    }
+
+    /**
      * Adds the glow effect to all the block and item display parts in this group
      * @param durationInTicks How long to highlight this selection
-     * @return this
      */
-    public SpawnedDisplayEntityGroup glow(long durationInTicks){
+    @Override
+    public void glow(long durationInTicks){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.glow(durationInTicks);
         }
-        return this;
     }
 
     /**
      * Make this group's block and item display entities glow for a player for a set period of time
      * @param player the player
      * @param durationInTicks how long the glowing should last
-     * @return this
      */
-    public SpawnedDisplayEntityGroup glow(@NotNull Player player, long durationInTicks){
-        glowMany(player, durationInTicks, spawnedParts.values());
-        return this;
-    }
-
-    static void glowMany(Player player, long durationInTicks, Collection<SpawnedDisplayEntityPart> parts){
-        for (SpawnedDisplayEntityPart part : parts){
+    @Override
+    public void glow(@NotNull Player player, long durationInTicks){
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
                 continue;
             }
@@ -1190,14 +1198,12 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     /**
      * Removes the glow effect from all the display parts in this group, for the specified player
      * @param player the player
-     * @return this
      */
     @Override
-    public SpawnedDisplayEntityGroup unglow(@NotNull Player player){
+    public void unglow(@NotNull Player player){
         for (SpawnedDisplayEntityPart part : spawnedParts.values()){
             part.unglow(player);
         }
-        return this;
     }
 
     /**

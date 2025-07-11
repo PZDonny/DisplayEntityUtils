@@ -1,11 +1,15 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.kyori.adventure.text.Component;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -58,6 +62,61 @@ public abstract class ActivePart implements Active{
      */
     public @NotNull HashSet<String> getTags(){
         return new HashSet<>(partTags);
+    }
+
+    /**
+     * Make this part glow for a player
+     * @param player the player
+     */
+    public void glow(@NotNull Player player){
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
+        PacketUtils.setGlowing(player, getEntityId(), true);
+    }
+
+    /**
+     * Make this part glow for a player for a set period of time, if it's a block or item display
+     * @param durationInTicks how long the glowing should last. -1 or less to last forever
+     */
+    @Override
+    public void glow(long durationInTicks){
+        if (type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
+            glow();
+
+            new BukkitRunnable(){
+                @Override
+                public void run() {
+                    unglow();
+                }
+            }.runTaskLater(DisplayEntityPlugin.getInstance(), durationInTicks);
+        }
+    }
+
+
+    /**
+     * Make this part glow for a player for a set period of time, if it's a block or item display
+     * @param player the player
+     * @param durationInTicks how long the glowing should last. -1 or less to last forever
+     */
+    @Override
+    public void glow(@NotNull Player player, long durationInTicks){
+        if (type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
+            if (durationInTicks <= -1){
+                PacketUtils.setGlowing(player, getEntityId(), true);
+            }
+            else{
+                PacketUtils.setGlowing(player, getEntityId(), durationInTicks);
+            }
+        }
+    }
+
+    /**
+     * Unglow this part for a player
+     * @param player the player
+     */
+    @Override
+    public void unglow(@NotNull Player player) {
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
+        PacketUtils.setGlowing(player, getEntityId(), false);
     }
 
     public abstract ActiveGroup getGroup();

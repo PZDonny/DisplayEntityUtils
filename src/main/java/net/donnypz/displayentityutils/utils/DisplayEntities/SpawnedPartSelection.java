@@ -176,45 +176,6 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
     }
 
     /**
-     * Adds the glow effect to the block and item display parts within this selection
-     * @param durationInTicks how long the glow should last
-     * @return this
-     */
-    public SpawnedPartSelection glow(long durationInTicks){
-        for (ActivePart part : selectedParts){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
-                continue;
-            }
-            ((SpawnedDisplayEntityPart) part).glow(durationInTicks);
-        }
-        return this;
-    }
-
-    /**
-     * Make this part glow for a player for a set period of time, if it's a block or item display
-     * @param player the player
-     * @param durationInTicks how long the glowing should last. -1 to last forever
-     * @return this
-     */
-    public SpawnedPartSelection glow(@NotNull Player player, long durationInTicks){
-        SpawnedDisplayEntityGroup.glowMany(player, durationInTicks, getSelectedParts());
-        return this;
-    }
-
-    /**
-     * Removes the glow effect from all the display parts in this selection, for the specified player
-     * @param player the player
-     * @return this
-     */
-    @Override
-    public SpawnedPartSelection unglow(@NotNull Player player){
-        for (ActivePart part : selectedParts){
-            ((SpawnedDisplayEntityPart) part).unglow(player);
-        }
-        return this;
-    }
-
-    /**
      * Remove a {@link SpawnedDisplayEntityPart} from this selection
      * @param part
      * @return true if the part was contained and removed

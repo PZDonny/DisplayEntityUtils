@@ -23,7 +23,15 @@ public interface Active {
 
     void glow();
 
+    void glow(@NotNull Player player);
+
+    void glow(long durationInTicks);
+
+    void glow(@NotNull Player player, long durationInTicks);
+
     void unglow();
+
+    void unglow(@NotNull Player player);
 
     void setPitch(float pitch);
 
