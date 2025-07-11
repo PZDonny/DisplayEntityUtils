@@ -1533,7 +1533,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
      * @param animation the animation the frame is from
      * @param frameId the id of the frame to display
      * @param isAsync whether to show this frame asynchronously (unpredictable results)
@@ -1544,7 +1544,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
      * @param animation the animation the frame is from
      * @param frame the frame to display
      * @param isAsync whether to show this frame asynchronously (unpredictable results)
@@ -1559,7 +1559,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
      * @param animation the animation the frame is from
      * @param frameId the id of the frame to display
      * @param isAsync whether to show this frame asynchronously (unpredictable results)
@@ -1572,7 +1572,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
      * @param animation the animation the frame is from
      * @param frame the frame to display
      * @param isAsync whether to show this frame asynchronously (unpredictable results)

@@ -427,6 +427,53 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         return masterPart.getLocation();
     }
 
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * @param animation the animation the frame is from
+     * @param frameId the id of the frame to display
+     * @return false if this group is in an unloaded chunk
+     */
+    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, int frameId) {
+        return setToFrame(animation, animation.getFrame(frameId));
+    }
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}  on this group
+     * @param animation the animation the frame is from
+     * @param frame the frame to display
+     * @return false if this group is in an unloaded chunk
+     */
+    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
+        PacketDisplayAnimationExecutor.setGroupToFrame(this, animation, frame);
+        return true;
+    }
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}  on this group
+     * @param animation the animation the frame is from
+     * @param frameId the id of the frame to display
+     * @param duration how long the frame should play
+     * @param delay how long until the frame should start playing
+     * @return false if this group is in an unloaded chunk
+     */
+    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, int frameId, int duration, int delay) {
+        return setToFrame(animation, animation.getFrame(frameId), duration, delay);
+    }
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}  on this group
+     * @param animation the animation the frame is from
+     * @param frame the frame to display
+     * @param duration how long the frame should play
+     * @param delay how long until the frame should start playing
+     * @return false if this group is in an unloaded chunk
+     */
+    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
+       PacketDisplayAnimationExecutor.setGroupToFrame(this, animation, frame, duration, delay);
+        return true;
+    }
+
     /**
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
      * @param player the player
