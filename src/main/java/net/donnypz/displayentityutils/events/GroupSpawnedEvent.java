@@ -51,6 +51,8 @@ public class GroupSpawnedEvent extends Event {
         DISPLAY_CONTROLLER,
         CUSTOM,
         @ApiStatus.Internal
-        INTERNAL;
+        INTERNAL,
+        @ApiStatus.Internal
+        SKRIPT;
     }
 }
