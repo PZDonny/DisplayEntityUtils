@@ -37,6 +37,7 @@ class AnimCMD extends ConsoleUsableSubCommand{
         subCommands.put("copypoint", new AnimCopyPointCMD());
         subCommands.put("movepoint", new AnimMovePointCMD());
         subCommands.put("showframe", new AnimShowFrameCMD());
+        subCommands.put("previewframe", new AnimPreviewFrameCMD());
         subCommands.put("addsound", new AnimAddSoundCMD());
         subCommands.put("removesound", new AnimRemoveSoundCMD());
         subCommands.put("addparticle", new AnimAddParticleCMD());
@@ -117,8 +118,9 @@ class AnimCMD extends ConsoleUsableSubCommand{
             CMDUtils.sendCMD(sender, "/mdis anim showframe <frame-id>", "Displays a frame on your selected group");
         }
         else{
+            CMDUtils.sendCMD(sender, "/mdis anim previewframe <frame-id>", "Preview a frame on your selected group, without changing group entity data");
             CMDUtils.sendCMD(sender, "/mdis anim play [-loop]", "Play your selected animation on your selected group. Include \"-loop\" to loop the animation");
-            CMDUtils.sendCMD(sender, "/mdis anim previewplay", "Preview your selected animation on your selected group, with only you seeing the animation.");
+            CMDUtils.sendCMD(sender, "/mdis anim previewplay", "Preview your selected animation on your selected group, without changing group entity data.");
             CMDUtils.sendCMD(sender, "/mdis anim stop", "Stop an animation playing on a group");
             CMDUtils.sendCMD(sender, "/mdis anim save <storage-location>", "Save your selected animation and any changes made");
             CMDUtils.sendCMD(sender, "/mdis anim delete <anim-tag> <storage-location>", "Delete a saved animation");
