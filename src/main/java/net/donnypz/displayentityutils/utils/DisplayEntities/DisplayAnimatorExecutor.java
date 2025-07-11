@@ -1,10 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.events.AnimationFrameEndEvent;
-import net.donnypz.displayentityutils.events.AnimationFrameStartEvent;
-import net.donnypz.displayentityutils.events.AnimationCompleteEvent;
-import net.donnypz.displayentityutils.events.AnimationLoopStartEvent;
+import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -106,7 +103,12 @@ final class DisplayAnimatorExecutor {
 
         Location groupLoc = group.getLocation();
         if (group.isInLoadedChunk()){
-            new AnimationFrameStartEvent(group, animator, animation, frameId, frame).callEvent();
+            if (!playSingleFrame){
+                new AnimationFrameStartEvent(group, animator, animation, frameId, frame).callEvent();
+            }
+            else{
+                new AnimationSetFrameEvent(group, animator, animation, frame).callEvent();
+            }
             frame.playEffects(group, animator, true);
 
             animateInteractions(groupLoc, frame, group, selection, animation);

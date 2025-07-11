@@ -95,7 +95,12 @@ final class PacketDisplayAnimationExecutor {
         }
 
         Location groupLoc = group.getLocation();
-        new PacketAnimationFrameStartEvent(group, animator, animation, frame, frameId, null).callEvent();
+        if (!playSingleFrame){
+            new PacketAnimationFrameStartEvent(group, animator, animation, frame, frameId, null).callEvent();
+        }
+        else{
+            new PacketAnimationSetFrameEvent(group, animator, animation, frame, null).callEvent();
+        }
         frame.playEffects(group, animator, true);
 
         if (group.hasTrackingPlayers()){

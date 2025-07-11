@@ -115,7 +115,12 @@ final class PlayerDisplayAnimationExecutor {
         }
 
         Location groupLoc = group.getLocation();
-        new PacketAnimationFrameStartEvent(group, animator, animation, frame, frameId, players).callEvent();
+        if (!playSingleFrame){
+            new PacketAnimationFrameStartEvent(group, animator, animation, frame, frameId, players).callEvent();
+        }
+        else{
+            new PacketAnimationSetFrameEvent(group, animator, animation, frame, players).callEvent();
+        }
         frame.playEffects(players, group);
 
         animateInteractions(players, groupLoc, frame, group, selection, animation);
