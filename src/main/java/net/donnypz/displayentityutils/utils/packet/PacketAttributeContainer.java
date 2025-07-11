@@ -146,6 +146,14 @@ public class PacketAttributeContainer implements Cloneable{
     }
 
     /**
+     * Check if this container has data set for any attribtues
+     * @return a boolean
+     */
+    public boolean hasAttributes() {
+        return !attributes.isEmpty();
+    }
+
+    /**
      * Create a {@link PacketDisplayEntityPart} with data representative of this container
      * @param partType the type of entity this container represents
      * @return a {@link PacketDisplayEntityPart}
