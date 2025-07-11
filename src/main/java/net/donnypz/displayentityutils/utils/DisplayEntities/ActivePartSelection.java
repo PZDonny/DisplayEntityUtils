@@ -62,6 +62,14 @@ public abstract class ActivePartSelection implements Active{
     }
 
     /**
+     * Get the total number of parts within this part selection
+     * @return an integer
+     */
+    public int getSize(){
+        return selectedParts.size();
+    }
+
+    /**
      * Update this selection's parts based on the filters set by a {@link PartFilter}. This builds upon any previous filters applied
      * @param filter the filter to use
      * @param reset whether to reset the currently selected parts and all filters

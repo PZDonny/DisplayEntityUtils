@@ -109,14 +109,6 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
     }
 
     /**
-     * Get the total number of parts within this part selection
-     * @return an integer
-     */
-    public int getSize(){
-        return selectedParts.size();
-    }
-
-    /**
      * Adds a part tag to the parts in this selection. The tag will not be added if it starts with an "!" or is blank
      * @param partTag The part tag to give the parts in this selection
      * @return true if the tag was successfully added
