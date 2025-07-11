@@ -135,6 +135,33 @@ public abstract class ActiveGroup implements Active{
     }
 
     /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * @param player the player
+     * @param animation the animation the frame is from
+     * @param frameId the id of the frame to display
+     */
+    public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, int frameId) {
+        setToFrame(player, animation, animation.getFrame(frameId));
+    }
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * @param player the player
+     * @param animation the animation the frame is from
+     * @param frameId the id of the frame to display
+     * @param duration how long the frame should play
+     * @param delay how long until the frame should start playing
+     */
+    public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, int frameId, int duration, int delay) {
+        setToFrame(player, animation, animation.getFrame(frameId), duration, delay);
+    }
+
+    public abstract void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame);
+
+    public abstract void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay);
+
+
+    /**
      * Check if an animator is animating on this group
      * @param animator the animator
      * @return a boolean

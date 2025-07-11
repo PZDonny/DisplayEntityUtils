@@ -428,6 +428,34 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     }
 
     /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * @param player the player
+     * @param animation the animation the frame is from
+     * @param frame the frame to display
+     */
+    @Override
+    public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
+        if (masterPart.isTrackedBy(player)){
+            PlayerDisplayAnimationExecutor.setGroupToFrame(player, this, animation, frame);
+        }
+    }
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * @param player the player
+     * @param animation the animation the frame is from
+     * @param frame the frame to display
+     * @param duration how long the frame should play
+     * @param delay how long until the frame should start playing
+     */
+    @Override
+    public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
+        if (masterPart.isTrackedBy(player)){
+            PlayerDisplayAnimationExecutor.setGroupToFrame(player, this, animation, frame, duration, delay);
+        }
+    }
+
+    /**
      * Get the name of the world this group is in
      * @return a string or null if the group's location was never set
      */

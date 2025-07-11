@@ -1540,7 +1540,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      * @return false if this group is in an unloaded chunk
      */
     public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, int frameId, boolean isAsync) {
-        return setToFrame(animation, animation.getFrame(frameId), frameId, isAsync);
+        return setToFrame(animation, animation.getFrame(frameId), isAsync);
     }
 
     /**
@@ -1550,11 +1550,11 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      * @param isAsync whether to show this frame asynchronously (unpredictable results)
      * @return false if this group is in an unloaded chunk
      */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int frameId, boolean isAsync) {
+    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, boolean isAsync) {
         if (!isInLoadedChunk()){
             return false;
         }
-        DisplayAnimatorExecutor.setGroupToFrame(this, animation, frame, frameId, isAsync);
+        DisplayAnimatorExecutor.setGroupToFrame(this, animation, frame, isAsync);
         return true;
     }
 
@@ -1568,7 +1568,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      * @return false if this group is in an unloaded chunk
      */
     public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, int frameId, int duration, int delay, boolean isAsync) {
-        return setToFrame(animation, animation.getFrame(frameId), frameId, duration, delay, isAsync);
+        return setToFrame(animation, animation.getFrame(frameId), duration, delay, isAsync);
     }
 
     /**
@@ -1580,12 +1580,44 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      * @param delay how long until the frame should start playing
      * @return false if this group is in an unloaded chunk
      */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int frameId, int duration, int delay, boolean isAsync) {
+    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay, boolean isAsync) {
         if (!isInLoadedChunk()){
             return false;
         }
-        DisplayAnimatorExecutor.setGroupToFrame(this, animation, frame, frameId, duration, delay, isAsync);
+        DisplayAnimatorExecutor.setGroupToFrame(this, animation, frame, duration, delay, isAsync);
         return true;
+    }
+
+
+
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * @param player the player
+     * @param animation the animation the frame is from
+     * @param frame the frame to display
+     */
+    @Override
+    public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
+        if (isInLoadedChunk()){
+            PlayerDisplayAnimationExecutor.setGroupToFrame(player, this, animation, frame);
+        }
+    }
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * @param player the player
+     * @param animation the animation the frame is from
+     * @param frame the frame to display
+     * @param duration how long the frame should play
+     * @param delay how long until the frame should start playing
+     */
+    @Override
+    public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
+        if (isInLoadedChunk()){
+            PlayerDisplayAnimationExecutor.setGroupToFrame(player, this, animation, frame, duration, delay);
+        }
+
     }
 
 

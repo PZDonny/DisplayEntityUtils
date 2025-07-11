@@ -86,7 +86,7 @@ class DatapackLegacyConverter {
             public void run() {
                 if (i == frames.size()){
                     try{
-                        createdGroup.setToFrame(anim, anim.getFrames().getFirst(), 0,false);
+                        createdGroup.setToFrame(anim, anim.getFrames().getFirst(), false);
                     }
                     catch(IndexOutOfBoundsException ignored){}
 

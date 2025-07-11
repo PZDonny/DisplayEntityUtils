@@ -41,9 +41,9 @@ final class PacketDisplayAnimationExecutor {
      * @param animation the animation the frame is from
      * @param frame the frame to display
      */
-    static void setGroupToFrame(@NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int frameId){
+    static void setGroupToFrame(@NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
-        new PacketDisplayAnimationExecutor(animator, animation, group, frame, frameId, 0, true);
+        new PacketDisplayAnimationExecutor(animator, animation, group, frame, -1, 0, true);
     }
 
     /**
@@ -54,11 +54,11 @@ final class PacketDisplayAnimationExecutor {
      * @param duration how long the frame should play
      * @param delay how long until the frame should start playing
      */
-    static void setGroupToFrame(@NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int frameId, int duration, int delay){
+    static void setGroupToFrame(@NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
         SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
         clonedFrame.duration = duration;
-        new PacketDisplayAnimationExecutor(animator, animation, group, clonedFrame, frameId, delay, true);
+        new PacketDisplayAnimationExecutor(animator, animation, group, clonedFrame, -1, delay, true);
     }
 
     private void prepareAnimation(SpawnedDisplayAnimation animation, ActiveGroup group, SpawnedDisplayAnimationFrame frame, int frameId, int delay){
