@@ -269,6 +269,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         return partList;
     }
 
+    @Override
+    public boolean isTrackedBy(@NotNull Player player) {
+        return masterPart.viewers.contains(player.getUniqueId());
+    }
+
     /**
      * Get the players who can visibly see this group
      * @return a collection of players

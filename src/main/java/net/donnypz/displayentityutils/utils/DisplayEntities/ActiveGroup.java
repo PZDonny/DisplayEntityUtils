@@ -114,6 +114,8 @@ public abstract class ActiveGroup implements Active{
 
     public abstract SequencedCollection<? extends ActivePart> getSpawnedDisplayParts();
 
+    public abstract boolean isTrackedBy(@NotNull Player player);
+
     public abstract Collection<Player> getTrackingPlayers();
 
     /**

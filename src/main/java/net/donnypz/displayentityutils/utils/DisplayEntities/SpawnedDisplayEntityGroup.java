@@ -409,6 +409,11 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         return partList;
     }
 
+    @Override
+    public boolean isTrackedBy(@NotNull Player player) {
+        return player.canSee(masterPart.getEntity());
+    }
+
     /**
      * Get the players who can visibly see this group
      * @return a collection of players
