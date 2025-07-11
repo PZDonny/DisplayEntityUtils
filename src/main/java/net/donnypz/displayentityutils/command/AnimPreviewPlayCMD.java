@@ -9,13 +9,12 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 class AnimPreviewPlayCMD extends PlayerSubCommand {
     AnimPreviewPlayCMD() {
-        super(Permission.ANIM_PLAY);
+        super(Permission.ANIM_PREVIEW);
     }
 
     @Override
@@ -46,12 +45,7 @@ class AnimPreviewPlayCMD extends PlayerSubCommand {
         Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
             if (player.isConnected()){
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Animation test complete!", NamedTextColor.GREEN)));
-                //Restore entity data for player
-                Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                    group.hideFromPlayer(player);
-                    group.showToPlayer(player);
-                    player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Restored group entity data", NamedTextColor.GRAY, TextDecoration.ITALIC)));
-                }, 30);
+                player.sendMessage(Component.text("| Use \"/mdis anim restore\" to restore entity data", NamedTextColor.GRAY));
             }
         }, anim.getDuration());
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Test playing animation!", NamedTextColor.AQUA)));

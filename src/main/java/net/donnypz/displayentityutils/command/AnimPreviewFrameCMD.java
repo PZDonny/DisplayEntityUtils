@@ -15,7 +15,7 @@ import java.util.List;
 
 class AnimPreviewFrameCMD extends PlayerSubCommand {
     AnimPreviewFrameCMD() {
-        super(Permission.ANIM_SHOW_FRAME);
+        super(Permission.ANIM_PREVIEW);
     }
 
     @Override
@@ -59,6 +59,7 @@ class AnimPreviewFrameCMD extends PlayerSubCommand {
             }
             group.setToFrame(player, anim, frames.get(id));
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Previewing your selected group as Frame #" + id, NamedTextColor.GREEN)));
+            player.sendMessage(Component.text("| Use \"/mdis anim restore\" to restore entity data", NamedTextColor.GRAY));
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid ID! ID's must be >= 0", NamedTextColor.RED));
         }

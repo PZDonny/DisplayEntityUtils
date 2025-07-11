@@ -50,6 +50,7 @@ class AnimCMD extends ConsoleUsableSubCommand{
         subCommands.put("previewplay", new AnimPreviewPlayCMD());
         subCommands.put("play", new AnimPlayCMD());
         subCommands.put("stop", new AnimStopCMD());
+        subCommands.put("restore", new AnimRestoreCMD());
         subCommands.put("select", new AnimSelectCMD());
     }
 
@@ -121,6 +122,7 @@ class AnimCMD extends ConsoleUsableSubCommand{
             CMDUtils.sendCMD(sender, "/mdis anim previewframe <frame-id>", "Preview a frame on your selected group, without changing group entity data");
             CMDUtils.sendCMD(sender, "/mdis anim play [-loop]", "Play your selected animation on your selected group. Include \"-loop\" to loop the animation");
             CMDUtils.sendCMD(sender, "/mdis anim previewplay", "Preview your selected animation on your selected group, without changing group entity data.");
+            CMDUtils.sendCMD(sender, "/mdis anim restore", "Restore your selected group to its previous state before previewing frames/animations");
             CMDUtils.sendCMD(sender, "/mdis anim stop", "Stop an animation playing on a group");
             CMDUtils.sendCMD(sender, "/mdis anim save <storage-location>", "Save your selected animation and any changes made");
             CMDUtils.sendCMD(sender, "/mdis anim delete <anim-tag> <storage-location>", "Delete a saved animation");
@@ -142,5 +144,4 @@ class AnimCMD extends ConsoleUsableSubCommand{
         player.sendMessage(Component.text("Your currently selected animation has no frames!", NamedTextColor.RED));
         player.sendMessage(Component.text("Use \"/mdis anim addframe\" instead", NamedTextColor.GRAY));
     }
-
 }

@@ -98,6 +98,7 @@ public enum Permission {
     ANIM_PLAY("deu.anim.play"),
     ANIM_STOP("deu.anim.stop"),
     ANIM_SELECT("deu.anim.select"),
+    ANIM_PREVIEW("deu.anim.preview"),
 
     BDENGINE_CONVERT_ANIM("deu.bdengine.convertanim"),
     BDENGINE_SPAWN_MODEL("deu.bdengine.spawnmodel");
