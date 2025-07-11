@@ -328,6 +328,8 @@ public abstract class ActivePartSelection implements Active{
         return group != null;
     }
 
+    public abstract SequencedCollection<? extends ActivePart> getSelectedParts();
+
     public abstract ActivePart getSelectedPart();
 
     public abstract ActiveGroup getGroup();

@@ -72,9 +72,10 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
     }
 
     /**
-     * Get the SpawnedDisplayEntityParts within this SpawnedPartSelection
-     * @return List of the parts in this selection
+     * Get the {@link SpawnedDisplayEntityPart} within this selection
+     * @return the parts in this selection
      */
+    @Override
     public SequencedCollection<SpawnedDisplayEntityPart> getSelectedParts() {
         List<SpawnedDisplayEntityPart> parts = new ArrayList<>();
         for (ActivePart part : selectedParts){

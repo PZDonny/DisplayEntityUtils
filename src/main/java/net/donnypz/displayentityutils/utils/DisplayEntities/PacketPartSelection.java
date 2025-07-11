@@ -13,7 +13,10 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.SequencedCollection;
 
 public class PacketPartSelection extends ActivePartSelection implements Packeted{
     public PacketPartSelection(@NotNull PacketDisplayEntityGroup group, @NotNull String partTag) {
@@ -58,6 +61,21 @@ public class PacketPartSelection extends ActivePartSelection implements Packeted
     @Override
     public PacketDisplayEntityGroup getGroup() {
         return (PacketDisplayEntityGroup) group;
+    }
+
+    /**
+     * Get the {@link PacketDisplayEntityPart} within this selection
+     * @return the parts in this selection
+     */
+    @Override
+    public SequencedCollection<PacketDisplayEntityPart> getSelectedParts() {
+        List<PacketDisplayEntityPart> parts = new ArrayList<>();
+        for (ActivePart part : selectedParts){
+            if (part instanceof PacketDisplayEntityPart p){
+                parts.add(p);
+            }
+        }
+        return parts;
     }
 
     @Override
