@@ -46,7 +46,7 @@ class AnimCMD extends ConsoleUsableSubCommand{
         subCommands.put("toggledatachanges", new AnimDataChangesCMD());
         subCommands.put("settag", new AnimSetTagCMD());
         subCommands.put("setframetag", new AnimSetFrameTagCMD());
-        subCommands.put("testplay", new AnimTestPlayCMD());
+        subCommands.put("previewplay", new AnimPreviewPlayCMD());
         subCommands.put("play", new AnimPlayCMD());
         subCommands.put("stop", new AnimStopCMD());
         subCommands.put("select", new AnimSelectCMD());
@@ -118,7 +118,7 @@ class AnimCMD extends ConsoleUsableSubCommand{
         }
         else{
             CMDUtils.sendCMD(sender, "/mdis anim play [-loop]", "Play your selected animation on your selected group. Include \"-loop\" to loop the animation");
-            CMDUtils.sendCMD(sender, "/mdis anim testplay", "Play your selected animation once on your selected group one time, but only you can see the animation. This animation cannot be manually stopped.");
+            CMDUtils.sendCMD(sender, "/mdis anim previewplay", "Preview your selected animation on your selected group, with only you seeing the animation.");
             CMDUtils.sendCMD(sender, "/mdis anim stop", "Stop an animation playing on a group");
             CMDUtils.sendCMD(sender, "/mdis anim save <storage-location>", "Save your selected animation and any changes made");
             CMDUtils.sendCMD(sender, "/mdis anim delete <anim-tag> <storage-location>", "Delete a saved animation");
