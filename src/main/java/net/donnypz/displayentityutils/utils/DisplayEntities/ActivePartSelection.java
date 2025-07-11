@@ -1,8 +1,12 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import org.bukkit.Color;
 import org.bukkit.block.BlockType;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -259,6 +263,137 @@ public abstract class ActivePartSelection implements Active{
         selectedPart = selectedParts.getLast();
     }
 
+
+    /**
+     * Set the view range of all parts in this selection
+     * @param viewRangeMultiplier The range to set
+     */
+    @Override
+    public void setViewRange(float viewRangeMultiplier) {
+        for (ActivePart part : selectedParts){
+            part.setViewRange(viewRangeMultiplier);
+        }
+    }
+
+    /**
+     * Set the billboard of all parts in this selection
+     * @param billboard the billboard to set
+     */
+
+    @Override
+    public void setBillboard(Display.@NotNull Billboard billboard) {
+        for (ActivePart part : selectedParts){
+            part.setBillboard(billboard);
+        }
+    }
+
+    /**
+     * Set the brightness of all parts in this selection
+     * @param brightness the brightness to set
+     */
+    @Override
+    public void setBrightness(Display.@Nullable Brightness brightness) {
+        for (ActivePart part : selectedParts){
+            part.setBrightness(brightness);
+        }
+    }
+
+    /**
+     * Set the teleport duration of all parts in this selection
+     * @param teleportDuration the teleport duration to set
+     */
+    @Override
+    public void setTeleportDuration(int teleportDuration) {
+        for (ActivePart part : selectedParts){
+            part.setTeleportDuration(teleportDuration);
+        }
+    }
+
+    /**
+     * Set the glow color of all parts in this selection
+     * @param color The color to set
+     */
+    @Override
+    public void setGlowColor(@Nullable Color color){
+        for (ActivePart part : selectedParts){
+            part.setGlowColor(color);
+        }
+    }
+
+    /**
+     * Make all display parts in this selection glow
+     */
+    @Override
+    public void glow(){
+        for (ActivePart part : selectedParts){
+            part.glow();
+        }
+    }
+
+    /**
+     * Removes the glow effect from all the display parts in this selection
+     */
+    @Override
+    public void unglow(){
+        for (ActivePart part : selectedParts){
+            part.unglow();
+        }
+    }
+
+    /**
+     * Pivot all Interaction parts in this selection around the SpawnedDisplayEntityGroup's master part
+     * @param angleInDegrees the pivot angle
+     */
+    @Override
+    public void pivot(float angleInDegrees){
+        for (ActivePart part : selectedParts){
+            part.pivot(angleInDegrees);
+        }
+    }
+
+    /**
+     * Set the yaw of all parts in this selection
+     * @param yaw the yaw to set
+     */
+    @Override
+    public void setYaw(float yaw, boolean pivotInteractions){
+        for (ActivePart part : selectedParts){
+            part.setYaw(yaw, pivotInteractions);
+        }
+    }
+
+    /**
+     * Set the pitch of all parts in this selection
+     * @param pitch the pitch to set
+     */
+    @Override
+    public void setPitch(float pitch){
+        for (ActivePart part : selectedParts){
+            part.setPitch(pitch);
+        }
+    }
+
+    /**
+     * Hide all parts in this selection from a player
+     * @param player The player to hide parts from
+     */
+    @Override
+    public void hideFromPlayer(@NotNull Player player){
+        for (ActivePart part : selectedParts){
+            part.hideFromPlayer(player);
+        }
+    }
+
+    /**
+     * Hide all parts in this selection from players
+     * @param players The players to hide parts from
+     */
+    @Override
+    public void hideFromPlayers(@NotNull Collection<Player> players){
+        for (ActivePart part : selectedParts){
+            part.hideFromPlayers(players);
+        }
+    }
 
     /**
      * Determine whether a {@link ActivePart} is contained in this selection

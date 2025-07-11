@@ -60,6 +60,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         return packetParts.values();
     }
 
+    @Override
+    public int getTeleportDuration() {
+        return masterPart.getTeleportDuration();
+    }
+
     /**
      * Create a {@link SpawnedPartSelection} containing unfiltered parts from this group
      * @return a {@link SpawnedPartSelection}
@@ -323,6 +328,13 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     public void unglow() {
         for (PacketDisplayEntityPart part : packetParts.values()){
             part.unglow();
+        }
+    }
+
+    @Override
+    public void setTeleportDuration(int teleportDuration) {
+        for (PacketDisplayEntityPart part : packetParts.values()){
+            part.setTeleportDuration(teleportDuration);
         }
     }
 

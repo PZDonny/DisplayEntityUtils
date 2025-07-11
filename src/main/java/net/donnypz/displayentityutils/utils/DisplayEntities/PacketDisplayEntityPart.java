@@ -245,8 +245,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
             return null;
         }
-        System.out.println("IT:"+getLocation().toVector());
-        System.out.println("RL:"+referenceLocation.toVector());
         return referenceLocation.toVector().subtract(getLocation().toVector());
     }
 
@@ -275,7 +273,13 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
+    public int getTeleportDuration() {
+        return attributeContainer.getAttribute(DisplayAttributes.TELEPORTATION_DURATION);
+    }
+
+    @Override
     protected void cull(float width, float height) {
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
         attributeContainer
             .setAttributesAndSend(new DisplayAttributeMap()
                     .add(DisplayAttributes.Culling.HEIGHT, height)
@@ -286,9 +290,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @Override
     public void autoCull(float widthAdder, float heightAdder) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            return;
-        }
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
         float[] values = getAutoCullValues(widthAdder, heightAdder);
         cull(values[0], values[1]);
     }
@@ -324,17 +326,26 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
+    public void setTeleportDuration(int teleportDuration) {
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
+        setAndSend(DisplayAttributes.TELEPORTATION_DURATION, teleportDuration);
+    }
+
+    @Override
     public void setViewRange(float viewRangeMultiplier) {
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
         setAndSend(DisplayAttributes.VIEW_RANGE, viewRangeMultiplier);
     }
 
     @Override
     public void setBillboard(Display.@NotNull Billboard billboard) {
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
         setAndSend(DisplayAttributes.BILLBOARD, billboard);
     }
 
     @Override
     public void setBrightness(Display.@Nullable Brightness brightness) {
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
         setAndSend(DisplayAttributes.BRIGHTNESS, brightness);
     }
 

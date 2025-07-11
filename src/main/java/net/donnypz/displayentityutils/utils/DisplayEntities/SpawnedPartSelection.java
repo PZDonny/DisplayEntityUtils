@@ -3,13 +3,11 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
-import org.bukkit.Color;
 import org.bukkit.block.BlockType;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -148,28 +146,6 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
     }
 
     /**
-     * Hide all parts in this selection from a player
-     * @param player The player to hide parts from
-     */
-    @Override
-    public void hideFromPlayer(@NotNull Player player){
-        for (ActivePart part : selectedParts){
-            part.hideFromPlayer(player);
-        }
-    }
-
-    /**
-     * Hide all parts in this selection from players
-     * @param players The players to hide parts from
-     */
-    @Override
-    public void hideFromPlayers(@NotNull Collection<Player> players){
-        for (ActivePart part : selectedParts){
-            part.hideFromPlayers(players);
-        }
-    }
-
-    /**
      * Check if all selected parts are within a loaded chunk
      * @return true if all parts are in a loaded chunk
      */
@@ -201,19 +177,6 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
 
     /**
      * Adds the glow effect to the block and item display parts within this selection
-     */
-    @Override
-    public void glow(){
-        for (ActivePart part : selectedParts){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
-                continue;
-            }
-            ((SpawnedDisplayEntityPart) part).glow();
-        }
-    }
-
-    /**
-     * Adds the glow effect to the block and item display parts within this selection
      * @param durationInTicks how long the glow should last
      * @return this
      */
@@ -239,16 +202,6 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
     }
 
     /**
-     * Removes the glow effect from all the display parts in this selection
-     */
-    @Override
-    public void unglow(){
-        for (ActivePart part : selectedParts){
-            ((SpawnedDisplayEntityPart) part).unglow();
-        }
-    }
-
-    /**
      * Removes the glow effect from all the display parts in this selection, for the specified player
      * @param player the player
      * @return this
@@ -260,9 +213,6 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
         }
         return this;
     }
-
-
-
 
     /**
      * Remove a {@link SpawnedDisplayEntityPart} from this selection
@@ -310,28 +260,6 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
     }
 
 
-    /**
-     * Set the glow color of all parts in this selection
-     * @param color The color to set
-     */
-    @Override
-    public void setGlowColor(@Nullable Color color){
-        for (ActivePart part : selectedParts){
-            ((SpawnedDisplayEntityPart) part).setGlowColor(color);
-        }
-    }
-
-    /**
-     * Set the brightness of all parts in this selection
-     * @param brightness the brightness to set
-     */
-    @Override
-    public void setBrightness(@Nullable Display.Brightness brightness){
-        for (ActivePart part : selectedParts){
-            ((SpawnedDisplayEntityPart) part).setBrightness(brightness);
-        }
-    }
-
 
     /**
      * Change the translation of the SpawnedDisplayEntityParts in this SpawnedPartSelection.
@@ -345,7 +273,7 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
     @Override
     public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks){
         for (ActivePart part : selectedParts){
-            ((SpawnedDisplayEntityPart) part).translate(direction, distance, durationInTicks, delayInTicks);
+            part.translate(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }
@@ -362,65 +290,11 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
     @Override
     public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks){
         for (ActivePart part : selectedParts){
-            ((SpawnedDisplayEntityPart) part).translate(direction, distance, durationInTicks, delayInTicks);
+            part.translate(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }
 
-    /**
-     * Pivot all Interaction parts in this selection around the SpawnedDisplayEntityGroup's master part
-     * @param angleInDegrees the pivot angle
-     */
-    @Override
-    public void pivot(float angleInDegrees){
-        for (ActivePart part : selectedParts){
-            ((SpawnedDisplayEntityPart) part).pivot(angleInDegrees);
-        }
-    }
-
-    /**
-     * Set the yaw of all parts in this selection
-     * @param yaw the yaw to set
-     */
-    @Override
-    public void setYaw(float yaw, boolean pivotInteractions){
-        for (ActivePart part : selectedParts){
-            ((SpawnedDisplayEntityPart) part).setYaw(yaw, pivotInteractions);
-        }
-    }
-
-    /**
-     * Set the pitch of all parts in this selection
-     * @param pitch the pitch to set
-     */
-    @Override
-    public void setPitch(float pitch){
-        for (ActivePart part : selectedParts){
-            ((SpawnedDisplayEntityPart) part).setPitch(pitch);
-        }
-    }
-
-    /**
-     * Set the view range of all parts in this selection
-     * @param viewRangeMultiplier The range to set
-     */
-    @Override
-    public void setViewRange(float viewRangeMultiplier){
-        for (ActivePart part : selectedParts){
-            ((SpawnedDisplayEntityPart) part).setViewRange(viewRangeMultiplier);
-        }
-    }
-
-    /**
-     * Set the billboard of all parts in this selection
-     * @param billboard the billboard to set
-     */
-    @Override
-    public void setBillboard(@NotNull Display.Billboard billboard){
-        for (ActivePart part : selectedParts){
-            ((SpawnedDisplayEntityPart) part).setBillboard(billboard);
-        }
-    }
 
     void removeNoManager(){
         reset();

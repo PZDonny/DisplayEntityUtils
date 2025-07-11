@@ -3,10 +3,8 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.block.BlockType;
-import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemType;
 import org.bukkit.util.Vector;
@@ -103,72 +101,9 @@ public class PacketPartSelection extends ActivePartSelection implements Packeted
     }
 
     @Override
-    public void setGlowColor(@Nullable Color color) {
-        for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).setGlowColor(color);
-        }
-    }
-
-    @Override
-    public void glow() {
-        for (ActivePart part : selectedParts){
-            part.glow();
-        }
-    }
-
-    @Override
-    public void unglow() {
-        for (ActivePart part : selectedParts){
-            part.unglow();
-        }
-    }
-
-    @Override
-    public void setViewRange(float viewRangeMultiplier) {
-        for (ActivePart part : selectedParts){
-            part.setViewRange(viewRangeMultiplier);
-        }
-    }
-
-    @Override
-    public void setBillboard(Display.@NotNull Billboard billboard) {
-        for (ActivePart part : selectedParts){
-            part.setBillboard(billboard);
-        }
-    }
-
-    @Override
-    public void setBrightness(Display.@Nullable Brightness brightness) {
-        for (ActivePart part : selectedParts){
-            part.setBrightness(brightness);
-        }
-    }
-
-    @Override
     public void setRotation(float pitch, float yaw, boolean pivotIfInteraction) {
         for (ActivePart part : selectedParts){
             ((PacketDisplayEntityPart) part).setRotation(pitch, yaw, pivotIfInteraction);
-        }
-    }
-
-    @Override
-    public void setPitch(float pitch) {
-        for (ActivePart part : selectedParts){
-            part.setPitch(pitch);
-        }
-    }
-
-    @Override
-    public void setYaw(float yaw, boolean pivot) {
-        for (ActivePart part : selectedParts){
-            part.setYaw(yaw, pivot);
-        }
-    }
-
-    @Override
-    public void pivot(float angleInDegrees) {
-        for (ActivePart part : selectedParts){
-            part.pivot(angleInDegrees);
         }
     }
 
@@ -215,20 +150,6 @@ public class PacketPartSelection extends ActivePartSelection implements Packeted
     public void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
         for (ActivePart part : selectedParts){
             ((PacketDisplayEntityPart) part).showToPlayers(players, spawnReason, groupSpawnSettings);
-        }
-    }
-
-    @Override
-    public void hideFromPlayer(@NotNull Player player) {
-        for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).hideFromPlayer(player);
-        }
-    }
-
-    @Override
-    public void hideFromPlayers(@NotNull Collection<Player> players) {
-        for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).hideFromPlayers(players);
         }
     }
 

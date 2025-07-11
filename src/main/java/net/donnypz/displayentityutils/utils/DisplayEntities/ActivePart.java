@@ -80,6 +80,8 @@ public abstract class ActivePart implements Active{
 
     public abstract float getInteractionWidth();
 
+    public abstract int getTeleportDuration();
+
     static class PartData {
 
         private final UUID entityUUID;

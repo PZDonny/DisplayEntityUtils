@@ -1427,9 +1427,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      * , or {@link #followEntityDirection(Entity, GroupFollowProperties)} variations
      * This makes the teleportation of the group visually smoother
      */
+    @Override
     public void setTeleportDuration(int teleportDuration){
-        for (SpawnedDisplayEntityPart part : getSpawnedDisplayParts()){
-            ((Display) part.getEntity()).setTeleportDuration(teleportDuration);
+        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
+            part.setTeleportDuration(teleportDuration);
         }
     }
 
@@ -1437,6 +1438,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      * Get the teleport duration of this SpawnedDisplayEntityGroup
      * @return the group's teleport duration value
      */
+    @Override
     public int getTeleportDuration(){
         return ((Display) masterPart.getEntity()).getTeleportDuration();
     }

@@ -641,6 +641,19 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         display.setBillboard(billboard);
     }
 
+    /**
+     * Set the teleport duration of this part
+     * @param teleportDuration the teleport duration to set
+     */
+    @Override
+    public void setTeleportDuration(int teleportDuration) {
+        Entity entity = getEntity();
+        if (entity instanceof Interaction){
+            return;
+        }
+        Display display = (Display) entity;
+        display.setTeleportDuration(teleportDuration);
+    }
 
     /**
      * Set the view range of this part
@@ -884,6 +897,18 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             return -1;
         }
         return ((Interaction) getEntity()).getInteractionWidth();
+    }
+
+    /**
+     * Get the teleport duration of this part if it's a display entity
+     * @return the teleport duration or -1 is the part is an interaction
+     */
+    @Override
+    public int getTeleportDuration() {
+        if (type == PartType.INTERACTION){
+            return -1;
+        }
+        return ((Display) getEntity()).getTeleportDuration();
     }
 
     public enum PartType{

@@ -42,6 +42,8 @@ public abstract class ActiveGroup implements Active{
 
     protected abstract Collection<? extends ActivePart> getParts();
 
+    public abstract int getTeleportDuration();
+
     /**
      * Attempt to automatically set the culling bounds for all parts within this group.
      * Results may not be 100% accurate due to the varying shapes of Minecraft blocks.
