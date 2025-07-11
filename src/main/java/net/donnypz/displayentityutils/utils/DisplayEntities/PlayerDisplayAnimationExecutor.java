@@ -279,7 +279,7 @@ final class PlayerDisplayAnimationExecutor {
     private void applyDisplayTransformation(Collection<Player> players, ActivePart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, ActiveGroup group, DisplayTransformation transformation, boolean applyDataOnly){
         if (applyDataOnly){
             if (animation.allowsDataChanges()){
-                transformation.applyData(part);
+                transformation.applyData(part, players);
             }
             return;
         }
@@ -327,7 +327,7 @@ final class PlayerDisplayAnimationExecutor {
         }
 
         if (animation.allowsDataChanges()){
-            transformation.applyData(part);
+            transformation.applyData(part, players);
         }
     }
 
