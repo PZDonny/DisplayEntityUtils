@@ -321,7 +321,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      */
     public void playSounds(@NotNull Player player, @NotNull ActiveGroup group){
         for (FramePoint framePoint : framePoints.values()){
-            framePoint.playSounds(group.getLocation(), player);
+            framePoint.playSounds(group, player);
         }
     }
 
@@ -332,7 +332,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      */
     public void playSounds(@NotNull Collection<Player> players, @NotNull ActiveGroup group){
         for (FramePoint framePoint : framePoints.values()){
-            framePoint.playSounds(group.getLocation(), players);
+            framePoint.playSounds(group, players);
         }
     }
 
@@ -375,7 +375,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      */
     public void showParticles(@NotNull Player player, @NotNull ActiveGroup group){
         for (FramePoint framePoint : framePoints.values()){
-            framePoint.showParticles(group.getLocation(), player);
+            framePoint.showParticles(group, player);
         }
     }
 
@@ -386,7 +386,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      */
     public void showParticles(@NotNull Collection<Player> players, @NotNull ActiveGroup group){
         for (FramePoint framePoint : framePoints.values()){
-            framePoint.showParticles(group.getLocation(), players);
+            framePoint.showParticles(group, players);
         }
     }
 
@@ -436,7 +436,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
 
     /**
      * Play all effects that are contained within every {@link FramePoint}
-     * Effects include sounds, particles.
+     * Effects include sounds and particles.
      * @param player the player to show the effects to
      * @param group the group to play these effects for
      */
@@ -446,7 +446,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     }
     /**
      * Play all effects that are contained within every {@link FramePoint}
-     * Effects include sounds, particles.
+     * Effects include sounds and particles.
      * @param players the players to show the effects to
      * @param group the group to play these effects for
      */

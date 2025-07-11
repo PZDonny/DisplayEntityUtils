@@ -101,6 +101,26 @@ public class FramePoint extends RelativePoint implements Serializable {
     }
 
     /**
+     * Immediately play the effects of this point's location relative to a {@link ActiveGroup}.
+     * Effects include sounds and particles
+     * @param group the relative group
+     * @param player the player
+     */
+    public void playEffects(@NotNull ActiveGroup group, @NotNull Player player){
+        playEffects(getLocation(group), player);
+    }
+
+    /**
+     * Immediately play the effects of this point's location relative to a {@link SpawnedDisplayEntityGroup}.
+     * Effects include sounds and particles
+     * @param group the relative group
+     * @param players the players
+     */
+    public void playEffects(@NotNull ActiveGroup group, @NotNull Collection<Player> players){
+        playEffects(getLocation(group), players);
+    }
+
+    /**
      * Immediately play the effects of this point at a specified location to players.
      * Effects include sounds and particles
      * @param location the location to play the effects
@@ -165,13 +185,26 @@ public class FramePoint extends RelativePoint implements Serializable {
      */
     public void showParticles(@NotNull Location location, @NotNull Collection<Player> players){
         for (AnimationParticle particle : particles){
-            if (players != null){
-                particle.spawn(location, players);
-            }
-            else{
-                particle.spawn(location);
-            }
+            particle.spawn(location, players);
         }
+    }
+
+    /**
+     * Immediately show the particles of this point at this point's location relative to a {@link ActiveGroup}
+     * @param group the relative group
+     * @param player the player that can see the particles
+     */
+    public void showParticles(@NotNull ActiveGroup group, @NotNull Player player){
+        showParticles(getLocation(group), player);
+    }
+
+    /**
+     * Immediately show the particles of this point at this point's location relative to a {@link ActiveGroup}
+     * @param group the relative group
+     * @param players the players
+     */
+    public void showParticles(@NotNull ActiveGroup group, @NotNull Collection<Player> players){
+        showParticles(getLocation(group), players);
     }
 
     /**
@@ -238,6 +271,24 @@ public class FramePoint extends RelativePoint implements Serializable {
         for (AnimationSound sound : sounds.values()){
             sound.playSound(location, players);
         }
+    }
+
+    /**
+     * Immediately play the sounds of this point at this point's location relative to a {@link ActiveGroup}
+     * @param group the relative group
+     * @param player the player
+     */
+    public void playSounds(@NotNull ActiveGroup group, @NotNull Player player){
+        playSounds(getLocation(group), player);
+    }
+
+    /**
+     * Immediately play the sounds of this point at this point's location relative to a {@link ActiveGroup}
+     * @param group the relative group
+     * @param players the players
+     */
+    public void playSounds(@NotNull ActiveGroup group, @NotNull Collection<Player> players){
+        playSounds(getLocation(group), players);
     }
 
     /**
