@@ -188,16 +188,17 @@ public final class DisplayEntityGroup implements Serializable{
         group.addDisplayEntity(blockDisplay).setMaster();
 
         for (DisplayEntity entity : displayEntities){ //Summon Display Entities
-            if (!entity.equals(masterEntity)){
+            if (entity.isMaster()) continue;
+            //if (!entity.equals(masterEntity)){
 
-                Display passenger = entity.createEntity(group, location, settings);
+            Display passenger = entity.createEntity(group, location, settings);
 
-                SpawnedDisplayEntityPart part = group.addDisplayEntity(passenger);
-                List<String> legacyPartTags = entity.getLegacyPartTags();
-                if (legacyPartTags != null && !entity.getLegacyPartTags().isEmpty()){
-                    part.adaptScoreboardTags(true);
-                }
+            SpawnedDisplayEntityPart part = group.addDisplayEntity(passenger);
+            List<String> legacyPartTags = entity.getLegacyPartTags();
+            if (legacyPartTags != null && !entity.getLegacyPartTags().isEmpty()){
+                part.adaptScoreboardTags(true);
             }
+            //}
         }
 
         for (InteractionEntity entity : interactionEntities){ //Summon Interaction Entities
@@ -249,11 +250,12 @@ public final class DisplayEntityGroup implements Serializable{
         PacketDisplayEntityPart masterPart = masterEntity.createPacketPart(packetGroup, spawnLocation);
         packetGroup.addPart(masterPart);
 
-        int passengerSize = displayEntities.size(); //was displayEntities.size()-1;
+        int passengerSize = displayEntities.size()-1;
         int[] passengerIds = new int[passengerSize];
         int i = 0;
 
         for (DisplayEntity entity : displayEntities){
+            if (entity.isMaster()) continue;
             PacketDisplayEntityPart part = entity.createPacketPart(packetGroup, spawnLocation);
             packetGroup.addPart(part);
             passengerIds[i] = part.entityId;
