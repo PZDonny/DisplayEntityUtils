@@ -60,6 +60,8 @@ public abstract class ActivePart implements Active{
         return new HashSet<>(partTags);
     }
 
+    public abstract ActiveGroup getGroup();
+
     public abstract void setTextDisplayText(@NotNull Component text);
 
     public abstract void setBlockDisplayBlock(@NotNull BlockData blockData);

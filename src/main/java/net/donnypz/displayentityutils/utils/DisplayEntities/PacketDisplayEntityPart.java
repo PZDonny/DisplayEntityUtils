@@ -500,6 +500,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * Get the group containing this packet-based part
      * @return a {@link PacketDisplayEntityGroup} or null if this part is not associated with a group
      */
+    @Override
     public @Nullable PacketDisplayEntityGroup getGroup(){
         return group;
     }

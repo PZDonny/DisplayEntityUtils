@@ -158,8 +158,9 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     /**
      * Get this part's associated group
-     * @return This part's group
+     * @return {@link SpawnedDisplayEntityGroup} or null if this part is not associated with a group
      */
+    @Override
     public SpawnedDisplayEntityGroup getGroup() {
         return group;
     }
