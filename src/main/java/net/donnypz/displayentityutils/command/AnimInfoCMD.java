@@ -34,8 +34,9 @@ class AnimInfoCMD extends PlayerSubCommand {
 
         player.sendMessage("Animation Tag: " + ChatColor.YELLOW + animTag);
         player.sendMessage("Total Frames: " + ChatColor.YELLOW + animation.getFrames().size());
-        player.sendMessage("Total Duration: "+ChatColor.YELLOW+animation.getDuration()+" ticks");
+        player.sendMessage("Total Duration: "+ChatColor.YELLOW + animation.getDuration()+" ticks");
         player.sendMessage("Respect Scale: " + ChatColor.YELLOW + animation.groupScaleRespect());
+        player.sendMessage("Allows Data Changes: "+ChatColor.YELLOW + animation.allowsDataChanges());
         if (!animation.hasFilter()) {
             player.sendMessage(MiniMessage.miniMessage().deserialize("<white>Animation Part Filter: <red>NOT SET"));
         } else {
