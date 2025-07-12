@@ -10,31 +10,28 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.util.Timespan;
 import ch.njol.util.Kleenean;
-import net.donnypz.displayentityutils.utils.DisplayEntities.Spawned;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Translate Spawned Group/Parts/Selection")
-@Description("Change the translation of a spawned group's parts, a part selection's parts, or a spawned part")
+@Name("Translate Active Group/Parts/Selection")
+@Description("Change the translation of an active group's parts, an active part selection's parts, or an active spawned part")
 @Examples({"add {_vector} to {_spawnedgroup}'s translation", "add {_vector} to {_partselection}'s translation over 20 ticks"})
 @Since("2.7.3")
-public class EffSpawnedTranslate extends Effect {
+public class EffActiveTranslate extends Effect {
     static {
-        Skript.registerEffect(EffSpawnedTranslate.class,"add %vector% to %spawnedgroups/spawnedparts/partselections%['s] translation [time:(for|over|with) [duration] %-timespan%]");
+        Skript.registerEffect(EffActiveTranslate.class,"add %vector% to %activegroups/activeparts/activepartselections%['s] translation [time:(for|over|with) [duration] %-timespan%]");
     }
 
     Expression<Vector> vector;
-    Expression<Object> spawned;
+    Expression<Object> active;
     Expression<Timespan> timespan;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         vector = (Expression<Vector>) expressions[0];
-        spawned = (Expression<Object>) expressions[1];
+        active = (Expression<Object>) expressions[1];
         if (parseResult.hasTag("time")){
             timespan = (Expression<Timespan>) expressions[2];
         }
@@ -45,8 +42,8 @@ public class EffSpawnedTranslate extends Effect {
     @Override
     protected void execute(Event event) {
         Vector v = vector.getSingle(event);
-        Spawned[] spawned = (Spawned[]) this.spawned.getArray(event);
-        if (spawned == null || v == null) return;
+        Object[] objects = this.active.getArray(event);
+        if (objects == null || v == null) return;
         float distance = (float) v.length();
         int ticks;
         if (timespan != null){
@@ -57,15 +54,9 @@ public class EffSpawnedTranslate extends Effect {
             ticks = -1;
         }
 
-        for (Spawned s : spawned){
-            if (s instanceof SpawnedDisplayEntityGroup g){
-                g.translate(v, distance, ticks, -1);
-            }
-            else if (s instanceof SpawnedDisplayEntityPart p){
-                p.translate(v, distance, ticks, -1);
-            }
-            else if (s instanceof SpawnedPartSelection sel){
-                sel.translate(v, distance, ticks, -1);
+        for (Object o : objects){
+            if (o instanceof Active a){
+                a.translate(v, distance, ticks, -1);
             }
         }
     }

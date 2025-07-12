@@ -9,25 +9,26 @@ import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Spawned Group Is Animating?")
-@Description("Check if a spawned group is animating")
+@Name("Active Group Is Animating?")
+@Description("Check if an active group is animating")
 @Examples({"if {_group} is animating:", "\tbroadcast\"It's animating, wow!\""})
 @Since("2.6.2")
-public class CondSpawnedGroupIsAnimating extends Condition {
+public class CondActiveGroupIsAnimating extends Condition {
 
     static {
-        Skript.registerCondition(CondSpawnedGroupIsAnimating.class, "%spawnedgroup% (1¦is|2¦is(n't| not)) animating");
+        Skript.registerCondition(CondActiveGroupIsAnimating.class, "%activegroup% (1¦is|2¦is(n't| not)) animating");
     }
 
-    Expression<SpawnedDisplayEntityGroup> group;
+    Expression<ActiveGroup> group;
 
     @Override
     public boolean check(Event event) {
-        SpawnedDisplayEntityGroup g = group.getSingle(event);
+        ActiveGroup g = group.getSingle(event);
         if (g == null) return isNegated();
         return g.isAnimating() == isNegated();
     }
@@ -40,7 +41,7 @@ public class CondSpawnedGroupIsAnimating extends Condition {
     @SuppressWarnings("unchecked")
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        this.group = (Expression<SpawnedDisplayEntityGroup>) expressions[0];
+        this.group = (Expression<ActiveGroup>) expressions[0];
         setNegated(parseResult.mark == 1);
         return true;
     }

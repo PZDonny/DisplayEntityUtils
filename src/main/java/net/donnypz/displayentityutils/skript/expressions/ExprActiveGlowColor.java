@@ -11,19 +11,21 @@ import ch.njol.skript.util.Color;
 import ch.njol.skript.util.ColorRGB;
 import ch.njol.util.coll.CollectionUtils;
 import ch.njol.skript.doc.Name;
-import net.donnypz.displayentityutils.utils.DisplayEntities.Active;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Glow Color")
-@Description("Set the glow color of a spawned group/part or part selection. Or get the glow color of a spawned group")
-@Examples({"set {_spawnedpart}'s deu glow color to red", "set {_color} to {_spawnedgroup}'s deu glow color"})
+@Description("Set the glow color of a active or packet-based group, part, or part selection. Or get the glow color of a active group")
+@Examples({"set {_spawnedpart}'s deu glow color to red",
+        "set {_color} to {_spawnedgroup}'s deu glow color",
+        "",
+        "#3.0.0 or later",
+        "set {_packetgroup}'s deu glow color to green"})
 @Since("2.6.2")
-public class ExprSpawnedGlowColor extends SimplePropertyExpression<Object, Color> {
+public class ExprActiveGlowColor extends SimplePropertyExpression<Object, Color> {
     static {
-        register(ExprSpawnedGlowColor.class, Color.class, "[the] deu glow[ing] colo[u]r [override]", "spawnedgroups/spawnedparts/partselections");
+        register(ExprActiveGlowColor.class, Color.class, "[the] deu glow[ing] colo[u]r [override]", "activegroups/activeparts/activepartselections");
     }
 
     @Override
@@ -34,18 +36,18 @@ public class ExprSpawnedGlowColor extends SimplePropertyExpression<Object, Color
     @Override
     @Nullable
     public Color convert(Object object) {
-        if (object instanceof SpawnedDisplayEntityGroup group){
+        if (object instanceof ActiveGroup group){
             if (group.getGlowColor() != null){
                 return ColorRGB.fromBukkitColor(group.getGlowColor());
             }
             return null;
         }
-        else if (object instanceof SpawnedDisplayEntityPart part){
+        else if (object instanceof ActivePart part){
             if (part.getGlowColor() != null){
                 return ColorRGB.fromBukkitColor(part.getGlowColor());
             }
             else if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                Skript.error("You can not get the glow color of an INTERACTION spawned part");
+                Skript.error("You can not get the glow color of an INTERACTION active part");
             }
             return null;
         }

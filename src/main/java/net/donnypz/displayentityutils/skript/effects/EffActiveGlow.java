@@ -11,35 +11,34 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.util.Timespan;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.Active;
-import net.donnypz.displayentityutils.utils.DisplayEntities.Spawned;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Glow")
-@Description("Set the glowing of a spawned group/part/selection")
-@Examples({"#Before 2.8.0",
+@Description("Set the glowing of an active group/part/selection")
+@Examples({"#Before 3.0.0",
             "make {_spawnedgroup} glow for 35 ticks", "make {_partselection} glow with interactions and with marker particles",
             "set {_spawnedpart} to unglowing"
             ,""
-            ,"#2.8.0 and Later"
+            ,"#3.0.0 and Later"
             ,"make {_spawnedgroup} glow for 35 ticks"
-            ,"make {_spawnedgroup} glow for 20 ticks for {_players}"
+            ,"make {_packetgroup} glow for 20 ticks for {_players}"
             ,"set {_part} to unglowing for {_player}"})
 @Since("2.6.2")
-public class EffSpawnedGlow extends Effect {
+public class EffActiveGlow extends Effect {
     static {
-        Skript.registerEffect(EffSpawnedGlow.class,"[deu ](make|set) %spawnedgroups/spawnedparts/partselections% (1¦glow[ing] [t:for %-timespan%] [p:for %-players%]|2¦unglow[ing] [p:for %-players%])");
+        Skript.registerEffect(EffActiveGlow.class,"[deu ](make|set) %activegroups/activeparts/activepartselections% (1¦glow[ing] [t:for %-timespan%] [p:for %-players%]|2¦unglow[ing] [p:for %-players%])");
     }
 
-    Expression<Object> object;
+    Expression<?> object;
     Expression<Timespan> timespan;
     Expression<Player> players;
     boolean glow;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        object = (Expression<Object>) expressions[0];
+        object = expressions[0];
         glow = parseResult.mark == 1;
         if (glow){
             if (parseResult.hasTag("t")){
@@ -65,31 +64,30 @@ public class EffSpawnedGlow extends Effect {
             if (ts != null) ticks = ts.getAs(Timespan.TimePeriod.TICK);
         }
 
-        Active[] objects = (Active[]) object.getArray(event);
-        for (Active s : objects){
-            if (s == null) continue;
+        for (Object o : object.getArray(event)){
+            if (!(o instanceof Active a)) continue;
             if (!glow){
                 if (players == null){
-                    s.unglow();
+                    a.unglow();
                 }
-                else{
-                    for (Player p : players.getArray(event)){
-                        ((Spawned) s).unglow(p);
+                else {
+                    for (Player p : players.getArray(event)) {
+                        a.unglow(p);
                     }
                 }
             }
             else{
                 if (players == null){
                     if (ticks == -1){
-                        s.glow();
+                        a.glow();
                     }
                     else{
-                        ((Spawned) s).glow(ticks);
+                        a.glow(ticks);
                     }
                 }
                 else{
                     for (Player player : players.getArray(event)){
-                        ((Spawned) s).glow(player, Math.max(-1, ticks));
+                        a.glow(player, Math.max(-1, ticks));
                     }
                 }
             }

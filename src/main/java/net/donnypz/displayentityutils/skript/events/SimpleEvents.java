@@ -56,16 +56,16 @@ public class SimpleEvents extends SimpleEvent {
             //Packet Group Send Event
             Skript.registerEvent("Packet Group Send", SimpleEvents.class, PacketGroupSendEvent.class, "packet [spawned] [display] group (spawn[ed]|sent|create[d])")
                     .description("Called when a packet-based group is sent to players")
-                    .since("2.8.0");
+                    .since("3.0.0");
             EventValues.registerEventValue(PacketGroupSendEvent.class, PacketDisplayEntityGroup.class, PacketGroupSendEvent::getGroup);
             EventValues.registerEventValue(PacketGroupSendEvent.class, GroupSpawnedEvent.SpawnReason.class, PacketGroupSendEvent::getSpawnReason);
             EventValues.registerEventValue(PacketGroupSendEvent.class, GroupSpawnSettings.class, PacketGroupSendEvent::getNewSettings);
             EventValues.registerEventValue(PacketGroupSendEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
 
-            //Packet Group Send Event
+            //Packet Group Destroy Event
             Skript.registerEvent("Packet Group Destroyed", SimpleEvents.class, PacketGroupDestroyEvent.class, "packet [spawned] [display] group (destroy[ed]|remove[d]|hid(e|den))")
                     .description("Called when a packet-based group is hidden from players")
-                    .since("2.8.0");
+                    .since("3.0.0");
             EventValues.registerEventValue(PacketGroupDestroyEvent.class, PacketDisplayEntityGroup.class, PacketGroupDestroyEvent::getGroup);
             EventValues.registerEventValue(PacketGroupDestroyEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
 
@@ -111,6 +111,59 @@ public class SimpleEvents extends SimpleEvent {
             EventValues.registerEventValue(AnimationCompleteEvent.class, ActiveGroup.class, AnimationCompleteEvent::getGroup);
             EventValues.registerEventValue(AnimationCompleteEvent.class, SpawnedDisplayAnimation.class, AnimationCompleteEvent::getAnimation);
             EventValues.registerEventValue(AnimationCompleteEvent.class, DisplayAnimator.class, AnimationCompleteEvent::getAnimator);
+
+            //Group Packet Animation Start Event
+            Skript.registerEvent("Group Animation Start", SimpleEvents.class, PacketAnimationStartEvent.class, "packet [display] anim[ation] frame (complete[d]|end[ed])")
+                    .description("Called when a display animator starts playing a spawned animation using packets.",
+                            "If players are not specified, the animation is shown to all players who can see the group")
+                    .since("3.0.0");
+            EventValues.registerEventValue(PacketAnimationStartEvent.class, SpawnedDisplayEntityGroup.class, g -> (SpawnedDisplayEntityGroup) g.getGroup());
+            EventValues.registerEventValue(PacketAnimationStartEvent.class, SpawnedDisplayAnimation.class, PacketAnimationStartEvent::getAnimation);
+            EventValues.registerEventValue(PacketAnimationStartEvent.class, DisplayAnimator.class, PacketAnimationStartEvent::getAnimator);
+            EventValues.registerEventValue(PacketAnimationStartEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
+
+            //Group Packet Animation Loop Start Event
+            Skript.registerEvent("Group Animation Loop Start", SimpleEvents.class, PacketAnimationLoopStartEvent.class, "packet [display] anim[ation] loop start[ed]")
+                    .description("Called when a display animator begins a new animation loop using packets.",
+                            "If players are not specified, the animation is shown to all players who can see the group.")
+                    .since("3.0.0");
+            EventValues.registerEventValue(PacketAnimationLoopStartEvent.class, ActiveGroup.class, PacketAnimationLoopStartEvent::getGroup);
+            EventValues.registerEventValue(PacketAnimationLoopStartEvent.class, SpawnedDisplayAnimation.class, PacketAnimationLoopStartEvent::getAnimation);
+            EventValues.registerEventValue(PacketAnimationLoopStartEvent.class, DisplayAnimator.class, PacketAnimationLoopStartEvent::getAnimator);
+            EventValues.registerEventValue(PacketAnimationLoopStartEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
+
+            //Group Packet Animate Frame Start Event
+            Skript.registerEvent("Group Animate Frame Start", SimpleEvents.class, PacketAnimationFrameStartEvent.class, "packet [display] anim[ation] frame start[ed]")
+                    .description("Called when a frame beings animating on a spawned group using packets.",
+                            "If players are not specified, the animation is shown to all players who can see the group.")
+                    .since("3.0.0");
+            EventValues.registerEventValue(PacketAnimationFrameStartEvent.class, ActiveGroup.class, PacketAnimationFrameStartEvent::getGroup);
+            EventValues.registerEventValue(PacketAnimationFrameStartEvent.class, SpawnedDisplayAnimation.class, PacketAnimationFrameStartEvent::getAnimation);
+            EventValues.registerEventValue(PacketAnimationFrameStartEvent.class, SpawnedDisplayAnimationFrame.class, PacketAnimationFrameStartEvent::getFrame);
+            EventValues.registerEventValue(PacketAnimationFrameStartEvent.class, DisplayAnimator.class, PacketAnimationFrameStartEvent::getAnimator);
+            EventValues.registerEventValue(PacketAnimationFrameStartEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
+
+            //Group Packet Animate Frame End Event
+            Skript.registerEvent("Group Animate Frame End", SimpleEvents.class, PacketAnimationFrameEndEvent.class, "packet [display] anim[ation] frame (complete[d]|end[ed])")
+                    .description("Called when a frame ends packet animation on a spawned group.",
+                            "Ignores frame delay and is called after translation of parts.",
+                            "If players are not specified, the animation is shown to all players who can see the group.")
+                    .since("3.0.0");
+            EventValues.registerEventValue(PacketAnimationFrameEndEvent.class, ActiveGroup.class, PacketAnimationFrameEndEvent::getGroup);
+            EventValues.registerEventValue(PacketAnimationFrameEndEvent.class, SpawnedDisplayAnimation.class, PacketAnimationFrameEndEvent::getAnimation);
+            EventValues.registerEventValue(PacketAnimationFrameEndEvent.class, SpawnedDisplayAnimationFrame.class, PacketAnimationFrameEndEvent::getFrame);
+            EventValues.registerEventValue(PacketAnimationFrameEndEvent.class, DisplayAnimator.class, PacketAnimationFrameEndEvent::getAnimator);
+            EventValues.registerEventValue(PacketAnimationFrameEndEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
+
+            //Group Packet Animation Complete Event
+            Skript.registerEvent("Group Animation Complete", SimpleEvents.class, PacketAnimationCompleteEvent.class, "packet [display] anim[ation] (complete[d]|end[ed])")
+                    .description("Called at the completion of a packet spawned animation. This is not called for looping animations/animators.",
+                            "If players are not specified, the animation is shown to all players who can see the group.")
+                    .since("3.0.0");
+            EventValues.registerEventValue(PacketAnimationCompleteEvent.class, ActiveGroup.class, PacketAnimationCompleteEvent::getGroup);
+            EventValues.registerEventValue(PacketAnimationCompleteEvent.class, SpawnedDisplayAnimation.class, PacketAnimationCompleteEvent::getAnimation);
+            EventValues.registerEventValue(PacketAnimationCompleteEvent.class, DisplayAnimator.class, PacketAnimationCompleteEvent::getAnimator);
+            EventValues.registerEventValue(PacketAnimationCompleteEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
 
             //Pre Interaction Click Event
             Skript.registerEvent("Pre Interaction Click", SimpleEvents.class, PreInteractionClickEvent.class, "pre interaction [entity] click[ed]")

@@ -8,18 +8,25 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.Timespan;
 import ch.njol.util.coll.CollectionUtils;
+import net.donnypz.displayentityutils.utils.DisplayEntities.Active;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Spawned Group Teleportation Duration")
-@Description("Get or Set the teleportation duration of a spawned group")
-@Examples({"set {_spawnedgroup}'s deu teleportation duration to 5 ticks", "reset {_spawnedgroup}'s deu teleport duration"})
+@Name("Active Group/Part/Part Selection Teleportation Duration")
+@Description("Set the teleportation duration of an active group, part or part selection. Get the duration on an active group or active part object.")
+@Examples({"set {_spawnedgroup}'s deu teleportation duration to 5 ticks",
+        "reset {_spawnedgroup}'s deu teleport duration",
+        "",
+        "#3.0.0 and later",
+        "set {_packetgroup}'s deu teleport duration to 1 tick"})
 @Since("2.7.2")
-public class ExprSpawnedTeleportDuration extends SimplePropertyExpression<SpawnedDisplayEntityGroup, Number> {
+public class ExprActiveTeleportDuration extends SimplePropertyExpression<Active, Number> {
 
     static {
-        register(ExprSpawnedTeleportDuration.class, Number.class, "[the] [deu] teleport[ation][ |-]duration", "spawnedgroup");
+        register(ExprActiveTeleportDuration.class, Number.class, "[the] [deu] teleport[ation][ |-]duration", "activegroup/activepart/activepartselection");
     }
 
     @Override
@@ -29,12 +36,18 @@ public class ExprSpawnedTeleportDuration extends SimplePropertyExpression<Spawne
 
     @Override
     @Nullable
-    public Number convert(SpawnedDisplayEntityGroup group) {
-        if (group == null){
+    public Number convert(Active active) {
+        if (active == null){
             return null;
         }
+        if (active instanceof ActiveGroup ag){
+            return ag.getTeleportDuration();
+        }
+        if (active instanceof ActivePart ap){
+            return ap.getTeleportDuration();
+        }
 
-        return group.getTeleportDuration();
+        return null;
     }
 
     @Override
@@ -49,8 +62,8 @@ public class ExprSpawnedTeleportDuration extends SimplePropertyExpression<Spawne
 
     @Override
     public void change(Event event, Object[] delta, Changer.ChangeMode mode){
-        SpawnedDisplayEntityGroup group = getExpr().getSingle(event);
-        if (group == null){
+        Active active = getExpr().getSingle(event);
+        if (active == null){
             return;
         }
 
@@ -60,10 +73,10 @@ public class ExprSpawnedTeleportDuration extends SimplePropertyExpression<Spawne
                     return;
                 }
                 Timespan timespan = (Timespan) delta[0];
-                group.setTeleportDuration((int) timespan.getAs(Timespan.TimePeriod.TICK));
+                active.setTeleportDuration((int) timespan.getAs(Timespan.TimePeriod.TICK));
             }
             case RESET -> {
-                group.setTeleportDuration(0);
+                active.setTeleportDuration(0);
             }
         }
     }

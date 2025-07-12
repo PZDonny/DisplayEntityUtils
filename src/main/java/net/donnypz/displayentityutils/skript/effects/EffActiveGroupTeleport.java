@@ -9,27 +9,29 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Teleport Spawned Group")
-@Description("Teleport a spawned group to a location")
+@Name("Teleport Active Group")
+@Description("Teleport an Active group to a location")
 @Examples({"deu teleport {_spawnedgroup} to player", "deu move {_spawnedgroup} to {_location} and respect group facing"})
 @Since("2.6.2")
-public class EffSpawnedGroupTeleport extends Effect {
+public class EffActiveGroupTeleport extends Effect {
     static {
-        Skript.registerEffect(EffSpawnedGroupTeleport.class,"[deu ](move|teleport) %spawnedgroup% to %location% [r:[and] (keep|respect) group (facing|direction|orientation)]");
+        Skript.registerEffect(EffActiveGroupTeleport.class,"[deu ](move|teleport) %activegroup% to %location% [r:[and] (keep|respect) group (facing|direction|orientation)]");
     }
 
-    Expression<SpawnedDisplayEntityGroup> group;
+    Expression<ActiveGroup> group;
     Expression<Location> location;
     boolean respect;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        group = (Expression<SpawnedDisplayEntityGroup>) expressions[0];
+        group = (Expression<ActiveGroup>) expressions[0];
         location = (Expression<Location>) expressions[1];
         respect = parseResult.hasTag("r");
         return true;
@@ -37,12 +39,18 @@ public class EffSpawnedGroupTeleport extends Effect {
 
     @Override
     protected void execute(Event event) {
-        SpawnedDisplayEntityGroup g = group.getSingle(event);
+        ActiveGroup g = group.getSingle(event);
         Location loc = location.getSingle(event);
         if (g == null || loc == null){
             return;
         }
-        g.teleport(loc, respect);
+        if (g instanceof SpawnedDisplayEntityGroup sg){
+            sg.teleport(loc, respect);
+        }
+        else if (g instanceof PacketDisplayEntityGroup pg){
+            pg.setLocation(loc, respect);
+        }
+
     }
 
     @Override

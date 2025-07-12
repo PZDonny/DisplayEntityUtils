@@ -11,41 +11,43 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Stop Animation")
-@Description("Stop an animation playing on a spawned group")
-@Examples({"stop animation on {_spawnedgroup} from {_displayanimator}"})
-@Since("2.6.2")
-public class EffSpawnedGroupStopAnimation extends Effect {
+@Name("Stop All Player Packet Animations")
+@Description("Stop all packet animations playing on an active group for a player")
+@Examples({"stop packet animations on {_displayanimator} for {_player::*}"})
+@Since("3.0.0")
+public class EffPlayerStopAllPacketAnimations extends Effect {
     static {
-        Skript.registerEffect(EffSpawnedGroupStopAnimation.class,"stop animation on %spawnedgroup% from %displayanimator%");
+        Skript.registerEffect(EffPlayerStopAllPacketAnimations.class,"stop [all] packet animations on %displayanimator% for %players%");
     }
 
-    Expression<SpawnedDisplayEntityGroup> group;
     Expression<DisplayAnimator> animator;
+    Expression<Player> players;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        group = (Expression<SpawnedDisplayEntityGroup>) expressions[0];
-        animator = (Expression<DisplayAnimator>) expressions[1];
+        animator = (Expression<DisplayAnimator>) expressions[0];
+        players = (Expression<Player>) expressions[1];
         return true;
     }
 
     @Override
     protected void execute(Event event) {
-        SpawnedDisplayEntityGroup g = group.getSingle(event);
         DisplayAnimator a = animator.getSingle(event);
-        if (g == null || a == null){
+        Player[] plrs = players.getAll(event);
+        if (a == null || plrs == null){
             return;
         }
-        g.stopAnimation(a);
+        for (Player p : plrs){
+            a.stop(p);
+        }
     }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "stop animator animation: "+group.toString(event, debug);
+        return "stop all packet animations for: "+players.toString(event, debug);
     }
 }

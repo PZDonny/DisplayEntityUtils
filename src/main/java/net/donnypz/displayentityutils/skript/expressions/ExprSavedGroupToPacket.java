@@ -17,13 +17,13 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Saved Group to Packet Group")
-@Description("Create a packet based group from a saved grup")
-@Examples({"set {_packetgroup} to packet based {_savedgroup}"})
-@Since("2.6.2")
+@Description("Create a packet based group from a saved group")
+@Examples({"set {_packetgroup} to packet based {_savedgroup} spawned at {_location}"})
+@Since("3.0.0")
 public class ExprSavedGroupToPacket extends SimpleExpression<PacketDisplayEntityGroup> {
 
     static{
-        Skript.registerExpression(ExprSavedGroupToPacket.class, PacketDisplayEntityGroup.class, ExpressionType.COMBINED, "packet( |-)?[based] %savedgroup%");
+        Skript.registerExpression(ExprSavedGroupToPacket.class, PacketDisplayEntityGroup.class, ExpressionType.COMBINED, "packet [based] %savedgroup% spawned at %location%");
     }
 
     Expression<DisplayEntityGroup> savedGroup;

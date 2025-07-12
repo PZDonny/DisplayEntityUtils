@@ -10,39 +10,49 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.util.Timespan;
 import ch.njol.util.Kleenean;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Show Animation Frame on Spawned Group")
-@Description("Play a single animation frame on a spawned group, optionally with custom duration and delay")
-@Examples({"play frame with id 5 on {_spawnedgroup} from {_spawnedanimation}"})
+import java.util.Arrays;
+import java.util.Collection;
+
+@Name("Show Animation Frame on Active Group")
+@Description("Play a single animation frame on an active group, optionally with custom duration and delay.")
+@Examples({"play frame with id 5 on {_spawnedgroup} from {_spawnedanimation}",
+        "",
+        "#3.0.0 and later",
+        "show frame with id 2 on {_packetgroup} from {_spawnedanimation}",
+        "show frame with id 12 on {_spawnedgroup} with {_spawnedanimation} for {_player}"})
 @Since("2.6.2")
 public class EffSpawnedGroupSetFrame extends Effect {
     static {
-        Skript.registerEffect(EffSpawnedGroupSetFrame.class,"(play|apply|show) frame with id %number% on %spawnedgroup% (with|from) [anim[ation]] %spawnedanimation% " +
-                "[d:[and] with duration %timespan% and delay %timespan%] [:async[hronously]]");
+        Skript.registerEffect(EffSpawnedGroupSetFrame.class,"(play|apply|show) frame with id %number% on %activegroup% (with|from) [anim[ation]] %spawnedanimation% " +
+                "[d:[and] with duration %-timespan% and delay %-timespan%] [:async[hronously]] [f:for %-players%]");
 
     }
 
     Expression<Number> frameID;
-    Expression<SpawnedDisplayEntityGroup> group;
+    Expression<ActiveGroup> group;
     Expression<SpawnedDisplayAnimation> animation;
     Expression<Timespan> duration;
     Expression<Timespan> delay;
+    Expression<Player> players;
     boolean async;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         frameID = (Expression<Number>) expressions[0];
-        group = (Expression<SpawnedDisplayEntityGroup>) expressions[1];
+        group = (Expression<ActiveGroup>) expressions[1];
         animation = (Expression<SpawnedDisplayAnimation>) expressions[2];
         async = parseResult.hasTag("async");
         if (parseResult.hasTag("d")){
             duration = (Expression<Timespan>) expressions[3];
             delay = (Expression<Timespan>) expressions[4];
+        }
+        if (parseResult.hasTag("f")){
+            players = (Expression<Player>) expressions[5];
         }
         return true;
     }
@@ -50,24 +60,63 @@ public class EffSpawnedGroupSetFrame extends Effect {
     @Override
     protected void execute(Event event) {
         Number n = frameID.getSingle(event);
-        SpawnedDisplayEntityGroup g = group.getSingle(event);
+        ActiveGroup g = group.getSingle(event);
         SpawnedDisplayAnimation a = animation.getSingle(event);
+        Player[] plrs = players.getAll(event);
         if (n == null || g == null || a == null){
             return;
         }
         int frameId = n.intValue();
         try{
             if (duration == null){
-                g.setToFrame(a, frameId, async);
+                if (plrs != null){
+                    for (Player p : plrs){
+                        g.setToFrame(p, a, frameId);
+                    }
+                }
+                else{
+                    if (g instanceof SpawnedDisplayEntityGroup sg){
+                        sg.setToFrame(a, frameId, async);
+                    }
+                    else if (g instanceof PacketDisplayEntityGroup pg) {
+                        pg.setToFrame(a, frameId);
+                    }
+                }
+
             }
             else{
                 Timespan dur = duration.getSingle(event);
                 Timespan del = delay.getSingle(event);
                 if (dur == null || del == null){
-                    g.setToFrame(a, frameId, async);
+                    if (plrs != null){
+                        for (Player p : plrs){
+                            g.setToFrame(p, a, frameId);
+                        }
+                    }
+                    else{
+                        if (g instanceof SpawnedDisplayEntityGroup sg){
+                            sg.setToFrame(a, frameId, async);
+                        }
+                        else if (g instanceof PacketDisplayEntityGroup pg) {
+                            pg.setToFrame(a, frameId);
+                        }
+                    }
+
                 }
                 else{
-                    g.setToFrame(a, frameId, (int) dur.getAs(Timespan.TimePeriod.TICK), (int) del.getAs(Timespan.TimePeriod.TICK), async);
+                    if (plrs != null){
+                        for (Player p : plrs){
+                            g.setToFrame(p, a, frameId, (int) dur.getAs(Timespan.TimePeriod.TICK), (int) del.getAs(Timespan.TimePeriod.TICK));
+                        }
+                    }
+                    else{
+                        if (g instanceof SpawnedDisplayEntityGroup sg){
+                            sg.setToFrame(a, frameId, (int) dur.getAs(Timespan.TimePeriod.TICK), (int) del.getAs(Timespan.TimePeriod.TICK), async);
+                        }
+                        else if (g instanceof PacketDisplayEntityGroup pg) {
+                            pg.setToFrame(a, frameId, (int) dur.getAs(Timespan.TimePeriod.TICK), (int) del.getAs(Timespan.TimePeriod.TICK));
+                        }
+                    }
                 }
             }
         }

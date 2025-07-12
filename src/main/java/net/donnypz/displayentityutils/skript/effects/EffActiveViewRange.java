@@ -10,17 +10,16 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.Active;
-import net.donnypz.displayentityutils.utils.DisplayEntities.Spawned;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Spawned Group/Part/Selection View Range")
-@Description("Change the view range of a DisplayEntityUtils spawned object")
+@Name("Active Group/Part/Selection View Range")
+@Description("Change the view range of an active group, part, or part selection")
 @Examples({"set {_spawnedgroup}'s view range multiplier to 5", "make {_spawnedpart}'s view range multiplier 0.5"})
 @Since("2.6.2")
-public class EffSpawnedViewRange extends Effect {
+public class EffActiveViewRange extends Effect {
     static {
-        Skript.registerEffect(EffSpawnedViewRange.class,"(make|set) %spawnedgroups/spawnedparts/partselections%['s] view range multiplier [to] %number%");
+        Skript.registerEffect(EffActiveViewRange.class,"(make|set) %activegroups/activeparts/activepartselections%['s] view range multiplier [to] %number%");
     }
 
     Expression<?> object;
@@ -35,11 +34,13 @@ public class EffSpawnedViewRange extends Effect {
 
     @Override
     protected void execute(Event event) {
-        Active[] spawned = (Active[]) object.getArray(event);
+        Object[] objects =  object.getArray(event);
         Number n = range.getSingle(event);
-        if (spawned == null || n == null) return;
-        for (Active s : spawned){
-            s.setViewRange(n.floatValue());
+        if (objects == null || n == null) return;
+        for (Object o : objects){
+            if (o instanceof Active a){
+                a.setViewRange(n.floatValue());
+            }
         }
     }
 

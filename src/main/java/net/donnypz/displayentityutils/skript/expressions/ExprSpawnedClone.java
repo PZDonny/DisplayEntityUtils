@@ -21,7 +21,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Cloned Spawned Group/Animation")
-@Description("Create a clone version of a spawned group/animation")
+@Description("Create a clone version of a active group/animation")
 @Examples({"set {_groupclone} to a clone of {_spawnedgroup}",
         "",
         "#Create a group clone at a certain location",

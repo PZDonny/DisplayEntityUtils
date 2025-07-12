@@ -5,18 +5,22 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.doc.Name;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Spawned Group Location")
-@Description("Get the location of a spawned group")
-@Examples({"set {_location} to {_spawnedgroup}'s true location"})
+@Name("Active Group Location")
+@Description("Get the location of an active group")
+@Examples({"set {_location} to {_spawnedgroup}'s true location",
+            "",
+            "#3.0.0 and later",
+            "set {_location to {_packetgroup}'s true location"})
 @Since("2.6.2")
-public class ExprSpawnedGroupLocation extends SimplePropertyExpression<SpawnedDisplayEntityGroup, Location> {
+public class ExprActiveGroupLocation extends SimplePropertyExpression<ActiveGroup, Location> {
 
     static {
-        register(ExprSpawnedGroupLocation.class, Location.class, "[the] true location", "spawnedgroup");
+        register(ExprActiveGroupLocation.class, Location.class, "[the] true location", "activegroup");
     }
 
     @Override
@@ -26,7 +30,7 @@ public class ExprSpawnedGroupLocation extends SimplePropertyExpression<SpawnedDi
 
     @Override
     @Nullable
-    public Location convert(SpawnedDisplayEntityGroup group) {
+    public Location convert(ActiveGroup group) {
         if (group == null){
             return null;
         }

@@ -5,19 +5,23 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-@Name("Spawned Part's Part UUID")
-@Description("Get the part uuid of a spawned part. This is different than the uuid of the entity a part represents")
-@Examples({"set {_uuid} to {_spawnedpart}'s part uuid"})
+@Name("Active Part's Part UUID")
+@Description("Get the part uuid of an active part, used to identify the part in its group and for animations. This is different than the uuid of the entity a part represents.")
+@Examples({"set {_uuid} to {_spawnedpart}'s part uuid",
+            "",
+            "#3.0.0 and later",
+            "set {_uuid} to {_packetpart}'s part uuid"})
 @Since("2.6.2")
-public class ExprSpawnedPartUUID extends SimplePropertyExpression<SpawnedDisplayEntityPart, UUID> {
+public class ExprActivePartUUID extends SimplePropertyExpression<ActivePart, UUID> {
 
     static {
-        register(ExprSpawnedPartUUID.class, UUID.class, "[the] part uuid", "spawnedpart");
+        register(ExprActivePartUUID.class, UUID.class, "[the] part uuid", "activepart");
     }
 
     @Override
@@ -27,7 +31,7 @@ public class ExprSpawnedPartUUID extends SimplePropertyExpression<SpawnedDisplay
 
     @Override
     @Nullable
-    public UUID convert(SpawnedDisplayEntityPart part) {
+    public UUID convert(ActivePart part) {
         if (part == null){
             return null;
         }

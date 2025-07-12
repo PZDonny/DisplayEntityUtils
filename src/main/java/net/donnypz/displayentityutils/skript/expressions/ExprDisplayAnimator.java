@@ -16,7 +16,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Create Display Animator")
-@Description("Create a display animator to play an spawned animations on a spawned group")
+@Description("Create a display animator to play an spawned animations on an active group")
 @Examples({"set {_animator} to a new linear display animator using {_spawnedanimation}",
         "set {_loopanim} to a loop animator using {_spawnedanimation}"})
 @Since("2.6.2")

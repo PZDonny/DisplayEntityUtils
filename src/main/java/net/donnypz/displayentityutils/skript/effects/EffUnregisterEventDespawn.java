@@ -14,7 +14,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Override Unregister Event Despawn")
-@Description("Override the possible despawning of spawned  parts when a spawned group is unregistered")
+@Description("Override the possible despawning of spawned parts when a spawned group is unregistered")
 @Examples({"on display group unregistered:", "\tdisallow group despawn"})
 @Since("2.6.2")
 public class EffUnregisterEventDespawn extends Effect {

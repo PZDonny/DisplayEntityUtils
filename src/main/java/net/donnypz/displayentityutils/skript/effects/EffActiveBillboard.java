@@ -15,12 +15,17 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Set Billboard")
-@Description("Set the billboard of a spawned group/part/selection")
-@Examples({"set {_setting}'s billboard to vertical", "set {_setting}'s billboard to center for parts with tag \"pivotpart\""})
+@Description("Set the billboard of an active group/part/selection")
+@Examples({"set {_spawnedpart}'s billboard to vertical",
+        "set {_spawnedgroup}'s billboard to center",
+        "",
+        "#3.0.0 and later",
+        "set {_packetgroup}'s billboard to horizontal"
+        })
 @Since("2.6.2")
-public class EffSpawnedBillboard extends Effect {
+public class EffActiveBillboard extends Effect {
     static {
-        Skript.registerEffect(EffSpawnedBillboard.class,"[deu] (set|change) %spawnedgroup/spawnedpart/partselection%['s] [display] billboard to %billboard%");
+        Skript.registerEffect(EffActiveBillboard.class,"[deu] (set|change) %activegroup/activepart/activepartselection%['s] [display] billboard to %billboard%");
     }
 
     Expression<?> object;
@@ -35,10 +40,10 @@ public class EffSpawnedBillboard extends Effect {
 
     @Override
     protected void execute(Event event) {
-        Active spawned = (Active) object.getSingle(event);
+        Active active = (Active) object.getSingle(event);
         Display.Billboard b = billboard.getSingle(event);
-        if (spawned != null && b != null) {
-            spawned.setBillboard(b);
+        if (active != null && b != null) {
+            active.setBillboard(b);
         }
     }
 
