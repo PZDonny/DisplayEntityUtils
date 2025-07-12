@@ -81,6 +81,11 @@ final class PlayerDisplayAnimationExecutor {
     }
 
     private void executeAnimation(Collection<Player> players, SpawnedDisplayAnimation animation, ActiveGroup group, ActivePartSelection selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame){
+        if (group.masterPart == null){
+            animator.stop(players, group);
+            return;
+        }
+
         //Remove disconnected players
         Iterator<Player> iter = players.iterator();
         while(iter.hasNext()){
