@@ -57,9 +57,7 @@ class SpawnedDisplayFollower {
             selection = new SpawnedPartSelection(group, partTags);
             for (ActivePart p : selection.selectedParts){
                 if (p.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                    SpawnedDisplayEntityPart sp = (SpawnedDisplayEntityPart) p;
-                    Display display = (Display) sp.getEntity();
-                    display.setTeleportDuration(teleportationDuration);
+                    p.setTeleportDuration(teleportationDuration);
                 }
             }
             if (group.defaultFollower != null){
