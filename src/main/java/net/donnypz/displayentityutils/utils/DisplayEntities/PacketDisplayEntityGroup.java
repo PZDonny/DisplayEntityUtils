@@ -350,7 +350,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
      * Set the location of this group
      * @param location the location
      */
-    public void setLocation(@NotNull Location location, boolean pivotInteractions){
+    public void teleport(@NotNull Location location, boolean pivotInteractions){
         for (ActivePart p : groupParts.values()){
             PacketDisplayEntityPart part = (PacketDisplayEntityPart) p;
             if (part.isMaster){

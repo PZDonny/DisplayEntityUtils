@@ -48,7 +48,7 @@ public class EffActiveGroupTeleport extends Effect {
             sg.teleport(loc, respect);
         }
         else if (g instanceof PacketDisplayEntityGroup pg){
-            pg.setLocation(loc, respect);
+            pg.teleport(loc, respect);
         }
 
     }
