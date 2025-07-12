@@ -715,7 +715,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         }
     }
 
-    public static void translateInteractionEventless(@NotNull Interaction interaction, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
+    private static void translateInteractionEventless(@NotNull Interaction interaction, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
         Location destination = interaction.getLocation().clone().add(direction.clone().normalize().multiply(distance));
         double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
         Vector incrementVector = direction
