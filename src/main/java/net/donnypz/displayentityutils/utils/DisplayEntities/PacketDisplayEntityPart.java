@@ -340,6 +340,30 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         setAndSend(DisplayAttributes.TELEPORTATION_DURATION, teleportDuration);
     }
 
+    /**
+     * Set the interpolation duration of this part
+     * @param interpolationDuration the interpolation duration to set
+     */
+    @Override
+    public void setInterpolationDuration(int interpolationDuration) {
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            return;
+        }
+        setAndSend(DisplayAttributes.Interpolation.DURATION, interpolationDuration);
+    }
+
+    /**
+     * Set the interpolation delay of this part
+     * @param interpolationDelay the interpolation delay to set
+     */
+    @Override
+    public void setInterpolationDelay(int interpolationDelay) {
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            return;
+        }
+        setAndSend(DisplayAttributes.Interpolation.DELAY, interpolationDelay);
+    }
+
     @Override
     public void setViewRange(float viewRangeMultiplier) {
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;

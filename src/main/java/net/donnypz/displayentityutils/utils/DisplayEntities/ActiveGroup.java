@@ -115,13 +115,36 @@ public abstract class ActiveGroup implements Active{
 
 
     /**
-     * Set the teleportation Duration of all parts in this group
+     * Set the teleportation duration of all parts in this group
      * This makes the teleportation of the group visually smoother
+     * @param teleportDuration the duration
      */
     @Override
     public void setTeleportDuration(int teleportDuration){
         for (ActivePart part : groupParts.values()){
             part.setTeleportDuration(teleportDuration);
+        }
+    }
+
+    /**
+     * Set the interpolation duration of all parts in this group
+     * @param interpolationDuration the duration
+     */
+    @Override
+    public void setInterpolationDuration(int interpolationDuration){
+        for (ActivePart part : groupParts.values()){
+            part.setInterpolationDuration(interpolationDuration);
+        }
+    }
+
+    /**
+     * Set the interpolation delay of all parts in this group
+     * @param interpolationDelay the delay
+     */
+    @Override
+    public void setInterpolationDelay(int interpolationDelay){
+        for (ActivePart part : groupParts.values()){
+            part.setInterpolationDelay(interpolationDelay);
         }
     }
 

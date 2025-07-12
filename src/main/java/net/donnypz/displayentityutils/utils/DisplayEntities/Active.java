@@ -13,6 +13,10 @@ import java.util.Collection;
 public interface Active {
     void setTeleportDuration(int teleportDuration);
 
+    void setInterpolationDuration(int interpolationDuration);
+
+    void setInterpolationDelay(int interpolationDelay);
+
     void setViewRange(float viewRangeMultiplier);
 
     void setBillboard(@NotNull Display.Billboard billboard);

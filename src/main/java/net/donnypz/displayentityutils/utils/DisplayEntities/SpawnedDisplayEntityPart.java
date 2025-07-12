@@ -618,12 +618,37 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     @Override
     public void setTeleportDuration(int teleportDuration) {
-        Entity entity = getEntity();
-        if (entity instanceof Interaction){
+        if (type == PartType.INTERACTION){
             return;
         }
-        Display display = (Display) entity;
+        Display display = (Display) getEntity();
         display.setTeleportDuration(teleportDuration);
+    }
+
+    /**
+     * Set the interpolation duration of this part
+     * @param interpolationDuration the interpolation duration to set
+     */
+    @Override
+    public void setInterpolationDuration(int interpolationDuration) {
+        if (type == PartType.INTERACTION){
+            return;
+        }
+        Display display = (Display) getEntity();
+        display.setInterpolationDuration(interpolationDuration);
+    }
+
+    /**
+     * Set the interpolation delay of this part
+     * @param interpolationDelay the interpolation delay to set
+     */
+    @Override
+    public void setInterpolationDelay(int interpolationDelay) {
+        if (type == PartType.INTERACTION){
+            return;
+        }
+        Display display = (Display) getEntity();
+        display.setInterpolationDelay(interpolationDelay);
     }
 
     /**

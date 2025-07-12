@@ -310,6 +310,28 @@ public abstract class ActivePartSelection implements Active{
     }
 
     /**
+     * Set the interpolation duration of all parts in this selection
+     * @param interpolationDuration the duration
+     */
+    @Override
+    public void setInterpolationDuration(int interpolationDuration){
+        for (ActivePart part : selectedParts){
+            part.setInterpolationDuration(interpolationDuration);
+        }
+    }
+
+    /**
+     * Set the interpolation delay of all parts in this selection
+     * @param interpolationDelay the delay
+     */
+    @Override
+    public void setInterpolationDelay(int interpolationDelay){
+        for (ActivePart part : selectedParts){
+            part.setInterpolationDelay(interpolationDelay);
+        }
+    }
+
+    /**
      * Set the glow color of all parts in this selection
      * @param color The color to set
      */
