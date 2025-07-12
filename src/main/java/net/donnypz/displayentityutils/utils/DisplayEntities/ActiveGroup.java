@@ -4,13 +4,18 @@ import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.CullOption;
+import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
+import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -18,6 +23,9 @@ import org.joml.Vector3f;
 import java.util.*;
 
 public abstract class ActiveGroup implements Active{
+
+    protected ActivePart masterPart;
+    protected LinkedHashMap<UUID, ActivePart> groupParts = new LinkedHashMap<>();
     protected String tag;
     protected final HashSet<DisplayAnimator> activeAnimators = new HashSet<>();
     protected String spawnAnimationTag;
@@ -36,13 +44,18 @@ public abstract class ActiveGroup implements Active{
         return tag;
     }
 
+    /**
+     * Get whether this group has a tag set
+     * @return a boolean
+     */
+    public boolean hasTag(){
+        return tag != null;
+    }
+
     public abstract ActivePartSelection createPartSelection();
 
     public abstract ActivePartSelection createPartSelection(@NotNull PartFilter partFilter);
 
-    protected abstract Collection<? extends ActivePart> getParts();
-
-    public abstract int getTeleportDuration();
 
     /**
      * Attempt to automatically set the culling bounds for all parts within this group.
@@ -100,6 +113,192 @@ public abstract class ActiveGroup implements Active{
 
     public abstract boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions);
 
+
+    /**
+     * Set the teleportation Duration of all parts in this group
+     * This makes the teleportation of the group visually smoother
+     */
+    @Override
+    public void setTeleportDuration(int teleportDuration){
+        for (ActivePart part : groupParts.values()){
+            part.setTeleportDuration(teleportDuration);
+        }
+    }
+
+    /**
+     * Change the yaw of this group
+     * @param yaw The yaw to set for this group
+     * @param pivotInteractions true if interactions should pivot around the group with the yaw change
+     */
+    @Override
+    public void setYaw(float yaw, boolean pivotInteractions){
+        for (ActivePart part : groupParts.values()){
+            part.setYaw(yaw, pivotInteractions);
+        }
+    }
+
+    /**
+     * Change the pitch of this group
+     * @param pitch The pitch to set for this group
+     */
+    @Override
+    public void setPitch(float pitch){
+        for (ActivePart part : groupParts.values()){
+            part.setPitch(pitch);
+        }
+    }
+
+    /**
+     * Set the brightness of this group
+     * @param brightness the brightness to set, null to use brightness based on position
+     */
+    @Override
+    public void setBrightness(@Nullable Display.Brightness brightness){
+        for (ActivePart part : groupParts.values()){
+            part.setBrightness(brightness);
+        }
+    }
+
+    /**
+     * Set the billboard of this group
+     * @param billboard the billboard to set
+     */
+    @Override
+    public void setBillboard(@NotNull Display.Billboard billboard){
+        for (ActivePart part : groupParts.values()){
+            part.setBillboard(billboard);
+        }
+    }
+
+    /**
+     * Set the view range of this group
+     * @param viewRangeMultiplier The range multiplier to set
+     */
+    @Override
+    public void setViewRange(float viewRangeMultiplier){
+        for (ActivePart part : groupParts.values()){
+            part.setViewRange(viewRangeMultiplier);
+        }
+    }
+
+    /**
+     * Set the glow color of this group
+     * @param color The color to set
+     */
+    @Override
+    public void setGlowColor(@Nullable Color color){
+        for (ActivePart part : groupParts.values()){
+            part.setGlowColor(color);
+        }
+    }
+
+
+    /**
+     * Adds the glow effect to all the block and item display parts in this group
+     */
+    @Override
+    public void glow(){
+        for (ActivePart part : groupParts.values()){
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || part.type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
+                part.glow();
+            }
+        }
+    }
+
+    /**
+     * Adds the glow effect to all the block and item display parts in this group for a player
+     * @param player the player
+     */
+    @Override
+    public void glow(@NotNull Player player){
+        for (ActivePart part : groupParts.values()){
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || part.type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
+                part.glow(player);
+            }
+        }
+    }
+
+    /**
+     * Adds the glow effect to all the block and item display parts in this group
+     * @param durationInTicks How long to highlight this selection
+     */
+    @Override
+    public void glow(long durationInTicks){
+        for (ActivePart part : groupParts.values()){
+            part.glow(durationInTicks);
+        }
+    }
+
+    /**
+     * Make this group's block and item display entities glow for a player for a set period of time
+     * @param player the player
+     * @param durationInTicks how long the glowing should last
+     */
+    @Override
+    public void glow(@NotNull Player player, long durationInTicks){
+        for (ActivePart part : groupParts.values()){
+            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
+                continue;
+            }
+            part.glow(player, durationInTicks);
+        }
+    }
+
+    /**
+     * Removes the glow effect from all the display parts in this group
+     */
+    @Override
+    public void unglow(){
+        for (ActivePart part : groupParts.values()){
+            part.unglow();
+        }
+    }
+
+    /**
+     * Removes the glow effect from all the display parts in this group, for the specified player
+     * @param player the player
+     */
+    @Override
+    public void unglow(@NotNull Player player){
+        for (ActivePart part : groupParts.values()){
+            part.unglow(player);
+        }
+    }
+
+
+
+
+    /**
+     * Get the glow color of this group
+     * @return a color or null if not set
+     */
+    public @Nullable Color getGlowColor(){
+        return masterPart.getGlowColor();
+    }
+
+
+    public abstract SequencedCollection<? extends ActivePart> getParts();
+
+    public abstract ActivePart getPart(@NotNull UUID partUUID);
+
+    public abstract SequencedCollection<? extends ActivePart> getParts(@NotNull String tag);
+
+    public abstract SequencedCollection<? extends ActivePart> getParts(@NotNull Collection<String> tags);
+
+    public abstract SequencedCollection<? extends ActivePart> getParts(@NotNull SpawnedDisplayEntityPart.PartType partType);
+
+    public abstract SequencedCollection<? extends ActivePart> getDisplayParts();
+
+    public abstract boolean isTrackedBy(@NotNull Player player);
+
+    public abstract Collection<Player> getTrackingPlayers();
+
+    public abstract ActivePart getMasterPart();
+
+    public abstract Location getLocation();
+
+    public abstract String getWorldName();
+
     /**
      * Get this group's scale multiplier set after using {@link ActiveGroup#scale(float, int, boolean)} or similar methods
      * @return the group's scale multiplier
@@ -108,27 +307,19 @@ public abstract class ActiveGroup implements Active{
         return scaleMultiplier;
     }
 
-    public abstract ActivePart getSpawnedPart(@NotNull UUID partUUID);
-
-    public abstract SequencedCollection<? extends ActivePart> getSpawnedParts();
-
-    public abstract SequencedCollection<? extends ActivePart> getSpawnedParts(@NotNull SpawnedDisplayEntityPart.PartType partType);
-
-    public abstract SequencedCollection<? extends ActivePart> getSpawnedDisplayParts();
-
-    public abstract boolean isTrackedBy(@NotNull Player player);
-
-    public abstract Collection<Player> getTrackingPlayers();
+    /**
+     * Get the teleport duration of this SpawnedDisplayEntityGroup
+     * @return the group's teleport duration value
+     */
+    public int getTeleportDuration(){
+        return masterPart.getTeleportDuration();
+    }
 
     /**
      * Get whether any players can visibly see this group. This is done by checking if the master (parent) part of the group can be seen.
      * @return a boolean
      */
     public abstract boolean hasTrackingPlayers();
-
-    public abstract ActivePart getMasterPart();
-
-    public abstract Location getLocation();
 
     void addActiveAnimator(DisplayAnimator animator){
         activeAnimators.add(animator);

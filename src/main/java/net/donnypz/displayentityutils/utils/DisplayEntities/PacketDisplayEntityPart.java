@@ -296,6 +296,15 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
+     * Get the glow color of this part
+     * @return a color, or null if not set or if this part's type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     */
+    @Override
+    public @Nullable Color getGlowColor() {
+        return attributeContainer.getAttribute(DisplayAttributes.GLOW_COLOR_OVERRIDE);
+    }
+
+    /**
      * Get the resulting auto cull width and height value, respectively.
      * @param widthAdder the width adder
      * @param heightAdder the height adder

@@ -125,7 +125,7 @@ public final class DisplayGroupManager {
             HashSet<Chunk> chunks = new HashSet<>();
             Chunk mainChunk = spawnedGroup.getLocation().getChunk();
             ticketChunk(mainChunk, chunks);
-            for (SpawnedDisplayEntityPart part : spawnedGroup.getSpawnedParts()) {
+            for (SpawnedDisplayEntityPart part : spawnedGroup.getParts()) {
                 if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){ //Chunk may be different from main chunk
                     Entity e = part.getEntity();
                     Chunk c = e.getChunk();
@@ -141,7 +141,7 @@ public final class DisplayGroupManager {
             }
         }
         else{
-            for (SpawnedDisplayEntityPart part : spawnedGroup.getSpawnedParts()) {
+            for (SpawnedDisplayEntityPart part : spawnedGroup.getParts()) {
                 part.remove(despawn);
             }
         }

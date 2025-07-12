@@ -108,7 +108,8 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      */
     public SpawnedDisplayAnimationFrame setTransformation(@NotNull SpawnedDisplayEntityGroup group){
         Location gLoc = group.getLocation();
-        for (SpawnedDisplayEntityPart part : group.spawnedParts.values()){
+        for (ActivePart p : group.groupParts.values()){
+            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) p;
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Interaction i = (Interaction) part.getEntity();
 
@@ -135,7 +136,8 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
         displayTransformations.clear();
         interactionTransformations.clear();
         Location gLoc = group.getLocation();
-        for (SpawnedDisplayEntityPart part : group.spawnedParts.values()){
+        for (ActivePart p : group.groupParts.values()){
+            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) p;
         //Ignore if part does not have specified tag
             if (!part.hasTag(partTag)){
                 continue;

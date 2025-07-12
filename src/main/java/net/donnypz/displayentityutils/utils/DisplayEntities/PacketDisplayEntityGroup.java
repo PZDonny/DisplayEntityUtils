@@ -15,7 +15,6 @@ import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
@@ -28,10 +27,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
-
-    LinkedHashMap<UUID, PacketDisplayEntityPart> packetParts = new LinkedHashMap<>();
     int interactionCount;
-    PacketDisplayEntityPart masterPart;
     int[] passengerIds;
     UUID vehicleUUID;
 
@@ -44,26 +40,26 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         if (part.partUUID == null) return;
         if (part.isMaster) masterPart = part;
 
-        packetParts.put(part.partUUID, part);
+        groupParts.put(part.partUUID, part);
         part.group = this;
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) interactionCount++;
     }
 
 
     @Override
-    public PacketDisplayEntityPart getMasterPart(){
-        return masterPart;
+    public @Nullable PacketDisplayEntityPart getMasterPart(){
+        return (PacketDisplayEntityPart) masterPart;
     }
 
     @Override
-    protected Collection<PacketDisplayEntityPart> getParts() {
-        return packetParts.values();
+    public SequencedCollection<PacketDisplayEntityPart> getParts() {
+        return groupParts
+                .values()
+                .stream()
+                .map(PacketDisplayEntityPart.class::cast)
+                .toList();
     }
 
-    @Override
-    public int getTeleportDuration() {
-        return masterPart.getTeleportDuration();
-    }
 
     /**
      * Create a {@link SpawnedPartSelection} containing unfiltered parts from this group
@@ -103,7 +99,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         float largestWidth = 0;
         float largestHeight = 0;
         CullOption cullOption = DisplayEntityPlugin.autoCulling();
-        for (ActivePart p : packetParts.values()){
+        for (ActivePart p : groupParts.values()){
             PacketDisplayEntityPart part = (PacketDisplayEntityPart) p;
             //Displays
             if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
@@ -153,20 +149,18 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
                     continue;
                 }
                 Vector oldVector = new Vector(translationVector.getX(), translationVector.getY(), translationVector.getZ());
-                System.out.println("OV: "+oldVector);
                 translationVector.setX((translationVector.getX()/scaleMultiplier)*newScaleMultiplier);
                 translationVector.setY((translationVector.getY()/scaleMultiplier)*newScaleMultiplier);
                 translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
 
                 Vector moveVector = oldVector.subtract(translationVector);
-                System.out.println("MV: "+moveVector);
                 PacketUtils.translateInteraction(part, moveVector, moveVector.length(), durationInTicks, 0);
             }
         }
 
     //Culling
         if (DisplayEntityPlugin.autoCulling() == CullOption.LARGEST){
-            for (PacketDisplayEntityPart part : packetParts.values()){
+            for (ActivePart part : groupParts.values()){
                 part.cull(largestWidth+DisplayEntityPlugin.widthCullingAdder(), largestHeight+DisplayEntityPlugin.heightCullingAdder());
             }
         }
@@ -215,7 +209,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
             return false;
         }
         vehicleUUID = vehicle.getUniqueId();
-        for (UUID uuid : masterPart.viewers){
+        for (UUID uuid : getMasterPart().viewers){
             Player p = Bukkit.getPlayer(uuid);
             if (p == null) continue;
             PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).addPassenger(false, vehicle.getEntityId(), masterPart.entityId);
@@ -228,7 +222,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         Entity vehicle = getVehicle();
         if (vehicle == null) return null;
 
-        for (UUID uuid : masterPart.viewers){
+        for (UUID uuid : getMasterPart().viewers){
             Player p = Bukkit.getPlayer(uuid);
             if (p == null) continue;
             PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).removePassenger(false, vehicle.getEntityId(), masterPart.entityId);
@@ -243,32 +237,60 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     }
 
     @Override
-    public PacketDisplayEntityPart getSpawnedPart(@NotNull UUID partUUID) {
-        return packetParts.get(partUUID);
+    public PacketDisplayEntityPart getPart(@NotNull UUID partUUID) {
+        return (PacketDisplayEntityPart) groupParts.get(partUUID);
     }
 
     @Override
-    public List<PacketDisplayEntityPart> getSpawnedParts() {
-        return new ArrayList<>(packetParts.sequencedValues());
-    }
-
-    @Override
-    public List<PacketDisplayEntityPart> getSpawnedParts(SpawnedDisplayEntityPart.@NotNull PartType partType) {
+    public List<PacketDisplayEntityPart> getParts(SpawnedDisplayEntityPart.@NotNull PartType partType) {
         List<PacketDisplayEntityPart> partList = new ArrayList<>();
-        for (PacketDisplayEntityPart part : packetParts.sequencedValues()){
+        for (ActivePart part : groupParts.sequencedValues()){
             if (partType == part.type){
-                partList.add(part);
+                partList.add((PacketDisplayEntityPart) part);
             }
         }
         return partList;
     }
 
     @Override
-    public List<PacketDisplayEntityPart> getSpawnedDisplayParts() {
+    public List<PacketDisplayEntityPart> getDisplayParts() {
         List<PacketDisplayEntityPart> partList = new ArrayList<>();
-        for (PacketDisplayEntityPart part : packetParts.sequencedValues()){
+        for (ActivePart part : groupParts.sequencedValues()){
             if (part.type != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                partList.add(part);
+                partList.add((PacketDisplayEntityPart) part);
+            }
+        }
+        return partList;
+    }
+
+    /**
+     * Get a list of all display entity parts within this group with a tag
+     * @return a list
+     */
+    @Override
+    public List<PacketDisplayEntityPart> getParts(@NotNull String tag){
+        List<PacketDisplayEntityPart> partList = new ArrayList<>();
+        for (ActivePart part : groupParts.sequencedValues()){
+            if (part.hasTag(tag)){
+                partList.add((PacketDisplayEntityPart) part);
+            }
+        }
+        return partList;
+    }
+
+    /**
+     * Get a list of all display entity parts within this group with at least one of the provided tags
+     * @return a list
+     */
+    @Override
+    public List<PacketDisplayEntityPart> getParts(@NotNull Collection<String> tags){
+        List<PacketDisplayEntityPart> partList = new ArrayList<>();
+        for (ActivePart part : groupParts.sequencedValues()){
+            for (String tag : tags){
+                if (part.hasTag(tag)){
+                    partList.add((PacketDisplayEntityPart) part);
+                    break;
+                }
             }
         }
         return partList;
@@ -276,7 +298,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
 
     @Override
     public boolean isTrackedBy(@NotNull Player player) {
-        return masterPart.viewers.contains(player.getUniqueId());
+        return getMasterPart().viewers.contains(player.getUniqueId());
     }
 
     /**
@@ -285,7 +307,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
      */
     @Override
     public Collection<Player> getTrackingPlayers() {
-        return masterPart.getViewersAsPlayers();
+        return getMasterPart().getViewersAsPlayers();
     }
 
     /**
@@ -294,7 +316,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
      */
     @Override
     public boolean hasTrackingPlayers() {
-        return !masterPart.viewers.isEmpty();
+        return !getMasterPart().viewers.isEmpty();
     }
 
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap, SpawnedDisplayEntityPart.PartType... effectedPartTypes){
@@ -303,7 +325,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
                         ? null
                         : EnumSet.copyOf(Arrays.asList(effectedPartTypes));
 
-        for (PacketDisplayEntityPart part : packetParts.values()){
+        for (ActivePart part : groupParts.values()){
             if (effectedTypes == null || effectedTypes.contains(part.type)){
                 part.setAttributes(attributeMap);
             }
@@ -311,112 +333,9 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     }
 
     @Override
-    public void setGlowColor(@Nullable Color color) {
-        for (PacketDisplayEntityPart part : packetParts.values()){
-            part.setGlowColor(color);
-        }
-    }
-
-    @Override
-    public void glow() {
-        for (PacketDisplayEntityPart part : packetParts.values()){
-            part.glow();
-        }
-    }
-
-    @Override
-    public void glow(@NotNull Player player){
-        for (PacketDisplayEntityPart part : packetParts.values()){
-            part.glow(player);
-        }
-    }
-
-    /**
-     * Adds the glow effect to all the block and item display parts in this group
-     * @param durationInTicks How long to highlight this selection
-     */
-    @Override
-    public void glow(long durationInTicks){
-        for (PacketDisplayEntityPart part : packetParts.values()){
-            part.glow(durationInTicks);
-        }
-    }
-
-    /**
-     * Make this group's block and item display entities glow for a player for a set period of time
-     * @param player the player
-     * @param durationInTicks how long the glowing should last
-     */
-    @Override
-    public void glow(@NotNull Player player, long durationInTicks){
-        for (PacketDisplayEntityPart part : packetParts.values()){
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
-                continue;
-            }
-            part.glow(player, durationInTicks);
-        }
-    }
-
-    @Override
-    public void unglow() {
-        for (PacketDisplayEntityPart part : packetParts.values()){
-            part.unglow();
-        }
-    }
-
-    @Override
-    public void unglow(@NotNull Player player) {
-        for (PacketDisplayEntityPart part : packetParts.values()){
-            part.unglow(player);
-        }
-    }
-
-    @Override
-    public void setTeleportDuration(int teleportDuration) {
-        for (PacketDisplayEntityPart part : packetParts.values()){
-            part.setTeleportDuration(teleportDuration);
-        }
-    }
-
-    @Override
-    public void setViewRange(float viewRangeMultiplier) {
-        for (PacketDisplayEntityPart part : packetParts.values()){
-            part.setViewRange(viewRangeMultiplier);
-        }
-    }
-
-    @Override
-    public void setBillboard(Display.@NotNull Billboard billboard) {
-        for (PacketDisplayEntityPart part : packetParts.values()){
-            part.setBillboard(billboard);
-        }
-    }
-
-    @Override
-    public void setBrightness(Display.@Nullable Brightness brightness) {
-        for (PacketDisplayEntityPart part : packetParts.values()){
-            part.setBrightness(brightness);
-        }
-    }
-
-    @Override
     public void setRotation(float pitch, float yaw, boolean pivotIfInteraction){
-        for (PacketDisplayEntityPart part : packetParts.values()){
-            part.setRotation(pitch, yaw, pivotIfInteraction);
-        }
-    }
-
-    @Override
-    public void setPitch(float pitch) {
-        for (PacketDisplayEntityPart part : packetParts.values()){
-            part.setPitch(pitch);
-        }
-    }
-
-    @Override
-    public void setYaw(float yaw, boolean pivot) {
-        for (PacketDisplayEntityPart part : packetParts.values()){
-            part.setYaw(yaw, pivot);
+        for (ActivePart part : groupParts.values()){
+            ((PacketDisplayEntityPart) part).setRotation(pitch, yaw, pivotIfInteraction);
         }
     }
 
@@ -433,9 +352,10 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
      * @param location the location
      */
     public void setLocation(@NotNull Location location, boolean pivotInteractions){
-        for (PacketDisplayEntityPart part : packetParts.values()){
+        for (ActivePart p : groupParts.values()){
+            PacketDisplayEntityPart part = (PacketDisplayEntityPart) p;
             if (part.isMaster){
-                masterPart.teleport(location);
+                part.teleport(location);
             }
             else if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION && pivotInteractions){
                 part.setRotation(location.getPitch(), location.getYaw(), true);
@@ -450,12 +370,12 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     public @NotNull Collection<PacketDisplayEntityPart> getInteractionParts(){
         int i = 0;
         Set<PacketDisplayEntityPart> parts = new HashSet<>();
-        for (PacketDisplayEntityPart part : packetParts.sequencedValues().reversed()){
+        for (ActivePart part : groupParts.sequencedValues().reversed()){
             if (i == interactionCount){
                 return parts;
             }
             if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                parts.add(part);
+                parts.add((PacketDisplayEntityPart) part);
                 i++;
             }
         }
@@ -464,12 +384,12 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
 
     private void iterateInteractionParts(Consumer<PacketDisplayEntityPart> consumer){
         int i = 0;
-        for (PacketDisplayEntityPart part : packetParts.sequencedValues().reversed()){
+        for (ActivePart part : groupParts.sequencedValues().reversed()){
             if (i == interactionCount){
                 return;
             }
             if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                consumer.accept(part);
+                consumer.accept((PacketDisplayEntityPart) part);
                 i++;
             }
         }
@@ -481,7 +401,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
      */
     @Override
     public @Nullable Location getLocation(){
-        return masterPart.getLocation();
+        return getMasterPart().getLocation();
     }
 
 
@@ -539,7 +459,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
      */
     @Override
     public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
-        if (masterPart.isTrackedBy(player)){
+        if (getMasterPart().isTrackedBy(player)){
             PlayerDisplayAnimationExecutor.setGroupToFrame(player, this, animation, frame);
         }
     }
@@ -554,7 +474,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
      */
     @Override
     public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
-        if (masterPart.isTrackedBy(player)){
+        if (getMasterPart().isTrackedBy(player)){
             PlayerDisplayAnimationExecutor.setGroupToFrame(player, this, animation, frame, duration, delay);
         }
     }
@@ -565,7 +485,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
      */
     @Override
     public @Nullable String getWorldName(){
-        return masterPart.getWorldName();
+        return getMasterPart().getWorldName();
     }
 
     /**
@@ -586,8 +506,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     @Override
     public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
         if (!sendShowEvent(List.of(player), spawnReason)) return;
-        for (PacketDisplayEntityPart part : packetParts.values()){
-            part.showToPlayer(player, spawnReason);
+        for (ActivePart part : groupParts.values()){
+            ((PacketDisplayEntityPart) part).showToPlayer(player, spawnReason);
         }
         setPassengers(player);
     }
@@ -611,8 +531,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     public void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
         if (!sendShowEvent(players, spawnReason)) return;
         for (Player player : players){
-            for (PacketDisplayEntityPart part : packetParts.sequencedValues()){
-                part.showToPlayer(player, spawnReason, groupSpawnSettings);
+            for (ActivePart part : groupParts.sequencedValues()){
+                ((PacketDisplayEntityPart) part).showToPlayer(player, spawnReason, groupSpawnSettings);
             }
             setPassengers(player);
         }
@@ -636,7 +556,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     @Override
     public void hideFromPlayer(@NotNull Player player) {
         sendDestroyEvent(List.of(player));
-        PacketUtils.destroyEntities(player, packetParts.sequencedValues());
+        PacketUtils.destroyEntities(player, getParts());
     }
 
     /**
@@ -646,7 +566,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     @Override
     public void hideFromPlayers(@NotNull Collection<Player> players) {
         sendDestroyEvent(players);
-        PacketUtils.destroyEntities(players, packetParts.sequencedValues());
+        PacketUtils.destroyEntities(players, getParts());
     }
 
     private void sendDestroyEvent(Collection<Player> players){
@@ -655,7 +575,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
 
     @Override
     public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks) {
-        for (PacketDisplayEntityPart part : packetParts.values()){
+        for (ActivePart part : groupParts.values()){
             part.translate(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
@@ -663,7 +583,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
 
     @Override
     public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks) {
-        for (PacketDisplayEntityPart part : packetParts.values()){
+        for (ActivePart part : groupParts.values()){
             part.translate(direction, distance, durationInTicks, delayInTicks);
         }
         return true;

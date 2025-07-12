@@ -102,7 +102,7 @@ public final class DatapackEntitySpawned implements Listener {
         if (group != null){
             List<Entity> laterParts = new ArrayList<>();
             Entity masterPart = group.getMasterPart().getEntity();
-            for (SpawnedDisplayEntityPart part : group.getSpawnedDisplayParts()){
+            for (SpawnedDisplayEntityPart part : group.getDisplayParts()){
                 if (part.isMaster()){
                     continue;
                 }

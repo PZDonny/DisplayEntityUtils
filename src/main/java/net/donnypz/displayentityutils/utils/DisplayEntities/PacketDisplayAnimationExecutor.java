@@ -192,7 +192,7 @@ final class PacketDisplayAnimationExecutor {
                 continue;
             }
 
-            ActivePart part = group.getSpawnedPart(partUUID);
+            ActivePart part = group.getPart(partUUID);
             if (part == null || !selection.contains(part)){
                 continue;
             }
@@ -255,7 +255,7 @@ final class PacketDisplayAnimationExecutor {
                     continue;
                 }
 
-                ActivePart part = group.getSpawnedPart(partUUID);
+                ActivePart part = group.getPart(partUUID);
                 if (part == null || !selection.contains(part)){
                     continue;
                 }

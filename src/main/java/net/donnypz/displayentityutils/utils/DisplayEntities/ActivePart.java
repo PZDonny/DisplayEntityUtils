@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Color;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -65,6 +66,15 @@ public abstract class ActivePart implements Active{
     }
 
     /**
+     * Check if this part has a tag
+     * @param tag the tag
+     * @return a boolean
+     */
+    public boolean hasTag(@NotNull String tag){
+        return partTags.contains(tag);
+    }
+
+    /**
      * Make this part glow for a player
      * @param player the player
      */
@@ -118,6 +128,8 @@ public abstract class ActivePart implements Active{
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
         PacketUtils.setGlowing(player, getEntityId(), false);
     }
+
+    public abstract @Nullable Color getGlowColor();
 
     public abstract ActiveGroup getGroup();
 

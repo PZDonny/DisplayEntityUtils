@@ -53,7 +53,7 @@ class PartsRemoveCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("Part selection reset! (No parts remaining)", NamedTextColor.RED));
         }
 
-        if (group.getSpawnedParts().size() <= 1){
+        if (group.getParts().size() <= 1){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Despawning your group, not enough parts remain", NamedTextColor.YELLOW)));
             DEUCommandUtils.removeRelativePoints(player);
             group.unregister(true, true);

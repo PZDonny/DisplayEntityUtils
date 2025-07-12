@@ -81,7 +81,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         allParts.put(partData, this);
 
         setPartUUID(random);
-        group.spawnedParts.put(partUUID, this);
+        group.groupParts.put(partUUID, this);
         entity.setPersistent(group.isPersistent());
 
         //For parts before v2.5.3
@@ -93,7 +93,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         this.partUUID = uuid;
         PersistentDataContainer pdc = getEntity().getPersistentDataContainer();
         pdc.set(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
-        group.spawnedParts.put(partUUID, this);
+        group.groupParts.put(partUUID, this);
     }
 
     private void setPartUUID(Random random){
@@ -139,7 +139,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     private boolean groupContainsUUID(UUID partUUID){
-        return group.spawnedParts.containsKey(partUUID);
+        return group.groupParts.containsKey(partUUID);
     }
 
     private void removeFromPreviousGroup(Display display){
@@ -274,16 +274,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
 
-    /**
-     * Determine whether this part has a tag
-     * @param tag the tag to check for
-     * @return true if this part has the tag
-     */
-    public boolean hasTag(@NotNull String tag){
-        return DisplayUtils.hasPartTag(getEntity(), tag);
-    }
-
-
     private void adaptLegacyPartTags(){ //Don't use getEntity()
         List<String> legacyTags = new ArrayList<>();
         for (String s : new HashSet<>(entity.getScoreboardTags())){
@@ -315,7 +305,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
 
         if (this.group != null){
-            this.group.spawnedParts.remove(partUUID);
+            this.group.groupParts.remove(partUUID);
         }
 
         this.group = group;
@@ -325,7 +315,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                 group.masterPart = this;
             }
 
-            Entity master = group.masterPart.getEntity();
+            Entity master = ((SpawnedDisplayEntityPart) group.masterPart).getEntity();
 
             Vector translation;
             if (!isMaster()){
@@ -536,7 +526,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             long i = 0;
             @Override
             public void run() {
-                if (!entity.isGlowing() || !entity.isValid() || (durationInTicks != -1 && i >= durationInTicks) || group == null || !group.isSpawned() || group.spawnedParts.isEmpty()){
+                if (!entity.isGlowing() || !entity.isValid() || (durationInTicks != -1 && i >= durationInTicks) || group == null || !group.isSpawned() || group.groupParts.isEmpty()){
                     cancel();
                     return;
                 }
@@ -709,6 +699,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * Get the glow color of this part
      * @return a color, or null if not set or if this part's type is {@link PartType#INTERACTION}
      */
+    @Override
     public @Nullable Color getGlowColor(){
         if (type == PartType.INTERACTION){
             return null;
@@ -928,7 +919,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     public void removeFromGroup() {
         allParts.remove(partData);
-        group.spawnedParts.remove(partUUID);
+        group.groupParts.remove(partUUID);
         for (SpawnedPartSelection selection : group.partSelections){
             selection.removePart(this);
         }

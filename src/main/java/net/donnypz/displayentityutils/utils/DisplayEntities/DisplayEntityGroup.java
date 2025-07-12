@@ -35,7 +35,7 @@ public final class DisplayEntityGroup implements Serializable{
         //HashMap<UUID, DisplayEntity> displayPairs = new HashMap<>();
         //HashMap<UUID, InteractionEntity> interactionPairs = new HashMap<>();
 
-        for (SpawnedDisplayEntityPart part : spawnedGroup.getSpawnedParts()){
+        for (SpawnedDisplayEntityPart part : spawnedGroup.getParts()){
 
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Interaction i = (Interaction) part.getEntity();

@@ -186,7 +186,7 @@ final class DisplayAnimatorExecutor {
                 continue;
             }
 
-            SpawnedDisplayEntityPart part = group.getSpawnedPart(partUUID);
+            SpawnedDisplayEntityPart part = group.getPart(partUUID);
             if (part == null || !selection.contains(part)){
                 continue;
             }
@@ -244,7 +244,7 @@ final class DisplayAnimatorExecutor {
                     continue;
                 }
 
-                SpawnedDisplayEntityPart part = group.getSpawnedPart(partUUID);
+                SpawnedDisplayEntityPart part = group.getPart(partUUID);
                 if (part == null || !selection.contains(part)){
                     continue;
                 }

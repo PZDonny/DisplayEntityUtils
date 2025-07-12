@@ -37,7 +37,7 @@ class InteractionPivotSelectionCMD extends PlayerSubCommand {
             }
 
             else{
-                for (SpawnedDisplayEntityPart part : group.getSpawnedParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
+                for (SpawnedDisplayEntityPart part : group.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
                     part.pivot(angle);
                 }
             }
