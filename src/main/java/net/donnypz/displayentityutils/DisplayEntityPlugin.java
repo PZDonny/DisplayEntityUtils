@@ -29,6 +29,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -80,6 +81,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     static List<String> unregisterUnloadWorlds;
     static boolean autoSelectGroups;
     static boolean limitGroupSelections;
+    static BlockData interactionPreviewBlock;
     static CullOption cullOption;
     static boolean cacheAnimations;
     static int cacheAnimationExpiration;
@@ -175,7 +177,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     private void initializeBStats(){
         int pluginID = 24875;
-        //new Metrics(this, pluginID);
+        new Metrics(this, pluginID);
     }
 
     private void createLocalSaveFolders(){
@@ -417,6 +419,14 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
      */
     public static boolean limitGroupSelections() {
         return limitGroupSelections;
+    }
+
+    /**
+     * Gets the value of "interactionPreviewBlock" in the config
+     * @return {@link BlockData}
+     */
+    public static BlockData interactionPreviewBlock() {
+        return interactionPreviewBlock;
     }
 
     /**

@@ -475,11 +475,11 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         spawnLoc.setYaw(0);
 
         PacketDisplayEntityPart part = new PacketAttributeContainer()
-                .setAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK, new ItemStack(Material.TARGET))
-                .setAttribute(DisplayAttributes.Transform.TRANSLATION, new Vector3f(0, height/2, 0))
+                .setAttribute(DisplayAttributes.BlockDisplay.BLOCK_STATE, DisplayEntityPlugin.interactionPreviewBlock())
+                .setAttribute(DisplayAttributes.Transform.TRANSLATION, new Vector3f(-0.5f*width, 0, -0.5f*width))
                 .setAttribute(DisplayAttributes.Transform.SCALE, new Vector3f(width, height, width))
-                .setAttribute(DisplayAttributes.BRIGHTNESS, new Display.Brightness(0, 15))
-                .createPart(PartType.ITEM_DISPLAY, spawnLoc);
+                .setAttribute(DisplayAttributes.BRIGHTNESS, new Display.Brightness(7, 7))
+                .createPart(PartType.BLOCK_DISPLAY, spawnLoc);
         part.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
 
         if (durationInTicks == -1) {

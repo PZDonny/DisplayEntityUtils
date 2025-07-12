@@ -9,7 +9,10 @@ import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.Server;
+import org.bukkit.block.BlockType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.PluginCommand;
@@ -105,6 +108,8 @@ final class ConfigUtils {
         DisplayEntityPlugin.overwriteExistingSaves = config.getBoolean("overwriteExistingSaves");
         DisplayEntityPlugin.autoSelectGroups = config.getBoolean("autoSelectGroups");
         DisplayEntityPlugin.limitGroupSelections = config.getBoolean("limitGroupSelections");
+        BlockType blockType = Registry.BLOCK.get(new NamespacedKey("minecraft", config.getString("interactionPreviewBlock", "target").toLowerCase()));
+        DisplayEntityPlugin.interactionPreviewBlock = blockType.createBlockData();
 
         String cull = config.getString("cullOption");
         try{

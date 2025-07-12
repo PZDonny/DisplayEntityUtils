@@ -41,6 +41,9 @@ seededPartUUIDs: true
 #Leave this value as true to avoid conflicts when using "/mdis group selectnearest"
 limitGroupSelections: true
 
+#When selecting a group, this is the block that will be shown, marking an interaction's entity location
+interactionPreviewBlock: TARGET
+
 #Automatically select groups when using the command "/mdis group spawn"
 autoSelectGroups: false
 
