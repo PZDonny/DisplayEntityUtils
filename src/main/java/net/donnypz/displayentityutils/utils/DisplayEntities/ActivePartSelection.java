@@ -118,7 +118,7 @@ public abstract class ActivePartSelection implements Active{
         selectedParts.clear();
 
         filter:
-        for (ActivePart part : getGroup().getParts()){
+        for (ActivePart part : group.groupParts.values()){
             SpawnedDisplayEntityPart.PartType type = part.getType();
 
             //Part Types not contained
