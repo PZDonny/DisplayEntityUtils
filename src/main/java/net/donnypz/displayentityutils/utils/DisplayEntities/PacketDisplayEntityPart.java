@@ -57,6 +57,14 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
+     * Get whether this part is the master of its group
+     * @return a boolean
+     */
+    public boolean isMaster() {
+        return isMaster;
+    }
+
+    /**
      * Show this part to a player as a packet-based entity
      * @param player the player
      * @param spawnReason the spawn reason
