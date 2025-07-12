@@ -13,7 +13,6 @@ import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -587,5 +586,12 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
             part.translate(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
+    }
+
+    public void unregister(){
+        hideFromPlayers(getTrackingPlayers());
+        groupParts.clear();
+        activeAnimators.clear();
+        masterPart = null;
     }
 }
