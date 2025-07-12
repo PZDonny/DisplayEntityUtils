@@ -109,7 +109,14 @@ class PartsCycleCMD extends PlayerSubCommand {
                 }
             }
         }
-        PacketUtils.setGlowing(p, part.getEntity().getEntityId(), 20);
+
+        int markDuration = 30;
+        if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            part.spawnInteractionOutline(p, markDuration);
+        }
+        else{
+            PacketUtils.setGlowing(p, part.getEntity().getEntityId(), markDuration);
+        }
         int index = partSelection.indexOf(part)+1;
         int size = partSelection.getSize();
         Component ratio = Component.text("["+index+"/"+size+"] ", NamedTextColor.GOLD);
