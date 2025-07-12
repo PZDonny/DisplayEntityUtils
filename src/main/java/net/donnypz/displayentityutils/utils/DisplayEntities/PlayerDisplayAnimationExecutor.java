@@ -41,7 +41,7 @@ final class PlayerDisplayAnimationExecutor {
                                    boolean playSingleFrame) {
         this.animator = animator;
         this.playSingleFrame = playSingleFrame;
-        prepareAnimation(players, animation, group, frame, frameId, delay);
+        prepareAnimation(new HashSet<>(players), animation, group, frame, frameId, delay);
     }
 
 
@@ -87,6 +87,9 @@ final class PlayerDisplayAnimationExecutor {
             Player p = iter.next();
             if (!p.isConnected()){
                 animator.stop(p);
+                iter.remove();
+            }
+            else if (!animator.isAnimating(p, group)){
                 iter.remove();
             }
         }

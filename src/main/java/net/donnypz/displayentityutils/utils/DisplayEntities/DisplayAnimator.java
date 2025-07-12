@@ -7,10 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DisplayAnimator {
@@ -151,9 +148,16 @@ public class DisplayAnimator {
 
             SpawnedDisplayAnimationFrame frame = animation.frames.get(frameId);
             int delay = frame.delay;
+            addPlayers(players, group);
             new PlayerDisplayAnimationExecutor(players, this, animation, group, frame, frameId, delay, false);
         });
         return this;
+    }
+
+    private void addPlayers(Collection<Player> players, ActiveGroup group){
+        for (Player p : players){
+            this.players.computeIfAbsent(p.getUniqueId(), g -> new HashSet<>()).add(group);
+        }
     }
 
 
