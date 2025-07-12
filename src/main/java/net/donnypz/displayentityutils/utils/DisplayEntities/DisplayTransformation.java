@@ -95,7 +95,6 @@ class DisplayTransformation extends Transformation{
     }
 
     void applyData(ActivePart part, Collection<Player> players){
-        System.out.println(data);
         if (type == null || data == null){
             return;
         }
