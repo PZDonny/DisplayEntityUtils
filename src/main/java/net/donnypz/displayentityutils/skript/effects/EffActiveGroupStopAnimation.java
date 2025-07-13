@@ -27,7 +27,7 @@ import java.util.Collection;
 @Since("2.6.2")
 public class EffActiveGroupStopAnimation extends Effect {
     static {
-        Skript.registerEffect(EffActiveGroupStopAnimation.class,"stop [packet] animation on %spawnedgroup% from %displayanimator% [f:for %players%]");
+        Skript.registerEffect(EffActiveGroupStopAnimation.class,"stop [packet] animation on %activegroup% from %displayanimator% [f:for %-players%]");
     }
 
     Expression<ActiveGroup> group;
