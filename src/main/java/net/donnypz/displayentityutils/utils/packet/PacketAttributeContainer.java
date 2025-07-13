@@ -158,7 +158,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @param partType the type of entity this container represents
      * @return a {@link PacketDisplayEntityPart}
      */
-    public PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location){
+    public @NotNull PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location){
         return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this);
     }
 
@@ -168,7 +168,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @param partTag a part tag to add to the returned part
      * @return a {@link PacketDisplayEntityPart}
      */
-    public PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location, @NotNull String partTag){
+    public @NotNull PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location, @NotNull String partTag){
         return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this, partTag);
     }
 
@@ -178,155 +178,101 @@ public class PacketAttributeContainer implements Cloneable{
      * @param partTags part tags to add to the returned part
      * @return a {@link PacketDisplayEntityPart}
      */
-    public PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location, @NotNull Set<String> partTags){
+    public @NotNull PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location, @NotNull Set<String> partTags){
         return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this, partTags);
     }
 
 
     /**
-     * Spawn a packet entity for a given player at a location with the given attributes of this container
+     * Spawn a packet entity for a given player at a location with the given attributes of this container.
+     * Use {@link PacketAttributeContainer#createPart(SpawnedDisplayEntityPart.PartType, Location)} or any variation for internal tracking of this packet entity
      * @param partType the type of entity this container represents
      * @param player the player
      * @param location the spawn location
-     * @param track whether this entity should be tracked internally
      * @return the entity's entity id
      */
-    public int sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Player player, @NotNull Location location, boolean track){
+    public int sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Player player, @NotNull Location location){
         int entityId = SpigotReflectionUtil.generateEntityId();
-        sendEntity(partType, entityId, player, location, track);
+        sendEntity(partType, entityId, player, location);
         return entityId;
     }
 
     /**
-     * Spawn a packet entity for a given player at a location with the given attributes of this container
+     * Spawn a packet entity for a given player at a location with the given attributes of this container.
+     * Use {@link PacketAttributeContainer#createPart(SpawnedDisplayEntityPart.PartType, Location)} or any variation for internal tracking of this packet entity
      * @param partType the type of entity this container represents
      * @param entityId the entity id of the packet entity
      * @param player the player
      * @param location the spawn location
-     * @param track whether this entity should be tracked internally
      * @return the entity's entity id
      */
-    public int sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Player player, @NotNull Location location, boolean track){
-        if (track) {
-            DEUUser.getOrCreateUser(player).trackPacketEntity(entityId, null);
-        }
+    public int sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Player player, @NotNull Location location){
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, createEntityPacket(entityId, partType, location));
         sendAttributes(partType, player, entityId);
         return entityId;
     }
 
     /**
-     * Spawn a packet entity for a given player at a location with the given attributes of this container
-     * @param partType the type of entity this container represents
-     * @param part the packet display entity part
-     * @param player the player
-     * @param location the spawn location
-     * @param track whether this entity should be tracked internally
-     */
-    public void sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull PacketDisplayEntityPart part, @NotNull Player player, @NotNull Location location, boolean track){
-        int entityId = part.getEntityId();
-        if (track) {
-            DEUUser.getOrCreateUser(player).trackPacketEntity(part);
-        }
-        PacketEvents.getAPI().getPlayerManager().sendPacket(player, createEntityPacket(entityId, part.getType(), location));
-        sendAttributes(partType, player, entityId);
-    }
-
-    /**
-     * Spawn a packet entity for players at a location with the given attributes of this container
+     * Spawn a packet entity for players at a location with the given attributes of this container.
+     * Use {@link PacketAttributeContainer#createPart(SpawnedDisplayEntityPart.PartType, Location)} or any variation for internal tracking of this packet entity
      * @param partType the type of entity this container represents
      * @param players the players
      * @param location the spawn location
-     * @param track whether this entity should be tracked internally
      * @return the entity's entity id
      */
-    public int sendEntityUsingPlayers(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Collection<Player> players, @NotNull Location location, boolean track){
+    public int sendEntityUsingPlayers(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Collection<Player> players, @NotNull Location location){
         int entityId = SpigotReflectionUtil.generateEntityId();
-        sendEntityUsingPlayers(partType, SpigotReflectionUtil.generateEntityId(), players, location, track);
+        sendEntityUsingPlayers(partType, SpigotReflectionUtil.generateEntityId(), players, location);
         return entityId;
     }
 
     /**
      * Spawn a packet entity for players at a location with the given attributes of this container
+     * Use {@link PacketAttributeContainer#createPart(SpawnedDisplayEntityPart.PartType, Location)} or any variation for internal tracking of this packet entity
      * @param partType the type of entity this container represents
      * @param entityId the entity id of the packet entity
      * @param players the players
      * @param location the spawn location
-     * @param track whether this entity should be tracked internally
      * @return the entity's entity id
      */
-    public int sendEntityUsingPlayers(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Collection<Player> players, @NotNull Location location, boolean track){
+    public int sendEntityUsingPlayers(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Collection<Player> players, @NotNull Location location){
         for (Player player : players){
-            sendEntity(partType, entityId, player, location, track);
+            sendEntity(partType, entityId, player, location);
         }
         return entityId;
     }
 
     /**
      * Spawn a packet entity for players at a location with the given attributes of this container
-     * @param partType the type of entity this container represents
-     * @param part the packet display entity part
-     * @param players the players
-     * @param location the spawn location
-     * @param track whether this entity should be tracked internally
-     * @return the entity's entity id
-     */
-    public int sendEntityUsingPlayers(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull PacketDisplayEntityPart part, @NotNull Collection<Player> players, @NotNull Location location, boolean track){
-        for (Player player : players){
-            sendEntity(partType, part, player, location, track);
-        }
-        return part.getEntityId();
-    }
-
-
-    /**
-     * Spawn a packet entity for players at a location with the given attributes of this container
+     * Use {@link PacketAttributeContainer#createPart(SpawnedDisplayEntityPart.PartType, Location)} or any variation for internal tracking of this packet entity
      * @param partType the type of entity this container represents
      * @param playerUUIDs the players
      * @param location the spawn location
-     * @param track whether this entity should be tracked internally
      * @return the entity's entity id
      */
-    public int sendEntityUsingUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location, boolean track){
+    public int sendEntityUsingUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location){
         int entityId = SpigotReflectionUtil.generateEntityId();
-        sendEntityUsingUUIDs(partType, entityId, playerUUIDs, location, track);
+        sendEntityUsingUUIDs(partType, entityId, playerUUIDs, location);
         return entityId;
     }
 
     /**
-     * Spawn a packet entity for players at a location with the given attributes of this container
+     * Spawn a packet entity for players at a location with the given attributes of this container.
+     * Use {@link PacketAttributeContainer#createPart(SpawnedDisplayEntityPart.PartType, Location)} or any variation for internal tracking of this packet entity
      * @param partType the type of entity this container represents
      * @param entityId the entity id of the packet entity
      * @param playerUUIDs the players
      * @param location the spawn location
-     * @param track whether this entity should be tracked internally
      * @return the entity's entity id
      */
-    public int sendEntityUsingUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location, boolean track){
+    public int sendEntityUsingUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location){
         for (UUID uuid : playerUUIDs){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
-            sendEntity(partType, entityId, player, location, track);
+            sendEntity(partType, entityId, player, location);
         }
         return entityId;
     }
-
-    /**
-     * Spawn a packet entity for players at a location with the given attributes of this container
-     * @param partType the type of entity this container represents
-     * @param part the packet display entity part
-     * @param playerUUIDs the players
-     * @param location the spawn location
-     * @param track whether this entity should be tracked internally
-     */
-    public void sendEntityUsingUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull PacketDisplayEntityPart part, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location, boolean track){
-        for (UUID uuid : playerUUIDs){
-            Player player = Bukkit.getPlayer(uuid);
-            if (player == null) continue;
-            sendEntity(partType, part, player, location, track);
-        }
-    }
-
 
     /**
      * Send attribute data to a player for a specific entity

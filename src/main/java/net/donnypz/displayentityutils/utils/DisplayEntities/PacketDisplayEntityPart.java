@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
+import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
@@ -86,7 +87,8 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     @Override
     public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
         viewers.add(player.getUniqueId());
-        attributeContainer.sendEntity(type, this, player, getLocation(), true);
+        DEUUser.getOrCreateUser(player).trackPacketEntity(this);
+        attributeContainer.sendEntity(type, this.entityId, player, getLocation());
     }
 
     /**
@@ -106,14 +108,15 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * @param groupSpawnSettings the spawn settings to apply
      * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#teleport(Location)}, or if when created for a group, the group's location was null.
      */
-    public void showToPlayers(@NotNull Collection<Player> players,  @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
+    public void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
         if (packetLocation == null){
             throw new RuntimeException("Location must be set for packet-based part before showing it to players.");
         }
-        for (Player p : players){
-            viewers.add(p.getUniqueId());
+        for (Player player : players){
+            viewers.add(player.getUniqueId());
+            DEUUser.getOrCreateUser(player).trackPacketEntity(this);
         }
-        attributeContainer.sendEntityUsingPlayers(type, this, players, getLocation(), true);
+        attributeContainer.sendEntityUsingPlayers(type, this.entityId, players, getLocation());
     }
 
     /**
