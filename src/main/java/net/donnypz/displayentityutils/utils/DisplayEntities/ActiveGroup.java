@@ -49,9 +49,18 @@ public abstract class ActiveGroup implements Active{
         return tag != null;
     }
 
-    public abstract ActivePartSelection createPartSelection();
+    /**
+     * Create a {@link ActivePartSelection} containing unfiltered parts from this group
+     * @return a {@link ActivePartSelection}
+     */
+    public abstract @NotNull ActivePartSelection createPartSelection();
 
-    public abstract ActivePartSelection createPartSelection(@NotNull PartFilter partFilter);
+    /**
+     * Create a {@link ActivePartSelection} containing filtered parts from this group
+     * @param partFilter the part filter
+     * @return a {@link ActivePartSelection}
+     */
+    public abstract @NotNull ActivePartSelection createPartSelection(@NotNull PartFilter partFilter);
 
 
     /**
@@ -108,6 +117,13 @@ public abstract class ActiveGroup implements Active{
     }
 
 
+    /**
+     * Change the scale of all parts in this group by the given scale multiplier
+     * @param newScaleMultiplier the scale multiplier to apply to this group
+     * @param durationInTicks how long it should take for the group to scale
+     * @param scaleInteractions whether interaction entities should be scaled
+     * @throws IllegalArgumentException if newScaleMultiplier is less than or equal to 0
+     */
     public abstract boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions);
 
 
@@ -285,9 +301,6 @@ public abstract class ActiveGroup implements Active{
         }
     }
 
-
-
-
     /**
      * Get the glow color of this group
      * @return a color or null if not set
@@ -297,20 +310,55 @@ public abstract class ActiveGroup implements Active{
     }
 
 
-    public abstract SequencedCollection<? extends ActivePart> getParts();
-
+    /**
+     * Get a part by its part uuid
+     * @param partUUID the part uuid of the part
+     * @return an {@link ActivePart} or null if no part in this group contains the provided part uuid
+     */
     public abstract ActivePart getPart(@NotNull UUID partUUID);
 
-    public abstract SequencedCollection<? extends ActivePart> getParts(@NotNull String tag);
+    /**
+     * Get all the parts contained in this group
+     * @return a list of {@link ActivePart}
+     */
+    public abstract List<? extends ActivePart> getParts();
 
-    public abstract SequencedCollection<? extends ActivePart> getParts(@NotNull Collection<String> tags);
+    /**
+     * Get a list of all parts with the given tag
+     * @return a list of {@link ActivePart}
+     */
+    public abstract List<? extends ActivePart> getParts(@NotNull String tag);
 
-    public abstract SequencedCollection<? extends ActivePart> getParts(@NotNull SpawnedDisplayEntityPart.PartType partType);
+    /**
+     * Get a list of all parts with at least one of the given tags
+     * @return a list of {@link ActivePart}
+     */
+    public abstract List<? extends ActivePart> getParts(@NotNull Collection<String> tags);
 
-    public abstract SequencedCollection<? extends ActivePart> getDisplayParts();
 
+    /**
+     * Get a collection of all parts of a certain type within this group.
+     * @return a list of {@link ActivePart}
+     */
+    public abstract List<? extends ActivePart> getParts(@NotNull SpawnedDisplayEntityPart.PartType partType);
+
+    /**
+     * Get a list of all display entity parts (block, item, text display) within this group
+     * @return a list of {@link ActivePart}
+     */
+    public abstract List<? extends ActivePart> getDisplayParts();
+
+    /**
+     * Get whether can player visibly see / is tracking this group
+     * @param player the player
+     * @return a boolean
+     */
     public abstract boolean isTrackedBy(@NotNull Player player);
 
+    /**
+     * Get the players who can visibly see / are tracking this group
+     * @return a collection of players
+     */
     public abstract Collection<Player> getTrackingPlayers();
 
     public abstract ActivePart getMasterPart();
@@ -336,10 +384,12 @@ public abstract class ActiveGroup implements Active{
     }
 
     /**
-     * Get whether any players can visibly see this group. This is done by checking if the master (parent) part of the group can be seen.
+     * Get whether any players can visibly see / are trakcing this group. This is done by checking if the master (parent) part of the group is tracked.
      * @return a boolean
      */
-    public abstract boolean hasTrackingPlayers();
+    public boolean hasTrackingPlayers() {
+        return !getTrackingPlayers().isEmpty();
+    }
 
     void addActiveAnimator(DisplayAnimator animator){
         activeAnimators.add(animator);
@@ -350,7 +400,7 @@ public abstract class ActiveGroup implements Active{
     }
 
     /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group for a player
      * @param player the player
      * @param animation the animation the frame is from
      * @param startFrameId the id of the frame to display
@@ -360,7 +410,7 @@ public abstract class ActiveGroup implements Active{
     }
 
     /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group for a player
      * @param player the player
      * @param animation the animation the frame is from
      * @param startFrameId the id of the frame to display
@@ -371,8 +421,23 @@ public abstract class ActiveGroup implements Active{
         setToFrame(player, animation, animation.getFrame(startFrameId), duration, delay);
     }
 
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group for a player
+     * @param player the player
+     * @param animation the animation the frame is from
+     * @param frame the frame to display
+     */
     public abstract void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame);
 
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group for a player
+     * @param player the player
+     * @param animation the animation the frame is from
+     * @param frame the frame to display
+     * @param duration how long the frame should play
+     * @param delay how long until the frame should start playing
+     */
     public abstract void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay);
 
 
@@ -537,8 +602,19 @@ public abstract class ActiveGroup implements Active{
         }
     }
 
+    /**
+     * Make a group perform an animation
+     * @param animation the animation this group should play
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
+     */
     public abstract @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation);
 
+
+    /**
+     * Make a group perform a looping animation.
+     * @param animation the animation this group should play
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
+     */
     public abstract @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation);
 
     /**
@@ -572,6 +648,11 @@ public abstract class ActiveGroup implements Active{
         return verticalRideOffset;
     }
 
+
+    /**
+     * Determine if this group's vertical offset can be applied, typically when mounted on an entity
+     * @return a boolean
+     */
     public abstract boolean canApplyVerticalRideOffset();
 
     void setSpawnAnimation(String animationTag, LoadMethod loadMethod, DisplayAnimator.AnimationType animationType){

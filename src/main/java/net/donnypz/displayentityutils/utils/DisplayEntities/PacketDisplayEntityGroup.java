@@ -50,42 +50,28 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         return (PacketDisplayEntityPart) masterPart;
     }
 
-    @Override
-    public SequencedCollection<PacketDisplayEntityPart> getParts() {
-        return groupParts
-                .values()
-                .stream()
-                .map(PacketDisplayEntityPart.class::cast)
-                .toList();
-    }
+
 
 
     /**
-     * Create a {@link SpawnedPartSelection} containing unfiltered parts from this group
-     * @return a {@link SpawnedPartSelection}
+     * {@inheritDoc}
+     * @return a {@link PacketPartSelection}
      */
     @Override
-    public ActivePartSelection createPartSelection() {
+    public @NotNull PacketPartSelection createPartSelection() {
         return new PacketPartSelection(this);
     }
 
     /**
-     * Create a {@link SpawnedPartSelection} containing filtered parts from this group
-     * @param partFilter the part filter
-     * @return a {@link SpawnedPartSelection}
+     * {@inheritDoc}
+     * @return a {@link PacketPartSelection}
      */
     @Override
-    public ActivePartSelection createPartSelection(@NotNull PartFilter partFilter) {
+    public @NotNull PacketPartSelection createPartSelection(@NotNull PartFilter partFilter) {
         return new PacketPartSelection(this, partFilter);
     }
 
-    /**
-     * Set the scale for all parts within this group
-     * @param newScaleMultiplier the scale multiplier to apply to this group
-     * @param durationInTicks how long it should take for the group to scale
-     * @param scaleInteractions whether interaction entities should be scaled
-     * @throws IllegalArgumentException if newScaleMultiplier is less than or equal to 0
-     */
+
     @Override
     public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions) {
         if (newScaleMultiplier <= 0){
@@ -169,20 +155,10 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     }
 
 
-    /**
-     * Make a group perform an animation
-     * @param animation the animation this group should play
-     * @return the {@link DisplayAnimator} that will control the playing of the given animation
-     */
     public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation){
         return DisplayAnimator.playUsingPackets(this, animation);
     }
 
-    /**
-     * Make a group perform a looping animation.
-     * @param animation the animation this group should play
-     * @return the {@link DisplayAnimator} that will control the playing of the given animation
-     */
     public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
         animator.playUsingPackets(this, 0);
@@ -235,11 +211,32 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         return vehicleUUID == null ? null : Bukkit.getEntity(vehicleUUID);
     }
 
+    /**
+     * {@inheritDoc}
+     * @return a list of {@link PacketDisplayEntityPart}
+     */
+    @Override
+    public List<PacketDisplayEntityPart> getParts() {
+        return groupParts
+                .values()
+                .stream()
+                .map(PacketDisplayEntityPart.class::cast)
+                .toList();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return {@link PacketDisplayEntityPart} or null
+     */
     @Override
     public PacketDisplayEntityPart getPart(@NotNull UUID partUUID) {
         return (PacketDisplayEntityPart) groupParts.get(partUUID);
     }
 
+    /**
+     * {@inheritDoc}
+     * @return a list of {@link PacketDisplayEntityPart}
+     */
     @Override
     public List<PacketDisplayEntityPart> getParts(SpawnedDisplayEntityPart.@NotNull PartType partType) {
         List<PacketDisplayEntityPart> partList = new ArrayList<>();
@@ -251,6 +248,10 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         return partList;
     }
 
+    /**
+     * {@inheritDoc}
+     * @return a list of {@link PacketDisplayEntityPart}
+     */
     @Override
     public List<PacketDisplayEntityPart> getDisplayParts() {
         List<PacketDisplayEntityPart> partList = new ArrayList<>();
@@ -263,8 +264,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     }
 
     /**
-     * Get a list of all display entity parts within this group with a tag
-     * @return a list
+     * {@inheritDoc}
+     * @return a list of {@link PacketDisplayEntityPart}
      */
     @Override
     public List<PacketDisplayEntityPart> getParts(@NotNull String tag){
@@ -278,8 +279,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     }
 
     /**
-     * Get a list of all display entity parts within this group with at least one of the provided tags
-     * @return a list
+     * {@inheritDoc}
+     * @return a list of {@link PacketDisplayEntityPart}
      */
     @Override
     public List<PacketDisplayEntityPart> getParts(@NotNull Collection<String> tags){
@@ -300,19 +301,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         return getMasterPart().viewers.contains(player.getUniqueId());
     }
 
-    /**
-     * Get the players who can visibly see this group
-     * @return a collection of players
-     */
     @Override
     public Collection<Player> getTrackingPlayers() {
         return getMasterPart().getViewersAsPlayers();
     }
 
-    /**
-     * Get whether any players can visibly see this group. This is done by checking if the master (parent) part of the group can be seen.
-     * @return a boolean
-     */
     @Override
     public boolean hasTrackingPlayers() {
         return !getMasterPart().viewers.isEmpty();
@@ -450,12 +443,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         return true;
     }
 
-    /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
-     * @param player the player
-     * @param animation the animation the frame is from
-     * @param frame the frame to display
-     */
     @Override
     public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
         if (getMasterPart().isTrackedBy(player)){
@@ -463,14 +450,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         }
     }
 
-    /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
-     * @param player the player
-     * @param animation the animation the frame is from
-     * @param frame the frame to display
-     * @param duration how long the frame should play
-     * @param delay how long until the frame should start playing
-     */
     @Override
     public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
         if (getMasterPart().isTrackedBy(player)){

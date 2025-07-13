@@ -26,17 +26,14 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     public static final long defaultPartUUIDSeed = 99;
     final Random partUUIDRandom = new Random(defaultPartUUIDSeed);
 
-
     Set<SpawnedPartSelection> partSelections = new HashSet<>();
     List<SpawnedDisplayFollower> followers = new ArrayList<>();
     SpawnedDisplayFollower defaultFollower;
 
     long creationTime = System.currentTimeMillis();
-
     boolean isVisibleByDefault;
     private boolean isPersistent = DisplayEntityPlugin.defaultPersistence();
     private boolean persistenceOverride = DisplayEntityPlugin.persistenceOverride();
-
 
     public static final NamespacedKey creationTimeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "creationtime");
     static final NamespacedKey scaleKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "scale");
@@ -91,14 +88,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         return (Display)((SpawnedDisplayEntityPart) masterPart).getEntity();
     }
 
-    @Override
-    public SequencedCollection<SpawnedDisplayEntityPart> getParts() {
-        return groupParts
-                .values()
-                .stream()
-                .map(SpawnedDisplayEntityPart.class::cast)
-                .toList();
-    }
+
 
     /**
      * Get the unix timestamp that this group was initially created.
@@ -388,28 +378,17 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         return player.canSee(getMasterEntity());
     }
 
-    /**
-     * Get the players who can visibly see this group
-     * @return a collection of players
-     */
     @Override
     public Collection<Player> getTrackingPlayers() {
         return getMasterEntity().getTrackedBy();
     }
 
-    /**
-     * Get whether any players can visibly see this group. This is done by checking if the master (parent) part of the group can be seen.
-     * @return a boolean
-     */
-    @Override
-    public boolean hasTrackingPlayers() {
-        return !getTrackingPlayers().isEmpty();
-    }
+
+
 
     /**
-     * Get a {@link SpawnedDisplayEntityPart} by its part uuid
-     * @param partUUID the part uuid of the part
-     * @return a {@link SpawnedDisplayEntityPart} or null if no part in this group contains the provided part uuid
+     * {@inheritDoc}
+     * @return {@link SpawnedDisplayEntityPart} or null
      */
     @Override
     public @Nullable SpawnedDisplayEntityPart getPart(@NotNull UUID partUUID){
@@ -417,8 +396,21 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     /**
-     * Get a list of all parts of a certain type within this group.
-     * @return a list of all {@link SpawnedDisplayEntityPart} in this group of a certain part type
+     * {@inheritDoc}
+     * @return a list of {@link SpawnedDisplayEntityPart}
+     */
+    @Override
+    public List<SpawnedDisplayEntityPart> getParts() {
+        return groupParts
+                .values()
+                .stream()
+                .map(SpawnedDisplayEntityPart.class::cast)
+                .toList();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return a list of {@link SpawnedDisplayEntityPart}
      */
     @Override
     public List<SpawnedDisplayEntityPart> getParts(@NotNull SpawnedDisplayEntityPart.PartType partType){
@@ -432,8 +424,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     /**
-     * Get a list of all display entity parts within this group
-     * @return a list of only display entity {@link SpawnedDisplayEntityPart}
+     * {@inheritDoc}
+     * @return a list of {@link SpawnedDisplayEntityPart}
      */
     @Override
     public List<SpawnedDisplayEntityPart> getDisplayParts(){
@@ -447,8 +439,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     /**
-     * Get a list of all display entity parts within this group with a tag
-     * @return a list
+     * {@inheritDoc}
+     * @return a list of {@link SpawnedDisplayEntityPart}
      */
     @Override
     public List<SpawnedDisplayEntityPart> getParts(@NotNull String tag){
@@ -462,8 +454,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     /**
-     * Get a list of all display entity parts within this group with at least one of the provided tags
-     * @return a list
+     * {@inheritDoc}
+     * @return a list of {@link SpawnedDisplayEntityPart}
      */
     @Override
     public List<SpawnedDisplayEntityPart> getParts(@NotNull Collection<String> tags){
@@ -570,14 +562,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         return this;
     }
 
-    /**
-     * Set the scale for all parts within this group
-     * @param newScaleMultiplier the scale multiplier to apply to this group
-     * @param durationInTicks how long it should take for the group to scale
-     * @param scaleInteractions whether interaction entities should be scaled
-     * @return false if the {@link GroupScaleEvent} was cancelled or if the group is in an unloaded chunk
-     * * @throws IllegalArgumentException if newScaleMultiplier is less than or equal to 0
-     */
+    @Override
     public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions){
         if (newScaleMultiplier <= 0){
             throw new IllegalArgumentException("New Scale Multiplier cannot be <= 0");
@@ -965,21 +950,20 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     /**
-     * Create a {@link SpawnedPartSelection} containing unfiltered parts from this group
+     * {@inheritDoc}
      * @return a {@link SpawnedPartSelection}
      */
     @Override
-    public ActivePartSelection createPartSelection() {
+    public @NotNull SpawnedPartSelection createPartSelection() {
         return new SpawnedPartSelection(this);
     }
 
     /**
-     * Create a {@link SpawnedPartSelection} containing filtered parts from this group
-     * @param partFilter the part filter
+     * {@inheritDoc}
      * @return a {@link SpawnedPartSelection}
      */
     @Override
-    public ActivePartSelection createPartSelection(@NotNull PartFilter partFilter) {
+    public @NotNull SpawnedPartSelection createPartSelection(@NotNull PartFilter partFilter) {
         return new SpawnedPartSelection(this, partFilter);
     }
 
@@ -1119,10 +1103,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         }
     }
 
-    /**
-     * Determine if this group's vertical offset can be applied, typically when mounted on an entity
-     * @return a boolean
-     */
+
     public boolean canApplyVerticalRideOffset(){
         if (verticalRideOffset == 0){
             return false;
@@ -1313,21 +1294,13 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         }
     }
 
-    /**
-     * Make a group perform an animation
-     * @param animation the animation this group should play
-     * @return the {@link DisplayAnimator} that will control the playing of the given animation
-     */
+
     @Override
     public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation){
         return DisplayAnimator.play(this, animation, DisplayAnimator.AnimationType.LINEAR);
     }
 
-    /**
-     * Make a group perform a looping animation.
-     * @param animation the animation this group should play
-     * @return the {@link DisplayAnimator} that will control the playing of the given animation
-     */
+
     @Override
     public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
@@ -1413,13 +1386,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
 
 
 
-
-    /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
-     * @param player the player
-     * @param animation the animation the frame is from
-     * @param frame the frame to display
-     */
     @Override
     public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
         if (isInLoadedChunk()){
@@ -1427,20 +1393,11 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         }
     }
 
-    /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
-     * @param player the player
-     * @param animation the animation the frame is from
-     * @param frame the frame to display
-     * @param duration how long the frame should play
-     * @param delay how long until the frame should start playing
-     */
     @Override
     public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
         if (isInLoadedChunk()){
             PlayerDisplayAnimationExecutor.setGroupToFrame(player, this, animation, frame, duration, delay);
         }
-
     }
 
 

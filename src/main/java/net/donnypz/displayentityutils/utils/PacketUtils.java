@@ -54,20 +54,43 @@ public final class PacketUtils {
     }
 
 
-
+    /**
+     * Teleport a {@link PacketDisplayEntityPart} to a location, only for a given player's client
+     * @param player the player
+     * @param part the part
+     * @param location the location
+     */
     public static void teleport(@NotNull Player player, @NotNull PacketDisplayEntityPart part, @NotNull Location location){
         teleport(player, part.getEntityId(), location);
     }
 
+    /**
+     * Teleport an entity to a location, only for a given player's client
+     * @param player the player
+     * @param entityId the entity's entity id
+     * @param location the location
+     */
     public static void teleport(@NotNull Player player, int entityId, @NotNull Location location){
         WrapperPlayServerEntityTeleport telPacket = new WrapperPlayServerEntityTeleport(entityId, SpigotConversionUtil.fromBukkitLocation(location), false);
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, telPacket);
     }
 
+    /**
+     * Teleport a {@link PacketDisplayEntityPart} to a location, only the clients of the given players
+     * @param players the players
+     * @param part the part
+     * @param location the location
+     */
     public static void teleport(@NotNull Collection<Player> players, @NotNull PacketDisplayEntityPart part, @NotNull Location location){
         teleport(players, part.getEntityId(), location);
     }
 
+    /**
+     * Teleport an entity to a location, only the clients of the given players
+     * @param players the players
+     * @param entityId the entity's entity id
+     * @param location the location
+     */
     public static void teleport(@NotNull Collection<Player> players, int entityId, @NotNull Location location){
         WrapperPlayServerEntityTeleport telPacket = new WrapperPlayServerEntityTeleport(entityId, SpigotConversionUtil.fromBukkitLocation(location), false);
         for (Player player : players){
@@ -75,19 +98,47 @@ public final class PacketUtils {
         }
     }
 
+    /**
+     * Set the rotation of a {@link PacketDisplayEntityPart}, only for a given player's client
+     * @param player the player
+     * @param part the part
+     * @param yaw the yaw
+     * @param pitch the pitch
+     */
     public static void setRotation(@NotNull Player player, @NotNull PacketDisplayEntityPart part, float yaw, float pitch){
         setRotation(player, part.getEntityId(), yaw, pitch);
     }
 
+    /**
+     * Set the rotation of an entity, only for a given player's client
+     * @param player the player
+     * @param entityId the entity's entity id
+     * @param yaw the yaw
+     * @param pitch the pitch
+     */
     public static void setRotation(@NotNull Player player, int entityId, float yaw, float pitch){
         WrapperPlayServerEntityRotation rotationPacket = new WrapperPlayServerEntityRotation(entityId, pitch, yaw, false);
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, rotationPacket);
     }
 
+    /**
+     * Set the rotation of a {@link PacketDisplayEntityPart}, only for the clients of given players
+     * @param players the players
+     * @param part the part
+     * @param yaw the yaw
+     * @param pitch the pitch
+     */
     public static void setRotation(@NotNull Collection<Player> players, @NotNull PacketDisplayEntityPart part, float yaw, float pitch){
         setRotation(players, part.getEntityId(), yaw, pitch);
     }
 
+    /**
+     * Set the rotation of an entity, only for the clients of given players
+     * @param players the players
+     * @param entityId the entity's entity id
+     * @param yaw the yaw
+     * @param pitch the pitch
+     */
     public static void setRotation(@NotNull Collection<Player> players, int entityId, float yaw, float pitch){
         WrapperPlayServerEntityRotation rotationPacket = new WrapperPlayServerEntityRotation(entityId, pitch, yaw, false);
         for (Player player : players){
@@ -286,35 +337,123 @@ public final class PacketUtils {
         }.runTaskTimerAsynchronously(DisplayEntityPlugin.getInstance(), delayInTicks, 1);
     }
 
+    /**
+     * Attempts to change the translation of a packet-based interaction entity similar
+     * to a Display Entity, through smooth teleportation for a given player.
+     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param player the player
+     * @param interaction the interaction
+     * @param direction The direction to translate the interaction entity
+     * @param distance How far the interaction entity should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
+     */
     public static void translateInteraction(@NotNull Player player, @NotNull Interaction interaction, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
         translateInteraction(player, interaction, direction.getVector(interaction), distance, durationInTicks, delayInTicks);
     }
 
+    /**
+     * Attempts to change the translation of a packet-based interaction entity similar
+     * to a Display Entity, through smooth teleportation for a given player.
+     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param player the player
+     * @param interaction the interaction
+     * @param direction The direction to translate the interaction entity
+     * @param distance How far the interaction entity should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
+     */
     public static void translateInteraction(@NotNull Player player, @NotNull Interaction interaction, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
         translateInteraction(List.of(player), interaction, direction, distance, durationInTicks, delayInTicks);
     }
 
+    /**
+     * Attempts to change the translation of a packet-based interaction entity similar
+     * to a Display Entity, through smooth teleportation for a given player.
+     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param player the player
+     * @param part the interaction part
+     * @param direction The direction to translate the interaction entity
+     * @param distance How far the interaction entity should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
+     */
     public static void translateInteraction(@NotNull Player player, @NotNull ActivePart part, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
         translateInteraction(player, part, direction.getVector(getLocation(part)), distance, durationInTicks, delayInTicks);
     }
 
+    /**
+     * Attempts to change the translation of a packet-based interaction entity similar
+     * to a Display Entity, through smooth teleportation for a given player.
+     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param player the player
+     * @param part the interaction part
+     * @param direction The direction to translate the interaction entity
+     * @param distance How far the interaction entity should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
+     */
     public static void translateInteraction(@NotNull Player player, @NotNull ActivePart part, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
         translateInteraction(List.of(player), part, direction, distance, durationInTicks, delayInTicks);
     }
 
+    /**
+     * Attempts to change the translation of a packet-based interaction entity similar
+     * to a Display Entity, through smooth teleportation for given players.
+     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param players the players
+     * @param interaction the interaction
+     * @param direction The direction to translate the interaction entity
+     * @param distance How far the interaction entity should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
+     */
     public static void translateInteraction(@NotNull Collection<Player> players, @NotNull Interaction interaction, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
         translateInteraction(players, interaction, direction.getVector(interaction), distance, durationInTicks, delayInTicks);
     }
 
+    /**
+     * Attempts to change the translation of a packet-based interaction entity similar
+     * to a Display Entity, through smooth teleportation for given players.
+     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param players the players
+     * @param interaction the interaction
+     * @param direction The direction to translate the interaction entity
+     * @param distance How far the interaction entity should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
+     */
     public static void translateInteraction(@NotNull Collection<Player> players, @NotNull Interaction interaction, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
         Location l = interaction.getLocation();
         translateInteraction(players, interaction.getEntityId(), l, l.getYaw(), direction, distance, durationInTicks, delayInTicks);
     }
 
+    /**
+     * Attempts to change the translation of a packet-based interaction entity similar
+     * to a Display Entity, through smooth teleportation for given players.
+     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param players the players
+     * @param part the interaction part
+     * @param direction The direction to translate the interaction entity
+     * @param distance How far the interaction entity should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
+     */
     public static void translateInteraction(@NotNull Collection<Player> players, @NotNull ActivePart part, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
         translateInteraction(players, part, direction.getVector(getLocation(part)), distance, durationInTicks, delayInTicks);
     }
 
+    /**
+     * Attempts to change the translation of a packet-based interaction entity similar
+     * to a Display Entity, through smooth teleportation for given players.
+     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param players the players
+     * @param part the interaction part
+     * @param direction The direction to translate the interaction entity
+     * @param distance How far the interaction entity should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
+     */
     public static void translateInteraction(@NotNull Collection<Player> players, @NotNull ActivePart part, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
         if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION) return;
         Location l = getLocation(part);
@@ -429,12 +568,24 @@ public final class PacketUtils {
         }
     }
 
+    /**
+     * Make an entity glow, only for the given player
+     * @param player the player
+     * @param entityId the entity's entity id
+     * @param glowing the glowing state
+     */
     public static void setGlowing(@NotNull Player player, int entityId, boolean glowing){
         new PacketAttributeContainer()
                 .setAttribute(DisplayAttributes.GLOWING, glowing)
                 .sendAttributes(player, entityId);
     }
 
+    /**
+     * Make an entity glow, only for the given player, for a set duration
+     * @param player the player
+     * @param entityId the entity's entity id
+     * @param durationInTicks how long the glowing should last
+     */
     public static void setGlowing(@NotNull Player player, int entityId, long durationInTicks){
         setGlowing(player, entityId, true);
         Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {

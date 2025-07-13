@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
@@ -32,6 +33,16 @@ public abstract class ActivePart implements Active{
 
     protected abstract void cull(float width, float height);
 
+
+    /**
+     * Attempt to automatically set the culling bounds for this part. This is the same as {@link ActiveGroup#autoSetCulling(CullOption, float, float)}
+     * with a CullSetting of {@link CullOption#LOCAL}.
+     * Results may not be 100% accurate due to the varying shapes of Minecraft blocks and variation is display entity transformations.
+     * The culling bounds will be representative of the part's scaling.
+     * @param widthAdder The amount of width to be added to the culling range
+     * @param heightAdder The amount of height to be added to the culling range
+     * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
+     */
     public abstract void autoCull(float widthAdder, float heightAdder);
 
     /** Get this part's UUID used for animations and uniquely identifying parts
@@ -129,28 +140,74 @@ public abstract class ActivePart implements Active{
         PacketUtils.setGlowing(player, getEntityId(), false);
     }
 
+    /**
+     * Get the glow color of this part
+     * @return a color, or null if not set or if this part's type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.
+     */
     public abstract @Nullable Color getGlowColor();
 
     public abstract ActiveGroup getGroup();
 
+    /**
+     * Set the text of this part if it's type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
+     * @param text the text
+     */
     public abstract void setTextDisplayText(@NotNull Component text);
 
+    /**
+     * Set the block data of this part if it's type is {@link SpawnedDisplayEntityPart.PartType#BLOCK_DISPLAY}.
+     * @param blockData the block data
+     */
     public abstract void setBlockDisplayBlock(@NotNull BlockData blockData);
 
-    public abstract void setItemDisplayItem(@NotNull ItemStack itemstack);
+    /**
+     * Set the item of this part if it's type is {@link SpawnedDisplayEntityPart.PartType#ITEM_DISPLAY}.
+     * @param itemStack the item
+     */
+    public abstract void setItemDisplayItem(@NotNull ItemStack itemStack);
 
+    /**
+     * Set an attribute on this part, and send the updated attribute to viewing players.
+     * @param attribute the attribute
+     * @param value the corresponding attribute value
+     */
     public abstract <T, V> void setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value);
 
+    /**
+     * Set multiple attributes at once on this part, and send the updated attributes to viewing players.
+     * @param attributeMap the attribute map
+     */
     public abstract void setAttributes(@NotNull DisplayAttributeMap attributeMap);
 
+    /**
+     * Get the interaction translation of this part, relative to its
+     * group's location <bold><u>only</u></bold> if the part's type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.
+     * @return a vector or null if the part is not an interaction
+     */
     public abstract @Nullable Vector getInteractionTranslation();
 
-    public abstract Transformation getDisplayTransformation();
+    /**
+     * Get the transformation of this part if its type of not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * @return a {@link Transformation} or null if the part is an interaction
+     */
+    public abstract @Nullable Transformation getDisplayTransformation();
 
+    /**
+     * Get the interaction height of this if its type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.
+     * @return the height or -1 if the part is not an interaction
+     */
     public abstract float getInteractionHeight();
 
+    /**
+     * Get the interaction width of this if its type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.
+     * @return the width or -1 if the part is not an interaction
+     */
     public abstract float getInteractionWidth();
 
+    /**
+     * Get the teleport duration of this part if its type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.
+     * @return the teleport duration or -1 is the part is an interaction
+     */
     public abstract int getTeleportDuration();
 
     static class PartData {

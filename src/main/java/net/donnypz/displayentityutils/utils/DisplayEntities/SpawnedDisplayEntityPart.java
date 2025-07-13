@@ -161,7 +161,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @return {@link SpawnedDisplayEntityGroup} or null if this part is not associated with a group
      */
     @Override
-    public SpawnedDisplayEntityGroup getGroup() {
+    public @Nullable SpawnedDisplayEntityGroup getGroup() {
         return group;
     }
 
@@ -688,13 +688,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     /**
-     * Attempt to automatically set the culling bounds for this part. This is the same as {@link SpawnedDisplayEntityGroup#autoSetCulling(CullOption, float, float)}
-     * with a CullSetting of {@link CullOption#LOCAL}.
-     * Results may not be 100% accurate due to the varying shapes of Minecraft blocks and variation is display entity transformations.
-     * The culling bounds will be representative of the part's scaling.
-     * @param widthAdder The amount of width to be added to the culling range
-     * @param heightAdder The amount of height to be added to the culling range
-     * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
+     * {@inheritDoc}
      */
     @Override
     public void autoCull(float widthAdder, float heightAdder){
@@ -720,10 +714,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         display.setGlowColorOverride(color);
     }
 
-    /**
-     * Get the glow color of this part
-     * @return a color, or null if not set or if this part's type is {@link PartType#INTERACTION}
-     */
     @Override
     public @Nullable Color getGlowColor(){
         if (type == PartType.INTERACTION){
@@ -821,19 +811,26 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public void setTextDisplayText(@NotNull Component text) {
+        if (type != PartType.TEXT_DISPLAY) return;
         ((TextDisplay) getEntity()).text(text);
     }
 
     @Override
     public void setBlockDisplayBlock(@NotNull BlockData blockData) {
+        if (type != PartType.BLOCK_DISPLAY) return;
         ((BlockDisplay) getEntity()).setBlock(blockData);
     }
 
     @Override
-    public void setItemDisplayItem(@NotNull ItemStack itemstack) {
-        ((ItemDisplay) getEntity()).setItemStack(itemstack);
+    public void setItemDisplayItem(@NotNull ItemStack itemStack) {
+        if (type != PartType.ITEM_DISPLAY) return;
+        ((ItemDisplay) getEntity()).setItemStack(itemStack);
     }
 
+    /**
+     * {@inheritDoc}
+     * The applied changes do not reflect the entity data server-side
+     */
     @Override
     public <T, V> void setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value) {
         Entity entity = getEntity();
@@ -841,6 +838,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                 .sendAttributesUsingPlayers(entity.getTrackedBy(), entity.getEntityId());
     }
 
+    /**
+     * {@inheritDoc}
+     * The applied changes do not reflect the entity data server-side
+     */
     @Override
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap) {
         Entity entity = getEntity();
@@ -848,10 +849,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                 .sendAttributesUsingPlayers(entity.getTrackedBy(), entity.getEntityId());
     }
 
-    /**
-     * Get the interaction translation of this part, relative to its group's location <bold><u>only</u></bold> if the part is an interaction.
-     * @return a vector or null if the part is not an interaction
-     */
     @Override
     public @Nullable Vector getInteractionTranslation() {
         if (type != PartType.INTERACTION) {
@@ -860,22 +857,15 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return DisplayUtils.getInteractionTranslation((Interaction) getEntity(), group.getLocation());
     }
 
-    /**
-     * Get the transformation of this part if its type of not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
-     * @return a {@link Transformation} or null if the part is an interaction
-     */
+
     @Override
-    public Transformation getDisplayTransformation() {
+    public @Nullable Transformation getDisplayTransformation() {
         if (type == PartType.INTERACTION) {
             return null;
         }
         return ((Display) getEntity()).getTransformation();
     }
 
-    /**
-     * Get the interaction height of this part if it is an interaction
-     * @return the height or -1 if the part is not an interaction
-     */
     @Override
     public float getInteractionHeight() {
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
@@ -884,10 +874,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return ((Interaction) getEntity()).getInteractionHeight();
     }
 
-    /**
-     * Get the interaction width of this part if it is an interaction
-     * @return the width or -1 if the part is not an interaction
-     */
     @Override
     public float getInteractionWidth() {
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
@@ -896,10 +882,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return ((Interaction) getEntity()).getInteractionWidth();
     }
 
-    /**
-     * Get the teleport duration of this part if it's a display entity
-     * @return the teleport duration or -1 is the part is an interaction
-     */
     @Override
     public int getTeleportDuration() {
         if (type == PartType.INTERACTION){

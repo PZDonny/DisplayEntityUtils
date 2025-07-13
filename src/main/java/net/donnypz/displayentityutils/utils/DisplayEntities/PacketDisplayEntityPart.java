@@ -39,6 +39,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
 
 
+    @ApiStatus.Internal
     public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer){
         super(entityId);
         this.type = partType;
@@ -46,11 +47,13 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         this.teleport(location);
     }
 
+    @ApiStatus.Internal
     public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull String partTag){
         this(partType, location, entityId, attributeContainer);
         this.partTags.add(partTag);
     }
 
+    @ApiStatus.Internal
     public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull Set<String> partTags){
         this(partType, location, entityId, attributeContainer);
         this.partTags.addAll(partTags);
@@ -173,48 +176,29 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         return players;
     }
 
-    /**
-     * Set the text of this text display and send the update to viewing players. This has no effect if the part is not a text display.
-     * @param text the text
-     */
     @Override
     public void setTextDisplayText(@NotNull Component text) {
         setAndSend(DisplayAttributes.TextDisplay.TEXT, text);
     }
 
-    /**
-     * Set the block of this block display of this part and send the update to viewing players. This has no effect if the part is not a block display.
-     * @param blockData the block data
-     */
     @Override
     public void setBlockDisplayBlock(@NotNull BlockData blockData) {
         setAndSend(DisplayAttributes.BlockDisplay.BLOCK_STATE, blockData);
     }
 
-    /**
-     * Set the item of this item display and send the update to viewing players. This has no effect if the part is not an item display.
-     * @param itemstack the itemstack
-     */
     @Override
-    public void setItemDisplayItem(@NotNull ItemStack itemstack) {
+    public void setItemDisplayItem(@NotNull ItemStack itemStack) {
         if (type != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) return;
-        setAndSend(DisplayAttributes.ItemDisplay.ITEMSTACK, itemstack);
+        setAndSend(DisplayAttributes.ItemDisplay.ITEMSTACK, itemStack);
     }
 
-    /**
-     * Set an attribute on this part, and send the updated attribute to viewing players.
-     * @param attribute the attribute
-     * @param value the corresponding attribute value
-     */
+
     @Override
     public <T, V> void setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value) {
         this.attributeContainer.setAttribute(attribute, value);
     }
 
-    /**
-     * Set multiple attributes at once on this part, and send the updated attributes to viewing players.
-     * @param attributeMap the attribute map
-     */
+
     @Override
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap){
         this.attributeContainer.setAttributesAndSend(attributeMap, entityId, viewers);
@@ -233,10 +217,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
 
-    /**
-     * Get the interaction translation of this part, relative to its group's location <bold><u>only</u></bold> if the part is an interaction.
-     * @return a vector. Null if the part is not an interaction or not in a group
-     */
     @Override
     public @Nullable Vector getInteractionTranslation() {
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
@@ -245,21 +225,14 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         return getInteractionTranslation(group.getLocation());
     }
 
-    /**
-     * Get the interaction translation of this part, relative to a given location <bold><u>only</u></bold> if the part is an interaction.
-     * @return a vector. Null if the part is not an interaction or not in a group
-     */
-    public @Nullable Vector getInteractionTranslation(@NotNull Location referenceLocation){
+    public Vector getInteractionTranslation(@NotNull Location referenceLocation){
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
             return null;
         }
         return referenceLocation.toVector().subtract(getLocation().toVector());
     }
 
-    /**
-     * Get the interaction height of this part if it is an interaction
-     * @return the height or -1 if the part is not an interaction
-     */
+
     @Override
     public float getInteractionHeight() {
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
@@ -268,10 +241,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         return attributeContainer.getAttribute(DisplayAttributes.Interaction.HEIGHT);
     }
 
-    /**
-     * Get the interaction width of this part if it is an interaction
-     * @return the width or -1 if the part is not an interaction
-     */
     @Override
     public float getInteractionWidth() {
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
@@ -303,10 +272,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         cull(values[0], values[1]);
     }
 
-    /**
-     * Get the glow color of this part
-     * @return a color, or null if not set or if this part's type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
-     */
+
     @Override
     public @Nullable Color getGlowColor() {
         return attributeContainer.getAttribute(DisplayAttributes.GLOW_COLOR_OVERRIDE);
@@ -424,10 +390,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         return packetLocation.yaw;
     }
 
-    /**
-     * Get the transformation of this part if its type of not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
-     * @return a {@link Transformation} or null if the part is an interaction
-     */
     @Override
     public Transformation getDisplayTransformation(){
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
