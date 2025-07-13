@@ -26,12 +26,12 @@ final class PacketDisplayAnimationExecutor {
                                    @NotNull SpawnedDisplayAnimation animation,
                                    @NotNull ActiveGroup group,
                                    @NotNull SpawnedDisplayAnimationFrame frame,
-                                   int frameId,
+                                   int startFrameId,
                                    int delay,
                                    boolean playSingleFrame) {
         this.animator = animator;
         this.playSingleFrame = playSingleFrame;
-        prepareAnimation(animation, group, frame, frameId, delay);
+        prepareAnimation(animation, group, frame, startFrameId, delay);
     }
 
 

@@ -25,10 +25,10 @@ final class PlayerDisplayAnimationExecutor {
                                    @NotNull SpawnedDisplayAnimation animation,
                                    @NotNull ActiveGroup group,
                                    @NotNull SpawnedDisplayAnimationFrame frame,
-                                   int frameId,
+                                   int startFrameId,
                                    int delay,
                                    boolean playSingleFrame) {
-        this(Set.of(player), animator, animation, group, frame, frameId, delay, playSingleFrame);
+        this(Set.of(player), animator, animation, group, frame, startFrameId, delay, playSingleFrame);
     }
 
     PlayerDisplayAnimationExecutor(@NotNull Collection<Player> players,
@@ -36,12 +36,12 @@ final class PlayerDisplayAnimationExecutor {
                                    @NotNull SpawnedDisplayAnimation animation,
                                    @NotNull ActiveGroup group,
                                    @NotNull SpawnedDisplayAnimationFrame frame,
-                                   int frameId,
+                                   int startFrameId,
                                    int delay,
                                    boolean playSingleFrame) {
         this.animator = animator;
         this.playSingleFrame = playSingleFrame;
-        prepareAnimation(new HashSet<>(players), animation, group, frame, frameId, delay);
+        prepareAnimation(new HashSet<>(players), animation, group, frame, startFrameId, delay);
     }
 
 

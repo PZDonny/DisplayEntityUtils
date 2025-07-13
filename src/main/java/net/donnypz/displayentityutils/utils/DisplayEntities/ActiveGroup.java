@@ -4,10 +4,8 @@ import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.CullOption;
-import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
-import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -15,7 +13,6 @@ import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -356,22 +353,22 @@ public abstract class ActiveGroup implements Active{
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
      * @param player the player
      * @param animation the animation the frame is from
-     * @param frameId the id of the frame to display
+     * @param startFrameId the id of the frame to display
      */
-    public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, int frameId) {
-        setToFrame(player, animation, animation.getFrame(frameId));
+    public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, int startFrameId) {
+        setToFrame(player, animation, animation.getFrame(startFrameId));
     }
 
     /**
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
      * @param player the player
      * @param animation the animation the frame is from
-     * @param frameId the id of the frame to display
+     * @param startFrameId the id of the frame to display
      * @param duration how long the frame should play
      * @param delay how long until the frame should start playing
      */
-    public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, int frameId, int duration, int delay) {
-        setToFrame(player, animation, animation.getFrame(frameId), duration, delay);
+    public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, int startFrameId, int duration, int delay) {
+        setToFrame(player, animation, animation.getFrame(startFrameId), duration, delay);
     }
 
     public abstract void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame);

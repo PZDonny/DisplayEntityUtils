@@ -24,7 +24,7 @@ final class DisplayAnimatorExecutor {
                             @NotNull SpawnedDisplayAnimation animation,
                             @NotNull ActiveGroup group,
                             @NotNull SpawnedDisplayAnimationFrame frame,
-                            int frameId,
+                            int startFrameId,
                             int delay,
                             boolean isAsync,
                             boolean playSingleFrame)
@@ -32,7 +32,7 @@ final class DisplayAnimatorExecutor {
         this.animator = animator;
         this.isAsync = isAsync;
         this.playSingleFrame = playSingleFrame;
-        prepareAnimation(animation, (SpawnedDisplayEntityGroup) group, frame, frameId, delay);
+        prepareAnimation(animation, (SpawnedDisplayEntityGroup) group, frame, startFrameId, delay);
     }
 
 

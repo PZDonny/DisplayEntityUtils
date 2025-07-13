@@ -407,11 +407,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     /**
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
      * @param animation the animation the frame is from
-     * @param frameId the id of the frame to display
+     * @param startFrameId the id of the frame to display
      * @return false if this group is in an unloaded chunk
      */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, int frameId) {
-        return setToFrame(animation, animation.getFrame(frameId));
+    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId) {
+        return setToFrame(animation, animation.getFrame(startFrameId));
     }
 
     /**
@@ -428,13 +428,13 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     /**
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame}  on this group
      * @param animation the animation the frame is from
-     * @param frameId the id of the frame to display
+     * @param startFrameId the id of the frame to display
      * @param duration how long the frame should play
      * @param delay how long until the frame should start playing
      * @return false if this group is in an unloaded chunk
      */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, int frameId, int duration, int delay) {
-        return setToFrame(animation, animation.getFrame(frameId), duration, delay);
+    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId, int duration, int delay) {
+        return setToFrame(animation, animation.getFrame(startFrameId), duration, delay);
     }
 
     /**
