@@ -5,10 +5,17 @@
 
 DisplayEntityUtils is a extensive plugin designed for use with BDEngine, a modeling/animation engine designed for display entities without the need for resource packs or mods.
 
-## What you'll need: BDEngine
+## What you'll need
+### Dependencies:
+- **[PacketEvents](https://modrinth.com/plugin/packetevents)**
+  - **_This dependency allows for usage of packet-based display entities, and is used throughout the plugin_** 
+- **[PassengerAPI](https://modrinth.com/plugin/passengerapi)**
+  - **_This dependency prevents conflicts with other plugins_**
+
+### BDEngine
 BDEngine is what you'll use to create models and animations that can be transferred into your game world. Info on BDEngine and the Block Display Place, the collection of BDEngine models and animations, can be found [HERE](block-display.com)
-> DISCLAIMER: I DO NOT OWN BDENGINE! ALL ISSUES AND SUGGESTIONS RELATED TO THAT PROJECT SHOULD BE BROUGHT TO THE OWNER, [ILLYSTRAY](https://illystray.com), IN THE BDENGINE DISCORD FOUND [HERE](https://discord.com/invite/VCeHfSd6Xa)
-> 
+> DISCLAIMER: I DO NOT OWN BDModels/BDEngine! ALL ISSUES AND SUGGESTIONS RELATED TO THAT PROJECT SHOULD BE BROUGHT TO THE OWNER, [ILLYSTRAY](https://illystray.com), IN THE BDENGINE DISCORD FOUND [HERE](https://discord.com/invite/VCeHfSd6Xa)
+
 ## What can DisplayEntityUtils do?
 - Manipulate Groups (BDEngine Models)
 - Manipulate every part (Display Entity) within a model
@@ -17,27 +24,26 @@ BDEngine is what you'll use to create models and animations that can be transfer
 
 [![SkriptHubViewTheDocs](http://skripthub.net/static/addon/ViewTheDocsButton.png)](http://skripthub.net/docs/?addon=DisplayEntityUtils)
 
-- Include Interaction Entities as part of groups/models
-- Execute commands through Interaction Entities
 - Create and Play Animations through the plugin
 - Convert Datapack Animations from BDEngine (preferred over creating in-game)
+- Include Interaction Entities as part of groups/models
+- Execute commands through Interaction Entities
 - Retrieve models from BDEngine and spawn them in-game
 - Intergration with **MythicMobs**
 - Create Animation State Machines
 - Save groups and animations through Local Storage, MySQL, or MongoDB
 - And so much more!
 
-## What more can it do for developers?
+## What more can it do for API/Skript users?
 - Tools to manipulate Display and Interaction entity as individual entities
 - Show/Hide groups to/from certain players
 - Mount groups on entities (or vice-versa)
 - Request models from BDEngine's website
+- Create packets based groups/entities
+- Play packet-based animations
 - Theres too many things to list!
 
 ## Showcases
-- Conversion of BDEngine Datapack Animations into plugin usable animations *(Credit goes to [HaniVindinggame](https://block-display.com/author/hanivindinggame/) for the Dungeon Door model and animation)*
-> ![](https://github.com/user-attachments/assets/0f53ea0d-3e91-4bd7-b811-8c59fafcd4fb)
-
 - Display Controllers (Using Models as cosmetic equipment) - With(out) MythicMobs
 > ![ezgif-1-873ca90c95 (1)](https://github.com/user-attachments/assets/ee189856-3459-49b8-b75c-4c18d1b43818)
 
@@ -47,12 +53,7 @@ BDEngine is what you'll use to create models and animations that can be transfer
 - API: Display Entities rotating smoothly with yaw changes, and Interaction entities pivoting around the center
 > ![](https://github.com/user-attachments/assets/5c333cd4-71ba-4ad1-a631-f8ec648651f0)
 
-
-
-
-
-
-## WIKI (WIP)
+## WIKI
 Access the wiki [HERE](https://github.com/PZDonny/DisplayEntityUtils/wiki)
 
 ## How can you access the API?
