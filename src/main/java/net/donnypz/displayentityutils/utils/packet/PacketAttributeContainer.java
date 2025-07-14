@@ -193,8 +193,7 @@ public class PacketAttributeContainer implements Cloneable{
      */
     public int sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Player player, @NotNull Location location){
         int entityId = SpigotReflectionUtil.generateEntityId();
-        sendEntity(partType, entityId, player, location);
-        return entityId;
+        return sendEntity(partType, entityId, player, location);
     }
 
     /**
