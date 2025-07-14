@@ -42,6 +42,17 @@ public class PacketAttributeContainer implements Cloneable{
     }
 
     /**
+     * Set the attribute that should be applied to a packet entity, BEFORE the entity is sent to any players, as long as the attribute is absent.
+     * @param attribute the {@link DisplayAttribute}
+     * @param value the value corresponding to the provided {@link DisplayAttribute}
+     * @return this
+     */
+    public <T, V> PacketAttributeContainer setAttributeIfAbsent(@NotNull DisplayAttribute<T, V> attribute, T value){
+        attributes.putIfAbsent(attribute, value);
+        return this;
+    }
+
+    /**
      * Set the values of a transformation through this single method instead of chaining
      * @param transformation the transformation
      * @return this
