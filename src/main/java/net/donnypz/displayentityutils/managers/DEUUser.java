@@ -148,11 +148,6 @@ public class DEUUser {
     }
 
     @ApiStatus.Internal
-    public void untrackPacketEntity(@NotNull PacketDisplayEntityPart part){
-        untrackPacketEntity(part.getEntityId());
-    }
-
-    @ApiStatus.Internal
     public void untrackPacketEntity(int entityId){
         trackedPacketEntities.remove(entityId);
     }
@@ -176,7 +171,7 @@ public class DEUUser {
             PacketDisplayEntityPart part = entry.getValue();
             if (part == null) continue;
             if (!worldName.equals(part.getWorldName())){
-                part.untrack(userUUID);
+                part.hideFromPlayer(player);
             }
             iter.remove();
         }
@@ -275,19 +270,19 @@ public class DEUUser {
         if (selectedPartSelection != null) selectedPartSelection.remove();
         if (particleBuilder != null) particleBuilder.remove();
 
+        Player player = Bukkit.getPlayer(userUUID);
+
         Iterator<Map.Entry<Integer, PacketDisplayEntityPart>> iter = trackedPacketEntities.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<Integer, PacketDisplayEntityPart> entry = iter.next();
             PacketDisplayEntityPart part = entry.getValue();
             if (part != null){
-                part.untrack(userUUID);
+                part.hideFromPlayer(player);
             }
             iter.remove();
         }
 
-        Player player = Bukkit.getPlayer(userUUID);
-        if (player != null){
-            DEUCommandUtils.removeRelativePoints(player);
-        }
+
+        DEUCommandUtils.removeRelativePoints(player);
     }
 }

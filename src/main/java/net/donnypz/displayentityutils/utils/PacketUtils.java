@@ -517,25 +517,13 @@ public final class PacketUtils {
         return null;
     }
 
-    public static void destroyEntity(@NotNull Player player, @NotNull PacketDisplayEntityPart part){
-        if (!part.isTrackedBy(player)) {
-            return;
-        }
-        int entityId = part.getEntityId();
-        part.untrack(player.getUniqueId());
+    public static void destroyEntity(@NotNull Player player, int entityId){
         destroyEntities(player, new int[]{entityId});
     }
 
-    public static void destroyEntity(@NotNull Collection<Player> players, @NotNull PacketDisplayEntityPart part){
-        int entityId = part.getEntityId();
-
+    public static void destroyEntity(@NotNull Collection<Player> players, int entityId){
         WrapperPlayServerDestroyEntities destroyPacket = new WrapperPlayServerDestroyEntities(new int[]{entityId});
-
         for (Player player : players){
-            if (!part.isTrackedBy(player)) {
-                continue;
-            }
-            part.untrack(player.getUniqueId());
             DEUUser.getOrCreateUser(player).untrackPacketEntity(entityId);
             PacketEvents.getAPI().getPlayerManager().sendPacket(player, destroyPacket);
         }
@@ -595,10 +583,11 @@ public final class PacketUtils {
 
     @ApiStatus.Internal
     public static int[] getTrackedIntersection(DEUUser user, SequencedCollection<PacketDisplayEntityPart> parts){
+        Player p = Bukkit.getPlayer(user.getUserUUID());
         return parts.stream()
                 .filter(part -> {
                     if (part.isTrackedBy(user.getUserUUID())){
-                        part.untrack(user.getUserUUID());
+                        part.hideFromPlayer(p);
                         return true;
                     }
                     return false;

@@ -125,8 +125,10 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void hideFromPlayer(@NotNull Player player) {
-        PacketUtils.destroyEntity(player, this);
-        untrack(player.getUniqueId());
+        if (player.isConnected()){
+            PacketUtils.destroyEntity(player, this.entityId);
+        }
+        viewers.remove(player.getUniqueId());
     }
 
     /**
@@ -135,25 +137,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void hideFromPlayers(@NotNull Collection<Player> players) {
-        PacketUtils.destroyEntity(players, this);
-    }
-
-    /**
-     * Use {@link #showToPlayer(Player, GroupSpawnedEvent.SpawnReason)} or similar methods to show this part
-     * @param playerUUID
-     */
-    @ApiStatus.Internal
-    public void track(@NotNull UUID playerUUID){
-        viewers.add(playerUUID);
-    }
-
-    /**
-     * Use {@link PacketDisplayEntityPart#hideFromPlayer(Player)} or {@link PacketDisplayEntityPart#hideFromPlayers(Collection)} to hide this part
-     * @param playerUUID
-     */
-    @ApiStatus.Internal
-    public void untrack(@NotNull UUID playerUUID){
-        viewers.remove(playerUUID);
+        PacketUtils.destroyEntity(players, this.entityId);
     }
 
     /**
