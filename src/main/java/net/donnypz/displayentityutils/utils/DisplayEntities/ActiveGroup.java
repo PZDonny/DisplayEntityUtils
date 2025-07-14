@@ -471,6 +471,30 @@ public abstract class ActiveGroup implements Active{
         return lastAnimatedTick == Bukkit.getCurrentTick();
     }
 
+
+    /**
+     * Make a group perform an animation
+     * @param animation the animation this group should play
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
+     */
+    public abstract @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation);
+
+
+    /**
+     * Make a group perform a looping animation.
+     * @param animation the animation this group should play
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
+     */
+    public abstract @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation);
+
+    /**
+     * Manually stop an animation from playing on this group
+     * @param displayAnimator the display animator controlling an animation
+     */
+    public void stopAnimation(@NotNull DisplayAnimator displayAnimator){
+        removeActiveAnimator(displayAnimator);
+    }
+
     /**
      * Manually stop all animations playing on this group
      * @param removeFromStateMachine removes this animation from its state machine if true
@@ -602,28 +626,6 @@ public abstract class ActiveGroup implements Active{
         }
     }
 
-    /**
-     * Make a group perform an animation
-     * @param animation the animation this group should play
-     * @return the {@link DisplayAnimator} that will control the playing of the given animation
-     */
-    public abstract @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation);
-
-
-    /**
-     * Make a group perform a looping animation.
-     * @param animation the animation this group should play
-     * @return the {@link DisplayAnimator} that will control the playing of the given animation
-     */
-    public abstract @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation);
-
-    /**
-     * Manually stop an animation from playing on this group
-     * @param displayAnimator the display animator controlling an animation
-     */
-    public void stopAnimation(@NotNull DisplayAnimator displayAnimator){
-        removeActiveAnimator(displayAnimator);
-    }
 
     public abstract boolean rideEntity(@NotNull Entity entity);
 
