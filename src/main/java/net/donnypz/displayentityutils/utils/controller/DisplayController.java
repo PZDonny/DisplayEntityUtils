@@ -393,7 +393,7 @@ public class DisplayController {
             DisplayStateMachine machine = new DisplayStateMachine(controllerID);
             for (MachineState.StateType stateType : MachineState.StateType.values()){
                 if (stateSect.contains(stateType.getStateID())){
-                    addState(machine, stateType, stateSect.getConfigurationSection(stateType.getStateID()));
+                    addState(controller, machine, stateType, stateSect.getConfigurationSection(stateType.getStateID()));
                 }
             }
 
@@ -454,7 +454,7 @@ public class DisplayController {
     }
 
 
-    private static void addState(DisplayStateMachine machine, MachineState.StateType stateType, ConfigurationSection section){
+    private static void addState(DisplayController controller, DisplayStateMachine machine, MachineState.StateType stateType, ConfigurationSection section){
         String animTag = section.getString("animation");
         //Get Load Method
         LoadMethod loadMethod = null;
@@ -471,7 +471,9 @@ public class DisplayController {
         boolean lock = section.getBoolean("lockTransition");
         MachineState state = new MachineState(machine, stateType.getStateID(), animTag, loadMethod, animType, lock);
         if (state.getDisplayAnimator() == null && !state.isNullLoader()){
-            Bukkit.getLogger().warning("Failed to add state, animation not found: "+animTag+" ["+machine.getId()+"]");
+            if (!controller.controllerID.equalsIgnoreCase("examplecontroller.yml")){
+                Bukkit.getLogger().warning("Failed to add state, animation not found: "+animTag+" ["+machine.getId()+"]");
+            }
             return;
         }
         machine.addState(state);
