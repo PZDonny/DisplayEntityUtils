@@ -10,11 +10,11 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ "master", "develop" ]
+    branches: [ "*" ]
     paths-ignore:
       - README.md
   pull_request:
-    branches: [ "master", "develop" ]
+    branches: [ "*" ]
     paths-ignore:
       - README.md
 
