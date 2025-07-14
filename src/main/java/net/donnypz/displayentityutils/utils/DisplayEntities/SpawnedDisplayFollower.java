@@ -55,10 +55,9 @@ class SpawnedDisplayFollower {
         Collection<String> partTags = properties.partTags();
         if (partTags != null && !partTags.isEmpty()){
             selection = new SpawnedPartSelection(group, partTags);
-            for (SpawnedDisplayEntityPart p : selection.selectedParts){
+            for (ActivePart p : selection.selectedParts){
                 if (p.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                    Display display = (Display) p.getEntity();
-                    display.setTeleportDuration(teleportationDuration);
+                    p.setTeleportDuration(teleportationDuration);
                 }
             }
             if (group.defaultFollower != null){
@@ -136,7 +135,8 @@ class SpawnedDisplayFollower {
         }
 
 
-        for (SpawnedDisplayEntityPart part : selection.selectedParts){
+        for (ActivePart p : selection.selectedParts){
+            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) p;
             switch(finalFollowType){
                 case YAW -> {
                     part.setYaw(newYaw, properties.pivotInteractions());

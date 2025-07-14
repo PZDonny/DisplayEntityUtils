@@ -1,31 +1,33 @@
 package net.donnypz.displayentityutils.skript.expressions;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import ch.njol.skript.log.ErrorQuality;
 import ch.njol.util.coll.CollectionUtils;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Group/Animation Tag")
 @Description("Get or set the tag of a group/animation")
-@Examples({"#Only the tag of a spawned group/animation can be changed",
+@Examples({"#Only the tag of a active group/animation can be changed",
             "reset {_spawnedgroup}'s tag",
             "set {_savedgrouptag} to {_savedgroup}'s tag",
             "",
             "set {_spawnedanimation}'s tag to \"newTag\"",
-            "set {_savedanimationtag}'s tag to {_savedanimation}'s tag"})
+            "set {_savedanimationtag}'s tag to {_savedanimation}'s tag",
+            "",
+            "#3.0.0 and later",
+            "set {_packetgrouptag} to {_packetgroup}'s tag"})
 @Since("2.6.2")
 public class ExprTag extends SimplePropertyExpression<Object, String> {
     static {
-        register(ExprTag.class, String.class, "[the] tag", "spawnedgroup/savedgroup/spawnedanimation/savedanimation");
+        register(ExprTag.class, String.class, "[the] tag", "activegroup/savedgroup/spawnedanimation/savedanimation");
     }
 
     @Override
@@ -36,7 +38,7 @@ public class ExprTag extends SimplePropertyExpression<Object, String> {
     @Override
     @Nullable
     public String convert(Object obj) {
-        if (obj instanceof SpawnedDisplayEntityGroup g){
+        if (obj instanceof ActiveGroup g){
             return g.getTag();
         }
         else if (obj instanceof DisplayEntityGroup g){
@@ -93,6 +95,7 @@ public class ExprTag extends SimplePropertyExpression<Object, String> {
                 }
             }
         }
+        Skript.error("You can only set the tag of a spawned group or spawned animation", ErrorQuality.SEMANTIC_ERROR);
 
     }
 

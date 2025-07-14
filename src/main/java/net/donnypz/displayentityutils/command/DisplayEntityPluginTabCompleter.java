@@ -17,7 +17,7 @@ public final class DisplayEntityPluginTabCompleter implements TabCompleter {
     private final List<String> empty = List.of();
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.HELP)){
+        if (!sender.hasPermission(Permission.HELP.getPermission())){
             return empty;
         }
         if (args.length == 1) {

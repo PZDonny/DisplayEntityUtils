@@ -17,6 +17,32 @@ public class SkriptTypes {
 
     static{
 
+        Classes.registerClass(new ClassInfo<>(ActiveGroup.class, "activegroup")
+                .user("active( |-)?(group|model)s?")
+                .name("Active Group")
+                .description("An ambiguous representation of a Spawned Group or Packet Group")
+                .examples()
+                .defaultExpression(new EventValueExpression<>(ActiveGroup.class))
+                .since("3.0.0")
+                .parser(new Parser<>() {
+
+                    @Override
+                    public boolean canParse(ParseContext context) {
+                        return false;
+                    }
+
+                    @Override
+                    public String toString(ActiveGroup o, int flags) {
+                        return toVariableNameString(o);
+                    }
+
+                    @Override
+                    public String toVariableNameString(ActiveGroup o) {
+                        return "activegroup w/ tag: " + o.getTag();
+                    }
+                })
+        );
+
         Classes.registerClass(new ClassInfo<>(SpawnedDisplayEntityGroup.class, "spawnedgroup")
                 .user("spawned( |-)?(group|model)s?")
                 .name("Spawned Group")
@@ -42,8 +68,33 @@ public class SkriptTypes {
                     }
                 })
         );
-
         Converters.registerConverter(SpawnedDisplayEntityGroup.class, Location.class, SpawnedDisplayEntityGroup::getLocation);
+
+        Classes.registerClass(new ClassInfo<>(PacketDisplayEntityGroup.class, "packetgroup")
+                .user("packet( |-)?(group|model)s?")
+                .name("Packet Group")
+                .description("Represents a packet-based Display Entity Group/Model")
+                .examples()
+                .defaultExpression(new EventValueExpression<>(PacketDisplayEntityGroup.class))
+                .since("3.0.0")
+                .parser(new Parser<>() {
+
+                    @Override
+                    public boolean canParse(ParseContext context) {
+                        return false;
+                    }
+
+                    @Override
+                    public String toString(PacketDisplayEntityGroup o, int flags) {
+                        return toVariableNameString(o);
+                    }
+
+                    @Override
+                    public String toVariableNameString(PacketDisplayEntityGroup o) {
+                        return "packetgroup w/ tag: " + o.getTag();
+                    }
+                })
+        );
 
         Classes.registerClass(new ClassInfo<>(DisplayEntityGroup.class, "savedgroup")
                 .user("saved( |-)?(group|model)s?")
@@ -97,6 +148,34 @@ public class SkriptTypes {
                 })
         );
 
+        Classes.registerClass(new ClassInfo<>(ActivePart.class, "activepart")
+                .user("active( |-)?parts?")
+                .name("Active Part")
+                .description("Represents an individual Display/Interaction entity from a spawned Display Entity Group/Model.",
+                        "This can be either a Spawned Part or Packet Part.")
+                .examples()
+                .defaultExpression(new EventValueExpression<>(ActivePart.class))
+                .since("3.0.0")
+                .parser(new Parser<>() {
+
+                    @Override
+                    public boolean canParse(ParseContext context) {
+                        return false;
+                    }
+
+                    @Override
+                    public String toString(ActivePart o, int flags) {
+                        return toVariableNameString(o);
+                    }
+
+                    @Override
+                    public String toVariableNameString(ActivePart o) {
+                        String groupTag = o.getGroup() != null ? o.getGroup().getTag() : "GROUPLESS";
+                        return "activepart w/ partUUID: " + o.getPartUUID()+" | (GROUP TAG:"+groupTag+")";
+                    }
+                })
+        );
+
         Classes.registerClass(new ClassInfo<>(SpawnedDisplayEntityPart.class, "spawnedpart")
                 .user("spawned( |-)?parts?")
                 .name("Spawned Part")
@@ -126,6 +205,60 @@ public class SkriptTypes {
         );
         Converters.registerConverter(SpawnedDisplayEntityPart.class, Entity.class, SpawnedDisplayEntityPart::getEntity);
 
+        Classes.registerClass(new ClassInfo<>(PacketDisplayEntityPart.class, "packetpart")
+                .user("packet( |-)?parts?")
+                .name("Packet Part")
+                .description("Represents an individual Display/Interaction entity from a packet group.")
+                .examples()
+                .defaultExpression(new EventValueExpression<>(PacketDisplayEntityPart.class))
+                .since("3.0.0")
+                .parser(new Parser<>() {
+
+                    @Override
+                    public boolean canParse(ParseContext context) {
+                        return false;
+                    }
+
+                    @Override
+                    public String toString(PacketDisplayEntityPart o, int flags) {
+                        return toVariableNameString(o);
+                    }
+
+                    @Override
+                    public String toVariableNameString(PacketDisplayEntityPart o) {
+                        String groupTag = o.getGroup() != null ? o.getGroup().getTag() : "GROUPLESS";
+                        return "packetedpart w/ partUUID: " + o.getPartUUID()+" | (GROUP TAG:"+groupTag+")";
+                    }
+                })
+        );
+
+        Classes.registerClass(new ClassInfo<>(ActivePartSelection.class, "activepartselection")
+                .user("(active( |-)?)?part( |-)?selection")
+                .name("Active Part Selection")
+                .description("Represents a selection of spawned parts from a spawned Display Entity Group/Model.",
+                            "This can be either a Part Selection or a Packet Part Selection")
+                .examples()
+                .defaultExpression(new EventValueExpression<>(ActivePartSelection.class))
+                .since("3.0.0")
+                .parser(new Parser<>() {
+
+                    @Override
+                    public boolean canParse(ParseContext context) {
+                        return false;
+                    }
+
+                    @Override
+                    public String toString(ActivePartSelection o, int flags) {
+                        return toVariableNameString(o);
+                    }
+
+                    @Override
+                    public String toVariableNameString(ActivePartSelection o) {
+                        return "activepartselection w/ size: " + o.getSize();
+                    }
+                })
+        );
+
         Classes.registerClass(new ClassInfo<>(SpawnedPartSelection.class, "partselection")
                 .user("(spawned( |-)?)?part( |-)?selection")
                 .name("Part Selection")
@@ -148,6 +281,32 @@ public class SkriptTypes {
                     @Override
                     public String toVariableNameString(SpawnedPartSelection o) {
                         return "partselection w/ size: " + o.getSize();
+                    }
+                })
+        );
+
+        Classes.registerClass(new ClassInfo<>(PacketPartSelection.class, "packetpartselection")
+                .user("packet( |-)?part( |-)?selection")
+                .name("Packet Part Selection")
+                .description("Represents a selection of packet-based parts from a packet-based Display Entity Group/Model.")
+                .examples()
+                .defaultExpression(new EventValueExpression<>(PacketPartSelection.class))
+                .since("3.0.0")
+                .parser(new Parser<>() {
+
+                    @Override
+                    public boolean canParse(ParseContext context) {
+                        return false;
+                    }
+
+                    @Override
+                    public String toString(PacketPartSelection o, int flags) {
+                        return toVariableNameString(o);
+                    }
+
+                    @Override
+                    public String toVariableNameString(PacketPartSelection o) {
+                        return "packetpartselection w/ size: " + o.getSize();
                     }
                 })
         );
@@ -311,7 +470,8 @@ public class SkriptTypes {
         Classes.registerClass(spawnReasonWrapper.getClassInfo("groupspawnreason")
                 .user("(group( |-)?spawn( |-)?)?reason")
                 .name("Group Spawn Reason")
-                .description("Represents a spawn reason when a saved Group/Model is spawned")
+                .description("Represents a spawn reason when a saved Group/Model is spawned.",
+                            "\"INTERNAL\" spawn reason added in version 3.0.0")
                 .since("2.6.2"));
 
     }

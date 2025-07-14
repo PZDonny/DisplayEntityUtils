@@ -1,15 +1,13 @@
 package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 class PartsListTagsCMD extends PlayerSubCommand {
     PartsListTagsCMD() {
@@ -35,7 +33,7 @@ class PartsListTagsCMD extends PlayerSubCommand {
             return;
         }
 
-        List<String> tags;
+        Set<String> tags;
         player.sendMessage(Component.empty());
         player.sendMessage(Component.text("Part's Tags:", NamedTextColor.YELLOW));
         tags = partSelection.getSelectedPart().getTags();

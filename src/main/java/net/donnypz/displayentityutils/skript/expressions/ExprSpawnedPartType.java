@@ -5,17 +5,18 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.doc.Name;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Spawned Part's Type")
-@Description("Get the spawned part's type")
+@Description("Get the active part's type")
 @Examples({"set {_type} to {_spawnedpart}'s part type", "if {_type} is parttype_interaction:", "\tThis part represents an interaction entity!"})
 @Since("2.6.2")
-public class ExprSpawnedPartType extends SimplePropertyExpression<SpawnedDisplayEntityPart, SpawnedDisplayEntityPart.PartType> {
+public class ExprSpawnedPartType extends SimplePropertyExpression<ActivePart, SpawnedDisplayEntityPart.PartType> {
 
     static {
-        register(ExprSpawnedPartType.class, SpawnedDisplayEntityPart.PartType.class, "[the] [part( |-)?]type", "spawnedpart");
+        register(ExprSpawnedPartType.class, SpawnedDisplayEntityPart.PartType.class, "[the] [part( |-)?]type", "activepart");
     }
 
     @Override
@@ -25,7 +26,7 @@ public class ExprSpawnedPartType extends SimplePropertyExpression<SpawnedDisplay
 
     @Override
     @Nullable
-    public SpawnedDisplayEntityPart.PartType convert(SpawnedDisplayEntityPart part) {
+    public SpawnedDisplayEntityPart.PartType convert(ActivePart part) {
         if (part == null){
             return null;
         }

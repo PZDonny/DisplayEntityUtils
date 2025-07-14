@@ -86,7 +86,7 @@ public abstract class RelativePoint implements Serializable {
      * @param group
      * @return a location
      */
-    public @NotNull Location getLocation(@NotNull SpawnedDisplayEntityGroup group){
+    public @NotNull Location getLocation(@NotNull ActiveGroup group){
         Vector v = vectorFromOrigin.clone();
         v.multiply(group.getScaleMultiplier());
         Location groupLoc = group.getLocation();

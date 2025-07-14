@@ -6,24 +6,25 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 @ApiStatus.Internal
 @ApiStatus.Experimental
 public class GroupPointDisplay extends RelativePointDisplay{
     SpawnedDisplayEntityGroup group;
 
-    GroupPointDisplay(Location spawnLocation, RelativePoint relativePoint, SpawnedDisplayEntityGroup group){
-        super(spawnLocation, relativePoint, Material.ORANGE_CONCRETE);
+    GroupPointDisplay(Player player, Location spawnLocation, RelativePoint relativePoint, SpawnedDisplayEntityGroup group){
+        super(player, spawnLocation, relativePoint, Material.ORANGE_CONCRETE);
         this.group = group;
     }
 
     @Override
-    public void leftClick(Player player) {
+    public void leftClick(@NotNull Player player) {
 
     }
 
     @Override
-    public void rightClick(Player player) {
+    public void rightClick(@NotNull Player player) {
 
     }
 

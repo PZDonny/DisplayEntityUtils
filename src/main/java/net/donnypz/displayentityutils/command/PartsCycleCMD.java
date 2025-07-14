@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -108,7 +109,14 @@ class PartsCycleCMD extends PlayerSubCommand {
                 }
             }
         }
-        part.glow(30, false);
+
+        int markDuration = 30;
+        if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            part.spawnInteractionOutline(p, markDuration);
+        }
+        else{
+            PacketUtils.setGlowing(p, part.getEntity().getEntityId(), markDuration);
+        }
         int index = partSelection.indexOf(part)+1;
         int size = partSelection.getSize();
         Component ratio = Component.text("["+index+"/"+size+"] ", NamedTextColor.GOLD);

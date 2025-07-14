@@ -7,25 +7,26 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.*;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 @ApiStatus.Internal
 public class FramePointDisplay extends RelativePointDisplay{
     SpawnedDisplayAnimationFrame frame;
 
-    FramePointDisplay(Location spawnLocation, FramePoint framePoint, SpawnedDisplayAnimationFrame frame){
-        super(spawnLocation, framePoint, Material.LIGHT_BLUE_CONCRETE);
+    FramePointDisplay(Player player, Location spawnLocation, FramePoint framePoint, SpawnedDisplayAnimationFrame frame){
+        super(player, spawnLocation, framePoint, Material.LIGHT_BLUE_CONCRETE);
         this.frame = frame;
     }
 
     @Override
-    public void leftClick(Player player) {
+    public void leftClick(@NotNull Player player) {
         ((FramePoint) relativePoint).sendInfo(player);
         player.playSound(player, Sound.ENTITY_ITEM_FRAME_PLACE, 1, 1);
     }
 
     @Override
-    public void rightClick(Player player) {
-        ((FramePoint) relativePoint).playEffects(spawnLocation);
+    public void rightClick(@NotNull Player player) {
+        ((FramePoint) relativePoint).playEffects(spawnLocation, player);
     }
 
     @Override

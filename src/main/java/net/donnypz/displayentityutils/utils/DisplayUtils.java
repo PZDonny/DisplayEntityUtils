@@ -5,7 +5,6 @@ import net.donnypz.displayentityutils.events.PartTranslateEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Display;
@@ -28,10 +27,10 @@ import java.util.UUID;
 
 public final class DisplayUtils {
 
-    private static final NamespacedKey leftClickConsole = new NamespacedKey(DisplayEntityPlugin.getInstance(), "lcc");
-    private static final NamespacedKey leftClickPlayer = new NamespacedKey(DisplayEntityPlugin.getInstance(), "lcp");
-    private static final NamespacedKey rightClickConsole = new NamespacedKey(DisplayEntityPlugin.getInstance(), "rcc");
-    private static final NamespacedKey rightClickPlayer = new NamespacedKey(DisplayEntityPlugin.getInstance(), "rcp");
+    public static final NamespacedKey leftClickConsole = new NamespacedKey(DisplayEntityPlugin.getInstance(), "lcc");
+    public static final NamespacedKey leftClickPlayer = new NamespacedKey(DisplayEntityPlugin.getInstance(), "lcp");
+    public static final NamespacedKey rightClickConsole = new NamespacedKey(DisplayEntityPlugin.getInstance(), "rcc");
+    public static final NamespacedKey rightClickPlayer = new NamespacedKey(DisplayEntityPlugin.getInstance(), "rcp");
 
     private static final ListPersistentDataType<String, String> tagPDCType = PersistentDataType.LIST.strings();
     private DisplayUtils(){}
@@ -95,10 +94,11 @@ public final class DisplayUtils {
     /**
      * Get the translation vector from a location to the interaction's location
      * @param interaction the interaction
+     * @param referenceLocation the reference location
      * @return a vector
      */
-    public static Vector getInteractionTranslation(@NotNull Interaction interaction, @NotNull Location location){
-        return location.toVector().subtract(interaction.getLocation().toVector());
+    public static Vector getInteractionTranslation(@NotNull Interaction interaction, @NotNull Location referenceLocation){
+        return referenceLocation.toVector().subtract(interaction.getLocation().toVector());
     }
 
     /**
@@ -242,28 +242,21 @@ public final class DisplayUtils {
      */
     public static void translate(@NotNull Interaction interaction, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
         Location destination = interaction.getLocation().clone().add(direction.clone().normalize().multiply(distance));
-        PartTranslateEvent event = new PartTranslateEvent(interaction, destination, null,null);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()){
+        if (!new PartTranslateEvent(interaction, destination, null,null).callEvent()){
             return;
         }
-        if (durationInTicks < 0){
-            durationInTicks = 1;
+
+        if (durationInTicks <= 0 && delayInTicks <= 0){
+            interaction.teleport(destination);
+            return;
         }
 
-        direction = direction.clone();
-        direction.normalize();
+        double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
+        Vector incrementVector = direction
+                .clone()
+                .normalize()
+                .multiply(movementIncrement);
 
-        double movementIncrement;
-        if (durationInTicks == 0 || durationInTicks == 1){
-            movementIncrement = distance;
-        }
-        else{
-            movementIncrement = distance/(double) durationInTicks;
-        }
-        direction.multiply(movementIncrement);
-
-        Vector finalDirection = direction;
         new BukkitRunnable(){
             double currentDistance = 0;
             float lastYaw = interaction.getYaw();
@@ -271,17 +264,18 @@ public final class DisplayUtils {
             public void run() {
                 float newYaw = interaction.getYaw();
                 if (newYaw != lastYaw){
-                    finalDirection.rotateAroundY(Math.toRadians(lastYaw-newYaw));
+                    incrementVector.rotateAroundY(Math.toRadians(lastYaw-newYaw));
                     lastYaw = newYaw;
                 }
                 currentDistance+=Math.abs(movementIncrement);
-                Location tpLoc = interaction.getLocation().clone().add(finalDirection);
-                interaction.teleport(tpLoc);
+                Location tpLoc = interaction.getLocation().clone().add(incrementVector);
+
                 if (currentDistance >= distance){
-                    /*if (!interaction.getLocation().equals(destination)){
-                        interaction.teleport(destination);
-                    }*/
+                    interaction.teleport(destination);
                     cancel();
+                }
+                else{
+                    interaction.teleport(tpLoc);
                 }
             }
         }.runTaskTimer(DisplayEntityPlugin.getInstance(), delayInTicks, 1);
@@ -347,7 +341,7 @@ public final class DisplayUtils {
      * @param center the location the interaction should pivot around
      * @param angleInDegrees the pivot angle in degrees
      */
-    public static void pivot(Interaction interaction, Location center, double angleInDegrees){
+    public static void pivot(@NotNull Interaction interaction, @NotNull Location center, double angleInDegrees){
         Vector translationVector = DisplayUtils.getInteractionTranslation(interaction, center);
         translationVector.rotateAroundY(Math.toRadians(angleInDegrees*-1));
         Location newLoc = center.clone().subtract(translationVector);
@@ -355,26 +349,50 @@ public final class DisplayUtils {
     }
 
     /**
+     * Get the location an interaction entity would be pivoted to after using {@link DisplayUtils#pivot(Interaction, Location, double)}
+     * @param interactionLocation the interaction entity's location
+     * @param center the location the interaction should pivot around
+     * @param angleInDegrees the pivot angle in degrees
+     */
+    public static Location getPivotLocation(@NotNull Location interactionLocation, @NotNull Location center, double angleInDegrees){
+        Vector translationVector = center.clone().subtract(interactionLocation).toVector();
+        return getPivotLocation(translationVector, center, angleInDegrees);
+    }
+
+    /**
+     * Get the location an interaction entity would be pivoted to after using {@link DisplayUtils#pivot(Interaction, Location, double)}
+     * @param translationVector the translation offset for an interaction entity from a center location
+     * @param center the location the interaction should pivot around
+     * @param angleInDegrees the pivot angle in degrees
+     */
+    public static Location getPivotLocation(@NotNull Vector translationVector, @NotNull Location center, double angleInDegrees){
+        translationVector.rotateAroundY(Math.toRadians(angleInDegrees*-1));
+        return center.clone().subtract(translationVector);
+    }
+
+    /**
      * Scale an Interaction entity over a period of time
      * @param interaction the interaction entity
-     * @param height the height to set
-     * @param width the width to set
+     * @param newHeight the height to set
+     * @param newWidth the width to set
      * @param durationInTicks how long the scaling should take
      * @param delayInTicks how long before the scaling should start
      */
-    public static void scaleInteraction(Interaction interaction, float height, float width, int durationInTicks, int delayInTicks){
+    public static void scaleInteraction(Interaction interaction, float newHeight, float newWidth, int durationInTicks, int delayInTicks){
         if (durationInTicks <= 0 && delayInTicks <= 0){
-            interaction.setInteractionHeight(height);
-            interaction.setInteractionWidth(width);
+            interaction.setInteractionHeight(newHeight);
+            interaction.setInteractionWidth(newWidth);
             return;
         }
-        float heightChange = (interaction.getInteractionHeight()-height)/durationInTicks;
-        float widthChange = (interaction.getInteractionWidth()-width)/durationInTicks;
+        float heightChange = (interaction.getInteractionHeight()-newHeight)/durationInTicks;
+        float widthChange = (interaction.getInteractionWidth()-newWidth)/durationInTicks;
         new BukkitRunnable(){
             int timeRan = 0;
             @Override
             public void run() {
                 if (timeRan == durationInTicks){
+                    interaction.setInteractionHeight(newHeight);
+                    interaction.setInteractionWidth(newWidth);
                     cancel();
                     return;
                 }

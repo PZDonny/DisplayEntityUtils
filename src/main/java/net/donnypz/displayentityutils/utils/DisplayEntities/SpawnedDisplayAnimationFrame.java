@@ -108,7 +108,8 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      */
     public SpawnedDisplayAnimationFrame setTransformation(@NotNull SpawnedDisplayEntityGroup group){
         Location gLoc = group.getLocation();
-        for (SpawnedDisplayEntityPart part : group.spawnedParts.values()){
+        for (ActivePart p : group.groupParts.values()){
+            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) p;
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Interaction i = (Interaction) part.getEntity();
 
@@ -135,7 +136,8 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
         displayTransformations.clear();
         interactionTransformations.clear();
         Location gLoc = group.getLocation();
-        for (SpawnedDisplayEntityPart part : group.spawnedParts.values()){
+        for (ActivePart p : group.groupParts.values()){
+            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) p;
         //Ignore if part does not have specified tag
             if (!part.hasTag(partTag)){
                 continue;
@@ -289,39 +291,70 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param location the location to play the sound
      */
     public void playSounds(@NotNull Location location){
-        if (!location.isChunkLoaded()){
-            return;
-        }
         for (FramePoint framePoint : framePoints.values()){
             framePoint.playSounds(location);
         }
     }
 
     /**
-     * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a location relative to a {@link SpawnedDisplayEntityGroup}
+     * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a location relative to a {@link ActiveGroup}
      * @param group the relative group
      */
-    public void playSounds(@NotNull SpawnedDisplayEntityGroup group){
-        if (!group.isInLoadedChunk()){
-            return;
-        }
+    public void playSounds(@NotNull ActiveGroup group){
+        playSounds(group, null, true);
+    }
+
+    /**
+     * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a location relative to a {@link ActiveGroup}
+     * @param group the relative group
+     * @param animator the animator attempting to play the sounds
+     * @param limited whether the effects should only be played to players who can see the group
+     */
+    public void playSounds(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
         for (FramePoint framePoint : framePoints.values()){
-            framePoint.playSounds(group);
+            framePoint.playSounds(group, animator, limited);
         }
     }
 
     /**
-     * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a location relative to a {@link SpawnedDisplayEntityGroup}
+     * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a location relative to a {@link ActiveGroup}
+     * @param player the player
      * @param group the relative group
-     * @param animator the animator attempting to play the sounds
      */
-    public void playSounds(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
-        if (!group.isInLoadedChunk()){
-            return;
-        }
+    public void playSounds(@NotNull Player player, @NotNull ActiveGroup group){
         for (FramePoint framePoint : framePoints.values()){
-            framePoint.playSounds(group, animator);
+            framePoint.playSounds(group, player);
         }
+    }
+
+    /**
+     * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a location relative to a {@link ActiveGroup}
+     * @param players the players
+     * @param group the relative group
+     */
+    public void playSounds(@NotNull Collection<Player> players, @NotNull ActiveGroup group){
+        for (FramePoint framePoint : framePoints.values()){
+            framePoint.playSounds(group, players);
+        }
+    }
+
+
+    /**
+     * Show the particles that will be displayed at the start of this frame
+     * @param location the location to display the particles
+     */
+    public void showParticles(@NotNull Location location){
+        for (FramePoint framePoint : framePoints.values()){
+            framePoint.showParticles(location);
+        }
+    }
+
+    /**
+     * Show the particles that will be displayed at the start of this frame
+     * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
+     */
+    public void showParticles(@NotNull ActiveGroup group){
+        showParticles(group, null, true);
     }
 
 
@@ -329,10 +362,33 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * Show the particles that will be displayed at the start of this frame
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
      * @param animator the animator attempting to show the particles
+     * @param limited whether the effects should only be played to players who can see the group
      */
-    public void showParticles(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
+    public void showParticles(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
         for (FramePoint framePoint : framePoints.values()){
-            framePoint.showParticles(group, animator);
+            framePoint.showParticles(group, animator, limited);
+        }
+    }
+
+    /**
+     * Show the particles that will be displayed at the start of this frame
+     * @param player
+     * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
+     */
+    public void showParticles(@NotNull Player player, @NotNull ActiveGroup group){
+        for (FramePoint framePoint : framePoints.values()){
+            framePoint.showParticles(group, player);
+        }
+    }
+
+    /**
+     * Show the particles that will be displayed at the start of this frame
+     * @param players
+     * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
+     */
+    public void showParticles(@NotNull Collection<Player> players, @NotNull ActiveGroup group){
+        for (FramePoint framePoint : framePoints.values()){
+            framePoint.showParticles(group, players);
         }
     }
 
@@ -369,15 +425,38 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * Effects include sounds, particles, commands.
      * @param group the group to play these effects for
      * @param animator the animator attempting to play the effects
+     * @param limited whether the effects should only be played to players who can see the group
      */
-    public void playEffects(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
+    public void playEffects(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
         Location groupLoc = group.getLocation();
         if (groupLoc != null){
             executeStartCommands(groupLoc);
         }
-        playSounds(group, animator);
-        showParticles(group, animator);
+        playSounds(group, animator, limited);
+        showParticles(group, animator, limited);
     }
+
+    /**
+     * Play all effects that are contained within every {@link FramePoint}
+     * Effects include sounds and particles.
+     * @param player the player to show the effects to
+     * @param group the group to play these effects for
+     */
+    public void playEffects(@NotNull Player player, @NotNull ActiveGroup group){
+        playSounds(player, group);
+        showParticles(player, group);
+    }
+    /**
+     * Play all effects that are contained within every {@link FramePoint}
+     * Effects include sounds and particles.
+     * @param players the players to show the effects to
+     * @param group the group to play these effects for
+     */
+    public void playEffects(@NotNull Collection<Player> players, @NotNull ActiveGroup group){
+        playSounds(players, group);
+        showParticles(players, group);
+    }
+
 
 
     @ApiStatus.Internal
@@ -438,5 +517,25 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
         } catch (CloneNotSupportedException e) {
             throw new AssertionError("Clone not supported", e);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SpawnedDisplayAnimationFrame other)) return false;
+
+        return delay == other.delay &&
+                duration == other.duration &&
+                Objects.equals(tag, other.tag) &&
+                Objects.equals(displayTransformations, other.displayTransformations) &&
+                Objects.equals(interactionTransformations, other.interactionTransformations) &&
+                Objects.equals(framePoints, other.framePoints) &&
+                Objects.equals(startCommands, other.startCommands) &&
+                Objects.equals(endCommands, other.endCommands);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(delay, duration, tag, displayTransformations, interactionTransformations, framePoints, startCommands, endCommands);
     }
 }

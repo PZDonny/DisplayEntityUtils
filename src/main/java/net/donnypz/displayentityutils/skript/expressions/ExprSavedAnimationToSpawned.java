@@ -17,7 +17,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Saved Animation to Spawned Animation")
-@Description("Get a spawned animation that can be used on spawned groups")
+@Description("Get a spawned animation that can be used on active groups")
 @Examples({"set {_spawnedanim} to {_savedanim} as spawned animation"})
 @Since("2.6.2")
 public class ExprSavedAnimationToSpawned extends SimpleExpression<SpawnedDisplayAnimation> {

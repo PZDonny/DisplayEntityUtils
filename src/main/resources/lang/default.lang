@@ -5,6 +5,8 @@ groupspawnreason:
     clone: clone
     display_controller: display controller, controller
     custom: custom
+    internal: internal
+    skript: skript
 
 animationtype:
     linear: linear

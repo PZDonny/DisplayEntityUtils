@@ -10,6 +10,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PartFilter;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import org.bukkit.Material;
@@ -25,17 +26,17 @@ import java.util.Set;
 @Since("2.6.2")
 public class EffPartSelectionFilterItemsBlocks extends Effect {
     static {
-        Skript.registerEffect(EffPartSelectionFilterItemsBlocks.class,"set (:block|item)[s] filter (for|of) %partselection% with[:out] %itemtypes%");
+        Skript.registerEffect(EffPartSelectionFilterItemsBlocks.class,"set (:block|item)[s] filter (for|of) %activepartselection% with[:out] %itemtypes%");
     }
 
-    Expression<SpawnedPartSelection> selection;
+    Expression<ActivePartSelection> selection;
     Expression<ItemType> itemTypes;
     boolean exclude;
     boolean isBlock;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        selection = (Expression<SpawnedPartSelection>) expressions[0];
+        selection = (Expression<ActivePartSelection>) expressions[0];
         itemTypes = (Expression<ItemType>) expressions[1];
         exclude = parseResult.hasTag("out");
         isBlock = parseResult.hasTag("block");
@@ -44,7 +45,7 @@ public class EffPartSelectionFilterItemsBlocks extends Effect {
 
     @Override
     protected void execute(Event event) {
-        SpawnedPartSelection sel = selection.getSingle(event);
+        ActivePartSelection sel = selection.getSingle(event);
         if (sel == null){
             return;
         }

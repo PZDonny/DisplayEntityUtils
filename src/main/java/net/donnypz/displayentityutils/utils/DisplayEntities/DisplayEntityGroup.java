@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -34,7 +35,7 @@ public final class DisplayEntityGroup implements Serializable{
         //HashMap<UUID, DisplayEntity> displayPairs = new HashMap<>();
         //HashMap<UUID, InteractionEntity> interactionPairs = new HashMap<>();
 
-        for (SpawnedDisplayEntityPart part : spawnedGroup.getSpawnedParts()){
+        for (SpawnedDisplayEntityPart part : spawnedGroup.getParts()){
 
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Interaction i = (Interaction) part.getEntity();
@@ -147,26 +148,23 @@ public final class DisplayEntityGroup implements Serializable{
     }
 
     /**
-     * Spawns this DisplayEntityGroup at a specified location returning a SpawnedDisplayEntityGroup that represents this.
-     * This cannot be called asynchronously
+     * Spawns this {@link DisplayEntityGroup} at a specified location returning a {@link SpawnedDisplayEntityGroup} that represents this.
      * @param location The location to spawn the group
      * @param spawnReason The reason for this display entity group to spawn
-     * @return A SpawnedDisplayEntityGroup representative of this DisplayEntityGroup
+     * @return A {@link SpawnedDisplayEntityGroup} representative of this DisplayEntityGroup. Null if the {@link PreGroupSpawnedEvent} is cancelled
      */
-    public SpawnedDisplayEntityGroup spawn(@NotNull Location location, @NotNull GroupSpawnedEvent.SpawnReason spawnReason){
+    public @Nullable SpawnedDisplayEntityGroup spawn(@NotNull Location location, @NotNull GroupSpawnedEvent.SpawnReason spawnReason){
         return spawn(location, spawnReason, new GroupSpawnSettings());
     }
 
     /**
-     * Spawns this DisplayEntityGroup at a specified location returning a SpawnedDisplayEntityGroup that represents this.
-     * This cannot be called asynchronously
+     * Spawns this {@link DisplayEntityGroup} at a specified location returning a {@link SpawnedDisplayEntityGroup} that represents this.
      * @param location The location to spawn the group
      * @param spawnReason The reason for this display entity group to spawn
-     * @param settings The settings to apply to every display entity and interaction entity created from this. This may be overridden with the {@link PreGroupSpawnedEvent}
-     * with {@link SpawnedDisplayEntityPart#showToPlayer(Player)} or by other custom methods
-     * @return A {@link SpawnedDisplayEntityGroup} representative of this DisplayEntityGroup
+     * @param settings The settings to apply to every display  and interaction entity created from this. This may be overridden with the {@link PreGroupSpawnedEvent}.
+     * @return A {@link SpawnedDisplayEntityGroup} representative of this DisplayEntityGroup. Null if the {@link PreGroupSpawnedEvent} is cancelled
      */
-    public SpawnedDisplayEntityGroup spawn(@NotNull Location location, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings settings){
+    public @Nullable SpawnedDisplayEntityGroup spawn(@NotNull Location location, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings settings){
         PreGroupSpawnedEvent event = new PreGroupSpawnedEvent(this, spawnReason);
         if (!event.callEvent()){
             return null;
@@ -175,39 +173,41 @@ public final class DisplayEntityGroup implements Serializable{
         if (newSettings != null){
             settings = newSettings;
         }
-        SpawnedDisplayEntityGroup spawnedGroup = new SpawnedDisplayEntityGroup(settings.visibleByDefault);
-        Display blockDisplay = masterEntity.createEntity(location, settings);
+
+        SpawnedDisplayEntityGroup group = new SpawnedDisplayEntityGroup(settings.visibleByDefault);
+        Display blockDisplay = masterEntity.createEntity(group, location, settings);
         if (isPersistent == null){
-            spawnedGroup.setPersistent(true);
+            group.setPersistent(true);
         }
         else{
-            spawnedGroup.setPersistent(isPersistent);
+            group.setPersistent(isPersistent);
         }
 
 
-        spawnedGroup.setTag(tag);
-        spawnedGroup.addDisplayEntity(blockDisplay).setMaster();
+        group.setTag(tag);
+        group.addDisplayEntity(blockDisplay).setMaster();
 
         for (DisplayEntity entity : displayEntities){ //Summon Display Entities
-            if (!entity.equals(masterEntity)){
+            if (entity.isMaster()) continue;
+            //if (!entity.equals(masterEntity)){
 
-                Display passenger = entity.createEntity(location, settings);
+            Display passenger = entity.createEntity(group, location, settings);
 
-                SpawnedDisplayEntityPart part = spawnedGroup.addDisplayEntity(passenger);
-                List<String> legacyPartTags = entity.getLegacyPartTags();
-                if (legacyPartTags != null && !entity.getLegacyPartTags().isEmpty()){
-                    part.adaptScoreboardTags(true);
-                }
+            SpawnedDisplayEntityPart part = group.addDisplayEntity(passenger);
+            List<String> legacyPartTags = entity.getLegacyPartTags();
+            if (legacyPartTags != null && !entity.getLegacyPartTags().isEmpty()){
+                part.adaptScoreboardTags(true);
             }
+            //}
         }
 
         for (InteractionEntity entity : interactionEntities){ //Summon Interaction Entities
             Vector v = entity.getVector();
-            Location spawnLocation = spawnedGroup.getMasterPart().getEntity().getLocation().clone().subtract(v);
+            Location spawnLocation = group.getMasterPart().getEntity().getLocation().clone().subtract(v);
 
             Interaction interaction = entity.createEntity(spawnLocation, settings);
 
-            SpawnedDisplayEntityPart part = spawnedGroup.addInteractionEntity(interaction);
+            SpawnedDisplayEntityPart part = group.addInteractionEntity(interaction);
             if (!entity.getLegacyPartTags().isEmpty()){
                 part.adaptScoreboardTags(true);
             }
@@ -219,20 +219,60 @@ public final class DisplayEntityGroup implements Serializable{
             }
         }
 
-        spawnedGroup.setPersistenceOverride(settings.persistenceOverride);
+        group.setPersistenceOverride(settings.persistenceOverride);
 
         if (tag != null){
-            spawnedGroup.setTag(tag);
+            group.setTag(tag);
         }
 
-        DisplayGroupManager.addSpawnedGroup(spawnedGroup.getMasterPart(), spawnedGroup);
+        DisplayGroupManager.addSpawnedGroup(group.getMasterPart(), group);
 
         float widthCullingAdder = DisplayEntityPlugin.widthCullingAdder();
         float heightCullingAdder = DisplayEntityPlugin.heightCullingAdder();
-        spawnedGroup.autoSetCulling(DisplayEntityPlugin.autoCulling(), widthCullingAdder, heightCullingAdder);
+        group.autoSetCulling(DisplayEntityPlugin.autoCulling(), widthCullingAdder, heightCullingAdder);
 
-        new GroupSpawnedEvent(spawnedGroup, spawnReason).callEvent();
-        spawnedGroup.playSpawnAnimation();
-        return spawnedGroup;
+        new GroupSpawnedEvent(group, spawnReason).callEvent();
+        group.playSpawnAnimation();
+        return group;
+    }
+
+
+
+    /**
+     * Spawns this {@link DisplayEntityGroup} at a specified location returning a {@link PacketDisplayEntityGroup} that represents this.
+     * @param spawnLocation The location where this group spawn be spawned for players
+     * @param playSpawnAnimation whether this packet group should automatically play its spawn animation when created
+     * @return A {@link PacketDisplayEntityGroup} representative of this DisplayEntityGroup.
+     */
+    public @NotNull PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation, boolean playSpawnAnimation){
+        PacketDisplayEntityGroup packetGroup = new PacketDisplayEntityGroup(tag);
+
+        PacketDisplayEntityPart masterPart = masterEntity.createPacketPart(packetGroup, spawnLocation);
+        packetGroup.addPart(masterPart);
+
+        int passengerSize = displayEntities.size()-1;
+        int[] passengerIds = new int[passengerSize];
+        int i = 0;
+
+        for (DisplayEntity entity : displayEntities){
+            if (entity.isMaster()) continue;
+            PacketDisplayEntityPart part = entity.createPacketPart(packetGroup, spawnLocation);
+            packetGroup.addPart(part);
+            passengerIds[i] = part.entityId;
+            i++;
+            part.teleport(spawnLocation);
+        }
+        packetGroup.passengerIds = passengerIds;
+
+        for (InteractionEntity entity : interactionEntities){
+            PacketDisplayEntityPart part = entity.createPacketPart(spawnLocation);
+            packetGroup.addPart(part);
+        }
+
+        if (playSpawnAnimation){
+            packetGroup.playSpawnAnimation();
+        }
+
+        return packetGroup;
     }
 }

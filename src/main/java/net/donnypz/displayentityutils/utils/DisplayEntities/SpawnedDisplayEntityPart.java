@@ -1,10 +1,18 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
+import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -19,20 +27,15 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawned {
+public final class SpawnedDisplayEntityPart extends ActivePart implements Spawned {
 
     private static final HashMap<PartData, SpawnedDisplayEntityPart> allParts = new HashMap<>();
     private SpawnedDisplayEntityGroup group;
-    private final PartType type;
     private Entity entity;
     private PartData partData;
-    private UUID partUUID;
-    private boolean isInteractionOutlined;
-    boolean valid = true;
-
-
 
     SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Display displayEntity, Random random){
+        super(displayEntity.getEntityId());
         this.group = group;
         this.entity = displayEntity;
         if (displayEntity instanceof BlockDisplay){
@@ -49,15 +52,17 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
         if (isMaster()){
             group.masterPart = this;
         }
+        partTags.addAll(DisplayUtils.getTags(displayEntity));
     }
 
 
     SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Interaction interactionEntity, Random random){
+        super(interactionEntity.getEntityId());
         this.group = group;
         this.entity = interactionEntity;
         this.type = PartType.INTERACTION;
         applyData(random, interactionEntity);
-
+        partTags.addAll(DisplayUtils.getTags(interactionEntity));
     }
 
     private void applyData(Random random, Entity entity){
@@ -76,7 +81,7 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
         allParts.put(partData, this);
 
         setPartUUID(random);
-        group.spawnedParts.put(partUUID, this);
+        group.groupParts.put(partUUID, this);
         entity.setPersistent(group.isPersistent());
 
         //For parts before v2.5.3
@@ -88,7 +93,7 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
         this.partUUID = uuid;
         PersistentDataContainer pdc = getEntity().getPersistentDataContainer();
         pdc.set(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
-        group.spawnedParts.put(partUUID, this);
+        group.groupParts.put(partUUID, this);
     }
 
     private void setPartUUID(Random random){
@@ -134,14 +139,7 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
     }
 
     private boolean groupContainsUUID(UUID partUUID){
-        return group.spawnedParts.containsKey(partUUID);
-    }
-
-    /** Get this part's UUID, used for animations and identifying parts
-     * @return a uuid
-     */
-    public UUID getPartUUID() {
-        return partUUID;
+        return group.groupParts.containsKey(partUUID);
     }
 
     private void removeFromPreviousGroup(Display display){
@@ -160,9 +158,10 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
 
     /**
      * Get this part's associated group
-     * @return This part's group
+     * @return {@link SpawnedDisplayEntityGroup} or null if this part is not associated with a group
      */
-    public SpawnedDisplayEntityGroup getGroup() {
+    @Override
+    public @Nullable SpawnedDisplayEntityGroup getGroup() {
         return group;
     }
 
@@ -173,25 +172,18 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
         return getEntity().getPersistentDataContainer().get(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG);
     }
 
-    /**
-     * Get the type of part this is
-     * @return This part's type
-     */
-    public PartType getType(){
-        return type;
-    }
 
     /**
      * Get the entity of that this part represents
      * @return This part's entity or null if this part has been previously removed.
-     * This may return a stale entity if the part exists in an unloaded chunk
+     * The returned entity will be stale if the part exists in an unloaded chunk or if this is called asynchronously.
      */
     public @Nullable Entity getEntity() {
         if (entity == null){
             return null;
         }
         //Stale Entity
-        if (!entity.getLocation().isChunkLoaded()){
+        if (!entity.getLocation().isChunkLoaded() || !Bukkit.isPrimaryThread()){
             return entity;
         }
         else{
@@ -250,7 +242,10 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
      * @return true if the tag was added successfully
      */
     public boolean addTag(@NotNull String tag){
-        return DisplayUtils.addTag(getEntity(), tag);
+        if (DisplayUtils.addTag(getEntity(), tag)){
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -261,14 +256,6 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
     public SpawnedDisplayEntityPart removeTag(@NotNull String tag){
         DisplayUtils.removeTag(getEntity(), tag);
         return this;
-    }
-
-    /**
-     * Gets the part tags of this SpawnedDisplayEntityPart
-     * @return This part's part tags.
-     */
-    public @NotNull List<String> getTags(){
-        return DisplayUtils.getTags(getEntity());
     }
 
     /**
@@ -284,16 +271,6 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
             addTag(tag);
         }
         return this;
-    }
-
-
-    /**
-     * Determine whether this part has a tag
-     * @param tag the tag to check for
-     * @return true if this part has the tag
-     */
-    public boolean hasTag(@NotNull String tag){
-        return DisplayUtils.hasPartTag(getEntity(), tag);
     }
 
 
@@ -328,7 +305,7 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
 
 
         if (this.group != null){
-            this.group.spawnedParts.remove(partUUID);
+            this.group.groupParts.remove(partUUID);
         }
 
         this.group = group;
@@ -338,7 +315,7 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
                 group.masterPart = this;
             }
 
-            Entity master = group.masterPart.getEntity();
+            Entity master = ((SpawnedDisplayEntityPart) group.masterPart).getEntity();
 
             Vector translation;
             if (!isMaster()){
@@ -401,8 +378,8 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
     }
 
     /**
-     * Hide this part's entity from a player. This may produce unexpected results if this part is in an unloaded chunk
-     * @param player
+     * Hide this part's entity from a player. This may produce unexpected results if this part is in an unloaded chunk.
+     * @param player the player
      */
     @Override
     public void hideFromPlayer(@NotNull Player player){
@@ -410,6 +387,17 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
             return;
         }
         player.hideEntity(DisplayEntityPlugin.getInstance(), getEntity());
+    }
+
+    /**
+     * Hide this part's entity from players. This may produce unexpected results if this part is in an unloaded chunk.
+     * @param players The players to hide this part from
+     */
+    @Override
+    public void hideFromPlayers(@NotNull Collection<Player> players){
+        for (Player player : players){
+            hideFromPlayer(player);
+        }
     }
 
     /**
@@ -443,86 +431,30 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
 
 
     /**
-     * Adds the glow effect to this SpawnDisplayEntityPart.
-     * Outlined with soul fire flame particles if Interaction.
-     * Cloud Particle if it's the master part
-     * @param particleHidden don't show parts with particles if it's the master part or has no visible material
-     * @return this
+     * Adds the glow effect to this SpawnDisplayEntityPart. This does <b><u>NOT</u></b> apply to Interaction or Text Display entities. Use {@link #spawnInteractionOutline(Player, long)} to show an outline of
+     * an interaction for a specific player.
      */
 
-    public SpawnedDisplayEntityPart glow(boolean particleHidden){
+    public void glow(){
         Entity entity = getEntity();
-        if (type == PartType.INTERACTION) {
-            interactionOutline((Interaction) entity, Long.MAX_VALUE);
+        if (type == PartType.INTERACTION || type == PartType.TEXT_DISPLAY) {
+            return;
         }
-
-        if (!particleHidden){
-            Material material = getMaterial();
-            if (material == null){
-                entity.setGlowing(true);
-            }
-            else{
-                switch (material){
-                    case AIR, CAVE_AIR, VOID_AIR -> {
-                        temporaryParticles(entity, -1, Particle.CLOUD);
-                    }
-                    default -> {
-                        entity.setGlowing(true);
-                    }
-                }
-            }
-        }
-        else{
-            entity.setGlowing(true);
-        }
-        return this;
+        entity.setGlowing(true);
     }
 
     /**
-     * Adds the glow effect to SpawnDisplayEntityPart.
+     * Adds the glow effect to this SpawnDisplayEntityPart.
      * It will glow if it's a Block/Item Display.
-     * Outlined with soul fire flame particles if Interaction.
-     * Cloud Particle if it's the master part
-     * @param durationInTicks How long to glow this selection
-     * @param particleHidden don't show parts with particles if it's the master part or has no visible material
-     * @return this
+     * @param durationInTicks How long to glow this part
      */
-    public SpawnedDisplayEntityPart glow(long durationInTicks, boolean particleHidden){
+    @Override
+    public void glow(long durationInTicks){
         Entity entity = getEntity();
-        if (type == PartType.INTERACTION) {
-            if (particleHidden){
-                return this;
-            }
-            interactionOutline((Interaction) entity, durationInTicks);
-            return this;
+        if (type == PartType.INTERACTION || type == PartType.TEXT_DISPLAY) {
+            return;
         }
-        if (this.equals(group.getMasterPart())){
-            if (!particleHidden){
-                temporaryParticles(entity, durationInTicks, Particle.FLAME);
-            }
-            entity.setGlowing(true);
-        }
-        else{
-            Material material = getMaterial();
-            if (material != null){
-                switch (material){
-                    case AIR, CAVE_AIR, VOID_AIR -> {
-                        if (!particleHidden){
-                            temporaryParticles(entity, durationInTicks, Particle.CLOUD);
-                        }
-                        entity.setGlowing(true);
-                    }
-                    default -> {
-                        entity.setGlowing(true);
-                    }
-                }
-            }
-            else{
-                entity.setGlowing(true);
-            }
-        }
-
-
+        entity.setGlowing(true);
 
         new BukkitRunnable(){
             @Override
@@ -530,81 +462,59 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
                 entity.setGlowing(false);
             }
         }.runTaskLater(DisplayEntityPlugin.getInstance(), durationInTicks);
-        return this;
+    }
+
+
+
+    public void spawnInteractionOutline(Player player, long durationInTicks){
+        Interaction i = (Interaction) getEntity();
+        float width = i.getInteractionWidth();
+        float height = i.getInteractionHeight();
+        Location spawnLoc = i.getLocation();
+        spawnLoc.setPitch(0);
+        spawnLoc.setYaw(0);
+
+        PacketDisplayEntityPart part = new PacketAttributeContainer()
+                .setAttribute(DisplayAttributes.BlockDisplay.BLOCK_STATE, DisplayEntityPlugin.interactionPreviewBlock())
+                .setAttribute(DisplayAttributes.Transform.TRANSLATION, new Vector3f(-0.5f*width, 0, -0.5f*width))
+                .setAttribute(DisplayAttributes.Transform.SCALE, new Vector3f(width, height, width))
+                .setAttribute(DisplayAttributes.BRIGHTNESS, new Display.Brightness(7, 7))
+                .createPart(PartType.BLOCK_DISPLAY, spawnLoc);
+        part.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
+
+        if (durationInTicks == -1) {
+            if (player.isConnected()){
+                part.hideFromPlayer(player);
+            }
+        }
+        else{
+            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                if (player.isConnected()){
+                    part.hideFromPlayer(player);
+                }
+            }, durationInTicks);
+        }
+
     }
 
     /**
-     * Stops this part from glowing
+     * Stops this part from glowing if it's a display entity
      */
     @Override
-    public SpawnedDisplayEntityPart unglow(){
-        if (type == PartType.INTERACTION) {
-            //temporaryParticles(entity, durationInTicks, Particle.COMPOSTER);
-            isInteractionOutlined = false;
-        }
-        else{
+    public void unglow(){
+        if (type != PartType.INTERACTION) {
             getEntity().setGlowing(false);
         }
-        return this;
     }
 
-    private void interactionOutline(Interaction interaction, long durationInTicks){
-        isInteractionOutlined = true;
-        float height = interaction.getInteractionHeight();
-        float width = interaction.getInteractionWidth();
-        if (height == 0 || width == 0){
-            return;
-        }
-        Location origin = interaction.getLocation().clone();
-        origin.setPitch(0);
-        origin.setYaw(0);
-        Location pointA = origin.clone();
-        pointA.add(width/2, 0, width/2);
-
-        Location pointB = origin.clone();
-        pointB.add((width/2)*-1, 0, width/2);
-
-        Location pointC = origin.clone();
-        pointC.add((width/2)*-1, 0, (width/2)*-1);
-
-        Location pointD = origin.clone();
-        pointD.add(width/2, 0, (width/2)*-1);
-        final int tickIncrement = 8;
-        new BukkitRunnable(){
-            int currentTick = 0;
-            @Override
-            public void run() {
-                if (group == null || !group.isSpawned() || group.getSpawnedParts().isEmpty() || !interaction.isValid()){
-                    cancel();
-                    return;
-                }
-                if (!isInteractionOutlined || currentTick >= durationInTicks){
-                    cancel();
-                    return;
-                }
-                particleLine(pointA.clone(), pointB.clone(), width, height);
-                particleLine(pointB.clone(), pointC.clone(), width, height);
-                particleLine(pointC.clone(), pointD.clone(), width, height);
-                particleLine(pointD.clone(), pointA.clone(), width, height);
-                currentTick+=tickIncrement;
-
-            }
-        }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, tickIncrement);
-    }
-
-
-    private static void particleLine(Location from, Location to, float width, float height) {
-        double heightIncrease = height/(2.5*width);
-        double currentHeight = 0;
-        while(currentHeight <= height){
-            for(double i = 0; i<from.distance(to); i+=0.4) {
-                Vector vector  = from.clone().toVector().subtract(to.toVector()).normalize().multiply(-i);
-                Location loc = from.clone().add(vector);
-                loc.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 1, 0, 0, 0, 0);
-            }
-            currentHeight+=heightIncrease;
-            from.add(0, heightIncrease, 0);
-            to.add(0, heightIncrease, 0);
+    /**
+     * Stops this part from glowing for a specific player, if the part is a display entity
+     * @param player the player
+     */
+    @Override
+    public void unglow(@NotNull Player player){
+        if (type != PartType.INTERACTION) {
+            PacketUtils.setGlowing(player, getEntity().getEntityId(), false);
         }
     }
 
@@ -616,7 +526,7 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
             long i = 0;
             @Override
             public void run() {
-                if (!entity.isGlowing() || !entity.isValid() || (durationInTicks != -1 && i >= durationInTicks) || group == null || !group.isSpawned() || group.spawnedParts.isEmpty()){
+                if (!entity.isGlowing() || !entity.isValid() || (durationInTicks != -1 && i >= durationInTicks) || group == null || !group.isSpawned() || group.groupParts.isEmpty()){
                     cancel();
                     return;
                 }
@@ -702,6 +612,44 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
         display.setBillboard(billboard);
     }
 
+    /**
+     * Set the teleport duration of this part
+     * @param teleportDuration the teleport duration to set
+     */
+    @Override
+    public void setTeleportDuration(int teleportDuration) {
+        if (type == PartType.INTERACTION){
+            return;
+        }
+        Display display = (Display) getEntity();
+        display.setTeleportDuration(teleportDuration);
+    }
+
+    /**
+     * Set the interpolation duration of this part
+     * @param interpolationDuration the interpolation duration to set
+     */
+    @Override
+    public void setInterpolationDuration(int interpolationDuration) {
+        if (type == PartType.INTERACTION){
+            return;
+        }
+        Display display = (Display) getEntity();
+        display.setInterpolationDuration(interpolationDuration);
+    }
+
+    /**
+     * Set the interpolation delay of this part
+     * @param interpolationDelay the interpolation delay to set
+     */
+    @Override
+    public void setInterpolationDelay(int interpolationDelay) {
+        if (type == PartType.INTERACTION){
+            return;
+        }
+        Display display = (Display) getEntity();
+        display.setInterpolationDelay(interpolationDelay);
+    }
 
     /**
      * Set the view range of this part
@@ -730,8 +678,8 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
     }
 
 
-    @ApiStatus.Experimental
-    void cull(float width, float height){
+    @Override
+    protected void cull(float width, float height){
         Entity entity = getEntity();
         if (entity instanceof Display display){
             display.setDisplayHeight(height);
@@ -740,22 +688,15 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
     }
 
     /**
-     * Attempt to automatically set the culling bounds for this part. This is the same as {@link SpawnedDisplayEntityGroup#autoSetCulling(CullOption, float, float)}
-     * with a CullSetting of {@link CullOption#LOCAL}.
-     * Results may not be 100% accurate due to the varying shapes of Minecraft blocks and variation is display entity transformations.
-     * The culling bounds will be representative of the part's scaling.
-     * @param widthAdder The amount of width to be added to the culling range
-     * @param heightAdder The amount of height to be added to the culling range
-     * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
+     * {@inheritDoc}
      */
-    @ApiStatus.Experimental
+    @Override
     public void autoCull(float widthAdder, float heightAdder){
         Entity entity = getEntity();
         if (entity instanceof Display display){
             Transformation transformation = display.getTransformation();
             Vector3f scale = transformation.getScale();
-            display.setDisplayHeight(scale.y+heightAdder);
-            display.setDisplayWidth((Math.max(scale.x, scale.z)*2)+widthAdder);
+            cull((Math.max(scale.x, scale.z)*2)+widthAdder, scale.y+heightAdder);
         }
     }
 
@@ -773,10 +714,7 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
         display.setGlowColorOverride(color);
     }
 
-    /**
-     * Get the glow color of this part
-     * @return a color, or null if not set or if this part's type is {@link PartType#INTERACTION}
-     */
+    @Override
     public @Nullable Color getGlowColor(){
         if (type == PartType.INTERACTION){
             return null;
@@ -834,7 +772,7 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
      * @param angleInDegrees the pivot angle
      */
     @Override
-    public void pivot(double angleInDegrees){
+    public void pivot(float angleInDegrees){
         Entity entity = getEntity();
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION){
             return;
@@ -871,6 +809,87 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
         return interaction;
     }
 
+    @Override
+    public void setTextDisplayText(@NotNull Component text) {
+        if (type != PartType.TEXT_DISPLAY) return;
+        ((TextDisplay) getEntity()).text(text);
+    }
+
+    @Override
+    public void setBlockDisplayBlock(@NotNull BlockData blockData) {
+        if (type != PartType.BLOCK_DISPLAY) return;
+        ((BlockDisplay) getEntity()).setBlock(blockData);
+    }
+
+    @Override
+    public void setItemDisplayItem(@NotNull ItemStack itemStack) {
+        if (type != PartType.ITEM_DISPLAY) return;
+        ((ItemDisplay) getEntity()).setItemStack(itemStack);
+    }
+
+    /**
+     * {@inheritDoc}
+     * The applied changes do not reflect the entity data server-side
+     */
+    @Override
+    public <T, V> void setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value) {
+        Entity entity = getEntity();
+        new PacketAttributeContainer().setAttribute(attribute, value)
+                .sendAttributesUsingPlayers(entity.getTrackedBy(), entity.getEntityId());
+    }
+
+    /**
+     * {@inheritDoc}
+     * The applied changes do not reflect the entity data server-side
+     */
+    @Override
+    public void setAttributes(@NotNull DisplayAttributeMap attributeMap) {
+        Entity entity = getEntity();
+        new PacketAttributeContainer().setAttributes(attributeMap)
+                .sendAttributesUsingPlayers(entity.getTrackedBy(), entity.getEntityId());
+    }
+
+    @Override
+    public @Nullable Vector getInteractionTranslation() {
+        if (type != PartType.INTERACTION) {
+            return null;
+        }
+        return DisplayUtils.getInteractionTranslation((Interaction) getEntity(), group.getLocation());
+    }
+
+
+    @Override
+    public @Nullable Transformation getDisplayTransformation() {
+        if (type == PartType.INTERACTION) {
+            return null;
+        }
+        return ((Display) getEntity()).getTransformation();
+    }
+
+    @Override
+    public float getInteractionHeight() {
+        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
+            return -1;
+        }
+        return ((Interaction) getEntity()).getInteractionHeight();
+    }
+
+    @Override
+    public float getInteractionWidth() {
+        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
+            return -1;
+        }
+        return ((Interaction) getEntity()).getInteractionWidth();
+    }
+
+    @Override
+    public int getTeleportDuration() {
+        if (type == PartType.INTERACTION){
+            return -1;
+        }
+        return ((Display) getEntity()).getTeleportDuration();
+    }
+
     public enum PartType{
         BLOCK_DISPLAY,
         ITEM_DISPLAY,
@@ -881,9 +900,9 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
     /**
      * Removes this SpawnedDisplayEntityPart from it's SpawnedDisplayEntityGroup, without dismounting the part from the group.
      * This makes this part invalid and unusable after removal. If the part needs to be reused, see {@link #removeFromGroup()}
-     * <p>
-     *     The part may not be killed if the part's entity is within an unloaded chunk
-     *     Create a chunk ticket for this entity's chunk to guarantee removal
+     * <br><br>
+     * The part may not be killed if the part's entity is within an unloaded chunk.
+     * Create a chunk ticket for this entity's chunk to guarantee removal
      * @param kill Whether to kill this part when removed.
      * @return Returns the part's entity.
      */
@@ -907,7 +926,7 @@ public final class SpawnedDisplayEntityPart extends SpawnedPart implements Spawn
      */
     public void removeFromGroup() {
         allParts.remove(partData);
-        group.spawnedParts.remove(partUUID);
+        group.groupParts.remove(partUUID);
         for (SpawnedPartSelection selection : group.partSelections){
             selection.removePart(this);
         }

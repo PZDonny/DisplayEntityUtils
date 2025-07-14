@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 public class CondHasTag extends Condition {
 
     static {
-        Skript.registerCondition(CondHasTag.class, "%spawnedgroup/savedgroup/spawnedanimation/savedanimation% (1¦has|2¦(has no|does(n't| not) have)) [a] tag");
+        Skript.registerCondition(CondHasTag.class, "%activegroup/savedgroup/spawnedanimation/savedanimation% (1¦has|2¦(has no|does(n't| not) have)) [a] tag");
     }
 
     Expression<?> object;
@@ -30,7 +30,7 @@ public class CondHasTag extends Condition {
     @Override
     public boolean check(Event event) {
         Object obj = object.getSingle(event);
-        if (obj instanceof SpawnedDisplayEntityGroup g){
+        if (obj instanceof ActiveGroup g){
             return (g.getTag() != null) == isNegated();
         }
         else if (obj instanceof DisplayEntityGroup g){

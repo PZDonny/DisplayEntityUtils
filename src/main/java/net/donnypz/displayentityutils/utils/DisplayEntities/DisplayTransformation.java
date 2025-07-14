@@ -1,14 +1,13 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.BlockDisplay;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.ItemDisplay;
-import org.bukkit.entity.TextDisplay;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +16,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Objects;
 
 
@@ -79,6 +79,39 @@ class DisplayTransformation extends Transformation{
         }
     }
 
+    void applyData(ActivePart part){
+        if (type == null || data == null){
+            return;
+        }
+        if (type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
+            part.setTextDisplayText((Component) data);
+        }
+        else if (type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY){
+            part.setBlockDisplayBlock((BlockData) data);
+        }
+        else if (type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
+            part.setItemDisplayItem((ItemStack) data);
+        }
+    }
+
+    void applyData(ActivePart part, Collection<Player> players){
+        if (type == null || data == null){
+            return;
+        }
+        PacketAttributeContainer container = new PacketAttributeContainer();
+        if (type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
+            container.setAttribute(DisplayAttributes.TextDisplay.TEXT, (Component) data);
+        }
+        else if (type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY){
+            container.setAttribute(DisplayAttributes.BlockDisplay.BLOCK_STATE, (BlockData) data);
+        }
+        else if (type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
+            container.setAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK, (ItemStack) data);
+        }
+
+        container.sendAttributesUsingPlayers(players, part.getEntityId());
+    }
+
     private void setData(SpawnedDisplayEntityPart.PartType type, Serializable data){
         this.type = type;
         if (data == null){
@@ -136,6 +169,13 @@ class DisplayTransformation extends Transformation{
             return false;
         }
         return Objects.equals(this.getRightRotation(), transformation.getRightRotation());
+    }
+
+    boolean isSimilar(ActivePart part){
+        if (part instanceof PacketDisplayEntityPart p){
+            return isSimilar(p.getDisplayTransformation());
+        }
+        return isSimilar(((Display) ((SpawnedDisplayEntityPart) part).getEntity()).getTransformation());
     }
 
     @Override

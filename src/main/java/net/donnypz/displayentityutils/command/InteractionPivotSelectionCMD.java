@@ -28,7 +28,7 @@ class InteractionPivotSelectionCMD extends PlayerSubCommand {
         }
 
         try{
-            double angle = Double.parseDouble(args[2]);
+            float angle = Float.parseFloat(args[2]);
 
             SpawnedPartSelection selection = DisplayGroupManager.getPartSelection(player);
             if (selection != null){
@@ -37,7 +37,7 @@ class InteractionPivotSelectionCMD extends PlayerSubCommand {
             }
 
             else{
-                for (SpawnedDisplayEntityPart part : group.getSpawnedParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
+                for (SpawnedDisplayEntityPart part : group.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
                     part.pivot(angle);
                 }
             }

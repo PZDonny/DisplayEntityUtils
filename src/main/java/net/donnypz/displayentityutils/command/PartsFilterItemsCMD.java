@@ -83,7 +83,7 @@ class PartsFilterItemsCMD extends PlayerSubCommand {
 
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Item Type Filters Applied!")));
         player.sendMessage(Component.text("This has no effect if Item Displays are filtered out of your selection", NamedTextColor.GRAY, TextDecoration.ITALIC));
-        partSelection.glow(30, false, false);
+        partSelection.glow(player, 30);
     }
 
 }

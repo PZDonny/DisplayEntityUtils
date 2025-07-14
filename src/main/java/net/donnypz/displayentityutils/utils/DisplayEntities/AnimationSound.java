@@ -4,11 +4,13 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.util.Collection;
 
 @ApiStatus.Internal
 public class AnimationSound implements Externalizable, Cloneable {
@@ -48,13 +50,13 @@ public class AnimationSound implements Externalizable, Cloneable {
         this.existsInGameVersion = sound.existsInGameVersion;
     }
 
-    public void playSound(@NotNull Location location, @NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
+    public void playSound(@NotNull Location location, @NotNull ActiveGroup group, @Nullable DisplayAnimator animator){
         if (delay == 0){
             playSound(location);
         }
         else{
             Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                if (!group.isSpawned()){
+                if (group.getMasterPart() == null){
                     return;
                 }
                 if (animator == null){
@@ -67,8 +69,56 @@ public class AnimationSound implements Externalizable, Cloneable {
         }
     }
 
+    public void playSound(@NotNull Location location, @NotNull ActiveGroup group, @Nullable DisplayAnimator animator, @NotNull Player player){
+        if (delay == 0){
+            playSound(location, player);
+        }
+        else{
+            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                if (group.getMasterPart() == null){
+                    return;
+                }
+                if (animator == null){
+                    playSound(location, player);
+                }
+                else if (group.isActiveAnimator(animator)){
+                    playSound(location, player);
+                }
+            }, delay);
+        }
+    }
+
+    public void playSound(@NotNull Location location, @NotNull ActiveGroup group, @Nullable DisplayAnimator animator, @NotNull Collection<Player> players){
+        if (delay == 0){
+            playSound(location, players);
+        }
+        else{
+            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                if (group.getMasterPart() == null){
+                    return;
+                }
+                if (animator == null){
+                    playSound(location, players);
+                }
+                else if (group.isActiveAnimator(animator)){
+                    playSound(location, players);
+                }
+            }, delay);
+        }
+    }
+
     public void playSound(@NotNull Location location){
         location.getWorld().playSound(location, sound, volume, pitch);
+    }
+
+    public void playSound(@NotNull Location location, Player player){
+        player.playSound(location, sound, volume, pitch);
+    }
+
+    public void playSound(@NotNull Location location, Collection<Player> players){
+        for (Player p : players){
+            playSound(location, p);
+        }
     }
 
     @Override

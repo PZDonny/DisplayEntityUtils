@@ -2,9 +2,12 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Color;
 import org.bukkit.entity.Display;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.Transformation;
 
 import java.io.IOException;
 import java.io.Serial;
@@ -95,6 +98,29 @@ abstract class DisplayEntitySpecifics implements Serializable {
     int getGlowColorOverride(){
         return glowColorOverride;
     }
+
+    PacketAttributeContainer getAttributeContainer(){
+        Transformation transformation = serialTransformation.toTransformation();
+
+        PacketAttributeContainer attributeContainer = new PacketAttributeContainer()
+                .setAttribute(DisplayAttributes.BILLBOARD, billboard)
+                .setAttribute(DisplayAttributes.VIEW_RANGE, viewRange)
+                .setAttribute(DisplayAttributes.Shadow.RADIUS, shadowRadius)
+                .setAttribute(DisplayAttributes.Shadow.STRENGTH, shadowStrength)
+                .setAttribute(DisplayAttributes.Culling.WIDTH, displayWidth)
+                .setAttribute(DisplayAttributes.Culling.HEIGHT, displayHeight)
+                .setAttribute(DisplayAttributes.Transform.LEFT_ROTATION, transformation.getLeftRotation())
+                .setAttribute(DisplayAttributes.Transform.RIGHT_ROTATION, transformation.getRightRotation())
+                .setAttribute(DisplayAttributes.Transform.SCALE, transformation.getScale())
+                .setAttribute(DisplayAttributes.Transform.TRANSLATION, transformation.getTranslation());
+
+        if (brightnessBlockLight != -1 && brightnessSkyLight != -1)
+            attributeContainer.setAttribute(DisplayAttributes.BRIGHTNESS, new Display.Brightness(brightnessBlockLight, brightnessSkyLight));
+        applyToAttributeContainer(attributeContainer);
+        return attributeContainer;
+    }
+
+    protected abstract void applyToAttributeContainer(PacketAttributeContainer attributeContainer);
 
     void apply(DisplayEntity displayEntity, Display display){
         display.setTransformation(serialTransformation.toTransformation());

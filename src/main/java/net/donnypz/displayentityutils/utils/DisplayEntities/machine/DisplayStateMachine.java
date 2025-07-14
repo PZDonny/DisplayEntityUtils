@@ -1,7 +1,8 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities.machine;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.events.GroupAnimationStateChangeEvent;
+import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -16,11 +17,11 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class DisplayStateMachine {
-    private static final Map<SpawnedDisplayEntityGroup, DisplayStateMachine> groupMachines = new HashMap<>();
+    private static final Map<ActiveGroup, DisplayStateMachine> groupMachines = new HashMap<>();
 
     private final Map<String, MachineState> states = new HashMap<>();
 
-    private Consumer<SpawnedDisplayEntityGroup> customStateTask = null;
+    private Consumer<ActiveGroup> customStateTask = null;
     private boolean overrideDefaultTask = false;
     String id;
 
@@ -44,7 +45,7 @@ public class DisplayStateMachine {
      * @param group the group to check
      * @return a {@link DisplayStateMachine} or null
      */
-    public static DisplayStateMachine getStateMachine(SpawnedDisplayEntityGroup group){
+    public static DisplayStateMachine getStateMachine(ActiveGroup group){
         return groupMachines.get(group);
     }
 
@@ -132,12 +133,12 @@ public class DisplayStateMachine {
      * Remove a group from this state machine
      * @param group the group to remove
      */
-    public void removeGroup(@NotNull SpawnedDisplayEntityGroup group){
+    public void removeGroup(@NotNull ActiveGroup group){
         groupMachines.remove(group);
         removeGroupConcurrent(group);
     }
 
-    private void removeGroupConcurrent(SpawnedDisplayEntityGroup group){
+    private void removeGroupConcurrent(ActiveGroup group){
         group.unsetMachineState();
     }
 
@@ -146,7 +147,7 @@ public class DisplayStateMachine {
      * @param group the group to check for
      * @return a boolean
      */
-    public boolean contains(@NotNull SpawnedDisplayEntityGroup group){
+    public boolean contains(@NotNull ActiveGroup group){
         return groupMachines.containsKey(group);
     }
 
@@ -156,7 +157,7 @@ public class DisplayStateMachine {
      * @param stateTransitionTask a consumer with conditions to manage state changes
      * @param overrideDefaultTask whether the default task should be overridden in place of the custom transition task. If false, this task will run then continue with the default task
      */
-    public void setCustomStateTransitionTask(@NotNull Consumer<SpawnedDisplayEntityGroup> stateTransitionTask, boolean overrideDefaultTask){
+    public void setCustomStateTransitionTask(@NotNull Consumer<ActiveGroup> stateTransitionTask, boolean overrideDefaultTask){
         this.customStateTask = stateTransitionTask;
         this.overrideDefaultTask = overrideDefaultTask;
     }
@@ -166,7 +167,7 @@ public class DisplayStateMachine {
      * Set the state of a group. This method will check if the state and the group exists within this state machine, and execute without throwing exceptions
      * @param stateID the name of the state
      * @param group the group to apply the new state to
-     * @return false if {@link GroupAnimationStateChangeEvent} is cancelled, the state doesn't exist, or the group is not contained in this state machine.
+     * @return false if {@link AnimationStateChangeEvent} is cancelled, the state doesn't exist, or the group is not contained in this state machine.
      */
     public boolean setStateIfPresent(@NotNull String stateID, @NotNull SpawnedDisplayEntityGroup group){
         if (hasState(stateID) && contains(group)){
@@ -179,7 +180,7 @@ public class DisplayStateMachine {
      * Set the state of a group. This method will check if the state and the group exists within this state machine, and execute without throwing exceptions
      * @param state the state
      * @param group the group to apply the new state to
-     * @return false if {@link GroupAnimationStateChangeEvent} is cancelled, the state doesn't exist, or the group is not contained in this state machine.
+     * @return false if {@link AnimationStateChangeEvent} is cancelled, the state doesn't exist, or the group is not contained in this state machine.
      */
     public boolean setStateIfPresent(@NotNull MachineState state, @NotNull SpawnedDisplayEntityGroup group){
         return setStateIfPresent(state.stateID, group);
@@ -189,7 +190,7 @@ public class DisplayStateMachine {
      * Set the state of a group. This method will check if the state and the group exists within this state machine, and execute without throwing exceptions
      * @param stateType the state
      * @param group the group to apply the new state to
-     * @return false if {@link GroupAnimationStateChangeEvent} is cancelled, the state doesn't exist, or the group is not contained in this state machine.
+     * @return false if {@link AnimationStateChangeEvent} is cancelled, the state doesn't exist, or the group is not contained in this state machine.
      */
     public boolean setStateIfPresent(@NotNull MachineState.StateType stateType, @NotNull SpawnedDisplayEntityGroup group){
         return setStateIfPresent(stateType.getStateID(), group);
@@ -198,12 +199,12 @@ public class DisplayStateMachine {
     /**
      * Set the state of a group contained in this state machine.
      * This will automatically update the SpawnedDisplayEntityGroup associated with this, and play animations from the first frame.
-     * This will NOT call the {@link GroupAnimationStateChangeEvent} if the new state is the same as the group's current state.
+     * This will NOT call the {@link AnimationStateChangeEvent} if the new state is the same as the group's current state.
      * @param stateID the name of the state
      * @param group the group to apply the new state to
      * @throws IllegalArgumentException if a {@link MachineState} with the given stateID could not be found
      * or if the group is not contained in this state machine
-     * @return false if {@link GroupAnimationStateChangeEvent} is cancelled or the group is not contained in this state machine.
+     * @return false if {@link AnimationStateChangeEvent} is cancelled or the group is not contained in this state machine.
      */
     public boolean setState(@NotNull String stateID, @NotNull SpawnedDisplayEntityGroup group){
         if (this != groupMachines.get(group)){
@@ -220,12 +221,12 @@ public class DisplayStateMachine {
     /**
      * Set the state of a group contained in this state machine.
      * This will automatically update the SpawnedDisplayEntityGroup associated with this, and play animations from the first frame.
-     * This will NOT call the {@link GroupAnimationStateChangeEvent} if the new state is the same as the group's current state.
+     * This will NOT call the {@link AnimationStateChangeEvent} if the new state is the same as the group's current state.
      * @param machineState the name the state
      * @param group the group to apply the new state to
      * @throws IllegalArgumentException if a {@link MachineState} with the given MachineState's ID could not be found
      * or if the group is not contained in this state machine
-     * @return false if {@link GroupAnimationStateChangeEvent} is cancelled or the group is not contained in this state machine.
+     * @return false if {@link AnimationStateChangeEvent} is cancelled or the group is not contained in this state machine.
      */
     public boolean setState(@NotNull MachineState machineState, @NotNull SpawnedDisplayEntityGroup group){
         return setState(machineState.stateID, group);
@@ -234,12 +235,12 @@ public class DisplayStateMachine {
     /**
      * Set the state of a group contained in this state machine.
      * This will automatically update the SpawnedDisplayEntityGroup associated with this, and play animations from the first frame.
-     * This will NOT call the {@link GroupAnimationStateChangeEvent} if the new state is the same as the group's current state.
+     * This will NOT call the {@link AnimationStateChangeEvent} if the new state is the same as the group's current state.
      * @param stateType the state
      * @param group the group to apply the new state to
      * @throws IllegalArgumentException if a {@link MachineState} with the given state type could not be found
      * or if the group is not contained in this state machine
-     * @return false if {@link GroupAnimationStateChangeEvent} is cancelled or the group is not contained in this state machine.
+     * @return false if {@link AnimationStateChangeEvent} is cancelled or the group is not contained in this state machine.
      */
     public boolean setState(@NotNull MachineState.StateType stateType, @NotNull SpawnedDisplayEntityGroup group){
         return setState(stateType.getStateID(), group);
@@ -259,7 +260,7 @@ public class DisplayStateMachine {
      * @param state
      * @return true if the state was unset
      */
-    public boolean unsetIfState(@NotNull SpawnedDisplayEntityGroup group, MachineState state){
+    public boolean unsetIfState(@NotNull ActiveGroup group, MachineState state){
         return group.unsetIfCurrentMachineState(state);
     }
 
@@ -311,7 +312,7 @@ public class DisplayStateMachine {
      * Unregisters this DisplayStateMachine, removing all states and stopping animations on every group added to this state machine
      */
     public void unregister(){
-        for (SpawnedDisplayEntityGroup group : groupMachines.keySet()){
+        for (ActiveGroup group : groupMachines.keySet()){
             removeGroupConcurrent(group);
         }
 
@@ -320,7 +321,7 @@ public class DisplayStateMachine {
     }
 
 
-    public static void unregisterFromStateMachine(@NotNull SpawnedDisplayEntityGroup group){
+    public static void unregisterFromStateMachine(@NotNull ActiveGroup group){
         DisplayStateMachine stateAnimator = groupMachines.get(group);
         if (stateAnimator != null){
             stateAnimator.removeGroup(group);

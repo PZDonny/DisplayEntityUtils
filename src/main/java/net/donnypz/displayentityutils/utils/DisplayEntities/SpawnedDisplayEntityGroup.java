@@ -2,15 +2,10 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.*;
-import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
-import net.donnypz.displayentityutils.utils.CullOption;
-import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
-import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.donnypz.displayentityutils.utils.FollowType;
 import io.papermc.paper.entity.TeleportFlag;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.*;
@@ -27,33 +22,21 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spawned {
+public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spawned {
     public static final long defaultPartUUIDSeed = 99;
     final Random partUUIDRandom = new Random(defaultPartUUIDSeed);
 
-    LinkedHashMap<UUID, SpawnedDisplayEntityPart> spawnedParts = new LinkedHashMap<>();
     Set<SpawnedPartSelection> partSelections = new HashSet<>();
     List<SpawnedDisplayFollower> followers = new ArrayList<>();
     SpawnedDisplayFollower defaultFollower;
 
-    private String tag;
-    SpawnedDisplayEntityPart masterPart;
     long creationTime = System.currentTimeMillis();
-    int lastAnimatedTick = -1;
-
     boolean isVisibleByDefault;
-    private float scaleMultiplier = 1;
     private boolean isPersistent = DisplayEntityPlugin.defaultPersistence();
     private boolean persistenceOverride = DisplayEntityPlugin.persistenceOverride();
-    private MachineState currentMachineState;
-    private float verticalOffset = 0;
-    private final HashSet<DisplayAnimator> activeAnimators = new HashSet<>();
 
     public static final NamespacedKey creationTimeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "creationtime");
     static final NamespacedKey scaleKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "scale");
-    static final NamespacedKey spawnAnimationKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimation");
-    static final NamespacedKey spawnAnimationTypeKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimationtype");
-    static final NamespacedKey spawnAnimationLoadMethodKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimationloader");
     static final NamespacedKey persistenceOverrideKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "persistence_override");
 
 
@@ -101,6 +84,12 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
         autoSetCulling(DisplayEntityPlugin.autoCulling(), widthCullingAdder, heightCullingAdder);
     }
 
+    private Display getMasterEntity(){
+        return (Display)((SpawnedDisplayEntityPart) masterPart).getEntity();
+    }
+
+
+
     /**
      * Get the unix timestamp that this group was initially created.
      * This is created when a group is selected/grouped for the first time.
@@ -116,126 +105,7 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      */
     @Override
     public boolean isInLoadedChunk(){
-        return DisplayUtils.isInLoadedChunk(masterPart);
-    }
-
-
-
-    /**
-     * Set the vertical translation offset of this group riding an entity. This will apply to animations
-     * as long as this group is riding an entity.
-     * @param verticalOffset
-     */
-    public SpawnedDisplayEntityGroup setVerticalOffset(float verticalOffset) {
-        this.verticalOffset = verticalOffset;
-        return this;
-    }
-
-    /**
-     * Get the vertical translation offset of this group when riding an entity.
-     * @return a float
-     */
-    public float getVerticalOffset() {
-        return verticalOffset;
-    }
-
-
-
-    /**
-     * Get this group's current animation state, respective of its {@link DisplayStateMachine}
-     * @return a {@link MachineState} or null
-     */
-    public @Nullable MachineState getMachineState(){
-        return currentMachineState;
-    }
-
-    /**
-     * Get the {@link DisplayStateMachine} this group is associated with
-     * @return a {@link DisplayStateMachine} or null
-     */
-    public @Nullable DisplayStateMachine getDisplayStateMachine(){
-        return DisplayStateMachine.getStateMachine(this);
-    }
-
-    /**
-     * Set the animation state of a group in its {@link DisplayStateMachine}
-     * @param state
-     * @param stateMachine
-     * @return false if:
-     * <p>- This group's state machine is locked by a MythicMobs skill</p>
-     * <p>- Group is not contained in the state machine</p>
-     * <p>- The state is part of a different state machine</p>
-     * <p>- GroupAnimationStateChangeEvent is cancelled</p>
-     * <p>- The current state has a transition lock and the new state cannot ignore it</p>
-     */
-    public boolean setMachineState(@NotNull MachineState state, @NotNull DisplayStateMachine stateMachine){
-        if (currentMachineState == state){
-            return false;
-        }
-
-        if (!stateMachine.contains(this) || state.getStateMachine() != stateMachine){
-            return false;
-        }
-
-        if (currentMachineState != null && !currentMachineState.canTransitionFrom(this, state)){
-            return false;
-        }
-
-        if (!new GroupAnimationStateChangeEvent(this, stateMachine, state, currentMachineState).callEvent()){
-            return false;
-        }
-
-
-
-        if (currentMachineState != null){
-            DisplayAnimator animator = currentMachineState.getDisplayAnimator();
-            if (animator != null){
-                animator.stop(this);
-            }
-        }
-        currentMachineState = state;
-
-        DisplayAnimator animator = state.getDisplayAnimator();
-
-        if (animator != null){
-            animator.play(this);
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    /**
-     * Unset this group's {@link DisplayStateMachine}'s animation state
-     */
-    public void unsetMachineState(){
-        DisplayStateMachine machine = getDisplayStateMachine();
-        if (machine == null || currentMachineState == null){
-            return;
-        }
-
-        DisplayAnimator animator = currentMachineState.getDisplayAnimator();
-        if (animator != null){
-            animator.stop(this);
-        }
-        currentMachineState = null;
-    }
-
-    /**
-     * Unset this group's state machine state if the provided state is the group's current state
-     * @param state
-     * @return true if the state was unset
-     */
-    public boolean unsetIfCurrentMachineState(MachineState state){
-        if (currentMachineState == null){
-            return false;
-        }
-        if (currentMachineState == state){
-            unsetMachineState();
-            return true;
-        }
-        return false;
+        return DisplayUtils.isInLoadedChunk((SpawnedDisplayEntityPart) masterPart);
     }
 
 
@@ -266,14 +136,15 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
         SpawnedDisplayEntityPart part = new SpawnedDisplayEntityPart(this, displayEntity, partUUIDRandom);
         if (masterPart != null){
             if (!part.isMaster()){
-                Display masterEntity = (Display) masterPart.getEntity();
+                Display masterEntity = getMasterEntity();
                 displayEntity.setTeleportDuration(masterEntity.getTeleportDuration());
-                masterPart.getEntity().addPassenger(displayEntity);
+                masterEntity.addPassenger(displayEntity);
             }
-            else if (!spawnedParts.isEmpty()){
-                for (SpawnedDisplayEntityPart spawnedPart : spawnedParts.values()){
-                    if (!spawnedPart.getEntity().equals(part.getEntity())){
-                        masterPart.getEntity().addPassenger(spawnedPart.getEntity());
+            else if (!groupParts.isEmpty()){
+                for (ActivePart spawnedPart : groupParts.values()){
+                    Entity spEntity = ((SpawnedDisplayEntityPart) spawnedPart).getEntity();
+                    if (!spEntity.equals(part.getEntity())){
+                        getMasterEntity().addPassenger(spEntity);
                     }
                 }
             }
@@ -390,8 +261,8 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
     public void seedPartUUIDs(long seed){
         byte[] byteArray;
         Random random = new Random(seed);
-        SequencedCollection<SpawnedDisplayEntityPart> parts = getSpawnedParts();
-        spawnedParts.clear();
+        SequencedCollection<SpawnedDisplayEntityPart> parts = getParts();
+        groupParts.clear();
         for (SpawnedDisplayEntityPart part : parts){
             byteArray = new byte[16];
             random.nextBytes(byteArray);
@@ -405,8 +276,8 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      */
     @Override
     public void showToPlayer(@NotNull Player player){
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.showToPlayer(player);
+        for (ActivePart part : groupParts.values()){
+            ((SpawnedDisplayEntityPart) part).showToPlayer(player);
         }
     }
 
@@ -416,14 +287,25 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      */
     @Override
     public void hideFromPlayer(@NotNull Player player){
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
+        for (ActivePart part : groupParts.values()){
             part.hideFromPlayer(player);
         }
     }
 
     /**
+     * Hide this group from players
+     * @param players The players to hide this group from
+     */
+    @Override
+    public void hideFromPlayers(@NotNull Collection<Player> players){
+        for (ActivePart part : groupParts.values()){
+            part.hideFromPlayers(players);
+        }
+    }
+
+    /**
      * Get whether this group is visible to players by default
-     * If not, use showToPlayer() to reveal this group to the player
+     * If not, use {@link #showToPlayer(Player)} to reveal this group to the player
      * and hideFromPlayer() to hide it
      * @return a boolean value
      */
@@ -444,7 +326,7 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
         }
         List<Interaction> interactions = new ArrayList<>();
         if (getMasterPart() != null){
-            List<Entity> existingInteractions = getSpawnedPartEntities(SpawnedDisplayEntityPart.PartType.INTERACTION);
+            List<Entity> existingInteractions = getPartEntities(SpawnedDisplayEntityPart.PartType.INTERACTION);
             for(Entity e : getMasterPart().getEntity().getNearbyEntities(searchRange, searchRange, searchRange)) {
                 if ((e instanceof Interaction interaction)){
                     if (!existingInteractions.contains(e)){
@@ -467,7 +349,7 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
     public List<Interaction> removeInteractionEntities(){
         List<Interaction> interactions = new ArrayList<>();
         HashSet<Chunk> loadedChunks = new HashSet<>();
-        for (SpawnedDisplayEntityPart part : getSpawnedParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
+        for (SpawnedDisplayEntityPart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
             Chunk chunk = part.getEntity().getChunk();
             chunk.addPluginChunkTicket(DisplayEntityPlugin.getInstance());
             loadedChunks.add(chunk);
@@ -483,86 +365,108 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * Get the location of this group.
      * @return Location of this group's master part. Null if the group is invalid
      */
+    @Override
     public Location getLocation(){
         if (!this.isSpawned()){
             return null;
         }
-        return masterPart.getLocation();
+        return getMasterEntity().getLocation();
+    }
+
+    @Override
+    public boolean isTrackedBy(@NotNull Player player) {
+        return player.canSee(getMasterEntity());
+    }
+
+    @Override
+    public Collection<Player> getTrackingPlayers() {
+        return getMasterEntity().getTrackedBy();
+    }
+
+
+
+
+    /**
+     * {@inheritDoc}
+     * @return {@link SpawnedDisplayEntityPart} or null
+     */
+    @Override
+    public @Nullable SpawnedDisplayEntityPart getPart(@NotNull UUID partUUID){
+        return (SpawnedDisplayEntityPart) groupParts.get(partUUID);
     }
 
     /**
-     * Get a {@link SpawnedDisplayEntityPart} by its part uuid
-     * @param partUUID the part uuid of the part
-     * @return a {@link SpawnedDisplayEntityPart} or null if no part in this group contains the provided part uuid
+     * {@inheritDoc}
+     * @return a list of {@link SpawnedDisplayEntityPart}
      */
-    public @Nullable SpawnedDisplayEntityPart getSpawnedPart(@NotNull UUID partUUID){
-        return spawnedParts.get(partUUID);
+    @Override
+    public List<SpawnedDisplayEntityPart> getParts() {
+        return groupParts
+                .values()
+                .stream()
+                .map(SpawnedDisplayEntityPart.class::cast)
+                .toList();
     }
 
     /**
-     * Get a {@link SequencedCollection} of all this group's parts.
-     * @return a sequenced collection
+     * {@inheritDoc}
+     * @return a list of {@link SpawnedDisplayEntityPart}
      */
-    public SequencedCollection<SpawnedDisplayEntityPart> getSpawnedParts(){
-        return new ArrayList<>(spawnedParts.sequencedValues());
-    }
-
-    /**
-     * Get a list of all parts of a certain type within this group.
-     * @return a list of all {@link SpawnedDisplayEntityPart} in this group of a certain part type
-     */
-    public List<SpawnedDisplayEntityPart> getSpawnedParts(@NotNull SpawnedDisplayEntityPart.PartType partType){
+    @Override
+    public List<SpawnedDisplayEntityPart> getParts(@NotNull SpawnedDisplayEntityPart.PartType partType){
         List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
-        for (SpawnedDisplayEntityPart part : spawnedParts.sequencedValues()){
+        for (ActivePart part : groupParts.sequencedValues()){
             if (partType == part.getType()){
-                partList.add(part);
+                partList.add((SpawnedDisplayEntityPart) part);
             }
         }
         return partList;
     }
 
     /**
-     * Get a list of all display entity parts within this group
-     * @return a list of only display entity {@link SpawnedDisplayEntityPart}
+     * {@inheritDoc}
+     * @return a list of {@link SpawnedDisplayEntityPart}
      */
-    public List<SpawnedDisplayEntityPart> getSpawnedDisplayParts(){
+    @Override
+    public List<SpawnedDisplayEntityPart> getDisplayParts(){
         List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
-        for (SpawnedDisplayEntityPart part : spawnedParts.sequencedValues()){
+        for (ActivePart part : groupParts.sequencedValues()){
             if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                partList.add(part);
+                partList.add((SpawnedDisplayEntityPart) part);
             }
         }
         return partList;
     }
 
     /**
-     * Get a list of all display entity parts within this group with a tag
-     * @return a list
+     * {@inheritDoc}
+     * @return a list of {@link SpawnedDisplayEntityPart}
      */
-    public List<SpawnedDisplayEntityPart> getSpawnedParts(@NotNull String tag){
+    @Override
+    public List<SpawnedDisplayEntityPart> getParts(@NotNull String tag){
         List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
-        for (SpawnedDisplayEntityPart part : spawnedParts.sequencedValues()){
+        for (ActivePart part : groupParts.sequencedValues()){
             if (part.hasTag(tag)){
-                partList.add(part);
+                partList.add((SpawnedDisplayEntityPart) part);
             }
         }
         return partList;
     }
 
     /**
-     * Get a list of all display entity parts within this group with at least one of the provided tags
-     * @return a list
+     * {@inheritDoc}
+     * @return a list of {@link SpawnedDisplayEntityPart}
      */
-    public List<SpawnedDisplayEntityPart> getSpawnedParts(@NotNull Collection<String> tags){
+    @Override
+    public List<SpawnedDisplayEntityPart> getParts(@NotNull Collection<String> tags){
         List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
-        for (SpawnedDisplayEntityPart part : spawnedParts.sequencedValues()){
+        for (ActivePart part : groupParts.sequencedValues()){
             for (String tag : tags){
                 if (part.hasTag(tag)){
-                    partList.add(part);
+                    partList.add((SpawnedDisplayEntityPart) part);
                     break;
                 }
             }
-
         }
         return partList;
     }
@@ -572,11 +476,11 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * @param partType the type of part to get
      * @return a list
      */
-    public List<Entity> getSpawnedPartEntities(@NotNull SpawnedDisplayEntityPart.PartType partType){
+    public List<Entity> getPartEntities(@NotNull SpawnedDisplayEntityPart.PartType partType){
         List<Entity> partList = new ArrayList<>();
-        for (SpawnedDisplayEntityPart part : spawnedParts.sequencedValues()){
+        for (ActivePart part : groupParts.sequencedValues()){
             if (partType == part.getType()){
-                partList.add(part.getEntity());
+                partList.add(((SpawnedDisplayEntityPart) part).getEntity());
             }
         }
         return partList;
@@ -587,10 +491,10 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * @param entityClazz the entity class to cast all entities to
      * @return a list
      */
-    public <T> List<T> getSpawnedPartEntities(@NotNull Class<T> entityClazz){
+    public <T> List<T> getPartEntities(@NotNull Class<T> entityClazz){
         List<T> partList = new ArrayList<>();
-        for (SpawnedDisplayEntityPart part : spawnedParts.sequencedValues()){
-            Entity partEntity = part.getEntity();
+        for (ActivePart part : groupParts.sequencedValues()){
+            Entity partEntity = ((SpawnedDisplayEntityPart) part).getEntity();
             if (entityClazz.isInstance(partEntity)){
                 T entity = entityClazz.cast(partEntity);
                 partList.add(entity);
@@ -626,8 +530,8 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * @return this
      */
     public SpawnedDisplayEntityGroup setPersistent(boolean persistent){
-        for (SpawnedDisplayEntityPart p : spawnedParts.values()){
-            p.getEntity().setPersistent(persistent);
+        for (ActivePart p : groupParts.values()){
+            ((SpawnedDisplayEntityPart) p).getEntity().setPersistent(persistent);
         }
         this.isPersistent = persistent;
         return this;
@@ -658,21 +562,7 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
         return this;
     }
 
-    /**
-     * Get this group's scale multiplier set after using {@link SpawnedDisplayEntityGroup#scale(float, int, boolean)}
-     * @return the group's scale multiplier
-     */
-    public float getScaleMultiplier(){
-        return scaleMultiplier;
-    }
-
-    /**
-     * Set the scale for all parts within this group
-     * @param newScaleMultiplier the scale multiplier to apply to this group
-     * @param durationInTicks how long it should take for the group to scale
-     * @param scaleInteractions whether interaction entities should be scaled
-     * @return false if the {@link GroupScaleEvent} was cancelled or if the group is in an unloaded chunk
-     */
+    @Override
     public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions){
         if (newScaleMultiplier <= 0){
             throw new IllegalArgumentException("New Scale Multiplier cannot be <= 0");
@@ -691,7 +581,8 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
 
         float largestWidth = 0;
         float largestHeight = 0;
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
+        for (ActivePart p : groupParts.values()){
+            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) p;
             //Displays
             if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Display d = (Display) part.getEntity();
@@ -750,14 +641,14 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
 
     //Culling
         if (DisplayEntityPlugin.autoCulling() == CullOption.LARGEST){
-            for (SpawnedDisplayEntityPart part : spawnedParts.values()){
+            for (ActivePart part : groupParts.values()){
                 part.cull(largestWidth+DisplayEntityPlugin.widthCullingAdder(), largestHeight+DisplayEntityPlugin.heightCullingAdder());
             }
         }
 
 
 
-        PersistentDataContainer pdc = masterPart.getEntity().getPersistentDataContainer();
+        PersistentDataContainer pdc = getMasterEntity().getPersistentDataContainer();
         pdc.set(scaleKey, PersistentDataType.FLOAT, newScaleMultiplier);
         scaleMultiplier = newScaleMultiplier;
         return true;
@@ -781,7 +672,7 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
     }
 
     private void teleportWithoutEvent(Location location, boolean respectGroupDirection){
-        Entity master = masterPart.getEntity();
+        Entity master = getMasterEntity();
         Location oldMasterLoc = master.getLocation().clone();
         if (respectGroupDirection){
             location.setPitch(oldMasterLoc.getPitch());
@@ -792,7 +683,7 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
         World w = location.getWorld();
 
 
-        for (SpawnedDisplayEntityPart part : getSpawnedParts()){
+        for (SpawnedDisplayEntityPart part : this.getParts()){
             part.getEntity().setRotation(location.getYaw(), location.getPitch());
 
         //Interaction Entity TP
@@ -809,6 +700,38 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
         }
     }
 
+    private static void translateInteractionEventless(@NotNull Interaction interaction, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
+        Location destination = interaction.getLocation().clone().add(direction.clone().normalize().multiply(distance));
+        double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
+        Vector incrementVector = direction
+                .clone()
+                .normalize()
+                .multiply(movementIncrement);
+
+        new BukkitRunnable(){
+            double currentDistance = 0;
+            float lastYaw = interaction.getYaw();
+            @Override
+            public void run() {
+                float newYaw = interaction.getYaw();
+                if (newYaw != lastYaw){
+                    incrementVector.rotateAroundY(Math.toRadians(lastYaw-newYaw));
+                    lastYaw = newYaw;
+                }
+                currentDistance+=Math.abs(movementIncrement);
+                Location tpLoc = interaction.getLocation().clone().add(incrementVector);
+
+                if (currentDistance >= distance){
+                    interaction.teleport(destination);
+                    cancel();
+                }
+                else{
+                    interaction.teleport(tpLoc);
+                }
+            }
+        }.runTaskTimer(DisplayEntityPlugin.getInstance(), delayInTicks, 1);
+    }
+
     /**
      * Move the actual location of all the SpawnedDisplayEntityParts in this group through smooth teleportation.
      * Doing this multiple times in a short amount of time may bring unexpected results.
@@ -817,37 +740,51 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * @param durationInTicks How long it should take for the translation to complete
      */
     public void teleportMove(Vector direction, double distance, int durationInTicks){
-        Location destination = masterPart.getEntity().getLocation().clone().add(direction.clone().normalize().multiply(distance));
-        GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()){
+        Entity master = getMasterEntity();
+        Location destination = master.getLocation().clone().add(direction.clone().normalize().multiply(distance));
+        if (!new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent()){
             return;
         }
-        if (durationInTicks <= 0){
-            durationInTicks = 1;
-        }
-        direction.normalize();
-        double movementIncrement = distance/(double) durationInTicks;
-        direction.multiply(movementIncrement);
-        Entity master = masterPart.getEntity();
 
-        new BukkitRunnable(){
-            double currentDistance = 0;
-            @Override
-            public void run() {
-                if (!isSpawned()){
-                    cancel();
-                    return;
-                }
-                currentDistance+=Math.abs(movementIncrement);
-                Location tpLoc = master.getLocation().clone().add(direction);
-                teleportWithoutEvent(tpLoc, false);
-                if (currentDistance >= distance){
-                    new GroupTeleportMoveEndEvent(SpawnedDisplayEntityGroup.this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent();
-                    cancel();
-                }
+        double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
+        Vector incrementVector = direction
+                .clone()
+                .normalize()
+                .multiply(movementIncrement);
+
+        for (ActivePart p : groupParts.values()){
+            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) p;
+            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                translateInteractionEventless((Interaction) part.getEntity(), direction, distance, durationInTicks, 0);
             }
-        }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, 1);
+            else{
+                new BukkitRunnable(){
+                    double currentDistance = 0;
+                    @Override
+                    public void run() {
+                        if (!isSpawned()){
+                            cancel();
+                            return;
+                        }
+                        currentDistance+=Math.abs(movementIncrement);
+                        Location tpLoc = master.getLocation().clone().add(incrementVector);
+
+                        part.getEntity().setRotation(tpLoc.getYaw(), tpLoc.getPitch());
+                        if (currentDistance >= distance){
+                            if (part.isMaster()){
+                                master.teleport(destination);
+                            }
+                            new GroupTeleportMoveEndEvent(SpawnedDisplayEntityGroup.this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent();
+                            cancel();
+                        }
+                        else if (part.isMaster()){
+                            master.teleport(tpLoc, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                        }
+
+                    }
+                }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, 1);
+            }
+        }
     }
 
     /**
@@ -858,7 +795,7 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * @param durationInTicks How long it should take for the translation to complete
      */
     public void teleportMove(@NotNull Direction direction, double distance, int durationInTicks){
-        teleportMove(direction.getVector(masterPart), distance, durationInTicks);
+        teleportMove(direction.getVector((SpawnedDisplayEntityPart) masterPart), distance, durationInTicks);
     }
 
     /**
@@ -888,7 +825,7 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
         double movementIncrement = distance/(double) durationInTicks;
         movementIncrement/=divisions;
         direction.multiply(movementIncrement);
-        Entity master = masterPart.getEntity();
+        Entity master = getMasterEntity();
         List<Location> locations = new ArrayList<>();
         Location loc = master.getLocation().clone();
         for (double currentDistance = 0; currentDistance <= distance; currentDistance+=Math.abs(movementIncrement)){
@@ -898,175 +835,20 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
         return locations;
     }
 
-    /**
-     * Check if this group's master part has this specified scoreboard tag
-     * @param tag The tag to check for
-     * @return whether this group has the specified tag
-     */
-    public boolean hasScoreboardTag(String tag){
-        return masterPart.getEntity().getScoreboardTags().contains(tag);
-    }
 
     /**
-     * Add a scoreboard tag to this group's master part
-     * @param tag The tag to add
-     */
-    public void addScoreboardTag(String tag){
-        if (hasScoreboardTag(tag)){
-            return;
-        }
-        masterPart.getEntity().addScoreboardTag(tag);
-    }
-
-    /**
-     * Remove a scoreboard tag from this group's master part
-     * @param tag The tag to remove
-     */
-    public void removeScoreboardTag(String tag){
-        if (!hasScoreboardTag(tag)){
-            return;
-        }
-        masterPart.getEntity().removeScoreboardTag(tag);
-    }
-
-    /**
-     * Pivot all Interaction parts in this selection around the SpawnedDisplayEntityGroup's master part
-     * @param angle the pivot angle
+     * Pivot all Interaction parts in this selection around this group's master part
+     * @param angleInDegrees the pivot angle
      */
     @Override
-    public void pivot(double angle){
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
+    public void pivot(float angleInDegrees){
+        for (ActivePart part : groupParts.values()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                part.pivot(angle);
+                part.pivot(angleInDegrees);
             }
         }
     }
 
-    /**
-     * Change the yaw of this group
-     * @param yaw The yaw to set for this group
-     * @param pivotInteractions true if interactions should pivot around the group with the yaw change
-     */
-    @Override
-    public void setYaw(float yaw, boolean pivotInteractions){
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.setYaw(yaw, pivotInteractions);
-        }
-    }
-
-    /**
-     * Change the pitch of this group
-     * @param pitch The pitch to set for this group
-     */
-    @Override
-    public void setPitch(float pitch){
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.setPitch(pitch);
-        }
-    }
-
-    /**
-     * Set the brightness of this group
-     * @param brightness the brightness to set, null to use brightness based on position
-     */
-    @Override
-    public void setBrightness(@Nullable Display.Brightness brightness){
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.setBrightness(brightness);
-        }
-    }
-
-    /**
-     * Set the billboard of this group
-     * @param billboard the billboard to set
-     */
-    @Override
-    public void setBillboard(@NotNull Display.Billboard billboard){
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.setBillboard(billboard);
-        }
-    }
-
-    /**
-     * Set the view range of this group
-     * @param viewRangeMultiplier The range multiplier to set
-     */
-    @Override
-    public void setViewRange(float viewRangeMultiplier){
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.setViewRange(viewRangeMultiplier);
-        }
-    }
-
-    /**
-     * Attempt to automatically set the culling bounds for all parts within this group.
-     * Results may not be 100% accurate due to the varying shapes of Minecraft blocks.
-     * The culling bounds will be representative of the part's scaling.
-     * @param cullOption The {@link CullOption} to use
-     * @param widthAdder The amount of width to be added to the culling range
-     * @param heightAdder The amount of height to be added to the culling range
-     * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
-     */
-    public void autoSetCulling(CullOption cullOption, float widthAdder, float heightAdder){
-        if (!isInLoadedChunk()){
-            return;
-        }
-        switch (cullOption){
-            case LARGEST -> largestCulling(widthAdder, heightAdder);
-            case LOCAL -> localCulling(widthAdder, heightAdder);
-            case NONE -> noneCulling();
-        }
-    }
-
-    private void largestCulling(float widthAdder, float heightAdder){
-        float maxWidth = 0;
-        float maxHeight = 0;
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()) {
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
-                continue;
-            }
-            Transformation transformation = ((Display) part.getEntity()).getTransformation();
-            Vector3f scale = transformation.getScale();
-
-            maxWidth = Math.max(maxWidth, Math.max(scale.x, scale.z));
-            maxHeight = Math.max(maxHeight, scale.y);
-        }
-
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.cull(maxWidth + widthAdder, maxHeight + heightAdder);
-        }
-    }
-
-    private void localCulling(float widthAdder, float heightAdder){
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.autoCull(widthAdder, heightAdder);
-        }
-    }
-
-    private void noneCulling(){
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.cull(0, 0);
-        }
-    }
-
-    /**
-     * Set the glow color of this group
-     * @param color The color to set
-     */
-    @Override
-    public void setGlowColor(@Nullable Color color){
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.setGlowColor(color);
-        }
-    }
-
-    /**
-     * Get the glow color of this group
-     * @return a color or null if not set
-     */
-    public @Nullable Color getGlowColor(){
-        return ((Display) masterPart.getEntity()).getGlowColorOverride();
-    }
 
     /**
      * Change the translation of all the SpawnedDisplayEntityParts in this group.
@@ -1083,14 +865,14 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
         if (!isInLoadedChunk()){
             return false;
         }
-        Location destination = masterPart.getEntity().getLocation().clone().add(direction.clone().normalize().multiply(distance));
+        Location destination = getMasterEntity().getLocation().clone().add(direction.clone().normalize().multiply(distance));
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.VANILLATRANSLATE, destination);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()){
             return false;
         }
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.translateForce(direction, distance, durationInTicks, delayInTicks);
+        for (ActivePart part : groupParts.values()){
+            ((SpawnedDisplayEntityPart)part).translateForce(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }
@@ -1110,14 +892,16 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
         if (!isInLoadedChunk()){
             return false;
         }
-        Location destination = masterPart.getEntity().getLocation().clone().add(direction.getVector(masterPart.getEntity()).normalize().multiply(distance));
+        Entity masterEntity = getMasterEntity();
+        Location destination = getLocation().clone().add(direction.getVector(masterEntity).normalize().multiply(distance));
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.VANILLATRANSLATE, destination);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()){
             return false;
         }
-        for(SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.translateForce(direction, distance, durationInTicks, delayInTicks);
+
+        for (ActivePart part : groupParts.values()){
+            ((SpawnedDisplayEntityPart)part).translateForce(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }
@@ -1129,8 +913,8 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      */
     public SpawnedDisplayEntityGroup setTag(String tag){
         this.tag = tag;
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.setGroupPDC();
+        for (ActivePart part : groupParts.values()){
+            ((SpawnedDisplayEntityPart) part).setGroupPDC();
         }
         return this;
     }
@@ -1141,6 +925,7 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * @return name of group's world
      * @throws NullPointerException if group is despawned or invalid
      */
+    @Override
     public String getWorldName(){
         return getWorld().getName();
     }
@@ -1151,23 +936,7 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * @throws NullPointerException if group is despawned or invalid
      */
     public @NotNull World getWorld(){
-        return masterPart.getEntity().getWorld();
-    }
-
-    /**
-     * Get this group's tag
-     * @return This group's tag. Null if it was not set
-     */
-    public @Nullable String getTag() {
-        return tag;
-    }
-
-    /**
-     * Get whether this group has a tag set
-     * @return true if a tag has been set for this group
-     */
-    public boolean hasTag(){
-        return tag != null;
+        return getMasterEntity().getWorld();
     }
 
 
@@ -1177,13 +946,25 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * @return This group's master part. Null if it could not be found
      */
     public @Nullable SpawnedDisplayEntityPart getMasterPart(){
-        return masterPart;
-        /*for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            if (part.isMaster()){
-                return part;
-            }
-        }
-        return null;*/
+        return (SpawnedDisplayEntityPart) masterPart;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return a {@link SpawnedPartSelection}
+     */
+    @Override
+    public @NotNull SpawnedPartSelection createPartSelection() {
+        return new SpawnedPartSelection(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return a {@link SpawnedPartSelection}
+     */
+    @Override
+    public @NotNull SpawnedPartSelection createPartSelection(@NotNull PartFilter partFilter) {
+        return new SpawnedPartSelection(this, partFilter);
     }
 
     /**
@@ -1196,50 +977,37 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
     }
 
     /**
-     * Adds the glow effect the parts within this group
-     * @param ignoreInteractions choose if interaction entities should be outlined with particles
-     * @param particleHidden show parts with particles if it's the master part or has no material
+     * Make this group's display entities glow, and interactions be outlined, for a player for a set period of time
+     * @param player the player
+     * @param durationInTicks how long the glowing should last. -1 to last forever
      * @return this
      */
-    public SpawnedDisplayEntityGroup glow(boolean ignoreInteractions, boolean particleHidden){
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                if (ignoreInteractions){
+    public SpawnedDisplayEntityGroup glowAndOutline(@NotNull Player player, long durationInTicks){
+        for (ActivePart p : groupParts.values()){
+            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) p;
+            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                part.spawnInteractionOutline(player, durationInTicks);
+            }
+            else {
+                Display display = (Display) part.getEntity();
+                if (display.isGlowing()){
                     continue;
                 }
-                part.glow(false);
-            }
-            part.glow(particleHidden);
-        }
-        return this;
-    }
-
-    /**
-     * Adds the glow effect to all the parts in this group
-     * @param durationInTicks How long to highlight this selection
-     * @return this
-     */
-    public SpawnedDisplayEntityGroup glow(long durationInTicks, boolean ignoreInteractions, boolean particleHidden){
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                if (ignoreInteractions){
-                    continue;
+                PacketUtils.setGlowing(player, display.getEntityId(), true);
+                if (durationInTicks > -1){
+                    Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                        if (!display.isGlowing()){
+                            PacketUtils.setGlowing(player, display.getEntityId(), false);
+                        }
+                    }, durationInTicks);
                 }
-                part.glow(durationInTicks, false);
-            }
-            part.glow(durationInTicks, particleHidden);
-        }
-        return this;
-    }
+                else{
+                    if (!display.isGlowing()){
+                        PacketUtils.setGlowing(player, display.getEntityId(), false);
+                    }
+                }
 
-    /**
-     * Removes the glow effect from all the parts in this group
-     * @return this
-     */
-    @Override
-    public SpawnedDisplayEntityGroup unglow(){
-        for (SpawnedDisplayEntityPart part : spawnedParts.values()){
-            part.unglow();
+            }
         }
         return this;
     }
@@ -1251,7 +1019,7 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * @return false if the {@link GroupRideEntityEvent} is cancelled or if {@link Entity#addPassenger(Entity)} fails for whatever reason
      */
     public boolean rideEntity(@NotNull Entity vehicle){
-        Entity masterEntity = masterPart.getEntity();
+        Entity masterEntity = getMasterEntity();
         GroupRideEntityEvent event = new GroupRideEntityEvent(this, vehicle);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()){
@@ -1263,11 +1031,11 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
             return false;
         }
 
-        if (verticalOffset != 0) {
-            translate(Direction.UP, verticalOffset, -1, -1);
+        if (verticalRideOffset != 0) {
+            translate(Direction.UP, verticalRideOffset, -1, -1);
         }
 
-        for (SpawnedDisplayEntityPart interactionPart: getSpawnedParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
+        for (SpawnedDisplayEntityPart interactionPart: this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
             alignInteractionWithMountedGroup(interactionPart, vehicle);
         }
         return true;
@@ -1277,13 +1045,14 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * Make this group stop riding its vehicle
      * @return the entity this group was riding
      */
+    @Override
     public @Nullable Entity dismount(){
         Entity vehicle = getVehicle();
-        Entity masterEntity = masterPart.getEntity();
+        Entity masterEntity = getMasterEntity();
         if (masterEntity != null){
-            if (masterPart.getEntity().leaveVehicle()){
-                if (verticalOffset != 0){
-                    translate(Direction.UP, verticalOffset*-1, -1, -1);
+            if (masterEntity.leaveVehicle()){
+                if (verticalRideOffset != 0){
+                    translate(Direction.UP, verticalRideOffset *-1, -1, -1);
                 }
             }
         }
@@ -1323,9 +1092,10 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * Get the entity this group is riding
      * @return an entity. null if this group is not riding an entity
      */
+    @Override
     public @Nullable Entity getVehicle(){
         try{
-            return masterPart.getEntity().getVehicle();
+            return getMasterEntity().getVehicle();
         }
         catch(NullPointerException e){
             e.printStackTrace();
@@ -1333,12 +1103,9 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
         }
     }
 
-    /**
-     * Determine if this group's vertical offset can be applied, typically when mounted on an entity
-     * @return
-     */
-    public boolean canApplyVerticalOffset(){
-        if (verticalOffset == 0){
+
+    public boolean canApplyVerticalRideOffset(){
+        if (verticalRideOffset == 0){
             return false;
         }
         Entity vehicle = getVehicle();
@@ -1436,9 +1203,9 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * @param passenger The entity to ride the SpawnedDisplayEntityGroup
      * @return Whether the mount was successful or not
      */
-    public boolean addPassenger(Entity passenger){
+    public boolean addPassenger(@NotNull Entity passenger){
         try{
-            Entity masterEntity = masterPart.getEntity();
+            Entity masterEntity = getMasterEntity();
             EntityRideGroupEvent event = new EntityRideGroupEvent(this, passenger);
             Bukkit.getPluginManager().callEvent(event);
             if (event.isCancelled()){
@@ -1458,29 +1225,8 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * @param entity the entity to check
      * @return a boolean
      */
-    public boolean isMountedToEntity(Entity entity){
-        return entity.getPassengers().contains(masterPart.getEntity());
-    }
-
-
-    /**
-     * Set the teleportation Duration of all SpawnedDisplayEntityParts in this SpawnedDisplayEntityGroup
-     * Useful when using methods such as {@link #teleportMove(Vector, double, int)}, {@link #teleportMove(Direction, double, int)}, {@link #teleport(Location, boolean)}
-     * , or {@link #followEntityDirection(Entity, GroupFollowProperties)} variations
-     * This makes the teleportation of the group visually smoother
-     */
-    public void setTeleportDuration(int teleportDuration){
-        for (SpawnedDisplayEntityPart part : getSpawnedDisplayParts()){
-            ((Display) part.getEntity()).setTeleportDuration(teleportDuration);
-        }
-    }
-
-    /**
-     * Get the teleport duration of this SpawnedDisplayEntityGroup
-     * @return the group's teleport duration value
-     */
-    public int getTeleportDuration(){
-        return ((Display) masterPart.getEntity()).getTeleportDuration();
+    public boolean isMountedToEntity(@NotNull Entity entity){
+        return entity.getPassengers().contains(getMasterEntity());
     }
 
     /**
@@ -1488,8 +1234,8 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * @param mergingGroup the group to merge
      * @return This display entity group with the other group merged
      */
-    public SpawnedDisplayEntityGroup merge(SpawnedDisplayEntityGroup mergingGroup){
-        for (SpawnedDisplayEntityPart part : mergingGroup.getSpawnedParts()){
+    public SpawnedDisplayEntityGroup merge(@NotNull SpawnedDisplayEntityGroup mergingGroup){
+        for (SpawnedDisplayEntityPart part : mergingGroup.getParts()){
             if (part.isMaster()){
                 part.remove(true);
             }
@@ -1513,8 +1259,8 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * @param copyGroup the group to copy from
      */
     public void copyTransformation(SpawnedDisplayEntityGroup copyGroup){
-        List<SpawnedDisplayEntityPart> displayParts = getSpawnedDisplayParts();
-        List<SpawnedDisplayEntityPart> copyParts = copyGroup.getSpawnedDisplayParts();
+        List<SpawnedDisplayEntityPart> displayParts = getDisplayParts();
+        List<SpawnedDisplayEntityPart> copyParts = copyGroup.getDisplayParts();
         for (int i = 0; i < displayParts.size(); i++){
             if (copyParts.size() < i+1){
                 return;
@@ -1525,97 +1271,41 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
         }
     }
 
-
-
-    /**
-     * Get the tag of the animation applied to this group when it's spawned/loaded
-     * @return a string or null if not set;
-     */
-    public @Nullable String getSpawnAnimationTag(){
-        PersistentDataContainer c = masterPart.getEntity().getPersistentDataContainer();
-        return c.get(spawnAnimationKey, PersistentDataType.STRING);
-    }
-
-    /**
-     * Get the {@link DisplayAnimator.AnimationType} applied to this group's spawn animation
-     * @return a {@link  DisplayAnimator.AnimationType} or null if not set;
-     */
-    public @Nullable DisplayAnimator.AnimationType getSpawnAnimationType(){
-        PersistentDataContainer c = masterPart.getEntity().getPersistentDataContainer();
-        String type = c.get(spawnAnimationTypeKey, PersistentDataType.STRING);
-        if (type == null){
-            return null;
-        }
-        try{
-            return DisplayAnimator.AnimationType.valueOf(type);
-        }
-        catch(IllegalArgumentException e){
-            return null;
-        }
-    }
-
-    /**
-     * Get the {@link LoadMethod} when fetching the spawn animation for this group
-     * @return a {@link  LoadMethod} or null if not set;
-     */
-    public @Nullable LoadMethod getSpawnAnimationLoadMethod(){
-        PersistentDataContainer c = masterPart.getEntity().getPersistentDataContainer();
-        String method = c.get(spawnAnimationLoadMethodKey, PersistentDataType.STRING);
-        if (method == null){
-            return null;
-        }
-        try{
-            return LoadMethod.valueOf(method);
-        }
-        catch(IllegalArgumentException e){
-            return null;
-        }
-    }
-
     /**
      * Set the animation to apply to a group when it is spawned, by its tag.
-     * A null animation tag will remove any existing spawn animation from this group.
+     * A null animation tag will remove any existing spawn animation from this group. If this is done, the other parameters can be set to any value
      * @param animationTag tag of animation to apply whenever this group is spawned/loaded
      * @param animationType type of animation to be applied
+     * @param loadMethod where the animation should be retrieved from
      */
     public void setSpawnAnimationTag(@Nullable String animationTag, @NotNull DisplayAnimator.AnimationType animationType, @NotNull LoadMethod loadMethod){
-        PersistentDataContainer c = masterPart.getEntity().getPersistentDataContainer();
+        PersistentDataContainer c = getMasterEntity().getPersistentDataContainer();
         if (animationTag == null){
-            c.remove(spawnAnimationKey);
-            c.remove(spawnAnimationTypeKey);
-            c.remove(spawnAnimationLoadMethodKey);
+            setSpawnAnimation(null, null, null);
+            c.remove(DisplayEntityPlugin.getSpawnAnimationKey());
+            c.remove(DisplayEntityPlugin.getSpawnAnimationTypeKey());
+            c.remove(DisplayEntityPlugin.getSpawnAnimationLoadMethodKey());
         }
         else{
-            c.set(spawnAnimationKey, PersistentDataType.STRING, animationTag);
-            c.set(spawnAnimationTypeKey, PersistentDataType.STRING, animationType.name());
-            c.set(spawnAnimationLoadMethodKey, PersistentDataType.STRING, loadMethod.name());
+            c.set(DisplayEntityPlugin.getSpawnAnimationKey(), PersistentDataType.STRING, animationTag);
+            c.set(DisplayEntityPlugin.getSpawnAnimationTypeKey(), PersistentDataType.STRING, animationType.name());
+            c.set(DisplayEntityPlugin.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING, loadMethod.name());
+            setSpawnAnimation(animationTag, loadMethod, animationType);
         }
     }
 
 
-    /**
-     * Start playing this group's looping spawn animation. This will do nothing if the spawn animation was never set with {@link #setSpawnAnimationTag(String, DisplayAnimator.AnimationType, LoadMethod)}
-     * or through plugin commands.
-     */
-    public void playSpawnAnimation(){
-        PersistentDataContainer c = masterPart.getEntity().getPersistentDataContainer();
-        String spawnAnimationTag = c.get(spawnAnimationKey, PersistentDataType.STRING);
-        if (spawnAnimationTag == null){
-            return;
-        }
+    @Override
+    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation){
+        return DisplayAnimator.play(this, animation, DisplayAnimator.AnimationType.LINEAR);
+    }
 
-        SpawnedDisplayAnimation anim = DisplayAnimationManager.getSpawnedDisplayAnimation(spawnAnimationTag, getSpawnAnimationLoadMethod());
-        if (anim != null){
-            DisplayAnimator.AnimationType type = getSpawnAnimationType();
-            if (type == null){
-                return;
-            }
-            switch(type){
-                case LINEAR -> animate(anim);
-                case LOOP -> animateLooping(anim);
-                //case PING_PONG -> animatePingPong(anim);
-            }
-        }
+
+    @Override
+    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation){
+        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
+        animator.play(this, 0);
+        return animator;
     }
 
     /**
@@ -1623,8 +1313,8 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * @param animation the animation this group should play
      * @return the {@link DisplayAnimator} that will control the playing of the given animation
      */
-    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation){
-        return DisplayAnimator.play(this, animation);
+    public @NotNull DisplayAnimator animateUsingPackets(@NotNull SpawnedDisplayAnimation animation){
+        return DisplayAnimator.playUsingPackets(this, animation);
     }
 
     /**
@@ -1632,35 +1322,25 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
      * @param animation the animation this group should play
      * @return the {@link DisplayAnimator} that will control the playing of the given animation
      */
-    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation){
+    public @NotNull DisplayAnimator animateLoopingUsingPackets(@NotNull SpawnedDisplayAnimation animation){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
-        animator.play(this);
+        animator.playUsingPackets(this, 0);
         return animator;
     }
 
     /**
-     * Manually stop an animation from playing on this group
-     * @param displayAnimator the display animator controlling an animation
-     * @return this
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * @param animation the animation the frame is from
+     * @param startFrameId the id of the frame to display
+     * @param isAsync whether to show this frame asynchronously (unpredictable results)
+     * @return false if this group is in an unloaded chunk
      */
-    public @NotNull SpawnedDisplayEntityGroup stopAnimation(@NotNull DisplayAnimator displayAnimator){
-        removeActiveAnimator(displayAnimator);
-        return this;
+    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId, boolean isAsync) {
+        return setToFrame(animation, animation.getFrame(startFrameId), isAsync);
     }
 
     /**
-     * Manually stop all animations playing on this group
-     * @param removeFromStateMachine removes this animation from its state machine if true
-     */
-    public void stopAnimations(boolean removeFromStateMachine){
-        activeAnimators.clear();
-        if (removeFromStateMachine){
-            DisplayStateMachine.unregisterFromStateMachine(this);
-        }
-    }
-
-    /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
      * @param animation the animation the frame is from
      * @param frame the frame to display
      * @param isAsync whether to show this frame asynchronously (unpredictable results)
@@ -1675,7 +1355,20 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
     }
 
     /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * @param animation the animation the frame is from
+     * @param startFrameId the id of the frame to display
+     * @param isAsync whether to show this frame asynchronously (unpredictable results)
+     * @param duration how long the frame should play
+     * @param delay how long until the frame should start playing
+     * @return false if this group is in an unloaded chunk
+     */
+    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId, int duration, int delay, boolean isAsync) {
+        return setToFrame(animation, animation.getFrame(startFrameId), duration, delay, isAsync);
+    }
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
      * @param animation the animation the frame is from
      * @param frame the frame to display
      * @param isAsync whether to show this frame asynchronously (unpredictable results)
@@ -1691,47 +1384,21 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
         return true;
     }
 
-    SpawnedDisplayEntityGroup addActiveAnimator(DisplayAnimator animator){
-        activeAnimators.add(animator);
-        return this;
+
+
+    @Override
+    public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
+        if (isInLoadedChunk()){
+            PlayerDisplayAnimationExecutor.setGroupToFrame(player, this, animation, frame);
+        }
     }
 
-    SpawnedDisplayEntityGroup removeActiveAnimator(DisplayAnimator animator){
-        activeAnimators.remove(animator);
-        return this;
+    @Override
+    public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
+        if (isInLoadedChunk()){
+            PlayerDisplayAnimationExecutor.setGroupToFrame(player, this, animation, frame, duration, delay);
+        }
     }
-
-    /**
-     * Check if an animator is animating on this group
-     * @param animator
-     * @return a boolean
-     */
-    public boolean isActiveAnimator(@NotNull DisplayAnimator animator){
-        return activeAnimators.contains(animator);
-    }
-
-    /**
-     * Check if this group's is being animated by any {@link DisplayAnimator}s
-     * @return a boolean
-     */
-    public boolean isAnimating(){
-        //return lastAnimationTimeStamp != -1;
-        return !activeAnimators.isEmpty();
-    }
-
-    void setLastAnimatedTick(){
-        lastAnimatedTick = Bukkit.getCurrentTick();
-    }
-
-
-    /**
-     * Check if this group has completed its animation frame in the game's current tick
-     * @return a boolean
-     */
-    public boolean hasAnimated(){
-        return lastAnimatedTick == Bukkit.getCurrentTick();
-    }
-
 
 
     /**
@@ -1753,7 +1420,7 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
 
         if (DisplayEntityPlugin.autoPivotInteractions()){
             HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
-            for (SpawnedDisplayEntityPart part : getSpawnedParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
+            for (SpawnedDisplayEntityPart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
                 float oldYaw = part.getEntity().getYaw();
                 oldYaws.put(part,  oldYaw);
                 part.pivot(-oldYaw);
@@ -1820,7 +1487,7 @@ public final class SpawnedDisplayEntityGroup extends SpawnedGroup implements Spa
         }
         DisplayStateMachine.unregisterFromStateMachine(this);
         DisplayGroupManager.removeSpawnedGroup(this, despawnParts, force);
-        spawnedParts.clear();
+        groupParts.clear();
         masterPart = null;
         followers.clear();
         if (defaultFollower != null){

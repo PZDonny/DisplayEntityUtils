@@ -36,7 +36,7 @@ class GroupInfoCMD extends PlayerSubCommand {
 
         player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: <yellow>"+groupTag));
         player.sendMessage(MiniMessage.miniMessage().deserialize("World: <yellow>"+group.getWorldName()));
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Total Parts: <yellow>"+(group.getSpawnedParts().size())));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Total Parts: <yellow>"+(group.getParts().size())));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Is Persistent: <yellow>"+group.isPersistent()));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Chunk Load Persistence Overriding: <yellow>"+group.allowsPersistenceOverriding()));
 

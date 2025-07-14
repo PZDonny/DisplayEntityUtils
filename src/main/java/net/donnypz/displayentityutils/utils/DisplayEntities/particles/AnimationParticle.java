@@ -1,8 +1,8 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities.particles;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.io.*;
+import java.util.Collection;
 
 @ApiStatus.Internal
 public abstract class AnimationParticle implements Externalizable, Cloneable {
@@ -59,24 +60,6 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
         this.delayInTicks = delayInTicks;
     }
 
-    public void spawn(@NotNull Location location, @NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator){
-        if (delayInTicks == 0){
-            spawn(location);
-        }
-        else{
-            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                if (!group.isSpawned()){
-                    return;
-                }
-                if (animator == null){
-                    spawn(location);
-                }
-                else if (group.isActiveAnimator(animator)){
-                    spawn(location);
-                }
-            }, delayInTicks);
-        }
-    }
 
     /*public Location getSpawnLocation(SpawnedDisplayEntityGroup group){
         Vector v = vectorFromOrigin.clone();
@@ -94,7 +77,74 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
         return groupLoc;
     }*/
 
+    public void spawn(@NotNull Location location, @NotNull ActiveGroup group, @Nullable DisplayAnimator animator){
+        if (delayInTicks == 0){
+            spawn(location);
+        }
+        else{
+            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                if (group.getMasterPart() == null){
+                    return;
+                }
+                if (animator == null){
+                    spawn(location);
+                }
+                else if (group.isActiveAnimator(animator)){
+                    spawn(location);
+                }
+            }, delayInTicks);
+        }
+    }
+
+    public void spawn(@NotNull Location location, @NotNull ActiveGroup group, @Nullable DisplayAnimator animator, Player player){
+        if (delayInTicks == 0){
+            spawn(location, player);
+        }
+        else{
+            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                if (group.getMasterPart() == null){
+                    return;
+                }
+                if (animator == null){
+                    spawn(location, player);
+                }
+                else if (group.isActiveAnimator(animator)){
+                    spawn(location, player);
+                }
+            }, delayInTicks);
+        }
+    }
+
+    public void spawn(@NotNull Location location, @NotNull ActiveGroup group, @Nullable DisplayAnimator animator, Collection<Player> players){
+        if (delayInTicks == 0){
+            spawn(location, players);
+        }
+        else{
+            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                if (group.getMasterPart() == null){
+                    return;
+                }
+                if (animator == null){
+                    spawn(location, players);
+                }
+                else if (group.isActiveAnimator(animator)){
+                    spawn(location, players);
+                }
+            }, delayInTicks);
+        }
+    }
+
+
+
     public abstract void spawn(Location location);
+
+    public abstract void spawn(Location location, @NotNull Player player);
+
+    public void spawn(Location location, @NotNull Collection<Player> players){
+        for (Player player : players){
+            spawn(location, player);
+        }
+    }
 
     @ApiStatus.Internal
     public void initializeParticle(){

@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -48,6 +49,10 @@ public class GroupSpawnedEvent extends Event {
         COMMAND,
         CLONE,
         DISPLAY_CONTROLLER,
-        CUSTOM;
+        CUSTOM,
+        @ApiStatus.Internal
+        INTERNAL,
+        @ApiStatus.Internal
+        SKRIPT;
     }
 }

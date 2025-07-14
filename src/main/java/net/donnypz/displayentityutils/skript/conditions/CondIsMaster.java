@@ -9,6 +9,7 @@ import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 public class CondIsMaster extends Condition {
 
     static {
-        Skript.registerCondition(CondIsMaster.class, "%spawnedpart/display% (1¦is|2¦is(n't| not)) [the] master part [of a [spawned]group]");
+        Skript.registerCondition(CondIsMaster.class, "%activepart/display% (1¦is|2¦is(n't| not)) [the] master part [of a [spawned]group]");
     }
 
     Expression<?> object;
@@ -33,18 +34,20 @@ public class CondIsMaster extends Condition {
     public boolean check(Event event) {
         Object obj = object.getSingle(event);
         Display entity;
-        if (obj instanceof SpawnedDisplayEntityPart p){
-            if (!(p.getEntity() instanceof Display display)){
+        switch (obj) {
+            case PacketDisplayEntityPart p -> {
+                return p.isMaster() == isNegated();
+            }
+            case SpawnedDisplayEntityPart p -> {
+                if (!(p.getEntity() instanceof Display display)) {
+                    return isNegated();
+                }
+                entity = display;
+            }
+            case Display display -> entity = display;
+            case null, default -> {
                 return isNegated();
             }
-            entity = display;
-
-        }
-        else if (obj instanceof Display display){
-            entity = display;
-        }
-        else{
-            return isNegated();
         }
         return DisplayUtils.isMaster(entity) == isNegated();
     }

@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils;
 
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -51,7 +52,6 @@ public enum Direction {
             case BACK -> {
                 vector = locVector.multiply(-1);
             }
-
             case NORTH -> { //NORTH
                 vector = new Vector(0, 0, -1);
             }
@@ -76,19 +76,27 @@ public enum Direction {
      * @param entity The entity to base this vector upon
      * @return A vector
      */
-    @ApiStatus.Internal
-    public Vector getVector(Entity entity) {
+    public Vector getVector(@NotNull Entity entity) {
         return getVector(entity.getLocation());
     }
 
     /**
      * Get the vector based on the Direction selection
-     * @param part The SpawnedDisplayEntityPart to base this vector upon
+     * @param part The {@link PacketDisplayEntityPart} to base this vector upon
      * @return A vector
      */
-    @ApiStatus.Internal
-    public Vector getVector(SpawnedDisplayEntityPart part) {
-        return getVector(part.getEntity());
+    public Vector getVector(@NotNull SpawnedDisplayEntityPart part) {
+        return getVector(part.getLocation());
+    }
+
+
+    /**
+     * Get the vector based on the Direction selection
+     * @param part The {@link SpawnedDisplayEntityPart} to base this vector upon
+     * @return A vector
+     */
+    public Vector getVector(@NotNull PacketDisplayEntityPart part){
+        return getVector(part.getLocation());
     }
 
 }

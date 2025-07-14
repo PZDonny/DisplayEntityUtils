@@ -20,6 +20,6 @@ class GroupGlowCMD extends PlayerSubCommand {
         }
 
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Glowing selected group!")));
-        group.glow(true, true);
+        group.glow();
     }
 }
