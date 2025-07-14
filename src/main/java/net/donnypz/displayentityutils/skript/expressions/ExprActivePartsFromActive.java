@@ -18,7 +18,9 @@ import org.jetbrains.annotations.Nullable;
 @Name("Spawned/Packet Parts of Group / Part Selection")
 @Description("Get the active/packet parts of a group or part selection")
 @Examples({"set {_spawnedparts::*} to {_spawnedgroup}'s parts",
-            "set {_packetparts::*} to {_packetpartselection}'s parts"})
+        "",
+        "#3.0.0 and later",
+        "set {_packetparts::*} to {_packetpartselection}'s parts"})
 @Since("2.6.2")
 public class ExprActivePartsFromActive extends SimpleExpression<ActivePart> {
 

@@ -15,11 +15,12 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Set Direction (Pitch, Yaw, Pivot)")
 @Description("Set the pitch and yaw of a spawned group/part/selection. Optionally pivot interactions")
-@Examples({"deu set {_spawnedgroup}'s yaw with interaction pivot to 35 ", "deu set {_spawnedpart}'s pitch to -90"})
+@Examples({"deu set {_spawnedgroup}'s yaw with interaction pivot to 35",
+        "deu set {_spawnedpart}'s pitch to -90"})
 @Since("2.6.2")
-public class EffSpawnedDirection extends Effect {
+public class EffActiveDirection extends Effect {
     static {
-        Skript.registerEffect(EffSpawnedDirection.class,"[deu ](make|set) %spawnedgroups/spawnedparts/partselections%['s] (1¦yaw [p:with [interaction ]pivot]|2¦pitch) [to|as] %number%");
+        Skript.registerEffect(EffActiveDirection.class,"[deu ](make|set) %activegroups/activeparts/activepartselections%['s] (1¦yaw [p:with [interaction ]pivot]|2¦pitch) [to|as] %-number%");
     }
 
     Expression<Object> object;
@@ -44,17 +45,14 @@ public class EffSpawnedDirection extends Effect {
         if (n == null) return;
 
         float value = n.floatValue();
-        Active[] objects = (Active[]) object.getArray(event);
-        if (yaw){
-            for (Active s : objects){
-                if (s == null) continue;
-                s.setYaw(value, pivot);
+        Object[] objects = object.getArray(event);
+        for (Object  o : objects){
+            if (!(o instanceof Active a)) continue;
+            if (yaw){
+                a.setYaw(value, pivot);
             }
-        }
-        else{
-            for (Active s : objects){
-                if (s == null) continue;
-                s.setPitch(value);
+            else{
+                a.setPitch(value);
             }
         }
     }

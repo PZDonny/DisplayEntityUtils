@@ -17,11 +17,11 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Stop All Player Packet Animations")
 @Description("Stop all packet animations playing on an active group for a player")
-@Examples({"stop packet animations on {_displayanimator} for {_player::*}"})
+@Examples({"stop packet animations from {_displayanimator} for {_player::*}"})
 @Since("3.0.0")
 public class EffPlayerStopAllPacketAnimations extends Effect {
     static {
-        Skript.registerEffect(EffPlayerStopAllPacketAnimations.class,"stop [all] packet animations on %displayanimator% for %players%");
+        Skript.registerEffect(EffPlayerStopAllPacketAnimations.class,"stop [all] packet animations from %displayanimator% for %players%");
     }
 
     Expression<DisplayAnimator> animator;

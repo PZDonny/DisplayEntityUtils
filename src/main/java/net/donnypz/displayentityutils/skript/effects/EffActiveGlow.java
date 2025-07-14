@@ -19,12 +19,12 @@ import org.jetbrains.annotations.Nullable;
 @Description("Set the glowing of an active group/part/selection")
 @Examples({"#Before 3.0.0",
             "make {_spawnedgroup} glow for 35 ticks", "make {_partselection} glow with interactions and with marker particles",
-            "set {_spawnedpart} to unglowing"
+            "make {_spawnedpart} unglow"
             ,""
             ,"#3.0.0 and Later"
             ,"make {_spawnedgroup} glow for 35 ticks"
-            ,"make {_packetgroup} glow for 20 ticks for {_players}"
-            ,"set {_part} to unglowing for {_player}"})
+            ,"make {_packetgroup} glow for 20 ticks for {_players::*}"
+            ,"make {_part} unglowing for {_player}"})
 @Since("2.6.2")
 public class EffActiveGlow extends Effect {
     static {
