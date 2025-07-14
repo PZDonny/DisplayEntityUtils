@@ -25,6 +25,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -46,18 +47,33 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         this.type = partType;
         this.attributeContainer = attributeContainer;
         this.teleport(location);
+        setDefaultTransformValues();
     }
 
     @ApiStatus.Internal
     public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull String partTag){
         this(partType, location, entityId, attributeContainer);
         this.partTags.add(partTag);
+        this.teleport(location);
+        setDefaultTransformValues();
     }
 
     @ApiStatus.Internal
     public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull Set<String> partTags){
         this(partType, location, entityId, attributeContainer);
         this.partTags.addAll(partTags);
+        this.teleport(location);
+        setDefaultTransformValues();
+    }
+
+    private void setDefaultTransformValues(){
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            return;
+        }
+        attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.TRANSLATION, new Vector3f());
+        attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.SCALE, new Vector3f(1));
+        attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.LEFT_ROTATION, new Quaternionf());
+        attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.RIGHT_ROTATION, new Quaternionf());
     }
 
     /**
