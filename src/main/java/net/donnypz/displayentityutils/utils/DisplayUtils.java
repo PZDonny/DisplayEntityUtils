@@ -19,6 +19,9 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -34,6 +37,33 @@ public final class DisplayUtils {
 
     private static final ListPersistentDataType<String, String> tagPDCType = PersistentDataType.LIST.strings();
     private DisplayUtils(){}
+
+    /**
+     * Get a {@link Transformation} from a transformation matrix
+     * @param matrix the matrix
+     * @return a {@link Transformation}
+     */
+    public static Transformation getTransformation(Matrix4f matrix) {
+        Vector3f translation = matrix.getTranslation(new Vector3f());
+
+        Matrix3f leftRotMatrix = new Matrix3f(matrix); //Matrix w/o translation from matrix4f
+        Quaternionf leftRotation = new Quaternionf().setFromUnnormalized(leftRotMatrix);
+
+        //Scale from column vectors
+        Vector3f xAxis = new Vector3f(matrix.m00(), matrix.m01(), matrix.m02());
+        Vector3f yAxis = new Vector3f(matrix.m10(), matrix.m11(), matrix.m12());
+        Vector3f zAxis = new Vector3f(matrix.m20(), matrix.m21(), matrix.m22());
+        Vector3f scale = new Vector3f(xAxis.length(), yAxis.length(), zAxis.length());
+
+        //Normalize for right rotation (since right rotation is rotating after scaling)
+        Matrix3f rightRotationMatrix = new Matrix3f();
+        rightRotationMatrix.setColumn(0, xAxis.normalize());
+        rightRotationMatrix.setColumn(1, yAxis.normalize());
+        rightRotationMatrix.setColumn(2, zAxis.normalize());
+
+        Quaternionf rightRotation = new Quaternionf().setFromUnnormalized(rightRotationMatrix);
+        return new Transformation(translation, leftRotation, scale, rightRotation);
+    }
 
     /**
      * Get the location of the model of a display entity. Not the entity's actual location but the location

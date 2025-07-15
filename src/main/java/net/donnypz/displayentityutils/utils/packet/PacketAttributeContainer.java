@@ -9,9 +9,9 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
-import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Bukkit;
@@ -20,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -63,6 +64,58 @@ public class PacketAttributeContainer implements Cloneable{
         setAttribute(DisplayAttributes.Transform.SCALE, new Vector3f(transformation.getScale()));
         setAttribute(DisplayAttributes.Transform.RIGHT_ROTATION, new Quaternionf(transformation.getRightRotation()));
         return this;
+    }
+
+    /**
+     * Set the values of a transformation through this single method instead of chaining
+     * Send the given attribute data to a player on the entity with the given entity id
+     * @param transformation the transformation
+     * @return this
+     */
+    public PacketAttributeContainer setTransformationAndSend(@NotNull Transformation transformation, int entityId, @NotNull Player player){
+        return setAttributesAndSend(new DisplayAttributeMap()
+                .addTransformation(transformation), entityId, player);
+    }
+
+    /**
+     * Set the values of a transformation through this single method instead of chaining
+     * Send the given attribute data to players on the entity with the given entity id
+     * @param transformation the transformation
+     * @return this
+     */
+    public PacketAttributeContainer setTransformationAndSend(@NotNull Transformation transformation, int entityId, @NotNull Collection<UUID> playerUUIDs){
+        return setAttributesAndSend(new DisplayAttributeMap()
+                .addTransformation(transformation), entityId, playerUUIDs);
+    }
+
+    /**
+     * Set the values of a transformation through this single method instead of chaining.
+     * Send the given attribute data to a player on the entity with the given entity id
+     * @param matrix the transformation matrix
+     * @return this
+     */
+    public PacketAttributeContainer setTransformationMatrix(@NotNull Matrix4f matrix){
+        return setTransformation(DisplayUtils.getTransformation(matrix));
+    }
+
+    /**
+     * Set the values of a transformation through this single method instead of chaining
+     * Send the given attribute data to a player on the entity with the given entity id
+     * @param matrix the transformation matrix
+     * @return this
+     */
+    public PacketAttributeContainer setTransformationMatrixAndSend(@NotNull Matrix4f matrix, int entityId, @NotNull Player player){
+        return setTransformationAndSend(DisplayUtils.getTransformation(matrix), entityId, player);
+    }
+
+    /**
+     * Set the values of a transformation through this single method instead of chaining
+     * Send the given attribute data to players on the entity with the given entity id
+     * @param matrix the transformation matrix
+     * @return this
+     */
+    public PacketAttributeContainer setTransformationMatrixAndSend(@NotNull Matrix4f matrix, int entityId, @NotNull Collection<UUID> playerUUIDs){
+        return setTransformationAndSend(DisplayUtils.getTransformation(matrix), entityId, playerUUIDs);
     }
 
     /**
@@ -121,10 +174,12 @@ public class PacketAttributeContainer implements Cloneable{
      * @param attributeMap the attribute setter
      * @param entityId the entity's entity id
      * @param playerUUIDs the players
+     * @return this
      */
-    public void setAttributesAndSend(@NotNull DisplayAttributeMap attributeMap, int entityId, @NotNull Collection<UUID> playerUUIDs){
+    public PacketAttributeContainer setAttributesAndSend(@NotNull DisplayAttributeMap attributeMap, int entityId, @NotNull Collection<UUID> playerUUIDs){
         this.attributes.putAll(attributeMap.attributes);
         sendAttributesToUUIDs(playerUUIDs, entityId, getMetadataList(attributeMap.attributes));
+        return this;
     }
 
     /**

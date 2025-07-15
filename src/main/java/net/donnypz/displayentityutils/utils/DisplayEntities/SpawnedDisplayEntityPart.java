@@ -23,6 +23,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -165,6 +166,8 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return group;
     }
 
+
+
     public long getCreationTime() {
         if (!getEntity().getPersistentDataContainer().has(SpawnedDisplayEntityGroup.creationTimeKey)){
             return -1;
@@ -283,13 +286,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             }
         }
         DisplayUtils.addTags(entity, legacyTags);
-    }
-
-    SpawnedDisplayEntityPart setTransformation(Transformation transformation){
-        if (type != PartType.INTERACTION){
-            ((Display) entity).setTransformation(transformation);
-        }
-        return this;
     }
 
     SpawnedDisplayEntityPart setMaster(){
@@ -807,6 +803,18 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         group.addInteractionEntity(interaction);
 
         return interaction;
+    }
+
+    @Override
+    public void setTransformation(@NotNull Transformation transformation) {
+        if (type == PartType.INTERACTION) return;
+        ((Display) getEntity()).setTransformation(transformation);
+    }
+
+    @Override
+    public void setTransformationMatrix(@NotNull Matrix4f matrix) {
+        if (type == PartType.INTERACTION) return;
+        ((Display) getEntity()).setTransformationMatrix(matrix);
     }
 
     @Override

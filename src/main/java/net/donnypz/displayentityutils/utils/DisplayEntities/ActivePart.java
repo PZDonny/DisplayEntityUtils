@@ -16,6 +16,7 @@ import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 
 import java.util.*;
 
@@ -147,6 +148,18 @@ public abstract class ActivePart implements Active{
     public abstract @Nullable Color getGlowColor();
 
     public abstract ActiveGroup getGroup();
+
+    /**
+     * Set this part's transformation data if it's type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * @param transformation the transformation
+     */
+    public abstract void setTransformation(@NotNull Transformation transformation);
+
+    /**
+     * Set this part's transformation data if it's type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * @param matrix the transformation matrix
+     */
+    public abstract void setTransformationMatrix(@NotNull Matrix4f matrix);
 
     /**
      * Set the text of this part if it's type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.

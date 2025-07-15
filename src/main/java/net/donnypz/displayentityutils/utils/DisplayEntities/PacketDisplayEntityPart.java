@@ -25,6 +25,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -178,6 +179,17 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         }
         return players;
     }
+
+    @Override
+    public void setTransformation(@NotNull Transformation transformation) {
+        attributeContainer.setTransformationAndSend(transformation, entityId, viewers);
+    }
+
+    @Override
+    public void setTransformationMatrix(@NotNull Matrix4f matrix) {
+        attributeContainer.setTransformationMatrixAndSend(matrix, entityId, viewers);
+    }
+
 
     @Override
     public void setTextDisplayText(@NotNull Component text) {
@@ -446,7 +458,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         for (UUID uuid : viewers){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
-            PacketUtils.teleport(player, entityId, getLocation());
+            PacketUtils.teleport(player, entityId, location);
         }
     }
 
@@ -521,7 +533,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public @Nullable PacketDisplayEntityGroup getGroup(){
         return group;
     }
-
 
     /**
      * Get whether this part is actively being tracked by a player (check if it's visible)
