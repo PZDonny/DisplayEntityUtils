@@ -43,7 +43,7 @@ public final class DisplayUtils {
      * @param matrix the matrix
      * @return a {@link Transformation}
      */
-    public static Transformation getTransformation(Matrix4f matrix) {
+    public static Transformation getTransformation(@NotNull Matrix4f matrix) {
         Vector3f translation = matrix.getTranslation(new Vector3f());
 
         Matrix3f leftRotMatrix = new Matrix3f(matrix); //Matrix w/o translation from matrix4f
