@@ -14,6 +14,7 @@ import net.donnypz.displayentityutils.listeners.entity.DEUInteractionListener;
 import net.donnypz.displayentityutils.listeners.entity.mythic.DEUMythicListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerChatListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerConnectionListener;
+import net.donnypz.displayentityutils.listeners.textDisplays.TextDisplayLoadListener;
 import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
@@ -22,6 +23,8 @@ import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TestCommand;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TextDisplayTools;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -89,6 +92,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     static float heightCullingAdder;
     static boolean asynchronousAnimations;
     static boolean registerPluginCommands;
+    static boolean enableTextDisplayManager;
 
     private static boolean isMythicMobsInstalled;
     private static boolean isSkriptInstalled;
@@ -113,6 +117,10 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         initializeNamespacedKeys();
         initializeBStats();
         getServer().getConsoleSender().sendMessage(pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
+        if (enableTextDisplayManager){
+            TextDisplayTools.checkSpawnChunks();
+            getCommand("test").setExecutor(new TestCommand());
+        }
     }
 
     @Override
@@ -169,6 +177,11 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new DEUEntityListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
         Bukkit.getPluginManager().registerEvents(new DEUInteractionListener(), this);
+        if (enableTextDisplayManager) {
+            // TextDisplay Listeners
+            Bukkit.getPluginManager().registerEvents(new TextDisplayLoadListener(), this);
+            //
+        }
     }
 
     private void initializeBStats(){
@@ -440,7 +453,13 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     public static boolean isSkriptInstalled() {
         return isSkriptInstalled;
     }
-
+    /**
+     * Get whether TextDisplayManager is enabled
+     * @return true if TextDisplayManager is enabled
+     */
+    public static boolean enableTextDisplayManager(){
+        return enableTextDisplayManager;
+    }
     /**
      * Determines whether {@link SpawnedDisplayEntityGroup}s should be unregistered in a world based
      * on config settings
@@ -482,7 +501,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
         reloadConfig();
         ConfigUtils.read(getConfig());
-        
+
         PluginCommand command = getCommand("managedisplays");
         if (command != null){
             if (registerPluginCommands && isOnEnable) {
