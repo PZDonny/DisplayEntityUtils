@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
+import net.donnypz.displayentityutils.utils.VersionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -129,8 +130,6 @@ public abstract class ActiveGroup implements Active{
 
     /**
      * Set the teleportation duration of all parts in this group
-     * This makes the teleportation of the group visually smoother
-     * @param teleportDuration the duration
      */
     @Override
     public void setTeleportDuration(int teleportDuration){

@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.utils.VersionUtils;
 import org.bukkit.Color;
 import org.bukkit.block.BlockType;
 import org.bukkit.entity.Display;
@@ -300,7 +301,6 @@ public abstract class ActivePartSelection implements Active{
 
     /**
      * Set the teleport duration of all parts in this selection
-     * @param teleportDuration the teleport duration to set
      */
     @Override
     public void setTeleportDuration(int teleportDuration) {

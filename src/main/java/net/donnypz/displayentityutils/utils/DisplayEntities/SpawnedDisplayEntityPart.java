@@ -2,10 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
-import net.donnypz.displayentityutils.utils.CullOption;
-import net.donnypz.displayentityutils.utils.Direction;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.*;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
@@ -610,13 +607,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     /**
      * Set the teleport duration of this part
-     * @param teleportDuration the teleport duration to set
      */
     @Override
     public void setTeleportDuration(int teleportDuration) {
-        if (type == PartType.INTERACTION){
-            return;
-        }
+        if (type == PartType.INTERACTION) return;
         Display display = (Display) getEntity();
         display.setTeleportDuration(teleportDuration);
     }

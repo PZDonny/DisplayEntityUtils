@@ -10,6 +10,7 @@ import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
@@ -323,6 +324,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         setAndSend(DisplayAttributes.GLOWING, false);
     }
 
+    /**
+     * Set the teleport duration of this part
+     */
     @Override
     public void setTeleportDuration(int teleportDuration) {
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
