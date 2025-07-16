@@ -211,7 +211,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @Override
     public <T, V> void setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value) {
-        this.attributeContainer.setAttribute(attribute, value);
+        this.attributeContainer.setAttributeAndSend(attribute, value, entityId, viewers);
     }
 
 
