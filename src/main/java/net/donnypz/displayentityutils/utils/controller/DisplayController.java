@@ -471,7 +471,7 @@ public class DisplayController {
         boolean lock = section.getBoolean("lockTransition");
         MachineState state = new MachineState(machine, stateType.getStateID(), animTag, loadMethod, animType, lock);
         if (state.getDisplayAnimator() == null && !state.isNullLoader()){
-            if (!controller.controllerID.equalsIgnoreCase("examplecontroller.yml")){
+            if (!controller.controllerID.equalsIgnoreCase("example")){
                 Bukkit.getLogger().warning("Failed to add state, animation not found: "+animTag+" ["+machine.getId()+"]");
             }
             return;
