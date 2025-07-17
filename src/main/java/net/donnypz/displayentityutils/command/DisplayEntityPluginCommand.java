@@ -1,6 +1,13 @@
 package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.anim.AnimCMD;
+import net.donnypz.displayentityutils.command.bdengine.BDEngineCMD;
+import net.donnypz.displayentityutils.command.group.GroupCMD;
+import net.donnypz.displayentityutils.command.interaction.InteractionCMD;
+import net.donnypz.displayentityutils.command.item.ItemCMD;
+import net.donnypz.displayentityutils.command.parts.PartsCMD;
+import net.donnypz.displayentityutils.command.text.TextCMD;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,7 +25,7 @@ import java.util.List;
 @ApiStatus.Internal
 public class DisplayEntityPluginCommand implements CommandExecutor {
 
-    private static final HashMap<String, SubCommand> subCommands = new HashMap<>();
+    private static final HashMap<String, DEUSubCommand> subCommands = new HashMap<>();
 
     public DisplayEntityPluginCommand(){
         subCommands.put("listgroups", new ListGroupsCMD());
@@ -68,34 +75,34 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
     }
 
 
-    static void invalidDirection(CommandSender sender){
+    public static void invalidDirection(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid direction type!", NamedTextColor.RED)));
         for (Direction d : Direction.values()){
             sender.sendMessage(Component.text("- ").append(Component.text(d.name().toLowerCase(), NamedTextColor.YELLOW)));
         }
     }
 
-    static void noGroupSelection(Player player){
+    public static void noGroupSelection(Player player){
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You have not selected a spawned display entity group!", NamedTextColor.RED)));
         player.sendMessage(Component.text("/mdis group selectnearest <interaction-distance>", NamedTextColor.GRAY));
     }
 
-    static void noPartSelection(Player player){
+    public static void noPartSelection(Player player){
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You have not selected a part!", NamedTextColor.RED)));
         player.sendMessage(Component.text("/mdis parts cycle <first | prev | next>", NamedTextColor.GRAY));
     }
 
-    static void invalidTag(Player player, String tag){
+    public static void invalidTag(Player player, String tag){
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to add tag: "+tag, NamedTextColor.RED)));
         invalidTagRestrictions(player);
     }
 
-    static void invalidTagRestrictions(Player player){
+    public static void invalidTagRestrictions(Player player){
         player.sendMessage(Component.text("| Valid tags do not start with an \"!\" and do not contain commas.", NamedTextColor.GRAY, TextDecoration.ITALIC));
         player.sendMessage(Component.text("| The tag may also already exist or be set", NamedTextColor.GRAY, TextDecoration.ITALIC));
     }
 
-    static void suggestUpdateSelection(Player player){
+    public static void suggestUpdateSelection(Player player){
         player.sendMessage(Component.text("| It is recommended to update/reset your part selection after adding parts!", NamedTextColor.GRAY));
         player.sendMessage(Component.text("| Quickly reset with \"/mdis parts refresh", NamedTextColor.GRAY));
     }
@@ -107,7 +114,7 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
             return true;
         }
         String arg = args[0];
-        SubCommand subCommand = subCommands.get(arg);
+        DEUSubCommand subCommand = subCommands.get(arg);
         if (subCommand == null){
             mainCommandHelp(sender);
         }
@@ -117,7 +124,7 @@ public class DisplayEntityPluginCommand implements CommandExecutor {
         return true;
     }
 
-    static void executeCommand(SubCommand subCommand, CommandSender sender, String[] args){
+    public static void executeCommand(DEUSubCommand subCommand, CommandSender sender, String[] args){
         if (!hasPermission(sender, subCommand.getPermission())){
             return;
         }

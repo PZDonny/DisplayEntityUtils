@@ -110,7 +110,7 @@ public enum Permission {
         this.permission = permission;
     }
 
-    String getPermission(){
+    public String getPermission(){
         return permission;
     }
 }

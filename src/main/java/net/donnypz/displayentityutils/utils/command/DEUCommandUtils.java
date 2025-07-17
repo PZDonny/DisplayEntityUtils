@@ -4,7 +4,12 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -257,6 +262,36 @@ public class DEUCommandUtils {
             catch(IllegalArgumentException ignored){}
         }
         return c;
+    }
+
+    public static void sendGlowColor(Player player, Color color){
+        player.sendMessage(Component.empty());
+        if (color != null) {
+            player.sendMessage(Component.text("Glow Color: ").append(Component.text("COLOR", TextColor.color(color.getRed(), color.getGreen(), color.getBlue()))));
+            player.sendMessage("| " + net.md_5.bungee.api.ChatColor.RED + "R: " + color.getRed());
+            player.sendMessage("| " + net.md_5.bungee.api.ChatColor.GREEN + "G: " + color.getGreen());
+            player.sendMessage("| " + ChatColor.BLUE + "B: " + color.getBlue());
+
+            String redString = Integer.toHexString(color.getRed());
+            if (redString.equals("0")) {
+                redString += "0";
+            }
+            String greenString = Integer.toHexString(color.getGreen());
+            if (greenString.equals("0")) {
+                greenString += "0";
+            }
+            String blueString = Integer.toHexString(color.getBlue());
+            if (blueString.equals("0")) {
+                blueString += "0";
+            }
+            String hex = "#"+redString+greenString+blueString;
+            player.sendMessage(Component.text("| HEX: "+hex, NamedTextColor.YELLOW)
+                    .hoverEvent(HoverEvent.showText(Component.text("Click to copy", NamedTextColor.GREEN)))
+                    .clickEvent(ClickEvent.copyToClipboard(hex)));
+        }
+        else {
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Glow Color: <red>NOT SET"));
+        }
     }
 
     @ApiStatus.Internal
