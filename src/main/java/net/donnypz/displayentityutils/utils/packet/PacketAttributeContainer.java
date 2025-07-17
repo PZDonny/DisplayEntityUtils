@@ -224,6 +224,16 @@ public class PacketAttributeContainer implements Cloneable{
      * @param partType the type of entity this container represents
      * @return a {@link PacketDisplayEntityPart}
      */
+    public @NotNull PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType){
+        return new PacketDisplayEntityPart(partType, SpigotReflectionUtil.generateEntityId(), this);
+    }
+
+    /**
+     * Create a {@link PacketDisplayEntityPart} with data representative of this container
+     * @param partType the type of entity this container represents
+     * @param location the location the part should originate from
+     * @return a {@link PacketDisplayEntityPart}
+     */
     public @NotNull PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location){
         return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this);
     }
@@ -231,6 +241,7 @@ public class PacketAttributeContainer implements Cloneable{
     /**
      * Create a {@link PacketDisplayEntityPart} with data representative of this container
      * @param partType the type of entity this container represents
+     * @param location the location the part should originate from
      * @param partTag a part tag to add to the returned part
      * @return a {@link PacketDisplayEntityPart}
      */
@@ -241,6 +252,7 @@ public class PacketAttributeContainer implements Cloneable{
     /**
      * Create a {@link PacketDisplayEntityPart} with data representative of this container
      * @param partType the type of entity this container represents
+     * @param location the location the part should originate from
      * @param partTags part tags to add to the returned part
      * @return a {@link PacketDisplayEntityPart}
      */

@@ -42,6 +42,13 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     PacketLocation packetLocation;
 
 
+    @ApiStatus.Internal
+    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull PacketAttributeContainer attributeContainer){
+        super(entityId);
+        this.type = partType;
+        this.attributeContainer = attributeContainer;
+        setDefaultTransformValues();
+    }
 
     @ApiStatus.Internal
     public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer){
@@ -472,7 +479,18 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public @Nullable Location getLocation(){
-        return packetLocation.toLocation();
+        if (packetLocation != null){
+            return packetLocation.toLocation();
+        }
+        return null;
+    }
+
+    /**
+     * Get whether this part has a defined location
+     * @return a boolean
+     */
+    public boolean hasLocation(){
+        return packetLocation != null;
     }
 
     /**
