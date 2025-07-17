@@ -10,7 +10,7 @@ import org.bukkit.command.CommandSender;
 import java.util.HashMap;
 import java.util.List;
 
-public class ItemCMD extends ConsoleUsableSubCommand {
+public final class ItemCMD extends ConsoleUsableSubCommand {
 
     private static final HashMap<String, DEUSubCommand> subCommands = new HashMap<>();
 

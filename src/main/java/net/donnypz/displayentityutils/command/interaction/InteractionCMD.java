@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.List;
 
-public class InteractionCMD extends ConsoleUsableSubCommand {
+public final class InteractionCMD extends ConsoleUsableSubCommand {
 
     private static final HashMap<String, DEUSubCommand> subCommands = new HashMap<>();
 

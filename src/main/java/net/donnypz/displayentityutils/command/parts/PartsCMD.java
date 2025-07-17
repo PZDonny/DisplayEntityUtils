@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.List;
 
-public class PartsCMD extends ConsoleUsableSubCommand {
+public final class PartsCMD extends ConsoleUsableSubCommand {
 
     private static final HashMap<String, DEUSubCommand> subCommands = new HashMap<>();
 

@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 import java.util.HashMap;
 import java.util.List;
 
-public class GroupCMD extends ConsoleUsableSubCommand {
+public final class GroupCMD extends ConsoleUsableSubCommand {
 
     private static final HashMap<String, DEUSubCommand> subCommands = new HashMap<>();
 

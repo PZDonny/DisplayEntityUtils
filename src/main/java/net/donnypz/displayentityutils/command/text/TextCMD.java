@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import java.util.HashMap;
 import java.util.List;
 
-public class TextCMD extends ConsoleUsableSubCommand {
+public final class TextCMD extends ConsoleUsableSubCommand {
 
     private static final HashMap<String, PlayerSubCommand> subCommands = new HashMap<>();
 
