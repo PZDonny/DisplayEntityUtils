@@ -98,8 +98,6 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onLoad() {
-        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
-        PacketEvents.getAPI().load();
         PacketEvents.getAPI().getEventManager().registerListener(
                 new DEUInteractionListener(), PacketListenerPriority.NORMAL);
     }
@@ -114,7 +112,6 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         registerListeners();
         initializeNamespacedKeys();
         initializeBStats();
-        PacketEvents.getAPI().init();
         getServer().getConsoleSender().sendMessage(pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
     }
 
@@ -122,7 +119,6 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     public void onDisable() {
         MYSQLManager.closeConnection();
         MongoManager.closeConnection();
-        PacketEvents.getAPI().terminate();
     }
 
 
