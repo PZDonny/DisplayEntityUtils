@@ -60,7 +60,7 @@ class AnimFrameInfoCMD extends PlayerSubCommand {
                     return;
                 }
                 player.sendMessage(Component.empty());
-                player.sendMessage(Component.text("Frame Points for Frame: "+id, NamedTextColor.YELLOW));
+                player.sendMessage(Component.text("Frame Points for Frame: "+id, NamedTextColor.WHITE));
                 player.playSound(player, Sound.ENTITY_ITEM_FRAME_PLACE, 1, 2);
                 frame.visuallyEditFramePoints(player, group);
             }));
