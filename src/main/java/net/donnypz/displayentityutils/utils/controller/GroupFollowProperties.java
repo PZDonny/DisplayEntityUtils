@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.controller;
 
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.FollowType;
@@ -13,7 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Create properties that can be applied when making an {@link SpawnedDisplayEntityGroup} follow/respect an entity's looking direction
+ * Create properties that can be applied when making an {@link ActiveGroup} follow/respect an entity's looking direction
  */
 public class GroupFollowProperties{
 
@@ -22,8 +23,8 @@ public class GroupFollowProperties{
     int unregisterDelay;
     boolean pivotInteractions;
     boolean pivotDisplays;
-    float yPivotOffsetPercentage = 100;
-    float zPivotOffsetPercentage = 100;
+    float yDisplayAdjustPercentage = 100;
+    float zDisplayAdjustPercentage = 100;
     int teleportationDuration;
     Collection<String> partTags;
     Set<String> filteredStates = new HashSet<>();
@@ -74,6 +75,24 @@ public class GroupFollowProperties{
         this.pivotDisplays = pivotDisplays;
     }
 
+
+    /**
+     * Create properties that can be applied when making an {@link SpawnedDisplayEntityGroup} follow/respect an entity's looking direction
+     * @param id the id to set. Must be unique from other follow properties if used in a {@link DisplayController}
+     * @param unregisterDelay how long until the group should be removed after the entity dies/following is manually stop. -1 to never remove
+     * @param pivotInteractions determine if interaction entities should pivot around the group
+     */
+    public GroupFollowProperties(@NotNull String id, float yOffsetPercentage, float zOffsetPercentage, int teleportationDuration, boolean pivotInteractions, int unregisterDelay){
+        this.id = id;
+        this.followType = FollowType.PITCH_AND_YAW;
+        this.pivotDisplays = true;
+        this.pivotInteractions = pivotInteractions;
+        this.unregisterDelay = unregisterDelay;
+        this.yDisplayAdjustPercentage = yOffsetPercentage;
+        this.zDisplayAdjustPercentage = zOffsetPercentage;
+        this.teleportationDuration = teleportationDuration;
+    }
+
     GroupFollowProperties(){}
 
     /**
@@ -86,8 +105,8 @@ public class GroupFollowProperties{
      * @return this
      */
     public GroupFollowProperties setDisplayPivotOffsetPercentage(float yPivotOffsetPercentage, float zPivotOffsetPercentage){
-        this.yPivotOffsetPercentage = yPivotOffsetPercentage;
-        this.zPivotOffsetPercentage = zPivotOffsetPercentage;
+        this.yDisplayAdjustPercentage = yPivotOffsetPercentage;
+        this.zDisplayAdjustPercentage = zPivotOffsetPercentage;
         return this;
     }
 
@@ -143,11 +162,11 @@ public class GroupFollowProperties{
     }
 
     public float getYPivotOffsetPercentage() {
-        return yPivotOffsetPercentage;
+        return yDisplayAdjustPercentage;
     }
 
     public float getZPivotOffsetPercentage() {
-        return zPivotOffsetPercentage;
+        return zDisplayAdjustPercentage;
     }
 
     /**
@@ -178,7 +197,7 @@ public class GroupFollowProperties{
     /**
      * Determine if the yaw and pitch of the followed entity's looking direction will be flipped.
      * The pitch will be inverted and the yaw will have 180 added to it if true.
-     * @return thus
+     * @return this
      */
     public @NotNull GroupFollowProperties flip(boolean flip){
         this.flip = flip;

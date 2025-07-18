@@ -437,8 +437,8 @@ public class DisplayController {
         followProperties.teleportationDuration = teleportationDuration;
         followProperties.pivotInteractions = pivotInteractions;
         followProperties.pivotDisplays = pivotDisplays;
-        followProperties.yPivotOffsetPercentage = (float) yOffsetPercentage;
-        followProperties.zPivotOffsetPercentage = (float) zOffsetPercentage;
+        followProperties.yDisplayAdjustPercentage = (float) yOffsetPercentage;
+        followProperties.zDisplayAdjustPercentage = (float) zOffsetPercentage;
         followProperties.flip = flip;
 
         followProperties.filteredStates.clear();
