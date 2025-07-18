@@ -10,7 +10,11 @@ import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 class GroupSelectCMD extends PlayerSubCommand {
     GroupSelectCMD() {
@@ -43,7 +47,27 @@ class GroupSelectCMD extends PlayerSubCommand {
             }
 
             group.getUnaddedInteractionEntitiesInRange(interactionDistance, true);
-            group.glowAndOutline(player, 50);
+            int selectDuration = 50;
+            group.glowAndOutline(player, selectDuration);
+            new BukkitRunnable(){
+                int maxIterations = selectDuration/2;
+                int iteration = 0;
+                @Override
+                public void run() {
+                    if (iteration == maxIterations){
+                        cancel();
+                        return;
+                    }
+                    try{
+                        Location groupLoc = group.getLocation();
+                        player.spawnParticle(Particle.END_ROD, groupLoc, 1, 0,0,0,0.01);
+                        iteration++;
+                    }
+                    catch(NullPointerException e){
+                        cancel();
+                    }
+                }
+            }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, 2);
 
             if (DEUCommandUtils.removeRelativePoints(player)){
                 player.sendMessage(Component.text("Your previewed points have been despawned since you have changed your selected group", NamedTextColor.GRAY, TextDecoration.ITALIC));
