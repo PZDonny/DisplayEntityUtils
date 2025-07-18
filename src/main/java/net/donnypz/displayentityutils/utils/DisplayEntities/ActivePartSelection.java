@@ -264,6 +264,25 @@ public abstract class ActivePartSelection implements Active{
         selectedPart = selectedParts.getLast();
     }
 
+    /**
+     * Remove parts from this selection, that also exist in a different one. If the provided selection is this, then {@link #remove()} will be called
+     * @param selection the other part selection
+     */
+    public void removeParts(@NotNull ActivePartSelection selection){
+        if (selection.getClass() != this.getClass()){
+            return;
+        }
+        if (selection == this){
+            remove();
+        }
+        for (ActivePart part : selection.selectedParts){
+            selectedParts.remove(part);
+            if (selectedPart == part){
+                selectedPart = null;
+            }
+        }
+    }
+
 
     /**
      * Set the view range of all parts in this selection
