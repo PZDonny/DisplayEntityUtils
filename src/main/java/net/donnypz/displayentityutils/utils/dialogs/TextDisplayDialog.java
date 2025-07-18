@@ -85,8 +85,8 @@ public final class TextDisplayDialog{
                 getTextInput(textDisplay.text(), miniMessageFormatted),
                 getFont(textDisplay.text().font()),
                 getAlignment(textDisplay.getAlignment()),
-                getOpacity(textDisplay.getTextOpacity()),
                 getLineWidth(textDisplay.getLineWidth()),
+                getOpacity(textDisplay.getTextOpacity()),
                 getBackgroundColor(),
                 getShadow(textDisplay.isShadowed()),
                 getSeeThrough(textDisplay.isSeeThrough()),
@@ -104,6 +104,7 @@ public final class TextDisplayDialog{
     }
 
     private static DialogInput getTextInput(Component text, boolean miniMessageFormatted){
+        text = text.font(null);
         String initialString = miniMessageFormatted ? MiniMessage.miniMessage().serialize(text) : LegacyComponentSerializer.legacyAmpersand().serialize(text);
         return DialogInput.text(TEXT,
                 512,
@@ -135,29 +136,31 @@ public final class TextDisplayDialog{
                 .build();
     }
 
-    private static DialogInput getOpacity(byte opacity){ //Lower = more visible
-        int originalOpacity = opacity < 0 ? opacity + 256 : opacity;
-        float percentage = originalOpacity/255f;
-
-        return DialogInput.numberRange(OPACITY, Component.text("Text Opacity"), 0, 1)
-                .width(200)
-                .step(0.01f)
-                .initial(percentage)
-                .build();
-    }
-
     private static DialogInput getLineWidth(int lineWidth){
-        return DialogInput.numberRange(LINE_WIDTH, Component.text("Line Width"), 0, 800)
+        return DialogInput.numberRange(LINE_WIDTH, Component.text("Line Width"), 0.0f, 800.0f)
                 .width(200)
-                .step(1f)
+                .step(1.0f)
                 .initial((float) lineWidth)
                 .build();
     }
 
+    private static DialogInput getOpacity(byte opacity){ //Lower = more visible
+        int originalOpacity = opacity < 0 ? opacity + 256 : opacity;
+        float step = 0.05f;
+        float percentage = (Math.round((originalOpacity/255f)/step)) * step;
+
+        return DialogInput.numberRange(OPACITY, Component.text("Text Opacity"), 0.0f, 1.0f)
+                .width(250)
+                .step(step)
+                .initial(percentage)
+                .build();
+    }
+
+
     private static DialogInput getBackgroundColor() {
         return DialogInput.text(BACKGROUND_COLOR,
                 100,
-                Component.text("Set Background Color (Minecraft Color or Hex)"),
+                Component.text("Set Background Color (Minecraft Color, Hex, or \"transparent\")"),
                 true,
                 "",
                 15,
@@ -217,12 +220,16 @@ public final class TextDisplayDialog{
             if (bgColor.isBlank()){
                 backgroundColorSuccess = true;
             }
-            else{
+            else if (!bgColor.equals("transparent")){
                 Color color = DEUCommandUtils.getColorFromText(bgColor);
                 if (color != null){
                     display.setBackgroundColor(color);
                     backgroundColorSuccess = true;
                 }
+            }
+            else{
+                display.setBackgroundColor(Color.fromARGB(0));
+                backgroundColorSuccess = true;
             }
 
 
