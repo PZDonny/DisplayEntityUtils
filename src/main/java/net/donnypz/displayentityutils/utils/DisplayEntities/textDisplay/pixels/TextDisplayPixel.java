@@ -48,7 +48,7 @@ public abstract class TextDisplayPixel {
     protected transient TextDisplaySettings settings;
 
     protected TextDisplayPixel() {
-        part = new PacketAttributeContainer().createPart(SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)
+        part = new PacketAttributeContainer().createPart(SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY);
     }
 
 
@@ -103,7 +103,7 @@ public abstract class TextDisplayPixel {
             render = alpha != 0;
         }
         hasUpdated = true;
-        container.setAttribute(DisplayAttributes.TextDisplay.BACKGROUND_COLOR,Color.fromARGB(alpha,red,green,blue));
+        part.setAttribute(DisplayAttributes.TextDisplay.BACKGROUND_COLOR,Color.fromARGB(alpha,red,green,blue));
     }
     public void ride(Entity mount) { //WIP
         if (mount==null){
@@ -174,7 +174,9 @@ public abstract class TextDisplayPixel {
         }
         move(new Vector3f(cords.getFirst(),cords.get(1),cords.getLast()));
     }
-    public abstract void move(Vector3f vector);
+    public void move(Vector3f vector){
+
+    }
 
     public Matrix4f getTextDisplayMatrix4f(){
         if (part == null||part.getDisplayTransformation()==null)

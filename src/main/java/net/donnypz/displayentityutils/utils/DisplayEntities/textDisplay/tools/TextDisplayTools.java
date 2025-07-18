@@ -34,7 +34,8 @@ import java.util.List;
 
 public class TextDisplayTools {
     //
-    public final static NamespacedKey PERSISTENT_DATA_CONTAINER_KEY = new NamespacedKey(DisplayEntityPlugin.getInstance(),"TextDisplayData");
+    public final static NamespacedKey PERSISTENT_DATA_CONTAINER_KEY = new NamespacedKey(DisplayEntityPlugin.getInstance(), "TextDisplayData");
+
     //
     public static Matrix4f transformationToMatrix(Transformation transformation) {
         Vector3f translationVec = transformation.getTranslation();
@@ -47,6 +48,7 @@ public class TextDisplayTools {
                 .scale(scaleVec);
         return matrix;
     }
+
     public static Transformation matrixToTransformation(Matrix4f matrix) {
         Vector3f translation = matrix.getTranslation(new Vector3f());
 
@@ -75,6 +77,7 @@ public class TextDisplayTools {
 
         return new Transformation(translation, leftRotation, scale, new Quaternionf());
     }
+
     public static BufferedImage getTexture(String path) {
         BufferedImage image = null;
 
@@ -84,7 +87,8 @@ public class TextDisplayTools {
             if (file.exists()) {
                 return ImageIO.read(file);
             }
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
 
         // Try as URL (with headers)
         try {
@@ -96,7 +100,8 @@ public class TextDisplayTools {
             try (InputStream input = connection.getInputStream()) {
                 image = ImageIO.read(input);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         // Try Minecraft assets fallback
         if (image == null) {
@@ -110,11 +115,13 @@ public class TextDisplayTools {
                 try (InputStream input = connection.getInputStream()) {
                     image = ImageIO.read(input);
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         return image;
     }
+
     public static InputStream getGifStream(String path) {
         try {
             // Try as file path
@@ -122,7 +129,8 @@ public class TextDisplayTools {
             if (file.exists()) {
                 return new FileInputStream(file);
             }
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
 
         try {
             // Try as URL
@@ -132,19 +140,21 @@ public class TextDisplayTools {
             connection.setRequestProperty("Accept", "image/gif,image/png,image/*;q=0.8,*/*;q=0.5");
             connection.connect();
             return connection.getInputStream();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         return null;
     }
-   public static Matrix2dContainer<TextDisplayElementPixel> bufferedImageToPixelMatrix(BufferedImage image){
-       if (image.getType() != BufferedImage.TYPE_INT_ARGB) {
-           BufferedImage converted = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-           Graphics2D g = converted.createGraphics();
-           g.drawImage(image, 0, 0, null);
-           g.dispose();
-           image = converted;
-       }
-       Matrix2dContainer<TextDisplayElementPixel> pixels = new Matrix2dContainer<TextDisplayElementPixel>(TextDisplayElementPixel.class);
+
+    public static Matrix2dContainer<TextDisplayElementPixel> bufferedImageToPixelMatrix(BufferedImage image) {
+        if (image.getType() != BufferedImage.TYPE_INT_ARGB) {
+            BufferedImage converted = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = converted.createGraphics();
+            g.drawImage(image, 0, 0, null);
+            g.dispose();
+            image = converted;
+        }
+        Matrix2dContainer<TextDisplayElementPixel> pixels = new Matrix2dContainer<TextDisplayElementPixel>(TextDisplayElementPixel.class);
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
                 int RGBA = image.getRGB(x, y);
@@ -158,11 +168,12 @@ public class TextDisplayTools {
 
 
                 List<Integer> color = Arrays.asList(a, r, g, b);
-                TextDisplayElementPixel pixel = new TextDisplayElementPixel(color,x,-y,pixels);
+                TextDisplayElementPixel pixel = new TextDisplayElementPixel(color, x, -y, pixels);
             }
         }
         return pixels;
     }
+
     public static List<Matrix2dContainer<TextDisplayElementPixel>> gifToPixelMatrixList(InputStream gifStream) {
         List<Matrix2dContainer<TextDisplayElementPixel>> frameMatrices = new ArrayList<>();
         try {
@@ -205,11 +216,12 @@ public class TextDisplayTools {
             reader.dispose();
             input.close();
         } catch (Exception e) {
-            DisplayEntityPlugin.getInstance().getLogger().severe("Error gifToPixelMatrixList "+e);
+            DisplayEntityPlugin.getInstance().getLogger().severe("Error gifToPixelMatrixList " + e);
         }
         return frameMatrices;
     }
-    public static BufferedImage scaleBufferedImage(BufferedImage image, int x, int y){
+
+    public static BufferedImage scaleBufferedImage(BufferedImage image, int x, int y) {
         if (image.getType() != BufferedImage.TYPE_INT_ARGB) {
             BufferedImage converted = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = converted.createGraphics();
@@ -223,6 +235,7 @@ public class TextDisplayTools {
         AffineTransformOp scaleOp = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
         return scaleOp.filter(image, new BufferedImage(x, y, BufferedImage.TYPE_INT_ARGB));
     }
+
     static private BufferedImage flattenBufferedImageToOpaque(BufferedImage image) {
         BufferedImage flat = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics2D g = flat.createGraphics();
@@ -232,13 +245,16 @@ public class TextDisplayTools {
         g.dispose();
         return flat;
     }
-    static public PersistentDataContainer getNewPersistentDataContainer(){
+
+    static public PersistentDataContainer getNewPersistentDataContainer() {
         return new ItemStack(Material.ACACIA_BOAT).getItemMeta().getPersistentDataContainer().getAdapterContext().newPersistentDataContainer();
     }
-    static public void loadFromEntity(EntityAddToWorldEvent event){
+
+    static public void loadFromEntity(EntityAddToWorldEvent event) {
         loadFromEntity(event.getEntity());
     }
-    static public void loadFromEntity(Entity entity){
+
+    static public void loadFromEntity(Entity entity) {
 
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(DisplayEntityPlugin.getInstance(), new Runnable() {
@@ -246,24 +262,25 @@ public class TextDisplayTools {
             public void run() {
 
             }
-        },1);
+        }, 1);
     }
-    static public void checkSpawnChunks(){
+
+    static public void checkSpawnChunks() {
         List<World> worlds = Bukkit.getWorlds();
         List<Entity> entities = new ArrayList<>();
-        for (World world: worlds){
+        for (World world : worlds) {
             entities.addAll(world.getEntities());
         }
-        for (Entity entity: entities){
+        for (Entity entity : entities) {
             PersistentDataContainer dataContainer = entity.getPersistentDataContainer();
-            if (dataContainer.has(TextDisplayTools.PERSISTENT_DATA_CONTAINER_KEY)){
+            if (dataContainer.has(TextDisplayTools.PERSISTENT_DATA_CONTAINER_KEY)) {
                 TextDisplayTools.loadFromEntity(entity);
-                DisplayEntityPlugin.getInstance().getLogger().severe(entity.getEntityId()+"");
+                DisplayEntityPlugin.getInstance().getLogger().severe(entity.getEntityId() + "");
             }
         }
     }
 
-    public static void optimizeScreen(Matrix2dContainer<TextDisplayPixelBasicCanvas> pixels){
+    public static void optimizeScreen(Matrix2dContainer<TextDisplayPixelBasicCanvas> pixels) {
 
     }
 }

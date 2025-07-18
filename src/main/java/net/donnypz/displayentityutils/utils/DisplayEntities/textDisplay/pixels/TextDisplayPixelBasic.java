@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityP
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.Matrix.Matrix2dContainer;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TextDisplaySettings;
+import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -50,10 +51,10 @@ public class TextDisplayPixelBasic extends TextDisplayPixel {
             b = Math.round(b * settings.AdjustBrightnessAmount);
         }
 
-
-        container.setAttribute(DisplayAttributes.TextDisplay.TEXT,Component.text(" "));
-        container.setAttribute(DisplayAttributes.TextDisplay.BACKGROUND_COLOR,Color.fromARGB(a, r, g, b));
-        part = container.createPart(SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY,location);
+        DisplayAttributeMap map = new DisplayAttributeMap();
+        map.add(DisplayAttributes.TextDisplay.TEXT,Component.text(" ")).add(DisplayAttributes.TextDisplay.BACKGROUND_COLOR,Color.fromARGB(a, r, g, b));
+        part.setAttributes(map);
+        part.teleport(location);
         updateSettings(part);
         updateTransformation();
         if (settings.IsVisibleDefault){
@@ -109,6 +110,7 @@ public class TextDisplayPixelBasic extends TextDisplayPixel {
     protected void updateTransformation() {
         if (part == null || settings == null) return;
         part.setAttribute(DisplayAttributes.Transform.SCALE,new Vector3f(0.5f*pixelWidth,0.25f*pixelHeight,0));
+
     }
 
 }
