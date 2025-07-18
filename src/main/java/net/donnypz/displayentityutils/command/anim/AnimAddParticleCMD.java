@@ -6,9 +6,11 @@ import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
+import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.donnypz.displayentityutils.utils.command.FramePointDisplay;
 import net.donnypz.displayentityutils.utils.command.RelativePointDisplay;
+import net.donnypz.displayentityutils.utils.dialogs.animationparticles.AnimationParticleSelectDialog;
 import org.bukkit.entity.Player;
 
 class AnimAddParticleCMD extends PlayerSubCommand {
@@ -30,6 +32,11 @@ class AnimAddParticleCMD extends PlayerSubCommand {
             return;
         }
 
-        new AnimationParticleBuilder(player, (FramePoint) display.getRelativePoint());
+        if (VersionUtils.canViewDialogs(player, true)){
+            AnimationParticleSelectDialog.sendDialog(player);
+        }
+        else{
+            new AnimationParticleBuilder(player, (FramePoint) display.getRelativePoint());
+        }
     }
 }
