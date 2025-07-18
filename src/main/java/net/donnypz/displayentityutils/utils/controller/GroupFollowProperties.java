@@ -96,6 +96,15 @@ public class GroupFollowProperties{
     GroupFollowProperties(){}
 
     /**
+     * Create {@link GroupFollowProperties} through a builder
+     * @param followType the {@link FollowType} that should be used
+     * @return {@link GroupFollowPropertiesBuilder}
+     */
+    public static GroupFollowPropertiesBuilder builder(@NotNull FollowType followType){
+        return new GroupFollowPropertiesBuilder(followType);
+    }
+
+    /**
      * Change how extreme the display pivot offsets are by setting the y and z pivot offset percentages. Default percentages are 100%.
      * <br>
      * <br>
@@ -273,7 +282,7 @@ public class GroupFollowProperties{
      * @param group
      * @return a boolean
      */
-    public boolean shouldPropertiesApply(@NotNull SpawnedDisplayEntityGroup group){
+    public boolean shouldPropertiesApply(@NotNull ActiveGroup group){
         MachineState state = group.getMachineState();
         if (state == null || filteredStates.isEmpty()){
             return true;

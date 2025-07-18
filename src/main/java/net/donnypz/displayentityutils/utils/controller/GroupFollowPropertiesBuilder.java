@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GroupFollowPropertiesBuilder {
+public final class GroupFollowPropertiesBuilder {
     String id;
     FollowType followType;
     int unregisterDelay;
@@ -26,21 +26,16 @@ public class GroupFollowPropertiesBuilder {
     boolean filterBlacklist = false;
     boolean flip;
 
+    GroupFollowPropertiesBuilder(@NotNull FollowType followType){
+        this.followType = followType;
+    }
+
     /**
      * Set the id of the {@link GroupFollowProperties}. This should be set if using this follow property on a {@link DisplayController}
      * @param id the id
      */
     public GroupFollowPropertiesBuilder setId(@NotNull String id) {
         this.id = id;
-        return this;
-    }
-
-    /**
-     * Set the follow type of the {@link GroupFollowProperties}
-     * @param followType the follow type
-     */
-    public GroupFollowPropertiesBuilder setFollowType(@NotNull FollowType followType) {
-        this.followType = followType;
         return this;
     }
 
