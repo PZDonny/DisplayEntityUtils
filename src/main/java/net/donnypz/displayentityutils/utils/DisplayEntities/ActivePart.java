@@ -150,6 +150,18 @@ public abstract class ActivePart implements Active{
     public abstract ActiveGroup getGroup();
 
     /**
+     * Get this part's pitch
+     * @return a float
+     */
+    public abstract float getPitch();
+
+    /**
+     * Get this part's yaw
+     * @return a float
+     */
+    public abstract float getYaw();
+
+    /**
      * Set this part's transformation data if it's type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
      * @param transformation the transformation
      */

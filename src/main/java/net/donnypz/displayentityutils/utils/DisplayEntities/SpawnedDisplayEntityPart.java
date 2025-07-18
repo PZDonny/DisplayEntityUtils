@@ -163,6 +163,15 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return group;
     }
 
+    @Override
+    public float getPitch() {
+        return getEntity().getPitch();
+    }
+
+    @Override
+    public float getYaw() {
+        return getEntity().getYaw();
+    }
 
 
     public long getCreationTime() {

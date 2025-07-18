@@ -408,10 +408,12 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         setRotation(getPitch(), yaw, pivot);
     }
 
+    @Override
     public float getPitch(){
         return packetLocation.pitch;
     }
 
+    @Override
     public float getYaw(){
         return packetLocation.yaw;
     }
