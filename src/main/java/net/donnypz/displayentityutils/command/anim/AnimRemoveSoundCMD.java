@@ -39,7 +39,7 @@ class AnimRemoveSoundCMD extends PlayerSubCommand {
         try {
             String soundName = args[2];
             boolean isRemoveAll = soundName.equalsIgnoreCase("-all");
-            FramePoint point = (FramePoint) display.getRelativePoint();
+            FramePoint point = display.getRelativePoint();
             if (isRemoveAll){
                 point.removeAllSounds();
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("All Sounds Removed from Frame Point!", NamedTextColor.YELLOW)));

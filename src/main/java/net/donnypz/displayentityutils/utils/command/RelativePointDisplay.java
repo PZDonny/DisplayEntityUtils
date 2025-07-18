@@ -94,9 +94,7 @@ public abstract class RelativePointDisplay {
         return part.getTags().contains(pointDisplayTag);
     }
 
-    public RelativePoint getRelativePoint() {
-        return relativePoint;
-    }
+    public abstract RelativePoint getRelativePoint();
 
     public abstract void leftClick(Player player);
 

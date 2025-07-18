@@ -5,7 +5,6 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationSound;
-import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.donnypz.displayentityutils.utils.command.FramePointDisplay;
@@ -47,7 +46,7 @@ class AnimAddSoundCMD extends PlayerSubCommand {
             float pitch = Float.parseFloat(args[4]);
             int delayInTicks = Integer.parseInt(args[5]);
 
-            ((FramePoint)display.getRelativePoint()).addSound(new AnimationSound(sound, volume, pitch, delayInTicks));
+            display.getRelativePoint().addSound(new AnimationSound(sound, volume, pitch, delayInTicks));
 
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Sound Added to Frame Point!", NamedTextColor.GREEN)));
             player.sendMessage(MiniMessage.miniMessage().deserialize("| Sound: <yellow>"+sound));

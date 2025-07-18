@@ -36,7 +36,7 @@ class AnimAddParticleCMD extends PlayerSubCommand {
             AnimationParticleSelectDialog.sendDialog(player);
         }
         else{
-            new AnimationParticleBuilder(player, (FramePoint) display.getRelativePoint());
+            new AnimationParticleBuilder(player, display.getRelativePoint());
         }
     }
 }

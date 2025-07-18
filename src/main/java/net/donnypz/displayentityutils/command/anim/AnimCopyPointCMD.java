@@ -34,7 +34,7 @@ class AnimCopyPointCMD extends PlayerSubCommand {
             AnimCMD.noFramePointSelection(player);
             return;
         }
-        FramePoint framePoint = (FramePoint) display.getRelativePoint();
+        FramePoint framePoint = display.getRelativePoint();
 
         if (args.length < 3) {
             player.sendMessage(Component.text("Incorrect Usage! /mdis anim copypoint <frame-ids | frame-tag>", NamedTextColor.RED));

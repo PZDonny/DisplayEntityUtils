@@ -67,7 +67,7 @@ public abstract class ParticleDialog {
         double zOffset = (double) view.getFloat(Z_OFFSET);
         Player p = (Player) audience;
         FramePointDisplay display = (FramePointDisplay) DEUCommandUtils.getSelectedRelativePoint(p);
-        FramePoint framePoint = ((FramePoint) display.getRelativePoint());
+        FramePoint framePoint = display.getRelativePoint();
         AnimationParticleBuilder builder = AnimationParticleBuilder.create(framePoint, particle, count, xOffset, yOffset, zOffset, extra, data);
         builder.build();
         builder.remove();

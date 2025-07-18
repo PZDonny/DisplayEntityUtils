@@ -34,6 +34,11 @@ public class GroupPointDisplay extends RelativePointDisplay{
         return true;
     }
 
+    @Override
+    public RelativePoint getRelativePoint() {
+        return relativePoint;
+    }
+
 
     @Override
     public void despawn(){
