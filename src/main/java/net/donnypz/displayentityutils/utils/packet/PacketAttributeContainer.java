@@ -225,7 +225,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @return a {@link PacketDisplayEntityPart}
      */
     public @NotNull PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType){
-        return new PacketDisplayEntityPart(partType, SpigotReflectionUtil.generateEntityId(), this);
+        return new PacketDisplayEntityPart(partType, SpigotReflectionUtil.generateEntityId(), this.clone());
     }
 
     /**
@@ -235,7 +235,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @return a {@link PacketDisplayEntityPart}
      */
     public @NotNull PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location){
-        return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this);
+        return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this.clone());
     }
 
     /**
@@ -246,7 +246,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @return a {@link PacketDisplayEntityPart}
      */
     public @NotNull PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location, @NotNull String partTag){
-        return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this, partTag);
+        return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this.clone(), partTag);
     }
 
     /**
@@ -257,7 +257,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @return a {@link PacketDisplayEntityPart}
      */
     public @NotNull PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location, @NotNull Set<String> partTags){
-        return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this, partTags);
+        return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this.clone(), partTags);
     }
 
 
