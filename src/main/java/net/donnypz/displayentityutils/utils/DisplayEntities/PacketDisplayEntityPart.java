@@ -86,6 +86,14 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
+     * Get a copy of this part's attribute container
+     * @return a copied {@link PacketAttributeContainer}
+     */
+    public @NotNull PacketAttributeContainer getAttributeContainer(){
+        return attributeContainer.clone();
+    }
+
+    /**
      * Get whether this part is the master of its group
      * @return a boolean
      */
