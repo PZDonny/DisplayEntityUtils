@@ -10,6 +10,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.Ma
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.Matrix.MatrixCords;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TextDisplaySettings;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TextDisplayTools;
+import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -78,9 +79,8 @@ public abstract class TextDisplayPixelBasicCanvas extends TextDisplayPixelBasic 
         }
 
 
-        container.setAttribute(DisplayAttributes.TextDisplay.TEXT,Component.text(" "));
-        container.setAttribute(DisplayAttributes.TextDisplay.BACKGROUND_COLOR,Color.fromARGB(a, r, g, b));
-        part = container.createPart(SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY,location);
+        DisplayAttributeMap map = new DisplayAttributeMap().add(DisplayAttributes.TextDisplay.TEXT,Component.text(" ")).add(DisplayAttributes.TextDisplay.BACKGROUND_COLOR,Color.fromARGB(a, r, g, b));
+        part.setAttributes(map);
         updateSettings(part);
 
         updateTransformation();
@@ -108,7 +108,7 @@ public abstract class TextDisplayPixelBasicCanvas extends TextDisplayPixelBasic 
             return;
         }
 
-        backFace = container.createPart(SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY,location);
+        backFace = part.get();
     }
 
 

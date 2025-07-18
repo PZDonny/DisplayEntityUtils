@@ -9,6 +9,7 @@ public abstract class MatrixContainer<T> {
     public abstract void clearSlot(MatrixCords cords);
     public abstract void forEach(Consumer<T> action);
     public abstract void clean();
+    public abstract MatrixContainer clone();
 
     public boolean isStrict() { return isStrict; }
     public void setStrict(boolean strict) { this.isStrict = strict; }

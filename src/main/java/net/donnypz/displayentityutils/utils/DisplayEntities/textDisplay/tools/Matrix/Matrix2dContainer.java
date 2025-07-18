@@ -28,8 +28,21 @@ public class Matrix2dContainer<T> extends MatrixContainer<T> {
     }
 
     // ───────────────────────── Set / Get / Clear ─────────────────────────
+    @Override
     public Matrix2dContainer clone(){
-        return null;
+        Matrix2dContainer<T> newMatrix = new Matrix2dContainer<>(type);
+
+        this.forEach(new TriConsumer<Integer, Integer, T>() {
+            @Override
+            public void accept(Integer x, Integer y, T object) {
+                if (object==null){
+                    return;
+                }
+                newMatrix.set(x,y,object);
+            }
+        });
+
+        return newMatrix;
     }
     @Override
     public void set(MatrixCords cords, T value) {
