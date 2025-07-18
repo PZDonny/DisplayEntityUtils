@@ -9,10 +9,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+@ApiStatus.Internal
 public class AnimationParticleSelectDialog {
 
     private static final ClickCallback.Options CALLBACK_OPTIONS = ClickCallback.Options.builder().uses(ClickCallback.UNLIMITED_USES).build();
@@ -21,6 +23,7 @@ public class AnimationParticleSelectDialog {
      * Send this dialog to a player
      * @param player the player
      */
+    @ApiStatus.Internal
     public static void sendDialog(@NotNull Player player){
         Dialog dialog = Dialog.create(builder -> {
             builder.empty()
