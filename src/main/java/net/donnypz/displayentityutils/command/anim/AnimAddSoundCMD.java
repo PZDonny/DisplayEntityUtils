@@ -9,9 +9,11 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.donnypz.displayentityutils.utils.command.FramePointDisplay;
 import net.donnypz.displayentityutils.utils.command.RelativePointDisplay;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -41,7 +43,11 @@ class AnimAddSoundCMD extends PlayerSubCommand {
         }
         try {
             String soundString = args[2].replace(".", "_").toUpperCase();
-            Sound sound = Sound.valueOf(soundString);
+            Sound sound = Registry.SOUNDS.get(Key.key("minecraft", soundString));
+            if (sound == null){
+                player.sendMessage(Component.text("Invalid Sound Name!", NamedTextColor.RED));
+                return;
+            }
             float volume = Float.parseFloat(args[3]);
             float pitch = Float.parseFloat(args[4]);
             int delayInTicks = Integer.parseInt(args[5]);
@@ -56,9 +62,6 @@ class AnimAddSoundCMD extends PlayerSubCommand {
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             player.sendMessage(Component.text("Invalid number entered! Enter a number >= 0", NamedTextColor.RED));
             player.sendMessage(Component.text("| Delay must be a whole number", NamedTextColor.GRAY));
-        }
-        catch (IllegalArgumentException e){
-            player.sendMessage(Component.text("Invalid Sound Name!", NamedTextColor.RED));
         }
     }
 }
