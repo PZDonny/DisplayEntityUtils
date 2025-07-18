@@ -11,15 +11,15 @@ import java.util.List;
 import java.util.UUID;
 
 public class PixelGroup {
-    private final List<PacketDisplayEntityPart> pixels = new ArrayList<>();
+    private final List<TextDisplayPixel> pixels = new ArrayList<>();
     private final List<Player> viewerPlayers = new ArrayList<>();
-    public List<PacketDisplayEntityPart> getPixels(){
+    public List<TextDisplayPixel> getPixels(){
         return pixels;
     }
-    public void add(PacketDisplayEntityPart pixel){
+    public void add(TextDisplayPixel pixel){
         pixels.add(pixel);
     }
-    public void remove(PacketDisplayEntityPart pixel){
+    public void remove(TextDisplayPixel pixel){
         pixels.remove(pixel);
     }
 
@@ -28,8 +28,8 @@ public class PixelGroup {
     }
     public void addViewer(Player player){
         viewerPlayers.add(player);
-        for (PacketDisplayEntityPart pixel: pixels){
-            pixel.showToPlayer(player, GroupSpawnedEvent.SpawnReason.CUSTOM);
+        for (TextDisplayPixel pixel: pixels){
+            pixel.getPart().showToPlayer(player, GroupSpawnedEvent.SpawnReason.CUSTOM);
         }
     }
     public void addViewer(UUID player){
@@ -37,8 +37,8 @@ public class PixelGroup {
     }
     public void removeViewer(Player player){
         viewerPlayers.remove(player);
-        for (PacketDisplayEntityPart pixel: pixels){
-            pixel.hideFromPlayer(player);
+        for (TextDisplayPixel pixel: pixels){
+            pixel.getPart().hideFromPlayer(player);
         }
     }
     public void removeViewer(UUID player){
@@ -46,41 +46,41 @@ public class PixelGroup {
 
     }
     public void sync(){
-        for (PacketDisplayEntityPart pixel:pixels){
-            pixel.showToPlayers(viewerPlayers, GroupSpawnedEvent.SpawnReason.CUSTOM);
+        for (TextDisplayPixel pixel:pixels){
+            pixel.getPart().showToPlayers(viewerPlayers, GroupSpawnedEvent.SpawnReason.CUSTOM);
         }
     }
     public void strictSync(){
-        for (PacketDisplayEntityPart pixel:pixels){
+        for (TextDisplayPixel pixel:pixels){
 
-            for (Player player: pixel.getViewersAsPlayers()){
+            for (Player player: pixel.getPart().getViewersAsPlayers()){
                 if (!viewerPlayers.contains(player)){
-                    pixel.hideFromPlayer(player);
+                    pixel.getPart().hideFromPlayer(player);
                 }
             }
 
-            pixel.showToPlayers(viewerPlayers, GroupSpawnedEvent.SpawnReason.CUSTOM);
+            pixel.getPart().showToPlayers(viewerPlayers, GroupSpawnedEvent.SpawnReason.CUSTOM);
 
         }
     }
     public void resend(Player player){
-        for (PacketDisplayEntityPart pixel:pixels){
-            pixel.resendAttributes(player);
+        for (TextDisplayPixel pixel:pixels){
+            pixel.getPart().resendAttributes(player);
         }
     }
     public void resend(UUID player){
         resend(Bukkit.getPlayer(player));
     }
     public void resendAll(){
-        for (PacketDisplayEntityPart pixel:pixels){
+        for (TextDisplayPixel pixel:pixels){
             for (Player player:viewerPlayers){
-                pixel.resendAttributes(player);
+                pixel.getPart().resendAttributes(player);
             }
         }
     }
     public void teleport(Location location){
-        for (PacketDisplayEntityPart pixel:pixels){
-            pixel.teleport(location);
+        for (TextDisplayPixel pixel:pixels){
+            pixel.setLocation(location);
         }
     }
 }

@@ -1,8 +1,8 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools;
 
 
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.Elements.*;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.TextDisplayScreen;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.elements.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.TextDisplayCanvas;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -26,8 +26,8 @@ public class TestCommand implements CommandExecutor {
             }
             case "2" -> {
 
-                TextDisplayScreen screen = new TextDisplayScreen();
-                TextDisplayGifScreenElement gif = new TextDisplayGifScreenElement();
+                TextDisplayCanvas screen = new TextDisplayCanvas();
+                TextDisplayGifCanvasElement gif = new TextDisplayGifCanvasElement();
 
                 gif.setFrames(TextDisplayTools.gifToPixelMatrixList(TextDisplayTools.getGifStream("https://cdn.pixabay.com/animation/2024/06/23/05/08/05-08-33-791_512.gif")));
                 if (gif.getFrames().isEmpty()) {
@@ -41,8 +41,8 @@ public class TestCommand implements CommandExecutor {
             case "3" -> {
 
 
-                TextDisplayScreen screen = new TextDisplayScreen();
-                TextDisplayStaticScreenElement walla = new TextDisplayStaticScreenElement();
+                TextDisplayCanvas screen = new TextDisplayCanvas();
+                TextDisplayStaticCanvasElement walla = new TextDisplayStaticCanvasElement();
                 BufferedImage image = TextDisplayTools.getTexture("https://i.imgur.com/Ioq9Rzu.png");
                 if (image == null) {
                     player.sendMessage("walla");
@@ -57,10 +57,10 @@ public class TestCommand implements CommandExecutor {
             }
             case "4" -> {
 
-                TextDisplayScreen screen = new TextDisplayScreen();
-                TextDisplayStaticButtonScreenElement button = new TextDisplayStaticButtonScreenElement(screen, 0, 0, new TextDisplayStaticButtonScreenElement.ClickHandler<TextDisplayStaticButtonScreenElement>() {
+                TextDisplayCanvas screen = new TextDisplayCanvas();
+                TextDisplayStaticButtonCanvasElement button = new TextDisplayStaticButtonCanvasElement(screen, 0, 0, new TextDisplayStaticButtonCanvasElement.ClickHandler<TextDisplayStaticButtonCanvasElement>() {
                     @Override
-                    public void handle(TextDisplayStaticButtonScreenElement self) {
+                    public void handle(TextDisplayStaticButtonCanvasElement self) {
                         screen.remove();
                     }
                 });
@@ -73,11 +73,11 @@ public class TestCommand implements CommandExecutor {
             }
             case "5" -> {
 
-                TextDisplayScreen screen = new TextDisplayScreen();
-                TextDisplayStaticButtonScreenElement buttonScreenElement = new TextDisplayStaticButtonScreenElement(screen, 0, 0, new TextDisplayStaticButtonScreenElement.ClickHandler<TextDisplayStaticButtonScreenElement>() {
+                TextDisplayCanvas screen = new TextDisplayCanvas();
+                TextDisplayStaticButtonCanvasElement buttonScreenElement = new TextDisplayStaticButtonCanvasElement(screen, 0, 0, new TextDisplayStaticButtonCanvasElement.ClickHandler<TextDisplayStaticButtonCanvasElement>() {
                     @Override
-                    public void handle(TextDisplayStaticButtonScreenElement self) {
-                        self.getScreen().remove();
+                    public void handle(TextDisplayStaticButtonCanvasElement self) {
+                        self.getCanvas().remove();
                     }
                 });
                 buttonScreenElement.setImage(TextDisplayTools.bufferedImageToPixelMatrix(TextDisplayTools.getTexture("item/ender_eye.png")));
@@ -86,7 +86,7 @@ public class TestCommand implements CommandExecutor {
                 return true;
             }
             case "6" -> {
-                    
+
                 return true;
             }
         }

@@ -16,7 +16,7 @@ import org.joml.Vector3f;
 
 public class TextDisplayPixelBasic extends TextDisplayPixel {
 
-    protected Matrix4f oldMatrix4f;
+            protected Matrix4f oldMatrix4f;
 
     public TextDisplayPixelBasic(){
 
@@ -24,7 +24,7 @@ public class TextDisplayPixelBasic extends TextDisplayPixel {
 
     @Override
     public void addToGroup(PixelGroup group) {
-        group.add(part);
+        group.add(this);
     }
 
     @Override
@@ -87,6 +87,11 @@ public class TextDisplayPixelBasic extends TextDisplayPixel {
         if (part!=null){
             part.hideFromPlayers(part.getViewersAsPlayers());
         }
+
+    }
+
+    @Override
+    public void move(Vector3f vector) {
 
     }
 

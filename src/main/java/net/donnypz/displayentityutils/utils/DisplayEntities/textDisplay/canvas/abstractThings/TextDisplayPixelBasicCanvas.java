@@ -1,8 +1,9 @@
-package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.abstractThings;
+package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.abstractThings;
 
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.pixels.PixelGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.pixels.TextDisplayPixel;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.pixels.TextDisplayPixelBasic;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.Matrix.Matrix2dContainer;
@@ -20,37 +21,38 @@ import org.joml.Matrix4f;
 
 import java.util.List;
 
-public abstract class TextDisplayPixelBasicScreen extends TextDisplayPixelBasic {
+public abstract class TextDisplayPixelBasicCanvas extends TextDisplayPixelBasic {
+    protected PixelGroup canvasGroup;
     protected Float realWidth = null ;
     protected Float realHeight = null ;
     protected MatrixCords cords;
     protected transient PacketDisplayEntityPart backFace;
     protected boolean twoFaced = false;
 
-    public TextDisplayPixelBasicScreen(int x, int y) {
+    public TextDisplayPixelBasicCanvas(int x, int y) {
         cords = new MatrixCords(x ,y,this);
     }
-    public TextDisplayPixelBasicScreen(int x, int y, Matrix2dContainer<? extends TextDisplayPixel> container) {
+    public TextDisplayPixelBasicCanvas(int x, int y, Matrix2dContainer<? extends TextDisplayPixel> container) {
     }
 
-    public TextDisplayPixelBasicScreen(Color color, int x, int y, Matrix2dContainer<? extends TextDisplayPixel> container) {
+    public TextDisplayPixelBasicCanvas(Color color, int x, int y, Matrix2dContainer<? extends TextDisplayPixel> container) {
         setColor(color);
     }
 
-    public TextDisplayPixelBasicScreen(List<Integer> color, int x, int y, Matrix2dContainer<? extends TextDisplayPixel> container) {
+    public TextDisplayPixelBasicCanvas(List<Integer> color, int x, int y, Matrix2dContainer<? extends TextDisplayPixel> container) {
         this(x, y,container);
         setColor(color);
     }
-    public TextDisplayPixelBasicScreen(Color color) {
+    public TextDisplayPixelBasicCanvas(Color color) {
         setColor(color);
     }
 
-    public TextDisplayPixelBasicScreen(List<Integer> color) {
+    public TextDisplayPixelBasicCanvas(List<Integer> color) {
         super();
         setColor(color);
     }
 
-    protected TextDisplayPixelBasicScreen() {
+    protected TextDisplayPixelBasicCanvas() {
     }
 
     @Override
@@ -153,6 +155,7 @@ public abstract class TextDisplayPixelBasicScreen extends TextDisplayPixelBasic 
         if (backFace!=null){
             backFace.hideFromPlayers(backFace.getViewersAsPlayers());
         }
+        canvasGroup.remove(this);
         render = false;
         realWidth = null;
         realHeight = null;
@@ -251,5 +254,10 @@ public abstract class TextDisplayPixelBasicScreen extends TextDisplayPixelBasic 
 
     public Float getRealHeight() {
         return realHeight;
+    }
+
+    public void setCanvasGroup(PixelGroup canvasGroup) {
+        this.canvasGroup = canvasGroup;
+        canvasGroup.add(this);
     }
 }

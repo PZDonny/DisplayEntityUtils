@@ -3,7 +3,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.M
 public class MatrixCords {
     private int x;
     private int y;
-    private transient MatrixContainer matrix; // Using the generic abstract MatrixContainer
+    private transient MatrixContainer matrix;
     private transient Object object;
 
 
@@ -36,10 +36,7 @@ public class MatrixCords {
         matrix = newMatrix;
     }
 
-    /**
-     * Overrides current coordinates with newCords and updates the matrix with the given object.
-     * Only allows override if the types match exactly.
-     */
+
     public void override(MatrixCords newCords, Object object) {
         if (newCords == null || object == null) return;
 

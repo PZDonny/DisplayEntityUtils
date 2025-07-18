@@ -3,8 +3,8 @@ package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools;
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.Matrix.Matrix2dContainer;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.Elements.helper.TextDisplayElementPixel;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.abstractThings.TextDisplayPixelBasicScreen;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.elements.helper.TextDisplayElementPixel;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.abstractThings.TextDisplayPixelBasicCanvas;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
@@ -263,7 +263,7 @@ public class TextDisplayTools {
         }
     }
 
-    public static void optimizeScreen(Matrix2dContainer<TextDisplayPixelBasicScreen> pixels){
+    public static void optimizeScreen(Matrix2dContainer<TextDisplayPixelBasicCanvas> pixels){
 
     }
 }

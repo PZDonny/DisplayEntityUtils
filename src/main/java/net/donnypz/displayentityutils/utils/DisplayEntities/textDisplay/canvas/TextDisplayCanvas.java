@@ -1,12 +1,12 @@
-package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen;
+package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.pixels.PixelGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.Matrix.Matrix2dContainer;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TextDisplaySettings;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.Elements.helper.TextDisplayElementPixel;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.abstractThings.TextDisplayScreenClickableElement;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.abstractThings.TextDisplayScreenElement;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.enums.TextDisplayScreenRenderTypes;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.elements.helper.TextDisplayElementPixel;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.abstractThings.TextDisplayCanvasClickableElement;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.abstractThings.TextDisplayCanvasElement;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
@@ -20,25 +20,24 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
-public class TextDisplayScreen {
+public class TextDisplayCanvas {
+    private   PixelGroup canvasGroup = new PixelGroup();
     private final Object sync = new Object();
-    private TextDisplayScreenRenderTypes renderType = TextDisplayScreenRenderTypes.DYNAMIC;
-    private Matrix2dContainer<TextDisplayScreenPixel> pixels = new Matrix2dContainer<>(TextDisplayScreenPixel.class);
-    private boolean isStrict = false;
-    private int width;
-    private int height;
+    private TextDisplayCanvasRenderTypes renderType = TextDisplayCanvasRenderTypes.DYNAMIC;
+    private Matrix2dContainer<TextDisplayCanvasPixel> pixels = new Matrix2dContainer<>(TextDisplayCanvasPixel.class);
+    private int stackSize = 500;
     private boolean forceUpdates = false;
     private boolean wipe = true;
-    private List<TextDisplayScreenElement> elements = new ArrayList<>();
+    private List<TextDisplayCanvasElement> elements = new ArrayList<>();
     private Location location = null;
     private TextDisplaySettings settings = new TextDisplaySettings();
     private boolean doUpdates = false;
     private Integer updateTask;
     private int updateInterval = 1;
     private Entity mount;
-    private List<Player> shownPlayers = new ArrayList<>();
 
     public void setWipe(boolean wipe) {
         this.wipe = wipe;
@@ -57,16 +56,16 @@ public class TextDisplayScreen {
                         stopUpdateTask();
                     }
                     if (wipe) {
-                        pixels.forEach(new Consumer<TextDisplayScreenPixel>() {
+                        pixels.forEach(new Consumer<TextDisplayCanvasPixel>() {
                             @Override
-                            public void accept(TextDisplayScreenPixel pixel) {
+                            public void accept(TextDisplayCanvasPixel pixel) {
                                 pixel.setRender(false);
                             }
                         });
                         pixels.clean();
                     }
                     if (location != null) {
-                        for (TextDisplayScreenElement element : elements) {
+                        for (TextDisplayCanvasElement element : elements) {
                             element.update();
                         }
                     }
@@ -123,9 +122,9 @@ public class TextDisplayScreen {
         update();
         switch (renderType){
             case DYNAMIC -> {
-                pixels.forEach(new Consumer<TextDisplayScreenPixel>() {
+                pixels.forEach(new Consumer<TextDisplayCanvasPixel>() {
                     @Override
-                    public void accept(TextDisplayScreenPixel pixel){
+                    public void accept(TextDisplayCanvasPixel pixel){
                         if (pixel.isUseSuperSettings()){
                         pixel.setSettings(settings);
                         }
@@ -148,7 +147,7 @@ public class TextDisplayScreen {
     }
     private void checkIfDoUpdates(){
         doUpdates = false;
-        for (TextDisplayScreenElement element : elements){
+        for (TextDisplayCanvasElement element : elements){
             if (element.isNeedsUpdates()) {
                 doUpdates = true;
                 break;
@@ -156,11 +155,11 @@ public class TextDisplayScreen {
         }
     }
     private void mergeElements(){
-        List<TextDisplayScreenElement> remove = new ArrayList<>();
-        elements.sort(Comparator.comparingInt(TextDisplayScreenElement::getLayer));
-        elements.forEach(new Consumer<TextDisplayScreenElement>() {
+        List<TextDisplayCanvasElement> remove = new ArrayList<>();
+        elements.sort(Comparator.comparingInt(TextDisplayCanvasElement::getLayer));
+        elements.forEach(new Consumer<TextDisplayCanvasElement>() {
             @Override
-            public void accept(TextDisplayScreenElement element) {
+            public void accept(TextDisplayCanvasElement element) {
                 if (element.isDead()){
                     remove.add(element);
                     return;
@@ -168,7 +167,7 @@ public class TextDisplayScreen {
                 int startX = element.getX();
                 int startY = element.getY();
                 boolean useThisSettings = element.getSettings() == null;
-                boolean clickable = element instanceof TextDisplayScreenClickableElement;
+                boolean clickable = element instanceof TextDisplayCanvasClickableElement;
                 element.getPixels().forEach(new Consumer<TextDisplayElementPixel>() {
                     @Override
                     public void accept(TextDisplayElementPixel pixel) {
@@ -184,27 +183,35 @@ public class TextDisplayScreen {
                             int trueY = y + startY;
 
                             boolean needsSpawning = false;
-                            TextDisplayScreenPixel screenPixel = pixels.get(trueX, trueY);
-                            if (screenPixel == null) {
-                                screenPixel = new TextDisplayScreenPixel(trueX, trueY, pixels);
+                            TextDisplayCanvasPixel canvasPixel = pixels.get(trueX, trueY);
+                            if (canvasPixel == null) {
+                                canvasPixel = new TextDisplayCanvasPixel(trueX, trueY, pixels);
                                 needsSpawning = true;
                             }
-
+                             if (!canvasPixel.getClickableElements().isEmpty()){
+                                 for (TextDisplayCanvasClickableElement clickableElement: canvasPixel.getClickableElements()){
+                                    if (!clickableElement.isBleed()){
+                                        canvasPixel.getClickableElements().remove(clickableElement);
+                                        clickableElement.getClickSpace().remove(canvasPixel);
+                                    }
+                                 }
+                             }
                             if (!useThisSettings) {
                                 //needs per pixel settings
-                            } else if(screenPixel.getSettings()==null){
-                                screenPixel.setSettings(settings);
+                            } else if(canvasPixel.getSettings()==null){
+                                canvasPixel.setSettings(settings);
                             }
-                            screenPixel.setTwoFaced(element.isTwoFaced());
-                            screenPixel.setColor(pixel.getAlpha(), pixel.getRed(), pixel.getGreen(), pixel.getBlue());
-                            screenPixel.setPixelHeight(pixel.getPixelHeight());
-                            screenPixel.setPixelWidth(pixel.getPixelWidth());
-                            screenPixel.setRender(pixel.isRender());
+                            canvasPixel.setTwoFaced(element.isTwoFaced());
+                            canvasPixel.setColor(pixel.getAlpha(), pixel.getRed(), pixel.getGreen(), pixel.getBlue());
+                            canvasPixel.setPixelHeight(pixel.getPixelHeight());
+                            canvasPixel.setPixelWidth(pixel.getPixelWidth());
+                            canvasPixel.setRender(pixel.isRender());
                             if (needsSpawning&&location!= null){
-                                screenPixel.spawn(location);
+                                canvasPixel.spawn(location);
                             }
                             if (clickable){
-                                ((TextDisplayScreenClickableElement) element).addClickSpacePixel(screenPixel);
+                                ((TextDisplayCanvasClickableElement) element).addClickSpacePixel(canvasPixel);
+                                canvasPixel.getClickableElements().add(((TextDisplayCanvasClickableElement) element));
                             }
                         }
                     }
@@ -212,15 +219,15 @@ public class TextDisplayScreen {
 
             }
         });
-        for (TextDisplayScreenElement element:remove){
+        for (TextDisplayCanvasElement element:remove){
             elements.remove(element);
         }
 
     }
     public void purge(){
-        pixels.forEach(new Consumer<TextDisplayScreenPixel>() {
+        pixels.forEach(new Consumer<TextDisplayCanvasPixel>() {
             @Override
-            public void accept(TextDisplayScreenPixel pixel) {
+            public void accept(TextDisplayCanvasPixel pixel) {
                 if (!pixel.isRender()){
                     pixels.set(pixel.getX(), pixel.getY(), null );
                     pixel.despawn();
@@ -231,16 +238,16 @@ public class TextDisplayScreen {
     }
     public void despawn(){
         stopUpdateTask();
-        pixels.forEach(new Consumer<TextDisplayScreenPixel>() {
+        pixels.forEach(new Consumer<TextDisplayCanvasPixel>() {
             @Override
-            public void accept(TextDisplayScreenPixel pixel) {
+            public void accept(TextDisplayCanvasPixel pixel) {
                 pixel.despawn();
             }
         });
     }
     public void remove(){
         despawn();
-        for (TextDisplayScreenElement element : elements){
+        for (TextDisplayCanvasElement element : elements){
             element.remove();
         }
     }
@@ -280,14 +287,16 @@ public class TextDisplayScreen {
         updatePixels();
     }
 
-    public void showPlayer(Player player) {
-        shownPlayers.add(player);
+    public void addViewer(Player player) {
+        canvasGroup.addViewer(player);
         updatePixels();
     }
 
     public void setLocation(Location location) {
         Location newLocation = location.clone();
+
         newLocation.setDirection(new Vector(0,0,1));
+        canvasGroup.teleport(newLocation);
         this.location=newLocation;
         updatePixels();
     }
@@ -304,12 +313,11 @@ public class TextDisplayScreen {
             @Override
             public void run() {
                 synchronized (sync) {
-                    pixels.forEach(new Consumer<TextDisplayScreenPixel>() {
+                    pixels.forEach(new Consumer<TextDisplayCanvasPixel>() {
                         @Override
-                        public void accept(TextDisplayScreenPixel pixel) {
-
+                        public void accept(TextDisplayCanvasPixel pixel) {
+                            pixel.setCanvasGroup(canvasGroup);
                             pixel.update();
-                            pixel.setLocation(location);
                             pixel.ride(mount);
 
                         }
@@ -318,21 +326,24 @@ public class TextDisplayScreen {
             }
         });
     }
+    public void stack(){
+        
+    }
     public TextDisplaySettings getSettings() {
         return settings;
     }
 
-    public List<TextDisplayScreenElement> getElements() {
+    public List<TextDisplayCanvasElement> getElements() {
         return elements;
     }
 
-    public void setElements(List<TextDisplayScreenElement> elements) {
+    public void setElements(List<TextDisplayCanvasElement> elements) {
         this.elements = elements;
     }
-    public void addElement(TextDisplayScreenElement element){
+    public void addElement(TextDisplayCanvasElement element){
         elements.add(element);
     }
-    public void removeElement(TextDisplayScreenElement element){
+    public void removeElement(TextDisplayCanvasElement element){
         elements.remove(element);
         element.remove();
     }
@@ -352,12 +363,13 @@ public class TextDisplayScreen {
         updateTask = null;
     }
 
-    public List<Player> getShownPlayers() {
-        return shownPlayers;
+    public List<Player> geViewerPlayers() {
+        return canvasGroup.getViewerPlayers();
     }
 
-    public void addShownPlayer(Player player) {
-        this.shownPlayers.add(player);
+    public void addViewer(UUID uuid){
+        canvasGroup.addViewer(uuid);
+        updatePixels();
     }
 
     public boolean isDoUpdates() {
@@ -375,5 +387,17 @@ public class TextDisplayScreen {
 
     public void setForceUpdates(boolean forceUpdates) {
         this.forceUpdates = forceUpdates;
+    }
+
+    public int getStackSize() {
+        return stackSize;
+    }
+
+    public void setStackSize(int stackSize) {
+        this.stackSize = stackSize;
+    }
+
+    public PixelGroup getCanvasGroup(){
+        return canvasGroup;
     }
 }

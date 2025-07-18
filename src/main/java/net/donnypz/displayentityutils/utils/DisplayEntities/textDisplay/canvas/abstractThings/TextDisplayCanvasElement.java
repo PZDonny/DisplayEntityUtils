@@ -1,10 +1,10 @@
-package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.abstractThings;
+package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.abstractThings;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.Matrix.Matrix2dContainer;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TextDisplaySettings;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.Elements.helper.TextDisplayElementPixel;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.elements.helper.TextDisplayElementPixel;
 
-public abstract class TextDisplayScreenElement {
+public abstract class TextDisplayCanvasElement {
     protected int x = 0;
     protected int y = 0;
     protected Matrix2dContainer<TextDisplayElementPixel> pixels = new Matrix2dContainer<>(TextDisplayElementPixel.class);

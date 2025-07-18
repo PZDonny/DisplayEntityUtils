@@ -1,18 +1,18 @@
-package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.Elements;
+package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.elements;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.Matrix.Matrix2dContainer;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.Elements.helper.TextDisplayElementPixel;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.abstractThings.TextDisplayScreenElement;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.elements.helper.TextDisplayElementPixel;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.abstractThings.TextDisplayCanvasElement;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class TextDisplayGifScreenElement extends TextDisplayScreenElement{
+public class TextDisplayGifCanvasElement extends TextDisplayCanvasElement {
         private int frame = 0;
         private List<Matrix2dContainer<TextDisplayElementPixel>> frames = new ArrayList<>();
         private int age = 0;
-    public TextDisplayGifScreenElement(){
+    public TextDisplayGifCanvasElement(){
         updateInterval = 80;
     }
     private void frameUp(){

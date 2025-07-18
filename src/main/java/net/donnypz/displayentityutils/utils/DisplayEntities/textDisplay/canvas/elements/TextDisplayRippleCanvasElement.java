@@ -1,8 +1,8 @@
-package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.Elements;
+package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.elements;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.Matrix.Matrix2dContainer;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.Elements.helper.TextDisplayElementPixel;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.abstractThings.TextDisplayScreenElement;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.elements.helper.TextDisplayElementPixel;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.abstractThings.TextDisplayCanvasElement;
 import org.bukkit.Color;
 
 import java.util.ArrayList;
@@ -11,24 +11,24 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class TextDisplayRippleScreenElement extends TextDisplayScreenElement {
+public class TextDisplayRippleCanvasElement extends TextDisplayCanvasElement {
     private int lifeTime = 400;
     private int updateInterval = 10;
     private int age = 0;
     private int ringSize = 1;
     private Color color = Color.fromARGB(255, 0, 0, 255);
 
-    public TextDisplayRippleScreenElement(Color color, int ringSize, int x, int y) {
+    public TextDisplayRippleCanvasElement(Color color, int ringSize, int x, int y) {
         this(ringSize, x, y);
         this.color = color;
     }
 
-    public TextDisplayRippleScreenElement(List<Integer> color, int ringSize, int x, int y) {
+    public TextDisplayRippleCanvasElement(List<Integer> color, int ringSize, int x, int y) {
         this(ringSize, x, y);
         this.color = Color.fromARGB(color.getFirst(), color.get(1), color.get(2), color.getLast());
     }
 
-    public TextDisplayRippleScreenElement(int ringSize, int x, int y) {
+    public TextDisplayRippleCanvasElement(int ringSize, int x, int y) {
         needsUpdates = true;
         this.x = x;
         this.y = y;

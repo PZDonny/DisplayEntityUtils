@@ -2,9 +2,9 @@ package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.particles.SinglePixelParticle;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.Elements.TextDisplayStaticButtonScreenElement;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.Elements.TextDisplayStaticScreenElement;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.TextDisplayScreen;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.elements.TextDisplayStaticButtonCanvasElement;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.elements.TextDisplayStaticCanvasElement;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.TextDisplayCanvas;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -18,7 +18,7 @@ import java.util.Random;
 
 public class TestCast {
     private final Object sync = new Object();
-    private TextDisplayStaticButtonScreenElement button;
+    private TextDisplayStaticButtonCanvasElement button;
     private Integer task;
     private Location location;
     private Vector3f forward;
@@ -32,9 +32,8 @@ public class TestCast {
     private final float particleCount = 400;
     private final int particlePerTick = 4;
     private final int alpha = 255;
-    private final Object particleLock = new Object();
     private final Random random = new Random();
-    private final TextDisplayScreen screen = new TextDisplayScreen();
+    private final TextDisplayCanvas screen = new TextDisplayCanvas();
     private final List<SinglePixelParticle> particles = new ArrayList<>();
     public void cast(Player player){
         Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), new Runnable() {
@@ -56,15 +55,15 @@ public class TestCast {
                     }
                     //castIcon = TextDisplayTools.scaleBufferedImage(castIcon,32,32);
                     //castButton = TextDisplayTools.scaleBufferedImage(castButton,16,16);
-                    button = new TextDisplayStaticButtonScreenElement(screen, -64, 64, new TextDisplayStaticButtonScreenElement.ClickHandler<TextDisplayStaticButtonScreenElement>() {
+                    button = new TextDisplayStaticButtonCanvasElement(screen, -64, 64, new TextDisplayStaticButtonCanvasElement.ClickHandler<TextDisplayStaticButtonCanvasElement>() {
                         @Override
-                        public void handle(TextDisplayStaticButtonScreenElement self) {
+                        public void handle(TextDisplayStaticButtonCanvasElement self) {
                             start();
                         }
                     });
                     button.setImage(TextDisplayTools.bufferedImageToPixelMatrix(castButton));
                     button.setLayer(11);
-                    TextDisplayStaticScreenElement icon = new TextDisplayStaticScreenElement();
+                    TextDisplayStaticCanvasElement icon = new TextDisplayStaticCanvasElement();
                     icon.setTwoFaced(true);
                     button.setTwoFaced(true);
                     icon.setImage(TextDisplayTools.bufferedImageToPixelMatrix(castIcon));

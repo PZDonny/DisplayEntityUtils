@@ -1,13 +1,13 @@
-package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.Elements.helper;
+package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.elements.helper;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.Matrix.Matrix2dContainer;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.Matrix.MatrixCords;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.screen.abstractThings.TextDisplayPixelBasicScreen;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.abstractThings.TextDisplayPixelBasicCanvas;
 import org.bukkit.Color;
 
 import java.util.List;
 
-public class TextDisplayElementPixel extends TextDisplayPixelBasicScreen {
+public class TextDisplayElementPixel extends TextDisplayPixelBasicCanvas {
 
 
     public TextDisplayElementPixel() {

@@ -5,22 +5,7 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import java.lang.reflect.Array;
 import java.util.function.Consumer;
 
-/**
- * Quadrant‑split 2‑D matrix that transparently supports negative coordinates.
- *
- * <p>Data are stored in four independent backing arrays (quadrants):
- *<pre>
- *   (+x,+y)  ⟶  posPos
- *   (−x,+y)  ⟶  negPos
- *   (+x,−y)  ⟶  posNeg
- *   (−x,−y)  ⟶  negNeg
- *</pre>
- * Each quadrant auto‑expands <i>and now auto‑shrinks</i> on demand.
- * Shrinking occurs in {@link #clean()} when more than 75 % of the rows or
- * columns at the edge are empty.
- *
- * @param <T> element type
- */
+
 public class Matrix2dContainer<T> extends MatrixContainer<T> {
 
     private final Class<T> type;
@@ -144,9 +129,7 @@ public class Matrix2dContainer<T> extends MatrixContainer<T> {
         return quad;
     }
 
-    /**
-     * Ensure <code>quad</code> has at least r rows and c columns.
-     */
+
     @SuppressWarnings("unchecked")
     private T[][] ensureCapacity(T[][] quad, int r, int c, int x, int y) {
         int rows = quad.length, cols = quad[0].length;
@@ -174,10 +157,7 @@ public class Matrix2dContainer<T> extends MatrixContainer<T> {
         shrinkQuadrant(posNeg,(q)->posNeg=q);
         shrinkQuadrant(negNeg,(q)->negNeg=q);
     }
-    /**
-     * Shrinks each quadrant where more than 75 % of the border rows/columns are
-     * unused.  Won't shrink below {@link #quadrantMinSize}.
-     */
+
     @SuppressWarnings("unchecked")
     private void shrinkQuadrant(T[][] quad, Consumer<T[][]> setter) {
         if (quad == null) return;

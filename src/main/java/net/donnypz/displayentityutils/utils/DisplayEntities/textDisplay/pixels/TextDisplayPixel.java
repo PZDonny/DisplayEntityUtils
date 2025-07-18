@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.pixels;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.Matrix.Matrix2dContainer;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TextDisplaySettings;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TextDisplayTools;
@@ -9,7 +10,9 @@ import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -21,8 +24,12 @@ public abstract class TextDisplayPixel {
     protected int blue = 0;
     //
 
-    protected transient PacketDisplayEntityPart part;
-    protected transient final PacketAttributeContainer container = new PacketAttributeContainer();;
+    protected final transient PacketDisplayEntityPart part;
+
+    public  PacketDisplayEntityPart getPart() {
+        return part;
+    }
+
     protected Matrix4f transformation = new Matrix4f().identity();
 
 
@@ -41,26 +48,17 @@ public abstract class TextDisplayPixel {
     protected transient TextDisplaySettings settings;
 
     protected TextDisplayPixel() {
-
+        part = new PacketAttributeContainer().createPart(SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)
     }
 
-    protected TextDisplayPixel(int x, int y, Matrix2dContainer<? extends TextDisplayPixel> container) {
-    }
 
-    protected TextDisplayPixel(Color color, int x, int y, Matrix2dContainer<? extends TextDisplayPixel> container) {
-        this(x, y,container);
-        setColor(color);
-    }
-
-    protected TextDisplayPixel(List<Integer> color, int x, int y, Matrix2dContainer<? extends TextDisplayPixel> container) {
-        this(x, y,container);
-        setColor(color);
-    }
     protected TextDisplayPixel(Color color) {
+        this();
         setColor(color);
     }
 
     protected TextDisplayPixel(List<Integer> color) {
+        this();
         setColor(color);
     }
 
@@ -129,7 +127,6 @@ public abstract class TextDisplayPixel {
     public void setBlue(int blue) { this.blue = blue; clampColor(); hasUpdated = true; }
 
 
-    // Pixel size getters/setters
     public int getPixelWidth() { return pixelWidth; }
     public void setPixelWidth(int pixelWidth) {
         this.pixelWidth = pixelWidth;
@@ -165,6 +162,19 @@ public abstract class TextDisplayPixel {
     public abstract void update();
     public abstract void load(TextDisplaySettings settings, Matrix2dContainer<? extends TextDisplayPixel> container  );
     public abstract void despawn();
+    public  void move(Vector vector){
+        move(vector.toVector3f());
+    }
+    public  void move(float x, float y,float z){
+        move(new Vector3f(x,y,z));
+    }
+    public  void move(List<Float> cords){
+        if (cords.size()!=3){
+            return;
+        }
+        move(new Vector3f(cords.getFirst(),cords.get(1),cords.getLast()));
+    }
+    public abstract void move(Vector3f vector);
 
     public Matrix4f getTextDisplayMatrix4f(){
         if (part == null||part.getDisplayTransformation()==null)
