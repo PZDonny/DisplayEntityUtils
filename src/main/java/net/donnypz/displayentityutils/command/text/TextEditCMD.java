@@ -16,10 +16,10 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-class TextMenuCMD extends PlayerSubCommand {
+class TextEditCMD extends PlayerSubCommand {
 
-    public TextMenuCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("menu", parentSubCommand, Permission.TEXT_MENU);
+    public TextEditCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("edit", parentSubCommand, Permission.TEXT_EDIT);
     }
 
     @Override

@@ -4,15 +4,11 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.command.*;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 public final class TextCMD extends ConsoleUsableSubCommand {
 
     public TextCMD(){
         super(Permission.HELP, true);
-        new TextMenuCMD(this);
+        new TextEditCMD(this);
         new TextSetCMD(this);
         new TextFontCMD(this);
         new TextShadowCMD(this);
@@ -42,7 +38,7 @@ public final class TextCMD extends ConsoleUsableSubCommand {
     static void textHelp(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         CMDUtils.sendCMD(sender, "/mdis text help", "Get help for text displays");
-        CMDUtils.sendCMD(sender, "/mdis text menu [-&]", "Open a dialog menu to edit all text display properties. Add the \"-&\" parameter to format the text with \"&\"");
+        CMDUtils.sendCMD(sender, "/mdis text edit [-&]", "Open a dialog menu to edit all text display properties. Add the \"-&\" parameter to format the text with \"&\"");
         CMDUtils.sendCMD(sender, "/mdis text set <text>", "Set this text for your selected text display");
         CMDUtils.sendCMD(sender, "/mdis text font <default | alt | uniform | illageralt>", "Set the text font for your selected text display");
         CMDUtils.sendCMD(sender, "/mdis text shadow", "Toggle shadows visibility in your selected text display");

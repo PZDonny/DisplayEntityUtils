@@ -47,7 +47,7 @@ public enum Permission {
     PARTS_VIEWRANGE("deu.parts.viewrange"),
 
 
-    TEXT_MENU("deu.text.menu"),
+    TEXT_EDIT("deu.text.edit"),
     TEXT_SET_TEXT("deu.text.set"),
     TEXT_SET_FONT("deu.text.font"),
     TEXT_TOGGLE_SHADOW("deu.text.shadow"),
