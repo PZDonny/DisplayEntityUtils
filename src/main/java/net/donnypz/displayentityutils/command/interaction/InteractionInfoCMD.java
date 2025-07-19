@@ -1,16 +1,18 @@
 package net.donnypz.displayentityutils.command.interaction;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class InteractionInfoCMD extends PlayerSubCommand {
-    InteractionInfoCMD() {
-        super(Permission.INTERACTION_INFO);
+    InteractionInfoCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("info", parentSubCommand, Permission.INTERACTION_INFO);
     }
 
     @Override

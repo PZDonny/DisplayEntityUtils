@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -10,10 +11,11 @@ import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class GroupMoveHereCMD extends PlayerSubCommand {
-    GroupMoveHereCMD() {
-        super(Permission.GROUP_TRANSFORM);
+    GroupMoveHereCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("movehere", parentSubCommand, Permission.GROUP_TRANSFORM);
     }
 
     @Override

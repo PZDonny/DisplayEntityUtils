@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.command.anim;
 
 import io.papermc.paper.entity.TeleportFlag;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DEUUser;
@@ -13,12 +14,13 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 
 class AnimDrawPosCMD extends PlayerSubCommand {
-    AnimDrawPosCMD() {
-        super(Permission.ANIM_DRAW_FRAME_POINTS);
+    AnimDrawPosCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("drawpos", parentSubCommand, Permission.ANIM_DRAW_FRAME_POINTS);
     }
 
     @Override

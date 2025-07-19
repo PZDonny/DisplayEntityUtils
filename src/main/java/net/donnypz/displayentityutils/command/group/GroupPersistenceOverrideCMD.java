@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -9,10 +10,11 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class GroupPersistenceOverrideCMD extends PlayerSubCommand {
-    GroupPersistenceOverrideCMD() {
-        super(Permission.GROUP_TOGGLE_PERSIST);
+    GroupPersistenceOverrideCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("togglepersistoverride", parentSubCommand, Permission.GROUP_TOGGLE_PERSIST);
     }
 
     @Override

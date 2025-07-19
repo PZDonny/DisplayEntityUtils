@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.interaction;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -9,10 +10,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class InteractionAddCMD extends PlayerSubCommand {
-    InteractionAddCMD() {
-        super(Permission.INTERACTION_ADD_CMD);
+    InteractionAddCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("addcmd", parentSubCommand, Permission.INTERACTION_ADD_CMD);
     }
 
     @Override

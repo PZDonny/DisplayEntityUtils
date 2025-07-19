@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -16,10 +17,11 @@ import org.bukkit.Material;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
+import org.jetbrains.annotations.NotNull;
 
 class PartsCycleCMD extends PlayerSubCommand {
-    PartsCycleCMD() {
-        super(Permission.PARTS_CYCLE);
+    PartsCycleCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("cycle", parentSubCommand, Permission.PARTS_CYCLE);
     }
 
     @Override

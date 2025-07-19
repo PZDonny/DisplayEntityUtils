@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.interaction;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -11,10 +12,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class InteractionSpawnCMD extends PlayerSubCommand {
-    InteractionSpawnCMD() {
-        super(Permission.INTERACTION_SPAWN);
+    InteractionSpawnCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("spawn", parentSubCommand, Permission.INTERACTION_SPAWN);
     }
 
     @Override

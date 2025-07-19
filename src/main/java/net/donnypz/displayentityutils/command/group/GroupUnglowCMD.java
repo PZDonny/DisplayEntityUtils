@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -8,10 +9,11 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class GroupUnglowCMD extends PlayerSubCommand {
-    GroupUnglowCMD() {
-        super(Permission.GROUP_GLOW);
+    GroupUnglowCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("unglow", parentSubCommand, Permission.GROUP_GLOW);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -18,13 +19,14 @@ import org.bukkit.entity.Display;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.UUID;
 
 class PartsInfoCMD extends PlayerSubCommand {
-    PartsInfoCMD() {
-        super(Permission.PARTS_INFO);
+    PartsInfoCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("info", parentSubCommand, Permission.PARTS_INFO);
     }
 
     @Override

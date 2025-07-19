@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -9,10 +10,11 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class GroupViewRangeCMD extends PlayerSubCommand {
-    GroupViewRangeCMD() {
-        super(Permission.GROUP_VIEWRANGE);
+    GroupViewRangeCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("viewrange", parentSubCommand, Permission.GROUP_VIEWRANGE);
     }
 
     @Override

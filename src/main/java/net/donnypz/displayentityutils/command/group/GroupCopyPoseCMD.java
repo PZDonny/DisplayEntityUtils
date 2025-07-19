@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.command.group;
 
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -9,10 +10,11 @@ import net.donnypz.displayentityutils.utils.GroupResult;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class GroupCopyPoseCMD extends PlayerSubCommand {
-    GroupCopyPoseCMD() {
-        super(Permission.GROUP_COPY_POSE);
+    GroupCopyPoseCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("copypose", parentSubCommand, Permission.GROUP_COPY_POSE);
     }
 
     @Override

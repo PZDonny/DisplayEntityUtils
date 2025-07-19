@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
@@ -14,11 +15,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class AnimFrameInfoCMD extends PlayerSubCommand {
 
-    AnimFrameInfoCMD() {
-        super(Permission.ANIM_FRAME_INFO);
+    AnimFrameInfoCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("frameinfo", parentSubCommand, Permission.ANIM_FRAME_INFO);
     }
 
     @Override

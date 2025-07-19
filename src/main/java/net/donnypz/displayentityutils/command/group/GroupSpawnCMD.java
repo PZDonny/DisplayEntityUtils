@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
@@ -16,10 +17,11 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class GroupSpawnCMD extends PlayerSubCommand {
-    GroupSpawnCMD() {
-        super(Permission.GROUP_SPAWN);
+    GroupSpawnCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("spawn", parentSubCommand, Permission.GROUP_SPAWN);
     }
 
     @Override

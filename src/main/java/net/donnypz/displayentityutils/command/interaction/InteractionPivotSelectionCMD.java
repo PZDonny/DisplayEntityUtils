@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.interaction;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -11,10 +12,11 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class InteractionPivotSelectionCMD extends PlayerSubCommand {
-    InteractionPivotSelectionCMD() {
-        super(Permission.INTERACTION_PIVOT);
+    InteractionPivotSelectionCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("pivotselection", parentSubCommand, Permission.INTERACTION_PIVOT);
     }
 
     @Override

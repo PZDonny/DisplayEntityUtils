@@ -1,16 +1,18 @@
 package net.donnypz.displayentityutils.command.bdengine;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.LocalManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class BDEngineConvertLegacyAnimCMD extends PlayerSubCommand {
-    BDEngineConvertLegacyAnimCMD() {
-        super(Permission.BDENGINE_CONVERT_ANIM);
+    BDEngineConvertLegacyAnimCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("convertanimleg", parentSubCommand, Permission.BDENGINE_CONVERT_ANIM);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.text;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.command.Permission;
@@ -13,10 +14,12 @@ import net.donnypz.displayentityutils.utils.dialogs.TextDisplayDialog;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class TextMenuCMD extends PlayerSubCommand {
-    TextMenuCMD() {
-        super(Permission.TEXT_MENU);
+
+    public TextMenuCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("menu", parentSubCommand, Permission.TEXT_MENU);
     }
 
     @Override

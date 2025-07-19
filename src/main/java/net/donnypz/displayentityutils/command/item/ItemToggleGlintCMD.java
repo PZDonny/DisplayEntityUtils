@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.item;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.command.Permission;
@@ -13,10 +14,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 class ItemToggleGlintCMD extends PlayerSubCommand {
-    ItemToggleGlintCMD() {
-        super(Permission.ITEM_TOGGLE_GLINT);
+    ItemToggleGlintCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("toggleglint", parentSubCommand, Permission.ITEM_TOGGLE_GLINT);
     }
 
     @Override

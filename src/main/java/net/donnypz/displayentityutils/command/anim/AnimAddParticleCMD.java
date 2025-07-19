@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.command.anim;
 
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
@@ -12,10 +13,11 @@ import net.donnypz.displayentityutils.utils.command.FramePointDisplay;
 import net.donnypz.displayentityutils.utils.command.RelativePointDisplay;
 import net.donnypz.displayentityutils.utils.dialogs.animationparticles.AnimationParticleSelectDialog;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class AnimAddParticleCMD extends PlayerSubCommand {
-    AnimAddParticleCMD() {
-        super(Permission.ANIM_ADD_PARTICLE);
+    AnimAddParticleCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("addparticle", parentSubCommand, Permission.ANIM_ADD_PARTICLE);
     }
 
     @Override

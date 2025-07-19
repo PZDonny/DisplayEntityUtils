@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -10,10 +11,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class PartsAddTagCMD extends PlayerSubCommand {
-    PartsAddTagCMD() {
-        super(Permission.PARTS_TAG);
+    PartsAddTagCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("addtag", parentSubCommand, Permission.PARTS_TAG);
     }
 
     @Override

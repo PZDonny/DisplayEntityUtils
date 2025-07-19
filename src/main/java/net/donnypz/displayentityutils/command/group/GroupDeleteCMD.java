@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
@@ -9,10 +10,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class GroupDeleteCMD extends PlayerSubCommand {
-    GroupDeleteCMD() {
-        super(Permission.GROUP_DELETE);
+    GroupDeleteCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("delete", parentSubCommand, Permission.GROUP_DELETE);
     }
 
     @Override

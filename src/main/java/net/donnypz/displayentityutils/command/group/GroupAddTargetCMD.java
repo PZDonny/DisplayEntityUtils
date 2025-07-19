@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.command.group;
 
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -11,10 +12,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class GroupAddTargetCMD extends PlayerSubCommand {
-    GroupAddTargetCMD() {
-        super(Permission.GROUP_ADD_TARGET);
+    GroupAddTargetCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("addtarget", parentSubCommand, Permission.GROUP_ADD_TARGET);
     }
 
     @Override

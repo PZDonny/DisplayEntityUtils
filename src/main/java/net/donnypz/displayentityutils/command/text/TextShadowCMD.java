@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.text;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.command.Permission;
@@ -12,10 +13,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
+import org.jetbrains.annotations.NotNull;
 
 class TextShadowCMD extends PlayerSubCommand {
-    TextShadowCMD() {
-        super(Permission.TEXT_TOGGLE_SHADOW);
+    TextShadowCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("shadow", parentSubCommand, Permission.TEXT_TOGGLE_SHADOW);
     }
 
     @Override

@@ -1,16 +1,18 @@
 package net.donnypz.displayentityutils.command.interaction;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class InteractionHeightCMD extends PlayerSubCommand {
-    InteractionHeightCMD() {
-        super(Permission.INTERACTION_DIMENSION);
+    InteractionHeightCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("height", parentSubCommand, Permission.INTERACTION_DIMENSION);
     }
 
     @Override

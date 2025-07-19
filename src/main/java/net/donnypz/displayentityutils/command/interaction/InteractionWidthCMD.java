@@ -1,14 +1,16 @@
 package net.donnypz.displayentityutils.command.interaction;
 
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class InteractionWidthCMD extends PlayerSubCommand {
-    InteractionWidthCMD() {
-        super(Permission.INTERACTION_DIMENSION);
+    InteractionWidthCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("width", parentSubCommand, Permission.INTERACTION_DIMENSION);
     }
 
     @Override

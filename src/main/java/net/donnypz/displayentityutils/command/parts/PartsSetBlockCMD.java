@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -14,10 +15,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class PartsSetBlockCMD extends PlayerSubCommand {
-    PartsSetBlockCMD() {
-        super(Permission.PARTS_SET_BLOCK);
+    PartsSetBlockCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("setblock", parentSubCommand, Permission.PARTS_SET_BLOCK);
     }
 
     @Override

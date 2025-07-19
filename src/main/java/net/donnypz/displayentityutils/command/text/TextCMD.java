@@ -4,30 +4,23 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.command.*;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public final class TextCMD extends ConsoleUsableSubCommand {
 
-    private static final HashMap<String, PlayerSubCommand> subCommands = new HashMap<>();
-
-
     public TextCMD(){
-        super(Permission.HELP);
-        subCommands.put("help", null);
-        subCommands.put("menu", new TextMenuCMD());
-        subCommands.put("set", new TextSetCMD());
-        subCommands.put("font", new TextFontCMD());
-        subCommands.put("shadow", new TextShadowCMD());
-        subCommands.put("seethrough", new TextSeeThroughCMD());
-        subCommands.put("align", new TextAlignCMD());
-        subCommands.put("linewidth", new TextLineWidthCMD());
-        subCommands.put("background", new TextBackgroundCMD());
-        subCommands.put("opacity", new TextOpacityCMD());
-    }
-
-    public static List<String> getTabComplete(){
-        return subCommands.keySet().stream().toList();
+        super(Permission.HELP, true);
+        new TextMenuCMD(this);
+        new TextSetCMD(this);
+        new TextFontCMD(this);
+        new TextShadowCMD(this);
+        new TextSeeThroughCMD(this);
+        new TextAlignCMD(this);
+        new TextLineWidthCMD(this);
+        new TextBackgroundCMD(this);
+        new TextOpacityCMD(this);
     }
 
     @Override

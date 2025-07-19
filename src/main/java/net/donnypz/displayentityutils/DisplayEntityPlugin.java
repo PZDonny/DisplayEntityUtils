@@ -5,8 +5,6 @@ import ch.njol.skript.SkriptAddon;
 import ch.njol.skript.util.Version;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
-import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginTabCompleter;
 import net.donnypz.displayentityutils.listeners.autoGroup.DEULoadingListeners;
 import net.donnypz.displayentityutils.listeners.bdengine.DatapackEntitySpawned;
 import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
@@ -488,8 +486,9 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         PluginCommand command = getCommand("managedisplays");
         if (command != null){
             if (registerPluginCommands && isOnEnable) {
-                command.setExecutor(new DisplayEntityPluginCommand());
-                command.setTabCompleter(new DisplayEntityPluginTabCompleter());
+                DisplayEntityPluginCommand cmd = new DisplayEntityPluginCommand();
+                command.setExecutor(cmd);
+                command.setTabCompleter(cmd);
             }
         }
     }

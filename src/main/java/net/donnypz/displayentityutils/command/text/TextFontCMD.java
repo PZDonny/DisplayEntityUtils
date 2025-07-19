@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.text;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.command.Permission;
@@ -13,10 +14,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
+import org.jetbrains.annotations.NotNull;
 
 class TextFontCMD extends PlayerSubCommand {
-    TextFontCMD() {
-        super(Permission.TEXT_SET_FONT);
+
+    public TextFontCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("font", parentSubCommand, Permission.TEXT_SET_FONT);
     }
 
     @Override

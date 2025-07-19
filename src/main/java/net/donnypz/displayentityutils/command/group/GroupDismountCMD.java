@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.command.ConsoleUsableSubCommand;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
@@ -12,10 +13,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class GroupDismountCMD extends ConsoleUsableSubCommand {
-    GroupDismountCMD() {
-        super(Permission.GROUP_DISMOUNT);
+    GroupDismountCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("dismount", parentSubCommand, Permission.GROUP_DISMOUNT);
     }
 
     @Override

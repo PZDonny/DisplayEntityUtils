@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -12,10 +13,11 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class AnimUseFilterCMD extends PlayerSubCommand {
-    AnimUseFilterCMD() {
-        super(Permission.ANIM_USE_FILTER);
+    AnimUseFilterCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("usefilter", parentSubCommand, Permission.ANIM_USE_FILTER);
     }
 
     @Override
