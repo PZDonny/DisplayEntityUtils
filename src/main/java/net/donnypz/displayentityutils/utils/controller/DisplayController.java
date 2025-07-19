@@ -48,7 +48,7 @@ public class DisplayController {
      */
     public boolean register(){
         if (controllers.containsKey(controllerID)){
-            Bukkit.broadcast(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to register controller with an existing ID: "+controllerID)));
+            Bukkit.getLogger().warning("Failed to register controller with an existing ID: "+controllerID);
             return false;
         }
         controllers.put(controllerID, this);
