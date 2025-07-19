@@ -6,12 +6,14 @@ import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
-import net.donnypz.displayentityutils.utils.VersionUtils;
+import net.donnypz.displayentityutils.utils.FollowType;
+import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +27,8 @@ public abstract class ActiveGroup implements Active{
     protected ActivePart masterPart;
     protected LinkedHashMap<UUID, ActivePart> groupParts = new LinkedHashMap<>();
     protected String tag;
+    protected Set<SpawnedDisplayFollower> followers = new HashSet<>();
+    SpawnedDisplayFollower defaultFollower;
     protected final HashSet<DisplayAnimator> activeAnimators = new HashSet<>();
     protected String spawnAnimationTag;
     protected LoadMethod spawnAnimationLoadMethod;
@@ -627,6 +631,36 @@ public abstract class ActiveGroup implements Active{
 
 
     public abstract boolean rideEntity(@NotNull Entity entity);
+
+    /**
+     * Force this group to constantly look in the same direction as a given entity
+     * <br>
+     * It is recommended to use this with {@link #rideEntity(Entity)}, but not required
+     * @param entity The entity
+     * @param properties The properties to use when following the entity's direction
+     * @throws IllegalArgumentException If followType is to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
+     */
+    public @NotNull GroupFollowProperties followEntityDirection(@NotNull Entity entity, @NotNull GroupFollowProperties properties){
+        SpawnedDisplayFollower follower = new SpawnedDisplayFollower(this, properties);
+        followers.add(follower);
+        follower.follow(entity);
+        return properties;
+    }
+
+    /**
+     * Stop following an entity's direction after using
+     * {@link #followEntityDirection(Entity, GroupFollowProperties)}
+     */
+    public void stopFollowingEntity(){
+        for (SpawnedDisplayFollower follower : new HashSet<>(followers)){
+            follower.remove();
+        }
+        if (defaultFollower != null){
+            defaultFollower.remove();
+            defaultFollower = null;
+        }
+        followers.clear();
+    }
 
     public abstract @Nullable Entity dismount();
 

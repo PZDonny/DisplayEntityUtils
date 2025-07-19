@@ -100,6 +100,8 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     public void onLoad() {
         PacketEvents.getAPI().getEventManager().registerListener(
                 new DEUInteractionListener(), PacketListenerPriority.NORMAL);
+        PacketEvents.getAPI().getEventManager().registerListener(
+                new DEUEntityListener(), PacketListenerPriority.NORMAL);
     }
 
     @Override

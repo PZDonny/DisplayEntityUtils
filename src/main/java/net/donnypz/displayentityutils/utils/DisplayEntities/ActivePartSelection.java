@@ -1,6 +1,5 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.utils.VersionUtils;
 import org.bukkit.Color;
 import org.bukkit.block.BlockType;
 import org.bukkit.entity.Display;
@@ -64,6 +63,19 @@ public abstract class ActivePartSelection implements Active{
         this.includeBlockTypes = filter.includeBlockTypes;
         this.includeItemTypes = filter.includeItemTypes;
         applyFilter(filter, false);
+    }
+
+
+    void addPlayerExecutor(PlayerDisplayAnimationExecutor executor){
+        for (ActivePart part : selectedParts){
+            part.playerExecutors.add(executor);
+        }
+    }
+
+    void removePlayerExecutor(PlayerDisplayAnimationExecutor executor){
+        for (ActivePart part : selectedParts){
+            part.playerExecutors.remove(executor);
+        }
     }
 
     /**

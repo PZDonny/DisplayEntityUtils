@@ -10,7 +10,6 @@ import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
-import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
@@ -181,21 +180,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         return new HashSet<>(viewers);
     }
 
-    /**
-     * Get the {@link UUID}s of players who can see this part
-     * @return a set of uuids
-     */
-    public @NotNull Collection<Player> getViewersAsPlayers(){
-        HashSet<Player> players = new HashSet<>();
-        for (UUID uuid : viewers){
-            Player p = Bukkit.getPlayer(uuid);
-            if (p != null){
-                players.add(p);
-            }
-        }
-        return players;
-    }
-
     @Override
     public void setTransformation(@NotNull Transformation transformation) {
         attributeContainer.setTransformationAndSend(transformation, entityId, viewers);
@@ -301,6 +285,18 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
         float[] values = getAutoCullValues(widthAdder, heightAdder);
         cull(values[0], values[1]);
+    }
+
+    @Override
+    public Collection<Player> getTrackingPlayers() {
+        HashSet<Player> players = new HashSet<>();
+        for (UUID uuid : viewers){
+            Player p = Bukkit.getPlayer(uuid);
+            if (p != null){
+                players.add(p);
+            }
+        }
+        return players;
     }
 
 

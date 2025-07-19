@@ -27,8 +27,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     final Random partUUIDRandom = new Random(defaultPartUUIDSeed);
 
     Set<SpawnedPartSelection> partSelections = new HashSet<>();
-    List<SpawnedDisplayFollower> followers = new ArrayList<>();
-    SpawnedDisplayFollower defaultFollower;
 
     long creationTime = System.currentTimeMillis();
     boolean isVisibleByDefault;
@@ -1116,9 +1114,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     /**
-     * Force the SpawnedDisplayEntityGroup to look in the same direction as a specified entity
+     * Force this group to constantly look in the same direction as a given entity
      * <br>
-     * It is recommended to use this with {@link #rideEntity(Entity)}
+     * It is recommended to use this with {@link #rideEntity(Entity)}, but not required
      * @param entity The entity with the directions to follow
      * @param followType The follow type, or null to disable respecting looking direction
      * @param unregisterAfterEntityDeathDelay How long after an entity dies to despawn the group, in ticks. -1 to never despawn
@@ -1131,9 +1129,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     /**
-     * Force the SpawnedDisplayEntityGroup to look in the same direction as a specified entity
+     * Force this group to constantly look in the same direction as a given entity
      * <br>
-     * It is recommended to use this with {@link #rideEntity(Entity)}
+     * It is recommended to use this with {@link #rideEntity(Entity)}, but not required
      * @param entity The entity with the directions to follow
      * @param followType The follow type, or null to disable respecting looking direction
      * @param unregisterAfterEntityDeathDelay How long after an entity dies to despawn the group, in ticks. A value of -1 will not despawn the group.
@@ -1147,9 +1145,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     /**
-     * Force the SpawnedDisplayEntityGroup to look in the same direction as a specified entity
+     * Force this group to constantly look in the same direction as a given entity
      * <br>
-     * It is recommended to use this with {@link #rideEntity(Entity)}
+     * It is recommended to use this with {@link #rideEntity(Entity)}, but not required
      * @param entity The entity with the directions to follow
      * @param followType The follow type, or null to disable respecting looking direction
      * @param unregisterAfterEntityDeathDelay How long after an entity dies to despawn the group, in ticks. A value of -1 will not despawn the group.
@@ -1161,39 +1159,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      */
     public @NotNull GroupFollowProperties followEntityDirection(@NotNull Entity entity, @Nullable FollowType followType, int unregisterAfterEntityDeathDelay, boolean pivotInteractions, boolean pivotPitch, int teleportationDuration){
         return followEntityDirection(entity, new GroupFollowProperties("", followType, unregisterAfterEntityDeathDelay, pivotInteractions, pivotPitch, teleportationDuration, null));
-    }
-
-
-    /**
-     * Force the SpawnedDisplayEntityGroup to look in the same direction as a specified entity
-     * <br>
-     * It is recommended to use this with {@link #rideEntity(Entity)}
-     * @param entity The entity with the directions to follow
-     * @param properties The properties to use when following the entity's direction
-     * @throws IllegalArgumentException If followType is to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
-     */
-    public @NotNull GroupFollowProperties followEntityDirection(@NotNull Entity entity, @NotNull GroupFollowProperties properties){
-        SpawnedDisplayFollower follower = new SpawnedDisplayFollower(this, properties);
-        followers.add(follower);
-        follower.follow(entity);
-        return properties;
-    }
-
-
-    /**
-     * Stop following an entity's direction after using
-     * {@link SpawnedDisplayEntityGroup#followEntityDirection(Entity, FollowType, int, boolean)}
-     * or any variation
-     */
-    public void stopFollowingEntity(){
-        for (SpawnedDisplayFollower follower : new HashSet<>(followers)){
-            follower.remove();
-        }
-        if (defaultFollower != null){
-            defaultFollower.remove();
-            defaultFollower = null;
-        }
-        followers.clear();
     }
 
 
