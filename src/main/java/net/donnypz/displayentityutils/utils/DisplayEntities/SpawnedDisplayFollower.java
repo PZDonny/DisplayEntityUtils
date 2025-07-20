@@ -31,7 +31,8 @@ class SpawnedDisplayFollower {
     SpawnedDisplayFollower(ActiveGroup group, GroupFollowProperties followProperties){
         this.group = group;
         this.properties = followProperties;
-        isDefaultFollower = followProperties.partTags() == null;
+        Collection<String> partTags = followProperties.partTags();
+        this.isDefaultFollower = partTags == null || partTags.isEmpty();
     }
 
     static void suppressTranslation(int entityId, Vector3f vector, Runnable action){

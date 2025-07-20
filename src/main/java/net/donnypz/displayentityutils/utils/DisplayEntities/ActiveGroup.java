@@ -534,10 +534,7 @@ public abstract class ActiveGroup implements Active{
             return;
         }
 
-        DisplayAnimator animator = currentMachineState.getDisplayAnimator();
-        if (animator != null){
-            animator.stop(this);
-        }
+        currentMachineState.stopDisplayAnimators(this);
         currentMachineState = null;
     }
 
@@ -590,14 +587,11 @@ public abstract class ActiveGroup implements Active{
 
 
         if (currentMachineState != null){
-            DisplayAnimator animator = currentMachineState.getDisplayAnimator();
-            if (animator != null){
-                animator.stop(this);
-            }
+            currentMachineState.stopDisplayAnimators(this);
         }
         currentMachineState = state;
 
-        DisplayAnimator animator = state.getDisplayAnimator();
+        DisplayAnimator animator = state.getRandomDisplayAnimator();
 
         if (animator != null){
             animator.playUsingPackets(this, 0);

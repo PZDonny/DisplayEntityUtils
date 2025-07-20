@@ -13,18 +13,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 public final class GroupFollowPropertiesBuilder {
-    String id;
-    FollowType followType;
-    int unregisterDelay;
-    boolean pivotInteractions;
-    boolean pivotDisplays;
-    float yDisplayAdjustPercentage = 100;
-    float zDisplayAdjustPercentage = 100;
-    int teleportationDuration;
-    Collection<String> partTags = new HashSet<>();
-    Set<String> filteredStates = new HashSet<>();
-    boolean filterBlacklist = false;
-    boolean flip;
+    private String id;
+    private FollowType followType;
+    private int unregisterDelay;
+    private boolean pivotInteractions;
+    private boolean pivotDisplays;
+    private float yDisplayAdjustPercentage = 100;
+    private float zDisplayAdjustPercentage = 100;
+    private int teleportationDuration;
+    private Collection<String> partTags = new HashSet<>();
+    private Set<String> filteredStates = new HashSet<>();
+    private boolean filterBlacklist = false;
+    private boolean flip;
+
+    GroupFollowPropertiesBuilder(){}
 
     GroupFollowPropertiesBuilder(@NotNull FollowType followType){
         this.followType = followType;
@@ -36,6 +38,15 @@ public final class GroupFollowPropertiesBuilder {
      */
     public GroupFollowPropertiesBuilder setId(@NotNull String id) {
         this.id = id;
+        return this;
+    }
+
+    /**
+     * Set the {@link FollowType} of the {@link GroupFollowProperties}
+     * @param followType the follow type
+     */
+    public GroupFollowPropertiesBuilder setFollowType(@NotNull FollowType followType) {
+        this.followType = followType;
         return this;
     }
 
@@ -151,7 +162,7 @@ public final class GroupFollowPropertiesBuilder {
         properties.followType = followType;
         properties.unregisterDelay = unregisterDelay;
         properties.pivotInteractions = pivotInteractions;
-        properties.pivotDisplays = pivotDisplays;
+        properties.adjustDisplays = pivotDisplays;
         properties.yDisplayAdjustPercentage = yDisplayAdjustPercentage;
         properties.zDisplayAdjustPercentage = zDisplayAdjustPercentage;
         properties.teleportationDuration = teleportationDuration;
