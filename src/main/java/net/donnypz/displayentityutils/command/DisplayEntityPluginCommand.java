@@ -141,6 +141,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
             return;
         }
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
+        sender.sendMessage(Component.text("v"+DisplayEntityPlugin.getInstance().getPluginMeta().getVersion(), NamedTextColor.GRAY));
         CMDUtils.sendCMD(sender, "/mdis group", "Display Entity Models/Groups related commands");
         CMDUtils.sendCMD(sender, "/mdis anim", "Animation related commands");
         CMDUtils.sendCMD(sender, "/mdis parts", "Commands related to the parts (individual display entities) of a Display Entity Model/Group");
