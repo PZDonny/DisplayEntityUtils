@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.command.ConsoleUsableSubCommand;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
@@ -20,13 +21,14 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.UUID;
 
 class GroupRideCMD extends ConsoleUsableSubCommand {
-    GroupRideCMD() {
-        super(Permission.GROUP_RIDE);
+    GroupRideCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("ride", parentSubCommand, Permission.GROUP_RIDE);
     }
 
     @Override

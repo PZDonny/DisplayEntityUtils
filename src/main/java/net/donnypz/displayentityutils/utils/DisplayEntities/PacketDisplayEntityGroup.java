@@ -50,9 +50,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         return (PacketDisplayEntityPart) masterPart;
     }
 
-
-
-
     /**
      * {@inheritDoc}
      * @return a {@link PacketPartSelection}
@@ -167,7 +164,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
 
     @Override
     public boolean canApplyVerticalRideOffset() {
-        if (verticalRideOffset == 0){
+        if (verticalRideOffset == 0 || vehicleUUID == null){
             return false;
         }
         Entity vehicle = Bukkit.getEntity(vehicleUUID);
@@ -303,7 +300,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
 
     @Override
     public Collection<Player> getTrackingPlayers() {
-        return getMasterPart().getViewersAsPlayers();
+        return getMasterPart().getTrackingPlayers();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -19,10 +20,11 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class GroupInfoCMD extends PlayerSubCommand {
-    GroupInfoCMD() {
-        super(Permission.GROUP_INFO);
+    GroupInfoCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("info", parentSubCommand, Permission.GROUP_INFO);
     }
 
     @Override

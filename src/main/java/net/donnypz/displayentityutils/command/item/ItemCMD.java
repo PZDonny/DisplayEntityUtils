@@ -12,19 +12,12 @@ import java.util.List;
 
 public final class ItemCMD extends ConsoleUsableSubCommand {
 
-    private static final HashMap<String, DEUSubCommand> subCommands = new HashMap<>();
-
 
     public ItemCMD(){
-        super(Permission.HELP);
-        subCommands.put("help", new ItemHelpCMD());
-        subCommands.put("set", new ItemSetCMD());
-        subCommands.put("toggleglint", new ItemToggleGlintCMD());
-        subCommands.put("transform", new ItemTransformCMD());
-    }
-
-    public static List<String> getTabComplete(){
-        return subCommands.keySet().stream().toList();
+        super(Permission.HELP, true);
+        new ItemSetCMD(this);
+        new ItemToggleGlintCMD(this);
+        new ItemTransformCMD(this);
     }
 
     @Override

@@ -13,38 +13,30 @@ import java.util.List;
 
 public final class PartsCMD extends ConsoleUsableSubCommand {
 
-    private static final HashMap<String, DEUSubCommand> subCommands = new HashMap<>();
-
-
     public PartsCMD(){
-        super(Permission.HELP);
-        subCommands.put("help", new PartsHelpCMD());
-        subCommands.put("info", new PartsInfoCMD());
-        subCommands.put("cycle", new PartsCycleCMD());
-        subCommands.put("glow", new PartsGlowCMD());
-        subCommands.put("unglow", new PartsUnglowCMD());
-        subCommands.put("glowcolor", new PartsGlowColorCMD());
-        subCommands.put("filtertags", new PartsFilterTagsCMD());
-        subCommands.put("filtertypes", new PartsFilterTypesCMD());
-        subCommands.put("filterblocks", new PartsFilterBlocksCMD());
-        subCommands.put("filteritems", new PartsFilterItemsCMD());
-        subCommands.put("refresh", new PartsRefreshCMD());
-        subCommands.put("reset", new PartsResetCMD());
-        subCommands.put("adapttags", new PartsAdaptTagsCMD());
-        subCommands.put("addtag", new PartsAddTagCMD());
-        subCommands.put("removetag", new PartsRemoveTagCMD());
-        subCommands.put("listtags", new PartsListTagsCMD());
-        subCommands.put("remove", new PartsRemoveCMD());
-        subCommands.put("translate", new PartsTranslateCMD());
-        subCommands.put("seeduuids", new PartsSeedUUIDsCMD());
-        subCommands.put("setblock", new PartsSetBlockCMD());
-        subCommands.put("billboard", new PartsBillboardCMD());
-        subCommands.put("viewrange", new PartsViewRangeCMD());
-        subCommands.put("brightness", new PartsBrightnessCMD());
-    }
-
-    public static List<String> getTabComplete(){
-        return subCommands.keySet().stream().toList();
+        super(Permission.HELP, new PartsHelpCMD());
+        new PartsInfoCMD(this);
+        new PartsCycleCMD(this);
+        new PartsGlowCMD(this);
+        new PartsUnglowCMD(this);
+        new PartsGlowColorCMD(this);
+        new PartsFilterTagsCMD(this);
+        new PartsFilterTypesCMD(this);
+        new PartsFilterBlocksCMD(this);
+        new PartsFilterItemsCMD(this);
+        new PartsRefreshCMD(this);
+        new PartsResetCMD(this);
+        new PartsAdaptTagsCMD(this);
+        new PartsAddTagCMD(this);
+        new PartsRemoveTagCMD(this);
+        new PartsListTagsCMD(this);
+        new PartsRemoveCMD(this);
+        new PartsTranslateCMD(this);
+        new PartsSeedUUIDsCMD(this);
+        new PartsSetBlockCMD(this);
+        new PartsBillboardCMD(this);
+        new PartsViewRangeCMD(this);
+        new PartsBrightnessCMD(this);
     }
 
     @Override

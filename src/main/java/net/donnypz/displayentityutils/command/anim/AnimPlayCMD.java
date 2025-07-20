@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
@@ -11,10 +12,11 @@ import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class AnimPlayCMD extends PlayerSubCommand {
-    AnimPlayCMD() {
-        super(Permission.ANIM_PLAY);
+    AnimPlayCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("play", parentSubCommand, Permission.ANIM_PLAY);
     }
 
     @Override

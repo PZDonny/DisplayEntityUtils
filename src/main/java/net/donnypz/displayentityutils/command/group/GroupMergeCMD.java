@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -10,12 +11,13 @@ import net.donnypz.displayentityutils.utils.GroupResult;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 class GroupMergeCMD extends PlayerSubCommand {
-    GroupMergeCMD() {
-        super(Permission.GROUP_MERGE);
+    GroupMergeCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("merge", parentSubCommand, Permission.GROUP_MERGE);
     }
 
     @Override

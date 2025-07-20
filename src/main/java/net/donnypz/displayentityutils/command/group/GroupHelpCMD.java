@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 class GroupHelpCMD extends ConsoleUsableSubCommand {
 
     GroupHelpCMD() {
-        super(Permission.HELP);
+        super(Permission.HELP, false);
     }
 
     @Override

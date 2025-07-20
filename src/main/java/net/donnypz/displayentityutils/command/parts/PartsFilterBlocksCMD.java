@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -14,14 +15,15 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 
 class PartsFilterBlocksCMD extends PlayerSubCommand {
 
 
-    PartsFilterBlocksCMD() {
-        super(Permission.PARTS_SELECT);
+    PartsFilterBlocksCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("filterblocks", parentSubCommand, Permission.PARTS_SELECT);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -15,10 +16,11 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.block.BlockType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemType;
+import org.jetbrains.annotations.NotNull;
 
 class AnimInfoCMD extends PlayerSubCommand {
-    AnimInfoCMD() {
-        super(Permission.ANIM_INFO);
+    AnimInfoCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("info", parentSubCommand, Permission.ANIM_INFO);
     }
 
     @Override

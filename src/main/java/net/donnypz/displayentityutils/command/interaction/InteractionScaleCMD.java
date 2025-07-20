@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.interaction;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -8,10 +9,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class InteractionScaleCMD extends PlayerSubCommand {
-    InteractionScaleCMD() {
-        super(Permission.INTERACTION_DIMENSION);
+    InteractionScaleCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("scale", parentSubCommand, Permission.INTERACTION_DIMENSION);
     }
 
     @Override

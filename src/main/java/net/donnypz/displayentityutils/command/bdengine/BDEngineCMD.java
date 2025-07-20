@@ -1,9 +1,7 @@
 package net.donnypz.displayentityutils.command.bdengine;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.command.CMDUtils;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
@@ -14,18 +12,11 @@ import java.util.List;
 
 public final class BDEngineCMD extends PlayerSubCommand {
 
-    private static final HashMap<String, PlayerSubCommand> subCommands = new HashMap<>();
-
-
     public BDEngineCMD(){
-        super(Permission.HELP);
-        subCommands.put("convertanim", new BDEngineConvertAnimCMD());
-        subCommands.put("convertanimleg", new BDEngineConvertLegacyAnimCMD());
-        subCommands.put("importmodel", new BDEngineImportModelCMD());
-    }
-
-    public static List<String> getTabComplete(){
-        return subCommands.keySet().stream().toList();
+        super(Permission.HELP, true);
+        new BDEngineConvertAnimCMD(this);
+        new BDEngineConvertLegacyAnimCMD(this);
+        new BDEngineImportModelCMD(this);
     }
 
     @Override
@@ -35,12 +26,12 @@ public final class BDEngineCMD extends PlayerSubCommand {
             return;
         }
         String arg = args[1];
-        PlayerSubCommand playerSubCommand = subCommands.get(arg);
-        if (playerSubCommand == null){
+        DEUSubCommand subCommand = subCommands.get(arg);
+        if (subCommand == null){
             conversionHelp(player);
         }
         else{
-            playerSubCommand.execute(player, args);
+            DisplayEntityPluginCommand.executeCommand(subCommand, player, args);
         }
     }
 
@@ -48,15 +39,12 @@ public final class BDEngineCMD extends PlayerSubCommand {
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Use <yellow>\"block-display.com\" (BDEngine) <aqua>to create convertable models and animations"));
         sender.sendMessage(Component.empty());
+        CMDUtils.sendCMD(sender, "/mdis bdengine help", "Get help with BDEngine commands");
         CMDUtils.sendCMD(sender,"/mdis bdengine convertanim <datapack-name> <group-tag-to-set> <anim-tag-prefix-to-set>",
                 "Convert an animation datapack from BDEngine into a animation file usable for DisplayEntityUtils");
         CMDUtils.sendCMD(sender,"/mdis bdengine convertanimleg <datapack-name> <group-tag-to-set> <anim-tag-to-set>",
                 "Convert an old animation datapack from BDEngine, before BDEngine v1.13 (Dec. 8th 2024), into a animation file usable for DisplayEntityUtils");
         sender.sendMessage(Component.empty());
         CMDUtils.sendCMD(sender, "/mdis bdengine importmodel <model-id>", "Import a model directly from BDEngine's Catalog into your game world");
-
-
     }
-
-
 }

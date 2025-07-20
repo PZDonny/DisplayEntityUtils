@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -13,10 +14,11 @@ import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class AnimAddPointCMD extends PlayerSubCommand {
-    AnimAddPointCMD() {
-        super(Permission.ANIM_ADD_FRAME_POINT);
+    AnimAddPointCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("addpoint", parentSubCommand, Permission.ANIM_ADD_FRAME_POINT);
     }
 
     @Override

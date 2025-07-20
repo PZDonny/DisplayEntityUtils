@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -14,6 +15,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,8 +24,8 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
 
     private static final HashSet<SpawnedDisplayEntityPart.PartType> partTypes = new HashSet<>(Arrays.stream(SpawnedDisplayEntityPart.PartType.values()).toList());
 
-    PartsFilterTypesCMD() {
-        super(Permission.PARTS_SELECT);
+    PartsFilterTypesCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("filtertypes", parentSubCommand, Permission.PARTS_SELECT);
     }
 
     @Override

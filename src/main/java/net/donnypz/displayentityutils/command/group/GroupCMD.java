@@ -10,48 +10,40 @@ import java.util.List;
 
 public final class GroupCMD extends ConsoleUsableSubCommand {
 
-    private static final HashMap<String, DEUSubCommand> subCommands = new HashMap<>();
-
-
     public GroupCMD(){
-        super(Permission.HELP);
-        subCommands.put("help", new GroupHelpCMD());
-        subCommands.put("selectnearest", new GroupSelectCMD());
-        subCommands.put("deselect", new GroupDeselectCMD());
-        subCommands.put("save", new GroupSaveCMD());
-        subCommands.put("delete", new GroupDeleteCMD());
-        subCommands.put("spawn", new GroupSpawnCMD());
-        subCommands.put("despawn", new GroupDespawnCMD());
-        subCommands.put("info", new GroupInfoCMD());
-        subCommands.put("settag", new GroupSetTagCMD());
-        subCommands.put("yaw", new GroupYawCMD());
-        subCommands.put("pitch", new GroupPitchCMD());
-        subCommands.put("scale", new GroupScaleCMD());
-        subCommands.put("brightness", new GroupBrightnessCMD());
-        subCommands.put("movehere", new GroupMoveHereCMD());
-        subCommands.put("move", new GroupMoveCMD());
-        subCommands.put("translate", new GroupTranslateCMD());
-        subCommands.put("ungroupinteractions", new GroupUngroupInteractionsCMD());
-        subCommands.put("merge", new GroupMergeCMD());
-        subCommands.put("addtarget", new GroupAddTargetCMD());
-        subCommands.put("clone", new GroupCloneCMD());
-        subCommands.put("clonehere", new GroupCloneHereCMD());
-        subCommands.put("glow", new GroupGlowCMD());
-        subCommands.put("unglow", new GroupUnglowCMD());
-        subCommands.put("glowcolor", new GroupGlowColorCMD());
-        subCommands.put("copypose", new GroupCopyPoseCMD());
-        subCommands.put("setspawnanim", new GroupSetSpawnAnimationCMD());
-        subCommands.put("unsetspawnanim", new GroupUnsetSpawnAnimationCMD());
-        subCommands.put("togglepersist", new GroupPersistCMD());
-        subCommands.put("togglepersistoverride", new GroupPersistenceOverrideCMD());
-        subCommands.put("billboard", new GroupBillboardCMD());
-        subCommands.put("viewrange", new GroupViewRangeCMD());
-        subCommands.put("ride", new GroupRideCMD());
-        subCommands.put("dismount", new GroupDismountCMD());
-    }
-
-    public static List<String> getTabComplete(){
-        return subCommands.keySet().stream().toList();
+        super(Permission.HELP, new GroupHelpCMD());
+        new GroupSelectCMD(this);
+        new GroupDeselectCMD(this);
+        new GroupSaveCMD(this);
+        new GroupDeleteCMD(this);
+        new GroupSpawnCMD(this);
+        new GroupDespawnCMD(this);
+        new GroupInfoCMD(this);
+        new GroupSetTagCMD(this);
+        new GroupYawCMD(this);
+        new GroupPitchCMD(this);
+        new GroupScaleCMD(this);
+        new GroupBrightnessCMD(this);
+        new GroupMoveHereCMD(this);
+        new GroupMoveCMD(this);
+        new GroupTranslateCMD(this);
+        new GroupUngroupInteractionsCMD(this);
+        new GroupMergeCMD(this);
+        new GroupAddTargetCMD(this);
+        new GroupCloneCMD(this);
+        new GroupCloneHereCMD(this);
+        new GroupGlowCMD(this);
+        new GroupUnglowCMD(this);
+        new GroupGlowColorCMD(this);
+        new GroupCopyPoseCMD(this);
+        new GroupSetSpawnAnimationCMD(this);
+        new GroupUnsetSpawnAnimationCMD(this);
+        new GroupPersistCMD(this);
+        new GroupPersistenceOverrideCMD(this);
+        new GroupBillboardCMD(this);
+        new GroupViewRangeCMD(this);
+        new GroupRideCMD(this);
+        new GroupDismountCMD(this);
     }
 
 

@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.group.GroupSpawnCMD;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -13,10 +14,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class AnimSelectCMD extends PlayerSubCommand {
-    AnimSelectCMD() {
-        super(Permission.ANIM_SELECT);
+    AnimSelectCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("select", parentSubCommand, Permission.ANIM_SELECT);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
@@ -11,10 +12,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class AnimSaveCMD extends PlayerSubCommand {
-    AnimSaveCMD() {
-        super(Permission.ANIM_SAVE);
+    AnimSaveCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("save", parentSubCommand, Permission.ANIM_SAVE);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.interaction;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -12,13 +13,14 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.List;
 
 class InteractionListCMD extends PlayerSubCommand {
-    InteractionListCMD() {
-        super(Permission.INTERACTION_LIST_CMD);
+    InteractionListCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("listcmd", parentSubCommand, Permission.INTERACTION_LIST_CMD);
     }
 
     @Override

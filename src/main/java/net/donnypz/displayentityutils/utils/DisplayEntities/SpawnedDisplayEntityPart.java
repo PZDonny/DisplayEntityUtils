@@ -520,6 +520,11 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
     }
 
+    @Override
+    public Collection<Player> getTrackingPlayers() {
+        return new HashSet<>(getEntity().getTrackedBy());
+    }
+
     private void temporaryParticles(Entity entity, long durationInTicks, Particle particle){
         entity.setGlowing(true);
 

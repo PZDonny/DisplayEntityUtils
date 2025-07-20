@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.bdengine;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.utils.bdengine.BDEngineModelResult;
@@ -11,6 +12,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -18,8 +20,8 @@ import java.net.URISyntaxException;
 
 class BDEngineImportModelCMD extends PlayerSubCommand {
 
-    BDEngineImportModelCMD() {
-        super(Permission.BDENGINE_SPAWN_MODEL);
+    BDEngineImportModelCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("importmodel", parentSubCommand, Permission.BDENGINE_SPAWN_MODEL);
     }
 
     @Override

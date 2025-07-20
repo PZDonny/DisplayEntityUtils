@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.item;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.command.Permission;
@@ -15,10 +16,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 class ItemSetCMD extends PlayerSubCommand {
-    ItemSetCMD() {
-        super(Permission.ITEM_SET);
+    ItemSetCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("set", parentSubCommand, Permission.ITEM_SET);
     }
 
     @Override

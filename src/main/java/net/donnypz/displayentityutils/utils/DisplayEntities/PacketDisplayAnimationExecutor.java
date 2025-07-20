@@ -73,10 +73,12 @@ final class PacketDisplayAnimationExecutor {
 
     private void executeAnimation(SpawnedDisplayAnimation animation, ActiveGroup group, ActivePartSelection selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame){
         if (!group.isActiveAnimator(animator)){
+            selection.remove();
             return;
         }
         if (group instanceof SpawnedDisplayEntityGroup g){
             if (!g.isRegistered()){
+                selection.remove();
                 return;
             }
         }
@@ -111,6 +113,7 @@ final class PacketDisplayAnimationExecutor {
         group.setLastAnimatedTick();
 
         if (playSingleFrame){
+            selection.remove();
             return;
         }
 
@@ -310,13 +313,13 @@ final class PacketDisplayAnimationExecutor {
             if (group.canApplyVerticalRideOffset()){
                 translationVector.add(0, group.getVerticalRideOffset(), 0);
             }
-            displayPivotTranslation(group, part, translationVector);
+            DisplayAnimatorExecutor.addFollowerDisplayPivot(group, part, translationVector);
 
             Transformation respectTransform = new DisplayTransformation(translationVector, transformation.getLeftRotation(), scaleVector, transformation.getRightRotation());
             map.addTransformation(respectTransform);
         }
         else{
-            displayPivotTranslation(group, part, translationVector);
+            DisplayAnimatorExecutor.addFollowerDisplayPivot(group, part, translationVector);
 
             if (group.canApplyVerticalRideOffset()){
                 translationVector.add(0, group.getVerticalRideOffset(), 0);
@@ -331,20 +334,6 @@ final class PacketDisplayAnimationExecutor {
 
         if (animation.allowsDataChanges()){
             transformation.applyData(part);
-        }
-    }
-
-    private void displayPivotTranslation(ActiveGroup group, ActivePart part, Vector3f translationVector){
-        if (!(group instanceof SpawnedDisplayEntityGroup spawned)){
-            return;
-        }
-        for (SpawnedDisplayFollower follower : spawned.followers){
-            if (!follower.hasSetDisplayPivotData()){
-                continue;
-            }
-            if (part instanceof SpawnedDisplayEntityPart sp){
-                follower.laterManualPivot(sp, translationVector);
-            }
         }
     }
 }

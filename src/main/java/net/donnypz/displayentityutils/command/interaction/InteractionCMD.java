@@ -19,27 +19,19 @@ import java.util.List;
 
 public final class InteractionCMD extends ConsoleUsableSubCommand {
 
-    private static final HashMap<String, DEUSubCommand> subCommands = new HashMap<>();
-
-
     public InteractionCMD(){
-        super(Permission.HELP);
-        subCommands.put("help", new InteractionHelpCMD());
-        subCommands.put("addcmd", new InteractionAddCMD());
-        subCommands.put("listcmd", new InteractionListCMD());
-        subCommands.put("height", new InteractionHeightCMD());
-        subCommands.put("width", new InteractionWidthCMD());
-        subCommands.put("scale", new InteractionScaleCMD());
-        subCommands.put("pivot", new InteractionPivotCMD());
-        subCommands.put("pivotselection", new InteractionPivotSelectionCMD());
-        subCommands.put("responsive", new InteractionResponsiveCMD());
-        subCommands.put("spawn", new InteractionSpawnCMD());
-        subCommands.put("spawnhere", new InteractionSpawnHereCMD());
-        subCommands.put("info", new InteractionInfoCMD());
-    }
-
-    public static List<String> getTabComplete(){
-        return subCommands.keySet().stream().toList();
+        super(Permission.HELP, new InteractionHelpCMD());
+        new InteractionAddCMD(this);
+        new InteractionListCMD(this);
+        new InteractionHeightCMD(this);
+        new InteractionWidthCMD(this);
+        new InteractionScaleCMD(this);
+        new InteractionPivotCMD(this);
+        new InteractionPivotSelectionCMD(this);
+        new InteractionResponsiveCMD(this);
+        new InteractionSpawnCMD(this);
+        new InteractionSpawnHereCMD(this);
+        new InteractionInfoCMD(this);
     }
 
     @Override

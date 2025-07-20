@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -12,12 +13,13 @@ import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 class AnimSetFrameTagCMD extends PlayerSubCommand {
-    AnimSetFrameTagCMD() {
-        super(Permission.ANIM_SET_FRAME_TAG);
+    AnimSetFrameTagCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("setframetag", parentSubCommand, Permission.ANIM_SET_FRAME_TAG);
     }
 
     @Override

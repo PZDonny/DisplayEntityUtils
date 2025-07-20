@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -11,10 +12,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class GroupGlowColorCMD extends PlayerSubCommand {
-    GroupGlowColorCMD() {
-        super(Permission.GROUP_GLOW_COLOR);
+    GroupGlowColorCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("glowcolor", parentSubCommand, Permission.GROUP_GLOW_COLOR);
     }
 
     @Override

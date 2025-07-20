@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
@@ -9,10 +10,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class AnimRestoreCMD extends PlayerSubCommand {
-    AnimRestoreCMD() {
-        super(Permission.ANIM_PREVIEW);
+    AnimRestoreCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("restore", parentSubCommand, Permission.ANIM_PREVIEW);
     }
 
     @Override

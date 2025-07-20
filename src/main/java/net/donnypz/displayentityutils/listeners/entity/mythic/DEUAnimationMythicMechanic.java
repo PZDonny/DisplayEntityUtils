@@ -14,6 +14,7 @@ import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import org.bukkit.entity.Entity;
 
+import java.util.List;
 import java.util.UUID;
 
 class DEUAnimationMythicMechanic implements ITargetedEntitySkill {
@@ -45,7 +46,7 @@ class DEUAnimationMythicMechanic implements ITargetedEntitySkill {
             loadMethod = null;
         }
 
-        state = new MachineState(controller.getStateMachine(), id, animTag, loadMethod, type, true);
+        state = new MachineState(controller.getStateMachine(), id, List.of(animTag), loadMethod, type, true);
         state.ignoreOtherTransitionLocks();
         state.skillState();
     }

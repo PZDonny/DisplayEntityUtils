@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.command.anim;
 
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
@@ -8,12 +9,13 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 class AnimRemoveFrameCMD extends PlayerSubCommand {
-    AnimRemoveFrameCMD() {
-        super(Permission.ANIM_REMOVE_FRAME);
+    AnimRemoveFrameCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("removeframe", parentSubCommand, Permission.ANIM_REMOVE_FRAME);
     }
 
     @Override

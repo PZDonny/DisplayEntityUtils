@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
@@ -16,10 +17,11 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class AnimAddSoundCMD extends PlayerSubCommand {
-    AnimAddSoundCMD() {
-        super(Permission.ANIM_ADD_SOUND);
+    AnimAddSoundCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("addsound", parentSubCommand, Permission.ANIM_ADD_SOUND);
     }
 
     @Override

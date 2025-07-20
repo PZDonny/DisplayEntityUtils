@@ -22,7 +22,7 @@ public class GroupFollowProperties{
     FollowType followType;
     int unregisterDelay;
     boolean pivotInteractions;
-    boolean pivotDisplays;
+    boolean adjustDisplays;
     float yDisplayAdjustPercentage = 100;
     float zDisplayAdjustPercentage = 100;
     int teleportationDuration;
@@ -37,10 +37,10 @@ public class GroupFollowProperties{
      * @param followType the follow type
      * @param unregisterDelay how long until the group should be removed after the entity dies/following is manually stop. -1 to never remove
      * @param pivotInteractions determine if interaction entities should pivot around the group
-     * @param pivotDisplays determine if parts should pivot up/down with the entity's pitch, ONLY IF followType is {@link FollowType#PITCH} or {@link FollowType#PITCH_AND_YAW}
+     * @param adjustDisplays determine if parts should pivot up/down with the entity's pitch, ONLY IF followType is {@link FollowType#PITCH} or {@link FollowType#PITCH_AND_YAW}
      */
-    public GroupFollowProperties(@NotNull String id, @Nullable FollowType followType, int unregisterDelay, boolean pivotInteractions, boolean pivotDisplays){
-        this(id, followType, unregisterDelay, pivotInteractions, pivotDisplays, 1, null);
+    public GroupFollowProperties(@NotNull String id, @Nullable FollowType followType, int unregisterDelay, boolean pivotInteractions, boolean adjustDisplays){
+        this(id, followType, unregisterDelay, pivotInteractions, adjustDisplays, 1, null);
     }
 
     /**
@@ -49,11 +49,11 @@ public class GroupFollowProperties{
      * @param followType the follow type
      * @param unregisterDelay how long until the group should be removed after the entity dies/following is manually stop. -1 to never remove
      * @param pivotInteractions determine if interaction entities should pivot around the group
-     * @param pivotDisplays determine if parts should pivot up/down with the entity's pitch, ONLY IF followType is {@link FollowType#PITCH} or {@link FollowType#PITCH_AND_YAW}
+     * @param adjustDisplays determine if parts should pivot up/down with the entity's pitch, ONLY IF followType is {@link FollowType#PITCH} or {@link FollowType#PITCH_AND_YAW}
      * @param teleportationDuration how long it should take for the group to respect the entity's direction in ticks
      */
-    public GroupFollowProperties(@NotNull String id, @Nullable FollowType followType, int unregisterDelay, boolean pivotInteractions, boolean pivotDisplays, int teleportationDuration){
-        this(id, followType, unregisterDelay, pivotInteractions, pivotDisplays, teleportationDuration, null);
+    public GroupFollowProperties(@NotNull String id, @Nullable FollowType followType, int unregisterDelay, boolean pivotInteractions, boolean adjustDisplays, int teleportationDuration){
+        this(id, followType, unregisterDelay, pivotInteractions, adjustDisplays, teleportationDuration, null);
     }
 
     /**
@@ -62,17 +62,17 @@ public class GroupFollowProperties{
      * @param followType the follow type
      * @param unregisterDelay how long until the group should be removed after the entity dies/following is manually stop. -1 to never remove
      * @param pivotInteractions determine if interaction entities should pivot around the group
-     * @param pivotDisplays determine if parts should pivot up/down with the entity's pitch, ONLY IF followType is {@link FollowType#PITCH} or {@link FollowType#PITCH_AND_YAW}
+     * @param adjustDisplays determine if parts should pivot up/down with the entity's pitch, ONLY IF followType is {@link FollowType#PITCH} or {@link FollowType#PITCH_AND_YAW}
      * @param teleportationDuration how long it should take for the group to respect the entity's direction in ticks
      */
-    public GroupFollowProperties(@NotNull String id, @Nullable FollowType followType, int unregisterDelay, boolean pivotInteractions, boolean pivotDisplays, int teleportationDuration, @Nullable Collection<String> partTags){
+    public GroupFollowProperties(@NotNull String id, @Nullable FollowType followType, int unregisterDelay, boolean pivotInteractions, boolean adjustDisplays, int teleportationDuration, @Nullable Collection<String> partTags){
         this.id = id;
         this.followType = followType;
         this.unregisterDelay = unregisterDelay;
         this.pivotInteractions = pivotInteractions;
         this.teleportationDuration = Math.max(teleportationDuration, 0);
         this.partTags = partTags;
-        this.pivotDisplays = pivotDisplays;
+        this.adjustDisplays = adjustDisplays;
     }
 
 
@@ -85,7 +85,7 @@ public class GroupFollowProperties{
     public GroupFollowProperties(@NotNull String id, float yOffsetPercentage, float zOffsetPercentage, int teleportationDuration, boolean pivotInteractions, int unregisterDelay){
         this.id = id;
         this.followType = FollowType.PITCH_AND_YAW;
-        this.pivotDisplays = true;
+        this.adjustDisplays = true;
         this.pivotInteractions = pivotInteractions;
         this.unregisterDelay = unregisterDelay;
         this.yDisplayAdjustPercentage = yOffsetPercentage;
@@ -97,26 +97,19 @@ public class GroupFollowProperties{
 
     /**
      * Create {@link GroupFollowProperties} through a builder
+     * @return {@link GroupFollowPropertiesBuilder}
+     */
+    public static GroupFollowPropertiesBuilder builder(){
+        return new GroupFollowPropertiesBuilder();
+    }
+
+    /**
+     * Create {@link GroupFollowProperties} through a builder
      * @param followType the {@link FollowType} that should be used
      * @return {@link GroupFollowPropertiesBuilder}
      */
     public static GroupFollowPropertiesBuilder builder(@NotNull FollowType followType){
         return new GroupFollowPropertiesBuilder(followType);
-    }
-
-    /**
-     * Change how extreme the display pivot offsets are by setting the y and z pivot offset percentages. Default percentages are 100%.
-     * <br>
-     * <br>
-     * Increased percentages adjust the group farther from the pivot point, while decreased values reduce the pivot's effect
-     * @param yPivotOffsetPercentage
-     * @param zPivotOffsetPercentage
-     * @return this
-     */
-    public GroupFollowProperties setDisplayPivotOffsetPercentage(float yPivotOffsetPercentage, float zPivotOffsetPercentage){
-        this.yDisplayAdjustPercentage = yPivotOffsetPercentage;
-        this.zDisplayAdjustPercentage = zPivotOffsetPercentage;
-        return this;
     }
 
     /**
@@ -167,7 +160,7 @@ public class GroupFollowProperties{
      * @return a boolean
      */
     public boolean pivotDisplays(){
-        return pivotDisplays;
+        return adjustDisplays;
     }
 
     public float getYPivotOffsetPercentage() {

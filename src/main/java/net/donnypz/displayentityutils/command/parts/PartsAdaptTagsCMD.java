@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -11,10 +12,11 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class PartsAdaptTagsCMD extends PlayerSubCommand {
-    PartsAdaptTagsCMD() {
-        super(Permission.PARTS_TAG);
+    PartsAdaptTagsCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("adapttags", parentSubCommand, Permission.PARTS_TAG);
     }
 
     @Override

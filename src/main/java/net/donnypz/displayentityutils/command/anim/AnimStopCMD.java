@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
@@ -8,10 +9,11 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class AnimStopCMD extends PlayerSubCommand {
-    AnimStopCMD() {
-        super(Permission.ANIM_STOP);
+    AnimStopCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("stop", parentSubCommand, Permission.ANIM_STOP);
     }
 
     @Override

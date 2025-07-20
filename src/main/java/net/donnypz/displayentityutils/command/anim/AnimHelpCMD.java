@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 class AnimHelpCMD extends ConsoleUsableSubCommand {
 
     AnimHelpCMD() {
-        super(Permission.HELP);
+        super(Permission.HELP, false);
     }
 
     @Override

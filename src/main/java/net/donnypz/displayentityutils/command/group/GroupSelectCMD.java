@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
@@ -15,10 +16,11 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 class GroupSelectCMD extends PlayerSubCommand {
-    GroupSelectCMD() {
-        super(Permission.GROUP_SELECT);
+    GroupSelectCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("selectnearest", parentSubCommand, Permission.GROUP_SELECT);
     }
 
     @Override

@@ -27,7 +27,7 @@ public class DisplayStateMachine {
 
 
     public DisplayStateMachine(@NotNull String machineID){
-        id = machineID;
+        this.id = machineID;
     }
 
 

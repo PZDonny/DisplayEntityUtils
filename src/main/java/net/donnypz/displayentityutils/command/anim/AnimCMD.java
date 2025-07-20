@@ -13,50 +13,42 @@ import java.util.List;
 
 public final class AnimCMD extends ConsoleUsableSubCommand {
 
-    private static final HashMap<String, DEUSubCommand> subCommands = new HashMap<>();
-
-
     public AnimCMD(){
-        super(Permission.HELP);
-        subCommands.put("help", new AnimHelpCMD());
-        subCommands.put("new", new AnimNewCMD());
-        subCommands.put("save", new AnimSaveCMD());
-        subCommands.put("delete", new AnimDeleteCMD());
-        subCommands.put("info", new AnimInfoCMD());
-        subCommands.put("frameinfo", new AnimFrameInfoCMD());
-        subCommands.put("usefilter", new AnimUseFilterCMD());
-        subCommands.put("unfilter", new AnimUnfilterCMD());
-        subCommands.put("addframe", new AnimAddFrameCMD());
-        subCommands.put("addframeafter", new AnimAddFrameAfterCMD());
-        subCommands.put("removeframe", new AnimRemoveFrameCMD());
-        subCommands.put("overwriteframe", new AnimOverwriteFrameCMD());
-        subCommands.put("editframe", new AnimEditFrameCMD());
-        subCommands.put("editallframes", new AnimEditAllFramesCMD());
-        subCommands.put("addpoint", new AnimAddPointCMD());
-        subCommands.put("drawpoints", new AnimDrawPointsCMD());
-        subCommands.put("drawpos", new AnimDrawPosCMD());
-        subCommands.put("copypoint", new AnimCopyPointCMD());
-        subCommands.put("movepoint", new AnimMovePointCMD());
-        subCommands.put("showframe", new AnimShowFrameCMD());
-        subCommands.put("previewframe", new AnimPreviewFrameCMD());
-        subCommands.put("addsound", new AnimAddSoundCMD());
-        subCommands.put("removesound", new AnimRemoveSoundCMD());
-        subCommands.put("addparticle", new AnimAddParticleCMD());
-        subCommands.put("cancelpoints", new AnimCancelPointsCMD());
-        subCommands.put("reverse", new AnimReverseCMD());
-        subCommands.put("togglescalerespect", new AnimScaleRespectCMD());
-        subCommands.put("toggledatachanges", new AnimDataChangesCMD());
-        subCommands.put("settag", new AnimSetTagCMD());
-        subCommands.put("setframetag", new AnimSetFrameTagCMD());
-        subCommands.put("previewplay", new AnimPreviewPlayCMD());
-        subCommands.put("play", new AnimPlayCMD());
-        subCommands.put("stop", new AnimStopCMD());
-        subCommands.put("restore", new AnimRestoreCMD());
-        subCommands.put("select", new AnimSelectCMD());
-    }
-
-    public static List<String> getTabComplete(){
-        return subCommands.keySet().stream().toList();
+        super(Permission.HELP, new AnimHelpCMD());
+        new AnimNewCMD(this);
+        new AnimSaveCMD(this);
+        new AnimDeleteCMD(this);
+        new AnimInfoCMD(this);
+        new AnimFrameInfoCMD(this);
+        new AnimUseFilterCMD(this);
+        new AnimUnfilterCMD(this);
+        new AnimAddFrameCMD(this);
+        new AnimAddFrameAfterCMD(this);
+        new AnimRemoveFrameCMD(this);
+        new AnimOverwriteFrameCMD(this);
+        new AnimEditFrameCMD(this);
+        new AnimEditAllFramesCMD(this);
+        new AnimAddPointCMD(this);
+        new AnimDrawPointsCMD(this);
+        new AnimDrawPosCMD(this);
+        new AnimCopyPointCMD(this);
+        new AnimMovePointCMD(this);
+        new AnimShowFrameCMD(this);
+        new AnimPreviewFrameCMD(this);
+        new AnimAddSoundCMD(this);
+        new AnimRemoveSoundCMD(this);
+        new AnimAddParticleCMD(this);
+        new AnimCancelPointsCMD(this);
+        new AnimReverseCMD(this);
+        new AnimScaleRespectCMD(this);
+        new AnimDataChangesCMD(this);
+        new AnimSetTagCMD(this);
+        new AnimSetFrameTagCMD(this);
+        new AnimPreviewPlayCMD(this);
+        new AnimPlayCMD(this);
+        new AnimStopCMD(this);
+        new AnimRestoreCMD(this);
+        new AnimSelectCMD(this);
     }
 
     @Override

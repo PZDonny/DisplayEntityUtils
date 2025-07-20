@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.text;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.command.Permission;
@@ -12,10 +13,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
+import org.jetbrains.annotations.NotNull;
 
 class TextSeeThroughCMD extends PlayerSubCommand {
-    TextSeeThroughCMD() {
-        super(Permission.TEXT_TOGGLE_SEE_THROUGH);
+    TextSeeThroughCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("seethrough", parentSubCommand, Permission.TEXT_TOGGLE_SEE_THROUGH);
     }
 
     @Override

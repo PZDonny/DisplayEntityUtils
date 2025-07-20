@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.text;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.command.Permission;
@@ -14,10 +15,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
+import org.jetbrains.annotations.NotNull;
 
 class TextSetCMD extends PlayerSubCommand {
-    TextSetCMD() {
-        super(Permission.TEXT_SET_TEXT);
+
+    public TextSetCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("set", parentSubCommand, Permission.TEXT_SET_TEXT);
     }
 
     @Override

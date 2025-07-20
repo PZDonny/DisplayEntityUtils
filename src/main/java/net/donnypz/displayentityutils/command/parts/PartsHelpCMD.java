@@ -1,13 +1,15 @@
 package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.command.ConsoleUsableSubCommand;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 class PartsHelpCMD extends ConsoleUsableSubCommand {
 
     PartsHelpCMD() {
-        super(Permission.HELP);
+        super(Permission.HELP, false);
     }
 
     @Override

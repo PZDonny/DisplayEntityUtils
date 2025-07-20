@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -10,10 +11,11 @@ import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 class GroupScaleCMD extends PlayerSubCommand {
-    GroupScaleCMD() {
-        super(Permission.GROUP_TRANSFORM);
+    GroupScaleCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("scale", parentSubCommand, Permission.GROUP_TRANSFORM);
     }
 
     @Override
