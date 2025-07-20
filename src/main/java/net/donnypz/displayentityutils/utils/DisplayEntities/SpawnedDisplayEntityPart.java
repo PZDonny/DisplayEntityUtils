@@ -252,6 +252,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     public boolean addTag(@NotNull String tag){
         if (DisplayUtils.addTag(getEntity(), tag)){
+            partTags.add(tag);
             return true;
         }
         return false;
@@ -264,6 +265,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     public SpawnedDisplayEntityPart removeTag(@NotNull String tag){
         DisplayUtils.removeTag(getEntity(), tag);
+        partTags.remove(tag);
         return this;
     }
 
