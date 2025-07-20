@@ -81,7 +81,7 @@ class DatapackConverter {
 
 
         String entryName;
-        ZipEntry createEntry = null;
+        ZipEntry modelEntry = null;
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
 
@@ -91,7 +91,7 @@ class DatapackConverter {
                 animations.putIfAbsent(getAnimationName(entryName, "a"), new ArrayList<>());
             }
             else if (entryName.endsWith(createModelPath)) { //Summon Model for animation
-                createEntry = entry;
+                modelEntry = entry;
             }
             else if (entryName.contains("/keyframe_") && entryName.endsWith(".mcfunction")){
                 String animName = getAnimationName(entryName, "k");
@@ -101,8 +101,8 @@ class DatapackConverter {
             }
         }
 
-        if (createEntry != null){
-            executeCommands(createEntry, zipFile, player, pLoc);
+        if (modelEntry != null){
+            executeCommands(modelEntry, zipFile, player, pLoc);
         }
 
 
@@ -244,7 +244,8 @@ class DatapackConverter {
                     if (line.startsWith("summon block_display")){
                         String coordinates = DEUCommandUtils.getCoordinateString(location);
                         String replacement = "execute at "+player.getName()+" run summon block_display "+coordinates;
-                        line = line.replace("summon block_display ~ ~ ~", replacement);
+                        line = line.replace("summon block_display ~ ~ ~", replacement); //Before BDEngine 1.15.3
+                        line = line.replace("summon block_display ~-0.5 ~-0.5 ~-0.5", replacement); //BDEngine 1.15.3 and Later
                         try{
                             DatapackEntitySpawned.prepareAnimationMaster(projectName);
                         }
