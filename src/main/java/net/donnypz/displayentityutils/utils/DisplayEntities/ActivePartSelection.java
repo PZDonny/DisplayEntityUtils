@@ -65,6 +65,19 @@ public abstract class ActivePartSelection implements Active{
         applyFilter(filter, false);
     }
 
+
+    void addPlayerExecutor(PlayerDisplayAnimationExecutor executor){
+        for (ActivePart part : selectedParts){
+            part.playerExecutors.add(executor);
+        }
+    }
+
+    void removePlayerExecutor(PlayerDisplayAnimationExecutor executor){
+        for (ActivePart part : selectedParts){
+            part.playerExecutors.remove(executor);
+        }
+    }
+
     /**
      * Get the total number of parts within this part selection
      * @return an integer
@@ -263,6 +276,25 @@ public abstract class ActivePartSelection implements Active{
         selectedPart = selectedParts.getLast();
     }
 
+    /**
+     * Remove parts from this selection, that also exist in a different one. If the provided selection is this, then {@link #remove()} will be called
+     * @param selection the other part selection
+     */
+    public void removeParts(@NotNull ActivePartSelection selection){
+        if (selection.getClass() != this.getClass()){
+            return;
+        }
+        if (selection == this){
+            remove();
+        }
+        for (ActivePart part : selection.selectedParts){
+            selectedParts.remove(part);
+            if (selectedPart == part){
+                selectedPart = null;
+            }
+        }
+    }
+
 
     /**
      * Set the view range of all parts in this selection
@@ -300,7 +332,6 @@ public abstract class ActivePartSelection implements Active{
 
     /**
      * Set the teleport duration of all parts in this selection
-     * @param teleportDuration the teleport duration to set
      */
     @Override
     public void setTeleportDuration(int teleportDuration) {

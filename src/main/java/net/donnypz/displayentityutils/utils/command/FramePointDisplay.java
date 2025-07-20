@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.command;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
+import net.donnypz.displayentityutils.utils.DisplayEntities.RelativePoint;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,18 +21,23 @@ public class FramePointDisplay extends RelativePointDisplay{
 
     @Override
     public void leftClick(@NotNull Player player) {
-        ((FramePoint) relativePoint).sendInfo(player);
+        getRelativePoint().sendInfo(player);
         player.playSound(player, Sound.ENTITY_ITEM_FRAME_PLACE, 1, 1);
     }
 
     @Override
     public void rightClick(@NotNull Player player) {
-        ((FramePoint) relativePoint).playEffects(spawnLocation, player);
+        getRelativePoint().playEffects(spawnLocation, player);
     }
 
     @Override
     public boolean removeFromPointHolder() {
-        return frame.removeFramePoint((FramePoint) relativePoint);
+        return frame.removeFramePoint(getRelativePoint());
+    }
+
+    @Override
+    public FramePoint getRelativePoint() {
+        return (FramePoint) relativePoint;
     }
 
 

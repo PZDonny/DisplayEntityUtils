@@ -1,6 +1,5 @@
 package net.donnypz.displayentityutils.utils.controller;
 
-import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.NullGroupLoaderEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
@@ -28,11 +27,13 @@ public class DisplayController {
     private static final HashMap<String, DisplayController> controllers = new HashMap<>();//Controller ID, Controller
     private static final HashMap<DisplayController, String> grouplessControllers = new HashMap<>();
 
-    DisplayEntityGroup group;
+    String controllerID;
+
     Collection<String> mythicMobs = new HashSet<>();
     HashMap<String, GroupFollowProperties> followProperties = new HashMap<>();
     DisplayStateMachine stateMachine;
-    String controllerID;
+
+    DisplayEntityGroup group;
     boolean configController;
     float verticalOffset = 0;
     boolean groupVisibleByDefault;
@@ -48,7 +49,7 @@ public class DisplayController {
      */
     public boolean register(){
         if (controllers.containsKey(controllerID)){
-            Bukkit.broadcast(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to register controller with an existing ID: "+controllerID)));
+            Bukkit.getLogger().warning("Failed to register controller with an existing ID: "+controllerID);
             return false;
         }
         controllers.put(controllerID, this);
@@ -163,11 +164,12 @@ public class DisplayController {
 
     /**
      * Set the mythic mobs that should use this controller
-     * @param mythicMobIDs
+     * @param mythicMobs
      * @return this
      */
-    public DisplayController setMythicMobs(@NotNull Collection<String> mythicMobIDs) {
-        this.mythicMobs = mythicMobIDs;
+    public DisplayController setMythicMobs(@NotNull Collection<String> mythicMobs) {
+        this.mythicMobs.clear();
+        this.mythicMobs.addAll(mythicMobs);
         return this;
     }
 
@@ -316,8 +318,8 @@ public class DisplayController {
     }
 
     /**
-     * Read a controller's configuration from an InputStream
-     * @param stream
+     * Read a {@link DisplayController} configuration from an InputStream
+     * @param stream the stream
      * @return a {@link DisplayController} or null
      */
     public static @Nullable DisplayController read(@NotNull InputStream stream){
@@ -326,127 +328,181 @@ public class DisplayController {
     }
 
     private static DisplayController read(YamlConfiguration config, String fileName, boolean fromFile){
-        String controllerID = config.getString("controllerID");
-        if (controllerID == null){
-            Bukkit.getLogger().severe("A display controller does not have a \"controllerID\": "+fileName);
+        try{
+            String controllerID = config.getString("controllerID");
+            if (controllerID == null){
+                Bukkit.getLogger().severe("Missing \"controllerID\" for display controller: "+fileName);
+                return null;
+            }
+
+            DisplayController controller;
+            controller = controllers.getOrDefault(controllerID, new DisplayController(controllerID));
+            if (fromFile) controller.setConfigController();
+
+            //Set Mythic Mobs
+            ConfigurationSection mythicSect = config.getConfigurationSection("mythicMobs");
+            List<String> mobs = mythicSect.getStringList("mobs");
+            controller.setMythicMobs(mobs);
+
+            //Group Properties
+            ConfigurationSection groupProps = mythicSect.getConfigurationSection("group");
+            String groupTag = groupProps.getString("tag");
+            boolean flip = groupProps.getBoolean("flip");
+            controller.verticalOffset = (float) groupProps.getDouble("verticalOffset");
+            controller.groupVisibleByDefault = groupProps.getBoolean("visibleByDefault", true);
+            //LoadMethod
+            try{ //Set with Config
+                LoadMethod method = LoadMethod.valueOf(groupProps.getString("storage").toUpperCase());
+                controller.setDisplayEntityGroup(groupTag, method);
+            }
+            catch(IllegalArgumentException e){ //Set with API Event
+                controller.markNullLoader(groupTag);
+            }
+
+
+
+            ConfigurationSection defaultPropsSection = config.getConfigurationSection("defaultFollowProperties");
+            int deathDespawnDelay = defaultPropsSection.getInt("deathDespawnDelay");
+
+            HashSet<String> propertiesToRemove = new HashSet<>(controller.followProperties.keySet());
+
+            //Default Follow Properties
+            configureDefaultProperties(controller, defaultPropsSection, deathDespawnDelay, flip);
+            propertiesToRemove.remove(null);
+
+
+            //Part Follow Properties
+            List<Map<?, ?>> partFollowMaps = config.getMapList("partFollowProperties");
+            if (!partFollowMaps.isEmpty()){
+                for (Map<?, ?> map : partFollowMaps){
+                    String followPropertyID = (String) map.get("id");
+                    GroupFollowProperties props = configurePartProperties(controller, followPropertyID, (Map<String, Object>) map, deathDespawnDelay, flip);
+                    if (props != null){
+                        propertiesToRemove.remove(followPropertyID);
+                    }
+                }
+            }
+
+            //Remove old properties that weren't included in the plugin reload
+            for (String propID : propertiesToRemove){
+                controller.followProperties.remove(propID);
+            }
+
+            //Animation States
+            ConfigurationSection stateSect = config.getConfigurationSection("states");
+            if (stateSect != null){
+                DisplayStateMachine machine = new DisplayStateMachine(controllerID);
+                for (MachineState.StateType stateType : MachineState.StateType.values()){
+                    if (stateSect.contains(stateType.getStateID())){
+                        addState(controller, machine, stateType, stateSect.getConfigurationSection(stateType.getStateID()));
+                    }
+                }
+                controller.setStateMachine(machine);
+            }
+
+            if (!controller.isMarkedNull()){
+                controller.register();
+            }
+            else{
+                Bukkit.getLogger().info("Null Group/Animation Display Controller must be handled through API: "+fileName);
+            }
+            return controller;
+        }
+        catch(Exception e){
+            Bukkit.getLogger().severe("Misconfigured Display Controller: "+fileName);
+            e.printStackTrace();
             return null;
         }
-
-        DisplayController controller;
-        controller = controllers.get(controllerID);
-        if (controller == null) {
-            controller = new DisplayController(controllerID);
-            if (fromFile) {
-                controller.setConfigController();
-            }
-        }
-
-        //Set Mythic Mobs
-        controller.setMythicMobs(config.getStringList("mythicMobs"));
-
-        //Group Properties
-        ConfigurationSection groupProps = config.getConfigurationSection("groupProperties");
-        String groupTag = groupProps.getString("tag");
-        try{ //Set with Config
-            LoadMethod method = LoadMethod.valueOf(groupProps.getString("storage").toUpperCase());
-            controller.setDisplayEntityGroup(groupTag, method);
-        }
-        catch(IllegalArgumentException e){ //Set with API Event
-            controller.markNullLoader(groupTag);
-        }
-        boolean flip = groupProps.getBoolean("flip");
-        controller.verticalOffset = (float) groupProps.getDouble("verticalOffset");
-        controller.groupVisibleByDefault = groupProps.getBoolean("visibleByDefault", true);
-
-
-        ConfigurationSection defaultPropsSection = config.getConfigurationSection("defaultFollowProperties");
-        int deathDespawnDelay = defaultPropsSection.getInt("deathDespawnDelay");
-
-        HashSet<String> propertiesToRemove = new HashSet<>(controller.followProperties.keySet());
-        //Default Follow Properties
-        GroupFollowProperties properties = configureProperties(controller, null, defaultPropsSection, deathDespawnDelay, flip, false);
-        if (properties != null){
-            propertiesToRemove.remove(null);
-        }
-
-
-        //Part Follow Properties
-        ConfigurationSection partPropsSect = config.getConfigurationSection("partFollowProperties");
-        if (partPropsSect != null){
-            for (String followPropertyID : partPropsSect.getKeys(false)){
-                ConfigurationSection propSect = partPropsSect.getConfigurationSection(followPropertyID);
-                GroupFollowProperties props = configureProperties(controller, followPropertyID, propSect, deathDespawnDelay, flip, true);
-                if (props != null){
-                    propertiesToRemove.remove(followPropertyID);
-                }
-            }
-        }
-
-        //Remove old properties that weren't included in the plugin reload
-        for (String propID : propertiesToRemove){
-            controller.followProperties.remove(propID);
-        }
-
-        //Animation States
-        ConfigurationSection stateSect = config.getConfigurationSection("states");
-        if (stateSect != null){
-            DisplayStateMachine machine = new DisplayStateMachine(controllerID);
-            for (MachineState.StateType stateType : MachineState.StateType.values()){
-                if (stateSect.contains(stateType.getStateID())){
-                    addState(machine, stateType, stateSect.getConfigurationSection(stateType.getStateID()));
-                }
-            }
-
-            controller.setStateMachine(machine);
-        }
-
-        if (!controller.isMarkedNull()){
-            controller.register();
-        }
-        return controller;
     }
 
-    private static GroupFollowProperties configureProperties(DisplayController controller, String id, ConfigurationSection section, int deathDespawnDelay, boolean flip, boolean isPartProperty){
+    private static GroupFollowProperties configureDefaultProperties(DisplayController controller, ConfigurationSection section, int deathDespawnDelay, boolean flip){
         FollowType followType = null;
         try{
-            followType = FollowType.valueOf(section.getString("entityFollowType"));
+            followType = FollowType.valueOf(section.getString("followType"));
         } catch(IllegalArgumentException followingDisabled){}
 
         int teleportationDuration = section.getInt("teleportationDuration");
         boolean pivotInteractions = section.getBoolean("pivotInteractions");
-        boolean pivotDisplays = section.getBoolean("pivotDisplays.enabled");
-        double yOffsetPercentage = section.getDouble("pivotDisplays.yOffsetPercentage");
-        double zOffsetPercentage = section.getDouble("pivotDisplays.zOffsetPercentage");
+        boolean adjustDisplays = section.getBoolean("adjustDisplays.enabled");
+        double yDisplayAdjustPercentage = section.getDouble("adjustDisplays.yDisplayAdjustPercentage");
+        double zDisplayAdjustPercentage = section.getDouble("adjustDisplays.zDisplayAdjustPercentage");
 
         GroupFollowProperties followProperties;
-        if (isPartProperty){
-            List<String> partTags = section.getStringList("partTags");
-            if (partTags.isEmpty()){
-                Bukkit.getConsoleSender().sendMessage(Component.text("Failed to find part tags for part follow property. It will be skipped: "+id, NamedTextColor.YELLOW));
-                return null;
-            }
-            followProperties = controller.followProperties.getOrDefault(id, new GroupFollowProperties(id, followType, deathDespawnDelay, pivotInteractions, pivotDisplays, teleportationDuration, partTags));
-        }
-        else{
             followProperties = controller.followProperties.getOrDefault(null, new GroupFollowProperties());
-        }
 
         //Set Fields
         followProperties.followType = followType;
         followProperties.unregisterDelay = deathDespawnDelay;
         followProperties.teleportationDuration = teleportationDuration;
         followProperties.pivotInteractions = pivotInteractions;
-        followProperties.pivotDisplays = pivotDisplays;
-        followProperties.yPivotOffsetPercentage = (float) yOffsetPercentage;
-        followProperties.zPivotOffsetPercentage = (float) zOffsetPercentage;
+        followProperties.adjustDisplays = adjustDisplays;
+        followProperties.yDisplayAdjustPercentage = (float) yDisplayAdjustPercentage;
+        followProperties.zDisplayAdjustPercentage = (float) zDisplayAdjustPercentage;
         followProperties.flip = flip;
 
         followProperties.filteredStates.clear();
         if (section.contains("stateFilter")){
-            for (String state : section.getStringList("stateFilter.states")){
+            ConfigurationSection stateSect = section.getConfigurationSection("stateFilter");
+            for (String state : stateSect.getStringList("states")){
                 followProperties.addFilterState(state);
             }
-            followProperties.filterBlacklist = section.getBoolean("stateFilter.blacklist");
+            followProperties.filterBlacklist = stateSect.getBoolean("blacklist", true);
+        }
+
+        controller.addFollowProperty(followProperties);
+        return followProperties;
+    }
+
+    private static GroupFollowProperties configurePartProperties(DisplayController controller, String id, Map<String, Object> map, int deathDespawnDelay, boolean flip){
+        List<String> partTags = (List<String>) map.get("partTags");
+        if (partTags.isEmpty()){
+            Bukkit.getConsoleSender().sendMessage(Component.text("Failed to find part tags for part follow property. It will be skipped: "+id, NamedTextColor.YELLOW));
+            return null;
+        }
+
+        FollowType followType = null;
+        try{
+            followType = FollowType.valueOf((String) map.get("followType"));
+        } catch(IllegalArgumentException followingDisabled){}
+
+        int teleportationDuration = (int) map.get("teleportationDuration");
+        boolean pivotInteractions = (boolean) map.get("pivotInteractions");
+
+        Map<String, Object> adjustSect = (Map<String, Object>) map.get("adjustDisplays");
+        boolean adjustDisplays;
+        float yDisplayAdjustPercentage;
+        float zDisplayAdjustPercentage;
+
+        if (adjustSect != null){
+            adjustDisplays = (boolean) adjustSect.getOrDefault("enabled", false);
+            yDisplayAdjustPercentage = ((Number) adjustSect.getOrDefault("yDisplayAdjustPercentage", 100f)).floatValue();
+            zDisplayAdjustPercentage = ((Number) adjustSect.getOrDefault("zDisplayAdjustPercentage", 100f)).floatValue();
+        }
+        else{
+            adjustDisplays = false;
+            yDisplayAdjustPercentage = 100f;
+            zDisplayAdjustPercentage = 100f;
+        }
+
+        GroupFollowProperties followProperties = controller.followProperties.getOrDefault(id, new GroupFollowProperties());
+        followProperties.id = id;
+        followProperties.partTags = new HashSet<>(partTags);
+        followProperties.followType = followType;
+        followProperties.unregisterDelay = deathDespawnDelay;
+        followProperties.teleportationDuration = teleportationDuration;
+        followProperties.pivotInteractions = pivotInteractions;
+        followProperties.adjustDisplays = adjustDisplays;
+        followProperties.yDisplayAdjustPercentage = yDisplayAdjustPercentage;
+        followProperties.zDisplayAdjustPercentage = zDisplayAdjustPercentage;
+        followProperties.flip = flip;
+
+        followProperties.filteredStates.clear();
+        Map<String, Object> stateSect = (Map<String, Object>) map.get("stateFilter");
+        if (stateSect != null){
+            for (String state : (List<String>) stateSect.getOrDefault("states", new ArrayList<String>())){
+                followProperties.addFilterState(state);
+            }
+            followProperties.filterBlacklist = (boolean) stateSect.getOrDefault("blacklist", true);
         }
 
         controller.addFollowProperty(followProperties);
@@ -454,8 +510,8 @@ public class DisplayController {
     }
 
 
-    private static void addState(DisplayStateMachine machine, MachineState.StateType stateType, ConfigurationSection section){
-        String animTag = section.getString("animation");
+    private static void addState(DisplayController controller, DisplayStateMachine machine, MachineState.StateType stateType, ConfigurationSection section){
+        List<String> animations = section.getStringList("animations");
         //Get Load Method
         LoadMethod loadMethod = null;
         try{
@@ -463,17 +519,23 @@ public class DisplayController {
         } catch(IllegalArgumentException | NullPointerException e){}
 
         //Get Animation Type
-        DisplayAnimator.AnimationType animType = DisplayAnimator.AnimationType.LINEAR; //Default
+        DisplayAnimator.AnimationType animType;
         try{
             animType = DisplayAnimator.AnimationType.valueOf(section.getString("animationType").toUpperCase());
-        }catch(IllegalArgumentException | NullPointerException e){}
+        }
+        catch(IllegalArgumentException | NullPointerException e){
+            animType = DisplayAnimator.AnimationType.LINEAR; //Default
+        }
 
         boolean lock = section.getBoolean("lockTransition");
-        MachineState state = new MachineState(machine, stateType.getStateID(), animTag, loadMethod, animType, lock);
-        if (state.getDisplayAnimator() == null && !state.isNullLoader()){
-            Bukkit.getLogger().warning("Failed to add state, animation not found: "+animTag+" ["+machine.getId()+"]");
+        MachineState state = new MachineState(machine, stateType.getStateID(), animations, loadMethod, animType, lock);
+        if (!state.hasDisplayAnimators() && !state.isNullLoader()){
+            if (!controller.controllerID.equalsIgnoreCase("example")){
+                Bukkit.getLogger().warning("Failed to add state, \""+stateType.getStateID()+"\". No animations found: ["+machine.getId()+"]");
+            }
             return;
         }
+
         machine.addState(state);
         switch(stateType){
             case DEATH -> {

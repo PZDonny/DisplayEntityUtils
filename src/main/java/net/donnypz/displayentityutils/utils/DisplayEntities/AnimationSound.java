@@ -1,9 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -133,9 +131,9 @@ public class AnimationSound implements Externalizable, Cloneable {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         soundName = (String) in.readObject();
         try{
-            sound = Sound.valueOf(soundName.toUpperCase().replace(".", "_"));
+            sound = Registry.SOUNDS.getOrThrow(NamespacedKey.minecraft(soundName.replace(".", "_")));
         }
-        catch(IllegalArgumentException e){
+        catch(Exception e){
             existsInGameVersion = false;
         }
         volume = in.readFloat();

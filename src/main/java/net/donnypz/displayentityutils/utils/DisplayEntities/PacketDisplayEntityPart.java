@@ -25,6 +25,8 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -39,6 +41,13 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     PacketLocation packetLocation;
 
 
+    @ApiStatus.Internal
+    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull PacketAttributeContainer attributeContainer){
+        super(entityId);
+        this.type = partType;
+        this.attributeContainer = attributeContainer;
+        setDefaultTransformValues();
+    }
 
     @ApiStatus.Internal
     public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer){
@@ -46,18 +55,41 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         this.type = partType;
         this.attributeContainer = attributeContainer;
         this.teleport(location);
+        setDefaultTransformValues();
     }
 
     @ApiStatus.Internal
     public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull String partTag){
         this(partType, location, entityId, attributeContainer);
         this.partTags.add(partTag);
+        this.teleport(location);
+        setDefaultTransformValues();
     }
 
     @ApiStatus.Internal
     public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull Set<String> partTags){
         this(partType, location, entityId, attributeContainer);
         this.partTags.addAll(partTags);
+        this.teleport(location);
+        setDefaultTransformValues();
+    }
+
+    private void setDefaultTransformValues(){
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            return;
+        }
+        attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.TRANSLATION, new Vector3f());
+        attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.SCALE, new Vector3f(1));
+        attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.LEFT_ROTATION, new Quaternionf());
+        attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.RIGHT_ROTATION, new Quaternionf());
+    }
+
+    /**
+     * Get a copy of this part's attribute container
+     * @return a copied {@link PacketAttributeContainer}
+     */
+    public @NotNull PacketAttributeContainer getAttributeContainer(){
+        return attributeContainer.clone();
     }
 
     /**
@@ -148,20 +180,16 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         return new HashSet<>(viewers);
     }
 
-    /**
-     * Get the {@link UUID}s of players who can see this part
-     * @return a set of uuids
-     */
-    public @NotNull Collection<Player> getViewersAsPlayers(){
-        HashSet<Player> players = new HashSet<>();
-        for (UUID uuid : viewers){
-            Player p = Bukkit.getPlayer(uuid);
-            if (p != null){
-                players.add(p);
-            }
-        }
-        return players;
+    @Override
+    public void setTransformation(@NotNull Transformation transformation) {
+        attributeContainer.setTransformationAndSend(transformation, entityId, viewers);
     }
+
+    @Override
+    public void setTransformationMatrix(@NotNull Matrix4f matrix) {
+        attributeContainer.setTransformationMatrixAndSend(matrix, entityId, viewers);
+    }
+
 
     @Override
     public void setTextDisplayText(@NotNull Component text) {
@@ -182,7 +210,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @Override
     public <T, V> void setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value) {
-        this.attributeContainer.setAttribute(attribute, value);
+        this.attributeContainer.setAttributeAndSend(attribute, value, entityId, viewers);
     }
 
 
@@ -259,6 +287,18 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         cull(values[0], values[1]);
     }
 
+    @Override
+    public Collection<Player> getTrackingPlayers() {
+        HashSet<Player> players = new HashSet<>();
+        for (UUID uuid : viewers){
+            Player p = Bukkit.getPlayer(uuid);
+            if (p != null){
+                players.add(p);
+            }
+        }
+        return players;
+    }
+
 
     @Override
     public @Nullable Color getGlowColor() {
@@ -295,6 +335,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         setAndSend(DisplayAttributes.GLOWING, false);
     }
 
+    /**
+     * Set the teleport duration of this part
+     */
     @Override
     public void setTeleportDuration(int teleportDuration) {
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
@@ -369,10 +412,12 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         setRotation(getPitch(), yaw, pivot);
     }
 
+    @Override
     public float getPitch(){
         return packetLocation.pitch;
     }
 
+    @Override
     public float getYaw(){
         return packetLocation.yaw;
     }
@@ -430,7 +475,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         for (UUID uuid : viewers){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
-            PacketUtils.teleport(player, entityId, getLocation());
+            PacketUtils.teleport(player, entityId, location);
         }
     }
 
@@ -440,7 +485,18 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public @Nullable Location getLocation(){
-        return packetLocation.toLocation();
+        if (packetLocation != null){
+            return packetLocation.toLocation();
+        }
+        return null;
+    }
+
+    /**
+     * Get whether this part has a defined location
+     * @return a boolean
+     */
+    public boolean hasLocation(){
+        return packetLocation != null;
     }
 
     /**
@@ -505,7 +561,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public @Nullable PacketDisplayEntityGroup getGroup(){
         return group;
     }
-
 
     /**
      * Get whether this part is actively being tracked by a player (check if it's visible)

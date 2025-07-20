@@ -5,8 +5,6 @@ import ch.njol.skript.SkriptAddon;
 import ch.njol.skript.util.Version;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
-import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginTabCompleter;
 import net.donnypz.displayentityutils.listeners.autoGroup.DEULoadingListeners;
 import net.donnypz.displayentityutils.listeners.bdengine.DatapackEntitySpawned;
 import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
@@ -98,10 +96,10 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onLoad() {
-        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
-        PacketEvents.getAPI().load();
         PacketEvents.getAPI().getEventManager().registerListener(
                 new DEUInteractionListener(), PacketListenerPriority.NORMAL);
+        PacketEvents.getAPI().getEventManager().registerListener(
+                new DEUEntityListener(), PacketListenerPriority.NORMAL);
     }
 
     @Override
@@ -114,7 +112,6 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         registerListeners();
         initializeNamespacedKeys();
         initializeBStats();
-        PacketEvents.getAPI().init();
         getServer().getConsoleSender().sendMessage(pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
     }
 
@@ -122,7 +119,6 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     public void onDisable() {
         MYSQLManager.closeConnection();
         MongoManager.closeConnection();
-        PacketEvents.getAPI().terminate();
     }
 
 
@@ -490,8 +486,9 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         PluginCommand command = getCommand("managedisplays");
         if (command != null){
             if (registerPluginCommands && isOnEnable) {
-                command.setExecutor(new DisplayEntityPluginCommand());
-                command.setTabCompleter(new DisplayEntityPluginTabCompleter());
+                DisplayEntityPluginCommand cmd = new DisplayEntityPluginCommand();
+                command.setExecutor(cmd);
+                command.setTabCompleter(cmd);
             }
         }
     }

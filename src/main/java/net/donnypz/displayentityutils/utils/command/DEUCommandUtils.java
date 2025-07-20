@@ -4,7 +4,12 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -20,6 +25,24 @@ public class DEUCommandUtils {
 
     private static final HashMap<UUID, Set<RelativePointDisplay>> relativePointDisplays = new HashMap<>();
     private static final HashMap<UUID, RelativePointDisplay> selectedRelativePoint = new HashMap<>();
+    private static final Map<String, Color> defaultColors = Map.ofEntries(
+            Map.entry("white", Color.WHITE),
+            Map.entry("silver", Color.SILVER),
+            Map.entry("gray", Color.GRAY),
+            Map.entry("black", Color.BLACK),
+            Map.entry("red", Color.RED),
+            Map.entry("maroon", Color.MAROON),
+            Map.entry("yellow", Color.YELLOW),
+            Map.entry("olive", Color.OLIVE),
+            Map.entry("lime", Color.LIME),
+            Map.entry("green", Color.GREEN),
+            Map.entry("aqua", Color.AQUA),
+            Map.entry("teal", Color.TEAL),
+            Map.entry("blue", Color.BLUE),
+            Map.entry("navy", Color.NAVY),
+            Map.entry("fuchsia", Color.FUCHSIA),
+            Map.entry("purple", Color.PURPLE),
+            Map.entry("orange", Color.ORANGE));
 
     @ApiStatus.Internal
     public static void spawnFramePointDisplays(SpawnedDisplayEntityGroup group, Player player, SpawnedDisplayAnimationFrame frame){
@@ -216,69 +239,59 @@ public class DEUCommandUtils {
     }
 
     public static Color getColorFromText(String color){
-        Color c = null;
+        Color c = defaultColors.get(color.toLowerCase());
 
-        //Vanilla Colors
-        if (color.equalsIgnoreCase("white")){
-            c = Color.WHITE;
-        }
-        else if (color.equalsIgnoreCase("silver")){
-            c = Color.SILVER;
-        }
-        else if (color.equalsIgnoreCase("gray")){
-            c = Color.GRAY;
-        }
-        else if (color.equalsIgnoreCase("black")){
-            c = Color.BLACK;
-        }
-        else if (color.equalsIgnoreCase("red")){
-            c = Color.RED;
-        }
-        else if (color.equalsIgnoreCase("maroon")){
-            c = Color.MAROON;
-        }
-        else if (color.equalsIgnoreCase("yellow")){
-            c = Color.YELLOW;
-        }
-        else if (color.equalsIgnoreCase("olive")){
-            c = Color.OLIVE;
-        }
-        else if (color.equalsIgnoreCase("lime")){
-            c = Color.LIME;
-        }
-        else if (color.equalsIgnoreCase("green")){
-            c = Color.GREEN;
-        }
-        else if (color.equalsIgnoreCase("aqua")){
-            c = Color.AQUA;
-        }
-        else if (color.equalsIgnoreCase("teal")){
-            c = Color.TEAL;
-        }
-        else if (color.equalsIgnoreCase("blue")){
-            c = Color.BLUE;
-        }
-        else if (color.equalsIgnoreCase("navy")){
-            c = Color.NAVY;
-        }
-        else if (color.equalsIgnoreCase("fuchsia")){
-            c = Color.FUCHSIA;
-        }
-        else if (color.equalsIgnoreCase("purple")){
-            c = Color.PURPLE;
-        }
-        else if (color.equalsIgnoreCase("orange")){
-            c = Color.ORANGE;
-        }
-        //Hex
-        else{
+        if (c == null){ //Hex
             try{
-                String formattedColor = color.replace("0x", "").replace("#", "");
-                c = Color.fromRGB(Integer.parseInt(formattedColor, 16));
+                if (color.startsWith("0x")){
+                    color = color.substring(2);
+                }
+                else if (color.startsWith("#")){
+                    color = color.substring(1);
+                }
+                if (color.length() == 8){
+                    String col = color.substring(0, 6);
+                    String alpha = color.substring(6, 8);
+                    c = Color.fromRGB(Integer.parseInt(col, 16))
+                            .setAlpha(Integer.parseInt(alpha, 16));
+                }
+                else if (color.length() == 6){
+                    c = Color.fromRGB(Integer.parseInt(color, 16));
+                }
             }
             catch(IllegalArgumentException ignored){}
         }
         return c;
+    }
+
+    public static void sendGlowColor(Player player, Color color){
+        player.sendMessage(Component.empty());
+        if (color != null) {
+            player.sendMessage(Component.text("Glow Color: ").append(Component.text("COLOR", TextColor.color(color.getRed(), color.getGreen(), color.getBlue()))));
+            player.sendMessage("| " + net.md_5.bungee.api.ChatColor.RED + "R: " + color.getRed());
+            player.sendMessage("| " + net.md_5.bungee.api.ChatColor.GREEN + "G: " + color.getGreen());
+            player.sendMessage("| " + ChatColor.BLUE + "B: " + color.getBlue());
+
+            String redString = Integer.toHexString(color.getRed());
+            if (redString.equals("0")) {
+                redString += "0";
+            }
+            String greenString = Integer.toHexString(color.getGreen());
+            if (greenString.equals("0")) {
+                greenString += "0";
+            }
+            String blueString = Integer.toHexString(color.getBlue());
+            if (blueString.equals("0")) {
+                blueString += "0";
+            }
+            String hex = "#"+redString+greenString+blueString;
+            player.sendMessage(Component.text("| HEX: "+hex, NamedTextColor.YELLOW)
+                    .hoverEvent(HoverEvent.showText(Component.text("Click to copy", NamedTextColor.GREEN)))
+                    .clickEvent(ClickEvent.copyToClipboard(hex)));
+        }
+        else {
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Glow Color: <red>NOT SET"));
+        }
     }
 
     @ApiStatus.Internal

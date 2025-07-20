@@ -193,23 +193,6 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
         return removed;
     }
 
-    /**
-     * Remove parts from this selection, that also exist in a different one. If the provided selection is this, then {@link #remove()} will be called
-     * @param selection
-     */
-    public void removeParts(SpawnedPartSelection selection){
-        if (selection == this){
-            remove();
-        }
-        for (ActivePart part : selection.selectedParts){
-            selectedParts.remove(part);
-            if (selectedPart == part){
-                selectedPart = null;
-            }
-        }
-    }
-
-
 
     /**
      * Remove this part selection.
@@ -262,7 +245,6 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
         ((SpawnedDisplayEntityGroup) group).partSelections.remove(this);
         group = null;
     }
-
 
     /**
      * Gets the {@link SpawnedDisplayEntityGroup} of this selection

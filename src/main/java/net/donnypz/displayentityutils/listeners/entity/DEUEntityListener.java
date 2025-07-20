@@ -2,6 +2,13 @@ package net.donnypz.displayentityutils.listeners.entity;
 
 import com.destroystokyo.paper.event.entity.EntityJumpEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
+import com.github.retrooper.packetevents.event.PacketListener;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.util.Vector3f;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.Direction;
@@ -24,7 +31,36 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 @ApiStatus.Internal
-public final class DEUEntityListener implements Listener {
+public final class DEUEntityListener implements Listener, PacketListener {
+
+    //===========Packet Events=================
+    @Override
+    public void onPacketSend(PacketSendEvent event) {
+        User user = event.getUser();
+        if (event.getPacketType() != PacketType.Play.Server.ENTITY_METADATA){
+            return;
+        }
+        WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata(event);
+
+        int entityId = packet.getEntityId();
+        ActivePart part = ActivePart.getPart(entityId);
+        if (part == null) return;
+        for (EntityData<?> data : packet.getEntityMetadata()){
+            if (data.getValue() instanceof Vector3f v) {
+                if (part.isTranslationSuppressed(new org.joml.Vector3f(v.x, v.y, v.z)) && part.isAnimatingForPlayer(Bukkit.getPlayer(user.getUUID()))){
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerTeleport(@NotNull PlayerChangedWorldEvent e){
+        DEUUser user = DEUUser.getOrCreateUser(e.getPlayer());
+        user.refreshTrackedPacketEntities(e.getPlayer());
+    }
 
     //============Mythic====================
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -122,13 +158,5 @@ public final class DEUEntityListener implements Listener {
         }
         stateMachine.setStateIfPresent(stateType, group);
         return stateMachine;
-    }
-
-
-    //===========Packet Entities=================
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerTeleport(@NotNull PlayerChangedWorldEvent e){
-        DEUUser user = DEUUser.getOrCreateUser(e.getPlayer());
-        user.refreshTrackedPacketEntities(e.getPlayer());
     }
 }

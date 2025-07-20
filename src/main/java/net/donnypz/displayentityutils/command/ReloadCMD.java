@@ -10,7 +10,7 @@ import org.bukkit.command.CommandSender;
 
 class ReloadCMD extends ConsoleUsableSubCommand {
     ReloadCMD() {
-        super(Permission.RELOAD);
+        super(Permission.RELOAD, false);
     }
 
     @Override

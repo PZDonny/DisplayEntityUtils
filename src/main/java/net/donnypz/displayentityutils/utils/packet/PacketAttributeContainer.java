@@ -9,9 +9,9 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
-import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Bukkit;
@@ -20,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -42,6 +43,17 @@ public class PacketAttributeContainer implements Cloneable{
     }
 
     /**
+     * Set the attribute that should be applied to a packet entity, BEFORE the entity is sent to any players, as long as the attribute is absent.
+     * @param attribute the {@link DisplayAttribute}
+     * @param value the value corresponding to the provided {@link DisplayAttribute}
+     * @return this
+     */
+    public <T, V> PacketAttributeContainer setAttributeIfAbsent(@NotNull DisplayAttribute<T, V> attribute, T value){
+        attributes.putIfAbsent(attribute, value);
+        return this;
+    }
+
+    /**
      * Set the values of a transformation through this single method instead of chaining
      * @param transformation the transformation
      * @return this
@@ -52,6 +64,58 @@ public class PacketAttributeContainer implements Cloneable{
         setAttribute(DisplayAttributes.Transform.SCALE, new Vector3f(transformation.getScale()));
         setAttribute(DisplayAttributes.Transform.RIGHT_ROTATION, new Quaternionf(transformation.getRightRotation()));
         return this;
+    }
+
+    /**
+     * Set the values of a transformation through this single method instead of chaining
+     * Send the given attribute data to a player on the entity with the given entity id
+     * @param transformation the transformation
+     * @return this
+     */
+    public PacketAttributeContainer setTransformationAndSend(@NotNull Transformation transformation, int entityId, @NotNull Player player){
+        return setAttributesAndSend(new DisplayAttributeMap()
+                .addTransformation(transformation), entityId, player);
+    }
+
+    /**
+     * Set the values of a transformation through this single method instead of chaining
+     * Send the given attribute data to players on the entity with the given entity id
+     * @param transformation the transformation
+     * @return this
+     */
+    public PacketAttributeContainer setTransformationAndSend(@NotNull Transformation transformation, int entityId, @NotNull Collection<UUID> playerUUIDs){
+        return setAttributesAndSend(new DisplayAttributeMap()
+                .addTransformation(transformation), entityId, playerUUIDs);
+    }
+
+    /**
+     * Set the values of a transformation through this single method instead of chaining.
+     * Send the given attribute data to a player on the entity with the given entity id
+     * @param matrix the transformation matrix
+     * @return this
+     */
+    public PacketAttributeContainer setTransformationMatrix(@NotNull Matrix4f matrix){
+        return setTransformation(DisplayUtils.getTransformation(matrix));
+    }
+
+    /**
+     * Set the values of a transformation through this single method instead of chaining
+     * Send the given attribute data to a player on the entity with the given entity id
+     * @param matrix the transformation matrix
+     * @return this
+     */
+    public PacketAttributeContainer setTransformationMatrixAndSend(@NotNull Matrix4f matrix, int entityId, @NotNull Player player){
+        return setTransformationAndSend(DisplayUtils.getTransformation(matrix), entityId, player);
+    }
+
+    /**
+     * Set the values of a transformation through this single method instead of chaining
+     * Send the given attribute data to players on the entity with the given entity id
+     * @param matrix the transformation matrix
+     * @return this
+     */
+    public PacketAttributeContainer setTransformationMatrixAndSend(@NotNull Matrix4f matrix, int entityId, @NotNull Collection<UUID> playerUUIDs){
+        return setTransformationAndSend(DisplayUtils.getTransformation(matrix), entityId, playerUUIDs);
     }
 
     /**
@@ -110,10 +174,12 @@ public class PacketAttributeContainer implements Cloneable{
      * @param attributeMap the attribute setter
      * @param entityId the entity's entity id
      * @param playerUUIDs the players
+     * @return this
      */
-    public void setAttributesAndSend(@NotNull DisplayAttributeMap attributeMap, int entityId, @NotNull Collection<UUID> playerUUIDs){
+    public PacketAttributeContainer setAttributesAndSend(@NotNull DisplayAttributeMap attributeMap, int entityId, @NotNull Collection<UUID> playerUUIDs){
         this.attributes.putAll(attributeMap.attributes);
         sendAttributesToUUIDs(playerUUIDs, entityId, getMetadataList(attributeMap.attributes));
+        return this;
     }
 
     /**
@@ -158,28 +224,40 @@ public class PacketAttributeContainer implements Cloneable{
      * @param partType the type of entity this container represents
      * @return a {@link PacketDisplayEntityPart}
      */
-    public @NotNull PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location){
-        return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this);
+    public @NotNull PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType){
+        return new PacketDisplayEntityPart(partType, SpigotReflectionUtil.generateEntityId(), this.clone());
     }
 
     /**
      * Create a {@link PacketDisplayEntityPart} with data representative of this container
      * @param partType the type of entity this container represents
+     * @param location the location the part should originate from
+     * @return a {@link PacketDisplayEntityPart}
+     */
+    public @NotNull PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location){
+        return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this.clone());
+    }
+
+    /**
+     * Create a {@link PacketDisplayEntityPart} with data representative of this container
+     * @param partType the type of entity this container represents
+     * @param location the location the part should originate from
      * @param partTag a part tag to add to the returned part
      * @return a {@link PacketDisplayEntityPart}
      */
     public @NotNull PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location, @NotNull String partTag){
-        return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this, partTag);
+        return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this.clone(), partTag);
     }
 
     /**
      * Create a {@link PacketDisplayEntityPart} with data representative of this container
      * @param partType the type of entity this container represents
+     * @param location the location the part should originate from
      * @param partTags part tags to add to the returned part
      * @return a {@link PacketDisplayEntityPart}
      */
     public @NotNull PacketDisplayEntityPart createPart(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Location location, @NotNull Set<String> partTags){
-        return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this, partTags);
+        return new PacketDisplayEntityPart(partType, location, SpigotReflectionUtil.generateEntityId(), this.clone(), partTags);
     }
 
 

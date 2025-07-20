@@ -73,7 +73,7 @@ public class SimpleEvents extends SimpleEvent {
             Skript.registerEvent("Animation Start", SimpleEvents.class, AnimationStartEvent.class, "[spawned] [display] anim[ation] frame (complete[d]|end[ed])")
                     .description("Called when a display animator starts playing a spawned animation")
                     .since("2.6.2");
-            EventValues.registerEventValue(AnimationStartEvent.class, SpawnedDisplayEntityGroup.class, g -> (SpawnedDisplayEntityGroup) g.getGroup());
+            EventValues.registerEventValue(AnimationStartEvent.class, SpawnedDisplayEntityGroup.class, AnimationStartEvent::getGroup);
             EventValues.registerEventValue(AnimationStartEvent.class, SpawnedDisplayAnimation.class, AnimationStartEvent::getAnimation);
             EventValues.registerEventValue(AnimationStartEvent.class, DisplayAnimator.class, AnimationStartEvent::getAnimator);
 

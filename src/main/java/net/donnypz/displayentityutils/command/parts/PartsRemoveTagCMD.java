@@ -1,0 +1,50 @@
+package net.donnypz.displayentityutils.command.parts;
+
+import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
+import net.donnypz.displayentityutils.command.Permission;
+import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+
+class PartsRemoveTagCMD extends PlayerSubCommand {
+    PartsRemoveTagCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("removetag", parentSubCommand, Permission.PARTS_TAG);
+    }
+
+    @Override
+    public void execute(Player player, String[] args) {
+
+        SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
+        if (partSelection == null){
+            PartsCMD.noPartSelection(player);
+            return;
+        }
+        if (!partSelection.isValid()){
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid part selection! Please try again!", NamedTextColor.RED)));
+            return;
+        }
+        if (args.length < 3){
+            player.sendMessage(Component.text("Provide a part tag! /mdis parts removetag <part-tag> [-all]", NamedTextColor.RED));
+            return;
+        }
+        String tag  = args[2];
+        if (args.length >= 4 && args[3].equalsIgnoreCase("-all")){
+            partSelection.removeTag(tag);
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Removing part tag from ALL selected parts! <white>(Removed Tag: "+tag+")")));
+        }
+        else{
+            partSelection.getSelectedPart().removeTag(tag);
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Removing part tag from selected part! <white>(Removed Tag: "+tag+")")));
+        }
+
+
+
+    }
+
+}

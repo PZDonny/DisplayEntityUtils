@@ -3,36 +3,51 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.FollowType;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
+import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
-import org.bukkit.util.Vector;
 import org.joml.Vector3f;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 class SpawnedDisplayFollower {
     GroupFollowProperties properties;
-    SpawnedDisplayEntityGroup group;
+    ActiveGroup group;
+    ActivePartSelection selection;
     UUID followedEntity;
     boolean isDefaultFollower;
-    SpawnedPartSelection selection;
     boolean stopped = false;
     boolean zeroedPivot = false;
     float lastGroupScaleMultiplier = 0;
     int lastDisplayPivotTick = -1;
-    HashMap<SpawnedDisplayEntityPart, PartFollowData> lastDisplayPivotData = new HashMap<>();
+    HashMap<ActivePart, PartFollowData> lastDisplayPivotData = new HashMap<>();
+    static final ConcurrentHashMap<Integer, Vector3f> suppressedVectors = new ConcurrentHashMap<>();
 
-    SpawnedDisplayFollower(SpawnedDisplayEntityGroup group, GroupFollowProperties followProperties){
+    SpawnedDisplayFollower(ActiveGroup group, GroupFollowProperties followProperties){
         this.group = group;
         this.properties = followProperties;
-        isDefaultFollower = followProperties.partTags() == null;
+        Collection<String> partTags = followProperties.partTags();
+        this.isDefaultFollower = partTags == null || partTags.isEmpty();
     }
+
+    static void suppressTranslation(int entityId, Vector3f vector, Runnable action){
+        try {
+            suppressedVectors.put(entityId, vector);
+            action.run();
+        }
+        finally{
+            Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
+                suppressedVectors.remove(entityId, vector);
+            });
+        }
+    }
+
+
 
     void follow(Entity entity){
         if (group.defaultFollower == this){
@@ -54,7 +69,7 @@ class SpawnedDisplayFollower {
 
         Collection<String> partTags = properties.partTags();
         if (partTags != null && !partTags.isEmpty()){
-            selection = new SpawnedPartSelection(group, partTags);
+            selection = group.createPartSelection(new PartFilter().includePartTags(partTags));
             for (ActivePart p : selection.selectedParts){
                 if (p.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
                     p.setTeleportDuration(teleportationDuration);
@@ -65,7 +80,7 @@ class SpawnedDisplayFollower {
             }
         }
         else{
-            selection = new SpawnedPartSelection(group);
+            selection = group.createPartSelection();
             group.setTeleportDuration(teleportationDuration);
         }
 
@@ -76,7 +91,7 @@ class SpawnedDisplayFollower {
                     cancel();
                     return;
                 }
-                if (stopped || !group.isSpawned()){
+                if (stopped || (group instanceof SpawnedDisplayEntityGroup sg && !sg.isSpawned())){
                     cancel();
                     remove();
                     return;
@@ -84,7 +99,12 @@ class SpawnedDisplayFollower {
                 if (entity.isDead()) {
                     if (properties.unregisterDelay() > -1) {
                         Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                            group.unregister(true, true);
+                            if (group instanceof SpawnedDisplayEntityGroup sg){
+                                sg.unregister(true, true);
+                            }
+                            else if (group instanceof PacketDisplayEntityGroup pg){
+                                pg.hideFromPlayers(pg.getTrackingPlayers());
+                            }
                         }, properties.unregisterDelay());
                     }
                     cancel();
@@ -98,7 +118,7 @@ class SpawnedDisplayFollower {
                     return;
                 }
 
-                if (!group.isInLoadedChunk()){
+                if (group instanceof SpawnedDisplayEntityGroup sg && !sg.isInLoadedChunk()){
                     return;
                 }
 
@@ -129,14 +149,13 @@ class SpawnedDisplayFollower {
         }.runTaskTimer(DisplayEntityPlugin.getInstance(), 1, teleportationDuration);
     }
 
-    private void apply(Entity entity, SpawnedPartSelection selection, float newYaw, float newPitch, FollowType finalFollowType, FollowType realFollowType){
+    private void apply(Entity entity, ActivePartSelection selection, float newYaw, float newPitch, FollowType finalFollowType, FollowType realFollowType){
         if (lastGroupScaleMultiplier == 0){
             lastGroupScaleMultiplier = group.getScaleMultiplier();
         }
 
 
-        for (ActivePart p : selection.selectedParts){
-            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) p;
+        for (ActivePart part : selection.selectedParts){
             switch(finalFollowType){
                 case YAW -> {
                     part.setYaw(newYaw, properties.pivotInteractions());
@@ -161,20 +180,32 @@ class SpawnedDisplayFollower {
             }
         }
         lastDisplayPivotTick = Bukkit.getCurrentTick();
-
         lastGroupScaleMultiplier = group.getScaleMultiplier();
     }
 
 
-    private void pivotDisplayPitch(SpawnedDisplayEntityPart part, boolean zero, float newPitch){
+    private void pivotDisplayPitch(ActivePart part, boolean zero, float newPitch){
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
             return;
         }
-        Display display = (Display) part.getEntity();
-        Transformation t = display.getTransformation();
-        Vector translation = Vector.fromJOML(t.getTranslation());
+        Transformation t = part.getDisplayTransformation();
+        Vector3f translation = t.getTranslation();
 
-        float pitch = display.getPitch();
+        /*if (part.isAnimatingForPlayers()){
+            for (PlayerDisplayAnimationExecutor ex : part.playerExecutors){
+                Vector3f lastVec = ex.lastTranslation.get(part);
+                if (lastVec != null){
+                    translation = new Vector3f(lastVec);
+                    break;
+                }
+            }
+            if (translation == null) translation = t.getTranslation();
+        }
+        else{
+            translation = t.getTranslation();
+        }*/
+
+        float pitch = part.getPitch();
         boolean oldPositive = pitch > 0;
         boolean newPositive = newPitch > 0;
 
@@ -197,7 +228,8 @@ class SpawnedDisplayFollower {
 
         float yOffset = Math.abs(newPitch)/180*group.getScaleMultiplier() * (properties.getYPivotOffsetPercentage()/100);
         float zOffset = Math.abs(newPitch)/270*group.getScaleMultiplier()*typeMultiplier * (properties.getZPivotOffsetPercentage()/100);
-
+        //Apply New Z Offset
+        boolean addZ = newPitch > 0;
 
         PartFollowData data = lastDisplayPivotData.getOrDefault(part, new PartFollowData());
         float lastYOffset = data.lastYOffset;
@@ -208,46 +240,65 @@ class SpawnedDisplayFollower {
         }
 
         //Reset+Apply Y Offset
-        translation.setY(translation.getY()+yOffset-lastYOffset);
+        translation.y = translation.y+yOffset-lastYOffset;
 
         //Reset Last Z Offset
         if (pitch < 0) {
-            translation.setZ(translation.getZ()+lastZOffset);
+            translation.z = translation.z+lastZOffset;
         }
         else{
-            translation.setZ(translation.getZ()-lastZOffset);
+            translation.z = translation.z-lastZOffset;
         }
 
-        //Apply New Z Offset
-        boolean addZ = newPitch > 0;
         if (addZ){
-            translation.setZ(translation.getZ()+zOffset);
+            translation.z = translation.z+zOffset;
         }
         else{
-            translation.setZ(translation.getZ()-zOffset);
+            translation.z = translation.z-zOffset;
         }
 
-        Vector3f vector3f = translation.toVector3f();
         data.lastYOffset = yOffset;
         data.lastZOffset = zOffset;
         data.addZ = addZ;
 
         lastDisplayPivotData.put(part, data);
 
-        if (group.isAnimating() && !group.hasAnimated()){
+        if (group.isAnimating() && !group.hasAnimated()) {
             return;
         }
-        display.setInterpolationDuration(properties.teleportationDuration());
-        display.setInterpolationDelay(0);
-        display.setTransformation(new Transformation(vector3f, t.getLeftRotation(), t.getScale(), t.getRightRotation()));
+
+        if (part.isAnimatingForPlayers()){
+            updateTranslation(translation, t, part);
+        }
+        else{
+            int entityId = part.entityId;
+            suppressTranslation(entityId, translation, () -> {
+                updateTranslation(translation, t, part);
+            });
+        }
+
     }
 
 
-    void laterManualPivot(SpawnedDisplayEntityPart part, Vector3f translationVector){
+    private void updateTranslation(Vector3f translation, Transformation t, ActivePart part){
+        Transformation transformation = new Transformation(translation, t.getLeftRotation(), t.getScale(), t.getRightRotation());
+        if (part instanceof SpawnedDisplayEntityPart){
+            part.setInterpolationDuration(properties.teleportationDuration());
+            part.setInterpolationDelay(0);
+            part.setTransformation(transformation);
+        }
+        else if (part instanceof PacketDisplayEntityPart pp) {
+            pp.setAttributes(new DisplayAttributeMap()
+                    .add(DisplayAttributes.Interpolation.DURATION, properties.teleportationDuration())
+                    .add(DisplayAttributes.Interpolation.DELAY, 0)
+                    .addTransformation(transformation));
+        }
+    }
+
+    void laterManualPivot(ActivePart part, Vector3f translationVector){
         PartFollowData data = lastDisplayPivotData.get(part);
         if (data != null){
             data.apply(translationVector);
-            //translationVector.add(data.translation);
         }
     }
 
@@ -264,7 +315,7 @@ class SpawnedDisplayFollower {
         lastDisplayPivotData.clear();
     }
 
-    class PartFollowData{
+    static class PartFollowData{
         float lastYOffset = 0;
         float lastZOffset = 0;
         boolean addZ;

@@ -14,22 +14,52 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ActivePart implements Active{
-
+    private static final ConcurrentHashMap<Integer, ActivePart> partsById = new ConcurrentHashMap<>();
     protected SpawnedDisplayEntityPart.PartType type;
     protected UUID partUUID;
     protected final int entityId;
     protected Set<String> partTags = new HashSet<>();
     protected boolean valid = true;
+    final Set<PlayerDisplayAnimationExecutor> playerExecutors = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     ActivePart(int entityId){
         this.entityId = entityId;
+        partsById.put(entityId, this);
     }
+
+    public static @Nullable ActivePart getPart(int entityId){
+        return partsById.get(entityId);
+    }
+
+    public boolean isAnimatingForPlayers(){
+        return !playerExecutors.isEmpty();
+    }
+
+    public boolean isAnimatingForPlayer(Player player){
+        for (PlayerDisplayAnimationExecutor ex : playerExecutors){
+            if (ex.players.contains(player)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @ApiStatus.Internal
+    public boolean isTranslationSuppressed(Vector3f vector){
+        Vector3f v = SpawnedDisplayFollower.suppressedVectors.get(entityId);
+        return vector.equals(v);
+    }
+
 
     protected abstract void cull(float width, float height);
 
@@ -141,12 +171,43 @@ public abstract class ActivePart implements Active{
     }
 
     /**
+     * Get the players who can visibly see / are tracking this part
+     * @return a collection of players
+     */
+    public abstract Collection<Player> getTrackingPlayers();
+
+
+    /**
      * Get the glow color of this part
      * @return a color, or null if not set or if this part's type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.
      */
     public abstract @Nullable Color getGlowColor();
 
     public abstract ActiveGroup getGroup();
+
+    /**
+     * Get this part's pitch
+     * @return a float
+     */
+    public abstract float getPitch();
+
+    /**
+     * Get this part's yaw
+     * @return a float
+     */
+    public abstract float getYaw();
+
+    /**
+     * Set this part's transformation data if it's type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * @param transformation the transformation
+     */
+    public abstract void setTransformation(@NotNull Transformation transformation);
+
+    /**
+     * Set this part's transformation data if it's type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * @param matrix the transformation matrix
+     */
+    public abstract void setTransformationMatrix(@NotNull Matrix4f matrix);
 
     /**
      * Set the text of this part if it's type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.

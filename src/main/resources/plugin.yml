@@ -1,9 +1,9 @@
 name: DisplayEntityUtils
 version: '${project.version}'
 main: net.donnypz.displayentityutils.DisplayEntityPlugin
-api-version: '1.21'
 author: DonnyPZ
 load: POSTWORLD
+api-version: 1.20
 softdepend:
   - MythicMobs
   - Skript

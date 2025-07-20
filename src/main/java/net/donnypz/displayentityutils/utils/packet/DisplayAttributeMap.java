@@ -1,9 +1,11 @@
 package net.donnypz.displayentityutils.utils.packet;
 
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -54,5 +56,14 @@ public class DisplayAttributeMap {
         add(DisplayAttributes.Transform.SCALE, new Vector3f(transformation.getScale()));
         add(DisplayAttributes.Transform.RIGHT_ROTATION, new Quaternionf(transformation.getRightRotation()));
         return this;
+    }
+
+    /**
+     * Set the values of a transformation through this single method instead of chaining
+     * @param matrix the transformation matrix
+     * @return this
+     */
+    public DisplayAttributeMap addTransformationMatrix(@NotNull Matrix4f matrix){
+        return addTransformation(DisplayUtils.getTransformation(matrix));
     }
 }

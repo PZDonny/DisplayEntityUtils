@@ -2,10 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
-import net.donnypz.displayentityutils.utils.CullOption;
-import net.donnypz.displayentityutils.utils.Direction;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.*;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
@@ -23,6 +20,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -165,6 +163,17 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return group;
     }
 
+    @Override
+    public float getPitch() {
+        return getEntity().getPitch();
+    }
+
+    @Override
+    public float getYaw() {
+        return getEntity().getYaw();
+    }
+
+
     public long getCreationTime() {
         if (!getEntity().getPersistentDataContainer().has(SpawnedDisplayEntityGroup.creationTimeKey)){
             return -1;
@@ -243,6 +252,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     public boolean addTag(@NotNull String tag){
         if (DisplayUtils.addTag(getEntity(), tag)){
+            partTags.add(tag);
             return true;
         }
         return false;
@@ -255,6 +265,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     public SpawnedDisplayEntityPart removeTag(@NotNull String tag){
         DisplayUtils.removeTag(getEntity(), tag);
+        partTags.remove(tag);
         return this;
     }
 
@@ -283,13 +294,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             }
         }
         DisplayUtils.addTags(entity, legacyTags);
-    }
-
-    SpawnedDisplayEntityPart setTransformation(Transformation transformation){
-        if (type != PartType.INTERACTION){
-            ((Display) entity).setTransformation(transformation);
-        }
-        return this;
     }
 
     SpawnedDisplayEntityPart setMaster(){
@@ -518,6 +522,11 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
     }
 
+    @Override
+    public Collection<Player> getTrackingPlayers() {
+        return new HashSet<>(getEntity().getTrackedBy());
+    }
+
     private void temporaryParticles(Entity entity, long durationInTicks, Particle particle){
         entity.setGlowing(true);
 
@@ -614,13 +623,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     /**
      * Set the teleport duration of this part
-     * @param teleportDuration the teleport duration to set
      */
     @Override
     public void setTeleportDuration(int teleportDuration) {
-        if (type == PartType.INTERACTION){
-            return;
-        }
+        if (type == PartType.INTERACTION) return;
         Display display = (Display) getEntity();
         display.setTeleportDuration(teleportDuration);
     }
@@ -807,6 +813,18 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         group.addInteractionEntity(interaction);
 
         return interaction;
+    }
+
+    @Override
+    public void setTransformation(@NotNull Transformation transformation) {
+        if (type == PartType.INTERACTION) return;
+        ((Display) getEntity()).setTransformation(transformation);
+    }
+
+    @Override
+    public void setTransformationMatrix(@NotNull Matrix4f matrix) {
+        if (type == PartType.INTERACTION) return;
+        ((Display) getEntity()).setTransformationMatrix(matrix);
     }
 
     @Override

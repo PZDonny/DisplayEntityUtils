@@ -42,6 +42,7 @@ public class SkriptTypes {
                     }
                 })
         );
+        Converters.registerConverter(ActiveGroup.class, Location.class, ActiveGroup::getLocation);
 
         Classes.registerClass(new ClassInfo<>(SpawnedDisplayEntityGroup.class, "spawnedgroup")
                 .user("spawned( |-)?(group|model)s?")

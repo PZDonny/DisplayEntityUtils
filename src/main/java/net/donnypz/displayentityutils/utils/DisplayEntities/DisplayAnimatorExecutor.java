@@ -82,10 +82,8 @@ final class DisplayAnimatorExecutor {
     }
 
     private void executeAnimation(SpawnedDisplayAnimation animation, SpawnedDisplayEntityGroup group, SpawnedPartSelection selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame){
-        if (!group.isActiveAnimator(animator)){
-            return;
-        }
-        if (!group.isRegistered()){
+        if (!group.isActiveAnimator(animator) || !group.isRegistered()){
+            selection.remove();
             return;
         }
 
@@ -118,6 +116,7 @@ final class DisplayAnimatorExecutor {
         group.setLastAnimatedTick();
 
         if (playSingleFrame){
+            selection.remove();
             return;
         }
 
@@ -309,13 +308,13 @@ final class DisplayAnimatorExecutor {
             if (group.canApplyVerticalRideOffset()){
                 translationVector.add(0, group.getVerticalRideOffset(), 0);
             }
-            displayPivotTranslation(group, part, translationVector);
+            addFollowerDisplayPivot(group, part, translationVector);
 
             Transformation respectTransform = new DisplayTransformation(translationVector, transformation.getLeftRotation(), scaleVector, transformation.getRightRotation());
             display.setTransformation(respectTransform);
         }
         else{
-            displayPivotTranslation(group, part, translationVector);
+            addFollowerDisplayPivot(group, part, translationVector);
 
             if (group.canApplyVerticalRideOffset()){
                 translationVector.add(0, group.getVerticalRideOffset(), 0);
@@ -332,7 +331,7 @@ final class DisplayAnimatorExecutor {
         }
     }
 
-    private void displayPivotTranslation(SpawnedDisplayEntityGroup group, SpawnedDisplayEntityPart part, Vector3f translationVector){
+    static void addFollowerDisplayPivot(ActiveGroup group, ActivePart part, Vector3f translationVector){
         for (SpawnedDisplayFollower follower : group.followers){
             if (!follower.hasSetDisplayPivotData()){
                 continue;

@@ -21,17 +21,17 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     int delayInTicks = 0;
     AnimationParticle editParticle = null;
 
-    Component prefix = DisplayEntityPlugin.pluginPrefix;
-    Component particleMSG = prefix.append(Component.text("Enter the name of the particle to use", NamedTextColor.YELLOW));
-    Component amountMSG = prefix.append(Component.text("Enter the amount of particles to spawn", NamedTextColor.YELLOW));
-    Component colorMSG = prefix.append(Component.text("Enter the color to set for the particle(s) and a particle size", NamedTextColor.YELLOW));
-    Component colorTransitionMSG = prefix.append(Component.text("Enter the color transition to set for the particle(s) and a particle size", NamedTextColor.YELLOW));
-    Component extraMSG = prefix.append(Component.text("Enter the extra value for the particle(s)", NamedTextColor.YELLOW));
-    Component blockMSG = prefix.append(Component.text("Enter the block to use for the particle(s).\nType \"-held\" to use your held block item, \"-target\" for your targeted block, or the block's id.", NamedTextColor.YELLOW));
-    Component itemMSG = prefix.append(Component.text("Enter the item to use for the particle(s)", NamedTextColor.YELLOW));
-    Component offsetMSG = prefix.append(Component.text("Enter the x, y, and z offset for the particle(s)", NamedTextColor.YELLOW));
-    Component delayMSG = prefix.append(Component.text("Enter the amount of delay (in ticks) before the particle should be shown", NamedTextColor.YELLOW));
-    Component separatedMSG = Component.text("All values should be entered separated by spaces.", NamedTextColor.GRAY, TextDecoration.ITALIC);
+    private static final Component prefix = DisplayEntityPlugin.pluginPrefix;
+    private static final Component particleMSG = prefix.append(Component.text("Enter the name of the particle to use", NamedTextColor.YELLOW));
+    private static final Component amountMSG = prefix.append(Component.text("Enter the amount of particles to spawn", NamedTextColor.YELLOW));
+    private static final Component colorMSG = prefix.append(Component.text("Enter the color to set for the particle(s) and a particle size", NamedTextColor.YELLOW));
+    private static final Component colorTransitionMSG = prefix.append(Component.text("Enter the color transition to set for the particle(s) and a particle size", NamedTextColor.YELLOW));
+    private static final Component extraMSG = prefix.append(Component.text("Enter the extra value for the particle(s)", NamedTextColor.YELLOW));
+    private static final Component blockMSG = prefix.append(Component.text("Enter the block to use for the particle(s).\nType \"-held\" to use your held block item, \"-target\" for your targeted block, or the block's id.", NamedTextColor.YELLOW));
+    private static final Component itemMSG = prefix.append(Component.text("Enter the item to use for the particle(s)", NamedTextColor.YELLOW));
+    private static final Component offsetMSG = prefix.append(Component.text("Enter the x, y, and z offset for the particle(s)", NamedTextColor.YELLOW));
+    private static final Component delayMSG = prefix.append(Component.text("Enter the amount of delay (in ticks) before the particle should be shown", NamedTextColor.YELLOW));
+    private static final Component separatedMSG = Component.text("All values should be entered separated by spaces.", NamedTextColor.GRAY, TextDecoration.ITALIC);
 
     @ApiStatus.Internal
     public AnimationParticleBuilder(@NotNull Player player, @NotNull FramePoint framePoint){
@@ -43,12 +43,28 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     }
 
     @ApiStatus.Internal
-    public AnimationParticleBuilder(@NotNull Player player, AnimationParticle editParticle, Step step){
+    public AnimationParticleBuilder(@NotNull Player player, @NotNull AnimationParticle editParticle, Step step){
         super(Particle.FLAME);
         this.player = player;
         DEUUser.getOrCreateUser(player).setAnimationParticleBuilder(this);
         advanceStep(step);
         this.editParticle = editParticle;
+    }
+
+    private AnimationParticleBuilder(FramePoint framePoint, Particle particle){
+        super(particle);
+        this.framePoint = framePoint;
+    }
+
+    @ApiStatus.Internal
+    public static AnimationParticleBuilder create(@NotNull FramePoint framePoint, @NotNull Particle particle, int count, double xOffset, double yOffset, double zOffset, double extra, Object data){
+        AnimationParticleBuilder builder = new AnimationParticleBuilder(framePoint, particle);
+        builder
+                .count(count)
+                .extra(extra)
+                .offset(xOffset, yOffset, zOffset)
+                .data(data);
+        return builder;
     }
 
     public void delay(int delayInTicks){

@@ -1,73 +1,59 @@
-#Group and Animation Storage Locations:
-#It is recommended to enable "cacheAnimations" in the plugin config
-#LOCAL
-#MYSQL
-#MONGODB
-#NULL (Use this if you will handle loading the group/animation through the API's Null(Group/Animation)LoadEvent)
-
-#The identifier for this controller
-#USE UNIQUE IDs FOR EACH CONTROLLER
+#The UNIQUE identifier for this controller
 controllerID: "example"
 
-#----------------------------------------------------
-#Mythic Mobs:
-#Associate a group with mythic mobs of the specified type(s)
-#The group will be associated to the mythic mob when spawned
+#--------------------Mythic Mobs--------------------
+#Spawn a group/model that will ride the listed MythicMobs
 #
-#NOTE: If planning to use this controller through the API, without MythicMobs,
+#NOTE: If planning to use this controller through the API or Skript, without MythicMobs,
 #simply set "mythicMobs" to []
 #----------------------------------------------------
-mythicMobs: ["ExampleMythicMob", "ExampleMythicMob2"]
-
-
-#------------------------------------------------------
-#Group Properties:
-#------------------------------------------------------
-groupProperties:
-  tag: "tag-of-group"
-  storage: LOCAL
-  #Set "flip" to true to reverse this group's follow property directions
-  #This is useful if your model is facing the opposite direction than intended
-  flip: false
-  #Set the vertical offset that this group should have when attached to an entity
-  verticalOffset: 0
-  #Determine if the group should be visible by default when spawned
-  visibleByDefault: true
-
+mythicMobs:
+  mobs: ["ExampleMythicMob", "ExampleMythicMob2"]
+  group:
+    tag: "group-tag"
+    #Storages: LOCAL, MYSQL, MONGODB, NULL (Handled through API with NullGroupLoaderEvent)
+    storage: LOCAL
+    #Reverses this group's follow property directions
+    #This is useful if your group was oriented in the opposite direction than intended
+    flip: false
+    #The vertical offset that should be applied to the group when riding an entity
+    verticalOffset: 0
+    #Determine if the group should be visible by default when spawned
+    visibleByDefault: true
 
 #-----------------------------------------------------------------------
 #Follow Properties:
-#Determine how the parts in a group will respect actions of an entity
+#Determine how the parts in a group will respect the looking direction of an entity
 #-----------------------------------------------------------------------
 defaultFollowProperties:
-  #Entity Follow Types (Controls how the group/model will move in orient itself in respect to the mythic mob):
-  #PITCH_AND_YAW -> Follows an entity's head pitch and yaw
-  #PITCH -> Follows an entity's head pitch
-  #YAW -> Follows an entity's head yaw
-  #BODY -> Follows an entity's body yaw
-  #NONE -> Following will be disabled
-  entityFollowType: PITCH_AND_YAW
+  #Controls how the group will orient itself in respect to the mythic mob direction:
+  #Types: PITCH_AND_YAW, PITCH, YAW, BODY, NONE (disables)
+  followType: PITCH_AND_YAW
 
   #"deathDespawnDelay" can be set to -1 to disable removal of a group, after an entity's death.
   #The delay is measured in ticks and the value is the same for the default follow properties and part follow properties.
+  #How long in ticks the group should be despawned after the death of a ridden entity
   deathDespawnDelay: 20
 
   #"teleportDuration" controls how smoothly the group will respect the entity's looking direction
   #The duration is measured in ticks.
   teleportationDuration: 2
 
-  #Determine if interaction entities should pivot (left/right) while following an entity's yaw
+  #Determine if interaction entities should horizontally pivot while following an entity's yaw
   pivotInteractions: false
 
-  #Apply additional pivot (up/down) to display entities while following an entity's pitch
-  pivotDisplays:
+  #Adjust displays to have a more predictable pitch rotation (when using PITCH_AND_YAW or PITCH follow types)
+  #
+  #This is useful especially when a model is shown as "attached" to an entity's head and
+  #is expected to stay attached
+  adjustDisplays:
     enabled: false
 
-    #The up/down offset distance percentage (Ex: The offset from the top of a player's head)
-    yOffsetPercentage: 100
+    #The local up/down offset distance percentage (Ex: The offset from the top of a player's head)
+    yDisplayAdjustPercentage: 100
 
-    #The forward/backwards offset distance percentage
-    zOffsetPercentage: 100
+    #The local forward/backwards offset distance percentage
+    zDisplayAdjustPercentage: 100
 
   #Determine whether certain animation states will enable/disable this follow property
   #If a state disables this property, the parts in the property will use the stop following
@@ -78,49 +64,31 @@ defaultFollowProperties:
     #If false, the listed states WILL use this follow property if they are the active state
     blacklist: true
 
-#Follow Properties that parts with specified tags will use
+#Follow Properties that parts with the listed tags will respect
 #If setting follow properties for parts with certain tags is not desired, the section below can be omitted
 partFollowProperties:
-  #An example of setting a property for parts with the tag "head"
-  headProperty: #The ID to give this follow property
+  - id: "part_follow_prop_head"
     partTags: ["head"]
-    entityFollowType: PITCH_AND_YAW
+    followType: PITCH_AND_YAW
     teleportationDuration: 2
     pivotInteractions: false
-    pivotDisplays:
+    adjustDisplays:
       enabled: false
-      yOffsetPercentage: 100
-      zOffsetPercentage: 100
-    #If a state disables this part follow property, the parts in the property will use the defaultFollowProperty's settings
+      yDisplayAdjustPercentage: 100
+      zDisplayAdjustPercentage: 100
+    #If a state disables this part follow property,
+    #the parts in the property will use the defaultFollowProperty's settings
     stateFilter:
       states: []
       blacklist: true
-
-
-
-
-#----------------------------------------------------------------------------------------
-#Animation States:
-#Remove the ENTIRE "states" section if creating an animation state machine is NOT desired
-#
-#Removing unwanted states will not interfere with other animation states
-#For example:
-#You can remove the "spawn" state and keep the "idle" state, and the idle state will still work as expected
-#
-#"animationType" determines how the animation will be played.
-#"LINEAR" will play the animation one time through
-#"LOOP" will play the animation repeatedly, from the beginning
-#
-#"lockTransition" stops other animations from being played before the
-#current one finishes its animation cycle
-#
-#NOTES:
-#- An "animationType" of "LOOP" with a true "lockTransition" may lead to blocking transitions to other states
-#
-#- The death state will ALWAYS ignore the "lockTransition" value of other states
-#
-#- If the entity has AI, and it's disabled, the automatic states (Not Mythic nor API created states) will not change the current animation state.
-#----------------------------------------------------------------------------------------
+  - id: "part_follow_prop_body"
+    partTags: ["body"]
+    followType: BODY
+    teleportationDuration: 2
+    pivotInteractions: true
+    stateFilter:
+      states: []
+      blacklist: true
 
 states:
   #------------------------------------------
@@ -144,49 +112,51 @@ states:
 
   #Below, animations can be triggered when an associated entity/mythic mob performs an action below
   spawn:
-    animation: "spawn_animation"
+    #Multiple animations will be picked at random
+    animations: ["spawn_animation_1", "spawn_animation_2"]
+    #Storages: LOCAL, MYSQL, MONGODB, NULL (Handled through API with NullAnimationLoaderEvent)
     storage: LOCAL
     animationType: LINEAR
     lockTransition: true
 
   death:
-    animation: "death_animation"
+    animations: ["death_animation_1", "death_animation_2"]
     storage: LOCAL
     animationType: LINEAR
     lockTransition: true
 
   idle:
-    animation: "idle_animation"
+    animations: ["idle_animation"]
     storage: LOCAL
     animationType: LOOP
     lockTransition: false
 
   walk:
-    animation: "walk_animation"
+    animations: ["walk_animation"]
     storage: LOCAL
     animationType: LOOP
     lockTransition: false
 
   swimming:
-    animation: "swim_animation"
+    animations: ["swim_animation"]
     storage: LOCAL
     animationType: LOOP
     lockTransition: false
 
   jump:
-    animation: "jump_animation"
+    animations: ["jump_animation"]
     storage: LOCAL
     animationType: LOOP
     lockTransition: true
 
   falling:
-    animation: "falling_animation"
+    animations: ["falling_animation"]
     storage: LOCAL
     animationType: LOOP
     lockTransition: false
 
   melee:
-    animation: "melee_animation"
+    animations: ["melee_animation"]
     storage: LOCAL
     animationType: LINEAR
     lockTransition: true
@@ -200,20 +170,19 @@ states:
     maxRange: 2
 
   shoot_bow:
-    animation: "shoot_bow_animation"
+    animations: ["shoot_bow_animation"]
     storage: LOCAL
     animationType: LINEAR
     lockTransition: true
 
   damaged:
-    animation: "damaged_animation"
+    animations: ["damaged_animation"]
     storage: LOCAL
     animationType: LINEAR
     lockTransition: true
 
   teleport:
-    animation: "teleport_animation"
+    animations: ["teleport_animation"]
     storage: LOCAL
     animationType: LINEAR
     lockTransition: false
-

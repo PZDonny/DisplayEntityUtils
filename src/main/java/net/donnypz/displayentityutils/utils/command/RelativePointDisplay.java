@@ -15,8 +15,8 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -94,9 +94,7 @@ public abstract class RelativePointDisplay {
         return part.getTags().contains(pointDisplayTag);
     }
 
-    public RelativePoint getRelativePoint() {
-        return relativePoint;
-    }
+    public abstract RelativePoint getRelativePoint();
 
     public abstract void leftClick(Player player);
 

@@ -11,16 +11,16 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class MachineState {
 
+    private static final Random random = new Random();
     private static final HashMap<MachineState, AnimatorData> animationlessStates = new HashMap<>();
     String stateID;
     boolean transitionLock;
     boolean ignoreOtherLocks;
-    DisplayAnimator animator;
+    List<DisplayAnimator> animators = new ArrayList<>();
     DisplayStateMachine stateMachine;
     int causeDelay = -1;
     float maxRange;
@@ -30,75 +30,77 @@ public class MachineState {
      * Create a machine state for an {@link DisplayStateMachine}, determining which animation should be played when this state is active
      * @param stateMachine the state machine
      * @param stateType this state's type
-     * @param animationTag the tag of the animation that should play when this state is active
+     * @param animationTags the tags of the animations that will be played (with random selection) through when this state is active
      * @param loadMethod where the animation will be loaded from. Null to determine the animation through the {@link NullGroupLoaderEvent}
      * @param animationType the type of animation
      * @param transitionLock whether this state should lock transitions to another state before this one's animation finishes
      * @apiNote Having the animation type as {@link DisplayAnimator.AnimationType#LOOP} will force the transitionLock to false, regardless of the value set.
      */
-    public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull StateType stateType, @NotNull String animationTag, @Nullable LoadMethod loadMethod, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock){
-        this(stateMachine, stateType.getStateID(), animationTag, loadMethod, animationType, transitionLock);
+    public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull StateType stateType, @NotNull List<String> animationTags, @Nullable LoadMethod loadMethod, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock){
+        this(stateMachine, stateType.getStateID(), animationTags, loadMethod, animationType, transitionLock);
     }
 
     /**
      * Create a machine state for an {@link DisplayStateMachine}, determining which animation should be played when this state is active
      * @param stateMachine the state machine
      * @param stateID this state's ID
-     * @param animationTag the tag of the animation that should play when this state is active
+     * @param animationTags the tags of the animations that will be played (with random selection) through when this state is active
      * @param loadMethod where the animation will be loaded from. Null to determine the animation through the {@link NullGroupLoaderEvent}
      * @param animationType the type of animation
      * @param transitionLock whether this state should lock transitions to another state before this one's animation finishes
      * @apiNote Having the animation type as {@link DisplayAnimator.AnimationType#LOOP} will force the transitionLock to false, regardless of the value set.
      */
-    public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull String stateID, @NotNull String animationTag, @Nullable LoadMethod loadMethod, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock){
+    public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull String stateID, @NotNull List<String> animationTags, @Nullable LoadMethod loadMethod, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock){
         this.stateMachine = stateMachine;
         this.stateID = stateID;
-        if (loadMethod == null){
-            SpawnedDisplayAnimation animation = DisplayAnimationManager.getCachedAnimation(animationTag);
-            if (animation == null){
-                animationlessStates.put(this, new AnimatorData(animationTag, animationType));
+        this.transitionLock = animationType != DisplayAnimator.AnimationType.LOOP && transitionLock;
+        for (String tag : animationTags){
+            if (loadMethod != null){
+                SpawnedDisplayAnimation animation = DisplayAnimationManager.getSpawnedDisplayAnimation(tag, loadMethod);
+                if (animation != null){
+                    this.animators.add(new DisplayAnimator(animation, animationType));
+                }
             }
             else{
-                this.animator = new DisplayAnimator(animation, animationType);
+                SpawnedDisplayAnimation animation = DisplayAnimationManager.getCachedAnimation(tag);
+                if (animation == null){
+                    animationlessStates.put(this, new AnimatorData(tag, animationType));
+                }
+                else{
+                    this.animators.add(new DisplayAnimator(animation, animationType));
+                }
             }
-
         }
-        else{
-            SpawnedDisplayAnimation animation = DisplayAnimationManager.getSpawnedDisplayAnimation(animationTag, loadMethod);
-            if (animation != null){
-                this.animator = new DisplayAnimator(animation, animationType);
-            }
-
-        }
-        this.transitionLock = animationType != DisplayAnimator.AnimationType.LOOP && transitionLock;
     }
 
     /**
      * Create a machine state for an {@link DisplayStateMachine}, determining which animation should be played when this state is active
      * @param stateMachine the state machine
      * @param stateType this state's type
-     * @param animation the animation that should play when this state is active
+     * @param animations the animations that will be played (with random selection) through when this state is active
      * @param animationType the type of animation
      * @param transitionLock whether this state should lock transitions to another state before this one's animation finishes
      * @apiNote Having the animation type as {@link DisplayAnimator.AnimationType#LOOP} will force the transitionLock to false, regardless of the value set.
      */
-    public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull StateType stateType, @NotNull SpawnedDisplayAnimation animation, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock){
-        this(stateMachine, stateType.getStateID(), animation, animationType, transitionLock);
+    public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull StateType stateType, @NotNull List<SpawnedDisplayAnimation> animations, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock){
+        this(stateMachine, stateType.getStateID(), animations, animationType, transitionLock);
     }
 
     /**
      * Create a machine state for an {@link DisplayStateMachine}, determining which animation should be played when this state is active
      * @param stateMachine the state machine
      * @param stateID this state's ID
-     * @param animation the animation that should play when this state is active
+     * @param animations the animations that will be played (with random selection) through when this state is active
      * @param animationType the type of animation
      * @param transitionLock whether this state should lock transitions to another state before this one's animation finishes
      * @apiNote Having the animation type as {@link DisplayAnimator.AnimationType#LOOP} will force the transitionLock to false, regardless of the value set.
      */
-    public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull String stateID, @NotNull SpawnedDisplayAnimation animation, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock){
+    public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull String stateID, @NotNull List<SpawnedDisplayAnimation> animations, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock){
         this.stateMachine = stateMachine;
         this.stateID = stateID;
-        this.animator = new DisplayAnimator(animation, animationType);
+        for (SpawnedDisplayAnimation anim : animations){
+            animators.add(new DisplayAnimator(anim, animationType));
+        }
         this.transitionLock = animationType != DisplayAnimator.AnimationType.LOOP && transitionLock;
     }
 
@@ -113,7 +115,7 @@ public class MachineState {
             e.callEvent();
             SpawnedDisplayAnimation animation = e.getAnimation();
             if (animation != null){
-                state.animator = new DisplayAnimator(animation, data.type);
+                state.animators.add(new DisplayAnimator(animation, data.type));
             }
         }
     }
@@ -177,11 +179,30 @@ public class MachineState {
     }
 
     /**
-     * Get the {@link DisplayAnimator} used for this machine state
-     * @return a {@link DisplayAnimator}
+     * Check if this state has any {@link DisplayAnimator}s
+     * @return a boolean
      */
-    public DisplayAnimator getDisplayAnimator(){
-        return animator;
+    public boolean hasDisplayAnimators(){
+        return !animators.isEmpty();
+    }
+
+    /**
+     * Get a random {@link DisplayAnimator} used for this machine state
+     * @return a {@link DisplayAnimator} or null if no animators are present
+     */
+    public @Nullable DisplayAnimator getRandomDisplayAnimator(){
+        if (animators.isEmpty()) return null;
+        return animators.get(random.nextInt(animators.size()));
+    }
+
+    /**
+     * Stop all {@link DisplayAnimator}s that this state uses from playing on a group
+     * @param group the group
+     */
+    public void stopDisplayAnimators(@NotNull ActiveGroup group){
+        for (DisplayAnimator animator : animators){
+            animator.stop(group);
+        }
     }
 
     @ApiStatus.Internal
