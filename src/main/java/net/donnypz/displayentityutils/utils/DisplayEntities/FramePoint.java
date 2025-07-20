@@ -431,9 +431,9 @@ public class FramePoint extends RelativePoint implements Serializable {
         }
 
         player.sendMessage(Component.empty());
-        player.sendMessage(Component.text("Right Click to PREVIEW effects", NamedTextColor.GOLD));
-        player.sendMessage(Component.text("Sneak+Right Click to DELETE", NamedTextColor.RED));
-        player.sendMessage(Component.text("| Use \"/mdis anim cancelpoints\" to hide revealed points", NamedTextColor.GRAY));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>RIGHT</yellow> <aqua>click to preview effects"));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Sneak+Right Click</gray> <red>to DELETE"));
+        player.sendMessage(Component.text("| Use \"/mdis anim cancelpoints\" to hide revealed points", NamedTextColor.WHITE, TextDecoration.ITALIC));
     }
 
 }
