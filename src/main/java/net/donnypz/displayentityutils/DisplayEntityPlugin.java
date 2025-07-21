@@ -22,7 +22,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TestCommand;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TextDisplayTools;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TextDisplayUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -118,7 +118,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         initializeBStats();
         getServer().getConsoleSender().sendMessage(pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
         if (enableTextDisplayManager){
-            TextDisplayTools.checkSpawnChunks();
+            TextDisplayUtils.checkSpawnChunks();
             getCommand("test").setExecutor(new TestCommand());
         }
     }

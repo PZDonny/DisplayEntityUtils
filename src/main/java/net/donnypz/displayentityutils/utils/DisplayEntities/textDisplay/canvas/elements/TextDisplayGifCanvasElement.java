@@ -9,12 +9,14 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class TextDisplayGifCanvasElement extends TextDisplayCanvasElement {
-        private int frame = 0;
-        private List<Matrix2dContainer<TextDisplayElementPixel>> frames = new ArrayList<>();
-        private int age = 0;
+    private int frame = 0;
+    private List<Matrix2dContainer<TextDisplayElementPixel>> frames = new ArrayList<>();
+    private int age = 0;
+
     public TextDisplayGifCanvasElement(){
         updateInterval = 80;
     }
+
     private void frameUp(){
         frame++;
         if (frame>frames.size()-1){

@@ -26,34 +26,40 @@ public class PixelGroup {
     public List<Player> getViewerPlayers() {
         return viewerPlayers;
     }
+
     public void addViewer(Player player){
         viewerPlayers.add(player);
         for (TextDisplayPixel pixel: pixels){
             pixel.getPart().showToPlayer(player, GroupSpawnedEvent.SpawnReason.CUSTOM);
         }
     }
+
     public void addViewer(UUID player){
         addViewer(Bukkit.getPlayer(player));
     }
+
     public void removeViewer(Player player){
         viewerPlayers.remove(player);
         for (TextDisplayPixel pixel: pixels){
             pixel.getPart().hideFromPlayer(player);
         }
     }
+
     public void removeViewer(UUID player){
         removeViewer(Bukkit.getPlayer(player));
 
     }
+
     public void sync(){
         for (TextDisplayPixel pixel:pixels){
             pixel.getPart().showToPlayers(viewerPlayers, GroupSpawnedEvent.SpawnReason.CUSTOM);
         }
     }
+
     public void strictSync(){
         for (TextDisplayPixel pixel:pixels){
 
-            for (Player player: pixel.getPart().getViewersAsPlayers()){
+            for (Player player: pixel.getPart().getTrackingPlayers()){
                 if (!viewerPlayers.contains(player)){
                     pixel.getPart().hideFromPlayer(player);
                 }

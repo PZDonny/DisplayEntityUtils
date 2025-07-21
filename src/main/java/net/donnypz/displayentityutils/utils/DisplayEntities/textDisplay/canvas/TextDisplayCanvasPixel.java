@@ -17,10 +17,10 @@ public class TextDisplayCanvasPixel extends TextDisplayPixelBasicCanvas {
 
     }
 
-
     public TextDisplayCanvasPixel(Color color, int x, int y, Matrix2dContainer<TextDisplayPixelBasicCanvas> container) {
         super(color, x, y, container);
     }
+
     public TextDisplayCanvasPixel(List<Integer> color, int x, int y, Matrix2dContainer<? extends TextDisplayPixel> container) {
         super(color,x, y,container);
     }
@@ -32,7 +32,7 @@ public class TextDisplayCanvasPixel extends TextDisplayPixelBasicCanvas {
 
 
     @Override
-    protected void subUpdate() {
+    protected void onUpdate() {
 
     }
 
@@ -42,7 +42,7 @@ public class TextDisplayCanvasPixel extends TextDisplayPixelBasicCanvas {
     }
 
     @Override
-    protected void subLoad() {
+    protected void onLoad() {
 
     }
 

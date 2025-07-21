@@ -4,7 +4,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityP
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.Matrix.Matrix2dContainer;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TextDisplaySettings;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TextDisplayTools;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TextDisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Color;
@@ -22,17 +22,10 @@ public abstract class TextDisplayPixel {
     protected int red = 0;
     protected int green = 0;
     protected int blue = 0;
-    //
 
     protected final transient PacketDisplayEntityPart part;
 
-    public  PacketDisplayEntityPart getPart() {
-        return part;
-    }
-
     protected Matrix4f transformation = new Matrix4f().identity();
-
-
 
 
     // Pixel size - width & height in pixel units WIP
@@ -47,10 +40,13 @@ public abstract class TextDisplayPixel {
     
     protected transient TextDisplaySettings settings;
 
+    public PacketDisplayEntityPart getPart() {
+        return part;
+    }
+
     protected TextDisplayPixel() {
         part = new PacketAttributeContainer().createPart(SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY);
     }
-
 
     protected TextDisplayPixel(Color color) {
         this();
@@ -103,7 +99,7 @@ public abstract class TextDisplayPixel {
             render = alpha != 0;
         }
         hasUpdated = true;
-        part.setAttribute(DisplayAttributes.TextDisplay.BACKGROUND_COLOR,Color.fromARGB(alpha,red,green,blue));
+        part.setAttribute(DisplayAttributes.TextDisplay.BACKGROUND_COLOR, Color.fromARGB(alpha,red,green,blue));
     }
     public void ride(Entity mount) { //WIP
         if (mount==null){
@@ -181,7 +177,7 @@ public abstract class TextDisplayPixel {
     public Matrix4f getTextDisplayMatrix4f(){
         if (part == null||part.getDisplayTransformation()==null)
             return null;
-        return TextDisplayTools.transformationToMatrix(part.getDisplayTransformation());
+        return TextDisplayUtils.transformationToMatrix(part.getDisplayTransformation());
     }
     public Location getLocation(){
         if (part==null){

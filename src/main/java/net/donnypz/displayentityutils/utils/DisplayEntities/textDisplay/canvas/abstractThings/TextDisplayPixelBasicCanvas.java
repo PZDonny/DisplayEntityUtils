@@ -2,14 +2,13 @@ package net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.
 
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.pixels.PixelGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.pixels.TextDisplayPixel;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.pixels.TextDisplayPixelBasic;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.Matrix.Matrix2dContainer;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.Matrix.MatrixCords;
 import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TextDisplaySettings;
-import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TextDisplayTools;
+import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.tools.TextDisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import net.kyori.adventure.text.Component;
@@ -33,6 +32,7 @@ public abstract class TextDisplayPixelBasicCanvas extends TextDisplayPixelBasic 
     public TextDisplayPixelBasicCanvas(int x, int y) {
         cords = new MatrixCords(x ,y,this);
     }
+
     public TextDisplayPixelBasicCanvas(int x, int y, Matrix2dContainer<? extends TextDisplayPixel> container) {
     }
 
@@ -96,7 +96,7 @@ public abstract class TextDisplayPixelBasicCanvas extends TextDisplayPixelBasic 
     }
     private void spawnBackFace(Location location){
         if (backFace!=null){
-            backFace.hideFromPlayers(backFace.getViewersAsPlayers());
+            backFace.hideFromPlayers(backFace.getTrackingPlayers());
             backFace = null;
         }
         if (!twoFaced){
@@ -127,33 +127,35 @@ public abstract class TextDisplayPixelBasicCanvas extends TextDisplayPixelBasic 
             g = Math.round(g * settings.AdjustBrightnessAmount);
             b = Math.round(b * settings.AdjustBrightnessAmount);
         }
-        part.setAttribute(DisplayAttributes.TextDisplay.BACKGROUND_COLOR,Color.fromARGB(a, r, g, b));
+        part.setAttribute(DisplayAttributes.TextDisplay.BACKGROUND_COLOR, Color.fromARGB(a, r, g, b));
         if (twoFaced&&backFace==null){
             spawnBackFace(part.getLocation());
         }
-        if (!twoFaced&&backFace!=null){
-            backFace.hideFromPlayers(backFace.getViewersAsPlayers());
+        if (!twoFaced && backFace!=null){
+            backFace.hideFromPlayers(backFace.getTrackingPlayers());
             backFace=null;
         }
         updateSettings(part);
         if (backFace!=null) {
-            backFace.setAttribute(DisplayAttributes.TextDisplay.BACKGROUND_COLOR,Color.fromARGB(a, r, g, b));
+            backFace.setAttribute(DisplayAttributes.TextDisplay.BACKGROUND_COLOR, Color.fromARGB(a, r, g, b));
             updateSettings(backFace);
         }
         if(oldMatrix4f!=settings.Matrix4f) {
             updateTransformation();
         }
         hasUpdated = false;
-        subUpdate();
+        onUpdate();
     }
-    protected abstract void subUpdate();
+
+    protected abstract void onUpdate();
+
     @Override
     public void despawn() {
         if (part!=null){
-            part.hideFromPlayers(part.getViewersAsPlayers());
+            part.hideFromPlayers(part.getTrackingPlayers());
         }
         if (backFace!=null){
-            backFace.hideFromPlayers(backFace.getViewersAsPlayers());
+            backFace.hideFromPlayers(backFace.getTrackingPlayers());
         }
         canvasGroup.remove(this);
         render = false;
@@ -172,9 +174,11 @@ public abstract class TextDisplayPixelBasicCanvas extends TextDisplayPixelBasic 
         } else {
             this.cords.migrateMatrix(container);
         }
-        subLoad();
+        onLoad();
     }
-    protected abstract void subLoad();
+
+    protected abstract void onLoad();
+
     @Override
     protected void updateTransformation() {
 
@@ -201,28 +205,29 @@ public abstract class TextDisplayPixelBasicCanvas extends TextDisplayPixelBasic 
         oldMatrix4f = new Matrix4f(settings.Matrix4f);
         matrix4f.scale(realWidth,realHeight , 1);
         matrix4f.translate(magicOffsetX * offsetX, magicOffsetY * offsetY, 0);
-        Transformation setTransformation = TextDisplayTools.matrixToTransformation(matrix4f);
+        Transformation setTransformation = TextDisplayUtils.matrixToTransformation(matrix4f);
         part.setAttribute(DisplayAttributes.Transform.SCALE,setTransformation.getScale());
         part.setAttribute(DisplayAttributes.Transform.TRANSLATION,setTransformation.getTranslation());
         part.setAttribute(DisplayAttributes.Transform.RIGHT_ROTATION,setTransformation.getRightRotation());
         part.setAttribute(DisplayAttributes.Transform.LEFT_ROTATION,setTransformation.getLeftRotation());
-        for (Player player:part.getViewersAsPlayers()){
+        for (Player player:part.getTrackingPlayers()){
             part.resendAttributes(player);
         }
         transformation = matrix4f;;
         if (twoFaced&&backFace!=null){
             Matrix4f backMatrix4f = new Matrix4f(transformation);
             backMatrix4f.rotateY((float) Math.toRadians(180));
-            Transformation backTransformation = TextDisplayTools.matrixToTransformation(backMatrix4f);
+            Transformation backTransformation = TextDisplayUtils.matrixToTransformation(backMatrix4f);
 
             backFace.setAttribute(DisplayAttributes.Transform.SCALE,backTransformation.getScale());
             backFace.setAttribute(DisplayAttributes.Transform.TRANSLATION,backTransformation.getTranslation());
             backFace.setAttribute(DisplayAttributes.Transform.RIGHT_ROTATION,backTransformation.getRightRotation());
             backFace.setAttribute(DisplayAttributes.Transform.LEFT_ROTATION,backTransformation.getLeftRotation());
-            if ( !backFace.getViewersAsPlayers().containsAll(part.getViewersAsPlayers())){
-            backFace.showToPlayers(part.getViewersAsPlayers(), GroupSpawnedEvent.SpawnReason.CUSTOM);
-            }else {
-                for (Player player:backFace.getViewersAsPlayers()){
+            if ( !backFace.getTrackingPlayers().containsAll(part.getTrackingPlayers())){
+            backFace.showToPlayers(part.getTrackingPlayers(), GroupSpawnedEvent.SpawnReason.CUSTOM);
+            }
+            else {
+                for (Player player:backFace.getTrackingPlayers()){
                     backFace.resendAttributes(player);
                 }
             }

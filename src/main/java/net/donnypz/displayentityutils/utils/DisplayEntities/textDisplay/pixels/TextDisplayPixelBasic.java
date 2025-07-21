@@ -17,7 +17,7 @@ import org.joml.Vector3f;
 
 public class TextDisplayPixelBasic extends TextDisplayPixel {
 
-            protected Matrix4f oldMatrix4f;
+    protected Matrix4f oldMatrix4f;
 
     public TextDisplayPixelBasic(){
 
@@ -85,10 +85,9 @@ public class TextDisplayPixelBasic extends TextDisplayPixel {
     }
     @Override
     public void despawn() {
-        if (part!=null){
-            part.hideFromPlayers(part.getViewersAsPlayers());
+        if (part != null){
+            part.hideFromPlayers(part.getTrackingPlayers());
         }
-
     }
 
     @Override

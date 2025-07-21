@@ -29,7 +29,7 @@ public class TestCommand implements CommandExecutor {
                 TextDisplayCanvas screen = new TextDisplayCanvas();
                 TextDisplayGifCanvasElement gif = new TextDisplayGifCanvasElement();
 
-                gif.setFrames(TextDisplayTools.gifToPixelMatrixList(TextDisplayTools.getGifStream("https://cdn.pixabay.com/animation/2024/06/23/05/08/05-08-33-791_512.gif")));
+                gif.setFrames(TextDisplayUtils.gifToPixelMatrixList(TextDisplayUtils.getGifStream("https://cdn.pixabay.com/animation/2024/06/23/05/08/05-08-33-791_512.gif")));
                 if (gif.getFrames().isEmpty()) {
                     player.sendMessage("Walla");
                 }
@@ -43,13 +43,13 @@ public class TestCommand implements CommandExecutor {
 
                 TextDisplayCanvas screen = new TextDisplayCanvas();
                 TextDisplayStaticCanvasElement walla = new TextDisplayStaticCanvasElement();
-                BufferedImage image = TextDisplayTools.getTexture("https://i.imgur.com/Ioq9Rzu.png");
+                BufferedImage image = TextDisplayUtils.getTexture("https://i.imgur.com/Ioq9Rzu.png");
                 if (image == null) {
                     player.sendMessage("walla");
                     return true;
                 }
 
-                walla.setImage(TextDisplayTools.bufferedImageToPixelMatrix(image));
+                walla.setImage(TextDisplayUtils.bufferedImageToPixelMatrix(image));
                 screen.addElement(walla);
                 screen.spawnFlipped(player.getEyeLocation());
 
@@ -64,7 +64,7 @@ public class TestCommand implements CommandExecutor {
                         screen.remove();
                     }
                 });
-                button.setImage(TextDisplayTools.bufferedImageToPixelMatrix(TextDisplayTools.getTexture(args[1])));
+                button.setImage(TextDisplayUtils.bufferedImageToPixelMatrix(TextDisplayUtils.getTexture(args[1])));
                 screen.addElement(button);
                 screen.spawnFlipped(player.getEyeLocation());
 
@@ -80,7 +80,7 @@ public class TestCommand implements CommandExecutor {
                         self.getCanvas().remove();
                     }
                 });
-                buttonScreenElement.setImage(TextDisplayTools.bufferedImageToPixelMatrix(TextDisplayTools.getTexture("item/ender_eye.png")));
+                buttonScreenElement.setImage(TextDisplayUtils.bufferedImageToPixelMatrix(TextDisplayUtils.getTexture("item/ender_eye.png")));
                 screen.addElement(buttonScreenElement);
                 screen.spawn(player.getEyeLocation());
                 return true;

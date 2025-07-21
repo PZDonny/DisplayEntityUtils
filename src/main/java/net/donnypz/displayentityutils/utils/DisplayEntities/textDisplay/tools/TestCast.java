@@ -43,8 +43,8 @@ public class TestCast {
                     Location loc = player.getEyeLocation();
                     forward = loc.getDirection().toVector3f();
                     loc.add(loc.getDirection().normalize().multiply(4));
-                    BufferedImage castButton = TextDisplayTools.getTexture("https://i.imgur.com/xe6UsZL.png");
-                    BufferedImage castIcon = TextDisplayTools.getTexture("https://i.imgur.com/Ioq9Rzu.png");
+                    BufferedImage castButton = TextDisplayUtils.getTexture("https://i.imgur.com/xe6UsZL.png");
+                    BufferedImage castIcon = TextDisplayUtils.getTexture("https://i.imgur.com/Ioq9Rzu.png");
                     if (castIcon==null){
                         player.sendMessage("castIcon==null");
                         return;
@@ -61,12 +61,12 @@ public class TestCast {
                             start();
                         }
                     });
-                    button.setImage(TextDisplayTools.bufferedImageToPixelMatrix(castButton));
+                    button.setImage(TextDisplayUtils.bufferedImageToPixelMatrix(castButton));
                     button.setLayer(11);
                     TextDisplayStaticCanvasElement icon = new TextDisplayStaticCanvasElement();
                     icon.setTwoFaced(true);
                     button.setTwoFaced(true);
-                    icon.setImage(TextDisplayTools.bufferedImageToPixelMatrix(castIcon));
+                    icon.setImage(TextDisplayUtils.bufferedImageToPixelMatrix(castIcon));
                     icon.setX(-64);
                     icon.setY(64);
                     screen.getSettings().TeleportDuration=1;

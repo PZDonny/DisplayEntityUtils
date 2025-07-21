@@ -7,12 +7,11 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.textDisplay.canvas.a
 public class TextDisplayStaticCanvasElement extends TextDisplayCanvasElement {
 
 
-
-
     @Override
     public void update() {
 
     }
+
     @Override
     public void remove() {
         pixels = new Matrix2dContainer<>(TextDisplayElementPixel.class);

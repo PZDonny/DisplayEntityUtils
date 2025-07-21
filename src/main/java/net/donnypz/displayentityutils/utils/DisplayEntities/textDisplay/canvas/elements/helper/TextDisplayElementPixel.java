@@ -28,7 +28,7 @@ public class TextDisplayElementPixel extends TextDisplayPixelBasicCanvas {
 
 
     @Override
-    protected void subUpdate() {
+    protected void onUpdate() {
 
     }
 
@@ -38,7 +38,7 @@ public class TextDisplayElementPixel extends TextDisplayPixelBasicCanvas {
     }
 
     @Override
-    protected void subLoad() {
+    protected void onLoad() {
 
     }
 

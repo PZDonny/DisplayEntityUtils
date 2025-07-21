@@ -14,19 +14,22 @@ import java.util.List;
 public abstract class TextDisplayCanvasClickableElement extends TextDisplayCanvasElement {
      protected boolean bleed = false;
      protected TextDisplayElementClickableType clickType = TextDisplayElementClickableType.ENTITY;
-     protected TextDisplayElementClickableAction clickAction= TextDisplayElementClickableAction.ANY;
+     protected TextDisplayElementClickableAction clickAction = TextDisplayElementClickableAction.ANY;
      protected Action action = null;
      protected int maxInteractionsPerTick = 1;//set to 0 to disable
      transient protected List<TextDisplayCanvasPixel> clickSpace = new ArrayList<>();
      transient protected TextDisplayCanvasElementClickListener listener = new TextDisplayCanvasElementClickListener(this);
      protected TextDisplayCanvas canvas;
+
      public TextDisplayCanvasClickableElement(TextDisplayCanvas canvas){
-          this.canvas =canvas;
+          this.canvas = canvas;
           listener.setCanvas(canvas);
      }
+
      public List<TextDisplayCanvasPixel> getClickSpace() {
           return clickSpace;
      }
+
      public abstract void onClick(PlayerInteractEvent event, TextDisplayCanvasPixel pixel);
 
      public TextDisplayElementClickableType getClickType() {
@@ -44,9 +47,10 @@ public abstract class TextDisplayCanvasClickableElement extends TextDisplayCanva
      @Override
      public void remove(){
           listener.unregister();
-          subRemove();
+          onRemoval();
      }
-     public abstract void subRemove();
+
+     protected abstract void onRemoval();
 
      public void setClickAction(TextDisplayElementClickableAction clickAction) {
           this.clickAction = clickAction;

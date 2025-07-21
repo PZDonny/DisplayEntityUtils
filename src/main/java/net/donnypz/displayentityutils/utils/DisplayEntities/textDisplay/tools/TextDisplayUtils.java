@@ -32,11 +32,9 @@ import java.net.URL;
 import java.util.*;
 import java.util.List;
 
-public class TextDisplayTools {
-    //
+public class TextDisplayUtils {
     public final static NamespacedKey PERSISTENT_DATA_CONTAINER_KEY = new NamespacedKey(DisplayEntityPlugin.getInstance(), "TextDisplayData");
 
-    //
     public static Matrix4f transformationToMatrix(Transformation transformation) {
         Vector3f translationVec = transformation.getTranslation();
         Vector3f scaleVec = transformation.getScale();
@@ -273,8 +271,8 @@ public class TextDisplayTools {
         }
         for (Entity entity : entities) {
             PersistentDataContainer dataContainer = entity.getPersistentDataContainer();
-            if (dataContainer.has(TextDisplayTools.PERSISTENT_DATA_CONTAINER_KEY)) {
-                TextDisplayTools.loadFromEntity(entity);
+            if (dataContainer.has(TextDisplayUtils.PERSISTENT_DATA_CONTAINER_KEY)) {
+                TextDisplayUtils.loadFromEntity(entity);
                 DisplayEntityPlugin.getInstance().getLogger().severe(entity.getEntityId() + "");
             }
         }

@@ -11,10 +11,7 @@ public class TextDisplayStaticButtonCanvasElement extends TextDisplayCanvasClick
     private final ClickHandler<TextDisplayStaticButtonCanvasElement> handler;
     transient private TextDisplayCanvasPixel clicked;
     transient private PlayerInteractEvent clickEvent;
-    @FunctionalInterface
-    public interface ClickHandler<T> {
-        void handle(T self);
-    }
+
     public TextDisplayStaticButtonCanvasElement(TextDisplayCanvas canvas, int x, int y, ClickHandler<TextDisplayStaticButtonCanvasElement> clickHandler){
         super(canvas);
         this.handler = clickHandler;
@@ -29,7 +26,7 @@ public class TextDisplayStaticButtonCanvasElement extends TextDisplayCanvasClick
 
     }
     @Override
-    public void subRemove() {
+    protected void onRemoval() {
         pixels = new Matrix2dContainer<>(TextDisplayElementPixel.class);
     }
     public void setImage(Matrix2dContainer<TextDisplayElementPixel> newPixels){
@@ -42,5 +39,10 @@ public class TextDisplayStaticButtonCanvasElement extends TextDisplayCanvasClick
         clickEvent = event;
         handler.handle(this);
         
+    }
+
+    @FunctionalInterface
+    public interface ClickHandler<T> { //Could alternatively use a Consumer
+        void handle(T self);
     }
 }

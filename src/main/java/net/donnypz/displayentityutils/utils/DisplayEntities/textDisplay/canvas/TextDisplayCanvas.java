@@ -238,12 +238,7 @@ public class TextDisplayCanvas {
     }
     public void despawn(){
         stopUpdateTask();
-        pixels.forEach(new Consumer<TextDisplayCanvasPixel>() {
-            @Override
-            public void accept(TextDisplayCanvasPixel pixel) {
-                pixel.despawn();
-            }
-        });
+        pixels.forEach(pixel -> pixel.despawn());
     }
     public void remove(){
         despawn();
@@ -363,7 +358,7 @@ public class TextDisplayCanvas {
         updateTask = null;
     }
 
-    public List<Player> geViewerPlayers() {
+    public List<Player> getViewerPlayers() {
         return canvasGroup.getViewerPlayers();
     }
 

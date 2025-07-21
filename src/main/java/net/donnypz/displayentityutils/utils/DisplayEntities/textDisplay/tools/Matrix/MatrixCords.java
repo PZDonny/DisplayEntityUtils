@@ -14,6 +14,7 @@ public class MatrixCords {
         migrateMatrix(matrix);
         matrix.set(this, object);
     }
+
     public MatrixCords(int x, int y, Object object) {
         this.x = x;
         this.y = y;

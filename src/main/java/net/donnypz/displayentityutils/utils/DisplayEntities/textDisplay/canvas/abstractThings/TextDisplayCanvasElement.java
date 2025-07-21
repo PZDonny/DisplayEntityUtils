@@ -16,6 +16,8 @@ public abstract class TextDisplayCanvasElement {
     protected int updateInterval = 10;
     protected boolean twoFaced =false;
     protected boolean isDead = false;
+
+
     public Matrix2dContainer<TextDisplayElementPixel> getPixels(){
         return pixels;
     }
@@ -29,13 +31,14 @@ public abstract class TextDisplayCanvasElement {
         hasDif = true;
     }
 
-    public boolean HasDif() {
+    public boolean hasDif() {
         return hasDif;
     }
 
     public void setHasDif(boolean hasDif) {
         this.hasDif = hasDif;
     }
+
     public abstract void update();
     public abstract void remove();
 

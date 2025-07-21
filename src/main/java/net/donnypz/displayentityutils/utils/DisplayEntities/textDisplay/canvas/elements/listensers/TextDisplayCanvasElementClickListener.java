@@ -36,7 +36,7 @@ public class TextDisplayCanvasElementClickListener extends TempListener {
 
     @EventHandler
     public void click(PlayerInteractEvent event){
-        if (!(canvas.getShownPlayers().contains(event.getPlayer())|| canvas.getSettings().IsVisibleDefault)){
+        if (!(canvas.getViewerPlayers().contains(event.getPlayer())|| canvas.getSettings().IsVisibleDefault)){
             return;
         }
         if (interactionsThisTick>=maxInteractionsPerTick){
@@ -96,7 +96,7 @@ public class TextDisplayCanvasElementClickListener extends TempListener {
             );
             List<Player> looking = detector.lookingAt(pixel.getTextDisplayMatrix4f());
             for (Player p :looking){
-                if (pixel.getPart().getViewersAsPlayers().contains(p)){
+                if (pixel.getPart().getTrackingPlayers().contains(p)){
                 clicked.add(pixel);
                 }
             }
