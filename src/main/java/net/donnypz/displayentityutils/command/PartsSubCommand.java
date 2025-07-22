@@ -47,7 +47,7 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
             return;
         }
 
-        if (selection.hasSelectedPart()){
+        if (!selection.hasSelectedPart()){
             PartsCMD.invalidPartSelection(player);
             return;
         }
