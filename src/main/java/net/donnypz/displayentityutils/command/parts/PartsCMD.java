@@ -41,6 +41,8 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         new PartsBrightnessCMD(this);
         new PartsPitchCMD(this);
         new PartsYawCMD(this);
+        new PartsMoveHereCMD(this);
+        new PartsMoveCMD(this);
     }
 
     @Override
@@ -102,6 +104,8 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis parts yaw <yaw>", "Set the yaw of an ungrouped part entity");
         }
         else{
+            CMDUtils.sendCMD(sender, "/mdis parts move <direction> <distance>", "Change the actual location of your selected group");
+            CMDUtils.sendCMD(sender, "/mdis parts movehere", "Change your selected part's actual location to your location");
             CMDUtils.sendCMD(sender, "/mdis parts setblock <\"-held\" | \"-target\" | block-id> [-all]", "Change the block of a block display part");
             CMDUtils.sendCMD(sender, "/mdis parts seeduuids <group | selection> <seed>","Useful when wanting to use the same animation on similar groups");
         }

@@ -213,14 +213,14 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                         case "glowcolor" -> {
                             addColors(suggestions);
                         }
-                        case "translate" -> {
+                        case "move", "translate" -> {
                             addDirections(suggestions);
                         }
-                        case "create" -> {
-                            suggestions.add("interaction");
+                        case "filtertypes", "create" -> {
                             suggestions.add("block");
                             suggestions.add("item");
                             suggestions.add("text");
+                            suggestions.add("interaction");
                         }
                         case "cycle" -> {
                             suggestions.add("first");
@@ -243,12 +243,6 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                         }
                         case "billboard" -> {
                             addBillboard(suggestions);
-                        }
-                        case "filtertypes" -> {
-                            suggestions.add("block");
-                            suggestions.add("item");
-                            suggestions.add("text");
-                            suggestions.add("interaction");
                         }
                     }
                 }
