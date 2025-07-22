@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.utils.DisplayEntities;
+package net.donnypz.displayentityutils.utils;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import org.bukkit.entity.Display;
