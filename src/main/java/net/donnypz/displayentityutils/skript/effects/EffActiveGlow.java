@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class EffActiveGlow extends Effect {
     static {
-        Skript.registerEffect(EffActiveGlow.class,"[deu ](make|set) %activegroups/activeparts/activepartselections% (1¦glow[ing] [t:for %-timespan%] [p:for %-players%]|2¦unglow[ing] [p:for %-players%])");
+        Skript.registerEffect(EffActiveGlow.class,"[deu ](make|set) %activegroups/activeparts/multipartselections% (1¦glow[ing] [t:for %-timespan%] [p:for %-players%]|2¦unglow[ing] [p:for %-players%])");
     }
 
     Expression<?> object;

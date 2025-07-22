@@ -26,7 +26,7 @@ public class ExprActivePartsFromActive extends SimpleExpression<ActivePart> {
 
     static {
         String property = "[the] parts";
-        String fromType = "activegroup/activepartselection";
+        String fromType = "activegroup/multipartselection";
         Skript.registerExpression(ExprActivePartsFromActive.class, ActivePart.class, ExpressionType.PROPERTY, PropertyExpression.getPatterns(property, fromType));
     }
 

@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class EffActiveBillboard extends Effect {
     static {
-        Skript.registerEffect(EffActiveBillboard.class,"[deu] (set|change) %activegroup/activepart/activepartselection%['s] [display] billboard to %billboard%");
+        Skript.registerEffect(EffActiveBillboard.class,"[deu] (set|change) %activegroup/activepart/multipartselection%['s] [display] billboard to %billboard%");
     }
 
     Expression<?> object;

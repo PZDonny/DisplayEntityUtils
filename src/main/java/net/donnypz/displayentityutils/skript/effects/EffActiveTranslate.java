@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.7.3")
 public class EffActiveTranslate extends Effect {
     static {
-        Skript.registerEffect(EffActiveTranslate.class,"add %vector% to %activegroups/activeparts/activepartselections%['s] translation [time:(for|over|with) [duration] %-timespan%]");
+        Skript.registerEffect(EffActiveTranslate.class,"add %vector% to %activegroups/activeparts/multipartselections%['s] translation [time:(for|over|with) [duration] %-timespan%]");
     }
 
     Expression<Vector> vector;

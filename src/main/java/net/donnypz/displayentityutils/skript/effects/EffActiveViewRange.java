@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class EffActiveViewRange extends Effect {
     static {
-        Skript.registerEffect(EffActiveViewRange.class,"(make|set) %activegroups/activeparts/activepartselections%['s] view range multiplier [to] %number%");
+        Skript.registerEffect(EffActiveViewRange.class,"(make|set) %activegroups/activeparts/multipartselections%['s] view range multiplier [to] %number%");
     }
 
     Expression<?> object;
