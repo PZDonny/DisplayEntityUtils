@@ -17,7 +17,7 @@ public final class GroupFollowPropertiesBuilder {
     private FollowType followType;
     private int unregisterDelay;
     private boolean pivotInteractions;
-    private boolean pivotDisplays;
+    private boolean adjustDisplays;
     private float yDisplayAdjustPercentage = 100;
     private float zDisplayAdjustPercentage = 100;
     private int teleportationDuration;
@@ -75,17 +75,19 @@ public final class GroupFollowPropertiesBuilder {
 
     /**
      * Set whether display entities should be realigned by the {@code yPivotOffsetPercentage}
-     * and {@code zPivotOffsetPercentage} of the {@link GroupFollowProperties} in order to keep centering.
-     * @param pivotDisplays
+     * and {@code zPivotOffsetPercentage} of the {@link GroupFollowProperties} in order to keep centering  when the followed entity's pitch changes.
+     * @param adjustDisplays
      * @return this
      */
-    public GroupFollowPropertiesBuilder setAdjustDisplays(boolean pivotDisplays) {
-        this.pivotDisplays = pivotDisplays;
+    public GroupFollowPropertiesBuilder setAdjustDisplays(boolean adjustDisplays) {
+        this.adjustDisplays = adjustDisplays;
         return this;
     }
 
     /**
      * Set the vertical adjustment percentage for parts that follow an entity's pitch {@link FollowType#PITCH_AND_YAW} or {@link FollowType#PITCH}.
+     * <br><br>
+     * {@code 100} is the same as default behavior
      * @param yDisplayAdjustPercentage the percentage
      * @return this
      */
@@ -96,6 +98,8 @@ public final class GroupFollowPropertiesBuilder {
 
     /**
      * Set the horizontal adjustment percentage for parts that follow an entity's pitch {@link FollowType#PITCH_AND_YAW} or {@link FollowType#PITCH}.
+     * <br><br>
+     * {@code 100} is the same as default behavior
      * @param zDisplayAdjustPercentage the percentage
      * @return this
      */
@@ -162,7 +166,7 @@ public final class GroupFollowPropertiesBuilder {
         properties.followType = followType;
         properties.unregisterDelay = unregisterDelay;
         properties.pivotInteractions = pivotInteractions;
-        properties.adjustDisplays = pivotDisplays;
+        properties.adjustDisplays = adjustDisplays;
         properties.yDisplayAdjustPercentage = yDisplayAdjustPercentage;
         properties.zDisplayAdjustPercentage = zDisplayAdjustPercentage;
         properties.teleportationDuration = teleportationDuration;
