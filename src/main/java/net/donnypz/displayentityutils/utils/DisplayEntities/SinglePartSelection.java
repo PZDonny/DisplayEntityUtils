@@ -11,6 +11,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 
 public final class SinglePartSelection extends PartSelection implements ServerSideSelection{
+
+    public SinglePartSelection(@NotNull SpawnedDisplayEntityPart part){
+        this.selectedPart = part;
+    }
     @Override
     public SpawnedDisplayEntityPart getSelectedPart() {
         return (SpawnedDisplayEntityPart) selectedPart;
