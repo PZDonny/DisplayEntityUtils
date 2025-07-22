@@ -10,15 +10,13 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Interaction;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
+import org.bukkit.entity.*;
 import org.jetbrains.annotations.NotNull;
 
 class PartsCycleCMD extends PlayerSubCommand {
@@ -92,37 +90,45 @@ class PartsCycleCMD extends PlayerSubCommand {
         }
     }
 
-    static void displayPartInfo(Player p, SpawnedDisplayEntityPart part, SpawnedPartSelection partSelection){
+    static Component getPartInfo(@NotNull Entity entity){
         Component desc = Component.empty();
-        switch(part.getType()){
-            case INTERACTION -> {
-                Interaction i = (Interaction) part.getEntity();
+        switch(entity){
+            case Interaction i -> {
                 desc = MiniMessage.miniMessage().deserialize("<yellow>(Interaction, H: "+i.getInteractionHeight()+" W:"+i.getInteractionWidth()+")");
             }
 
-            case TEXT_DISPLAY -> {
-                TextDisplay display = (TextDisplay) part.getEntity();
+            case TextDisplay display -> {
                 if (!display.getText().isBlank()) {
                     desc = Component.text("(Text Display: ", NamedTextColor.YELLOW).append(display.text()).append(Component.text(")", NamedTextColor.YELLOW));
                 }
             }
 
-            case BLOCK_DISPLAY -> {
-                if (part.isMaster()){
+            case BlockDisplay display -> {
+                if (DisplayUtils.isMaster(display)){
                     desc = Component.text("(Master Entity/Part)", NamedTextColor.AQUA);
                 }
-                if (part.getMaterial() == Material.AIR){
+                else if (display.getBlock().getMaterial() == Material.AIR){
                     desc = Component.text("(Invisible Block Display | AIR, CAVE_AIR, or VOID_AIR)", NamedTextColor.GRAY);
                 }
-            }
-
-            case ITEM_DISPLAY -> {
-                if (part.getMaterial() == Material.AIR){
-                    desc = Component.text("(Invisible Item Display | AIR, CAVE_AIR, or VOID_AIR)", NamedTextColor.GRAY);
+                else{
+                    desc = Component.text("("+display.getBlock().getMaterial().key().value()+")");
                 }
             }
-        }
 
+            case ItemDisplay display -> {
+                if (display.getItemStack().getType() == Material.AIR){
+                    desc = Component.text("(Invisible Item Display | AIR, CAVE_AIR, or VOID_AIR)", NamedTextColor.GRAY);
+                }
+                else{
+                    desc = Component.text("("+display.getItemStack().getType().key().value()+")");
+                }
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + entity);
+        }
+        return desc;
+    }
+
+    private void displayPartInfo(Player p, SpawnedDisplayEntityPart part, SpawnedPartSelection partSelection){
         int markDuration = 30;
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
             part.spawnInteractionOutline(p, markDuration);
@@ -138,7 +144,7 @@ class PartsCycleCMD extends PlayerSubCommand {
             p.sendMessage(DisplayEntityPlugin.pluginPrefix
                     .append(Component.text("Selected Part! ", NamedTextColor.GREEN))
                     .append(ratio)
-                    .append(desc));
+                    .append(getPartInfo(part.getEntity())));
         }
 
     }
