@@ -1,10 +1,7 @@
 package net.donnypz.displayentityutils.managers;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import org.bukkit.Bukkit;
@@ -25,7 +22,7 @@ public class DEUUser {
     private boolean isValid = true;
     private SpawnedDisplayEntityGroup selectedGroup;
     private SpawnedDisplayAnimation selectedAnimation;
-    SpawnedPartSelection selectedPartSelection;
+    ServerSideSelection selectedPartSelection;
     private AnimationParticleBuilder particleBuilder;
     private final Location[] pointPositions = new Location[3];
     private final ConcurrentHashMap<Integer, PacketDisplayEntityPart> trackedPacketEntities = new ConcurrentHashMap<>();
@@ -72,16 +69,30 @@ public class DEUUser {
     }
 
     /**
-     * Set a user's {@link SpawnedPartSelection} and their group to the part's group
+     * Set a user's selected {@link ServerSideSelection} and their group to the part's group
      *
      * @param selection The selection for the user to have selected
      * @param setGroup Whether to set the user's selected group to the selection's group
      */
-    public void setSelectedPartSelection(@NotNull SpawnedPartSelection selection, boolean setGroup) {
-        selectedPartSelection = selection;
-        if (setGroup) {
-            selectedGroup = selection.getGroup();
+    public void setSelectedPartSelection(@NotNull ServerSideSelection selection, boolean setGroup) {
+        if (selectedPartSelection instanceof SpawnedPartSelection oldSel){
+            if (selectedGroup != null) selectedGroup.removePartSelection(oldSel);
         }
+
+
+        if (selection instanceof SpawnedPartSelection newSel) {
+            if (setGroup){
+                selectedGroup = newSel.getGroup();
+            }
+            else if (selectedGroup != null && selectedPartSelection instanceof SpawnedPartSelection oldSel){
+                selectedGroup.removePartSelection(oldSel);
+                selectedGroup = null;
+            }
+        }
+        else{
+            selectedGroup = null;
+        }
+        selectedPartSelection = selection;
     }
 
     /**
@@ -212,7 +223,7 @@ public class DEUUser {
         return selectedGroup;
     }
 
-    public @Nullable SpawnedPartSelection getSelectedPartSelection(){
+    public @Nullable ServerSideSelection getSelectedPartSelection(){
         return selectedPartSelection;
     }
 

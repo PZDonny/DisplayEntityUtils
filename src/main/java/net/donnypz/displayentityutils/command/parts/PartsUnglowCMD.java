@@ -1,54 +1,35 @@
 package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.*;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-class PartsUnglowCMD extends PlayerSubCommand {
+class PartsUnglowCMD extends PartsSubCommand {
     PartsUnglowCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("unglow", parentSubCommand, Permission.PARTS_GLOW);
+        super("unglow", parentSubCommand, Permission.PARTS_GLOW, 2, 2);
     }
 
     @Override
-    public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
-        if (group == null) {
-            DisplayEntityPluginCommand.noGroupSelection(player);
-            return;
-        }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
-        SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
-        if (partSelection == null){
-            PartsCMD.noPartSelection(player);
-            return;
-        }
+    @Override
+    protected void executeAllPartsAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull SpawnedPartSelection selection, @NotNull String[] args) {
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Removed the glow from your selection!", NamedTextColor.YELLOW)));
+        selection.unglow();
+    }
 
-        boolean isAll;
-
-        if (args.length >= 3){
-            isAll = args[2].equalsIgnoreCase("-all");
-        }
-        else{
-            isAll = false;
-        }
-
-        if (isAll){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Removed the glow from your selection!", NamedTextColor.YELLOW)));
-            partSelection.unglow();
-        }
-        else{
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Removed the glow from your selected part!", NamedTextColor.YELLOW)));
-            partSelection.getSelectedPart().unglow();
-        }
-
+    @Override
+    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ServerSideSelection selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Removed the glow from your selected part!", NamedTextColor.YELLOW)));
+        selectedPart.unglow();
     }
 }

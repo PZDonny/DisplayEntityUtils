@@ -5,7 +5,9 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
@@ -35,9 +37,15 @@ class InteractionPivotSelectionCMD extends PlayerSubCommand {
         try{
             float angle = Float.parseFloat(args[2]);
 
-            SpawnedPartSelection selection = DisplayGroupManager.getPartSelection(player);
-            if (selection != null){
-                selection.pivot(angle);
+
+            ServerSideSelection sel = DisplayGroupManager.getPartSelection(player);
+
+            if (PartsCMD.isUnwantedSingleSelection(player, sel)){
+                return;
+            }
+
+            if (sel != null){
+                ((SpawnedPartSelection) sel).pivot(angle);
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Pivoting all Interaction Entities in part selection around group!", NamedTextColor.GREEN)));
             }
 

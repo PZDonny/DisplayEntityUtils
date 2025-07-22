@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
@@ -13,6 +14,7 @@ import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
@@ -37,10 +39,17 @@ class PartsCycleCMD extends PlayerSubCommand {
             return;
         }
 
-        SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
-        if (partSelection == null){
+        ServerSideSelection sel = DisplayGroupManager.getPartSelection(player);
+        SpawnedPartSelection partSelection;
+        if (PartsCMD.isUnwantedSingleSelection(player, sel)){
+            return;
+        }
+        else if (sel == null){
             partSelection = new SpawnedPartSelection(group);
             DisplayGroupManager.setPartSelection(player, partSelection, false);
+        }
+        else{
+            partSelection = (SpawnedPartSelection) sel;
         }
 
         int jump;
@@ -63,19 +72,19 @@ class PartsCycleCMD extends PlayerSubCommand {
         switch(args[2]){
             case "first" -> {
                 partSelection.setToFirstPart();
-                displayPartInfo(player, partSelection);
+                displayPartInfo(player, partSelection.getSelectedPart(), partSelection);
             }
             case "last" -> {
                 partSelection.setToLastPart();
-                displayPartInfo(player, partSelection);
+                displayPartInfo(player, partSelection.getSelectedPart(), partSelection);
             }
             case "prev", "previous" -> {
                 partSelection.setToPreviousPart(jump);
-                displayPartInfo(player, partSelection);
+                displayPartInfo(player, partSelection.getSelectedPart(), partSelection);
             }
             case "next" -> {
                 partSelection.setToNextPart(jump);
-                displayPartInfo(player, partSelection);
+                displayPartInfo(player, partSelection.getSelectedPart(), partSelection);
             }
             default ->{
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid Option! /mdis parts cycle <first | prev | next | last>", NamedTextColor.RED)));
@@ -83,8 +92,7 @@ class PartsCycleCMD extends PlayerSubCommand {
         }
     }
 
-    private void displayPartInfo(Player p, SpawnedPartSelection partSelection){
-        SpawnedDisplayEntityPart part = partSelection.getSelectedPart();
+    static void displayPartInfo(Player p, SpawnedDisplayEntityPart part, SpawnedPartSelection partSelection){
         Component desc = Component.empty();
         switch(part.getType()){
             case INTERACTION -> {
@@ -122,13 +130,17 @@ class PartsCycleCMD extends PlayerSubCommand {
         else{
             PacketUtils.setGlowing(p, part.getEntity().getEntityId(), markDuration);
         }
-        int index = partSelection.indexOf(part)+1;
-        int size = partSelection.getSize();
-        Component ratio = Component.text("["+index+"/"+size+"] ", NamedTextColor.GOLD);
-        p.sendMessage(DisplayEntityPlugin.pluginPrefix
-                .append(Component.text("Selected Part! ", NamedTextColor.GREEN))
-                .append(ratio)
-                .append(desc));
+
+        if (partSelection != null){
+            int index = partSelection.indexOf(part)+1;
+            int size = partSelection.getSize();
+            Component ratio = Component.text("["+index+"/"+size+"] ", NamedTextColor.GOLD);
+            p.sendMessage(DisplayEntityPlugin.pluginPrefix
+                    .append(Component.text("Selected Part! ", NamedTextColor.GREEN))
+                    .append(ratio)
+                    .append(desc));
+        }
+
     }
 
 }

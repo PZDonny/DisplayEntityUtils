@@ -2,14 +2,13 @@ package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.command.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SinglePartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.HashMap;
-import java.util.List;
 
 public final class PartsCMD extends ConsoleUsableSubCommand {
 
@@ -105,6 +104,22 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
 
     public static void invalidPartSelection(CommandSender sender){
         sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your part selection is invalid!", NamedTextColor.RED)));
+    }
+
+    public static boolean isUnwantedSingleSelection(Player player, ServerSideSelection selection){
+        if (selection instanceof SinglePartSelection){
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You cannot do this with an ungrouped selected display/part!", NamedTextColor.RED)));
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isUnwantedSingleSelectionAll(Player player, ServerSideSelection selection){
+        if (selection instanceof SinglePartSelection){
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You cannot use \"-all\" with an ungrouped selected display/part!", NamedTextColor.RED)));
+            return true;
+        }
+        return false;
     }
 
 

@@ -7,6 +7,7 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PartFilter;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
@@ -22,13 +23,16 @@ class PartsFilterTagsCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
-        if (group == null) {
-            DisplayEntityPluginCommand.noGroupSelection(player);
+        ServerSideSelection sel = DisplayGroupManager.getPartSelection(player);
+        if (sel == null){
+            PartsCMD.noPartSelection(player);
             return;
         }
 
-        SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
+        SpawnedPartSelection partSelection = (SpawnedPartSelection) sel;
+        if (PartsCMD.isUnwantedSingleSelection(player, sel)){
+            return;
+        }
 
         if (args.length < 3){
             player.sendMessage(Component.text("/mdis parts filtertags <part-tags>", NamedTextColor.RED));

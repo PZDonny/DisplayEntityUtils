@@ -5,7 +5,9 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -27,11 +29,17 @@ class InteractionPivotCMD extends PlayerSubCommand {
             DisplayEntityPluginCommand.noGroupSelection(player);
             return;
         }
-        SpawnedPartSelection selection = DisplayGroupManager.getPartSelection(player);
-        if (selection == null){
+
+        ServerSideSelection sel = DisplayGroupManager.getPartSelection(player);
+        if (sel == null){
             DisplayEntityPluginCommand.noPartSelection(player);
             return;
         }
+
+        if (PartsCMD.isUnwantedSingleSelection(player, sel)){
+            return;
+        }
+        SpawnedPartSelection selection = (SpawnedPartSelection) sel;
         if (args.length < 3){
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Incorrect Usage! /mdis interaction pivot <angle>", NamedTextColor.RED)));
             return;

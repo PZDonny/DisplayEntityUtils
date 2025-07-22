@@ -7,6 +7,7 @@ import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.key.Key;
@@ -24,15 +25,14 @@ class TextFontCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
+        ServerSideSelection partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){
             DisplayEntityPluginCommand.noPartSelection(player);
             return;
         }
 
-        if (partSelection.getSelectedParts().isEmpty()){
+        if (!partSelection.hasSelectedPart()){
             PartsCMD.invalidPartSelection(player);
-            return;
         }
 
         SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();

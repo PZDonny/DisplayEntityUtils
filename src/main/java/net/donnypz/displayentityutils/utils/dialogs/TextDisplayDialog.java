@@ -10,8 +10,8 @@ import io.papermc.paper.registry.data.dialog.input.TextDialogInput;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -188,7 +188,7 @@ public final class TextDisplayDialog{
     private static DialogAction getConfirmAction(){
         return DialogAction.customClick((view, audience) -> {
             Player p = (Player) audience;
-            SpawnedPartSelection selection = DisplayGroupManager.getPartSelection(p);
+            ServerSideSelection selection = DisplayGroupManager.getPartSelection(p);
             if (selection == null){
                 p.sendMessage(Component.text("Part selection lost!", NamedTextColor.RED));
                 return;
