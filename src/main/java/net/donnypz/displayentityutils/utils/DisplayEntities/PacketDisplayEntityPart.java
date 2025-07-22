@@ -44,7 +44,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @ApiStatus.Internal
     public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull PacketAttributeContainer attributeContainer){
-        super(entityId);
+        super(entityId, true);
         this.type = partType;
         this.attributeContainer = attributeContainer;
         setDefaultTransformValues();
@@ -52,7 +52,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @ApiStatus.Internal
     public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer){
-        super(entityId);
+        super(entityId, true);
         this.type = partType;
         this.attributeContainer = attributeContainer;
         this.teleport(location);

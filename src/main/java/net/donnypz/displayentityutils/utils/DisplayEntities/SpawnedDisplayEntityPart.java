@@ -31,9 +31,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     private SpawnedDisplayEntityGroup group;
     private Entity entity;
     private PartData partData;
+    private final boolean isSingle;
 
     SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Display displayEntity, Random random){
-        super(displayEntity.getEntityId());
+        super(displayEntity.getEntityId(), true);
         this.group = group;
         this.entity = displayEntity;
         if (displayEntity instanceof BlockDisplay){
@@ -51,16 +52,56 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             group.masterPart = this;
         }
         partTags.addAll(DisplayUtils.getTags(displayEntity));
+        isSingle = false;
     }
 
 
     SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Interaction interactionEntity, Random random){
-        super(interactionEntity.getEntityId());
+        super(interactionEntity.getEntityId(), false);
         this.group = group;
         this.entity = interactionEntity;
         this.type = PartType.INTERACTION;
         applyData(random, interactionEntity);
         partTags.addAll(DisplayUtils.getTags(interactionEntity));
+        isSingle = false;
+    }
+
+    SpawnedDisplayEntityPart(Entity entity){
+        super(entity.getEntityId(), false);
+        switch (entity) {
+            case BlockDisplay blockDisplay -> this.type = PartType.BLOCK_DISPLAY;
+            case ItemDisplay itemDisplay -> this.type = PartType.ITEM_DISPLAY;
+            case TextDisplay textDisplay -> this.type = PartType.TEXT_DISPLAY;
+            default -> this.type = PartType.INTERACTION;
+        }
+        this.entity = entity;
+        isSingle = true;
+    }
+
+    /**
+     * Create a {@link SpawnedDisplayEntityPart} that is not included in any group.
+     * <br>
+     * If the entity is already included in a group, its respective part will be returned.
+     * @param display the display entity
+     * @return a {@link SpawnedDisplayEntityPart}
+     */
+    public @NotNull SpawnedDisplayEntityPart create(@NotNull Display display){
+        SpawnedDisplayEntityPart part = getPart(display);
+        if (part != null) return part;
+        return new SpawnedDisplayEntityPart(display);
+    }
+
+    /**
+     * Create a {@link SpawnedDisplayEntityPart} that is not included in any group.
+     * <br>
+     * If the entity is already included in a group, its respective part will be returned.
+     * @param interaction the interaction entity
+     * @return a {@link SpawnedDisplayEntityPart}
+     */
+    public @NotNull SpawnedDisplayEntityPart create(@NotNull Interaction interaction){
+        SpawnedDisplayEntityPart part = getPart(interaction);
+        if (part != null) return part;
+        return new SpawnedDisplayEntityPart(interaction);
     }
 
     private void applyData(Random random, Entity entity){
@@ -88,6 +129,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @ApiStatus.Internal
     public void setPartUUID(@NotNull UUID uuid){
+        if (isSingle) return;
         this.partUUID = uuid;
         PersistentDataContainer pdc = getEntity().getPersistentDataContainer();
         pdc.set(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
@@ -156,11 +198,20 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     /**
      * Get this part's associated group
-     * @return {@link SpawnedDisplayEntityGroup} or null if this part is not associated with a group
+     * @return a {@link SpawnedDisplayEntityGroup} or null if this part is not associated with a group
      */
     @Override
     public @Nullable SpawnedDisplayEntityGroup getGroup() {
         return group;
+    }
+
+    /**
+     * Get whether this part can be added to a group. This returns false if the part was
+     * created through {@link #create(Display)} or {@link #create(Interaction)}
+     * @return a boolean.
+     */
+    public boolean isGroupable(){
+        return !isSingle;
     }
 
     @Override
@@ -174,6 +225,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
 
+    @ApiStatus.Internal
     public long getCreationTime() {
         if (!getEntity().getPersistentDataContainer().has(SpawnedDisplayEntityGroup.creationTimeKey)){
             return -1;
@@ -228,18 +280,18 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     /**
-     * Get the SpawnedDisplayEntityPart of the Display during this play session
-     * @param display
-     * @return The SpawnedDisplayEntityPart. Null if not created during play session or not a SpawnedDisplayEntityPart
+     * Get the {@link SpawnedDisplayEntityPart} of a {@link Display}, during this play session. Use {@link #create(Display)} if the part is not grouped
+     * @param display the display entity
+     * @return The SpawnedDisplayEntityPart. Null if not created during play session or not associated with any group
      */
     public static SpawnedDisplayEntityPart getPart(@NotNull Display display){
         return getPart((Entity) display);
     }
 
     /**
-     * Get the SpawnedDisplayEntityPart of the Interaction during this play session
-     * @param interaction
-     * @return The SpawnedDisplayEntityPart. Null if not created during play session or not a SpawnedDisplayEntityPart
+     * Get the {@link SpawnedDisplayEntityPart} of an {@link Interaction}, during this play session. Use {@link #create(Interaction)} if the part is not grouped
+     * @param interaction the interaction entity
+     * @return a {@link SpawnedDisplayEntityPart}. Null if not created during play session or not associated with any group
      */
     public static SpawnedDisplayEntityPart getPart(Interaction interaction){
         return getPart((Entity) interaction);
@@ -303,7 +355,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     public SpawnedDisplayEntityPart setGroup(@NotNull SpawnedDisplayEntityGroup group){
-        if (this.group == group){
+        if (this.group == group || isSingle){
             return this;
         }
 
@@ -944,11 +996,13 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * This part will still be valid and can be readded to a group through {@link SpawnedDisplayEntityGroup#addSpawnedDisplayEntityPart(SpawnedDisplayEntityPart)}
      */
     public void removeFromGroup() {
-        allParts.remove(partData);
-        group.groupParts.remove(partUUID);
-        for (SpawnedPartSelection selection : group.partSelections){
-            selection.removePart(this);
+        if (group != null){
+            allParts.remove(partData);
+            group.groupParts.remove(partUUID);
+            for (SpawnedPartSelection selection : group.partSelections){
+                selection.removePart(this);
+            }
+            group = null;
         }
-        group = null;
     }
 }

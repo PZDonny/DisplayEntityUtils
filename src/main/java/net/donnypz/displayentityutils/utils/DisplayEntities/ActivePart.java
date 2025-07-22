@@ -32,9 +32,9 @@ public abstract class ActivePart implements Active{
     private boolean valid = true;
     final Set<PlayerDisplayAnimationExecutor> playerExecutors = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    protected ActivePart(int entityId){
+    protected ActivePart(int entityId, boolean mapped){
         this.entityId = entityId;
-        partsById.put(entityId, this);
+        if (mapped) partsById.put(entityId, this);
     }
 
     protected void unregister(){
