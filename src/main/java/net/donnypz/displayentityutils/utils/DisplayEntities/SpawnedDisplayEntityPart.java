@@ -82,6 +82,24 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * Create a {@link SpawnedDisplayEntityPart} that is not included in any group.
      * <br>
      * If the entity is already included in a group, its respective part will be returned.
+     * @param uuid the entity uuid
+     * @return a {@link SpawnedDisplayEntityPart} or null if the entity uuid is not a display or interaction
+     */
+    public static @Nullable SpawnedDisplayEntityPart create(@NotNull UUID uuid){
+        Entity entity = Bukkit.getEntity(uuid);
+        if (entity instanceof Interaction i){
+            return create(i);
+        }
+        else if (entity instanceof Display d){
+            return create(d);
+        }
+        return null;
+    }
+
+    /**
+     * Create a {@link SpawnedDisplayEntityPart} that is not included in any group.
+     * <br>
+     * If the entity is already included in a group, its respective part will be returned.
      * @param display the display entity
      * @return a {@link SpawnedDisplayEntityPart}
      */
