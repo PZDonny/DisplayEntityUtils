@@ -75,22 +75,9 @@ public class DEUUser {
      * @param setGroup Whether to set the user's selected group to the selection's group
      */
     public void setSelectedPartSelection(@NotNull ServerSideSelection selection, boolean setGroup) {
-        if (selectedPartSelection instanceof SpawnedPartSelection oldSel){
-            if (selectedGroup != null) selectedGroup.removePartSelection(oldSel);
-        }
-
-
-        if (selection instanceof SpawnedPartSelection newSel) {
-            if (setGroup){
-                selectedGroup = newSel.getGroup();
-            }
-            else if (selectedGroup != null && selectedPartSelection instanceof SpawnedPartSelection oldSel){
-                selectedGroup.removePartSelection(oldSel);
-                selectedGroup = null;
-            }
-        }
-        else{
-            selectedGroup = null;
+        deselectPartSelection();
+        if (selection instanceof SpawnedPartSelection newSel && setGroup){
+            selectedGroup = newSel.getGroup();
         }
         selectedPartSelection = selection;
     }
@@ -136,6 +123,14 @@ public class DEUUser {
      */
     public void deselectSpawnedAnimation(){
         selectedAnimation = null;
+    }
+
+    public void deselectPartSelection(){
+        if (selectedPartSelection != null){
+            selectedPartSelection.remove();
+            selectedPartSelection = null;
+        }
+        selectedGroup = null;
     }
 
     /**

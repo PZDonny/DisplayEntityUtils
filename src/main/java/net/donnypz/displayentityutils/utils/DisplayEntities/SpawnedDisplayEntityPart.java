@@ -1005,6 +1005,24 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         TEXT_DISPLAY,
         INTERACTION;
 
+        public static PartType getDisplayType(@NotNull Entity entity){
+            switch (entity){
+                case Interaction i -> {
+                    return INTERACTION;
+                }
+                case BlockDisplay d -> {
+                    return BLOCK_DISPLAY;
+                }
+                case ItemDisplay d -> {
+                    return ITEM_DISPLAY;
+                }
+                case TextDisplay d -> {
+                    return TEXT_DISPLAY;
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + entity);
+            }
+        }
+
         public static PartType getDisplayType(@NotNull Display display){
             switch (display){
                 case BlockDisplay d -> {
@@ -1018,7 +1036,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                 }
                 default -> throw new IllegalStateException("Unexpected value: " + display);
             }
-
         }
     }
 

@@ -295,8 +295,13 @@ public class DEUCommandUtils {
 
     @ApiStatus.Internal
     public static String getCoordinateString(Location location){
-        return location.x()+" "+location.y()+" "+location.z();
+        return round(location.x())+" "+round(location.y())+" "+round(location.z());
     }
+
+    private static double round(double coord){
+        return Math.round(coord * 100)/100.0;
+    }
+
 
     @ApiStatus.Internal
     public static String getExecuteCommandWorldName(World w){

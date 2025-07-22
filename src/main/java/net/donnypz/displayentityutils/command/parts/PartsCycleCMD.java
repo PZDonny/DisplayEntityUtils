@@ -111,7 +111,7 @@ class PartsCycleCMD extends PlayerSubCommand {
                     desc = Component.text("(Invisible Block Display | AIR, CAVE_AIR, or VOID_AIR)", NamedTextColor.GRAY);
                 }
                 else{
-                    desc = Component.text("("+display.getBlock().getMaterial().key().value()+")");
+                    desc = Component.text("("+display.getBlock().getMaterial().key().value()+")", NamedTextColor.GREEN);
                 }
             }
 
@@ -120,7 +120,7 @@ class PartsCycleCMD extends PlayerSubCommand {
                     desc = Component.text("(Invisible Item Display | AIR, CAVE_AIR, or VOID_AIR)", NamedTextColor.GRAY);
                 }
                 else{
-                    desc = Component.text("("+display.getItemStack().getType().key().value()+")");
+                    desc = Component.text("("+display.getItemStack().getType().key().value()+")", NamedTextColor.LIGHT_PURPLE);
                 }
             }
             default -> throw new IllegalStateException("Unexpected value: " + entity);

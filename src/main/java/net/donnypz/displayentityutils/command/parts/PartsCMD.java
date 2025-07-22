@@ -15,6 +15,7 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
     public PartsCMD(){
         super(Permission.HELP, new PartsHelpCMD());
         new PartsInfoCMD(this);
+        new PartsSelectCMD(this);
         new PartsCycleCMD(this);
         new PartsGlowCMD(this);
         new PartsUnglowCMD(this);
