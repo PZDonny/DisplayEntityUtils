@@ -5,4 +5,16 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
  * This includes {@link SinglePartSelection} and {@link SpawnedPartSelection}
  */
 public sealed interface ServerSideSelection extends Spawned permits SinglePartSelection, SpawnedPartSelection {
+
+    boolean isValid();
+
+    void remove();
+
+    SpawnedDisplayEntityPart getSelectedPart();
+
+    boolean hasSelectedPart();
+
+    default boolean isSinglePartSelection(){
+        return (this instanceof SinglePartSelection);
+    }
 }
