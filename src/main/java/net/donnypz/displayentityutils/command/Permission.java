@@ -32,6 +32,7 @@ public enum Permission {
 
 
     PARTS_INFO("deu.parts.info"),
+    PARTS_CREATE("deu.parts.create"),
     PARTS_CYCLE("deu.parts.cycle"),
     PARTS_GLOW("deu.parts.glow"),
     PARTS_GLOW_COLOR("deu.parts.glow.set"),

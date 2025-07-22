@@ -15,6 +15,7 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
     public PartsCMD(){
         super(Permission.HELP, new PartsHelpCMD());
         new PartsInfoCMD(this);
+        new PartsCreateCMD(this);
         new PartsSelectCMD(this);
         new PartsCycleCMD(this);
         new PartsGlowCMD(this);
@@ -65,6 +66,7 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
             sender.sendMessage(Component.empty());
             CMDUtils.sendCMD(sender, "/mdis parts help <page-number>", "Get help for parts");
             CMDUtils.sendCMD(sender, "/mdis parts info", "Get information about your current part/selection");
+            CMDUtils.sendCMD(sender, "/mdis parts create <block | item | text | interaction>", "Spawn an entity at your location and automatically select it");
             CMDUtils.sendCMD(sender, "/mdis parts select <distance>", "Select an ungrouped part (display/interaction) entity near your location");
         }
         else if (page == 2) {
