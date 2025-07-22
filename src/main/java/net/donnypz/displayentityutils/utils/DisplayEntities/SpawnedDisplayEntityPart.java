@@ -215,7 +215,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @return a location
      */
     public @NotNull Location getLocation(){
-        return entity.getLocation();
+        return getEntity().getLocation();
     }
 
 
@@ -916,7 +916,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     /**
-     * Removes this SpawnedDisplayEntityPart from it's SpawnedDisplayEntityGroup, without dismounting the part from the group.
+     * Removes this SpawnedDisplayEntityPart from it's {@link SpawnedDisplayEntityGroup}, without dismounting the part from the group.
      * This makes this part invalid and unusable after removal. If the part needs to be reused, see {@link #removeFromGroup()}
      * <br><br>
      * The part may not be killed if the part's entity is within an unloaded chunk.
@@ -932,8 +932,8 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                 entity.remove();
             }
         }
-        partData = null;
-        valid = false;
+        this.entity = null;
+        this.partData = null;
         this.unregister();
         return entity;
     }

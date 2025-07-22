@@ -29,16 +29,25 @@ public abstract class ActivePart implements Active{
     protected UUID partUUID;
     protected final int entityId;
     protected Set<String> partTags = new HashSet<>();
-    protected boolean valid = true;
+    private boolean valid = true;
     final Set<PlayerDisplayAnimationExecutor> playerExecutors = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    ActivePart(int entityId){
+    protected ActivePart(int entityId){
         this.entityId = entityId;
         partsById.put(entityId, this);
     }
 
     protected void unregister(){
         partsById.remove(entityId);
+        valid = false;
+    }
+
+    /**
+     * Get whether this part is valid
+     * @return a boolean
+     */
+    public boolean isValid(){
+        return valid;
     }
 
     /**
@@ -70,19 +79,6 @@ public abstract class ActivePart implements Active{
     }
 
 
-    protected abstract void cull(float width, float height);
-
-
-    /**
-     * Attempt to automatically set the culling bounds for this part. This is the same as {@link ActiveGroup#autoSetCulling(CullOption, float, float)}
-     * with a CullSetting of {@link CullOption#LOCAL}.
-     * Results may not be 100% accurate due to the varying shapes of Minecraft blocks and variation is display entity transformations.
-     * The culling bounds will be representative of the part's scaling.
-     * @param widthAdder The amount of width to be added to the culling range
-     * @param heightAdder The amount of height to be added to the culling range
-     * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
-     */
-    public abstract void autoCull(float widthAdder, float heightAdder);
 
     /** Get this part's UUID used for animations and uniquely identifying parts
      * @return a {@link UUID}
@@ -97,14 +93,6 @@ public abstract class ActivePart implements Active{
      */
     public int getEntityId(){
         return entityId;
-    }
-
-    /**
-     * Get this part's type
-     * @return a {@link SpawnedDisplayEntityPart.PartType}
-     */
-    public SpawnedDisplayEntityPart.PartType getType(){
-        return type;
     }
 
     /**
@@ -124,6 +112,29 @@ public abstract class ActivePart implements Active{
         return partTags.contains(tag);
     }
 
+    public abstract ActiveGroup getGroup();
+
+    protected abstract void cull(float width, float height);
+
+    /**
+     * Attempt to automatically set the culling bounds for this part. This is the same as {@link ActiveGroup#autoSetCulling(CullOption, float, float)}
+     * with a CullSetting of {@link CullOption#LOCAL}.
+     * Results may not be 100% accurate due to the varying shapes of Minecraft blocks and variation is display entity transformations.
+     * The culling bounds will be representative of the part's scaling.
+     * @param widthAdder The amount of width to be added to the culling range
+     * @param heightAdder The amount of height to be added to the culling range
+     * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
+     */
+    public abstract void autoCull(float widthAdder, float heightAdder);
+
+    /**
+     * Get this part's type
+     * @return a {@link SpawnedDisplayEntityPart.PartType}
+     */
+    public SpawnedDisplayEntityPart.PartType getType(){
+        return type;
+    }
+
     /**
      * Make this part glow for a player
      * @param player the player
@@ -134,7 +145,7 @@ public abstract class ActivePart implements Active{
     }
 
     /**
-     * Make this part glow for a player for a set period of time, if it's a block or item display
+     * Make this part glow for a set period of time, if it's a block or item display
      * @param durationInTicks how long the glowing should last. -1 or less to last forever
      */
     @Override
@@ -191,8 +202,6 @@ public abstract class ActivePart implements Active{
      * @return a color, or null if not set or if this part's type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.
      */
     public abstract @Nullable Color getGlowColor();
-
-    public abstract ActiveGroup getGroup();
 
     /**
      * Get this part's pitch

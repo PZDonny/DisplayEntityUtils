@@ -1466,7 +1466,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      * @return true if the group's master part is not invalid.
      */
     public boolean isSpawned(){
-        return masterPart != null && masterPart.valid;
+        return masterPart != null && masterPart.isValid();
     }
 
     /**
