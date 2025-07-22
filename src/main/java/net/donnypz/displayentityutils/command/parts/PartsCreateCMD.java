@@ -9,6 +9,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.donnypz.displayentityutils.utils.dialogs.TextDisplayDialog;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickCallback;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
@@ -18,6 +20,7 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.UUID;
 
 class PartsCreateCMD extends PlayerSubCommand {
@@ -53,7 +56,12 @@ class PartsCreateCMD extends PlayerSubCommand {
                 });
                 selectEntity(player, entity.getUniqueId(), "Text Display");
                 if (VersionUtils.canViewDialogs(player, true)){
-                    TextDisplayDialog.sendDialog(player, entity, true);
+                    UUID entityUUID = entity.getUniqueId();
+                    player.sendMessage(Component.text("| Click here to edit it!", NamedTextColor.LIGHT_PURPLE)
+                            .clickEvent(ClickEvent.callback(audience -> {
+                                Player p = (Player) audience;
+                                TextDisplayDialog.sendDialog(p, entityUUID, true);
+                            }, ClickCallback.Options.builder().uses(-1).lifetime(Duration.ofMinutes(5)).build())));
                 }
             }
             case "interaction" -> {
