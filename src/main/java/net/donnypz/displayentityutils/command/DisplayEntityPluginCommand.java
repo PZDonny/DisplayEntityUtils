@@ -216,6 +216,12 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                         case "move", "translate" -> {
                             addDirections(suggestions);
                         }
+                        case "scale" -> {
+                            suggestions.add("x");
+                            suggestions.add("y");
+                            suggestions.add("z");
+                            suggestions.add("-all");
+                        }
                         case "filtertypes", "create" -> {
                             suggestions.add("block");
                             suggestions.add("item");
