@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public final class SpawnedPartSelection extends MultiPartSelection implements Spawned{
+public final class SpawnedPartSelection extends MultiPartSelection implements ServerSideSelection{
 
     /**
      * Create a selection of parts with the specified part tag from a group.

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public abstract class MultiPartSelection extends DisplaySelection {
+public abstract class MultiPartSelection extends PartSelection {
     ActiveGroup group;
     LinkedHashSet<ActivePart> selectedParts = new LinkedHashSet<>();
     Set<SpawnedDisplayEntityPart.PartType> partTypes = new HashSet<>();
