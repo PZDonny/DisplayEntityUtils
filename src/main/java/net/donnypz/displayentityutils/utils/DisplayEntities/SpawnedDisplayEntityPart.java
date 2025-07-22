@@ -31,6 +31,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     private SpawnedDisplayEntityGroup group;
     private Entity entity;
     private PartData partData;
+    private UUID entityUUID;
     private final boolean isSingle;
 
     SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Display displayEntity, Random random){
@@ -75,6 +76,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             default -> this.type = PartType.INTERACTION;
         }
         this.entity = entity;
+        this.entityUUID = entity.getUniqueId();
         isSingle = true;
     }
 
@@ -135,6 +137,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
 
         this.partData = new PartData(entity);
+        this.entityUUID = entity.getUniqueId();
         allParts.put(partData, this);
 
         setPartUUID(random);
@@ -266,7 +269,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             return entity;
         }
         else{
-            Entity nonStale = Bukkit.getEntity(partData.getUUID());
+            Entity nonStale = Bukkit.getEntity(entityUUID);
             if (entity == nonStale){
                 return entity;
             }
@@ -850,7 +853,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public void pivot(float angleInDegrees){
         Entity entity = getEntity();
-        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION){
+        if (type != PartType.INTERACTION){
             return;
         }
         Interaction i = (Interaction) entity;
@@ -974,7 +977,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public float getInteractionHeight() {
-        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
+        if (type != PartType.INTERACTION) {
             return -1;
         }
         return ((Interaction) getEntity()).getInteractionHeight();
@@ -982,7 +985,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public float getInteractionWidth() {
-        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
+        if (type != PartType.INTERACTION) {
             return -1;
         }
         return ((Interaction) getEntity()).getInteractionWidth();
@@ -1001,6 +1004,22 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         ITEM_DISPLAY,
         TEXT_DISPLAY,
         INTERACTION;
+
+        public static PartType getDisplayType(@NotNull Display display){
+            switch (display){
+                case BlockDisplay d -> {
+                    return BLOCK_DISPLAY;
+                }
+                case ItemDisplay d -> {
+                    return ITEM_DISPLAY;
+                }
+                case TextDisplay d -> {
+                    return TEXT_DISPLAY;
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + display);
+            }
+
+        }
     }
 
     /**
