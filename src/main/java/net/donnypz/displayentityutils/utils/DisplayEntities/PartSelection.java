@@ -5,6 +5,14 @@ public abstract class PartSelection implements Active{
 
     public abstract ActivePart getSelectedPart();
 
+    /**
+     * Get whether this part selection has an {@link ActivePart} currently selected
+     * @return a boolean
+     */
+    public boolean hasSelectedPart(){
+        return selectedPart != null;
+    }
+
     public abstract void remove();
 
     /**
