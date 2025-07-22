@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.command.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SinglePartSelection;
 import net.kyori.adventure.text.Component;
@@ -38,6 +39,8 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         new PartsBillboardCMD(this);
         new PartsViewRangeCMD(this);
         new PartsBrightnessCMD(this);
+        new PartsPitchCMD(this);
+        new PartsYawCMD(this);
     }
 
     @Override
@@ -89,12 +92,16 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis parts glow [-all]", "Make your selected part glow");
             CMDUtils.sendCMD(sender, "/mdis parts unglow [-all]", "Remove the glow from your selected part");
         }
-        else{
+        else if (page == 4){
             CMDUtils.sendCMD(sender, "/mdis parts glowcolor <color | hex-code> [-all]", "Set your selected part's glow color");
             CMDUtils.sendCMD(sender, "/mdis parts brightness <block> <sky> [-all]", "Set your selected part's brightness. Enter values between 0-15. -1 resets");
             CMDUtils.sendCMD(sender, "/mdis parts viewrange <view-range-multiplier> [-all]", "Set the view range multiplier for your selected part");
             CMDUtils.sendCMD(sender, "/mdis parts billboard <fixed | vertical | horizontal | center> [-all]", "Set the billboard of your selected part");
             CMDUtils.sendCMD(sender, "/mdis parts translate <direction> <distance> <tick-duration> [-all]", "Translate your selected part");
+            CMDUtils.sendCMD(sender, "/mdis parts pitch <pitch>", "Set the pitch of an ungrouped part entity");
+            CMDUtils.sendCMD(sender, "/mdis parts yaw <yaw>", "Set the yaw of an ungrouped part entity");
+        }
+        else{
             CMDUtils.sendCMD(sender, "/mdis parts setblock <\"-held\" | \"-target\" | block-id> [-all]", "Change the block of a block display part");
             CMDUtils.sendCMD(sender, "/mdis parts seeduuids <group | selection> <seed>","Useful when wanting to use the same animation on similar groups");
         }
@@ -110,9 +117,17 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your part selection is invalid!", NamedTextColor.RED)));
     }
 
+    public static boolean isUnwantedMultiSelection(Player player, ServerSideSelection selection){
+        if (selection instanceof MultiPartSelection){
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You cannot do this with a grouped part!", NamedTextColor.RED)));
+            return true;
+        }
+        return false;
+    }
+
     public static boolean isUnwantedSingleSelection(Player player, ServerSideSelection selection){
         if (selection instanceof SinglePartSelection){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You cannot do this with an ungrouped selected display/part!", NamedTextColor.RED)));
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You cannot do this with an ungrouped selected part entity!", NamedTextColor.RED)));
             return true;
         }
         return false;
@@ -120,7 +135,7 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
 
     public static boolean isUnwantedSingleSelectionAll(Player player, ServerSideSelection selection){
         if (selection instanceof SinglePartSelection){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You cannot use \"-all\" with an ungrouped selected display/part!", NamedTextColor.RED)));
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You cannot use \"-all\" with an ungrouped selected part entity!", NamedTextColor.RED)));
             return true;
         }
         return false;
