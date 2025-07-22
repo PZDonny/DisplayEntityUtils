@@ -94,24 +94,25 @@ class PartsCycleCMD extends PlayerSubCommand {
         Component desc = Component.empty();
         switch(entity){
             case Interaction i -> {
-                desc = MiniMessage.miniMessage().deserialize("<yellow>(Interaction, H: "+i.getInteractionHeight()+" W:"+i.getInteractionWidth()+")");
+                desc = MiniMessage.miniMessage().deserialize("<dark_aqua>(Interaction, H: "+i.getInteractionHeight()+" W:"+i.getInteractionWidth()+")");
             }
 
             case TextDisplay display -> {
                 if (!display.getText().isBlank()) {
-                    desc = Component.text("(Text Display: ", NamedTextColor.YELLOW).append(display.text()).append(Component.text(")", NamedTextColor.YELLOW));
+                    desc = Component.text("(Text Display: \"", NamedTextColor.LIGHT_PURPLE).append(display.text())
+                            .append(Component.text("\")", NamedTextColor.LIGHT_PURPLE));
                 }
             }
 
             case BlockDisplay display -> {
                 if (DisplayUtils.isMaster(display)){
-                    desc = Component.text("(Master Entity/Part)", NamedTextColor.AQUA);
+                    desc = Component.text("(Master Entity/Part)", NamedTextColor.GOLD);
                 }
                 else if (display.getBlock().getMaterial() == Material.AIR){
                     desc = Component.text("(Invisible Block Display | AIR, CAVE_AIR, or VOID_AIR)", NamedTextColor.GRAY);
                 }
                 else{
-                    desc = Component.text("("+display.getBlock().getMaterial().key().value()+")", NamedTextColor.GREEN);
+                    desc = Component.text("("+display.getBlock().getMaterial().key().value()+")", NamedTextColor.YELLOW);
                 }
             }
 
@@ -120,7 +121,7 @@ class PartsCycleCMD extends PlayerSubCommand {
                     desc = Component.text("(Invisible Item Display | AIR, CAVE_AIR, or VOID_AIR)", NamedTextColor.GRAY);
                 }
                 else{
-                    desc = Component.text("("+display.getItemStack().getType().key().value()+")", NamedTextColor.LIGHT_PURPLE);
+                    desc = Component.text("("+display.getItemStack().getType().key().value()+")", NamedTextColor.AQUA);
                 }
             }
             default -> throw new IllegalStateException("Unexpected value: " + entity);
