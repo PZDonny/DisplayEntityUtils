@@ -85,7 +85,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @param display the display entity
      * @return a {@link SpawnedDisplayEntityPart}
      */
-    public @NotNull SpawnedDisplayEntityPart create(@NotNull Display display){
+    public static @NotNull SpawnedDisplayEntityPart create(@NotNull Display display){
         SpawnedDisplayEntityPart part = getPart(display);
         if (part != null) return part;
         return new SpawnedDisplayEntityPart(display);
@@ -98,7 +98,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @param interaction the interaction entity
      * @return a {@link SpawnedDisplayEntityPart}
      */
-    public @NotNull SpawnedDisplayEntityPart create(@NotNull Interaction interaction){
+    public static @NotNull SpawnedDisplayEntityPart create(@NotNull Interaction interaction){
         SpawnedDisplayEntityPart part = getPart(interaction);
         if (part != null) return part;
         return new SpawnedDisplayEntityPart(interaction);
