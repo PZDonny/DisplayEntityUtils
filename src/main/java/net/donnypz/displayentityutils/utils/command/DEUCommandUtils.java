@@ -264,7 +264,6 @@ public class DEUCommandUtils {
     }
 
     public static void sendGlowColor(Player player, Color color){
-        player.sendMessage(Component.empty());
         if (color != null) {
             player.sendMessage(Component.text("Glow Color: ").append(Component.text("COLOR", TextColor.color(color.getRed(), color.getGreen(), color.getBlue()))));
             player.sendMessage("| " + net.md_5.bungee.api.ChatColor.RED + "R: " + color.getRed());
