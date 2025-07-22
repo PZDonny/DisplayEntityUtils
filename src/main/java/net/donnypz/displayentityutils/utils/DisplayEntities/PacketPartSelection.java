@@ -16,19 +16,39 @@ import java.util.Collection;
 import java.util.List;
 import java.util.SequencedCollection;
 
-public class PacketPartSelection extends ActivePartSelection implements Packeted{
+public class PacketPartSelection extends MultiPartSelection implements Packeted{
+
+    /**
+     * Create a selection of parts with the specified part tag from a group.
+     * @param group The group to get the parts from
+     * @param partTag The part tag to include in the filter
+     */
     public PacketPartSelection(@NotNull PacketDisplayEntityGroup group, @NotNull String partTag) {
         super(group, partTag);
     }
 
+    /**
+     * Create a selection of parts with the specified part tags from a group.
+     * @param group The group to get the parts from
+     * @param partTags The part tags to include in the filter
+     */
     public PacketPartSelection(@NotNull PacketDisplayEntityGroup group, @NotNull Collection<String> partTags) {
         super(group, partTags);
     }
 
+    /**
+     * Create a selection containing all parts from a group.
+     * @param group The group to cycle through for this selection.
+     */
     public PacketPartSelection(@NotNull PacketDisplayEntityGroup group) {
         super(group);
     }
 
+    /**
+     * Create a selection containing filtered parts from a group.
+     * @param group The group to cycle through for this selection.
+     * @param filter The filter used to filter parts
+     */
     public PacketPartSelection(@NotNull PacketDisplayEntityGroup group, @NotNull PartFilter filter) {
         super(group, filter);
     }

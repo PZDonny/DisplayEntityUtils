@@ -233,14 +233,14 @@ public class SkriptTypes {
                 })
         );
 
-        Classes.registerClass(new ClassInfo<>(ActivePartSelection.class, "activepartselection")
-                .user("(active( |-)?)?part( |-)?selection")
-                .name("Active Part Selection")
+        Classes.registerClass(new ClassInfo<>(MultiPartSelection.class, "multipartselection")
+                .user("(multi( |-)?)?part( |-)?selection")
+                .name("Multi Part Selection")
                 .description("Represents a selection of spawned parts from a spawned Display Entity Group/Model.",
-                            "This can be either a Part Selection or a Packet Part Selection")
+                            "This can be either a Spawned Part Selection or a Packet Part Selection")
                 .examples()
-                .defaultExpression(new EventValueExpression<>(ActivePartSelection.class))
-                .since("3.0.0")
+                .defaultExpression(new EventValueExpression<>(MultiPartSelection.class))
+                .since("3.1.1")
                 .parser(new Parser<>() {
 
                     @Override
@@ -249,20 +249,20 @@ public class SkriptTypes {
                     }
 
                     @Override
-                    public String toString(ActivePartSelection o, int flags) {
+                    public String toString(MultiPartSelection o, int flags) {
                         return toVariableNameString(o);
                     }
 
                     @Override
-                    public String toVariableNameString(ActivePartSelection o) {
-                        return "activepartselection w/ size: " + o.getSize();
+                    public String toVariableNameString(MultiPartSelection o) {
+                        return "multipartselection w/ size: " + o.getSize();
                     }
                 })
         );
 
         Classes.registerClass(new ClassInfo<>(SpawnedPartSelection.class, "partselection")
                 .user("(spawned( |-)?)?part( |-)?selection")
-                .name("Part Selection")
+                .name("Spawned Part Selection")
                 .description("Represents a selection of spawned parts from a spawned Display Entity Group/Model.")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(SpawnedPartSelection.class))

@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprActiveGetGroup extends SimplePropertyExpression<Object, ActiveGroup> {
 
     static {
-        register(ExprActiveGetGroup.class, ActiveGroup.class, "[the] (active|spawned|packet)[ |-]group", "activepart/activepartselection");
+        register(ExprActiveGetGroup.class, ActiveGroup.class, "[the] (active|spawned|packet)[ |-]group", "activepart/multipartselection");
     }
 
     @Override
@@ -33,7 +33,7 @@ public class ExprActiveGetGroup extends SimplePropertyExpression<Object, ActiveG
         if (spawned instanceof ActivePart part){
             return part.getGroup();
         }
-        else if (spawned instanceof ActivePartSelection sel){
+        else if (spawned instanceof MultiPartSelection sel){
             return sel.getGroup();
         }
         return null;

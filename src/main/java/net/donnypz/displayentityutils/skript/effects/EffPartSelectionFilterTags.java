@@ -9,9 +9,8 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PartFilter;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,16 +24,16 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class EffPartSelectionFilterTags extends Effect {
     static {
-        Skript.registerEffect(EffPartSelectionFilterTags.class,"add filter to %activepartselection% [in:with [part( |-)?]tag[s] %strings%] [ex:[and ]without [part( |-)?]tag[s] %strings%]");
+        Skript.registerEffect(EffPartSelectionFilterTags.class,"add filter to %multipartselection% [in:with [part( |-)?]tag[s] %strings%] [ex:[and ]without [part( |-)?]tag[s] %strings%]");
     }
 
-    Expression<ActivePartSelection> selection;
+    Expression<MultiPartSelection> selection;
     Expression<String> includedTags;
     Expression<String> excludedTags;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        selection = (Expression<ActivePartSelection>) expressions[0];
+        selection = (Expression<MultiPartSelection>) expressions[0];
         if (parseResult.hasTag("in")){
             includedTags = (Expression<String>) expressions[1];
         }
@@ -46,7 +45,7 @@ public class EffPartSelectionFilterTags extends Effect {
 
     @Override
     protected void execute(Event event) {
-        ActivePartSelection sel = selection.getSingle(event);
+        MultiPartSelection sel = selection.getSingle(event);
         if (sel == null || (includedTags == null && excludedTags == null)){
             return;
         }

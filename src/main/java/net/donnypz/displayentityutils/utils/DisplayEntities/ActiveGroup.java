@@ -55,17 +55,17 @@ public abstract class ActiveGroup implements Active{
     }
 
     /**
-     * Create a {@link ActivePartSelection} containing unfiltered parts from this group
-     * @return a {@link ActivePartSelection}
+     * Create a {@link MultiPartSelection} containing unfiltered parts from this group
+     * @return a {@link MultiPartSelection}
      */
-    public abstract @NotNull ActivePartSelection createPartSelection();
+    public abstract @NotNull MultiPartSelection createPartSelection();
 
     /**
-     * Create a {@link ActivePartSelection} containing filtered parts from this group
+     * Create a {@link MultiPartSelection} containing filtered parts from this group
      * @param partFilter the part filter
-     * @return a {@link ActivePartSelection}
+     * @return a {@link MultiPartSelection}
      */
-    public abstract @NotNull ActivePartSelection createPartSelection(@NotNull PartFilter partFilter);
+    public abstract @NotNull MultiPartSelection createPartSelection(@NotNull PartFilter partFilter);
 
 
     /**

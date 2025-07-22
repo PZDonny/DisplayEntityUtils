@@ -11,9 +11,7 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import ch.njol.skript.doc.Name;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,22 +24,22 @@ import org.jetbrains.annotations.Nullable;
         "set {_selection} to a new part selection using {_packetgroup}",
         "set {_selection} to a new part selection of {_spawnedgroup}"})
 @Since("2.6.2")
-public class ExprActiveGroupCreateSelection extends SimpleExpression<ActivePartSelection> {
+public class ExprActiveGroupCreateSelection extends SimpleExpression<MultiPartSelection> {
 
     static{
-        Skript.registerExpression(ExprActiveGroupCreateSelection.class, ActivePartSelection.class, ExpressionType.SIMPLE, "[a] [new] part[ |-]selection [from|using|of] %activegroup%");
+        Skript.registerExpression(ExprActiveGroupCreateSelection.class, MultiPartSelection.class, ExpressionType.SIMPLE, "[a] [new] part[ |-]selection [from|using|of] %activegroup%");
     }
 
     Expression<ActiveGroup> group;
 
     @Override
-    protected ActivePartSelection @Nullable [] get(Event event) {
+    protected MultiPartSelection @Nullable [] get(Event event) {
         ActiveGroup g = group.getSingle(event);
         if (g == null){
             return null;
         }
 
-        return new ActivePartSelection[]{g.createPartSelection()};
+        return new MultiPartSelection[]{g.createPartSelection()};
     }
 
     @Override
@@ -50,8 +48,8 @@ public class ExprActiveGroupCreateSelection extends SimpleExpression<ActivePartS
     }
 
     @Override
-    public Class<? extends ActivePartSelection> getReturnType() {
-        return ActivePartSelection.class;
+    public Class<? extends MultiPartSelection> getReturnType() {
+        return MultiPartSelection.class;
     }
 
     @Override

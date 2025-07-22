@@ -10,12 +10,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public abstract class ActivePartSelection implements Active{
+public abstract class MultiPartSelection extends DisplaySelection {
     ActiveGroup group;
     LinkedHashSet<ActivePart> selectedParts = new LinkedHashSet<>();
-
     Set<SpawnedDisplayEntityPart.PartType> partTypes = new HashSet<>();
-    ActivePart selectedPart = null;
 
     Set<ItemType> itemTypes = new HashSet<>();
     boolean includeItemTypes;
@@ -26,39 +24,20 @@ public abstract class ActivePartSelection implements Active{
     Collection<String> includedTags = new HashSet<>();
     Collection<String> excludedTags = new HashSet<>();
 
-
-    /**
-     * Create a SpawnedPartSelection for parts with the specified part tag from a group.
-     * @param group The group to get the parts from
-     * @param partTag The part tag to include in the filter
-     */
-    public ActivePartSelection(ActiveGroup group, @NotNull String partTag){
+    public MultiPartSelection(ActiveGroup group, @NotNull String partTag){
         this(group, Set.of(partTag));
     }
 
-    /**
-     * Create a SpawnedPartSelection for parts with the specified part tags from a group.
-     * @param group The group to get the parts from
-     * @param partTags The part tags to include in the filter
-     */
-    public ActivePartSelection(ActiveGroup group, @NotNull Collection<String> partTags){
+
+    public MultiPartSelection(ActiveGroup group, @NotNull Collection<String> partTags){
         this(group, new PartFilter().includePartTags(partTags));
     }
 
-    /**
-     * Create a SpawnedPartSelection containing all parts from a group.
-     * @param group The group to cycle through for this selection.
-     */
-    public ActivePartSelection(ActiveGroup group){
+    public MultiPartSelection(ActiveGroup group){
         this(group, new PartFilter());
     }
 
-    /**
-     * Create a SpawnedPartSelection containing filtered parts from a group.
-     * @param group The group to cycle through for this selection.
-     * @param filter The filter used to filter parts
-     */
-    public ActivePartSelection(@NotNull ActiveGroup group, @NotNull PartFilter filter){
+    public MultiPartSelection(@NotNull ActiveGroup group, @NotNull PartFilter filter){
         this.group = group;
         this.includeBlockTypes = filter.includeBlockTypes;
         this.includeItemTypes = filter.includeItemTypes;
@@ -280,7 +259,7 @@ public abstract class ActivePartSelection implements Active{
      * Remove parts from this selection, that also exist in a different one. If the provided selection is this, then {@link #remove()} will be called
      * @param selection the other part selection
      */
-    public void removeParts(@NotNull ActivePartSelection selection){
+    public void removeParts(@NotNull MultiPartSelection selection){
         if (selection.getClass() != this.getClass()){
             return;
         }
@@ -553,11 +532,7 @@ public abstract class ActivePartSelection implements Active{
 
     public abstract SequencedCollection<? extends ActivePart> getSelectedParts();
 
-    public abstract ActivePart getSelectedPart();
-
     public abstract ActiveGroup getGroup();
 
     public abstract boolean reset();
-
-    public abstract void remove();
 }
