@@ -603,7 +603,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * @return true if this part is an interaction entity and has commands
      */
     public boolean hasInteractionCommands(){
-        return interactionCommands != null && interactionCommands.isEmpty();
+        return interactionCommands != null && !interactionCommands.isEmpty();
     }
 
     public List<String> getLeftConsoleInteractionCommands(){
