@@ -22,6 +22,11 @@ public final class SinglePartSelection extends PartSelection implements ServerSi
     }
 
     @Override
+    public boolean isValid() {
+        return selectedPart != null;
+    }
+
+    @Override
     public void setTeleportDuration(int teleportDuration) {
         selectedPart.setTeleportDuration(teleportDuration);
     }

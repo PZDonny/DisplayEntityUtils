@@ -522,10 +522,7 @@ public abstract class MultiPartSelection extends PartSelection {
                 .excludePartTags(excludedTags);
     }
 
-    /**
-     * Get the validity and usability of this selection
-     * @return a boolean
-     */
+    @Override
     public boolean isValid(){
         return group != null;
     }

@@ -6,4 +6,10 @@ public abstract class PartSelection implements Active{
     public abstract ActivePart getSelectedPart();
 
     public abstract void remove();
+
+    /**
+     * Get whether this part selection is valid and usable
+     * @return a boolean
+     */
+    public abstract boolean isValid();
 }
