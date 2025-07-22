@@ -37,6 +37,15 @@ public abstract class ActivePart implements Active{
         partsById.put(entityId, this);
     }
 
+    protected void unregister(){
+        partsById.remove(entityId);
+    }
+
+    /**
+     * Get an {@link ActivePart} by its entity id
+     * @param entityId the entity id
+     * @return an {@link ActivePart} or null
+     */
     public static @Nullable ActivePart getPart(int entityId){
         return partsById.get(entityId);
     }

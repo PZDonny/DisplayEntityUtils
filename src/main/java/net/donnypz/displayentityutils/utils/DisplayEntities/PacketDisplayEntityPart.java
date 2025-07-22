@@ -30,10 +30,11 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class PacketDisplayEntityPart extends ActivePart implements Packeted{
-    Set<UUID> viewers = new HashSet<>();
+    final Set<UUID> viewers = Collections.newSetFromMap(new ConcurrentHashMap<>());
     PacketDisplayEntityGroup group;
     PacketAttributeContainer attributeContainer;
     HashMap<NamespacedKey, List<String>> interactionCommands;
@@ -152,6 +153,19 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
+     * Hide the packet-based entity from all players tracking this part
+     */
+    public void hide(){
+        for (UUID uuid : getViewers()){
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null && player.isConnected()){
+                PacketUtils.destroyEntity(player, this.entityId);
+            }
+        }
+        viewers.clear();
+    }
+
+    /**
      * Hide the packet-based entity from a player
      * @param player the player
      */
@@ -170,6 +184,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     @Override
     public void hideFromPlayers(@NotNull Collection<Player> players) {
         PacketUtils.destroyEntity(players, this.entityId);
+        for (Player p : players){
+            viewers.remove(p.getUniqueId());
+        }
     }
 
     /**
@@ -603,5 +620,13 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     public List<String> getRightPlayerInteractionCommands(){
         return interactionCommands.get(DisplayUtils.rightClickPlayer);
+    }
+
+    /**
+     * Hide this part from all players and unregister this part, making it unusable
+     */
+    public void remove(){
+        hide();
+        unregister();
     }
 }

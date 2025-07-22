@@ -925,7 +925,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @return Returns the part's entity.
      */
     public Entity remove(boolean kill) {
-        removeFromGroup();
+        this.removeFromGroup();
         Entity entity = getEntity();
         if (kill && entity != null) {
             if (!entity.isDead()){
@@ -934,6 +934,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
         partData = null;
         valid = false;
+        this.unregister();
         return entity;
     }
 
