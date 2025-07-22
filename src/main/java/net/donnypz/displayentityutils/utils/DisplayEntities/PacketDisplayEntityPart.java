@@ -14,6 +14,7 @@ import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.donnypz.displayentityutils.utils.packet.attributes.ItemStackDisplayAttribute;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
@@ -222,6 +223,23 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public void setItemDisplayItem(@NotNull ItemStack itemStack) {
         if (type != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) return;
         setAndSend(DisplayAttributes.ItemDisplay.ITEMSTACK, itemStack);
+    }
+
+    @Override
+    public void setItemDisplayItemGlint(boolean hasGlint) {
+        ItemStack item = getItemDisplayItem();
+        if (item != null){
+            item.editMeta(meta -> {
+               meta.setEnchantmentGlintOverride(hasGlint);
+            });
+            setAndSend(DisplayAttributes.ItemDisplay.ITEMSTACK, item);
+        }
+    }
+
+    @Override
+    public @Nullable ItemStack getItemDisplayItem() {
+        if (type != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) return null;
+        return attributeContainer.getAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK);
     }
 
 

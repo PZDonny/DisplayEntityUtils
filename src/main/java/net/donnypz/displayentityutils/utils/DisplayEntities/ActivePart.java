@@ -216,34 +216,46 @@ public abstract class ActivePart implements Active{
     public abstract float getYaw();
 
     /**
-     * Set this part's transformation data if it's type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * Set this part's transformation data if its type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
      * @param transformation the transformation
      */
     public abstract void setTransformation(@NotNull Transformation transformation);
 
     /**
-     * Set this part's transformation data if it's type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * Set this part's transformation data if its type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
      * @param matrix the transformation matrix
      */
     public abstract void setTransformationMatrix(@NotNull Matrix4f matrix);
 
     /**
-     * Set the text of this part if it's type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
+     * Set the text of this part if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
      * @param text the text
      */
     public abstract void setTextDisplayText(@NotNull Component text);
 
     /**
-     * Set the block data of this part if it's type is {@link SpawnedDisplayEntityPart.PartType#BLOCK_DISPLAY}.
+     * Set the block data of this part if its type is {@link SpawnedDisplayEntityPart.PartType#BLOCK_DISPLAY}.
      * @param blockData the block data
      */
     public abstract void setBlockDisplayBlock(@NotNull BlockData blockData);
 
     /**
-     * Set the item of this part if it's type is {@link SpawnedDisplayEntityPart.PartType#ITEM_DISPLAY}.
+     * Set the item of this part if its type is {@link SpawnedDisplayEntityPart.PartType#ITEM_DISPLAY}.
      * @param itemStack the item
      */
     public abstract void setItemDisplayItem(@NotNull ItemStack itemStack);
+
+    /**
+     * Set the item glint of this part if its type is {@link SpawnedDisplayEntityPart.PartType#ITEM_DISPLAY}.
+     * @param hasGlint whether the item display should have an item glint
+     */
+    public abstract void setItemDisplayItemGlint(boolean hasGlint);
+
+    /**
+     * Get the {@link ItemStack} of this part if its type is {@link SpawnedDisplayEntityPart.PartType#ITEM_DISPLAY}.
+     * @return an {@link ItemStack} or null
+     */
+    public abstract @Nullable ItemStack getItemDisplayItem();
 
     /**
      * Set an attribute on this part, and send the updated attribute to viewing players.

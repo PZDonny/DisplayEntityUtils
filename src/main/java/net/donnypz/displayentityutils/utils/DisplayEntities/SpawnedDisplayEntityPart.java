@@ -897,6 +897,24 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         ((ItemDisplay) getEntity()).setItemStack(itemStack);
     }
 
+    @Override
+    public void setItemDisplayItemGlint(boolean hasGlint) {
+        ItemStack itemStack = getItemDisplayItem();
+        if (itemStack == null) return;
+        itemStack.editMeta(meta -> {
+            meta.setEnchantmentGlintOverride(hasGlint);
+        });
+        ((ItemDisplay) getEntity()).setItemStack(itemStack);
+    }
+
+    @Override
+    public @Nullable ItemStack getItemDisplayItem() {
+        if (type != PartType.ITEM_DISPLAY) return null;
+        ItemDisplay display = (ItemDisplay) getEntity();
+        if (display == null) return null;
+        return display.getItemStack();
+    }
+
     /**
      * {@inheritDoc}
      * The applied changes do not reflect the entity data server-side
