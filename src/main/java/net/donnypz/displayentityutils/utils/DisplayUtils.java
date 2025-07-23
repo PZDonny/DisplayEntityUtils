@@ -7,6 +7,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
@@ -37,6 +38,21 @@ public final class DisplayUtils {
 
     private static final ListPersistentDataType<String, String> tagPDCType = PersistentDataType.LIST.strings();
     private DisplayUtils(){}
+
+
+    public static @NotNull List<Entity> getUngroupedPartEntities(@NotNull Location location, double distance){
+        List<Entity> parts = new ArrayList<>();
+        for (Entity e : location.getNearbyEntities(distance, distance, distance)) {
+            if (!(e instanceof Display) && !(e instanceof Interaction)) continue;
+            if (e instanceof Display){
+                if (e.getVehicle() instanceof BlockDisplay) continue;
+            }
+            if (!e.getPassengers().isEmpty()) continue;
+            if (DisplayUtils.isInGroup(e)) continue;
+            parts.add(e);
+        }
+        return parts;
+    }
 
     /**
      * Get a {@link Transformation} from a transformation matrix

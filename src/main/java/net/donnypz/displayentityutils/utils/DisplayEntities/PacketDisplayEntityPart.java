@@ -14,6 +14,7 @@ import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.donnypz.displayentityutils.utils.packet.attributes.ItemStackDisplayAttribute;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
@@ -30,10 +31,11 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class PacketDisplayEntityPart extends ActivePart implements Packeted{
-    Set<UUID> viewers = new HashSet<>();
+    final Set<UUID> viewers = Collections.newSetFromMap(new ConcurrentHashMap<>());
     PacketDisplayEntityGroup group;
     PacketAttributeContainer attributeContainer;
     HashMap<NamespacedKey, List<String>> interactionCommands;
@@ -43,7 +45,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @ApiStatus.Internal
     public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull PacketAttributeContainer attributeContainer){
-        super(entityId);
+        super(entityId, true);
         this.type = partType;
         this.attributeContainer = attributeContainer;
         setDefaultTransformValues();
@@ -51,7 +53,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @ApiStatus.Internal
     public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer){
-        super(entityId);
+        super(entityId, true);
         this.type = partType;
         this.attributeContainer = attributeContainer;
         this.teleport(location);
@@ -120,7 +122,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
         viewers.add(player.getUniqueId());
         DEUUser.getOrCreateUser(player).trackPacketEntity(this);
-        attributeContainer.sendEntity(type, this.entityId, player, getLocation());
+        attributeContainer.sendEntity(type, getEntityId(), player, getLocation());
     }
 
     /**
@@ -148,7 +150,20 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             viewers.add(player.getUniqueId());
             DEUUser.getOrCreateUser(player).trackPacketEntity(this);
         }
-        attributeContainer.sendEntityUsingPlayers(type, this.entityId, players, getLocation());
+        attributeContainer.sendEntityUsingPlayers(type, getEntityId(), players, getLocation());
+    }
+
+    /**
+     * Hide the packet-based entity from all players tracking this part
+     */
+    public void hide(){
+        for (UUID uuid : getViewers()){
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null && player.isConnected()){
+                PacketUtils.destroyEntity(player, getEntityId());
+            }
+        }
+        viewers.clear();
     }
 
     /**
@@ -158,7 +173,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     @Override
     public void hideFromPlayer(@NotNull Player player) {
         if (player.isConnected()){
-            PacketUtils.destroyEntity(player, this.entityId);
+            PacketUtils.destroyEntity(player, getEntityId());
         }
         viewers.remove(player.getUniqueId());
     }
@@ -169,7 +184,10 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void hideFromPlayers(@NotNull Collection<Player> players) {
-        PacketUtils.destroyEntity(players, this.entityId);
+        PacketUtils.destroyEntity(players, getEntityId());
+        for (Player p : players){
+            viewers.remove(p.getUniqueId());
+        }
     }
 
     /**
@@ -182,12 +200,12 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @Override
     public void setTransformation(@NotNull Transformation transformation) {
-        attributeContainer.setTransformationAndSend(transformation, entityId, viewers);
+        attributeContainer.setTransformationAndSend(transformation, getEntityId(), viewers);
     }
 
     @Override
     public void setTransformationMatrix(@NotNull Matrix4f matrix) {
-        attributeContainer.setTransformationMatrixAndSend(matrix, entityId, viewers);
+        attributeContainer.setTransformationMatrixAndSend(matrix, getEntityId(), viewers);
     }
 
 
@@ -207,20 +225,37 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         setAndSend(DisplayAttributes.ItemDisplay.ITEMSTACK, itemStack);
     }
 
+    @Override
+    public void setItemDisplayItemGlint(boolean hasGlint) {
+        ItemStack item = getItemDisplayItem();
+        if (item != null){
+            item.editMeta(meta -> {
+               meta.setEnchantmentGlintOverride(hasGlint);
+            });
+            setAndSend(DisplayAttributes.ItemDisplay.ITEMSTACK, item);
+        }
+    }
+
+    @Override
+    public @Nullable ItemStack getItemDisplayItem() {
+        if (type != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) return null;
+        return attributeContainer.getAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK);
+    }
+
 
     @Override
     public <T, V> void setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value) {
-        this.attributeContainer.setAttributeAndSend(attribute, value, entityId, viewers);
+        this.attributeContainer.setAttributeAndSend(attribute, value, getEntityId(), viewers);
     }
 
 
     @Override
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap){
-        this.attributeContainer.setAttributesAndSend(attributeMap, entityId, viewers);
+        this.attributeContainer.setAttributesAndSend(attributeMap, getEntityId(), viewers);
     }
 
     private <T, V>void setAndSend(DisplayAttribute<T, V> attribute, T value){
-        attributeContainer.setAttributeAndSend(attribute, value, entityId, viewers);
+        attributeContainer.setAttributeAndSend(attribute, value, getEntityId(), viewers);
     }
 
     /**
@@ -228,7 +263,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * @param player the player
      */
     public void resendAttributes(@NotNull Player player){
-        this.attributeContainer.sendAttributes(player, entityId);
+        this.attributeContainer.sendAttributes(player, getEntityId());
     }
 
 
@@ -276,7 +311,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             .setAttributesAndSend(new DisplayAttributeMap()
                     .add(DisplayAttributes.Culling.HEIGHT, height)
                     .add(DisplayAttributes.Culling.WIDTH, width),
-            entityId,
+            getEntityId(),
             viewers);
     }
 
@@ -392,7 +427,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             pivot(yaw, pitch);
         }
         else{
-            WrapperPlayServerEntityRotation rotPacket = new WrapperPlayServerEntityRotation(entityId, yaw, pitch, false);
+            WrapperPlayServerEntityRotation rotPacket = new WrapperPlayServerEntityRotation(getEntityId(), yaw, pitch, false);
             for (UUID uuid : viewers){
                 PacketEvents.getAPI().getPlayerManager().sendPacket(Bukkit.getPlayer(uuid), rotPacket);
             }
@@ -458,7 +493,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         for (UUID uuid : viewers){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
-            PacketEvents.getAPI().getPlayerManager().sendPacket(player, new WrapperPlayServerEntityTeleport(entityId,
+            PacketEvents.getAPI().getPlayerManager().sendPacket(player, new WrapperPlayServerEntityTeleport(getEntityId(),
                     new Vector3d(pivotedLoc.x(), pivotedLoc.y(), pivotedLoc.z()),
                     yaw,
                     pitch,
@@ -475,7 +510,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         for (UUID uuid : viewers){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
-            PacketUtils.teleport(player, entityId, location);
+            PacketUtils.teleport(player, getEntityId(), location);
         }
     }
 
@@ -532,7 +567,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
                                         .add(DisplayAttributes.Transform.TRANSLATION, translation)
                                         .add(DisplayAttributes.Interpolation.DURATION, durationInTicks)
                                         .add(DisplayAttributes.Interpolation.DELAY, delayInTicks),
-                                entityId,
+                                getEntityId(),
                                 viewers);
             }, delayInTicks*50L, TimeUnit.MILLISECONDS);
         }
@@ -586,7 +621,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * @return true if this part is an interaction entity and has commands
      */
     public boolean hasInteractionCommands(){
-        return interactionCommands != null && interactionCommands.isEmpty();
+        return interactionCommands != null && !interactionCommands.isEmpty();
     }
 
     public List<String> getLeftConsoleInteractionCommands(){
@@ -603,5 +638,13 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     public List<String> getRightPlayerInteractionCommands(){
         return interactionCommands.get(DisplayUtils.rightClickPlayer);
+    }
+
+    /**
+     * Hide this part from all players and unregister this part, making it unusable
+     */
+    public void remove(){
+        hide();
+        unregister();
     }
 }

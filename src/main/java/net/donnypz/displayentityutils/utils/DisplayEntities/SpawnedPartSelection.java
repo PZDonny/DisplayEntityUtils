@@ -11,10 +11,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public final class SpawnedPartSelection extends ActivePartSelection implements Spawned{
+public final class SpawnedPartSelection extends MultiPartSelection implements ServerSideSelection{
 
     /**
-     * Create a SpawnedPartSelection for parts with the specified part tag from a group.
+     * Create a selection of parts with the specified part tag from a group.
      * @param group The group to get the parts from
      * @param partTag The part tag to include in the filter
      */
@@ -23,7 +23,7 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
     }
 
     /**
-     * Create a SpawnedPartSelection for parts with the specified part tags from a group.
+     * Create a selection of parts with the specified part tags from a group.
      * @param group The group to get the parts from
      * @param partTags The part tags to include in the filter
      */
@@ -32,7 +32,7 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
     }
 
     /**
-     * Create a SpawnedPartSelection containing all parts from a group.
+     * Create a selection containing all parts from a group.
      * @param group The group to cycle through for this selection.
      */
     public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group){
@@ -40,7 +40,7 @@ public final class SpawnedPartSelection extends ActivePartSelection implements S
     }
 
     /**
-     * Create a SpawnedPartSelection containing filtered parts from a group.
+     * Create a selection containing filtered parts from a group.
      * @param group The group to cycle through for this selection.
      * @param filter The filter used to filter parts
      */

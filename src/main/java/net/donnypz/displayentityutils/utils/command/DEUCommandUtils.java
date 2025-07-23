@@ -12,9 +12,11 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockType;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemType;
 import org.bukkit.util.RayTraceResult;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -208,34 +210,31 @@ public class DEUCommandUtils {
 
         //Block-ID
         else{
-            Material material = Material.matchMaterial(block.toLowerCase());
-            if (material == null || !material.isBlock()){
+            BlockType blockType = Registry.BLOCK.get(NamespacedKey.minecraft(block.toLowerCase().replace(".", "_")));
+            if (blockType == null){
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Block not recognized! The block's name might have been misspelled or the block doesn't exist.", NamedTextColor.RED)));
                 return null;
             }
-            blockData = material.createBlockData();
+            blockData = blockType.createBlockData();
         }
         return blockData;
     }
 
     public static ItemStack getItemFromText(String item, Player player){
-        ItemStack itemStack;
         if (item.equals("-held")){
             ItemStack mainHand = player.getInventory().getItemInMainHand();
-            itemStack = mainHand.clone();
+            return mainHand.clone();
         }
-
 
         //Item-ID
         else{
-            Material material = Material.matchMaterial(item.toLowerCase());
-            if (material == null){
+            ItemType itemType = Registry.ITEM.get(NamespacedKey.minecraft(item.toLowerCase().replace(".", "_")));
+            if (itemType == null){
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Item not recognized! The item's name might have been misspelled.", NamedTextColor.RED)));
                 return null;
             }
-            itemStack = new ItemStack(material);
+            return itemType.createItemStack();
         }
-        return itemStack;
     }
 
     public static Color getColorFromText(String color){
@@ -265,7 +264,6 @@ public class DEUCommandUtils {
     }
 
     public static void sendGlowColor(Player player, Color color){
-        player.sendMessage(Component.empty());
         if (color != null) {
             player.sendMessage(Component.text("Glow Color: ").append(Component.text("COLOR", TextColor.color(color.getRed(), color.getGreen(), color.getBlue()))));
             player.sendMessage("| " + net.md_5.bungee.api.ChatColor.RED + "R: " + color.getRed());
@@ -296,8 +294,13 @@ public class DEUCommandUtils {
 
     @ApiStatus.Internal
     public static String getCoordinateString(Location location){
-        return location.x()+" "+location.y()+" "+location.z();
+        return round(location.x())+" "+round(location.y())+" "+round(location.z());
     }
+
+    private static double round(double coord){
+        return Math.round(coord * 100)/100.0;
+    }
+
 
     @ApiStatus.Internal
     public static String getExecuteCommandWorldName(World w){

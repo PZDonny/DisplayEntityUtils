@@ -115,7 +115,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
                     largestHeight = Math.max(largestHeight, scale.y);
                 }
 
-                part.attributeContainer.setAttributesAndSend(attributeMap, part.entityId, part.viewers);
+                part.attributeContainer.setAttributesAndSend(attributeMap, part.getEntityId(), part.viewers);
             }
             //Interactions
             else if (scaleInteractions){
@@ -171,7 +171,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         if (vehicle == null || vehicle.isDead()){
             return false;
         }
-        return PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).getPassengers(false, vehicle.getEntityId()).contains(masterPart.entityId);
+        return PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).getPassengers(false, vehicle.getEntityId()).contains(masterPart.getEntityId());
 
         //return !vehicle.isDead();
     }
@@ -184,7 +184,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         for (UUID uuid : getMasterPart().viewers){
             Player p = Bukkit.getPlayer(uuid);
             if (p == null) continue;
-            PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).addPassenger(false, vehicle.getEntityId(), masterPart.entityId);
+            PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).addPassenger(false, vehicle.getEntityId(), masterPart.getEntityId());
         }
         return true;
     }
@@ -197,7 +197,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         for (UUID uuid : getMasterPart().viewers){
             Player p = Bukkit.getPlayer(uuid);
             if (p == null) continue;
-            PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).removePassenger(false, vehicle.getEntityId(), masterPart.entityId);
+            PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).removePassenger(false, vehicle.getEntityId(), masterPart.getEntityId());
         }
         vehicleUUID = null;
         return vehicle;
@@ -514,7 +514,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     }
 
     private void setPassengers(Player player){
-        int masterId = masterPart.entityId;
+        int masterId = masterPart.getEntityId();
         WrapperPlayServerSetPassengers passengerPacket = new WrapperPlayServerSetPassengers(masterId, passengerIds);
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, passengerPacket);
     }

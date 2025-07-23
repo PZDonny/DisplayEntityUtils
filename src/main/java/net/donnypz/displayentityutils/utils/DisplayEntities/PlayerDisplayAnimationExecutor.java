@@ -75,7 +75,7 @@ final class PlayerDisplayAnimationExecutor {
     }
 
     private void prepareAnimation(SpawnedDisplayAnimation animation, ActiveGroup group, SpawnedDisplayAnimationFrame frame, int frameId, int delay){
-        ActivePartSelection selection = animation.hasFilter() ? group.createPartSelection(animation.filter) : group.createPartSelection();
+        MultiPartSelection selection = animation.hasFilter() ? group.createPartSelection(animation.filter) : group.createPartSelection();
         selection.addPlayerExecutor(this);
         Bukkit
                 .getScheduler()
@@ -84,7 +84,7 @@ final class PlayerDisplayAnimationExecutor {
                         Math.max(delay, 0));
     }
 
-    private void executeAnimation(SpawnedDisplayAnimation animation, ActiveGroup group, ActivePartSelection selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame){
+    private void executeAnimation(SpawnedDisplayAnimation animation, ActiveGroup group, MultiPartSelection selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame){
         if (group.masterPart == null){
             animator.stop(players, group);
             return;
@@ -198,7 +198,7 @@ final class PlayerDisplayAnimationExecutor {
         }
     }
 
-    private void animateInteractions(Location groupLoc, SpawnedDisplayAnimationFrame frame, ActiveGroup group, ActivePartSelection selection, SpawnedDisplayAnimation animation){
+    private void animateInteractions(Location groupLoc, SpawnedDisplayAnimationFrame frame, ActiveGroup group, MultiPartSelection selection, SpawnedDisplayAnimation animation){
         for (Map.Entry<UUID, Vector3f> entry : frame.interactionTransformations.entrySet()){
             UUID partUUID = entry.getKey();
 
@@ -254,7 +254,7 @@ final class PlayerDisplayAnimationExecutor {
         }
     }
 
-    private void animateDisplays(SpawnedDisplayAnimationFrame frame, ActiveGroup group, ActivePartSelection selection, SpawnedDisplayAnimation animation){
+    private void animateDisplays(SpawnedDisplayAnimationFrame frame, ActiveGroup group, MultiPartSelection selection, SpawnedDisplayAnimation animation){
         if (selection.selectedParts.size() >= frame.displayTransformations.size()){
             for (Map.Entry<UUID, DisplayTransformation> entry : frame.displayTransformations.entrySet()){
                 UUID partUUID = entry.getKey();
@@ -336,7 +336,7 @@ final class PlayerDisplayAnimationExecutor {
             }
         }
         for (Player p : players){
-            PacketUtils.setAttributes(p, part.entityId, map);
+            PacketUtils.setAttributes(p, part.getEntityId(), map);
         }
 
         if (animation.allowsDataChanges()){
@@ -355,7 +355,7 @@ final class PlayerDisplayAnimationExecutor {
         }
     }
 
-    private void removeSelection(ActivePartSelection selection){
+    private void removeSelection(MultiPartSelection selection){
         selection.removePlayerExecutor(this);
         selection.remove();
     }

@@ -63,7 +63,7 @@ final class PacketDisplayAnimationExecutor {
 
     private void prepareAnimation(SpawnedDisplayAnimation animation, ActiveGroup group, SpawnedDisplayAnimationFrame frame, int frameId, int delay){
         group.addActiveAnimator(animator);
-        ActivePartSelection selection = animation.hasFilter() ? group.createPartSelection(animation.filter) : group.createPartSelection();
+        MultiPartSelection selection = animation.hasFilter() ? group.createPartSelection(animation.filter) : group.createPartSelection();
         Bukkit
                 .getScheduler()
                 .runTaskLaterAsynchronously(DisplayEntityPlugin.getInstance(),
@@ -71,7 +71,7 @@ final class PacketDisplayAnimationExecutor {
                         Math.max(delay, 0));
     }
 
-    private void executeAnimation(SpawnedDisplayAnimation animation, ActiveGroup group, ActivePartSelection selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame){
+    private void executeAnimation(SpawnedDisplayAnimation animation, ActiveGroup group, MultiPartSelection selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame){
         if (!group.isActiveAnimator(animator)){
             selection.remove();
             return;
@@ -186,7 +186,7 @@ final class PacketDisplayAnimationExecutor {
         }
     }
 
-    private void animateInteractions(Location groupLoc, SpawnedDisplayAnimationFrame frame, ActiveGroup group, ActivePartSelection selection, SpawnedDisplayAnimation animation){
+    private void animateInteractions(Location groupLoc, SpawnedDisplayAnimationFrame frame, ActiveGroup group, MultiPartSelection selection, SpawnedDisplayAnimation animation){
         for (Map.Entry<UUID, Vector3f> entry : frame.interactionTransformations.entrySet()){
             UUID partUUID = entry.getKey();
 
@@ -249,7 +249,7 @@ final class PacketDisplayAnimationExecutor {
         }
     }
 
-    private void animateDisplays(SpawnedDisplayAnimationFrame frame, ActiveGroup group, ActivePartSelection selection, SpawnedDisplayAnimation animation){
+    private void animateDisplays(SpawnedDisplayAnimationFrame frame, ActiveGroup group, MultiPartSelection selection, SpawnedDisplayAnimation animation){
         if (selection.selectedParts.size() >= frame.displayTransformations.size()){
             for (Map.Entry<UUID, DisplayTransformation> entry : frame.displayTransformations.entrySet()){
                 UUID partUUID = entry.getKey();

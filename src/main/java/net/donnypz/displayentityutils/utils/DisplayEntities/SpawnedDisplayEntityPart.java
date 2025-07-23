@@ -31,9 +31,11 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     private SpawnedDisplayEntityGroup group;
     private Entity entity;
     private PartData partData;
+    private UUID entityUUID;
+    private final boolean isSingle;
 
     SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Display displayEntity, Random random){
-        super(displayEntity.getEntityId());
+        super(displayEntity.getEntityId(), true);
         this.group = group;
         this.entity = displayEntity;
         if (displayEntity instanceof BlockDisplay){
@@ -51,16 +53,75 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             group.masterPart = this;
         }
         partTags.addAll(DisplayUtils.getTags(displayEntity));
+        isSingle = false;
     }
 
 
     SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Interaction interactionEntity, Random random){
-        super(interactionEntity.getEntityId());
+        super(interactionEntity.getEntityId(), false);
         this.group = group;
         this.entity = interactionEntity;
         this.type = PartType.INTERACTION;
         applyData(random, interactionEntity);
         partTags.addAll(DisplayUtils.getTags(interactionEntity));
+        isSingle = false;
+    }
+
+    SpawnedDisplayEntityPart(Entity entity){
+        super(entity.getEntityId(), false);
+        switch (entity) {
+            case BlockDisplay blockDisplay -> this.type = PartType.BLOCK_DISPLAY;
+            case ItemDisplay itemDisplay -> this.type = PartType.ITEM_DISPLAY;
+            case TextDisplay textDisplay -> this.type = PartType.TEXT_DISPLAY;
+            default -> this.type = PartType.INTERACTION;
+        }
+        this.entity = entity;
+        this.entityUUID = entity.getUniqueId();
+        isSingle = true;
+    }
+
+    /**
+     * Create a {@link SpawnedDisplayEntityPart} that is not included in any group.
+     * <br>
+     * If the entity is already included in a group, its respective part will be returned.
+     * @param uuid the entity uuid
+     * @return a {@link SpawnedDisplayEntityPart} or null if the entity uuid is not a display or interaction
+     */
+    public static @Nullable SpawnedDisplayEntityPart create(@NotNull UUID uuid){
+        Entity entity = Bukkit.getEntity(uuid);
+        if (entity instanceof Interaction i){
+            return create(i);
+        }
+        else if (entity instanceof Display d){
+            return create(d);
+        }
+        return null;
+    }
+
+    /**
+     * Create a {@link SpawnedDisplayEntityPart} that is not included in any group.
+     * <br>
+     * If the entity is already included in a group, its respective part will be returned.
+     * @param display the display entity
+     * @return a {@link SpawnedDisplayEntityPart}
+     */
+    public static @NotNull SpawnedDisplayEntityPart create(@NotNull Display display){
+        SpawnedDisplayEntityPart part = getPart(display);
+        if (part != null) return part;
+        return new SpawnedDisplayEntityPart(display);
+    }
+
+    /**
+     * Create a {@link SpawnedDisplayEntityPart} that is not included in any group.
+     * <br>
+     * If the entity is already included in a group, its respective part will be returned.
+     * @param interaction the interaction entity
+     * @return a {@link SpawnedDisplayEntityPart}
+     */
+    public static @NotNull SpawnedDisplayEntityPart create(@NotNull Interaction interaction){
+        SpawnedDisplayEntityPart part = getPart(interaction);
+        if (part != null) return part;
+        return new SpawnedDisplayEntityPart(interaction);
     }
 
     private void applyData(Random random, Entity entity){
@@ -76,6 +137,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
 
         this.partData = new PartData(entity);
+        this.entityUUID = entity.getUniqueId();
         allParts.put(partData, this);
 
         setPartUUID(random);
@@ -88,6 +150,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @ApiStatus.Internal
     public void setPartUUID(@NotNull UUID uuid){
+        if (isSingle) return;
         this.partUUID = uuid;
         PersistentDataContainer pdc = getEntity().getPersistentDataContainer();
         pdc.set(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
@@ -156,11 +219,20 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     /**
      * Get this part's associated group
-     * @return {@link SpawnedDisplayEntityGroup} or null if this part is not associated with a group
+     * @return a {@link SpawnedDisplayEntityGroup} or null if this part is not associated with a group
      */
     @Override
     public @Nullable SpawnedDisplayEntityGroup getGroup() {
         return group;
+    }
+
+    /**
+     * Get whether this part can be added to a group. This returns false if the part was
+     * created through {@link #create(Display)} or {@link #create(Interaction)}
+     * @return a boolean.
+     */
+    public boolean isGroupable(){
+        return !isSingle;
     }
 
     @Override
@@ -174,6 +246,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
 
+    @ApiStatus.Internal
     public long getCreationTime() {
         if (!getEntity().getPersistentDataContainer().has(SpawnedDisplayEntityGroup.creationTimeKey)){
             return -1;
@@ -191,22 +264,21 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (entity == null){
             return null;
         }
-        //Stale Entity
-        if (!entity.getLocation().isChunkLoaded() || !Bukkit.isPrimaryThread()){
-            return entity;
+
+        if (entity.getLocation().isChunkLoaded() && Bukkit.isPrimaryThread()) {
+            if (!entity.isValid()) { //Stale Entity
+                refreshEntity();
+            }
         }
-        else{
-            Entity nonStale = Bukkit.getEntity(partData.getUUID());
-            if (entity == nonStale){
-                return entity;
-            }
-            else if (entity.isDead() && nonStale != null){
-                entity = nonStale;
-                return nonStale;
-            }
-            else{
-                return entity;
-            }
+        return entity;
+    }
+
+    @ApiStatus.Internal
+    public void refreshEntity(){
+        Entity nonStale = Bukkit.getEntity(entityUUID);
+        if (entity != nonStale && nonStale != null) {
+            entity = nonStale;
+            refreshEntityId(entity.getEntityId());
         }
     }
 
@@ -215,7 +287,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @return a location
      */
     public @NotNull Location getLocation(){
-        return entity.getLocation();
+        return getEntity().getLocation();
     }
 
 
@@ -228,18 +300,18 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     /**
-     * Get the SpawnedDisplayEntityPart of the Display during this play session
-     * @param display
-     * @return The SpawnedDisplayEntityPart. Null if not created during play session or not a SpawnedDisplayEntityPart
+     * Get the {@link SpawnedDisplayEntityPart} of a {@link Display}, during this play session. Use {@link #create(Display)} if the part is not grouped
+     * @param display the display entity
+     * @return The SpawnedDisplayEntityPart. Null if not created during play session or not associated with any group
      */
     public static SpawnedDisplayEntityPart getPart(@NotNull Display display){
         return getPart((Entity) display);
     }
 
     /**
-     * Get the SpawnedDisplayEntityPart of the Interaction during this play session
-     * @param interaction
-     * @return The SpawnedDisplayEntityPart. Null if not created during play session or not a SpawnedDisplayEntityPart
+     * Get the {@link SpawnedDisplayEntityPart} of an {@link Interaction}, during this play session. Use {@link #create(Interaction)} if the part is not grouped
+     * @param interaction the interaction entity
+     * @return a {@link SpawnedDisplayEntityPart}. Null if not created during play session or not associated with any group
      */
     public static SpawnedDisplayEntityPart getPart(Interaction interaction){
         return getPart((Entity) interaction);
@@ -303,7 +375,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     public SpawnedDisplayEntityPart setGroup(@NotNull SpawnedDisplayEntityGroup group){
-        if (this.group == group){
+        if (this.group == group || isSingle){
             return this;
         }
 
@@ -518,7 +590,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public void unglow(@NotNull Player player){
         if (type != PartType.INTERACTION) {
-            PacketUtils.setGlowing(player, getEntity().getEntityId(), false);
+            PacketUtils.setGlowing(player, getEntityId(), false);
         }
     }
 
@@ -579,6 +651,75 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         Entity entity = getEntity();
         entity.setRotation(entity.getYaw(), pitch);
     }
+
+    /**
+     * Change the X scale of this part
+     * @param scale The X scale to set for this part
+     * @return false if this part is grouped or is an Interaction
+     */
+    public boolean setXScale(float scale){
+        if (!isSingle || type == PartType.INTERACTION){
+            return false;
+        }
+        Transformation t = getDisplayTransformation();
+        Vector3f v = t.getScale();
+        Transformation newT = new Transformation(t.getTranslation(), t.getLeftRotation(), new Vector3f(scale, v.y, v.z), t.getRightRotation());
+        Display entity = (Display) getEntity();
+        entity.setTransformation(newT);
+        return true;
+    }
+    /**
+     * Change the Y scale of this part
+     * @param scale The Y scale to set for this part
+     * @return false if this part is grouped or is an Interaction
+     */
+    public boolean setYScale(float scale){
+        if (!isSingle || type == PartType.INTERACTION){
+            return false;
+        }
+        Transformation t = getDisplayTransformation();
+        Vector3f v = t.getScale();
+        Transformation newT = new Transformation(t.getTranslation(), t.getLeftRotation(), new Vector3f(v.x, scale, v.z), t.getRightRotation());
+        Display entity = (Display) getEntity();
+        entity.setTransformation(newT);
+        return true;
+    }
+    /**
+     * Change the Z scale of this part
+     * @param scale The Z scale to set for this part
+     * @return false if this part is grouped or is an Interaction
+     */
+    public boolean setZScale(float scale){
+        if (!isSingle || type == PartType.INTERACTION){
+            return false;
+        }
+        Transformation t = getDisplayTransformation();
+        Vector3f v = t.getScale();
+        Transformation newT = new Transformation(t.getTranslation(), t.getLeftRotation(), new Vector3f(v.x, v.y, scale), t.getRightRotation());
+        Display entity = (Display) getEntity();
+        entity.setTransformation(newT);
+        return true;
+    }
+
+    /**
+     * Change the scale of this part
+     * @param x The X scale to set for this part
+     * @param y The Y scale to set for this part
+     * @param z The Z scale to set for this part
+     * @return false if this part is grouped or is an Interaction
+     */
+    public boolean setScale(float x, float y, float z){
+        if (!isSingle || type == PartType.INTERACTION){
+            return false;
+        }
+        Transformation t = getDisplayTransformation();
+        Transformation newT = new Transformation(t.getTranslation(), t.getLeftRotation(), new Vector3f(x, y, z), t.getRightRotation());
+        Display entity = (Display) getEntity();
+        entity.setTransformation(newT);
+        return true;
+    }
+
+
 
 
     /**
@@ -780,7 +921,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public void pivot(float angleInDegrees){
         Entity entity = getEntity();
-        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION){
+        if (type != PartType.INTERACTION || isSingle){
             return;
         }
         Interaction i = (Interaction) entity;
@@ -845,6 +986,24 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         ((ItemDisplay) getEntity()).setItemStack(itemStack);
     }
 
+    @Override
+    public void setItemDisplayItemGlint(boolean hasGlint) {
+        ItemStack itemStack = getItemDisplayItem();
+        if (itemStack == null) return;
+        itemStack.editMeta(meta -> {
+            meta.setEnchantmentGlintOverride(hasGlint);
+        });
+        ((ItemDisplay) getEntity()).setItemStack(itemStack);
+    }
+
+    @Override
+    public @Nullable ItemStack getItemDisplayItem() {
+        if (type != PartType.ITEM_DISPLAY) return null;
+        ItemDisplay display = (ItemDisplay) getEntity();
+        if (display == null) return null;
+        return display.getItemStack();
+    }
+
     /**
      * {@inheritDoc}
      * The applied changes do not reflect the entity data server-side
@@ -853,7 +1012,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     public <T, V> void setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value) {
         Entity entity = getEntity();
         new PacketAttributeContainer().setAttribute(attribute, value)
-                .sendAttributesUsingPlayers(entity.getTrackedBy(), entity.getEntityId());
+                .sendAttributesUsingPlayers(entity.getTrackedBy(), getEntityId());
     }
 
     /**
@@ -864,7 +1023,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap) {
         Entity entity = getEntity();
         new PacketAttributeContainer().setAttributes(attributeMap)
-                .sendAttributesUsingPlayers(entity.getTrackedBy(), entity.getEntityId());
+                .sendAttributesUsingPlayers(entity.getTrackedBy(), getEntityId());
     }
 
     @Override
@@ -886,7 +1045,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public float getInteractionHeight() {
-        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
+        if (type != PartType.INTERACTION) {
             return -1;
         }
         return ((Interaction) getEntity()).getInteractionHeight();
@@ -894,7 +1053,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public float getInteractionWidth() {
-        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
+        if (type != PartType.INTERACTION) {
             return -1;
         }
         return ((Interaction) getEntity()).getInteractionWidth();
@@ -913,10 +1072,43 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         ITEM_DISPLAY,
         TEXT_DISPLAY,
         INTERACTION;
+
+        public static PartType getDisplayType(@NotNull Entity entity){
+            switch (entity){
+                case Interaction i -> {
+                    return INTERACTION;
+                }
+                case BlockDisplay d -> {
+                    return BLOCK_DISPLAY;
+                }
+                case ItemDisplay d -> {
+                    return ITEM_DISPLAY;
+                }
+                case TextDisplay d -> {
+                    return TEXT_DISPLAY;
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + entity);
+            }
+        }
+
+        public static PartType getDisplayType(@NotNull Display display){
+            switch (display){
+                case BlockDisplay d -> {
+                    return BLOCK_DISPLAY;
+                }
+                case ItemDisplay d -> {
+                    return ITEM_DISPLAY;
+                }
+                case TextDisplay d -> {
+                    return TEXT_DISPLAY;
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + display);
+            }
+        }
     }
 
     /**
-     * Removes this SpawnedDisplayEntityPart from it's SpawnedDisplayEntityGroup, without dismounting the part from the group.
+     * Removes this SpawnedDisplayEntityPart from it's {@link SpawnedDisplayEntityGroup}, without dismounting the part from the group.
      * This makes this part invalid and unusable after removal. If the part needs to be reused, see {@link #removeFromGroup()}
      * <br><br>
      * The part may not be killed if the part's entity is within an unloaded chunk.
@@ -925,15 +1117,16 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @return Returns the part's entity.
      */
     public Entity remove(boolean kill) {
-        removeFromGroup();
+        this.removeFromGroup();
         Entity entity = getEntity();
         if (kill && entity != null) {
             if (!entity.isDead()){
                 entity.remove();
             }
         }
-        partData = null;
-        valid = false;
+        this.entity = null;
+        this.partData = null;
+        this.unregister();
         return entity;
     }
 
@@ -943,11 +1136,13 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * This part will still be valid and can be readded to a group through {@link SpawnedDisplayEntityGroup#addSpawnedDisplayEntityPart(SpawnedDisplayEntityPart)}
      */
     public void removeFromGroup() {
-        allParts.remove(partData);
-        group.groupParts.remove(partUUID);
-        for (SpawnedPartSelection selection : group.partSelections){
-            selection.removePart(this);
+        if (group != null){
+            allParts.remove(partData);
+            group.groupParts.remove(partUUID);
+            for (SpawnedPartSelection selection : group.partSelections){
+                selection.removePart(this);
+            }
+            group = null;
         }
-        group = null;
     }
 }

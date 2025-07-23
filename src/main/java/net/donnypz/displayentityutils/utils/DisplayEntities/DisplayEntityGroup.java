@@ -258,7 +258,7 @@ public final class DisplayEntityGroup implements Serializable{
             if (entity.isMaster()) continue;
             PacketDisplayEntityPart part = entity.createPacketPart(packetGroup, spawnLocation);
             packetGroup.addPart(part);
-            passengerIds[i] = part.entityId;
+            passengerIds[i] = part.getEntityId();
             i++;
             part.teleport(spawnLocation);
         }

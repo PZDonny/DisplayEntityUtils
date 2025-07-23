@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -21,17 +22,12 @@ class PartsListTagsCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (DisplayGroupManager.getSelectedSpawnedGroup(player)== null){
-            DisplayEntityPluginCommand.noGroupSelection(player);
-            return;
-        }
 
-        SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
+        ServerSideSelection partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){
             PartsCMD.noPartSelection(player);
             return;
         }
-
 
         if (!partSelection.isValid()){
             PartsCMD.invalidPartSelection(player);

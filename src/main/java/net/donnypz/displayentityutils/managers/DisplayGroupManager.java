@@ -76,7 +76,7 @@ public final class DisplayGroupManager {
      * @param selection The SpawnedPartSelection for the player to have selected
      * @param setGroup Whether to set the player's selected group to the selection's group
      */
-    public static void setPartSelection(@NotNull Player player, @NotNull SpawnedPartSelection selection, boolean setGroup) {
+    public static void setPartSelection(@NotNull Player player, @NotNull ServerSideSelection selection, boolean setGroup) {
         DEUUser.getOrCreateUser(player).setSelectedPartSelection(selection, setGroup);
     }
 
@@ -84,21 +84,21 @@ public final class DisplayGroupManager {
      * Gets the SpawnedPartSelection a player has selected
      *
      * @param player Player to get the selection of
-     * @return The SpawnedPartSelection that the player has. Null if player does not have a selection or their selection is invalid.
+     * @return a {@link ServerSideSelection} or null if the player does not have an active selection
      */
-    public static SpawnedPartSelection getPartSelection(@NotNull Player player) {
+    public static ServerSideSelection getPartSelection(@NotNull Player player) {
         DEUUser user = DEUUser.getUser(player);
         if (user == null){
             return null;
         }
-        SpawnedPartSelection sel = user.getSelectedPartSelection();
+        ServerSideSelection sel = user.getSelectedPartSelection();
         if (sel != null && sel.isValid()) return sel;
         return null;
     }
 
     /**
      * Removes the part selection from its associated group
-     * The SpawnedPartSelection will not be usable afterwards.
+     * The part selection will not be usable afterward.
      *
      * @param partSelection The part selection to remove
      */

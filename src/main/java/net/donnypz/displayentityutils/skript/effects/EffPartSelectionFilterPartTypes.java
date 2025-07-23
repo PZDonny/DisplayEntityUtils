@@ -9,10 +9,9 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PartFilter;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,16 +25,16 @@ import java.util.Arrays;
 @Since("2.6.2")
 public class EffPartSelectionFilterPartTypes extends Effect {
     static {
-        Skript.registerEffect(EffPartSelectionFilterPartTypes.class,"set [part] type[s] filter (for|of) %activepartselection% (with[:out]|to [out:exclude]) %parttypes%");
+        Skript.registerEffect(EffPartSelectionFilterPartTypes.class,"set [part] type[s] filter (for|of) %multipartselection% (with[:out]|to [out:exclude]) %parttypes%");
     }
 
-    Expression<ActivePartSelection> selection;
+    Expression<MultiPartSelection> selection;
     Expression<SpawnedDisplayEntityPart.PartType> partTypes;
     boolean exclude;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        selection = (Expression<ActivePartSelection>) expressions[0];
+        selection = (Expression<MultiPartSelection>) expressions[0];
         partTypes = (Expression<SpawnedDisplayEntityPart.PartType>) expressions[1];
         exclude = parseResult.hasTag("out");
         return true;
@@ -43,7 +42,7 @@ public class EffPartSelectionFilterPartTypes extends Effect {
 
     @Override
     protected void execute(Event event) {
-        ActivePartSelection sel = selection.getSingle(event);
+        MultiPartSelection sel = selection.getSingle(event);
         if (sel == null){
             return;
         }

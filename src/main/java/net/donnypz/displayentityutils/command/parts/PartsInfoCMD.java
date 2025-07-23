@@ -31,14 +31,8 @@ class PartsInfoCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
-        if (group == null) {
-            DisplayEntityPluginCommand.noGroupSelection(player);
-            return;
-        }
-        SpawnedPartSelection sel = DisplayGroupManager.getPartSelection(player);
-        if (sel == null){
+        ServerSideSelection selection = DisplayGroupManager.getPartSelection(player);
+        if (selection == null){
             DisplayEntityPluginCommand.noPartSelection(player);
             return;
         }
@@ -60,42 +54,57 @@ class PartsInfoCMD extends PlayerSubCommand {
         }
 
         player.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-        String groupTag = group.getTag();
-        groupTag = groupTag == null ? "<red>NOT SET" : "<yellow>"+groupTag;
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: <yellow>"+groupTag));
 
-        //Part Selection
+
+        //Spawned Part Selection
         if (isSelection){
+            if (PartsCMD.isUnwantedSingleSelection(player, selection)){
+                return;
+            }
+            SpawnedPartSelection sel = (SpawnedPartSelection) selection;
+            SpawnedDisplayEntityGroup group = sel.getGroup();
+            String groupTag = group.getTag();
+
+            groupTag = groupTag == null ? "<red>NOT SET" : "<yellow>"+groupTag;
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: "+groupTag));
             player.sendMessage(MiniMessage.miniMessage().deserialize("Parts Selected: <yellow>"+sel.getSize()));
             sendFilterInfo(player, sel);
             return;
         }
 
         //Single Part
-        SpawnedDisplayEntityPart part = sel.getSelectedPart();
+        SpawnedDisplayEntityPart part = selection.getSelectedPart();
         player.sendMessage(MiniMessage.miniMessage().deserialize("Part Type: <yellow>"+part.getType()));
 
-        UUID partUUID = part.getPartUUID();
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Part UUID: <yellow>"+partUUID)
-                .hoverEvent(HoverEvent.showText(Component.text("Click to copy", NamedTextColor.GREEN)))
-                .clickEvent(ClickEvent.copyToClipboard(partUUID.toString())));
+        if (!selection.isSinglePartSelection()){
+            UUID partUUID = part.getPartUUID();
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Part UUID: <yellow>"+partUUID)
+                    .hoverEvent(HoverEvent.showText(Component.text("Click to copy", NamedTextColor.GREEN)))
+                    .clickEvent(ClickEvent.copyToClipboard(partUUID.toString())));
 
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Is Master Part: "+(part.isMaster() ? "<green>TRUE" : "<red>FALSE")));
-
-        player.sendMessage(Component.text("| Click to view Part Tags", NamedTextColor.GOLD)
-                .clickEvent(ClickEvent.suggestCommand("/mdis parts listtags")));
-        player.sendMessage(Component.empty());
-        if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Is Master Part: "+(part.isMaster() ? "<green>TRUE" : "<red>FALSE")));
+            player.sendMessage(Component.empty());
+            if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
+                player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getViewRange()));
+                sendBrightness(player, part);
+                DEUCommandUtils.sendGlowColor(player, part.getGlowColor());
+            }
+            else{
+                Interaction interaction = (Interaction) part.getEntity();
+                player.sendMessage(MiniMessage.miniMessage().deserialize("Height: <yellow>"+interaction.getInteractionHeight()));
+                player.sendMessage(MiniMessage.miniMessage().deserialize("Width: <yellow>"+interaction.getInteractionWidth()));
+                player.sendMessage(MiniMessage.miniMessage().deserialize("Responsive: "+(interaction.isResponsive() ? "<green>ENABLED" : "<red>DISABLED")));
+            }
+        }
+        else{
             player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getViewRange()));
             sendBrightness(player, part);
             DEUCommandUtils.sendGlowColor(player, part.getGlowColor());
         }
-        else{
-            Interaction interaction = (Interaction) part.getEntity();
-            player.sendMessage(MiniMessage.miniMessage().deserialize("Height: <yellow>"+interaction.getInteractionHeight()));
-            player.sendMessage(MiniMessage.miniMessage().deserialize("Width: <yellow>"+interaction.getInteractionWidth()));
-            player.sendMessage(MiniMessage.miniMessage().deserialize("Responsive: "+(interaction.isResponsive() ? "<green>ENABLED" : "<red>DISABLED")));
-        }
+        player.sendMessage(Component.empty());
+        player.sendMessage(Component.text("| Click to view Part Tags", NamedTextColor.GOLD)
+                .clickEvent(ClickEvent.suggestCommand("/mdis parts listtags")));
+
     }
 
     private void incorrectUsage(Player player){

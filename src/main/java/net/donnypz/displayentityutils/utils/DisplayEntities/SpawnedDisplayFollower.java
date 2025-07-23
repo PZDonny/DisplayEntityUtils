@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 class SpawnedDisplayFollower {
     GroupFollowProperties properties;
     ActiveGroup group;
-    ActivePartSelection selection;
+    MultiPartSelection selection;
     UUID followedEntity;
     boolean isDefaultFollower;
     boolean stopped = false;
@@ -149,7 +149,7 @@ class SpawnedDisplayFollower {
         }.runTaskTimer(DisplayEntityPlugin.getInstance(), 1, teleportationDuration);
     }
 
-    private void apply(Entity entity, ActivePartSelection selection, float newYaw, float newPitch, FollowType finalFollowType, FollowType realFollowType){
+    private void apply(Entity entity, MultiPartSelection selection, float newYaw, float newPitch, FollowType finalFollowType, FollowType realFollowType){
         if (lastGroupScaleMultiplier == 0){
             lastGroupScaleMultiplier = group.getScaleMultiplier();
         }
@@ -271,7 +271,7 @@ class SpawnedDisplayFollower {
             updateTranslation(translation, t, part);
         }
         else{
-            int entityId = part.entityId;
+            int entityId = part.getEntityId();
             suppressTranslation(entityId, translation, () -> {
                 updateTranslation(translation, t, part);
             });

@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class EffActiveDirection extends Effect {
     static {
-        Skript.registerEffect(EffActiveDirection.class,"[deu ](make|set) %activegroups/activeparts/activepartselections%['s] (1¦yaw [p:with [interaction ]pivot]|2¦pitch) [to|as] %-number%");
+        Skript.registerEffect(EffActiveDirection.class,"[deu ](make|set) %activegroups/activeparts/multipartselections%['s] (1¦yaw [p:with [interaction ]pivot]|2¦pitch) [to|as] %-number%");
     }
 
     Expression<Object> object;

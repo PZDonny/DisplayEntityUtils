@@ -9,8 +9,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,22 +23,22 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class EffPartSelectionResetRefreshRemove extends Effect {
     static {
-        Skript.registerEffect(EffPartSelectionResetRefreshRemove.class,"(1¦refresh|2¦reset|3¦remove) %activepartselections%");
+        Skript.registerEffect(EffPartSelectionResetRefreshRemove.class,"(1¦refresh|2¦reset|3¦remove) %multipartselections%");
     }
 
-    Expression<ActivePartSelection> selections;
+    Expression<MultiPartSelection> selections;
     int option;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        selections = (Expression<ActivePartSelection>) expressions[0];
+        selections = (Expression<MultiPartSelection>) expressions[0];
         option = parseResult.mark;
         return true;
     }
 
     @Override
     protected void execute(Event event) {
-        for (ActivePartSelection s : selections.getArray(event)){
+        for (MultiPartSelection s : selections.getArray(event)){
             if (s == null){
                 continue;
             }

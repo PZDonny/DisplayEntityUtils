@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class ExprActiveGlowColor extends SimplePropertyExpression<Object, Color> {
     static {
-        register(ExprActiveGlowColor.class, Color.class, "[the] deu glow[ing] colo[u]r [override]", "activegroups/activeparts/activepartselections");
+        register(ExprActiveGlowColor.class, Color.class, "[the] deu glow[ing] colo[u]r [override]", "activegroups/activeparts/multipartselections");
     }
 
     @Override

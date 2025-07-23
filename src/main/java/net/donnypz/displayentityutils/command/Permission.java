@@ -32,6 +32,7 @@ public enum Permission {
 
 
     PARTS_INFO("deu.parts.info"),
+    PARTS_CREATE("deu.parts.create"),
     PARTS_CYCLE("deu.parts.cycle"),
     PARTS_GLOW("deu.parts.glow"),
     PARTS_GLOW_COLOR("deu.parts.glow.set"),
@@ -40,6 +41,7 @@ public enum Permission {
     PARTS_LIST_TAGS("deu.parts.tag.list"),
     PARTS_REMOVE("deu.parts.remove"),
     PARTS_TRANSLATE("deu.parts.translate"),
+    PARTS_TRANSFORM("deu.parts.transform"),
     PARTS_SEED_UUIDS("deu.parts.seed"),
     PARTS_SET_BLOCK("deu.parts.setblock"),
     PARTS_BILLBOARD("deu.parts.billboard"),

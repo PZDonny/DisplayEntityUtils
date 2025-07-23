@@ -27,16 +27,34 @@ public abstract class ActivePart implements Active{
     private static final ConcurrentHashMap<Integer, ActivePart> partsById = new ConcurrentHashMap<>();
     protected SpawnedDisplayEntityPart.PartType type;
     protected UUID partUUID;
-    protected final int entityId;
+    private int entityId;
     protected Set<String> partTags = new HashSet<>();
-    protected boolean valid = true;
+    private boolean valid = true;
     final Set<PlayerDisplayAnimationExecutor> playerExecutors = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    ActivePart(int entityId){
+    protected ActivePart(int entityId, boolean mapped){
         this.entityId = entityId;
-        partsById.put(entityId, this);
+        if (mapped) partsById.put(entityId, this);
     }
 
+    protected void unregister(){
+        partsById.remove(entityId);
+        valid = false;
+    }
+
+    /**
+     * Get whether this part is valid
+     * @return a boolean
+     */
+    public boolean isValid(){
+        return valid;
+    }
+
+    /**
+     * Get an {@link ActivePart} by its entity id
+     * @param entityId the entity id
+     * @return an {@link ActivePart} or null
+     */
     public static @Nullable ActivePart getPart(int entityId){
         return partsById.get(entityId);
     }
@@ -61,19 +79,6 @@ public abstract class ActivePart implements Active{
     }
 
 
-    protected abstract void cull(float width, float height);
-
-
-    /**
-     * Attempt to automatically set the culling bounds for this part. This is the same as {@link ActiveGroup#autoSetCulling(CullOption, float, float)}
-     * with a CullSetting of {@link CullOption#LOCAL}.
-     * Results may not be 100% accurate due to the varying shapes of Minecraft blocks and variation is display entity transformations.
-     * The culling bounds will be representative of the part's scaling.
-     * @param widthAdder The amount of width to be added to the culling range
-     * @param heightAdder The amount of height to be added to the culling range
-     * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
-     */
-    public abstract void autoCull(float widthAdder, float heightAdder);
 
     /** Get this part's UUID used for animations and uniquely identifying parts
      * @return a {@link UUID}
@@ -90,12 +95,10 @@ public abstract class ActivePart implements Active{
         return entityId;
     }
 
-    /**
-     * Get this part's type
-     * @return a {@link SpawnedDisplayEntityPart.PartType}
-     */
-    public SpawnedDisplayEntityPart.PartType getType(){
-        return type;
+    protected void refreshEntityId(int newEntityId){
+        partsById.remove(entityId);
+        entityId = newEntityId;
+        partsById.put(entityId, this);
     }
 
     /**
@@ -115,6 +118,29 @@ public abstract class ActivePart implements Active{
         return partTags.contains(tag);
     }
 
+    public abstract ActiveGroup getGroup();
+
+    protected abstract void cull(float width, float height);
+
+    /**
+     * Attempt to automatically set the culling bounds for this part. This is the same as {@link ActiveGroup#autoSetCulling(CullOption, float, float)}
+     * with a CullSetting of {@link CullOption#LOCAL}.
+     * Results may not be 100% accurate due to the varying shapes of Minecraft blocks and variation is display entity transformations.
+     * The culling bounds will be representative of the part's scaling.
+     * @param widthAdder The amount of width to be added to the culling range
+     * @param heightAdder The amount of height to be added to the culling range
+     * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
+     */
+    public abstract void autoCull(float widthAdder, float heightAdder);
+
+    /**
+     * Get this part's type
+     * @return a {@link SpawnedDisplayEntityPart.PartType}
+     */
+    public SpawnedDisplayEntityPart.PartType getType(){
+        return type;
+    }
+
     /**
      * Make this part glow for a player
      * @param player the player
@@ -125,7 +151,7 @@ public abstract class ActivePart implements Active{
     }
 
     /**
-     * Make this part glow for a player for a set period of time, if it's a block or item display
+     * Make this part glow for a set period of time, if it's a block or item display
      * @param durationInTicks how long the glowing should last. -1 or less to last forever
      */
     @Override
@@ -183,8 +209,6 @@ public abstract class ActivePart implements Active{
      */
     public abstract @Nullable Color getGlowColor();
 
-    public abstract ActiveGroup getGroup();
-
     /**
      * Get this part's pitch
      * @return a float
@@ -198,34 +222,46 @@ public abstract class ActivePart implements Active{
     public abstract float getYaw();
 
     /**
-     * Set this part's transformation data if it's type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * Set this part's transformation data if its type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
      * @param transformation the transformation
      */
     public abstract void setTransformation(@NotNull Transformation transformation);
 
     /**
-     * Set this part's transformation data if it's type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * Set this part's transformation data if its type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
      * @param matrix the transformation matrix
      */
     public abstract void setTransformationMatrix(@NotNull Matrix4f matrix);
 
     /**
-     * Set the text of this part if it's type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
+     * Set the text of this part if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
      * @param text the text
      */
     public abstract void setTextDisplayText(@NotNull Component text);
 
     /**
-     * Set the block data of this part if it's type is {@link SpawnedDisplayEntityPart.PartType#BLOCK_DISPLAY}.
+     * Set the block data of this part if its type is {@link SpawnedDisplayEntityPart.PartType#BLOCK_DISPLAY}.
      * @param blockData the block data
      */
     public abstract void setBlockDisplayBlock(@NotNull BlockData blockData);
 
     /**
-     * Set the item of this part if it's type is {@link SpawnedDisplayEntityPart.PartType#ITEM_DISPLAY}.
+     * Set the item of this part if its type is {@link SpawnedDisplayEntityPart.PartType#ITEM_DISPLAY}.
      * @param itemStack the item
      */
     public abstract void setItemDisplayItem(@NotNull ItemStack itemStack);
+
+    /**
+     * Set the item glint of this part if its type is {@link SpawnedDisplayEntityPart.PartType#ITEM_DISPLAY}.
+     * @param hasGlint whether the item display should have an item glint
+     */
+    public abstract void setItemDisplayItemGlint(boolean hasGlint);
+
+    /**
+     * Get the {@link ItemStack} of this part if its type is {@link SpawnedDisplayEntityPart.PartType#ITEM_DISPLAY}.
+     * @return an {@link ItemStack} or null
+     */
+    public abstract @Nullable ItemStack getItemDisplayItem();
 
     /**
      * Set an attribute on this part, and send the updated attribute to viewing players.

@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.command.*;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
@@ -72,26 +73,30 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }
 
-    static Interaction getInteraction(Player p, boolean checkTargeted){
-        Entity entity = p.getTargetEntity(5);
+    static Interaction getInteraction(Player player, boolean checkTargeted){
+        Entity entity = player.getTargetEntity(5);
         if (entity instanceof Interaction i && checkTargeted){
             return i;
         }
         else{
-            SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(p);
+            ServerSideSelection selection = DisplayGroupManager.getPartSelection(player);
+            if (PartsCMD.isUnwantedSingleSelection(player, selection)){
+                return null;
+            }
+            SpawnedPartSelection partSelection = (SpawnedPartSelection) selection;
             if (partSelection == null){
-                noPartSelectionInteraction(p);
+                noPartSelectionInteraction(player);
                 return null;
             }
             else{
                 if (partSelection.getSelectedParts().isEmpty()){
-                    PartsCMD.invalidPartSelection(p);
+                    PartsCMD.invalidPartSelection(player);
                     return null;
                 }
 
                 SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
                 if (selected.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION) {
-                    p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You can only do this with interaction entities", NamedTextColor.RED)));
+                    player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You can only do this with interaction entities", NamedTextColor.RED)));
                     return null;
                 }
                 return (Interaction) selected.getEntity();

@@ -770,7 +770,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
                         part.getEntity().setRotation(tpLoc.getYaw(), tpLoc.getPitch());
                         if (currentDistance >= distance){
                             if (part.isMaster()){
-                                master.teleport(destination);
+                                master.teleport(destination, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                             }
                             new GroupTeleportMoveEndEvent(SpawnedDisplayEntityGroup.this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent();
                             cancel();
@@ -1466,7 +1466,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      * @return true if the group's master part is not invalid.
      */
     public boolean isSpawned(){
-        return masterPart != null && masterPart.valid;
+        return masterPart != null && masterPart.isValid();
     }
 
     /**

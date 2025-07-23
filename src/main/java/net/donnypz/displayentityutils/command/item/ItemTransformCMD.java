@@ -1,12 +1,9 @@
 package net.donnypz.displayentityutils.command.item;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
-import net.donnypz.displayentityutils.command.parts.PartsCMD;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.command.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
@@ -14,66 +11,55 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-class ItemTransformCMD extends PlayerSubCommand {
+class ItemTransformCMD extends PartsSubCommand {
     ItemTransformCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("transform", parentSubCommand, Permission.ITEM_TRANSFORM);
+        super("transform", parentSubCommand, Permission.ITEM_TRANSFORM, 3, 3);
     }
 
     @Override
-    public void execute(Player player, String[] args) {
-        if (DisplayGroupManager.getSelectedSpawnedGroup(player)== null){
-            DisplayEntityPluginCommand.noGroupSelection(player);
-            return;
-        }
+    protected void sendIncorrectUsage(@NotNull Player player) {
+        player.sendMessage(Component.text("Incorrect Usage! /mdis item transform <transform-type> [-all]", NamedTextColor.RED));
+    }
 
-        SpawnedPartSelection partSelection = DisplayGroupManager.getPartSelection(player);
-        if (partSelection == null){
-            PartsCMD.noPartSelection(player);
-            return;
-        }
-
-        if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /mdis item transform <transform-type> [-all]", NamedTextColor.RED));
-            return;
-        }
-
-
-        if (partSelection.getSelectedParts().isEmpty()){
-            PartsCMD.invalidPartSelection(player);
-            return;
-        }
-
-        try{
-            ItemDisplay.ItemDisplayTransform transform = ItemDisplay.ItemDisplayTransform.valueOf(args[2].toUpperCase());
-
-            if (args.length >= 4 && args[3].equalsIgnoreCase("-all")){
-                for (SpawnedDisplayEntityPart part : partSelection.getSelectedParts()){
-                    if (part.getType() == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
-                        setTransform(part, transform);
-                    }
-                }
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully set item transform of ALL selected item displays!", NamedTextColor.GREEN)));
-            }
-            else{
-                SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
-                if (selected.getType() != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
-                    player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You can only do this with item display entities", NamedTextColor.RED)));
-                    return;
-                }
-                setTransform(selected, transform);
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully set item transform of selected item display!", NamedTextColor.GREEN)));
+    @Override
+    protected void executeAllPartsAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull SpawnedPartSelection selection, @NotNull String[] args) {
+        ItemDisplay.ItemDisplayTransform transform = getTransform(player, args[2]);
+        if (transform == null) return;
+        for (SpawnedDisplayEntityPart part : selection.getSelectedParts()){
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
+                setTransform(part, transform);
             }
         }
-        catch(IllegalArgumentException e){
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid item transform option!", NamedTextColor.RED)));
-        }
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully set item transform of ALL selected item displays!", NamedTextColor.GREEN)));
+    }
 
+    @Override
+    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ServerSideSelection selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+        ItemDisplay.ItemDisplayTransform transform = getTransform(player, args[2]);
+        if (transform == null) return;
+        if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You can only do this with item display entities", NamedTextColor.RED)));
+            return;
+        }
+        setTransform(selectedPart, transform);
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully set item transform of selected item display!", NamedTextColor.GREEN)));
     }
 
     private void setTransform(SpawnedDisplayEntityPart part, ItemDisplay.ItemDisplayTransform transform){
         ItemDisplay display = (ItemDisplay) part.getEntity();
         display.setItemDisplayTransform(transform);
+    }
+
+    private ItemDisplay.ItemDisplayTransform getTransform(Player player, String transform){
+        try{
+            return ItemDisplay.ItemDisplayTransform.valueOf(transform.toUpperCase());
+        }
+        catch(IllegalArgumentException e){
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid item transform option!", NamedTextColor.RED)));
+            return null;
+        }
     }
 
 }

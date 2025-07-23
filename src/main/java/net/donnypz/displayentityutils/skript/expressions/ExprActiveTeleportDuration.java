@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprActiveTeleportDuration extends SimplePropertyExpression<Active, Number> {
 
     static {
-        register(ExprActiveTeleportDuration.class, Number.class, "[the] [deu] teleport[ation][ |-]duration", "activegroup/activepart/activepartselection");
+        register(ExprActiveTeleportDuration.class, Number.class, "[the] [deu] teleport[ation][ |-]duration", "activegroup/activepart/multipartselection");
     }
 
     @Override

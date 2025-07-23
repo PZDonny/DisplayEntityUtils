@@ -10,8 +10,8 @@ import io.papermc.paper.registry.data.dialog.input.TextDialogInput;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -19,12 +19,15 @@ import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.UUID;
 
 
 public final class TextDisplayDialog{
@@ -65,6 +68,21 @@ public final class TextDisplayDialog{
                                     200, null)));
         });
         player.showDialog(dialog);
+    }
+
+    /**
+     * Send this dialog to a player
+     * @param player the player
+     * @param entityUUID the text display to edit
+     * @param miniMessageFormatted whether the text display's text should be formatted as minimessage or ampersand
+     */
+    public static void sendDialog(@NotNull Player player, @NotNull UUID entityUUID, boolean miniMessageFormatted){
+        Entity entity = Bukkit.getEntity(entityUUID);
+        if (!(entity instanceof TextDisplay textDisplay)){
+            player.sendMessage(Component.text("The provided entity is not a text display, or is not loaded!", NamedTextColor.RED));
+            return;
+        }
+        sendDialog(player, textDisplay, miniMessageFormatted);
     }
 
     /**
@@ -188,7 +206,7 @@ public final class TextDisplayDialog{
     private static DialogAction getConfirmAction(){
         return DialogAction.customClick((view, audience) -> {
             Player p = (Player) audience;
-            SpawnedPartSelection selection = DisplayGroupManager.getPartSelection(p);
+            ServerSideSelection selection = DisplayGroupManager.getPartSelection(p);
             if (selection == null){
                 p.sendMessage(Component.text("Part selection lost!", NamedTextColor.RED));
                 return;
