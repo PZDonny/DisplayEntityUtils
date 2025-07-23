@@ -264,23 +264,16 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (entity == null){
             return null;
         }
-        //Stale Entity
-        if (!entity.getLocation().isChunkLoaded() || !Bukkit.isPrimaryThread()){
-            return entity;
-        }
-        else{
-            Entity nonStale = Bukkit.getEntity(entityUUID);
-            if (entity == nonStale){
-                return entity;
-            }
-            else if (entity.isDead() && nonStale != null){
-                entity = nonStale;
-                return nonStale;
-            }
-            else{
-                return entity;
+
+        if (entity.getLocation().isChunkLoaded() && Bukkit.isPrimaryThread()) {
+            if (!entity.isValid()) { //Stale Entity
+                Entity nonStale = Bukkit.getEntity(entityUUID);
+                if (entity != nonStale && nonStale != null) {
+                    entity = nonStale;
+                }
             }
         }
+        return entity;
     }
 
     /**
@@ -591,7 +584,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public void unglow(@NotNull Player player){
         if (type != PartType.INTERACTION) {
-            PacketUtils.setGlowing(player, getEntity().getEntityId(), false);
+            PacketUtils.setGlowing(player, getEntityId(), false);
         }
     }
 
@@ -1013,7 +1006,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     public <T, V> void setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value) {
         Entity entity = getEntity();
         new PacketAttributeContainer().setAttribute(attribute, value)
-                .sendAttributesUsingPlayers(entity.getTrackedBy(), entity.getEntityId());
+                .sendAttributesUsingPlayers(entity.getTrackedBy(), getEntityId());
     }
 
     /**
@@ -1024,7 +1017,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap) {
         Entity entity = getEntity();
         new PacketAttributeContainer().setAttributes(attributeMap)
-                .sendAttributesUsingPlayers(entity.getTrackedBy(), entity.getEntityId());
+                .sendAttributesUsingPlayers(entity.getTrackedBy(), getEntityId());
     }
 
     @Override
