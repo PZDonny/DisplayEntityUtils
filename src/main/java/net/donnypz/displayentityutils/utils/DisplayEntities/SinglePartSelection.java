@@ -5,6 +5,7 @@ import org.bukkit.Color;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,7 +13,11 @@ import java.util.Collection;
 
 public final class SinglePartSelection extends PartSelection implements ServerSideSelection{
 
+    @ApiStatus.Internal
     public SinglePartSelection(@NotNull SpawnedDisplayEntityPart part){
+        if (part.isGroupable()){
+            throw new IllegalArgumentException("Cannot make a SinglePartSelection with a (previously) grouped part");
+        }
         this.selectedPart = part;
     }
     @Override
