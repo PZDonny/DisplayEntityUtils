@@ -22,8 +22,6 @@ import java.util.concurrent.CompletableFuture;
 public final class DEULoadingListeners implements Listener {
     @EventHandler(priority =  EventPriority.HIGHEST)
     public void onEntityLoad(EntitiesLoadEvent e){
-        if (!DisplayEntityPlugin.automaticGroupDetection()) return;
-
         Chunk chunk = e.getChunk();
         if (e.getChunk().isLoaded()){
             AutoGroup.detectGroups(chunk, e.getEntities());

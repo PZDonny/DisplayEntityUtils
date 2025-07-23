@@ -29,8 +29,22 @@ final class AutoGroup {
     static final HashMap<String, ArrayList<Long>> readChunks = new HashMap<>();
     private static final Gson gson = new Gson();
 
+    private static void refreshGroupPartEntities(List<Entity> entities){
+        for (Entity e : entities){
+            if (e instanceof Interaction i){
+                SpawnedDisplayEntityPart p = SpawnedDisplayEntityPart.getPart(i);
+                if (p != null) p.refreshEntity();
+            }
+            else if (e instanceof Display d){
+                SpawnedDisplayEntityPart p = SpawnedDisplayEntityPart.getPart(d);
+                if (p != null) p.refreshEntity();
+            }
+        }
+    }
+
     static void detectGroups(Chunk chunk, List<Entity> entities){
         if (!DisplayEntityPlugin.automaticGroupDetection()){
+            refreshGroupPartEntities(entities);
             return;
         }
 
@@ -40,6 +54,7 @@ final class AutoGroup {
 
         ArrayList<Long> chunks = readChunks.get(worldName);
         if (chunks.contains(chunk.getChunkKey())){
+            refreshGroupPartEntities(entities);
             if (!DisplayEntityPlugin.readSameChunks()){
                 return;
             }

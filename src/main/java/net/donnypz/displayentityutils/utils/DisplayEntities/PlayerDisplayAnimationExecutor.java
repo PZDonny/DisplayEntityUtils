@@ -336,7 +336,7 @@ final class PlayerDisplayAnimationExecutor {
             }
         }
         for (Player p : players){
-            PacketUtils.setAttributes(p, part.entityId, map);
+            PacketUtils.setAttributes(p, part.getEntityId(), map);
         }
 
         if (animation.allowsDataChanges()){

@@ -271,7 +271,7 @@ class SpawnedDisplayFollower {
             updateTranslation(translation, t, part);
         }
         else{
-            int entityId = part.entityId;
+            int entityId = part.getEntityId();
             suppressTranslation(entityId, translation, () -> {
                 updateTranslation(translation, t, part);
             });

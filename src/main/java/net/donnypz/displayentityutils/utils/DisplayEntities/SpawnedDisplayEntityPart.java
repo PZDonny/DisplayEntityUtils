@@ -267,13 +267,19 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
         if (entity.getLocation().isChunkLoaded() && Bukkit.isPrimaryThread()) {
             if (!entity.isValid()) { //Stale Entity
-                Entity nonStale = Bukkit.getEntity(entityUUID);
-                if (entity != nonStale && nonStale != null) {
-                    entity = nonStale;
-                }
+                refreshEntity();
             }
         }
         return entity;
+    }
+
+    @ApiStatus.Internal
+    public void refreshEntity(){
+        Entity nonStale = Bukkit.getEntity(entityUUID);
+        if (entity != nonStale && nonStale != null) {
+            entity = nonStale;
+            refreshEntityId(entity.getEntityId());
+        }
     }
 
     /**

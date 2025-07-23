@@ -27,7 +27,7 @@ public abstract class ActivePart implements Active{
     private static final ConcurrentHashMap<Integer, ActivePart> partsById = new ConcurrentHashMap<>();
     protected SpawnedDisplayEntityPart.PartType type;
     protected UUID partUUID;
-    protected final int entityId;
+    private int entityId;
     protected Set<String> partTags = new HashSet<>();
     private boolean valid = true;
     final Set<PlayerDisplayAnimationExecutor> playerExecutors = Collections.newSetFromMap(new ConcurrentHashMap<>());
@@ -93,6 +93,12 @@ public abstract class ActivePart implements Active{
      */
     public int getEntityId(){
         return entityId;
+    }
+
+    protected void refreshEntityId(int newEntityId){
+        partsById.remove(entityId);
+        entityId = newEntityId;
+        partsById.put(entityId, this);
     }
 
     /**
