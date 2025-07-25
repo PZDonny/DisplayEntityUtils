@@ -255,12 +255,12 @@ public class PartFilter implements Serializable, Cloneable {
     }
 
     /**
-     * Create a {@link SpawnedPartSelection} from this filter
+     * Create a {@link MultiPartSelection} from this filter
      * @param group the group to create a selection from
-     * @return a {@link SpawnedPartSelection}
+     * @return a {@link MultiPartSelection}
      */
-    public @NotNull SpawnedPartSelection toSpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group){
-        return new SpawnedPartSelection(group, this);
+    public @NotNull MultiPartSelection toPartSelection(@NotNull ActiveGroup group){
+        return group.createPartSelection(this);
     }
 
 
