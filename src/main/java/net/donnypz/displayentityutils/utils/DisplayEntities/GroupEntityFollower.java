@@ -70,11 +70,7 @@ class GroupEntityFollower {
         Collection<String> partTags = properties.partTags();
         if (partTags != null && !partTags.isEmpty()){
             selection = group.createPartSelection(new PartFilter().includePartTags(partTags));
-            for (ActivePart p : selection.selectedParts){
-                if (p.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                    p.setTeleportDuration(teleportationDuration);
-                }
-            }
+            selection.setTeleportDuration(teleportationDuration);
             if (group.defaultFollower != null){
                 group.defaultFollower.selection.removeParts(selection);
             }
@@ -91,11 +87,13 @@ class GroupEntityFollower {
                     cancel();
                     return;
                 }
+
                 if (stopped || (group instanceof SpawnedDisplayEntityGroup sg && !sg.isSpawned())){
                     cancel();
                     remove();
                     return;
                 }
+
                 if (entity.isDead()) {
                     if (properties.unregisterDelay() > -1) {
                         Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
@@ -103,7 +101,7 @@ class GroupEntityFollower {
                                 sg.unregister(true, true);
                             }
                             else if (group instanceof PacketDisplayEntityGroup pg){
-                                pg.hideFromPlayers(pg.getTrackingPlayers());
+                                pg.unregister();
                             }
                         }, properties.unregisterDelay());
                     }
@@ -153,7 +151,6 @@ class GroupEntityFollower {
         if (lastGroupScaleMultiplier == 0){
             lastGroupScaleMultiplier = group.getScaleMultiplier();
         }
-
 
         for (ActivePart part : selection.selectedParts){
             switch(finalFollowType){
