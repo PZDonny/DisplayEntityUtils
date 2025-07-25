@@ -295,7 +295,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
 
     @Override
     public boolean isTrackedBy(@NotNull Player player) {
-        return getMasterPart().viewers.contains(player.getUniqueId());
+        return getMasterPart().isTrackedBy(player.getUniqueId());
     }
 
     @Override
@@ -566,7 +566,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
 
     public void unregister(){
         hideFromPlayers(getTrackingPlayers());
-        groupParts.clear();
+        Iterator<Map.Entry<UUID, ActivePart>> it = groupParts.entrySet().iterator();
+        while (it.hasNext()){
+            Map.Entry<UUID, ActivePart> entry = it.next();
+            ((PacketDisplayEntityPart) entry.getValue()).removeFromGroup(true);
+        }
         activeAnimators.clear();
         masterPart = null;
     }
