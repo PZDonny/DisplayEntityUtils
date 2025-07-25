@@ -120,6 +120,8 @@ public abstract class ActivePart implements Active{
 
     public abstract ActiveGroup getGroup();
 
+    public abstract boolean hasGroup();
+
     protected abstract void cull(float width, float height);
 
     /**

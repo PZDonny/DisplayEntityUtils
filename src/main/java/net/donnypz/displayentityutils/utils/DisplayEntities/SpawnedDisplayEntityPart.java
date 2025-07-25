@@ -231,7 +231,8 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * created through {@link #create(Display)} or {@link #create(Interaction)}
      * @return a boolean.
      */
-    public boolean isGroupable(){
+    @Override
+    public boolean hasGroup(){
         return !isSingle;
     }
 

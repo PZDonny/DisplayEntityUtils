@@ -597,6 +597,15 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
+     * Get whether this part is contained in a group
+     * @return a boolean
+     */
+    @Override
+    public boolean hasGroup(){
+        return group != null;
+    }
+
+    /**
      * Get whether this part is actively being tracked by a player (check if it's visible)
      * @param player the player
      * @return a boolean
@@ -640,11 +649,30 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
-     * Hide this part from all players and unregister this part, making it unusable
-     */
+     * Hide this part from all players and unregister this part, making it unusable.
+     * <br>
+     * If {@link #hasGroup()} returns true, {@link #removeFromGroup(boolean)} will be executed instead, unregistering the part
+     * */
     public void remove(){
+        if (hasGroup()){
+            removeFromGroup(true);
+        }
         hide();
         unregister();
+    }
+
+    /**
+     * Hide this part from all players and unregister this part, making it unusable.
+     * <br>
+     * This does nothing if {@link #hasGroup()} returns false. Instead, use {@link #remove()} to remove this part
+     */
+    public void removeFromGroup(boolean unregister){
+        if (!hasGroup()) return;
+        group.groupParts.remove(partUUID);
+        group = null;
+        if (unregister){
+            remove();
+        }
     }
 
     private static final class PacketLocation {
