@@ -14,7 +14,6 @@ import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
-import net.donnypz.displayentityutils.utils.packet.attributes.ItemStackDisplayAttribute;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
@@ -646,5 +645,45 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public void remove(){
         hide();
         unregister();
+    }
+
+    private static final class PacketLocation {
+
+        String worldName;
+        double x;
+        double y;
+        double z;
+        float yaw;
+        float pitch;
+
+        PacketLocation(Location location){
+            this.worldName = location.getWorld().getName();
+            this.x = location.x();
+            this.y = location.y();
+            this.z = location.z();
+            this.yaw = location.getYaw();
+            this.pitch = location.getPitch();
+        }
+
+        PacketLocation(Location location, Vector3f vector){
+            this(vector == null ? location : DisplayUtils.getPivotLocation(Vector.fromJOML(vector), location, location.getYaw()));
+        }
+
+        PacketLocation setRotation(float yaw, float pitch){
+            this.yaw = yaw;
+            this.pitch = pitch;
+            return this;
+        }
+
+        PacketLocation setCoordinates(Location location){
+            this.x = location.x();
+            this.y = location.y();
+            this.z = location.z();
+            return this;
+        }
+
+        Location toLocation(){
+            return new Location(Bukkit.getWorld(worldName), x, y, z, yaw, pitch);
+        }
     }
 }
