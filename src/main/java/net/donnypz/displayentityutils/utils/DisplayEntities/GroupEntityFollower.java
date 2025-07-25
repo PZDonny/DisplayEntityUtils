@@ -15,7 +15,7 @@ import org.joml.Vector3f;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-class SpawnedDisplayFollower {
+class GroupEntityFollower {
     GroupFollowProperties properties;
     ActiveGroup group;
     MultiPartSelection selection;
@@ -28,7 +28,7 @@ class SpawnedDisplayFollower {
     HashMap<ActivePart, PartFollowData> lastDisplayPivotData = new HashMap<>();
     static final ConcurrentHashMap<Integer, Vector3f> suppressedVectors = new ConcurrentHashMap<>();
 
-    SpawnedDisplayFollower(ActiveGroup group, GroupFollowProperties followProperties){
+    GroupEntityFollower(ActiveGroup group, GroupFollowProperties followProperties){
         this.group = group;
         this.properties = followProperties;
         Collection<String> partTags = followProperties.partTags();
@@ -87,7 +87,7 @@ class SpawnedDisplayFollower {
         new BukkitRunnable(){
             @Override
             public void run() {
-                if (!group.followers.contains(SpawnedDisplayFollower.this) && !isDefaultFollower){
+                if (!group.followers.contains(GroupEntityFollower.this) && !isDefaultFollower){
                     cancel();
                     return;
                 }
@@ -112,7 +112,7 @@ class SpawnedDisplayFollower {
                     return;
                 }
 
-                if (isDefaultFollower && group.defaultFollower != SpawnedDisplayFollower.this){
+                if (isDefaultFollower && group.defaultFollower != GroupEntityFollower.this){
                     cancel();
                     remove();
                     return;

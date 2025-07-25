@@ -74,7 +74,7 @@ public abstract class ActivePart implements Active{
 
     @ApiStatus.Internal
     public boolean isTranslationSuppressed(Vector3f vector){
-        Vector3f v = SpawnedDisplayFollower.suppressedVectors.get(entityId);
+        Vector3f v = GroupEntityFollower.suppressedVectors.get(entityId);
         return vector.equals(v);
     }
 

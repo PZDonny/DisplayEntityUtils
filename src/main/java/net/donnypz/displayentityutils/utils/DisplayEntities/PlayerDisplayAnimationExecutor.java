@@ -345,7 +345,7 @@ final class PlayerDisplayAnimationExecutor {
     }
 
     private void addFollowerDisplayPivot(ActiveGroup group, ActivePart part, Vector3f translationVector) {
-        for (SpawnedDisplayFollower follower : group.followers) {
+        for (GroupEntityFollower follower : group.followers) {
             if (!follower.selection.contains(part)) {
                 continue;
             }
