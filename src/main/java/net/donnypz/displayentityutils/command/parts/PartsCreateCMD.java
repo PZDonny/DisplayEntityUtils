@@ -55,7 +55,7 @@ class PartsCreateCMD extends PlayerSubCommand {
                     e.text(Component.text("New Text Display Entity"));
                 });
                 selectEntity(player, entity.getUniqueId(), "Text Display");
-                if (VersionUtils.canViewDialogs(player, true)){
+                if (VersionUtils.canViewDialogs(player, false)){
                     UUID entityUUID = entity.getUniqueId();
                     player.sendMessage(Component.text("| Click here to edit it!", NamedTextColor.LIGHT_PURPLE)
                             .clickEvent(ClickEvent.callback(audience -> {
