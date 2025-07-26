@@ -30,6 +30,8 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 @ApiStatus.Internal
 public final class DEUEntityListener implements Listener, PacketListener {
 
@@ -45,9 +47,12 @@ public final class DEUEntityListener implements Listener, PacketListener {
         int entityId = packet.getEntityId();
         ActivePart part = ActivePart.getPart(entityId);
         if (part == null) return;
+
+        UUID uuid = user.getUUID();
+        DEUUser deuUser = DEUUser.getOrCreateUser(uuid);
         for (EntityData<?> data : packet.getEntityMetadata()){
             if (data.getValue() instanceof Vector3f v) {
-                if (part.isTranslationSuppressed(new org.joml.Vector3f(v.x, v.y, v.z)) && part.isAnimatingForPlayer(Bukkit.getPlayer(user.getUUID()))){
+                if (part.isAnimatingForPlayer(Bukkit.getPlayer(uuid)) && deuUser.unsuppressIfEqual(entityId, new org.joml.Vector3f(v.x, v.y, v.z))){
                     event.setCancelled(true);
                     return;
                 }

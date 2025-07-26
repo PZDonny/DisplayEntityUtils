@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.FollowType;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
@@ -8,25 +9,24 @@ import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.joml.Vector3f;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 class GroupEntityFollower {
-    GroupFollowProperties properties;
-    ActiveGroup group;
+    private GroupFollowProperties properties;
+    private ActiveGroup group;
     MultiPartSelection selection;
     UUID followedEntity;
-    boolean isDefaultFollower;
-    boolean stopped = false;
-    boolean zeroedPivot = false;
-    float lastGroupScaleMultiplier = 0;
-    int lastDisplayPivotTick = -1;
-    HashMap<ActivePart, PartFollowData> lastDisplayPivotData = new HashMap<>();
-    static final ConcurrentHashMap<Integer, Vector3f> suppressedVectors = new ConcurrentHashMap<>();
+    private boolean isDefaultFollower;
+    private boolean stopped = false;
+    private boolean zeroedPivot = false;
+    private float lastGroupScaleMultiplier = 0;
+    private int lastDisplayPivotTick = -1;
+    private HashMap<ActivePart, PartFollowData> lastDisplayPivotData = new HashMap<>();
 
     GroupEntityFollower(ActiveGroup group, GroupFollowProperties followProperties){
         this.group = group;
@@ -34,19 +34,6 @@ class GroupEntityFollower {
         Collection<String> partTags = followProperties.partTags();
         this.isDefaultFollower = partTags == null || partTags.isEmpty();
     }
-
-    static void suppressTranslation(int entityId, Vector3f vector, Runnable action){
-        try {
-            suppressedVectors.put(entityId, vector);
-            action.run();
-        }
-        finally{
-            Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
-                suppressedVectors.remove(entityId, vector);
-            });
-        }
-    }
-
 
 
     void follow(Entity entity){
@@ -147,7 +134,7 @@ class GroupEntityFollower {
         }.runTaskTimer(DisplayEntityPlugin.getInstance(), 1, teleportationDuration);
     }
 
-    private void apply(Entity entity, MultiPartSelection selection, float newYaw, float newPitch, FollowType finalFollowType, FollowType realFollowType){
+    private void apply(Entity entity, MultiPartSelection selection, float newYaw, float newPitch, FollowType finalFollowType, FollowType trueFollowType){
         if (lastGroupScaleMultiplier == 0){
             lastGroupScaleMultiplier = group.getScaleMultiplier();
         }
@@ -169,7 +156,7 @@ class GroupEntityFollower {
                 case BODY -> {
                     LivingEntity e = (LivingEntity) entity;
                     part.setYaw(properties.flip() ? e.getBodyYaw()+180 : e.getBodyYaw(), properties.pivotInteractions());
-                    if (realFollowType == FollowType.PITCH || realFollowType == FollowType.PITCH_AND_YAW){
+                    if (trueFollowType == FollowType.PITCH || trueFollowType == FollowType.PITCH_AND_YAW){
                         pivotDisplayPitch(part, !zeroedPivot, newPitch);
                         part.setPitch(newPitch);
                     }
@@ -264,16 +251,18 @@ class GroupEntityFollower {
             return;
         }
 
-        if (part.isAnimatingForPlayers()){
+        if (!part.isAnimatingForPlayers()){
             updateTranslation(translation, t, part);
         }
         else{
             int entityId = part.getEntityId();
-            suppressTranslation(entityId, translation, () -> {
-                updateTranslation(translation, t, part);
-            });
+            for (Player player : part.getAnimatingPlayers()){
+                DEUUser.getOrCreateUser(player)
+                        .suppressTranslation(entityId, translation);
+            }
+            //Still update Translation for players not viewing part's animation
+            updateTranslation(translation, t, part);
         }
-
     }
 
 
