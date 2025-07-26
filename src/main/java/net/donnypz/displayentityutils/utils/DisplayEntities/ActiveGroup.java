@@ -27,8 +27,8 @@ public abstract class ActiveGroup implements Active{
     protected ActivePart masterPart;
     protected LinkedHashMap<UUID, ActivePart> groupParts = new LinkedHashMap<>();
     protected String tag;
-    protected Set<SpawnedDisplayFollower> followers = new HashSet<>();
-    SpawnedDisplayFollower defaultFollower;
+    protected Set<GroupEntityFollower> followers = new HashSet<>();
+    GroupEntityFollower defaultFollower;
     protected final HashSet<DisplayAnimator> activeAnimators = new HashSet<>();
     protected String spawnAnimationTag;
     protected LoadMethod spawnAnimationLoadMethod;
@@ -635,7 +635,7 @@ public abstract class ActiveGroup implements Active{
      * @throws IllegalArgumentException If followType is to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
      */
     public @NotNull GroupFollowProperties followEntityDirection(@NotNull Entity entity, @NotNull GroupFollowProperties properties){
-        SpawnedDisplayFollower follower = new SpawnedDisplayFollower(this, properties);
+        GroupEntityFollower follower = new GroupEntityFollower(this, properties);
         followers.add(follower);
         follower.follow(entity);
         return properties;
@@ -646,7 +646,7 @@ public abstract class ActiveGroup implements Active{
      * {@link #followEntityDirection(Entity, GroupFollowProperties)}
      */
     public void stopFollowingEntity(){
-        for (SpawnedDisplayFollower follower : new HashSet<>(followers)){
+        for (GroupEntityFollower follower : new HashSet<>(followers)){
             follower.remove();
         }
         if (defaultFollower != null){

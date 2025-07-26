@@ -14,7 +14,6 @@ import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
-import net.donnypz.displayentityutils.utils.packet.attributes.ItemStackDisplayAttribute;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
@@ -598,6 +597,15 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
+     * Get whether this part is contained in a group
+     * @return a boolean
+     */
+    @Override
+    public boolean hasGroup(){
+        return group != null;
+    }
+
+    /**
      * Get whether this part is actively being tracked by a player (check if it's visible)
      * @param player the player
      * @return a boolean
@@ -641,10 +649,69 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
-     * Hide this part from all players and unregister this part, making it unusable
-     */
+     * Hide this part from all players and unregister this part, making it unusable.
+     * <br>
+     * If {@link #hasGroup()} returns true, {@link #removeFromGroup(boolean)} will be executed instead, unregistering the part
+     * */
     public void remove(){
+        if (hasGroup()){
+            removeFromGroup(true);
+        }
         hide();
         unregister();
+    }
+
+    /**
+     * Hide this part from all players and unregister this part, making it unusable.
+     * <br>
+     * This does nothing if {@link #hasGroup()} returns false. Instead, use {@link #remove()} to remove this part
+     */
+    public void removeFromGroup(boolean unregister){
+        if (!hasGroup()) return;
+        group.groupParts.remove(partUUID);
+        group = null;
+        if (unregister){
+            remove();
+        }
+    }
+
+    private static final class PacketLocation {
+
+        String worldName;
+        double x;
+        double y;
+        double z;
+        float yaw;
+        float pitch;
+
+        PacketLocation(Location location){
+            this.worldName = location.getWorld().getName();
+            this.x = location.x();
+            this.y = location.y();
+            this.z = location.z();
+            this.yaw = location.getYaw();
+            this.pitch = location.getPitch();
+        }
+
+        PacketLocation(Location location, Vector3f vector){
+            this(vector == null ? location : DisplayUtils.getPivotLocation(Vector.fromJOML(vector), location, location.getYaw()));
+        }
+
+        PacketLocation setRotation(float yaw, float pitch){
+            this.yaw = yaw;
+            this.pitch = pitch;
+            return this;
+        }
+
+        PacketLocation setCoordinates(Location location){
+            this.x = location.x();
+            this.y = location.y();
+            this.z = location.z();
+            return this;
+        }
+
+        Location toLocation(){
+            return new Location(Bukkit.getWorld(worldName), x, y, z, yaw, pitch);
+        }
     }
 }

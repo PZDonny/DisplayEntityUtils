@@ -14,11 +14,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -72,10 +70,12 @@ public abstract class ActivePart implements Active{
         return false;
     }
 
-    @ApiStatus.Internal
-    public boolean isTranslationSuppressed(Vector3f vector){
-        Vector3f v = SpawnedDisplayFollower.suppressedVectors.get(entityId);
-        return vector.equals(v);
+    public Collection<Player> getAnimatingPlayers(){
+        HashSet<Player> players = new HashSet<>();
+        for (PlayerDisplayAnimationExecutor ex : playerExecutors){
+            players.addAll(ex.players);
+        }
+        return players;
     }
 
 
@@ -119,6 +119,8 @@ public abstract class ActivePart implements Active{
     }
 
     public abstract ActiveGroup getGroup();
+
+    public abstract boolean hasGroup();
 
     protected abstract void cull(float width, float height);
 

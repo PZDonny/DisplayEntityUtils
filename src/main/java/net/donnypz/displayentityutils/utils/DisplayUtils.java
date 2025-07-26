@@ -105,6 +105,29 @@ public final class DisplayUtils {
     }
 
     /**
+     * Get the location of the model of a display entity. Not the entity's actual location but the location
+     * based off of its transformation
+     * This may not be a perfect representation of where the model's location actually is, due to the shape of models varying (e.g.: Stone Block vs Stone Pressure Plate)
+     * @param origin The origin location
+     * @param translation the translation
+     * @param includeRotation Determine if calculations should be made for the entity's yaw
+     * @return Model's World Location
+     */
+    public static Location getModelLocation(@NotNull Location origin, @NotNull Vector3f translation, boolean includeRotation){
+        Location translationLoc = origin.clone();
+        Vector translationVector = Vector.fromJOML(translation);
+
+        if (includeRotation){
+            //Pivot with yaw
+            translationVector.rotateAroundY(Math.toRadians(origin.getYaw()*-1));
+        }
+
+
+        translationLoc.add(translationVector);
+        return translationLoc;
+    }
+
+    /**
      * Gets the center location of an Interaction entity
      * @param interaction The interaction entity get the center of
      * @return The interaction's center location

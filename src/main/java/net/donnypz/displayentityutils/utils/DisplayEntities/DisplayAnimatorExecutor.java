@@ -332,7 +332,7 @@ final class DisplayAnimatorExecutor {
     }
 
     static void addFollowerDisplayPivot(ActiveGroup group, ActivePart part, Vector3f translationVector){
-        for (SpawnedDisplayFollower follower : group.followers){
+        for (GroupEntityFollower follower : group.followers){
             if (!follower.hasSetDisplayPivotData()){
                 continue;
             }

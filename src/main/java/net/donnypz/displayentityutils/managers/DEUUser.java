@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +27,7 @@ public class DEUUser {
     private AnimationParticleBuilder particleBuilder;
     private final Location[] pointPositions = new Location[3];
     private final ConcurrentHashMap<Integer, PacketDisplayEntityPart> trackedPacketEntities = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Integer, Vector3f> suppressedVectors = new ConcurrentHashMap<>();
 
 
 
@@ -50,6 +52,23 @@ public class DEUUser {
 
     public static @Nullable DEUUser getUser(@NotNull UUID uuid){
         return users.get(uuid);
+    }
+
+    @ApiStatus.Internal
+    public void suppressTranslation(int entityId, @NotNull Vector3f vector){
+        suppressedVectors.put(entityId, vector);
+    }
+
+    @ApiStatus.Internal
+    public boolean unsuppressIfEqual(int entityId, @NotNull Vector3f vector3f) {
+        if (vector3f.equals(suppressedVectors.get(entityId))){
+            Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+                suppressedVectors.remove(entityId);
+            }, 1);
+
+            return true;
+        }
+        return false;
     }
 
     /**

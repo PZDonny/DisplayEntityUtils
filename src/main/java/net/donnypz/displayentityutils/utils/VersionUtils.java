@@ -17,7 +17,7 @@ public final class VersionUtils {
         if (!serverHasDialogs()){
             if (sendErrorMessage){
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix
-                        .append(Component.text("This server's version is below 1.21.7 and cannot use Dialog Menus!", NamedTextColor.RED)));
+                        .append(Component.text("This server's version is below 1.21.7 and does not support Dialog Menus!", NamedTextColor.RED)));
             }
             return false;
         }
@@ -33,7 +33,7 @@ public final class VersionUtils {
         return true;
     }
 
-    public static boolean serverHasDialogs(){ //Dialog API came to paper in 1.21.7, Dialog System came to MC in 1.21.6
+    public static boolean serverHasDialogs(){ //Dialog API came to Paper in 1.21.7, Dialog System came to MC in 1.21.6
         return IS_1_21_7;
     }
 }

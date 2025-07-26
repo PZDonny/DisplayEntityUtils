@@ -15,7 +15,7 @@ public final class SinglePartSelection extends PartSelection implements ServerSi
 
     @ApiStatus.Internal
     public SinglePartSelection(@NotNull SpawnedDisplayEntityPart part){
-        if (part.isGroupable()){
+        if (part.hasGroup()){
             throw new IllegalArgumentException("Cannot make a SinglePartSelection with a (previously) grouped part");
         }
         this.selectedPart = part;

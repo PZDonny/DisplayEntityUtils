@@ -12,6 +12,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -55,7 +56,7 @@ class PartsCreateCMD extends PlayerSubCommand {
                     e.text(Component.text("New Text Display Entity"));
                 });
                 selectEntity(player, entity.getUniqueId(), "Text Display");
-                if (VersionUtils.canViewDialogs(player, true)){
+                if (VersionUtils.canViewDialogs(player, false)){
                     UUID entityUUID = entity.getUniqueId();
                     player.sendMessage(Component.text("| Click here to edit it!", NamedTextColor.LIGHT_PURPLE)
                             .clickEvent(ClickEvent.callback(audience -> {
@@ -85,6 +86,7 @@ class PartsCreateCMD extends PlayerSubCommand {
         player.sendMessage(DisplayEntityPlugin
                 .pluginPrefix
                 .append(MiniMessage.miniMessage().deserialize("<green>You have spawned a <aqua>" + displayName + " <green>entity at your location!")));
+        player.sendMessage(Component.text("| The created part has been automatically selected, removing previous selections", NamedTextColor.GRAY, TextDecoration.ITALIC));
         DEUUser.getOrCreateUser(player).setSelectedPartSelection(new SinglePartSelection(SpawnedDisplayEntityPart.create(entityUUID)), false);
     }
 

@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.FollowType;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
@@ -8,45 +9,31 @@ import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.joml.Vector3f;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
-class SpawnedDisplayFollower {
-    GroupFollowProperties properties;
-    ActiveGroup group;
+class GroupEntityFollower {
+    private GroupFollowProperties properties;
+    private ActiveGroup group;
     MultiPartSelection selection;
     UUID followedEntity;
-    boolean isDefaultFollower;
-    boolean stopped = false;
-    boolean zeroedPivot = false;
-    float lastGroupScaleMultiplier = 0;
-    int lastDisplayPivotTick = -1;
-    HashMap<ActivePart, PartFollowData> lastDisplayPivotData = new HashMap<>();
-    static final ConcurrentHashMap<Integer, Vector3f> suppressedVectors = new ConcurrentHashMap<>();
+    private boolean isDefaultFollower;
+    private boolean stopped = false;
+    private boolean zeroedPivot = false;
+    private float lastGroupScaleMultiplier = 0;
+    private int lastDisplayPivotTick = -1;
+    private HashMap<ActivePart, PartFollowData> lastDisplayPivotData = new HashMap<>();
 
-    SpawnedDisplayFollower(ActiveGroup group, GroupFollowProperties followProperties){
+    GroupEntityFollower(ActiveGroup group, GroupFollowProperties followProperties){
         this.group = group;
         this.properties = followProperties;
         Collection<String> partTags = followProperties.partTags();
         this.isDefaultFollower = partTags == null || partTags.isEmpty();
     }
-
-    static void suppressTranslation(int entityId, Vector3f vector, Runnable action){
-        try {
-            suppressedVectors.put(entityId, vector);
-            action.run();
-        }
-        finally{
-            Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
-                suppressedVectors.remove(entityId, vector);
-            });
-        }
-    }
-
 
 
     void follow(Entity entity){
@@ -70,11 +57,7 @@ class SpawnedDisplayFollower {
         Collection<String> partTags = properties.partTags();
         if (partTags != null && !partTags.isEmpty()){
             selection = group.createPartSelection(new PartFilter().includePartTags(partTags));
-            for (ActivePart p : selection.selectedParts){
-                if (p.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                    p.setTeleportDuration(teleportationDuration);
-                }
-            }
+            selection.setTeleportDuration(teleportationDuration);
             if (group.defaultFollower != null){
                 group.defaultFollower.selection.removeParts(selection);
             }
@@ -87,15 +70,17 @@ class SpawnedDisplayFollower {
         new BukkitRunnable(){
             @Override
             public void run() {
-                if (!group.followers.contains(SpawnedDisplayFollower.this) && !isDefaultFollower){
+                if (!group.followers.contains(GroupEntityFollower.this) && !isDefaultFollower){
                     cancel();
                     return;
                 }
+
                 if (stopped || (group instanceof SpawnedDisplayEntityGroup sg && !sg.isSpawned())){
                     cancel();
                     remove();
                     return;
                 }
+
                 if (entity.isDead()) {
                     if (properties.unregisterDelay() > -1) {
                         Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
@@ -103,7 +88,7 @@ class SpawnedDisplayFollower {
                                 sg.unregister(true, true);
                             }
                             else if (group instanceof PacketDisplayEntityGroup pg){
-                                pg.hideFromPlayers(pg.getTrackingPlayers());
+                                pg.unregister();
                             }
                         }, properties.unregisterDelay());
                     }
@@ -112,7 +97,7 @@ class SpawnedDisplayFollower {
                     return;
                 }
 
-                if (isDefaultFollower && group.defaultFollower != SpawnedDisplayFollower.this){
+                if (isDefaultFollower && group.defaultFollower != GroupEntityFollower.this){
                     cancel();
                     remove();
                     return;
@@ -149,11 +134,10 @@ class SpawnedDisplayFollower {
         }.runTaskTimer(DisplayEntityPlugin.getInstance(), 1, teleportationDuration);
     }
 
-    private void apply(Entity entity, MultiPartSelection selection, float newYaw, float newPitch, FollowType finalFollowType, FollowType realFollowType){
+    private void apply(Entity entity, MultiPartSelection selection, float newYaw, float newPitch, FollowType finalFollowType, FollowType trueFollowType){
         if (lastGroupScaleMultiplier == 0){
             lastGroupScaleMultiplier = group.getScaleMultiplier();
         }
-
 
         for (ActivePart part : selection.selectedParts){
             switch(finalFollowType){
@@ -172,7 +156,7 @@ class SpawnedDisplayFollower {
                 case BODY -> {
                     LivingEntity e = (LivingEntity) entity;
                     part.setYaw(properties.flip() ? e.getBodyYaw()+180 : e.getBodyYaw(), properties.pivotInteractions());
-                    if (realFollowType == FollowType.PITCH || realFollowType == FollowType.PITCH_AND_YAW){
+                    if (trueFollowType == FollowType.PITCH || trueFollowType == FollowType.PITCH_AND_YAW){
                         pivotDisplayPitch(part, !zeroedPivot, newPitch);
                         part.setPitch(newPitch);
                     }
@@ -267,16 +251,18 @@ class SpawnedDisplayFollower {
             return;
         }
 
-        if (part.isAnimatingForPlayers()){
+        if (!part.isAnimatingForPlayers()){
             updateTranslation(translation, t, part);
         }
         else{
             int entityId = part.getEntityId();
-            suppressTranslation(entityId, translation, () -> {
-                updateTranslation(translation, t, part);
-            });
+            for (Player player : part.getAnimatingPlayers()){
+                DEUUser.getOrCreateUser(player)
+                        .suppressTranslation(entityId, translation);
+            }
+            //Still update Translation for players not viewing part's animation
+            updateTranslation(translation, t, part);
         }
-
     }
 
 

@@ -239,9 +239,9 @@ final class PacketDisplayAnimationExecutor {
                 part.translate(moveVector, (float) moveVector.length(), frame.duration, 0);
             }
 
-            //Could be a spawned part, so this wouldn't work
+
             if (part instanceof SpawnedDisplayEntityPart sp){
-                DisplayUtils.scaleInteraction((Interaction) sp.getEntity(), height, width, frame.duration, 0);
+                PacketUtils.scaleInteraction(sp.getTrackingPlayers(), (Interaction) sp.getEntity(), height, width, frame.duration, 0);
             }
             else if (part instanceof PacketDisplayEntityPart pp){
                 PacketUtils.scaleInteraction(pp, height, width, frame.duration, 0);
