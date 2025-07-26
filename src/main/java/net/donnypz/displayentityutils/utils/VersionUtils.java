@@ -14,17 +14,19 @@ public final class VersionUtils {
     public static boolean IS_1_21_7 = Bukkit.getUnsafe().getProtocolVersion() >= 772;
 
     public static boolean canViewDialogs(Player player, boolean sendErrorMessage){
-        if (player.getProtocolVersion() < 771){ //1.21.6
+        if (!serverHasDialogs()){
             if (sendErrorMessage){
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix
-                        .append(Component.text("You can only view Dialog Menus when playing on version 1.21.6 or higher!", NamedTextColor.RED)));
+                        .append(Component.text("This server's version is below 1.21.7 and does not support Dialog Menus!", NamedTextColor.RED)));
             }
             return false;
         }
-        else if (!serverHasDialogs()){
-            if (sendErrorMessage){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix
-                        .append(Component.text("This server's version is below 1.21.7 and cannot use Dialog Menus!", NamedTextColor.RED)));
+        else if (player.getProtocolVersion() < 771){ //1.21.6
+            if (!serverHasDialogs()){
+                if (sendErrorMessage){
+                    player.sendMessage(DisplayEntityPlugin.pluginPrefix
+                            .append(Component.text("You can only view Dialog Menus when playing on version 1.21.6 or higher!", NamedTextColor.RED)));
+                }
             }
             return false;
         }
