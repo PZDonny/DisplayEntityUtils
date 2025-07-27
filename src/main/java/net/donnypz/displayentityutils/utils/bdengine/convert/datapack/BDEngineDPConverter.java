@@ -1,7 +1,11 @@
-package net.donnypz.displayentityutils.managers;
+package net.donnypz.displayentityutils.utils.bdengine.convert.datapack;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.listeners.bdengine.DatapackEntitySpawned;
+import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
+import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.managers.LoadMethod;
+import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -14,8 +18,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -26,13 +32,19 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-class DatapackConverter {
+@ApiStatus.Internal
+public class BDEngineDPConverter {
 
     private static final String createModelPath = "/create.mcfunction";
     private String projectName = null;
     private final LinkedHashMap<String, ArrayList<ZipEntry>> animations = new LinkedHashMap<>();
+    static final CommandSender silentSender = Bukkit.createCommandSender(feedback -> {});
 
-    DatapackConverter(Player player, String datapackName, String groupSaveTag, String animationSaveTag){
+    @ApiStatus.Internal
+    public BDEngineDPConverter(@NotNull Player player, @NotNull String datapackName, @NotNull String groupSaveTag, @NotNull String animationSaveTag){
+        if (!datapackName.endsWith(".zip")){
+            datapackName = datapackName+".zip";
+        }
         try{
             ZipFile zipFile = new ZipFile(LocalManager.getAnimationDatapackFolder()+"/"+datapackName);
             searchEntries(player, datapackName, zipFile.entries(), zipFile, groupSaveTag, animationSaveTag);
@@ -283,7 +295,7 @@ class DatapackConverter {
                 if (!line.startsWith("data merge entity @e[") && commands != null){ //Not an animation command
                     commands.add(line);
                 }
-                Bukkit.dispatchCommand(LocalManager.silentSender, "execute positioned "+coordinates+" in "+worldName+" run "+line);
+                Bukkit.dispatchCommand(silentSender, "execute positioned "+coordinates+" in "+worldName+" run "+line);
             }
             br.close();
         }
