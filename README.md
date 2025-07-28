@@ -3,7 +3,7 @@
 
 [Join the Discord Here!](https://discord.gg/k3wtdG5fRZ)
 
-DisplayEntityUtils is a extensive plugin designed for use with BDEngine, a modeling/animation engine designed for display entities without the need for resource packs or mods.
+DisplayEntityUtils is a extensive plugin designed to make the usage of Display/Interaction entities simplier. It also supports BDEngine, a modeling/animation engine designed for display entities without the need for resource packs or mods.
 
 ## What you'll need
 ### Dependencies:
@@ -12,11 +12,12 @@ DisplayEntityUtils is a extensive plugin designed for use with BDEngine, a model
 - **[PassengerAPI](https://modrinth.com/plugin/passengerapi)**
   - **_This dependency prevents conflicts with other plugins_**
 
-### BDEngine
+### BDEngine (Recommended)
 BDEngine is what you'll use to create models and animations that can be transferred into your game world. Info on BDEngine and the Block Display Place, the collection of BDEngine models and animations, can be found [HERE](block-display.com)
 > DISCLAIMER: I DO NOT OWN BDModels/BDEngine! ALL ISSUES AND SUGGESTIONS RELATED TO THAT PROJECT SHOULD BE BROUGHT TO THE OWNER, [ILLYSTRAY](https://illystray.com), IN THE BDENGINE DISCORD FOUND [HERE](https://discord.com/invite/VCeHfSd6Xa)
 
 ## What can DisplayEntityUtils do?
+- Manipulate Individual Display/Interaction entities
 - Manipulate Groups (BDEngine Models)
 - Manipulate every part (Display Entity) within a model
 - Manipulate Interaction Entities
