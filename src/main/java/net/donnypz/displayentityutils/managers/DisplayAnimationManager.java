@@ -211,8 +211,8 @@ public final class DisplayAnimationManager {
      * @return The found {@link DisplayAnimation}. Null if not found.
      */
     public static @Nullable DisplayAnimation getAnimation(@NotNull File file){
-        try{
-            return getAnimation(new FileInputStream(file));
+        try(FileInputStream stream = new FileInputStream(file)){
+            return getAnimation(stream);
         }
         catch(IOException ex){
             ex.printStackTrace();
@@ -234,19 +234,16 @@ public final class DisplayAnimationManager {
             e.printStackTrace();
             return null;
         }
-        try(ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes)){
+        try(ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes);
             GZIPInputStream gzipInputStream = new GZIPInputStream(byteStream);
+            ObjectInputStream objIn = new DisplayAnimationInputStream(gzipInputStream)
+        ){
 
-            ObjectInputStream objIn = new DisplayAnimationInputStream(gzipInputStream);
             DisplayAnimation anim = (DisplayAnimation) objIn.readObject();
             anim.adaptOldSounds();
             PartFilter filter = anim.getPartFilter();
             if (filter != null) filter.deserializeMaterials();
 
-            objIn.close();
-            gzipInputStream.close();
-            byteStream.close();
-            inputStream.close();
             for (DisplayAnimationFrame f : anim.getFrames()){
                 for (AnimationParticle p : f.getFrameStartParticles()){
                     p.initializeParticle();
@@ -261,16 +258,13 @@ public final class DisplayAnimationManager {
             return anim;
         }
 
-    //Not Compressed (Will typically be old file version)
+    //Not Compressed (Will be an older file version, before gzip compression)
         catch (ZipException z){
-            try(ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes)){
-                ObjectInputStream objIn = new DisplayAnimationInputStream(byteStream);
+            try(ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes);
+                ObjectInputStream objIn = new DisplayAnimationInputStream(byteStream)
+            ){
                 DisplayAnimation anim = (DisplayAnimation) objIn.readObject();
                 anim.adaptOldSounds();
-
-                objIn.close();
-                byteStream.close();
-                inputStream.close();
                 return anim;
             }
             catch (IOException | ClassNotFoundException ex) {
@@ -286,22 +280,19 @@ public final class DisplayAnimationManager {
 
     /**
      * Get a {@link DisplayAnimation} from a plugin's resources
-     * @param plugin The plugin to get the {@link DisplayAnimation} from
-     * @param resourcePath The path of the {@link DisplayAnimation}
+     * @param plugin The plugin to get the animation from
+     * @param resourcePath The path of the animation
      * @return The found {@link DisplayAnimation}. Null if not found.
      */
     public static @Nullable DisplayAnimation getAnimation(@NotNull JavaPlugin plugin, @NotNull String resourcePath){
-        InputStream modelStream;
-        if (resourcePath.contains(DisplayAnimation.fileExtension)){
-            modelStream = plugin.getResource(resourcePath);
+        try(InputStream stream = plugin.getResource(resourcePath)){
+            if (stream == null) return null;
+            return getAnimation(stream);
         }
-        else{
-            modelStream = plugin.getResource(resourcePath+DisplayAnimation.fileExtension);
-        }
-        if (modelStream == null){
+        catch(IOException e){
+            e.printStackTrace();
             return null;
         }
-        return getAnimation(modelStream);
     }
 
 

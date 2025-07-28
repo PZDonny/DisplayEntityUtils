@@ -264,8 +264,8 @@ public final class DisplayGroupManager {
      * @return The found {@link DisplayEntityGroup}. Null if not found.
      */
     public static DisplayEntityGroup getGroup(@NotNull File file) {
-        try {
-            return getGroup(new FileInputStream(file));
+        try(FileInputStream stream = new FileInputStream(file)){
+            return getGroup(stream);
         } catch (IOException ex) {
             ex.printStackTrace();
             return null;
@@ -287,28 +287,18 @@ public final class DisplayGroupManager {
             e.printStackTrace();
             return null;
         }
-        try(ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes)) {
+        try(ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes);
             GZIPInputStream gzipInputStream = new GZIPInputStream(byteStream);
-
             ObjectInputStream objIn = new DisplayObjectInputStream(gzipInputStream);
-            DisplayEntityGroup group = (DisplayEntityGroup) objIn.readObject();
-
-            objIn.close();
-            gzipInputStream.close();
-            byteStream.close();
-            inputStream.close();
-            return group;
+        ) {
+            return (DisplayEntityGroup) objIn.readObject();
         }
-    //Not Compressed (Will typically be old file version)
+    //Not Compressed (Will be an older file version, before gzip compression)
         catch (ZipException z){
-            try(ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes)){
-                ObjectInputStream objIn = new DisplayObjectInputStream(byteStream);
-                DisplayEntityGroup group = (DisplayEntityGroup) objIn.readObject();
-
-                objIn.close();
-                byteStream.close();
-                inputStream.close();
-                return group;
+            try(ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes);
+                ObjectInputStream objIn = new DisplayObjectInputStream(byteStream)
+            ){
+                return (DisplayEntityGroup) objIn.readObject();
             }
             catch (IOException | ClassNotFoundException ex) {
                 ex.printStackTrace();
@@ -325,18 +315,19 @@ public final class DisplayGroupManager {
     /**
      * Get a {@link DisplayEntityGroup} from a plugin's resources
      *
-     * @param plugin The plugin to get the DisplayEntityGroup from
-     * @param resourcePath The path of the DisplayEntityGroup
-     * @return The found DisplayEntityGroup. Null if not found.
+     * @param plugin The plugin to get the group from
+     * @param resourcePath The path of the group
+     * @return The found {@link DisplayEntityGroup} Null if not found.
      */
     public static DisplayEntityGroup getGroup(@NotNull JavaPlugin plugin, @NotNull String resourcePath) {
-        InputStream modelStream;
-        if (resourcePath.contains(DisplayEntityGroup.fileExtension)) {
-            modelStream = plugin.getResource(resourcePath);
-        } else {
-            modelStream = plugin.getResource(resourcePath + DisplayEntityGroup.fileExtension);
+        try(InputStream stream = plugin.getResource(resourcePath)){
+            if (stream == null) return null;
+            return getGroup(stream);
         }
-        return getGroup(modelStream);
+        catch(IOException e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static SpawnedDisplayEntityGroup getExistingSpawnedGroup(Display displayEntity) {
