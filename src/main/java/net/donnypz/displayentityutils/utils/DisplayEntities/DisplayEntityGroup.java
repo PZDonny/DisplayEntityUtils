@@ -273,6 +273,11 @@ public final class DisplayEntityGroup implements Serializable{
             packetGroup.playSpawnAnimation();
         }
 
+
+        float widthCullingAdder = DisplayEntityPlugin.widthCullingAdder();
+        float heightCullingAdder = DisplayEntityPlugin.heightCullingAdder();
+        packetGroup.autoSetCulling(DisplayEntityPlugin.autoCulling(), widthCullingAdder, heightCullingAdder);
+
         return packetGroup;
     }
 }
