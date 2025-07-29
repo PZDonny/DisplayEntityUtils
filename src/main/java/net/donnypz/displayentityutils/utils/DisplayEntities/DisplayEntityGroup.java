@@ -248,6 +248,7 @@ public final class DisplayEntityGroup implements Serializable{
         PacketDisplayEntityGroup packetGroup = new PacketDisplayEntityGroup(tag);
 
         PacketDisplayEntityPart masterPart = masterEntity.createPacketPart(packetGroup, spawnLocation);
+        masterPart.isMaster = true; //for parts in old models that do not contain pdc data / part uuids
         packetGroup.addPart(masterPart);
 
         int passengerSize = displayEntities.size()-1;
@@ -260,7 +261,6 @@ public final class DisplayEntityGroup implements Serializable{
             packetGroup.addPart(part);
             passengerIds[i] = part.getEntityId();
             i++;
-            part.teleport(spawnLocation);
         }
         packetGroup.passengerIds = passengerIds;
 

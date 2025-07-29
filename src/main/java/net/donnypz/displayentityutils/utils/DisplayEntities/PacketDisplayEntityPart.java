@@ -159,7 +159,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         for (UUID uuid : getViewers()){
             Player player = Bukkit.getPlayer(uuid);
             if (player != null && player.isConnected()){
-                PacketUtils.destroyEntity(player, getEntityId());
+                PacketUtils.hideEntity(player, getEntityId());
             }
         }
         viewers.clear();
@@ -172,9 +172,10 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     @Override
     public void hideFromPlayer(@NotNull Player player) {
         if (player.isConnected()){
-            PacketUtils.destroyEntity(player, getEntityId());
+            PacketUtils.hideEntity(player, getEntityId());
         }
         viewers.remove(player.getUniqueId());
+        DEUUser.getOrCreateUser(player).untrackPacketEntity(this);
     }
 
     /**
@@ -183,9 +184,10 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void hideFromPlayers(@NotNull Collection<Player> players) {
-        PacketUtils.destroyEntity(players, getEntityId());
+        PacketUtils.hideEntity(players, getEntityId());
         for (Player p : players){
             viewers.remove(p.getUniqueId());
+            DEUUser.getOrCreateUser(p).untrackPacketEntity(this);
         }
     }
 

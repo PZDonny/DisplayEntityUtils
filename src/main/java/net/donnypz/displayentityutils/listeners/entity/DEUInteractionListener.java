@@ -12,6 +12,7 @@ import net.donnypz.displayentityutils.events.InteractionClickEvent;
 import net.donnypz.displayentityutils.events.PacketInteractionClickEvent;
 import net.donnypz.displayentityutils.events.PreInteractionClickEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
@@ -53,15 +54,18 @@ public class DEUInteractionListener implements Listener, PacketListener {
                             InteractionClickEvent.ClickType.RIGHT;
 
         int entityId = interact.getEntityId();
+        ActivePart activePart = ActivePart.getPart(entityId);
+        if (!(activePart instanceof PacketDisplayEntityPart part)){
+            return;
+        }
+        if (!DEUUser.getOrCreateUser(user.getUUID()).isTrackingPart(part)){
+            return;
+        }
         Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
-            PacketDisplayEntityPart part = DEUUser
-                    .getOrCreateUser(user.getUUID())
-                    .getPacketDisplayEntityPart(entityId);
-            if (part == null) return;
+
             Player player = Bukkit.getPlayer(user.getUUID());
 
             //Point Displays
-
             if (RelativePointDisplay.isRelativePointPart(part)){
                 RelativePointDisplay pointDisplay = RelativePointDisplay.get(part);
                 if (pointDisplay == null){

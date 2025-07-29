@@ -352,6 +352,20 @@ public abstract class ActiveGroup implements Active{
     public abstract List<? extends ActivePart> getDisplayParts();
 
     /**
+     * Get an array containing the entity ids of every part in this group
+     * @return an int array
+     */
+    public int[] getPartEntityIds(){
+        int[] ids = new int[groupParts.size()];
+        int i = 0;
+        for (ActivePart part : groupParts.sequencedValues()){
+            ids[i] = part.getEntityId();
+            i++;
+        }
+        return ids;
+    }
+
+    /**
      * Get whether can player visibly see / is tracking this group
      * @param player the player
      * @return a boolean

@@ -7,6 +7,7 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.events.PacketGroupDestroyEvent;
 import net.donnypz.displayentityutils.events.PacketGroupSendEvent;
+import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.PacketUtils;
@@ -18,6 +19,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -36,7 +38,9 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     }
 
     void addPart(@NotNull PacketDisplayEntityPart part){
-        if (part.partUUID == null) return;
+        if (part.partUUID == null){
+            part.partUUID = UUID.randomUUID(); //for parts in old models that do not contain pdc data / part uuids
+        }
         if (part.isMaster) masterPart = part;
 
         groupParts.put(part.partUUID, part);
@@ -163,6 +167,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     }
 
     @Override
+    @ApiStatus.Internal
     public boolean canApplyVerticalRideOffset() {
         if (verticalRideOffset == 0 || vehicleUUID == null){
             return false;
@@ -171,7 +176,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         if (vehicle == null || vehicle.isDead()){
             return false;
         }
-        return PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).getPassengers(false, vehicle.getEntityId()).contains(masterPart.getEntityId());
+        return PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).getPassengers(true, vehicle.getEntityId()).contains(masterPart.getEntityId());
 
         //return !vehicle.isDead();
     }
@@ -184,7 +189,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         for (UUID uuid : getMasterPart().viewers){
             Player p = Bukkit.getPlayer(uuid);
             if (p == null) continue;
-            PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).addPassenger(false, vehicle.getEntityId(), masterPart.getEntityId());
+            PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).addPassenger(!Bukkit.isPrimaryThread(), vehicle.getEntityId(), masterPart.getEntityId());
         }
         return true;
     }
@@ -197,7 +202,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         for (UUID uuid : getMasterPart().viewers){
             Player p = Bukkit.getPlayer(uuid);
             if (p == null) continue;
-            PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).removePassenger(false, vehicle.getEntityId(), masterPart.getEntityId());
+            PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).removePassenger(!Bukkit.isPrimaryThread(), vehicle.getEntityId(), masterPart.getEntityId());
         }
         vehicleUUID = null;
         return vehicle;
@@ -525,23 +530,46 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
 
 
     /**
-     * Hide the group's packet-based entities from a player
+     * Hide the group's {@link PacketDisplayEntityPart}s from a player
      * @param player the player
      */
     @Override
     public void hideFromPlayer(@NotNull Player player) {
         sendDestroyEvent(List.of(player));
-        PacketUtils.destroyEntities(player, getParts());
+
+        int[] ids = new int[groupParts.size()];
+        int i = 0;
+        for (ActivePart p : groupParts.values()){
+            PacketDisplayEntityPart part = (PacketDisplayEntityPart) p;
+
+            part.viewers.remove(player.getUniqueId());
+            DEUUser.getOrCreateUser(player).untrackPacketEntity(part);
+            ids[i] = part.getEntityId();
+            i++;
+        }
+        PacketUtils.hideEntities(player, ids);
     }
 
     /**
-     * Hide the group's packet-based entities from players
+     * Hide the group's {@link PacketDisplayEntityPart}s from players
      * @param players the players
      */
     @Override
     public void hideFromPlayers(@NotNull Collection<Player> players) {
         sendDestroyEvent(players);
-        PacketUtils.destroyEntities(players, getParts());
+
+        int[] ids = new int[groupParts.size()];
+        int i = 0;
+        for (ActivePart p : groupParts.values()){
+            PacketDisplayEntityPart part = (PacketDisplayEntityPart) p;
+            for (Player player : players){
+                part.viewers.remove(player.getUniqueId());
+                DEUUser.getOrCreateUser(player).untrackPacketEntity(part);
+            }
+            ids[i] = part.getEntityId();
+            i++;
+        }
+        PacketUtils.hideEntities(players, ids);
     }
 
     private void sendDestroyEvent(Collection<Player> players){
@@ -567,9 +595,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     public void unregister(){
         hideFromPlayers(getTrackingPlayers());
         Iterator<Map.Entry<UUID, ActivePart>> it = groupParts.entrySet().iterator();
-        while (it.hasNext()){
-            Map.Entry<UUID, ActivePart> entry = it.next();
-            ((PacketDisplayEntityPart) entry.getValue()).removeFromGroup(true);
+        for (ActivePart part : new HashSet<>(groupParts.values())){
+            ((PacketDisplayEntityPart) part).removeFromGroup(true);
         }
         activeAnimators.clear();
         masterPart = null;

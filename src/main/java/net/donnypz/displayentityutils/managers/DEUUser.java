@@ -26,7 +26,7 @@ public class DEUUser {
     ServerSideSelection selectedPartSelection;
     private AnimationParticleBuilder particleBuilder;
     private final Location[] pointPositions = new Location[3];
-    private final ConcurrentHashMap<Integer, PacketDisplayEntityPart> trackedPacketEntities = new ConcurrentHashMap<>();
+    private final Set<PacketDisplayEntityPart> trackedPacketEntities = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private static final ConcurrentHashMap<Integer, Vector3f> suppressedVectors = new ConcurrentHashMap<>();
 
 
@@ -164,24 +164,17 @@ public class DEUUser {
 
     @ApiStatus.Internal
     public void trackPacketEntity(@NotNull PacketDisplayEntityPart part){
-        trackPacketEntity(part.getEntityId(), part);
+        trackedPacketEntities.add(part);
     }
 
     @ApiStatus.Internal
-    public void trackPacketEntity(int entityId, @Nullable PacketDisplayEntityPart part){
-        trackedPacketEntities.put(entityId, part);
+    public void untrackPacketEntity(@NotNull PacketDisplayEntityPart part){
+        trackedPacketEntities.remove(part);
     }
 
     @ApiStatus.Internal
-    public void untrackPacketEntity(int entityId){
-        trackedPacketEntities.remove(entityId);
-    }
-
-    @ApiStatus.Internal
-    public void untrackPacketEntities(int @NotNull [] entityIds){
-        for (int i : entityIds){
-            trackedPacketEntities.remove(i);
-        }
+    public void untrackPacketEntities(Collection<PacketDisplayEntityPart> parts){
+        trackedPacketEntities.removeAll(parts);
     }
 
     @ApiStatus.Internal
@@ -190,10 +183,9 @@ public class DEUUser {
 
         String worldName = player.getWorld().getName();
 
-        Iterator<Map.Entry<Integer, PacketDisplayEntityPart>> iter = trackedPacketEntities.entrySet().iterator();
+        Iterator<PacketDisplayEntityPart> iter = trackedPacketEntities.iterator();
         while (iter.hasNext()) {
-            Map.Entry<Integer, PacketDisplayEntityPart> entry = iter.next();
-            PacketDisplayEntityPart part = entry.getValue();
+            PacketDisplayEntityPart part = iter.next();
             if (part == null) continue;
             if (!worldName.equals(part.getWorldName())){
                 part.hideFromPlayer(player);
@@ -207,26 +199,8 @@ public class DEUUser {
      * @param part the {@link PacketDisplayEntityPart}
      * @return a boolean
      */
-    public boolean isTrackingPacketEntity(@NotNull PacketDisplayEntityPart part){
-        return isTrackingPacketEntity(part.getEntityId());
-    }
-
-    /**
-     * Check if this user is tracking a packet-based entity
-     * @param entityId the entity's entity id
-     * @return a boolean
-     */
-    public boolean isTrackingPacketEntity(int entityId){
-        return trackedPacketEntities.containsKey(entityId);
-    }
-
-    /**
-     * Get a {@link PacketDisplayEntityPart} a player is tracking by its entity id
-     * @param entityId the part's entity id
-     * @return a {@link PacketDisplayEntityPart} if present
-     */
-    public @Nullable PacketDisplayEntityPart getPacketDisplayEntityPart(int entityId){
-        return trackedPacketEntities.get(entityId);
+    public boolean isTrackingPart(@NotNull PacketDisplayEntityPart part){
+        return trackedPacketEntities.contains(part);
     }
 
     public int getTrackedPacketEntityCount(){
@@ -297,16 +271,14 @@ public class DEUUser {
 
         Player player = Bukkit.getPlayer(userUUID);
 
-        Iterator<Map.Entry<Integer, PacketDisplayEntityPart>> iter = trackedPacketEntities.entrySet().iterator();
+        Iterator<PacketDisplayEntityPart> iter = trackedPacketEntities.iterator();
         while (iter.hasNext()) {
-            Map.Entry<Integer, PacketDisplayEntityPart> entry = iter.next();
-            PacketDisplayEntityPart part = entry.getValue();
+            PacketDisplayEntityPart part = iter.next();
             if (part != null){
                 part.hideFromPlayer(player);
             }
             iter.remove();
         }
-
 
         DEUCommandUtils.removeRelativePoints(player);
     }
