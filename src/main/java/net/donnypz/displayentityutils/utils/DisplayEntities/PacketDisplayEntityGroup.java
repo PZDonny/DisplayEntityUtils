@@ -48,12 +48,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) interactionCount++;
     }
 
-
-    @Override
-    public @Nullable PacketDisplayEntityPart getMasterPart(){
-        return (PacketDisplayEntityPart) masterPart;
-    }
-
     /**
      * {@inheritDoc}
      * @return a {@link PacketPartSelection}
@@ -177,8 +171,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
             return false;
         }
         return PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).getPassengers(true, vehicle.getEntityId()).contains(masterPart.getEntityId());
-
-        //return !vehicle.isDead();
     }
 
     public boolean rideEntity(@NotNull Entity vehicle){
@@ -521,7 +513,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
     private void setPassengers(Player player){
         int masterId = masterPart.getEntityId();
         WrapperPlayServerSetPassengers passengerPacket = new WrapperPlayServerSetPassengers(masterId, passengerIds);
-        PacketEvents.getAPI().getPlayerManager().sendPacket(player, passengerPacket);
+        PacketEvents.getAPI().getPlayerManager().sendPacketSilently(player, passengerPacket);
     }
 
     private boolean sendShowEvent(Collection<Player> players, GroupSpawnedEvent.SpawnReason spawnReason){
