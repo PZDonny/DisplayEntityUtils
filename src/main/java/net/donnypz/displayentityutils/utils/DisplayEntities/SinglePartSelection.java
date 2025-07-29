@@ -11,18 +11,15 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
-public final class SinglePartSelection extends PartSelection implements ServerSideSelection{
+public final class SinglePartSelection extends PartSelection<SpawnedDisplayEntityPart> implements ServerSideSelection{
 
     @ApiStatus.Internal
     public SinglePartSelection(@NotNull SpawnedDisplayEntityPart part){
+        super(SpawnedDisplayEntityPart.class);
         if (part.hasGroup()){
-            throw new IllegalArgumentException("Cannot make a SinglePartSelection with a (previously) grouped part");
+            throw new IllegalArgumentException("Unable to create a SinglePartSelection with a (previously) grouped part");
         }
         this.selectedPart = part;
-    }
-    @Override
-    public SpawnedDisplayEntityPart getSelectedPart() {
-        return (SpawnedDisplayEntityPart) selectedPart;
     }
 
     @Override

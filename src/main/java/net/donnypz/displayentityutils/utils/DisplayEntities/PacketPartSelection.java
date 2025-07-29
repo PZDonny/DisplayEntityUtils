@@ -11,12 +11,9 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.SequencedCollection;
 
-public class PacketPartSelection extends MultiPartSelection implements Packeted{
+public class PacketPartSelection extends MultiPartSelection<PacketDisplayEntityPart> implements Packeted{
 
     /**
      * Create a selection of parts with the specified part tag from a group.
@@ -24,7 +21,7 @@ public class PacketPartSelection extends MultiPartSelection implements Packeted{
      * @param partTag The part tag to include in the filter
      */
     public PacketPartSelection(@NotNull PacketDisplayEntityGroup group, @NotNull String partTag) {
-        super(group, partTag);
+        super(group, partTag, PacketDisplayEntityPart.class);
     }
 
     /**
@@ -33,7 +30,7 @@ public class PacketPartSelection extends MultiPartSelection implements Packeted{
      * @param partTags The part tags to include in the filter
      */
     public PacketPartSelection(@NotNull PacketDisplayEntityGroup group, @NotNull Collection<String> partTags) {
-        super(group, partTags);
+        super(group, partTags, PacketDisplayEntityPart.class);
     }
 
     /**
@@ -41,7 +38,7 @@ public class PacketPartSelection extends MultiPartSelection implements Packeted{
      * @param group The group to cycle through for this selection.
      */
     public PacketPartSelection(@NotNull PacketDisplayEntityGroup group) {
-        super(group);
+        super(group, PacketDisplayEntityPart.class);
     }
 
     /**
@@ -50,12 +47,12 @@ public class PacketPartSelection extends MultiPartSelection implements Packeted{
      * @param filter The filter used to filter parts
      */
     public PacketPartSelection(@NotNull PacketDisplayEntityGroup group, @NotNull PartFilter filter) {
-        super(group, filter);
+        super(group, filter, PacketDisplayEntityPart.class);
     }
 
     @Override
-    BlockType getBlockType(ActivePart part) {
-        return ((PacketDisplayEntityPart) part)
+    BlockType getBlockType(PacketDisplayEntityPart part) {
+        return part
                 .attributeContainer
                 .getAttribute(DisplayAttributes.BlockDisplay.BLOCK_STATE)
                 .getMaterial()
@@ -63,38 +60,24 @@ public class PacketPartSelection extends MultiPartSelection implements Packeted{
     }
 
     @Override
-    ItemType getItemType(ActivePart part) {
-        return ((PacketDisplayEntityPart) part)
+    ItemType getItemType(PacketDisplayEntityPart part) {
+        return part
                 .attributeContainer
                 .getAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK)
                 .getType()
                 .asItemType();
     }
 
-    @Override
-    public PacketDisplayEntityPart getSelectedPart() {
-        return (PacketDisplayEntityPart) selectedPart;
-    }
 
+    /**
+     * Gets the {@link PacketDisplayEntityGroup} of this selection
+     * @return a {@link PacketDisplayEntityGroup}
+     */
     @Override
     public PacketDisplayEntityGroup getGroup() {
         return (PacketDisplayEntityGroup) group;
     }
 
-    /**
-     * Get the {@link PacketDisplayEntityPart} within this selection
-     * @return the parts in this selection
-     */
-    @Override
-    public SequencedCollection<PacketDisplayEntityPart> getSelectedParts() {
-        List<PacketDisplayEntityPart> parts = new ArrayList<>();
-        for (ActivePart part : selectedParts){
-            if (part instanceof PacketDisplayEntityPart p){
-                parts.add(p);
-            }
-        }
-        return parts;
-    }
 
     @Override
     public boolean reset() {
@@ -122,8 +105,8 @@ public class PacketPartSelection extends MultiPartSelection implements Packeted{
 
     @Override
     public void setRotation(float pitch, float yaw, boolean pivotIfInteraction) {
-        for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).setRotation(pitch, yaw, pivotIfInteraction);
+        for (PacketDisplayEntityPart part : selectedParts){
+            part.setRotation(pitch, yaw, pivotIfInteraction);
         }
     }
 
@@ -147,45 +130,30 @@ public class PacketPartSelection extends MultiPartSelection implements Packeted{
 
     @Override
     public void showToPlayer(@NotNull Player player, GroupSpawnedEvent.@NotNull SpawnReason spawnReason) {
-        for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).showToPlayer(player, spawnReason);
+        for (PacketDisplayEntityPart part : selectedParts){
+            part.showToPlayer(player, spawnReason);
         }
     }
 
     @Override
     public void showToPlayer(@NotNull Player player, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
-        for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).showToPlayer(player, spawnReason, groupSpawnSettings);
+        for (PacketDisplayEntityPart part : selectedParts){
+            part.showToPlayer(player, spawnReason, groupSpawnSettings);
         }
     }
 
     @Override
     public void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason) {
-        for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).showToPlayers(players, spawnReason);
+        for (PacketDisplayEntityPart part : selectedParts){
+            part.showToPlayers(players, spawnReason);
         }
     }
 
     @Override
     public void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
-        for (ActivePart part : selectedParts){
-            ((PacketDisplayEntityPart) part).showToPlayers(players, spawnReason, groupSpawnSettings);
+        for (PacketDisplayEntityPart part : selectedParts){
+            part.showToPlayers(players, spawnReason, groupSpawnSettings);
         }
     }
 
-    @Override
-    public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks) {
-        for (ActivePart part : selectedParts){
-            part.translate(direction, distance, durationInTicks, delayInTicks);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks) {
-        for (ActivePart part : selectedParts){
-            part.translate(direction, distance, durationInTicks, delayInTicks);
-        }
-        return true;
-    }
 }

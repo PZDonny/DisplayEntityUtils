@@ -1,9 +1,17 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-public abstract class PartSelection implements Active{
-    protected ActivePart selectedPart = null;
+public abstract class PartSelection<T extends ActivePart> implements Active{
 
-    public abstract ActivePart getSelectedPart();
+    Class<T> partClass;
+    protected T selectedPart = null;
+
+    PartSelection(Class<T> partClass){
+        this.partClass = partClass;
+    }
+
+    public T getSelectedPart(){
+        return selectedPart;
+    }
 
     /**
      * Get whether this part selection has an {@link ActivePart} currently selected

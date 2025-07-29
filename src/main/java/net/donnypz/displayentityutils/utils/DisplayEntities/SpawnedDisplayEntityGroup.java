@@ -22,7 +22,7 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spawned {
+public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayEntityPart> implements Spawned {
     public static final long defaultPartUUIDSeed = 99;
     final Random partUUIDRandom = new Random(defaultPartUUIDSeed);
 
@@ -39,6 +39,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
 
 
     SpawnedDisplayEntityGroup(boolean isVisible) {
+        super(SpawnedDisplayEntityPart.class);
         this.isVisibleByDefault = isVisible;
     }
 
@@ -49,6 +50,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      */
     @ApiStatus.Internal
     public SpawnedDisplayEntityGroup(Display masterDisplay){
+        super(SpawnedDisplayEntityPart.class);
         this.isVisibleByDefault = masterDisplay.isVisibleByDefault();
         PersistentDataContainer c = masterDisplay.getPersistentDataContainer();
         if (c.has(creationTimeKey)){
@@ -382,93 +384,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
 
-
-
-    /**
-     * {@inheritDoc}
-     * @return {@link SpawnedDisplayEntityPart} or null
-     */
-    @Override
-    public @Nullable SpawnedDisplayEntityPart getPart(@NotNull UUID partUUID){
-        return (SpawnedDisplayEntityPart) groupParts.get(partUUID);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return a list of {@link SpawnedDisplayEntityPart}
-     */
-    @Override
-    public List<SpawnedDisplayEntityPart> getParts() {
-        return groupParts
-                .values()
-                .stream()
-                .map(SpawnedDisplayEntityPart.class::cast)
-                .toList();
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return a list of {@link SpawnedDisplayEntityPart}
-     */
-    @Override
-    public List<SpawnedDisplayEntityPart> getParts(@NotNull SpawnedDisplayEntityPart.PartType partType){
-        List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
-        for (ActivePart part : groupParts.sequencedValues()){
-            if (partType == part.getType()){
-                partList.add((SpawnedDisplayEntityPart) part);
-            }
-        }
-        return partList;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return a list of {@link SpawnedDisplayEntityPart}
-     */
-    @Override
-    public List<SpawnedDisplayEntityPart> getDisplayParts(){
-        List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
-        for (ActivePart part : groupParts.sequencedValues()){
-            if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                partList.add((SpawnedDisplayEntityPart) part);
-            }
-        }
-        return partList;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return a list of {@link SpawnedDisplayEntityPart}
-     */
-    @Override
-    public List<SpawnedDisplayEntityPart> getParts(@NotNull String tag){
-        List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
-        for (ActivePart part : groupParts.sequencedValues()){
-            if (part.hasTag(tag)){
-                partList.add((SpawnedDisplayEntityPart) part);
-            }
-        }
-        return partList;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return a list of {@link SpawnedDisplayEntityPart}
-     */
-    @Override
-    public List<SpawnedDisplayEntityPart> getParts(@NotNull Collection<String> tags){
-        List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
-        for (ActivePart part : groupParts.sequencedValues()){
-            for (String tag : tags){
-                if (part.hasTag(tag)){
-                    partList.add((SpawnedDisplayEntityPart) part);
-                    break;
-                }
-            }
-        }
-        return partList;
-    }
-
     /**
      * Get a list of parts specified by a part type as entities
      * @param partType the type of part to get
@@ -491,8 +406,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      */
     public <T> List<T> getPartEntities(@NotNull Class<T> entityClazz){
         List<T> partList = new ArrayList<>();
-        for (ActivePart part : groupParts.sequencedValues()){
-            Entity partEntity = ((SpawnedDisplayEntityPart) part).getEntity();
+        for (SpawnedDisplayEntityPart part : groupParts.sequencedValues()){
+            Entity partEntity = part.getEntity();
             if (entityClazz.isInstance(partEntity)){
                 T entity = entityClazz.cast(partEntity);
                 partList.add(entity);
@@ -937,15 +852,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         return getMasterEntity().getWorld();
     }
 
-
-
-    /**
-     * Get this group's master part
-     * @return This group's master part. Null if it could not be found
-     */
-    public @Nullable SpawnedDisplayEntityPart getMasterPart(){
-        return (SpawnedDisplayEntityPart) masterPart;
-    }
 
     /**
      * {@inheritDoc}

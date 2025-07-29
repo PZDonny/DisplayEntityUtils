@@ -27,13 +27,14 @@ import org.joml.Vector3f;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
+public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPart> implements Packeted{
     int interactionCount;
     int[] passengerIds;
     UUID vehicleUUID;
 
 
     PacketDisplayEntityGroup(String tag){
+        super(PacketDisplayEntityPart.class);
         this.tag = tag;
     }
 
@@ -205,90 +206,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
         return vehicleUUID == null ? null : Bukkit.getEntity(vehicleUUID);
     }
 
-    /**
-     * {@inheritDoc}
-     * @return a list of {@link PacketDisplayEntityPart}
-     */
-    @Override
-    public List<PacketDisplayEntityPart> getParts() {
-        return groupParts
-                .values()
-                .stream()
-                .map(PacketDisplayEntityPart.class::cast)
-                .toList();
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return {@link PacketDisplayEntityPart} or null
-     */
-    @Override
-    public PacketDisplayEntityPart getPart(@NotNull UUID partUUID) {
-        return (PacketDisplayEntityPart) groupParts.get(partUUID);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return a list of {@link PacketDisplayEntityPart}
-     */
-    @Override
-    public List<PacketDisplayEntityPart> getParts(SpawnedDisplayEntityPart.@NotNull PartType partType) {
-        List<PacketDisplayEntityPart> partList = new ArrayList<>();
-        for (ActivePart part : groupParts.sequencedValues()){
-            if (partType == part.type){
-                partList.add((PacketDisplayEntityPart) part);
-            }
-        }
-        return partList;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return a list of {@link PacketDisplayEntityPart}
-     */
-    @Override
-    public List<PacketDisplayEntityPart> getDisplayParts() {
-        List<PacketDisplayEntityPart> partList = new ArrayList<>();
-        for (ActivePart part : groupParts.sequencedValues()){
-            if (part.type != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                partList.add((PacketDisplayEntityPart) part);
-            }
-        }
-        return partList;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return a list of {@link PacketDisplayEntityPart}
-     */
-    @Override
-    public List<PacketDisplayEntityPart> getParts(@NotNull String tag){
-        List<PacketDisplayEntityPart> partList = new ArrayList<>();
-        for (ActivePart part : groupParts.sequencedValues()){
-            if (part.hasTag(tag)){
-                partList.add((PacketDisplayEntityPart) part);
-            }
-        }
-        return partList;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return a list of {@link PacketDisplayEntityPart}
-     */
-    @Override
-    public List<PacketDisplayEntityPart> getParts(@NotNull Collection<String> tags){
-        List<PacketDisplayEntityPart> partList = new ArrayList<>();
-        for (ActivePart part : groupParts.sequencedValues()){
-            for (String tag : tags){
-                if (part.hasTag(tag)){
-                    partList.add((PacketDisplayEntityPart) part);
-                    break;
-                }
-            }
-        }
-        return partList;
-    }
 
     @Override
     public boolean isTrackedBy(@NotNull Player player) {
@@ -586,9 +503,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup implements Packeted{
 
     public void unregister(){
         hideFromPlayers(getTrackingPlayers());
-        Iterator<Map.Entry<UUID, ActivePart>> it = groupParts.entrySet().iterator();
-        for (ActivePart part : new HashSet<>(groupParts.values())){
-            ((PacketDisplayEntityPart) part).removeFromGroup(true);
+        for (PacketDisplayEntityPart part : new HashSet<>(groupParts.values())){
+            (part).removeFromGroup(true);
         }
         activeAnimators.clear();
         masterPart = null;

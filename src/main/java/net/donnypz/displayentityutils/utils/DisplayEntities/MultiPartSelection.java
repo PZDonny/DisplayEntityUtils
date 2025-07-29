@@ -1,18 +1,20 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.utils.Direction;
 import org.bukkit.Color;
 import org.bukkit.block.BlockType;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemType;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public abstract class MultiPartSelection extends PartSelection {
-    ActiveGroup group;
-    LinkedHashSet<ActivePart> selectedParts = new LinkedHashSet<>();
+public abstract class MultiPartSelection<T extends ActivePart> extends PartSelection<T> {
+    ActiveGroup<T> group;
+    LinkedHashSet<T> selectedParts = new LinkedHashSet<>();
     Set<SpawnedDisplayEntityPart.PartType> partTypes = new HashSet<>();
 
     Set<ItemType> itemTypes = new HashSet<>();
@@ -24,20 +26,21 @@ public abstract class MultiPartSelection extends PartSelection {
     Collection<String> includedTags = new HashSet<>();
     Collection<String> excludedTags = new HashSet<>();
 
-    public MultiPartSelection(ActiveGroup group, @NotNull String partTag){
-        this(group, Set.of(partTag));
+    public MultiPartSelection(ActiveGroup<T> group, @NotNull String partTag, Class<T> partClass){
+        this(group, Set.of(partTag), partClass);
     }
 
 
-    public MultiPartSelection(ActiveGroup group, @NotNull Collection<String> partTags){
-        this(group, new PartFilter().includePartTags(partTags));
+    public MultiPartSelection(ActiveGroup<T> group, @NotNull Collection<String> partTags, Class<T> partClass){
+        this(group, new PartFilter().includePartTags(partTags), partClass);
     }
 
-    public MultiPartSelection(ActiveGroup group){
-        this(group, new PartFilter());
+    public MultiPartSelection(ActiveGroup<T> group, Class<T> partClass){
+        this(group, new PartFilter(), partClass);
     }
 
-    public MultiPartSelection(@NotNull ActiveGroup group, @NotNull PartFilter filter){
+    public MultiPartSelection(@NotNull ActiveGroup<T> group, @NotNull PartFilter filter, Class<T> partClass){
+        super(partClass);
         this.group = group;
         this.includeBlockTypes = filter.includeBlockTypes;
         this.includeItemTypes = filter.includeItemTypes;
@@ -110,7 +113,7 @@ public abstract class MultiPartSelection extends PartSelection {
         selectedParts.clear();
 
         filter:
-        for (ActivePart part : group.groupParts.values()){
+        for (T part : group.groupParts.values()){
             SpawnedDisplayEntityPart.PartType type = part.getType();
 
             //Part Types not contained
@@ -175,9 +178,9 @@ public abstract class MultiPartSelection extends PartSelection {
     }
 
 
-    abstract BlockType getBlockType(ActivePart part);
+    abstract BlockType getBlockType(T part);
 
-    abstract ItemType getItemType(ActivePart part);
+    abstract ItemType getItemType(T part);
 
 
     /**
@@ -217,7 +220,7 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     public void setToNextPart(int jump){
         if (!selectedParts.isEmpty()){
-            List<ActivePart> parts = new ArrayList<>(selectedParts);
+            List<T> parts = new ArrayList<>(selectedParts);
             int index = indexOf(selectedPart)+jump;
             while (index >= selectedParts.size()){
                 index-=selectedParts.size();
@@ -234,7 +237,7 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     public void setToPreviousPart(int jump){
         if (!selectedParts.isEmpty()){
-            List<ActivePart> parts = new ArrayList<>(selectedParts);
+            List<T> parts = new ArrayList<>(selectedParts);
             int index = (indexOf(selectedPart) - Math.abs(jump)) % selectedParts.size();
             if (index < 0) index += selectedParts.size();
             selectedPart = parts.get(index);
@@ -259,14 +262,14 @@ public abstract class MultiPartSelection extends PartSelection {
      * Remove parts from this selection, that also exist in a different one. If the provided selection is this, then {@link #remove()} will be called
      * @param selection the other part selection
      */
-    public void removeParts(@NotNull MultiPartSelection selection){
+    public void removeParts(@NotNull MultiPartSelection<T> selection){
         if (selection.getClass() != this.getClass()){
             return;
         }
         if (selection == this){
             remove();
         }
-        for (ActivePart part : selection.selectedParts){
+        for (T part : selection.selectedParts){
             selectedParts.remove(part);
             if (selectedPart == part){
                 selectedPart = null;
@@ -281,7 +284,7 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     @Override
     public void setViewRange(float viewRangeMultiplier) {
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.setViewRange(viewRangeMultiplier);
         }
     }
@@ -293,7 +296,7 @@ public abstract class MultiPartSelection extends PartSelection {
 
     @Override
     public void setBillboard(Display.@NotNull Billboard billboard) {
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.setBillboard(billboard);
         }
     }
@@ -304,7 +307,7 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     @Override
     public void setBrightness(Display.@Nullable Brightness brightness) {
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.setBrightness(brightness);
         }
     }
@@ -314,7 +317,7 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     @Override
     public void setTeleportDuration(int teleportDuration) {
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.setTeleportDuration(teleportDuration);
         }
     }
@@ -325,7 +328,7 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     @Override
     public void setInterpolationDuration(int interpolationDuration){
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.setInterpolationDuration(interpolationDuration);
         }
     }
@@ -336,7 +339,7 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     @Override
     public void setInterpolationDelay(int interpolationDelay){
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.setInterpolationDelay(interpolationDelay);
         }
     }
@@ -347,7 +350,7 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     @Override
     public void setGlowColor(@Nullable Color color){
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.setGlowColor(color);
         }
     }
@@ -357,7 +360,7 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     @Override
     public void glow(){
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.glow();
         }
     }
@@ -367,7 +370,7 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     @Override
     public void glow(@NotNull Player player){
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.glow(player);
         }
     }
@@ -375,14 +378,14 @@ public abstract class MultiPartSelection extends PartSelection {
 
     @Override
     public void glow(long durationInTicks){
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.glow(durationInTicks);
         }
     }
 
     @Override
     public void glow(@NotNull Player player, long durationInTicks){
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.glow(player, durationInTicks);
         }
     }
@@ -392,7 +395,7 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     @Override
     public void unglow(){
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.unglow();
         }
     }
@@ -402,7 +405,7 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     @Override
     public void unglow(@NotNull Player player){
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.unglow(player);
         }
     }
@@ -413,7 +416,7 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     @Override
     public void pivot(float angleInDegrees){
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.pivot(angleInDegrees);
         }
     }
@@ -424,7 +427,7 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     @Override
     public void setYaw(float yaw, boolean pivotInteractions){
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.setYaw(yaw, pivotInteractions);
         }
     }
@@ -435,7 +438,7 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     @Override
     public void setPitch(float pitch){
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.setPitch(pitch);
         }
     }
@@ -446,7 +449,7 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     @Override
     public void hideFromPlayer(@NotNull Player player){
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.hideFromPlayer(player);
         }
     }
@@ -457,18 +460,58 @@ public abstract class MultiPartSelection extends PartSelection {
      */
     @Override
     public void hideFromPlayers(@NotNull Collection<Player> players){
-        for (ActivePart part : selectedParts){
+        for (T part : selectedParts){
             part.hideFromPlayers(players);
         }
     }
 
     /**
-     * Determine whether a {@link ActivePart} is contained in this selection
+     * Change the translation of the SpawnedDisplayEntityParts in this SpawnedPartSelection.
+     * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
+     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param direction The direction to translate the parts
+     * @param distance How far the part should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
+     */
+    @Override
+    public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks){
+        for (ActivePart part : selectedParts){
+            part.translate(direction, distance, durationInTicks, delayInTicks);
+        }
+        return true;
+    }
+
+    /**
+     * Change the translation of the SpawnedDisplayEntityParts in this SpawnedPartSelection.
+     * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
+     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
+     * @param direction The direction to translate the parts
+     * @param distance How far the part should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
+     */
+    @Override
+    public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks){
+        for (ActivePart part : selectedParts){
+            part.translate(direction, distance, durationInTicks, delayInTicks);
+        }
+        return true;
+    }
+
+
+    /**
+     * Determine whether a part is contained in this selection
      * @param part the part
      * @return a boolean
      */
     public boolean contains(@NotNull ActivePart part){
-        return selectedParts.contains(part);
+        try{
+            return selectedParts.contains(partClass.cast(part));
+        }
+        catch (ClassCastException e){
+            return false;
+        }
     }
 
     /**
@@ -476,9 +519,9 @@ public abstract class MultiPartSelection extends PartSelection {
      * @param part the part
      * @return an integer. -1 if the part is not contained in this selection
      */
-    public int indexOf(@NotNull ActivePart part){
+    public int indexOf(@NotNull T part){
         int i = 0;
-        for (ActivePart p : selectedParts){
+        for (T p : selectedParts){
             if (part.equals(p)){
                 return i;
             }
@@ -527,9 +570,15 @@ public abstract class MultiPartSelection extends PartSelection {
         return group != null;
     }
 
-    public abstract SequencedCollection<? extends ActivePart> getSelectedParts();
+    /**
+     * Get the parts contained in this selection
+     * @return the parts in this selection
+     */
+    public List<T> getSelectedParts(){
+        return new ArrayList<>(selectedParts);
+    }
 
-    public abstract ActiveGroup getGroup();
+    public abstract ActiveGroup<T> getGroup();
 
     public abstract boolean reset();
 }

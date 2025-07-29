@@ -134,7 +134,7 @@ class GroupEntityFollower {
         }.runTaskTimer(DisplayEntityPlugin.getInstance(), 1, teleportationDuration);
     }
 
-    private void apply(Entity entity, MultiPartSelection selection, float newYaw, float newPitch, FollowType finalFollowType, FollowType trueFollowType){
+    private void apply(Entity entity, MultiPartSelection<?> selection, float newYaw, float newPitch, FollowType finalFollowType, FollowType trueFollowType){
         if (lastGroupScaleMultiplier == 0){
             lastGroupScaleMultiplier = group.getScaleMultiplier();
         }
