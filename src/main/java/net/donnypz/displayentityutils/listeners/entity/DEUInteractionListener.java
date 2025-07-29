@@ -61,44 +61,43 @@ public class DEUInteractionListener implements Listener, PacketListener {
         if (!DEUUser.getOrCreateUser(user.getUUID()).isTrackingPart(part)){
             return;
         }
+
+        Player player = Bukkit.getPlayer(user.getUUID());
+
+        //Point Displays
+        if (RelativePointDisplay.isRelativePointPart(part)){
+            RelativePointDisplay pointDisplay = RelativePointDisplay.get(part);
+            if (pointDisplay == null){
+                player.sendMessage(Component.text("Failed to get point!", NamedTextColor.RED));
+                return;
+            }
+
+            //Left Click Action
+            if (clickType == InteractionClickEvent.ClickType.LEFT){
+                pointDisplay.leftClick(player);
+                DEUCommandUtils.selectRelativePoint(player, pointDisplay);
+                return;
+            }
+
+            //Right Click Action
+            if (!player.isSneaking()){
+                pointDisplay.rightClick(player);
+                return;
+            }
+
+            //Right Click Action (Remove Point)
+            if (DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_REMOVE_FRAME_POINT)){
+                player.sendMessage(buildPointRemovalComponent(pointDisplay));
+                player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+            }
+            return;
+        }
+
+        if (!new PacketInteractionClickEvent(player, part, clickType).callEvent()){
+            return;
+        }
+
         Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
-
-            Player player = Bukkit.getPlayer(user.getUUID());
-
-            //Point Displays
-            if (RelativePointDisplay.isRelativePointPart(part)){
-                RelativePointDisplay pointDisplay = RelativePointDisplay.get(part);
-                if (pointDisplay == null){
-                    player.sendMessage(Component.text("Failed to get point!", NamedTextColor.RED));
-                    return;
-                }
-
-                //Left Click Action
-                if (clickType == InteractionClickEvent.ClickType.LEFT){
-                    pointDisplay.leftClick(player);
-                    DEUCommandUtils.selectRelativePoint(player, pointDisplay);
-                    return;
-                }
-
-                //Right Click Action
-                if (!player.isSneaking()){
-                    pointDisplay.rightClick(player);
-                    return;
-                }
-
-                //Right Click Action (Remove Point)
-                if (DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_REMOVE_FRAME_POINT)){
-                    player.sendMessage(buildPointRemovalComponent(pointDisplay));
-                    player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
-                }
-                return;
-            }
-
-
-            if (!new PacketInteractionClickEvent(player, part, clickType).callEvent()){
-                return;
-            }
-
             //Execute Commands
             if (clickType == InteractionClickEvent.ClickType.LEFT){
                 for (String cmd : part.getLeftConsoleInteractionCommands()){
