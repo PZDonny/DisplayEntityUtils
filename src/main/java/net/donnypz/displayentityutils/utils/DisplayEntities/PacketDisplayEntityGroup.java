@@ -40,9 +40,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     Predicate<Player> autoShowCondition;
 
 
-    PacketDisplayEntityGroup(String tag, boolean autoShow){
+    PacketDisplayEntityGroup(String tag){
         this.tag = tag;
-        this.autoShow = autoShow;
     }
 
     public static @NotNull Set<PacketDisplayEntityGroup> getGroups(World world){
@@ -422,9 +421,13 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     /**
      * Set whether this group should automatically handle revealing itself to players after they switch worlds
      * @param autoShow whether the group should autoShow
-     *
      */
     public void setAutoShow(boolean autoShow){
+        if (this.autoShow != autoShow && autoShow){
+            Location loc = getLocation();
+            if (loc == null) return;
+            showToPlayers(new ArrayList<>(loc.getWorld().getPlayers()), GroupSpawnedEvent.SpawnReason.INTERNAL);
+        }
         this.autoShow = autoShow;
     }
 

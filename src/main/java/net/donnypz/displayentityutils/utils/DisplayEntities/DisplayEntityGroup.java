@@ -257,7 +257,7 @@ public final class DisplayEntityGroup implements Serializable{
      * @return A {@link PacketDisplayEntityGroup} representative of this DisplayEntityGroup.
      */
     public @NotNull PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation, boolean playSpawnAnimation, boolean autoShow){
-        PacketDisplayEntityGroup packetGroup = new PacketDisplayEntityGroup(tag, autoShow);
+        PacketDisplayEntityGroup packetGroup = new PacketDisplayEntityGroup(tag);
 
         packetGroup.changeWorld(spawnLocation.getWorld());
         PacketDisplayEntityPart masterPart = masterEntity.createPacketPart(packetGroup, spawnLocation);
@@ -285,6 +285,7 @@ public final class DisplayEntityGroup implements Serializable{
         if (playSpawnAnimation){
             packetGroup.playSpawnAnimation();
         }
+        packetGroup.setAutoShow(autoShow);
 
 
         float widthCullingAdder = DisplayEntityPlugin.widthCullingAdder();
