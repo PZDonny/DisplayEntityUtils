@@ -24,8 +24,7 @@ import java.util.*;
 
 public abstract class ActiveGroup<T extends ActivePart> implements Active{
 
-    private Class<T> partClass;
-    protected ActivePart masterPart;
+    protected T masterPart;
     protected LinkedHashMap<UUID, T> groupParts = new LinkedHashMap<>();
     protected String tag;
     protected Set<GroupEntityFollower> followers = new HashSet<>();
@@ -38,10 +37,6 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     protected float scaleMultiplier = 1;
     protected float verticalRideOffset = 0;
     int lastAnimatedTick = -1;
-
-    ActiveGroup(Class<T> partClass){
-        this.partClass = partClass;
-    }
 
     /**
      * Get this group's tag
@@ -324,7 +319,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @return a part or null if no part in this group contains the provided part uuid
      */
     public @Nullable T getPart(@NotNull UUID partUUID){
-        return partClass.cast(groupParts.get(partUUID));
+        return groupParts.get(partUUID);
     }
 
     /**
@@ -427,7 +422,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @return This group's master part. Null if it could not be found
      */
     public @Nullable T getMasterPart(){
-        return partClass.cast(masterPart);
+        return masterPart;
     }
 
     public abstract Location getLocation();

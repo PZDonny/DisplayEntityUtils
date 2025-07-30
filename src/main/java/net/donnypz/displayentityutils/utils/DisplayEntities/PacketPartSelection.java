@@ -21,7 +21,7 @@ public class PacketPartSelection extends MultiPartSelection<PacketDisplayEntityP
      * @param partTag The part tag to include in the filter
      */
     public PacketPartSelection(@NotNull PacketDisplayEntityGroup group, @NotNull String partTag) {
-        super(group, partTag, PacketDisplayEntityPart.class);
+        super(group, partTag);
     }
 
     /**
@@ -30,7 +30,7 @@ public class PacketPartSelection extends MultiPartSelection<PacketDisplayEntityP
      * @param partTags The part tags to include in the filter
      */
     public PacketPartSelection(@NotNull PacketDisplayEntityGroup group, @NotNull Collection<String> partTags) {
-        super(group, partTags, PacketDisplayEntityPart.class);
+        super(group, partTags);
     }
 
     /**
@@ -38,7 +38,7 @@ public class PacketPartSelection extends MultiPartSelection<PacketDisplayEntityP
      * @param group The group to cycle through for this selection.
      */
     public PacketPartSelection(@NotNull PacketDisplayEntityGroup group) {
-        super(group, PacketDisplayEntityPart.class);
+        super(group);
     }
 
     /**
@@ -47,7 +47,7 @@ public class PacketPartSelection extends MultiPartSelection<PacketDisplayEntityP
      * @param filter The filter used to filter parts
      */
     public PacketPartSelection(@NotNull PacketDisplayEntityGroup group, @NotNull PartFilter filter) {
-        super(group, filter, PacketDisplayEntityPart.class);
+        super(group, filter);
     }
 
     @Override

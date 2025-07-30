@@ -45,7 +45,7 @@ public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDispla
      * @param filter The filter used to filter parts
      */
     public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull PartFilter filter){
-        super(group, filter, SpawnedDisplayEntityPart.class);
+        super(group, filter);
         group.partSelections.add(this);
     }
 
@@ -79,15 +79,6 @@ public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDispla
     ItemType getItemType(SpawnedDisplayEntityPart part) {
         ItemDisplay display = (ItemDisplay) part.getEntity();
         return display.getItemStack().getType().asItemType();
-    }
-
-    /**
-     * Get the part that is selected out of all the parts within this SpawnedPartSelection
-     * @return a {@link SpawnedDisplayEntityPart}. Null if a part is not selected
-     */
-    @Override
-    public SpawnedDisplayEntityPart getSelectedPart() {
-        return selectedPart;
     }
 
     /**

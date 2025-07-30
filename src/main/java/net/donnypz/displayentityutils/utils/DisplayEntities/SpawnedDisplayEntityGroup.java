@@ -39,7 +39,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
 
     SpawnedDisplayEntityGroup(boolean isVisible) {
-        super(SpawnedDisplayEntityPart.class);
         this.isVisibleByDefault = isVisible;
     }
 
@@ -50,7 +49,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     @ApiStatus.Internal
     public SpawnedDisplayEntityGroup(Display masterDisplay){
-        super(SpawnedDisplayEntityPart.class);
         this.isVisibleByDefault = masterDisplay.isVisibleByDefault();
         PersistentDataContainer c = masterDisplay.getPersistentDataContainer();
         if (c.has(creationTimeKey)){
@@ -85,7 +83,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     private Display getMasterEntity(){
-        return (Display)((SpawnedDisplayEntityPart) masterPart).getEntity();
+        return (Display) masterPart.getEntity();
     }
 
 

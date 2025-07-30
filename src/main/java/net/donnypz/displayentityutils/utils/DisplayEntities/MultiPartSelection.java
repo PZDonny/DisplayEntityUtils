@@ -26,21 +26,20 @@ public abstract class MultiPartSelection<T extends ActivePart> extends PartSelec
     Collection<String> includedTags = new HashSet<>();
     Collection<String> excludedTags = new HashSet<>();
 
-    public MultiPartSelection(ActiveGroup<T> group, @NotNull String partTag, Class<T> partClass){
-        this(group, Set.of(partTag), partClass);
+    public MultiPartSelection(ActiveGroup<T> group, @NotNull String partTag){
+        this(group, Set.of(partTag));
     }
 
 
-    public MultiPartSelection(ActiveGroup<T> group, @NotNull Collection<String> partTags, Class<T> partClass){
-        this(group, new PartFilter().includePartTags(partTags), partClass);
+    public MultiPartSelection(ActiveGroup<T> group, @NotNull Collection<String> partTags){
+        this(group, new PartFilter().includePartTags(partTags));
     }
 
-    public MultiPartSelection(ActiveGroup<T> group, Class<T> partClass){
-        this(group, new PartFilter(), partClass);
+    public MultiPartSelection(ActiveGroup<T> group){
+        this(group, new PartFilter());
     }
 
-    public MultiPartSelection(@NotNull ActiveGroup<T> group, @NotNull PartFilter filter, Class<T> partClass){
-        super(partClass);
+    public MultiPartSelection(@NotNull ActiveGroup<T> group, @NotNull PartFilter filter){
         this.group = group;
         this.includeBlockTypes = filter.includeBlockTypes;
         this.includeItemTypes = filter.includeItemTypes;
@@ -507,7 +506,7 @@ public abstract class MultiPartSelection<T extends ActivePart> extends PartSelec
      */
     public boolean contains(@NotNull ActivePart part){
         try{
-            return selectedParts.contains(partClass.cast(part));
+            return selectedParts.contains(part);
         }
         catch (ClassCastException e){
             return false;

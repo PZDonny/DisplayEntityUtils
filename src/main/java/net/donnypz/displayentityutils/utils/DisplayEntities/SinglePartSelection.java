@@ -15,7 +15,6 @@ public final class SinglePartSelection extends PartSelection<SpawnedDisplayEntit
 
     @ApiStatus.Internal
     public SinglePartSelection(@NotNull SpawnedDisplayEntityPart part){
-        super(SpawnedDisplayEntityPart.class);
         if (part.hasGroup()){
             throw new IllegalArgumentException("Unable to create a SinglePartSelection with a (previously) grouped part");
         }

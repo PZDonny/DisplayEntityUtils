@@ -41,7 +41,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
 
     PacketDisplayEntityGroup(String tag, boolean autoShow){
-        super(PacketDisplayEntityPart.class);
         this.tag = tag;
         this.autoShow = autoShow;
     }
@@ -209,7 +208,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             return false;
         }
         vehicleUUID = vehicle.getUniqueId();
-        for (UUID uuid : getMasterPart().viewers){
+        for (UUID uuid : masterPart.viewers){
             Player p = Bukkit.getPlayer(uuid);
             if (p == null) continue;
             PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).addPassenger(!Bukkit.isPrimaryThread(), vehicle.getEntityId(), masterPart.getEntityId());
@@ -222,7 +221,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         Entity vehicle = getVehicle();
         if (vehicle == null) return null;
 
-        for (UUID uuid : getMasterPart().viewers){
+        for (UUID uuid : masterPart.viewers){
             Player p = Bukkit.getPlayer(uuid);
             if (p == null) continue;
             PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).removePassenger(!Bukkit.isPrimaryThread(), vehicle.getEntityId(), masterPart.getEntityId());
@@ -239,17 +238,17 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
     @Override
     public boolean isTrackedBy(@NotNull Player player) {
-        return getMasterPart().isTrackedBy(player.getUniqueId());
+        return masterPart.isTrackedBy(player.getUniqueId());
     }
 
     @Override
     public Collection<Player> getTrackingPlayers() {
-        return getMasterPart().getTrackingPlayers();
+        return masterPart.getTrackingPlayers();
     }
 
     @Override
     public boolean hasTrackingPlayers() {
-        return !getMasterPart().viewers.isEmpty();
+        return !masterPart.viewers.isEmpty();
     }
 
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap, SpawnedDisplayEntityPart.PartType... effectedPartTypes){
@@ -333,7 +332,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     @Override
     public @Nullable Location getLocation(){
         if (masterPart == null) return null;
-        return getMasterPart().getLocation();
+        return masterPart.getLocation();
     }
 
 
