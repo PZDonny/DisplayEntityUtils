@@ -156,6 +156,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * Hide the packet-based entity from all players tracking this part
      */
     public void hide(){
+        if (viewers.isEmpty()) return;
         for (UUID uuid : getViewers()){
             Player player = Bukkit.getPlayer(uuid);
             if (player != null && player.isConnected()){
@@ -175,6 +176,16 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             PacketUtils.hideEntity(player, getEntityId());
         }
         viewers.remove(player.getUniqueId());
+        DEUUser.getOrCreateUser(player).untrackPacketEntity(this);
+    }
+
+    @ApiStatus.Internal
+    public void hideFromPlayer(@NotNull Player player, DEUUser user) {
+        if (player.isConnected()){
+            PacketUtils.hideEntity(player, getEntityId());
+        }
+        viewers.remove(player.getUniqueId());
+        user.untrackPacketEntity(this);
         DEUUser.getOrCreateUser(player).untrackPacketEntity(this);
     }
 
@@ -427,9 +438,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (pivotIfInteraction && type == SpawnedDisplayEntityPart.PartType.INTERACTION){
             pivot(yaw, pitch);
         }
-        else{
+        else if (!viewers.isEmpty()){
             WrapperPlayServerEntityRotation rotPacket = new WrapperPlayServerEntityRotation(getEntityId(), yaw, pitch, false);
-            for (UUID uuid : viewers){
+            for (UUID uuid : getViewers()){
                 PacketEvents.getAPI().getPlayerManager().sendPacket(Bukkit.getPlayer(uuid), rotPacket);
             }
         }
@@ -491,7 +502,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         packetLocation.setCoordinates(pivotedLoc);
 
 
-        for (UUID uuid : viewers){
+        for (UUID uuid : getViewers()){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
             PacketEvents.getAPI().getPlayerManager().sendPacket(player, new WrapperPlayServerEntityTeleport(getEntityId(),
@@ -503,12 +514,12 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
-     * Set the location of this packet-based entity.
+     * Set the location of this packet-based entity. The part should be hidden first with {@link #hide()} if being teleported to a different world.
      * @param location the location
      */
     public void teleport(@NotNull Location location){
         packetLocation = new PacketLocation(location);
-        for (UUID uuid : viewers){
+        for (UUID uuid : getViewers()){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
             PacketUtils.teleport(player, getEntityId(), location);

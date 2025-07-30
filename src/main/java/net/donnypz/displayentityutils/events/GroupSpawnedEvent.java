@@ -53,6 +53,8 @@ public class GroupSpawnedEvent extends Event {
         @ApiStatus.Internal
         INTERNAL,
         @ApiStatus.Internal
-        SKRIPT;
+        SKRIPT,
+        @ApiStatus.Internal
+        PLAYER_SWITCH_WORLD;
     }
 }

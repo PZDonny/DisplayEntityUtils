@@ -245,8 +245,21 @@ public final class DisplayEntityGroup implements Serializable{
      * @return A {@link PacketDisplayEntityGroup} representative of this DisplayEntityGroup.
      */
     public @NotNull PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation, boolean playSpawnAnimation){
-        PacketDisplayEntityGroup packetGroup = new PacketDisplayEntityGroup(tag);
+        return createPacketGroup(spawnLocation, playSpawnAnimation, false);
+    }
 
+
+    /**
+     * Spawns this {@link DisplayEntityGroup} at a specified location returning a {@link PacketDisplayEntityGroup} that represents this.
+     * @param spawnLocation The location where this group spawn be spawned for players
+     * @param playSpawnAnimation whether this packet group should automatically play its spawn animation when created
+     * @param autoShow whether this packet group should automatically handle revealing and hiding itself to players
+     * @return A {@link PacketDisplayEntityGroup} representative of this DisplayEntityGroup.
+     */
+    public @NotNull PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation, boolean playSpawnAnimation, boolean autoShow){
+        PacketDisplayEntityGroup packetGroup = new PacketDisplayEntityGroup(tag, autoShow);
+
+        packetGroup.changeWorld(spawnLocation.getWorld());
         PacketDisplayEntityPart masterPart = masterEntity.createPacketPart(packetGroup, spawnLocation);
         masterPart.isMaster = true; //for parts in old models that do not contain pdc data / part uuids
         packetGroup.addPart(masterPart);

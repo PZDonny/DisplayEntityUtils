@@ -173,24 +173,15 @@ public class DEUUser {
     }
 
     @ApiStatus.Internal
-    public void untrackPacketEntities(Collection<PacketDisplayEntityPart> parts){
+    public void untrackPacketEntities(@NotNull Collection<PacketDisplayEntityPart> parts){
         trackedPacketEntities.removeAll(parts);
     }
 
     @ApiStatus.Internal
-    public void refreshTrackedPacketEntities(@NotNull Player player){
+    public void resetTrackedPacketParts(@NotNull Player player){
         if (trackedPacketEntities.isEmpty()) return;
-
-        String worldName = player.getWorld().getName();
-
-        Iterator<PacketDisplayEntityPart> iter = trackedPacketEntities.iterator();
-        while (iter.hasNext()) {
-            PacketDisplayEntityPart part = iter.next();
-            if (part == null) continue;
-            if (!worldName.equals(part.getWorldName())){
-                part.hideFromPlayer(player);
-            }
-            iter.remove();
+        for (PacketDisplayEntityPart part : new HashSet<>(trackedPacketEntities)){
+            part.hideFromPlayer(player, this);
         }
     }
 

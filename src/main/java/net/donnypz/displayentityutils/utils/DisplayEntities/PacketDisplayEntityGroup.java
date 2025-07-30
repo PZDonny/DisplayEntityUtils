@@ -15,6 +15,7 @@ import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
@@ -25,17 +26,46 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPart> implements Packeted{
+
+    private static final ConcurrentHashMap<String, Set<PacketDisplayEntityGroup>> allPacketGroups = new ConcurrentHashMap<>();
     int interactionCount;
     int[] passengerIds;
     UUID vehicleUUID;
+    final boolean autoShow;
+    Predicate<Player> autoShowCondition;
 
 
-    PacketDisplayEntityGroup(String tag){
+    PacketDisplayEntityGroup(String tag, boolean autoShow){
         super(PacketDisplayEntityPart.class);
         this.tag = tag;
+        this.autoShow = autoShow;
+    }
+
+    public static @NotNull Set<PacketDisplayEntityGroup> getGroups(World world){
+        Set<PacketDisplayEntityGroup> groups = allPacketGroups.get(world.getName());
+        return groups != null ? new HashSet<>(groups) : new HashSet<>();
+    }
+
+    void changeWorld(World world){
+        Location oldLoc = getLocation();
+        //Remove from previous
+        if (oldLoc != null){
+            String oldWorldName = oldLoc.getWorld().getName();
+            Set<PacketDisplayEntityGroup> set = allPacketGroups.get(oldWorldName);
+            if (set == null) return;
+            set.remove(this);
+            if (set.isEmpty()){
+                allPacketGroups.remove(oldWorldName);
+            }
+        }
+
+        allPacketGroups.computeIfAbsent(world.getName(), name -> new HashSet<>())
+                .add(this);
     }
 
     void addPart(@NotNull PacketDisplayEntityPart part){
@@ -237,8 +267,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
     @Override
     public void setRotation(float pitch, float yaw, boolean pivotIfInteraction){
-        for (ActivePart part : groupParts.values()){
-            ((PacketDisplayEntityPart) part).setRotation(pitch, yaw, pivotIfInteraction);
+        for (PacketDisplayEntityPart part : groupParts.values()){
+            part.setRotation(pitch, yaw, pivotIfInteraction);
         }
     }
 
@@ -251,21 +281,19 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
 
     /**
-     * Set the location of this group
+     * Set the location of this group. The group should be hidden first with {@link #hide()} if being teleported to a different world.
      * @param location the location
      */
     public void teleport(@NotNull Location location, boolean pivotInteractions){
-        for (ActivePart p : groupParts.values()){
-            PacketDisplayEntityPart part = (PacketDisplayEntityPart) p;
+        Location oldLoc = getLocation();
+        if (oldLoc != null && !location.getWorld().equals(oldLoc.getWorld())){
+            changeWorld(location.getWorld());
+        }
+        for (PacketDisplayEntityPart part : groupParts.values()){
             if (part.isMaster){
                 part.teleport(location);
             }
-            else if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION && pivotInteractions){
-                part.setRotation(location.getPitch(), location.getYaw(), true);
-            }
-            else{ //Rotate Passengers
-                part.setRotation(location.getPitch(), location.getYaw(), false);
-            }
+            part.setRotation(location.getPitch(), location.getYaw(), pivotInteractions);
         }
     }
 
@@ -273,12 +301,12 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     public @NotNull Collection<PacketDisplayEntityPart> getInteractionParts(){
         int i = 0;
         Set<PacketDisplayEntityPart> parts = new HashSet<>();
-        for (ActivePart part : groupParts.sequencedValues().reversed()){
+        for (PacketDisplayEntityPart part : groupParts.sequencedValues().reversed()){
             if (i == interactionCount){
                 return parts;
             }
             if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                parts.add((PacketDisplayEntityPart) part);
+                parts.add(part);
                 i++;
             }
         }
@@ -287,12 +315,12 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
     private void iterateInteractionParts(Consumer<PacketDisplayEntityPart> consumer){
         int i = 0;
-        for (ActivePart part : groupParts.sequencedValues().reversed()){
+        for (PacketDisplayEntityPart part : groupParts.sequencedValues().reversed()){
             if (i == interactionCount){
                 return;
             }
             if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                consumer.accept((PacketDisplayEntityPart) part);
+                consumer.accept(part);
                 i++;
             }
         }
@@ -304,6 +332,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      */
     @Override
     public @Nullable Location getLocation(){
+        if (masterPart == null) return null;
         return getMasterPart().getLocation();
     }
 
@@ -312,21 +341,18 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
      * @param animation the animation the frame is from
      * @param startFrameId the id of the frame to display
-     * @return false if this group is in an unloaded chunk
      */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId) {
-        return setToFrame(animation, animation.getFrame(startFrameId));
+    public void setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId) {
+        setToFrame(animation, animation.getFrame(startFrameId));
     }
 
     /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}  on this group
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
      * @param animation the animation the frame is from
      * @param frame the frame to display
-     * @return false if this group is in an unloaded chunk
      */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
+    public void setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
         PacketDisplayAnimationExecutor.setGroupToFrame(this, animation, frame);
-        return true;
     }
 
     /**
@@ -335,10 +361,9 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * @param startFrameId the id of the frame to display
      * @param duration how long the frame should play
      * @param delay how long until the frame should start playing
-     * @return false if this group is in an unloaded chunk
      */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId, int duration, int delay) {
-        return setToFrame(animation, animation.getFrame(startFrameId), duration, delay);
+    public void setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId, int duration, int delay) {
+        setToFrame(animation, animation.getFrame(startFrameId), duration, delay);
     }
 
     /**
@@ -347,11 +372,9 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * @param frame the frame to display
      * @param duration how long the frame should play
      * @param delay how long until the frame should start playing
-     * @return false if this group is in an unloaded chunk
      */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
-       PacketDisplayAnimationExecutor.setGroupToFrame(this, animation, frame, duration, delay);
-        return true;
+    public void setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
+        PacketDisplayAnimationExecutor.setGroupToFrame(this, animation, frame, duration, delay);
     }
 
     @Override
@@ -375,6 +398,33 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     @Override
     public @Nullable String getWorldName(){
         return getMasterPart().getWorldName();
+    }
+
+    /**
+     * Get whether this group should automatically handle revealing itself to player after a world switch
+     * @return a boolean
+     */
+    public boolean isAutoShow(){
+        return autoShow;
+    }
+
+    /**
+     * Set a condition that will be checked when determining if a group should be automatically shown to a player.
+     * <br><br>
+     * The condition is tested on a player whenever they switch worlds. If the given predicate returns false,
+     * the group must manually be shown to the player. If true, the group will be shown.
+     * @param playerCondition the condition checked for every player
+     */
+    public void setAutoShowCondition(@Nullable Predicate<Player> playerCondition){
+        this.autoShowCondition = playerCondition;
+    }
+
+    /**
+     * Get the condition that will be used on a player for this group when determining if this group should automatically reveal itself after the player switches worlds
+     * @return a {@link Predicate} or null
+     */
+    public @Nullable Predicate<Player> getAutoShowCondition(){
+        return autoShowCondition;
     }
 
     /**
@@ -437,6 +487,14 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return new PacketGroupSendEvent(this, spawnReason, players).callEvent();
     }
 
+    /**
+     * Hide this group's {@link PacketDisplayEntityPart}s from all players tracking this group
+     */
+    public void hide(){
+        Collection<Player> viewers = getTrackingPlayers();
+        sendDestroyEvent(viewers);
+        hideFromPlayers(viewers);
+    }
 
     /**
      * Hide the group's {@link PacketDisplayEntityPart}s from a player
@@ -448,9 +506,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
         int[] ids = new int[groupParts.size()];
         int i = 0;
-        for (ActivePart p : groupParts.values()){
-            PacketDisplayEntityPart part = (PacketDisplayEntityPart) p;
-
+        for (PacketDisplayEntityPart part : groupParts.values()){
             part.viewers.remove(player.getUniqueId());
             DEUUser.getOrCreateUser(player).untrackPacketEntity(part);
             ids[i] = part.getEntityId();
@@ -469,8 +525,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
         int[] ids = new int[groupParts.size()];
         int i = 0;
-        for (ActivePart p : groupParts.values()){
-            PacketDisplayEntityPart part = (PacketDisplayEntityPart) p;
+        for (PacketDisplayEntityPart part : groupParts.values()){
             for (Player player : players){
                 part.viewers.remove(player.getUniqueId());
                 DEUUser.getOrCreateUser(player).untrackPacketEntity(part);
@@ -503,9 +558,19 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
     public void unregister(){
         hideFromPlayers(getTrackingPlayers());
+        String worldName = getWorldName();
+        if (worldName != null){
+            Set<PacketDisplayEntityGroup> groups = allPacketGroups.get(worldName);
+            if (groups != null){
+                groups.remove(this);
+                if (groups.isEmpty()) allPacketGroups.remove(worldName);
+            }
+
+        }
         for (PacketDisplayEntityPart part : new HashSet<>(groupParts.values())){
             (part).removeFromGroup(true);
         }
+
         activeAnimators.clear();
         masterPart = null;
     }

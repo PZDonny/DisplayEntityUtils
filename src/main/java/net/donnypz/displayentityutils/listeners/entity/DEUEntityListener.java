@@ -10,6 +10,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
@@ -17,11 +18,13 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayState
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -31,6 +34,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
+import java.util.function.Predicate;
 
 @ApiStatus.Internal
 public final class DEUEntityListener implements Listener, PacketListener {
@@ -61,10 +65,24 @@ public final class DEUEntityListener implements Listener, PacketListener {
 
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerTeleport(@NotNull PlayerChangedWorldEvent e){
-        DEUUser user = DEUUser.getOrCreateUser(e.getPlayer());
-        user.refreshTrackedPacketEntities(e.getPlayer());
+    @EventHandler(priority = EventPriority.LOW)
+    public void onPlayerChangeWorld(@NotNull PlayerChangedWorldEvent e){
+        Player player = e.getPlayer();
+
+        Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+            DEUUser user = DEUUser.getOrCreateUser(player);
+            user.resetTrackedPacketParts(player);
+
+            for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(player.getWorld())){
+                if (!pg.isAutoShow()) continue;
+                Predicate<Player> condition = pg.getAutoShowCondition();
+                if (condition != null && !condition.test(player)) continue;
+                pg.showToPlayer(player, GroupSpawnedEvent.SpawnReason.PLAYER_SWITCH_WORLD);
+
+                //Entity vehicle = pg.getVehicle();
+                //PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).updateGlobalPassengers(true, vehicle.getEntityId(), player);
+            }
+        });
     }
 
     //============Mythic====================
