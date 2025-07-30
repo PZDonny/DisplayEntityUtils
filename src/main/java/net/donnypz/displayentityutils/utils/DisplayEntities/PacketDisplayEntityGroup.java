@@ -36,7 +36,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     int interactionCount;
     int[] passengerIds;
     UUID vehicleUUID;
-    final boolean autoShow;
+    boolean autoShow;
     Predicate<Player> autoShowCondition;
 
 
@@ -278,10 +278,29 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         });
     }
 
+    /**
+     * Set the location of this group. If the teleport changes worlds, the group will automatically be hidden from players in the old world
+     * @param location the location
+     * @param pivotInteractions whether interaction entities should be pivoted
+     */
+    public void teleportSafe(@NotNull Location location, boolean pivotInteractions){
+        Location oldLoc = getLocation();
+        if (oldLoc != null && !location.getWorld().equals(oldLoc.getWorld())){
+            hide();
+            changeWorld(location.getWorld());
+        }
+        for (PacketDisplayEntityPart part : groupParts.values()){
+            if (part.isMaster){
+                part.teleport(location);
+            }
+            part.setRotation(location.getPitch(), location.getYaw(), pivotInteractions);
+        }
+    }
 
     /**
      * Set the location of this group. The group should be hidden first with {@link #hide()} if being teleported to a different world.
      * @param location the location
+     * @param pivotInteractions whether interaction entities should be pivoted
      */
     public void teleport(@NotNull Location location, boolean pivotInteractions){
         Location oldLoc = getLocation();
@@ -378,14 +397,14 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
     @Override
     public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
-        if (getMasterPart().isTrackedBy(player)){
+        if (masterPart.isTrackedBy(player)){
             PlayerDisplayAnimationExecutor.setGroupToFrame(player, this, animation, frame);
         }
     }
 
     @Override
     public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
-        if (getMasterPart().isTrackedBy(player)){
+        if (masterPart.isTrackedBy(player)){
             PlayerDisplayAnimationExecutor.setGroupToFrame(player, this, animation, frame, duration, delay);
         }
     }
@@ -396,7 +415,32 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      */
     @Override
     public @Nullable String getWorldName(){
-        return getMasterPart().getWorldName();
+        if (masterPart == null) return null;
+        return masterPart.getWorldName();
+    }
+
+    /**
+     * Set whether this group should automatically handle revealing itself to players after they switch worlds
+     * @param autoShow whether the group should autoShow
+     *
+     */
+    public void setAutoShow(boolean autoShow){
+        this.autoShow = autoShow;
+    }
+
+    /**
+     * Set whether this group should automatically handle revealing itself to players after they switch worlds and set
+     * a condition that will be tested, determining if the group should be shown to a player
+     * <br><br>
+     * The condition is tested on a player whenever they switch worlds. If the given predicate returns false,
+     * the group must manually be shown to the player. If true, the group will be shown.
+     * @param autoShow whether the group should autoShow
+     * @param playerCondition the condition checked for every player.
+     *
+     */
+    public void setAutoShow(boolean autoShow, @Nullable Predicate<Player> playerCondition){
+        this.autoShow = autoShow;
+        this.autoShowCondition = playerCondition;
     }
 
     /**
@@ -408,7 +452,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     /**
-     * Set a condition that will be checked when determining if a group should be automatically shown to a player.
+     * Set a condition that will be checked when determining if a group should be automatically shown to a player after they switch worlds.
      * <br><br>
      * The condition is tested on a player whenever they switch worlds. If the given predicate returns false,
      * the group must manually be shown to the player. If true, the group will be shown.
