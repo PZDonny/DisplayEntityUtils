@@ -44,9 +44,15 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         this.tag = tag;
     }
 
-    public static @NotNull Set<PacketDisplayEntityGroup> getGroups(World world){
+    public static @NotNull Set<PacketDisplayEntityGroup> getGroups(@NotNull World world){
         Set<PacketDisplayEntityGroup> groups = allPacketGroups.get(world.getName());
         return groups != null ? new HashSet<>(groups) : new HashSet<>();
+    }
+
+    @ApiStatus.Internal
+    public static void removeWorld(@NotNull World world){
+        //Viewers are already removed since this is only called on unloaded worlds (Viewers are forced to a new world)
+        allPacketGroups.remove(world.getName());
     }
 
     void changeWorld(World world){
