@@ -254,15 +254,6 @@ public class PartFilter implements Serializable, Cloneable {
         return includeBlockTypes;
     }
 
-    /**
-     * Create a {@link MultiPartSelection} from this filter
-     * @param group the group to create a selection from
-     * @return a {@link MultiPartSelection}
-     */
-    public @NotNull MultiPartSelection toPartSelection(@NotNull ActiveGroup group){
-        return group.createPartSelection(this);
-    }
-
 
     /**
      * Create a copy of this {@link PartFilter}
