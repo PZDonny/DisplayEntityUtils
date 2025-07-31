@@ -11,29 +11,29 @@ import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
-class GroupSelectCMD extends PlayerSubCommand {
-    GroupSelectCMD(@NotNull DEUSubCommand parentSubCommand) {
+class GroupSelectNearestCMD extends PlayerSubCommand {
+    GroupSelectNearestCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("selectnearest", parentSubCommand, Permission.GROUP_SELECT);
     }
 
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 3) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a number for the distance to select interaction entities", NamedTextColor.RED)));
-            player.sendMessage(Component.text("/mdis group selectnearest <interaction-distance>", NamedTextColor.GRAY));
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a number for the distance to search for the nearest group", NamedTextColor.RED)));
+            player.sendMessage(Component.text("/mdis group selectnearest <distance>", NamedTextColor.GRAY));
             return;
         }
 
         try {
-            double interactionDistance = Double.parseDouble(args[2]);
-            GroupResult result = DisplayGroupManager.getSpawnedGroupNearLocation(player.getLocation(), 2.5f, player);
+            double searchDistance = Double.parseDouble(args[2]);
+            if (searchDistance <= 0 ) throw new NumberFormatException();
+            GroupResult result = DisplayGroupManager.getSpawnedGroupNearLocation(player.getLocation(), searchDistance, player);
             if (result == null || result.group() == null){
                 return;
             }
@@ -48,7 +48,7 @@ class GroupSelectCMD extends PlayerSubCommand {
                 return;
             }
 
-            group.getUnaddedInteractionEntitiesInRange(interactionDistance, true);
+            group.getUnaddedInteractionEntitiesInRange(searchDistance, true);
             int selectDuration = 50;
             group.glowAndOutline(player, selectDuration);
             new BukkitRunnable(){
@@ -56,7 +56,7 @@ class GroupSelectCMD extends PlayerSubCommand {
                 int iteration = 0;
                 @Override
                 public void run() {
-                    if (iteration == maxIterations){
+                    if (iteration == maxIterations || !group.isSpawned()){
                         cancel();
                         return;
                     }
@@ -75,7 +75,7 @@ class GroupSelectCMD extends PlayerSubCommand {
                 player.sendMessage(Component.text("Your previewed points have been despawned since you have changed your selected group", NamedTextColor.GRAY, TextDecoration.ITALIC));
             }
         } catch (NumberFormatException e) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a number for the distance to select interaction entities", NamedTextColor.RED)));
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a positive number for the distance to select interaction entities", NamedTextColor.RED)));
         }
     }
 }

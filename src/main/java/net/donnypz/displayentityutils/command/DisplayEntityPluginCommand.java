@@ -72,7 +72,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
 
     public static void noGroupSelection(Player player){
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You have not selected a spawned display entity group!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/mdis group selectnearest <interaction-distance>", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("/mdis group selectnearest <distance>", NamedTextColor.GRAY));
     }
 
     public static void noPartSelection(Player player){
@@ -186,7 +186,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                 case "group" -> {
                     switch (args[1].toLowerCase()){
                         case "selectnearest" -> {
-                            suggestions.add("<interaction-distance>");
+                            suggestions.add("<distance>");
                         }
                         case "glowcolor" -> {
                             addColors(suggestions);

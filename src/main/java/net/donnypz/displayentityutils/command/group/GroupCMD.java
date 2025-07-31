@@ -9,7 +9,7 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
 
     public GroupCMD(){
         super(Permission.HELP, new GroupHelpCMD());
-        new GroupSelectCMD(this);
+        new GroupSelectNearestCMD(this);
         new GroupDeselectCMD(this);
         new GroupSaveCMD(this);
         new GroupToPacketCMD(this);
@@ -67,7 +67,7 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         if (page <= 1){
             CMDUtils.sendCMD(sender, "/mdis group help <page-number>", "Get help for groups");
-            CMDUtils.sendCMD(sender, "/mdis group selectnearest <interaction-distance>", "Select the nearest model group and distance to search for interactions");
+            CMDUtils.sendCMD(sender, "/mdis group selectnearest <distance>", "Select the nearest group within the given distance");
             CMDUtils.sendCMD(sender, "/mdis group deselect", "Clear your group selection");
             CMDUtils.sendCMD(sender, "/mdis group info", "List information about your selected group");
             CMDUtils.sendCMD(sender, "/mdis group spawn <group-tag> <storage>", "Spawn a saved DisplayEntityGroup from a storage location");
@@ -82,7 +82,6 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group addtarget", "Add a targeted interaction entity to your group");
             CMDUtils.sendCMD(sender, "/mdis group ungroupinteractions", "Remove all interactions from your group");
             CMDUtils.sendCMD(sender, "/mdis group settag <group-tag>", "Set this group's tag, or identifier");
-
         }
         else if (page == 3){
             CMDUtils.sendCMD(sender, "/mdis group yaw <yaw> [-pivot]","Set your selected group's yaw, \"-pivot\" pivots interaction entities around the group");
