@@ -1,22 +1,22 @@
-package net.donnypz.displayentityutils.command.group;
+package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
-class GroupUnmarkPacketGroupsCMD extends PlayerSubCommand {
-    GroupUnmarkPacketGroupsCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("unmarkpacketgroups", parentSubCommand, Permission.GROUP_MARK_PACKET_GROUPS);
+class HidePointsCMD extends PlayerSubCommand {
+    HidePointsCMD() {
+        super(Permission.HELP, false);
     }
 
     @Override
     public void execute(Player player, String[] args) {
+        if (!DEUCommandUtils.isViewingRelativePoints(player)){
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You are not viewing any points!", NamedTextColor.RED)));
+            return;
+        }
         DEUCommandUtils.removeRelativePoints(player);
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Removed all visible points!", NamedTextColor.GREEN)));
     }

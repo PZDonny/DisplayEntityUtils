@@ -50,7 +50,6 @@ public class DEUCommandUtils {
     @ApiStatus.Internal
     public static void spawnFramePointDisplays(SpawnedDisplayEntityGroup group, Player player, SpawnedDisplayAnimationFrame frame){
         if (stopIfViewing(player)){
-            player.sendMessage(Component.text("| Run \"/mdis anim cancelpoints\" to stop viewing points", NamedTextColor.GRAY));
             return;
         }
 
@@ -67,14 +66,12 @@ public class DEUCommandUtils {
             displays.add(pd);
         }
         setDisplays(player, displays);
-        player.sendMessage(Component.text("| Run \"/mdis anim cancelpoints\" to stop viewing points", NamedTextColor.GRAY));
     }
 
 
     @ApiStatus.Internal
     public static void spawnChunkPacketGroupPoints(Chunk chunk, Player player){
         if (stopIfViewing(player)){
-            player.sendMessage(Component.text("| Run \"/mdis group unmarkpacketgroups\" to stop viewing points", NamedTextColor.GRAY));
             return;
         }
 
@@ -84,25 +81,24 @@ public class DEUCommandUtils {
             return;
         }
 
-        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Showing all stored packet-based groups in this chunk as points!")));
-
         Set<RelativePointDisplay> displays = new HashSet<>();
         for (DisplayGroupManager.ChunkPacketGroupInfo info : infos){
             ChunkPacketGroupDisplay display = new ChunkPacketGroupDisplay(player, info);
             displays.add(display);
         }
         setDisplays(player, displays);
-        player.sendMessage(Component.text("| Run \"/mdis group unmarkpacketgroups\" to stop viewing points", NamedTextColor.GRAY));
     }
 
     private static void setDisplays(Player player, Set<RelativePointDisplay> displays){
         relativePointDisplays.put(player.getUniqueId(), displays);
         player.sendMessage(Component.text("Left click a point to select it", NamedTextColor.YELLOW));
+        player.sendMessage(Component.text("| Run \"/mdis hidepoints\" to stop viewing points", NamedTextColor.GRAY));
     }
 
     private static boolean stopIfViewing(Player player){
         if (isViewingRelativePoints(player)) {
             player.sendMessage(Component.text("You are already viewing points!", NamedTextColor.RED));
+            player.sendMessage(Component.text("| Run \"/mdis hidepoints\" to stop viewing points", NamedTextColor.GRAY));
             return true;
         }
         return false;

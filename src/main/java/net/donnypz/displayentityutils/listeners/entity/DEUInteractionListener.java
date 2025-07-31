@@ -22,6 +22,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Interaction;
@@ -77,6 +78,8 @@ public class DEUInteractionListener implements Listener, PacketListener {
                 player.sendMessage(Component.empty());
                 player.sendMessage(Component.text("-------=Point Info=-------", NamedTextColor.AQUA, TextDecoration.BOLD));
                 pointDisplay.sendInfo(player);
+                player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Sneak+Right Click</gray> <red>to DELETE"));
+                player.sendMessage(Component.text("| Run \"/mdis hidepoints\" to stop viewing points", NamedTextColor.GRAY));
                 DEUCommandUtils.selectRelativePoint(player, pointDisplay);
                 return;
             }

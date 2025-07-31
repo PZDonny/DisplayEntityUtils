@@ -7,6 +7,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -20,7 +21,7 @@ public class ChunkPacketGroupDisplay extends RelativePointDisplay{
     String worldName;
     String groupTag;
     ChunkPacketGroupDisplay(Player player, DisplayGroupManager.ChunkPacketGroupInfo info) {
-        super(player, info.location(), null, Material.ORANGE_CONCRETE);
+        super(player, getPitchCorrectedLocation(info.location()), null, Material.ORANGE_CONCRETE);
         this.id = info.id();
         this.chunkKey = info.location().getChunk().getChunkKey();
         this.worldName = info.location().getWorld().getName();
@@ -43,9 +44,14 @@ public class ChunkPacketGroupDisplay extends RelativePointDisplay{
         player.sendMessage(Component.text("ID: "+id, NamedTextColor.YELLOW));
         player.sendMessage(Component.text("Chunk Key: "+chunkKey, NamedTextColor.YELLOW));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: "+(groupTag == null ? "<red>NOT SET" : "<yellow>"+groupTag)));
-        player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Sneak+Right Click</gray> <red>to DELETE"));
     }
 
     @Override
     public void rightClick(Player player) {}
+
+    private static Location getPitchCorrectedLocation(Location location){
+        Location newLoc = location.clone();
+        newLoc.setPitch(0);
+        return newLoc;
+    }
 }

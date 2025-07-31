@@ -14,7 +14,6 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         new GroupSaveCMD(this);
         new GroupToPacketCMD(this);
         new GroupMarkPacketGroupsCMD(this);
-        new GroupUnmarkPacketGroupsCMD(this);
         new GroupDeleteCMD(this);
         new GroupSpawnCMD(this);
         new GroupDespawnCMD(this);
@@ -80,7 +79,6 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group topacket [-confirm] [-keep]", "Make your selected group packet-based, making it unselectable. \"-confirm\" confirms the action."+
                     " \"-keep\" keeps the non-packet based version of your group spawned.");
             CMDUtils.sendCMD(sender, "/mdis group markpacketgroups", "Create markers for all packet groups stored in your current chunk");
-            CMDUtils.sendCMD(sender, "/mdis group unmarkpacketgroups", "Hide markers for stored packet groups in your current chunk");
             CMDUtils.sendCMD(sender, "/mdis group addtarget", "Add a targeted interaction entity to your group");
             CMDUtils.sendCMD(sender, "/mdis group ungroupinteractions", "Remove all interactions from your group");
             CMDUtils.sendCMD(sender, "/mdis group settag <group-tag>", "Set this group's tag, or identifier");
