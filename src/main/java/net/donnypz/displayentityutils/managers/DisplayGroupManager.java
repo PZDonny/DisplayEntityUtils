@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.managers;
 
+import com.google.gson.Gson;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupUnregisteredEvent;
 import net.donnypz.displayentityutils.events.GroupRegisteredEvent;
@@ -11,7 +12,10 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.*;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.*;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipException;
 
 public final class DisplayGroupManager {
@@ -584,6 +589,150 @@ public final class DisplayGroupManager {
             default -> {
                 return new ArrayList<>();
             }
+        }
+    }
+
+    public static boolean addChunkPacketGroup(@NotNull Location location, @NotNull DisplayEntityGroup displayEntityGroup){
+        Chunk c = location.getChunk();
+        PersistentDataContainer pdc = c.getPersistentDataContainer();
+        Gson gson = new Gson();
+        List<String> list = getChunkList(pdc);
+        int id;
+        if (list.isEmpty()){
+            id = 1;
+        }
+        else{
+            id = gson.fromJson(list.getLast(), ChunkPacketGroup.class).id+1;
+        }
+        ChunkPacketGroup cpg = ChunkPacketGroup.create(id, location, displayEntityGroup);
+        if (cpg == null) return false;
+
+        String json = gson.toJson(cpg);
+        list.add(json);
+        pdc.set(DisplayEntityPlugin.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
+        displayEntityGroup.createPacketGroup(location, true, true).setChunkPacketGroupId(id);
+        return true;
+    }
+
+    public static boolean removeChunkPacketGroup(@NotNull Chunk chunk, int id, String groupTag){
+        List<String> list = getChunkList(chunk.getPersistentDataContainer());
+        Gson gson = new Gson();
+        for (int i = 0; i < list.size(); i++){
+            String json = list.get(i);
+            ChunkPacketGroup cpg = gson.fromJson(json, ChunkPacketGroup.class);
+            if (cpg == null) continue;
+            if (cpg.id == id && Objects.equals(cpg.groupTag, groupTag)){
+                list.remove(json);
+                chunk.getPersistentDataContainer().set(DisplayEntityPlugin.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
+                Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+                   for (PacketDisplayEntityGroup g : PacketDisplayEntityGroup.getGroups(chunk)){
+                       if (g.getChunkPacketGroupId() == id){
+                           g.unregister();
+                           return;
+                       }
+                   }
+                });
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void removeChunkPacketGroups(@NotNull Chunk chunk){
+        chunk.getPersistentDataContainer().remove(DisplayEntityPlugin.getChunkPacketGroupsKey());
+    }
+
+    @ApiStatus.Internal
+    public static void spawnChunkPacketGroups(@NotNull Chunk chunk){
+        List<String> list = getChunkList(chunk.getPersistentDataContainer());
+        Gson gson = new Gson();
+        for (String json : list){
+            ChunkPacketGroup cpg = gson.fromJson(json, ChunkPacketGroup.class);
+            cpg.spawn(chunk).setChunkPacketGroupId(cpg.id);
+        }
+    }
+
+    private static List<String> getChunkList(PersistentDataContainer pdc){
+        List<String> list = pdc.get(DisplayEntityPlugin.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings());
+        return list == null ? new ArrayList<>() : new ArrayList<>(list);
+    }
+
+    @ApiStatus.Internal
+    public static List<ChunkPacketGroupInfo> getChunkPacketGroupInfo(Chunk chunk){
+        Gson gson = new Gson();
+        List<ChunkPacketGroupInfo> info = new ArrayList<>();
+        for (String json : getChunkList(chunk.getPersistentDataContainer())){
+            ChunkPacketGroup cpg = gson.fromJson(json, ChunkPacketGroup.class);
+            if (cpg == null) continue;
+            info.add(new ChunkPacketGroupInfo(cpg.getLocation(chunk), cpg.groupTag, cpg.id));
+        }
+        return info;
+    }
+
+    public record ChunkPacketGroupInfo(Location location, String groupTag, int id){}
+
+
+    static class ChunkPacketGroup{
+        int id;
+        double x;
+        double y;
+        double z;
+        float yaw;
+        float pitch;
+        String groupBase64;
+        String groupTag;
+
+        private ChunkPacketGroup(){}
+
+        static ChunkPacketGroup create(int id, Location location, DisplayEntityGroup group){
+            ChunkPacketGroup cpg = new ChunkPacketGroup();
+            cpg.id = id;
+            cpg.x = location.x();
+            cpg.y = location.y();
+            cpg.z = location.z();
+            cpg.yaw = location.getYaw();
+            cpg.pitch = location.getPitch();
+            cpg.groupTag = group.getTag();
+            try{
+                ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+                GZIPOutputStream gzipOut = new GZIPOutputStream(byteOut);
+                ObjectOutputStream objOut = new ObjectOutputStream(gzipOut);
+                objOut.writeObject(group);
+
+                gzipOut.close();
+                objOut.close();
+
+                cpg.groupBase64 = Base64.getEncoder().encodeToString(byteOut.toByteArray());
+
+                byteOut.close();
+            }
+            catch(IOException e){
+                return null;
+            }
+            return cpg;
+        }
+
+
+        Location getLocation(Chunk chunk){
+            World w = chunk.getWorld();
+            return new Location(w, x, y, z, yaw, pitch);
+        }
+
+        DisplayEntityGroup getGroup(){
+            byte[] groupBytes = Base64.getDecoder().decode(groupBase64);
+            try(ByteArrayInputStream stream = new ByteArrayInputStream(groupBytes)){
+                return DisplayGroupManager.getGroup(stream);
+            }
+            catch(IOException e){
+                return null;
+            }
+        }
+
+        public PacketDisplayEntityGroup spawn(Chunk chunk){
+            Location spawnLoc = getLocation(chunk);
+            DisplayEntityGroup g = getGroup();
+            if (spawnLoc == null || g == null) return null;
+            return g.createPacketGroup(spawnLoc, true, true);
         }
     }
 }

@@ -22,7 +22,6 @@ public class FramePointDisplay extends RelativePointDisplay{
     @Override
     public void leftClick(@NotNull Player player) {
         getRelativePoint().sendInfo(player);
-        player.playSound(player, Sound.ENTITY_ITEM_FRAME_PLACE, 1, 1);
     }
 
     @Override

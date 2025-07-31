@@ -58,6 +58,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     private static NamespacedKey spawnAnimationKey;
     private static NamespacedKey spawnAnimationTypeKey;
     private static NamespacedKey spawnAnimationLoadMethodKey;
+    private static NamespacedKey chunkPacketGroupsKey;
 
     private static final String legacyPartTagPrefix = "deu.parttag_";
     static boolean isMongoEnabled = false;
@@ -130,6 +131,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         spawnAnimationKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimation");
         spawnAnimationTypeKey = new NamespacedKey(this, "spawnanimationtype");
         spawnAnimationLoadMethodKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimationloader");
+        chunkPacketGroupsKey = new NamespacedKey(this, "chunkpacketgroups");
     }
 
     private void initializeDependencies(){
@@ -224,6 +226,10 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     public static NamespacedKey getSpawnAnimationLoadMethodKey() {
         return spawnAnimationLoadMethodKey;
+    }
+
+    public static NamespacedKey getChunkPacketGroupsKey() {
+        return chunkPacketGroupsKey;
     }
 
     public static DisplayEntityPlugin getInstance(){

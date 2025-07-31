@@ -201,6 +201,9 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                         case "ride", "dismount" -> {
                             return null;
                         }
+                        case "topacket" -> {
+                            suggestions.add("-confirm");
+                        }
                     }
                 }
                 case "anim" -> {
@@ -291,6 +294,9 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                 }
                 else if (args[1].equalsIgnoreCase("dismount")){
                     return null;
+                }
+                else if (args[1].equalsIgnoreCase("topacket")){
+                    suggestions.add("-keep");
                 }
             }
             else if (args[0].equalsIgnoreCase("anim")){

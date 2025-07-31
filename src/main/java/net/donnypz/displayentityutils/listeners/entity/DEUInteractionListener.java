@@ -166,7 +166,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
                     boolean result = point.removeFromPointHolder();
                     DEUCommandUtils.removeRelativePoint(p, point);
                     if (result){
-                        p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully removed point from frame!", NamedTextColor.YELLOW)));
+                        p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully removed point!", NamedTextColor.YELLOW)));
                         point.despawn();
                     }
                     else{

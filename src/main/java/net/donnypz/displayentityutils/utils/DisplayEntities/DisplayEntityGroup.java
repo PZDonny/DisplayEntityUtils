@@ -259,7 +259,7 @@ public final class DisplayEntityGroup implements Serializable{
     public @NotNull PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation, boolean playSpawnAnimation, boolean autoShow){
         PacketDisplayEntityGroup packetGroup = new PacketDisplayEntityGroup(tag);
 
-        packetGroup.changeWorld(spawnLocation.getWorld());
+        packetGroup.updateChunkAndWorld(spawnLocation);
         PacketDisplayEntityPart masterPart = masterEntity.createPacketPart(packetGroup, spawnLocation);
         masterPart.isMaster = true; //for parts in old models that do not contain pdc data / part uuids
         packetGroup.addPart(masterPart);
