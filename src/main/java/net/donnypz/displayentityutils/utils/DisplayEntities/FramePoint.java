@@ -387,8 +387,6 @@ public class FramePoint extends RelativePoint implements Serializable {
 
     @ApiStatus.Internal
     public void sendInfo(Player player){
-        player.sendMessage(Component.empty());
-        player.sendMessage(Component.text("-------=Point Info=-------", NamedTextColor.AQUA, TextDecoration.BOLD));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Tag: <yellow>"+tag));
 
         //Particles

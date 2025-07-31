@@ -96,7 +96,7 @@ public abstract class RelativePointDisplay {
 
     public abstract RelativePoint getRelativePoint();
 
-    public abstract void leftClick(Player player);
+    public abstract void sendInfo(Player player);
 
     public abstract void rightClick(Player player);
 

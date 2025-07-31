@@ -74,7 +74,9 @@ public class DEUInteractionListener implements Listener, PacketListener {
 
             //Left Click Action
             if (clickType == InteractionClickEvent.ClickType.LEFT){
-                pointDisplay.leftClick(player);
+                player.sendMessage(Component.empty());
+                player.sendMessage(Component.text("-------=Point Info=-------", NamedTextColor.AQUA, TextDecoration.BOLD));
+                pointDisplay.sendInfo(player);
                 DEUCommandUtils.selectRelativePoint(player, pointDisplay);
                 return;
             }

@@ -39,9 +39,7 @@ public class ChunkPacketGroupDisplay extends RelativePointDisplay{
     }
 
     @Override
-    public void leftClick(Player player) {
-        player.sendMessage(Component.empty());
-        player.sendMessage(Component.text("-------=Point Info=-------", NamedTextColor.AQUA, TextDecoration.BOLD));
+    public void sendInfo(Player player) {
         player.sendMessage(Component.text("ID: "+id, NamedTextColor.YELLOW));
         player.sendMessage(Component.text("Chunk Key: "+chunkKey, NamedTextColor.YELLOW));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: "+(groupTag == null ? "<red>NOT SET" : "<yellow>"+groupTag)));
