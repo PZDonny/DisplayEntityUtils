@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.managers;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
@@ -15,6 +16,7 @@ import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 public class DEUUser {
     static final HashMap<UUID, DEUUser> users = new HashMap<>();
@@ -182,6 +184,23 @@ public class DEUUser {
         if (trackedPacketEntities.isEmpty()) return;
         for (PacketDisplayEntityPart part : new HashSet<>(trackedPacketEntities)){
             part.hideFromPlayer(player, this);
+        }
+    }
+
+    public void revealAutoShowPacketGroups(){
+        Player player = Bukkit.getPlayer(userUUID);
+        if (player == null || !player.isOnline()){
+            return;
+        }
+        World world = player.getWorld();
+        for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(world)){
+            if (!pg.isAutoShow()) continue;
+            Predicate<Player> condition = pg.getAutoShowCondition();
+            if (condition != null && !condition.test(player)) continue;
+            pg.showToPlayer(player, GroupSpawnedEvent.SpawnReason.PLAYER_SWITCH_WORLD);
+
+            //Entity vehicle = pg.getVehicle();
+            //PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).updateGlobalPassengers(true, vehicle.getEntityId(), player);
         }
     }
 
