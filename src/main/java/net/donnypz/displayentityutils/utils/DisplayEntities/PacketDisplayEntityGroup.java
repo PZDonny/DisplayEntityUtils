@@ -648,7 +648,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     public void unregister(){
-        hideFromPlayers(getTrackingPlayers());
         String worldName = getWorldName();
         if (worldName != null){
             WorldData data = allPacketGroups.get(worldName);
