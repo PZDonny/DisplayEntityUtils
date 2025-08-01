@@ -119,7 +119,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
-        viewers.add(player.getUniqueId());
+        if (!viewers.add(player.getUniqueId())){  //Already viewing
+            return;
+        }
         DEUUser.getOrCreateUser(player).trackPacketEntity(this);
         attributeContainer.sendEntity(type, getEntityId(), player, getLocation());
     }
@@ -145,11 +147,15 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (packetLocation == null){
             throw new RuntimeException("Location must be set for packet-based part before showing it to players.");
         }
+        Collection<Player> plrs = new HashSet<>(players);
         for (Player player : players){
-            viewers.add(player.getUniqueId());
+            if (!viewers.add(player.getUniqueId())){ //Already viewing
+                plrs.remove(player);
+                continue;
+            }
             DEUUser.getOrCreateUser(player).trackPacketEntity(this);
         }
-        attributeContainer.sendEntityUsingPlayers(type, getEntityId(), players, getLocation());
+        attributeContainer.sendEntityUsingPlayers(type, getEntityId(), plrs, getLocation());
     }
 
     /**
@@ -172,18 +178,16 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void hideFromPlayer(@NotNull Player player) {
-        if (player.isConnected()){
+        if (viewers.remove(player.getUniqueId())){ //Was present and removed
             PacketUtils.hideEntity(player, getEntityId());
+            DEUUser.getOrCreateUser(player).untrackPacketEntity(this);
         }
-        viewers.remove(player.getUniqueId());
-        DEUUser.getOrCreateUser(player).untrackPacketEntity(this);
+
     }
 
     @ApiStatus.Internal
     public void hideFromPlayer(@NotNull Player player, DEUUser user) {
-        if (player.isConnected()){
-            PacketUtils.hideEntity(player, getEntityId());
-        }
+        PacketUtils.hideEntity(player, getEntityId());
         viewers.remove(player.getUniqueId());
         user.untrackPacketEntity(this);
         DEUUser.getOrCreateUser(player).untrackPacketEntity(this);
@@ -195,10 +199,11 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void hideFromPlayers(@NotNull Collection<Player> players) {
-        PacketUtils.hideEntity(players, getEntityId());
         for (Player p : players){
-            viewers.remove(p.getUniqueId());
-            DEUUser.getOrCreateUser(p).untrackPacketEntity(this);
+            if (viewers.remove(p.getUniqueId())){ //Was present and removed
+                PacketUtils.hideEntity(p, getEntityId());
+                DEUUser.getOrCreateUser(p).untrackPacketEntity(this);
+            }
         }
     }
 
@@ -284,9 +289,15 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
             return null;
         }
+        if (group == null) return null;
         return getInteractionTranslation(group.getLocation());
     }
 
+    /**
+     * Get the Interaction's translation vector relative to a location
+     * @param referenceLocation the reference location
+     * @return A vector or null if the part is not an interaction
+     */
     public Vector getInteractionTranslation(@NotNull Location referenceLocation){
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
             return null;

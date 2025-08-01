@@ -279,9 +279,9 @@ public abstract class ActivePart implements Active{
     public abstract void setAttributes(@NotNull DisplayAttributeMap attributeMap);
 
     /**
-     * Get the interaction translation of this part, relative to its
+     * Get the interaction translation of this part, relative to its group's location
      * group's location <bold><u>only</u></bold> if the part's type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.
-     * @return a vector or null if the part is not an interaction
+     * @return a vector or null if the part is not an interaction or the part is ungrouped
      */
     public abstract @Nullable Vector getInteractionTranslation();
 

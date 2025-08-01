@@ -1032,6 +1032,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (type != PartType.INTERACTION) {
             return null;
         }
+        if (group == null) return null;
         return DisplayUtils.getInteractionTranslation((Interaction) getEntity(), group.getLocation());
     }
 
