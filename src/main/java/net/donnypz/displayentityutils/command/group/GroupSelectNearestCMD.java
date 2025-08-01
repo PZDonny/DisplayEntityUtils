@@ -41,14 +41,14 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
 
             boolean selectResult = DisplayGroupManager.setSelectedSpawnedGroup(player, group);
             if (selectResult){
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully selected group!", NamedTextColor.GREEN)));
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Selected the nearest group!", NamedTextColor.GREEN)));
             }
             else{
-                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to select group! Another player already has that group selected!", NamedTextColor.RED)));
+                player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to select nearest group! Another player already has that group selected!", NamedTextColor.RED)));
                 return;
             }
 
-            group.getUnaddedInteractionEntitiesInRange(searchDistance, true);
+            group.addMissingInteractionEntities(searchDistance);
             int selectDuration = 50;
             group.glowAndOutline(player, selectDuration);
             new BukkitRunnable(){
@@ -75,7 +75,7 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
                 player.sendMessage(Component.text("Your previewed points have been despawned since you have changed your selected group", NamedTextColor.GRAY, TextDecoration.ITALIC));
             }
         } catch (NumberFormatException e) {
-            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Enter a positive number for the distance to select interaction entities", NamedTextColor.RED)));
+            player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid distance! The distance must be a positive number.", NamedTextColor.RED)));
         }
     }
 }

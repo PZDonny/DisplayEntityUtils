@@ -9,6 +9,7 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
 
     public GroupCMD(){
         super(Permission.HELP, new GroupHelpCMD());
+        new GroupSelectCMD(this);
         new GroupSelectNearestCMD(this);
         new GroupDeselectCMD(this);
         new GroupSaveCMD(this);
@@ -67,14 +68,15 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
         if (page <= 1){
             CMDUtils.sendCMD(sender, "/mdis group help <page-number>", "Get help for groups");
+            CMDUtils.sendCMD(sender, "/mdis group select <distance>", "Select from nearby groups within the given distance");
             CMDUtils.sendCMD(sender, "/mdis group selectnearest <distance>", "Select the nearest group within the given distance");
             CMDUtils.sendCMD(sender, "/mdis group deselect", "Clear your group selection");
             CMDUtils.sendCMD(sender, "/mdis group info", "List information about your selected group");
             CMDUtils.sendCMD(sender, "/mdis group spawn <group-tag> <storage>", "Spawn a saved DisplayEntityGroup from a storage location");
             CMDUtils.sendCMD(sender, "/mdis group despawn", "Despawn your selected group");
-            CMDUtils.sendCMD(sender, "/mdis group save <storage-location>", "Save your selected group");
         }
         else if (page == 2){
+            CMDUtils.sendCMD(sender, "/mdis group save <storage-location>", "Save your selected group");
             CMDUtils.sendCMD(sender, "/mdis group delete <group-tag> <storage-location>", "Delete a saved group from a storage location");
             CMDUtils.sendCMD(sender, "/mdis group topacket [-confirm] [-keep]", "Make your selected group packet-based, making it unselectable. \"-confirm\" confirms the action."+
                     " \"-keep\" keeps the non-packet based version of your group spawned.");
