@@ -39,7 +39,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     UUID vehicleUUID;
     boolean autoShow;
     Predicate<Player> autoShowCondition;
-    int chunkPacketGroupId;
+    int chunkPacketGroupId = -1;
 
 
     PacketDisplayEntityGroup(String tag){
