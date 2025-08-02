@@ -13,6 +13,7 @@ public enum Permission {
     GROUP_TO_PACKET("deu.group.topacket"),
     GROUP_DELETE("deu.group.delete"),
     GROUP_MARK_PACKET_GROUPS("deu.group.markpg"),
+    GROUP_CHUNK_PACKET_GROUP_VISIBILITY("deu.group.pgvisbility"),
     GROUP_DESPAWN("deu.group.despawn"),
     GROUP_SELECT("deu.group.select"),
     GROUP_SETTAG("deu.group.settag"),
