@@ -2,14 +2,6 @@ package net.donnypz.displayentityutils.listeners.entity;
 
 import com.destroystokyo.paper.event.entity.EntityJumpEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
-import com.github.retrooper.packetevents.event.PacketListener;
-import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.Vector3f;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import com.maximde.passengerapi.events.AsyncRemovePassengerEvent;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DEUUser;
@@ -32,50 +24,10 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 @ApiStatus.Internal
-public final class DEUEntityListener implements Listener, PacketListener {
-
-    //===========Packet Events=================
-    @Override
-    public void onPacketSend(PacketSendEvent event) {
-        User user = event.getUser();
-        if (event.getPacketType() == PacketType.Play.Server.SPAWN_ENTITY){
-            WrapperPlayServerSpawnEntity packet = new WrapperPlayServerSpawnEntity(event);
-            Optional<UUID> entityUUID = packet.getUUID();
-            entityUUID.ifPresent(uuid -> {
-                Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
-                    ActiveGroup<?> group = DisplayControllerManager.getControllerGroup(uuid);
-                    if (group instanceof PacketDisplayEntityGroup pg){
-                        //pg.refreshVehicle(player);
-                    }
-                });
-
-            });
-        }
-        if (event.getPacketType() == PacketType.Play.Server.ENTITY_METADATA){
-            WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata(event);
-
-            int entityId = packet.getEntityId();
-            ActivePart part = ActivePart.getPart(entityId);
-            if (part == null) return;
-
-            UUID uuid = user.getUUID();
-            DEUUser deuUser = DEUUser.getOrCreateUser(uuid);
-            for (EntityData<?> data : packet.getEntityMetadata()){
-                if (data.getValue() instanceof Vector3f v) {
-                    if (part.isAnimatingForPlayer(Bukkit.getPlayer(uuid)) && deuUser.unsuppressIfEqual(entityId, new org.joml.Vector3f(v.x, v.y, v.z))){
-                        event.setCancelled(true);
-                        return;
-                    }
-                }
-            }
-        }
-
-    }
+public final class DEUEntityListener implements Listener {
 
     @EventHandler
     public void onRemovePassenger(AsyncRemovePassengerEvent e){
@@ -98,8 +50,7 @@ public final class DEUEntityListener implements Listener, PacketListener {
 
         Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
             DEUUser user = DEUUser.getOrCreateUser(player);
-            user.resetTrackedPacketParts(player);
-            user.revealAutoShowPacketGroups();
+            user.resetTrackedPacketParts();
         });
     }
 

@@ -53,8 +53,12 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     public static @NotNull Set<PacketDisplayEntityGroup> getGroups(@NotNull Chunk chunk){
-        WorldData data = allPacketGroups.get(chunk.getWorld().getName());
-        return data != null ? data.getGroups(chunk) : Collections.emptySet();
+        return getGroups(chunk.getWorld(), chunk.getChunkKey());
+    }
+
+    public static @NotNull Set<PacketDisplayEntityGroup> getGroups(@NotNull World world, long chunkKey){
+        WorldData data = allPacketGroups.get(world.getName());
+        return data != null ? data.getGroups(chunkKey) : Collections.emptySet();
     }
 
     @ApiStatus.Internal
@@ -707,7 +711,12 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
 
         Set<PacketDisplayEntityGroup> getGroups(Chunk chunk){
-            return new HashSet<>(worldGroups.get(chunk.getChunkKey()));
+            return getGroups(chunk.getChunkKey());
+        }
+
+        Set<PacketDisplayEntityGroup> getGroups(long chunkKey){
+            Set<PacketDisplayEntityGroup> groups = worldGroups.get(chunkKey);
+            return groups == null ? Collections.emptySet() : new HashSet<>(groups);
         }
 
         void addGroup(long chunkKey, PacketDisplayEntityGroup group){

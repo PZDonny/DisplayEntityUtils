@@ -52,7 +52,7 @@ public class GroupSpawnedEvent extends Event {
         /**
          * This is only applicable to the {@link PacketGroupSendEvent} and if a group is revealed to a player after a world switch
          */
-        PLAYER_SWITCH_WORLD,
+        PLAYER_SENT_CHUNK,
         SKRIPT,
         INTERNAL;
     }

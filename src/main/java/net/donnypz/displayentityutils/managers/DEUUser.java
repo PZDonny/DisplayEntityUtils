@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -180,28 +181,77 @@ public class DEUUser {
     }
 
     @ApiStatus.Internal
-    public void resetTrackedPacketParts(@NotNull Player player){
+    public void resetTrackedPacketParts(){
         if (trackedPacketEntities.isEmpty()) return;
+        Player player = Bukkit.getPlayer(userUUID);
         for (PacketDisplayEntityPart part : new HashSet<>(trackedPacketEntities)){
             part.worldSwitchHide(player, this);
         }
     }
 
-    public void revealAutoShowPacketGroups(){
+    @ApiStatus.Internal
+    public void hideTrackedChunkGroups(@NotNull Chunk chunk){
+        if (trackedPacketEntities.isEmpty()){
+            return;
+        }
+
         Player player = Bukkit.getPlayer(userUUID);
         if (player == null || !player.isOnline()){
             return;
         }
+
+        if (!player.getWorld().equals(chunk.getWorld())){
+            return;
+        }
+
+        for (PacketDisplayEntityGroup g : PacketDisplayEntityGroup.getGroups(chunk)){
+            if (g.isAutoShow()){
+                g.hideFromPlayer(player);
+            }
+        }
+    }
+
+    private void revealPacketGroupsInWorld(){
+        Player player = Bukkit.getPlayer(userUUID);
+        if (player == null || !player.isOnline()){
+            return;
+        }
+        
         World world = player.getWorld();
         for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(world)){
             if (!pg.isAutoShow()) continue;
             Predicate<Player> condition = pg.getAutoShowCondition();
             if (condition != null && !condition.test(player)) continue;
-            pg.showToPlayer(player, GroupSpawnedEvent.SpawnReason.PLAYER_SWITCH_WORLD);
+            pg.showToPlayer(player, GroupSpawnedEvent.SpawnReason.PLAYER_SENT_CHUNK);
 
             //Entity vehicle = pg.getVehicle();
             //PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).updateGlobalPassengers(true, vehicle.getEntityId(), player);
         }
+    }
+
+    @ApiStatus.Internal
+    public void revealPacketGroupsFromSentChunk(int x, int z){
+        Player player = Bukkit.getPlayer(userUUID);
+        if (player == null || !player.isOnline()){
+            return;
+        }
+
+        World w = player.getWorld();
+        for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(w, getChunkKey(x, z))){
+            if (!pg.isAutoShow()) continue;
+
+            Predicate<Player> condition = pg.getAutoShowCondition();
+            if (condition != null && !condition.test(player)) continue;
+
+            pg.showToPlayer(player, GroupSpawnedEvent.SpawnReason.PLAYER_SENT_CHUNK);
+
+            //Entity vehicle = pg.getVehicle();
+            //PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).updateGlobalPassengers(true, vehicle.getEntityId(), player);
+        }
+    }
+
+    private long getChunkKey(int x, int z){
+        return ((long) z << 32) | (x & 0xFFFFFFFFL); //Order is inverted
     }
 
     /**
