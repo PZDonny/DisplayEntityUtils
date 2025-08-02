@@ -186,8 +186,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @ApiStatus.Internal
-    public void hideFromPlayer(@NotNull Player player, DEUUser user) {
-        PacketUtils.hideEntity(player, getEntityId());
+    public void worldSwitchHide(@NotNull Player player, DEUUser user) {
         viewers.remove(player.getUniqueId());
         user.untrackPacketEntity(this);
         DEUUser.getOrCreateUser(player).untrackPacketEntity(this);

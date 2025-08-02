@@ -183,7 +183,7 @@ public class DEUUser {
     public void resetTrackedPacketParts(@NotNull Player player){
         if (trackedPacketEntities.isEmpty()) return;
         for (PacketDisplayEntityPart part : new HashSet<>(trackedPacketEntities)){
-            part.hideFromPlayer(player, this);
+            part.worldSwitchHide(player, this);
         }
     }
 
