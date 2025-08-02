@@ -9,6 +9,8 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
+import com.maximde.passengerapi.events.AsyncRemovePassengerEvent;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.Direction;
@@ -29,8 +31,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @ApiStatus.Internal
@@ -40,30 +43,57 @@ public final class DEUEntityListener implements Listener, PacketListener {
     @Override
     public void onPacketSend(PacketSendEvent event) {
         User user = event.getUser();
-        if (event.getPacketType() != PacketType.Play.Server.ENTITY_METADATA){
-            return;
+        if (event.getPacketType() == PacketType.Play.Server.SPAWN_ENTITY){
+            WrapperPlayServerSpawnEntity packet = new WrapperPlayServerSpawnEntity(event);
+            Optional<UUID> entityUUID = packet.getUUID();
+            entityUUID.ifPresent(uuid -> {
+                Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
+                    ActiveGroup<?> group = DisplayControllerManager.getControllerGroup(uuid);
+                    if (group instanceof PacketDisplayEntityGroup pg){
+                        //pg.refreshVehicle(player);
+                    }
+                });
+
+            });
         }
-        WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata(event);
+        if (event.getPacketType() == PacketType.Play.Server.ENTITY_METADATA){
+            WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata(event);
 
-        int entityId = packet.getEntityId();
-        ActivePart part = ActivePart.getPart(entityId);
-        if (part == null) return;
+            int entityId = packet.getEntityId();
+            ActivePart part = ActivePart.getPart(entityId);
+            if (part == null) return;
 
-        UUID uuid = user.getUUID();
-        DEUUser deuUser = DEUUser.getOrCreateUser(uuid);
-        for (EntityData<?> data : packet.getEntityMetadata()){
-            if (data.getValue() instanceof Vector3f v) {
-                if (part.isAnimatingForPlayer(Bukkit.getPlayer(uuid)) && deuUser.unsuppressIfEqual(entityId, new org.joml.Vector3f(v.x, v.y, v.z))){
-                    event.setCancelled(true);
-                    return;
+            UUID uuid = user.getUUID();
+            DEUUser deuUser = DEUUser.getOrCreateUser(uuid);
+            for (EntityData<?> data : packet.getEntityMetadata()){
+                if (data.getValue() instanceof Vector3f v) {
+                    if (part.isAnimatingForPlayer(Bukkit.getPlayer(uuid)) && deuUser.unsuppressIfEqual(entityId, new org.joml.Vector3f(v.x, v.y, v.z))){
+                        event.setCancelled(true);
+                        return;
+                    }
                 }
             }
         }
 
     }
 
+    @EventHandler
+    public void onRemovePassenger(AsyncRemovePassengerEvent e){
+        Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+            Set<Integer> passengers = e.getPassengerList();
+            for (int i : passengers){
+                ActivePart activePart = PacketDisplayEntityPart.getPart(i);
+                if (!(activePart instanceof PacketDisplayEntityPart part)) continue;
+                PacketDisplayEntityGroup group = part.getGroup();
+                if (group != null){
+                    group.unsetVehicle();
+                }
+            }
+        });
+    }
+
     @EventHandler(priority = EventPriority.LOW)
-    public void onPlayerChangeWorld(@NotNull PlayerChangedWorldEvent e){
+    public void onPlayerChangeWorld(PlayerChangedWorldEvent e){
         Player player = e.getPlayer();
 
         Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
@@ -159,7 +189,7 @@ public final class DEUEntityListener implements Listener, PacketListener {
     }
 
     private DisplayStateMachine applyState(Entity entity, MachineState.StateType stateType){
-        SpawnedDisplayEntityGroup group = DisplayControllerManager.getControllerGroup(entity);
+        ActiveGroup<?> group = DisplayControllerManager.getControllerGroup(entity);
         if (group == null){
             return null;
         }

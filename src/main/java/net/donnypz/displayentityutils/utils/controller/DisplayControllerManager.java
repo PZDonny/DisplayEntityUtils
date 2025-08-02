@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.controller;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
@@ -15,7 +16,7 @@ import java.util.UUID;
 public final class DisplayControllerManager {
 
     private static final HashMap<String, DisplayController> mythicControllers = new HashMap<>(); //Mythic Mob Id, Controller
-    private static final HashMap<UUID, SpawnedDisplayEntityGroup> activeGroups = new HashMap<>(); //Entity UUID, Groups
+    private static final HashMap<UUID, ActiveGroup<?>> activeGroups = new HashMap<>(); //Entity UUID, Groups
 
     public static final NamespacedKey controllerGroupKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "controller_group");
     public static final NamespacedKey preControllerGroupKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "mythic_persist");
@@ -39,21 +40,6 @@ public final class DisplayControllerManager {
      */
     public static void setController(String mythicMobID, DisplayController controller){
         mythicControllers.put(mythicMobID, controller);
-
-
-        //Update Existing
-        /*\\if (mythicSpawnedGroups.containsKey(mythicMobID)){
-            for (SpawnedDisplayEntityGroup g : mythicSpawnedGroups.get(mythicMobID)){
-                GroupFollowProperties properties = controller.followProperties;
-                g.setUnregisterAfterDeathDelay(properties.getUnregisterDelay());
-                g.setEntityFollowType(properties.getFollowType());
-                g.setTeleportDuration(properties.getTeleportationDuration());
-                g.pivotInteractionsWhenFollowing(properties.isPivotInteractions());
-            }
-        }
-        else{
-            mythicSpawnedGroups.put(mythicMobID, new HashSet<>());
-        }*/
     }
 
 
@@ -76,25 +62,25 @@ public final class DisplayControllerManager {
     }
 
     /**
-     * Get the controller {@link SpawnedDisplayEntityGroup} of an entity
+     * Get the controller {@link ActiveGroup} of an entity
      * @param entity
-     * @return a {@link SpawnedDisplayEntityGroup} or null
+     * @return a {@link ActiveGroup} or null
      */
-    public static @Nullable SpawnedDisplayEntityGroup getControllerGroup(@NotNull Entity entity){
+    public static @Nullable ActiveGroup<?> getControllerGroup(@NotNull Entity entity){
         return activeGroups.get(entity.getUniqueId());
     }
 
     /**
-     * Get the controller {@link SpawnedDisplayEntityGroup} of an entity by its entity UUID
+     * Get the controller {@link ActiveGroup} of an entity by its entity UUID
      * @param entityUUID
-     * @return a {@link SpawnedDisplayEntityGroup} or null
+     * @return a {@link ActiveGroup} or null
      */
-    public static @Nullable SpawnedDisplayEntityGroup getControllerGroup(@NotNull UUID entityUUID){
+    public static @Nullable ActiveGroup<?> getControllerGroup(@NotNull UUID entityUUID){
         return activeGroups.get(entityUUID);
     }
 
     /**
-     * Check if an entity has a {@link SpawnedDisplayEntityGroup} controller
+     * Check if an entity has a {@link ActiveGroup} controller
      * @param entity
      * @return a boolean
      */
@@ -103,7 +89,7 @@ public final class DisplayControllerManager {
     }
 
     /**
-     * Check if an entity has a {@link SpawnedDisplayEntityGroup} controller by its entity UUID
+     * Check if an entity has a {@link ActiveGroup} controller by its entity UUID
      * @param entityUUID
      * @return a boolean
      */
@@ -123,7 +109,7 @@ public final class DisplayControllerManager {
 
 
     @ApiStatus.Internal
-    public static void registerEntity(@NotNull Entity entity, @NotNull SpawnedDisplayEntityGroup group){
+    public static void registerEntity(@NotNull Entity entity, @NotNull ActiveGroup<?> group){
         UUID entityUUID = entity.getUniqueId();
         activeGroups.put(entityUUID, group);
     }
@@ -131,5 +117,9 @@ public final class DisplayControllerManager {
     @ApiStatus.Internal
     public static void unregisterEntity(@NotNull Entity entity){
         activeGroups.remove(entity.getUniqueId());
+    }
+
+    public static boolean isControllerEntity(@NotNull Entity entity){
+        return activeGroups.containsKey(entity.getUniqueId());
     }
 }

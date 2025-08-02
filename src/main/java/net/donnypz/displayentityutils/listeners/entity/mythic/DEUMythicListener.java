@@ -2,11 +2,10 @@ package net.donnypz.displayentityutils.listeners.entity.mythic;
 
 import io.lumine.mythic.bukkit.events.MythicMechanicLoadEvent;
 import io.lumine.mythic.bukkit.events.MythicMobSpawnEvent;
+import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
-import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
@@ -18,8 +17,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.ApiStatus;
-
-import java.util.Collection;
 
 @ApiStatus.Internal
 public final class DEUMythicListener implements Listener {
@@ -74,16 +71,15 @@ public final class DEUMythicListener implements Listener {
         }
     }
 
+
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onMythicSpawn(MythicMobSpawnEvent e){
-        Entity mythicMob = e.getEntity();
+        Entity entity = e.getEntity();
         String mobID = e.getMobType().getInternalName();
         DisplayController controller = DisplayControllerManager.getControllerOfMythicMob(mobID);
         if (controller == null){
             return;
         }
-
-        Collection<GroupFollowProperties> properties = controller.getFollowProperties();
 
         DisplayEntityGroup group = controller.getDisplayEntityGroup();
         if (group == null){
@@ -91,30 +87,60 @@ public final class DEUMythicListener implements Listener {
         }
 
         boolean persistGroupAfterRestart = e.getMob().getDespawnMode().getSavesToDisk();
-        GroupSpawnSettings settings = new GroupSpawnSettings()
-                .persistentByDefault(persistGroupAfterRestart)
-                .allowPersistenceOverride(false)
-                .visibleByDefault(controller.isVisibleByDefault(), null);
 
-        SpawnedDisplayEntityGroup spawned = group.spawn(e.getLocation(), GroupSpawnedEvent.SpawnReason.DISPLAY_CONTROLLER, settings);
-        spawned.setVerticalRideOffset(controller.getVerticalOffset());
-        spawned.rideEntity(e.getEntity());
+        ActiveGroup<?> activeGroup;
+        if (controller.isPacketBased()){
+            activeGroup = group.createPacketGroup(e.getLocation(), true);
+            ((PacketDisplayEntityGroup) activeGroup).setAutoShow(controller.isVisibleByDefault());
+        }
+        else{
+            activeGroup = group.spawn(e.getLocation(), GroupSpawnedEvent.SpawnReason.DISPLAY_CONTROLLER, new GroupSpawnSettings()
+                    .persistentByDefault(persistGroupAfterRestart)
+                    .allowPersistenceOverride(false)
+                    .visibleByDefault(controller.isVisibleByDefault(), null));
+            Entity masterEntity = ((SpawnedDisplayEntityGroup) activeGroup).getMasterPart().getEntity();
+            PersistentDataContainer pdc = masterEntity.getPersistentDataContainer();
+            pdc.set(DisplayControllerManager.controllerGroupKey, PersistentDataType.STRING, controller.getControllerID());
+        }
 
-        Entity masterEntity = spawned.getMasterPart().getEntity();
-        PersistentDataContainer pdc = masterEntity.getPersistentDataContainer();
-        pdc.set(DisplayControllerManager.controllerGroupKey, PersistentDataType.STRING, controller.getControllerID());
+        activeGroup.setVerticalRideOffset(controller.getVerticalOffset());
 
-        spawned.rideEntity(mythicMob);
-        spawned.setPitch(0);
-        for (GroupFollowProperties property : properties){
-            spawned.followEntityDirection(mythicMob, property);
+        if (DisplayEntityPlugin.isLibsDisguisesInstalled()){
+            String disg = e.getMobType().getConfig().getString("Disguise");
+            if (disg == null || disg.isBlank()){
+                activeGroup.rideEntity(entity);
+                startFollowersAndMachine(controller, activeGroup, entity);
+            }
+            else{
+                Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+                    activeGroup.rideEntity(entity);
+                    startFollowersAndMachine(controller, activeGroup, entity);
+                }, 2);
+            }
+        }
+        else{
+            activeGroup.rideEntity(entity);
+            startFollowersAndMachine(controller, activeGroup, entity);
+        }
+
+
+        activeGroup.setPitch(0);
+        DisplayControllerManager.registerEntity(entity, activeGroup);
+    }
+
+    static void startFollowersAndMachine(DisplayController controller, ActiveGroup<?> activeGroup, Entity entity){
+        for (GroupFollowProperties property : controller.getFollowProperties()){
+            activeGroup.followEntityDirection(entity, property);
         }
 
         DisplayStateMachine machine = controller.getStateMachine();
         if (machine != null){
-            machine.addGroup(spawned);
+            if (controller.isPacketBased()){
+                machine.addGroup((PacketDisplayEntityGroup) activeGroup);
+            }
+            else{
+                machine.addGroup((SpawnedDisplayEntityGroup) activeGroup);
+            }
         }
-
-        DisplayControllerManager.registerEntity(mythicMob, spawned);
     }
 }

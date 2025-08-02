@@ -90,6 +90,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     static boolean registerPluginCommands;
 
     private static boolean isMythicMobsInstalled;
+    private static boolean isLibsDisguisesInstalled;
     private static boolean isSkriptInstalled;
 
     SkriptAddon addon;
@@ -141,6 +142,8 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             Bukkit.getPluginManager().registerEvents(new DEUMythicListener(), this);
         }
 
+        //LibsDisguises
+        isLibsDisguisesInstalled = Bukkit.getPluginManager().isPluginEnabled("LibsDisguises");
 
         //Skript
         isSkriptInstalled = Bukkit.getPluginManager().isPluginEnabled("Skript");
@@ -187,6 +190,9 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         }
         if (!LocalManager.getAnimationDatapackFolder().exists()){
             LocalManager.getAnimationDatapackFolder().mkdirs();
+        }
+        if (!LocalManager.getBDEngineModelFolder().exists()){
+            LocalManager.getBDEngineModelFolder().mkdirs();
         }
         if (!LocalManager.getDisplayControllerFolder().exists()){
             LocalManager.getDisplayControllerFolder().mkdirs();
@@ -437,6 +443,14 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
      */
     public static boolean isMythicMobsInstalled() {
         return isMythicMobsInstalled;
+    }
+
+    /**
+     * Get whether LibsDisguises is installed on this server
+     * @return true if MythicMobs is present
+     */
+    public static boolean isLibsDisguisesInstalled() {
+        return isLibsDisguisesInstalled;
     }
 
     /**

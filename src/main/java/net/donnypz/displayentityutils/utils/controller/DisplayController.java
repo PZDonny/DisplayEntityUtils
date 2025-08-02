@@ -37,6 +37,7 @@ public class DisplayController {
     boolean configController;
     float verticalOffset = 0;
     boolean groupVisibleByDefault;
+    boolean isPacketBased;
 
     public DisplayController(@NotNull String controllerID) {
         this.controllerID = controllerID;
@@ -144,7 +145,7 @@ public class DisplayController {
     }
 
     /**
-     * Set the vertical offset for the {@link SpawnedDisplayEntityGroup} that will be spawned for entities using this controller.
+     * Set the vertical offset for the {@link ActiveGroup} that will be spawned for entities using this controller.
      * The value is offset from the entity's passenger position
      * @param verticalOffset
      * @return this
@@ -155,7 +156,7 @@ public class DisplayController {
     }
 
     /**
-     * Get the vertical offset this controller will apply to {@link SpawnedDisplayEntityGroup}s of entities using this controller.
+     * Get the vertical offset this controller will apply to {@link ActiveGroup}s of entities using this controller.
      * @return a float
      */
     public float getVerticalOffset() {
@@ -222,11 +223,19 @@ public class DisplayController {
     }
 
     /**
-     * Get whether the {@link SpawnedDisplayEntityGroup} created from this controller will be visible by default
+     * Get whether the {@link ActiveGroup} created from this controller will be visible by default
      * @return a boolean
      */
     public boolean isVisibleByDefault() {
         return groupVisibleByDefault;
+    }
+
+    /**
+     * Get whether the {@link ActiveGroup} created from this controller will be packet based
+     * @return a boolean
+     */
+    public boolean isPacketBased(){
+        return isPacketBased;
     }
 
     /**
@@ -296,7 +305,6 @@ public class DisplayController {
     public static @Nullable DisplayController read(@NotNull File file){
         return read(YamlConfiguration.loadConfiguration(file), file.getName(), true);
         //String fileName = file.getName().split(".yml")[0];
-
     }
 
 
@@ -350,6 +358,7 @@ public class DisplayController {
             boolean flip = groupProps.getBoolean("flip");
             controller.verticalOffset = (float) groupProps.getDouble("verticalOffset");
             controller.groupVisibleByDefault = groupProps.getBoolean("visibleByDefault", true);
+            controller.isPacketBased = groupProps.getBoolean("packetBased", false);
             //LoadMethod
             try{ //Set with Config
                 LoadMethod method = LoadMethod.valueOf(groupProps.getString("storage").toUpperCase());

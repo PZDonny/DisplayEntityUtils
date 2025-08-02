@@ -19,6 +19,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
@@ -138,12 +139,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         float largestWidth = 0;
         float largestHeight = 0;
         CullOption cullOption = DisplayEntityPlugin.autoCulling();
-        for (ActivePart p : groupParts.values()){
-            PacketDisplayEntityPart part = (PacketDisplayEntityPart) p;
+        for (PacketDisplayEntityPart p : groupParts.values()){
             //Displays
-            if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (p.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
                 DisplayAttributeMap attributeMap = new DisplayAttributeMap();
-                Transformation transformation = part.getDisplayTransformation();
+                Transformation transformation = p.getDisplayTransformation();
                 //Reset Scale then multiply by newScaleMultiplier
                 Vector3f scale = transformation.getScale();
                 scale.x = (scale.x/scaleMultiplier)*newScaleMultiplier;
@@ -156,14 +156,14 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 translationVector.y = (translationVector.y/scaleMultiplier)*newScaleMultiplier;
                 translationVector.z = (translationVector.z/scaleMultiplier)*newScaleMultiplier;
 
-                if (!transformation.equals(part.getDisplayTransformation())){
+                if (!transformation.equals(p.getDisplayTransformation())){
                     attributeMap.add(DisplayAttributes.Interpolation.DURATION, durationInTicks)
                         .add(DisplayAttributes.Interpolation.DELAY, -1)
                         .addTransformation(transformation);
                 }
                 //Culling
                 if (cullOption == CullOption.LOCAL){
-                    float[] values = part.getAutoCullValues(DisplayEntityPlugin.widthCullingAdder(), DisplayEntityPlugin.heightCullingAdder());
+                    float[] values = p.getAutoCullValues(DisplayEntityPlugin.widthCullingAdder(), DisplayEntityPlugin.heightCullingAdder());
                     attributeMap.add(DisplayAttributes.Culling.HEIGHT, values[1])
                         .add(DisplayAttributes.Culling.WIDTH, values[0]);
                 }
@@ -172,18 +172,18 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                     largestHeight = Math.max(largestHeight, scale.y);
                 }
 
-                part.attributeContainer.setAttributesAndSend(attributeMap, part.getEntityId(), part.viewers);
+                p.attributeContainer.setAttributesAndSend(attributeMap, p.getEntityId(), p.viewers);
             }
             //Interactions
             else if (scaleInteractions){
 
                 //Reset Scale then multiply by newScaleMultiplier
-                float newHeight = (part.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier;
-                float newWidth = (part.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier;
-                PacketUtils.scaleInteraction(part, newHeight, newWidth, durationInTicks, 0);
+                float newHeight = (p.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier;
+                float newWidth = (p.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier;
+                PacketUtils.scaleInteraction(p, newHeight, newWidth, durationInTicks, 0);
 
                 //Reset Translation then multiply by newScaleMultiplier
-                Vector translationVector = part.getInteractionTranslation();
+                Vector translationVector = p.getInteractionTranslation();
                 if (translationVector == null){
                     continue;
                 }
@@ -193,7 +193,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
 
                 Vector moveVector = oldVector.subtract(translationVector);
-                PacketUtils.translateInteraction(part, moveVector, moveVector.length(), durationInTicks, 0);
+                PacketUtils.translateInteraction(p, moveVector, moveVector.length(), durationInTicks, 0);
             }
         }
 
@@ -225,11 +225,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         if (verticalRideOffset == 0 || vehicleUUID == null){
             return false;
         }
-        Entity vehicle = Bukkit.getEntity(vehicleUUID);
-        if (vehicle == null || vehicle.isDead()){
-            return false;
-        }
-        return PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).getPassengers(true, vehicle.getEntityId()).contains(masterPart.getEntityId());
+        return true;
     }
 
     public boolean rideEntity(@NotNull Entity vehicle){
@@ -237,11 +233,25 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             return false;
         }
         vehicleUUID = vehicle.getUniqueId();
-        for (UUID uuid : masterPart.viewers){
-            Player p = Bukkit.getPlayer(uuid);
-            if (p == null) continue;
-            PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).addPassenger(!Bukkit.isPrimaryThread(), vehicle.getEntityId(), masterPart.getEntityId());
-        }
+        PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).addPassenger(!Bukkit.isPrimaryThread(), vehicle.getEntityId(), masterPart.getEntityId());
+        final UUID finalUUID = vehicle.getUniqueId();
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+                if (vehicleUUID != finalUUID){
+                    cancel();
+                    return;
+                }
+                Entity entity = Bukkit.getEntity(vehicleUUID);
+                if (entity == null || entity.isDead()){
+                    return;
+                }
+                updateChunkAndWorld(entity.getLocation());
+            }
+        }.runTaskTimer(DisplayEntityPlugin.getInstance(), 40, 40);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+
+        }, 20, 20);
         return true;
     }
 
@@ -249,14 +259,14 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     public @Nullable Entity dismount(){
         Entity vehicle = getVehicle();
         if (vehicle == null) return null;
-
-        for (UUID uuid : masterPart.viewers){
-            Player p = Bukkit.getPlayer(uuid);
-            if (p == null) continue;
-            PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).removePassenger(!Bukkit.isPrimaryThread(), vehicle.getEntityId(), masterPart.getEntityId());
-        }
+        PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).removePassenger(!Bukkit.isPrimaryThread(), vehicle.getEntityId(), masterPart.getEntityId());
         vehicleUUID = null;
         return vehicle;
+    }
+
+    @ApiStatus.Internal
+    public void unsetVehicle(){
+        vehicleUUID = null;
     }
 
     @Override
@@ -540,6 +550,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             part.showToPlayer(player, spawnReason);
         }
         setPassengers(player);
+        refreshVehicle(player);
     }
 
     /**
@@ -565,6 +576,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 part.showToPlayer(player, spawnReason, groupSpawnSettings);
             }
             setPassengers(player);
+            refreshVehicle(player);
         }
     }
 
@@ -572,6 +584,21 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         int masterId = masterPart.getEntityId();
         WrapperPlayServerSetPassengers passengerPacket = new WrapperPlayServerSetPassengers(masterId, passengerIds);
         PacketEvents.getAPI().getPlayerManager().sendPacketSilently(player, passengerPacket);
+    }
+
+    private void refreshVehicle(Player player){
+        if (vehicleUUID == null) return;
+        Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+            if (vehicleUUID == null) return;
+            Entity vehicle = getVehicle();
+            if (vehicle == null){
+                int vehicleId = vehicle.getEntityId();
+                Set<Integer> set = PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).getGlobalPassengers(false, vehicleId);
+                int[] passengers = set.stream().mapToInt(Integer::intValue).toArray();
+                WrapperPlayServerSetPassengers passengerPacket = new WrapperPlayServerSetPassengers(vehicleId, passengers);
+                PacketEvents.getAPI().getPlayerManager().sendPacketSilently(player, passengerPacket);
+            }
+        }, 2);
     }
 
     private boolean sendShowEvent(Collection<Player> players, GroupSpawnedEvent.SpawnReason spawnReason){
