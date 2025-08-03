@@ -2,7 +2,6 @@ package net.donnypz.displayentityutils.listeners.entity;
 
 import com.destroystokyo.paper.event.entity.EntityJumpEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
-import com.maximde.passengerapi.events.AsyncRemovePassengerEvent;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.Direction;
@@ -24,25 +23,8 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.Set;
-
 @ApiStatus.Internal
 public final class DEUEntityListener implements Listener {
-
-    @EventHandler
-    public void onRemovePassenger(AsyncRemovePassengerEvent e){
-        Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
-            Set<Integer> passengers = e.getPassengerList();
-            for (int i : passengers){
-                ActivePart activePart = PacketDisplayEntityPart.getPart(i);
-                if (!(activePart instanceof PacketDisplayEntityPart part)) continue;
-                PacketDisplayEntityGroup group = part.getGroup();
-                if (group != null){
-                    group.unsetVehicle();
-                }
-            }
-        });
-    }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerChangeWorld(PlayerChangedWorldEvent e){
@@ -123,10 +105,17 @@ public final class DEUEntityListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDeath(EntityDeathEvent e){
         applyState(e.getEntity(), MachineState.StateType.DEATH);
+        ActiveGroup<?> controllerGroup = DisplayControllerManager.getControllerGroup(e.getEntity().getUniqueId());
+        boolean controllerTranslated = false;
         //Group Vertical Offset
         for (SpawnedDisplayEntityGroup group : DisplayUtils.getGroupPassengers(e.getEntity())){
             if (group.getVerticalRideOffset() == 0) continue;
+            if (group == controllerGroup) controllerTranslated = true;
             group.translate(Direction.UP, group.getVerticalRideOffset()*-1, -1, -1);
+        }
+
+        if (!controllerTranslated && controllerGroup != null){ //Must be packet based if not found above
+            controllerGroup.dismount();
         }
     }
 
