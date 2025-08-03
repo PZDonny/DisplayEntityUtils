@@ -112,7 +112,7 @@ public final class DEUMythicListener implements Listener {
                 startFollowersAndMachine(controller, activeGroup, entity);
             }
             else{
-                Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+                Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
                     activeGroup.rideEntity(entity);
                     startFollowersAndMachine(controller, activeGroup, entity);
                 }, 2);
