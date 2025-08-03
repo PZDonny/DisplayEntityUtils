@@ -698,7 +698,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         }
     }
 
-    private static final class PacketLocation {
+    static final class PacketLocation {
 
         String worldName;
         double x;

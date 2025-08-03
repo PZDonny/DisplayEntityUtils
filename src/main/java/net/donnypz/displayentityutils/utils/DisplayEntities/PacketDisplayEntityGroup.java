@@ -75,30 +75,34 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         allPacketGroups.remove(world.getName());
     }
 
-    void updateChunkAndWorld(Location location){
-        Location oldLoc = getLocation();
-        //Remove from previous
-        if (oldLoc != null){
-            String oldWorldName = oldLoc.getWorld().getName();
-            WorldData data = allPacketGroups.get(oldWorldName);
-            if (data != null){
-                long chunkKey = oldLoc.getChunk().getChunkKey();
-                data.removeGroup(chunkKey, this);
-                if (data.worldGroups.isEmpty() && !location.getWorld().getName().equals(oldWorldName)){
-                    allPacketGroups.remove(oldWorldName);
+        void updateChunkAndWorld(Location location){
+            Location oldLoc = getLocation();
+            //Remove from previous
+            if (oldLoc != null){
+                if (location.getWorld().equals(oldLoc.getWorld()) && location.getChunk().getChunkKey() == oldLoc.getChunk().getChunkKey()){
+                   return;
+                }
+                String oldWorldName = oldLoc.getWorld().getName();
+                WorldData data = allPacketGroups.get(oldWorldName);
+                if (data != null){
+                    long chunkKey = oldLoc.getChunk().getChunkKey();
+                    data.removeGroup(chunkKey, this);
+                    if (data.worldGroups.isEmpty() && !location.getWorld().getName().equals(oldWorldName)){
+                        allPacketGroups.remove(oldWorldName);
+                    }
                 }
             }
-        }
 
-        World world = location.getWorld();
-        Chunk chunk = location.getChunk();
-        long chunkKey = chunk.getChunkKey();
-        allPacketGroups
-                .computeIfAbsent(world.getName(), key -> new WorldData())
-                .worldGroups
-                .computeIfAbsent(chunkKey, key -> new HashSet<>())
-                .add(this);
-    }
+            World world = location.getWorld();
+            Chunk chunk = location.getChunk();
+            long chunkKey = chunk.getChunkKey();
+            allPacketGroups
+                    .computeIfAbsent(world.getName(), key -> new WorldData())
+                    .addGroup(chunkKey, this);
+            if (masterPart != null){
+                masterPart.packetLocation = new PacketDisplayEntityPart.PacketLocation(location);
+            }
+        }
 
     void addPart(@NotNull PacketDisplayEntityPart part){
         if (part.partUUID == null){
@@ -243,7 +247,12 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return arr;
     }
 
+    @Override
     public boolean rideEntity(@NotNull Entity vehicle){
+        return rideEntity(vehicle, true);
+    }
+
+    public boolean rideEntity(@NotNull Entity vehicle, boolean runLocationUpdater){
         if (vehicle.isDead()){
             return false;
         }
@@ -254,21 +263,27 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             PacketEvents.getAPI().getPlayerManager().sendPacket(p, packet);
         }
 
-        final UUID finalUUID = vehicle.getUniqueId();
-        new BukkitRunnable(){
-            @Override
-            public void run() {
-                if (vehicleUUID != finalUUID){
-                    cancel();
-                    return;
+        if (runLocationUpdater){
+            final UUID finalUUID = vehicle.getUniqueId();
+            new BukkitRunnable(){
+                @Override
+                public void run() {
+                    if (vehicleUUID != finalUUID){
+                        cancel();
+                        return;
+                    }
+                    Entity entity = Bukkit.getEntity(vehicleUUID);
+                    if (entity == null){
+                        return;
+                    }
+                    if (entity.isDead()){
+                        cancel();
+                        return;
+                    }
+                    updateChunkAndWorld(entity.getLocation());
                 }
-                Entity entity = Bukkit.getEntity(vehicleUUID);
-                if (entity == null || entity.isDead()){
-                    return;
-                }
-                updateChunkAndWorld(entity.getLocation());
-            }
-        }.runTaskTimer(DisplayEntityPlugin.getInstance(), 40, 40);
+            }.runTaskTimer(DisplayEntityPlugin.getInstance(), 40, 40);
+        }
         return true;
     }
 
@@ -743,15 +758,17 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
         void addGroup(long chunkKey, PacketDisplayEntityGroup group){
             worldGroups
-                    .computeIfAbsent(chunkKey, key -> ConcurrentHashMap.newKeySet())
+                    .computeIfAbsent(chunkKey, key -> Collections.newSetFromMap(new ConcurrentHashMap<>()))
                     .add(group);
         }
 
         void removeGroup(long chunkKey, PacketDisplayEntityGroup group){
             Set<PacketDisplayEntityGroup> groups = worldGroups.get(chunkKey);
             if (groups == null) return;
-            groups.remove(group);
-            if (groups.isEmpty()) worldGroups.remove(chunkKey);
+            synchronized (groups){
+                groups.remove(group);
+                if (groups.isEmpty()) worldGroups.remove(chunkKey);
+            }
         }
     }
 }
