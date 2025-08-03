@@ -3,7 +3,6 @@ package net.donnypz.displayentityutils.listeners.entity;
 import com.destroystokyo.paper.event.entity.EntityJumpEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
@@ -15,26 +14,14 @@ import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
 public final class DEUEntityListener implements Listener {
-
-    @EventHandler(priority = EventPriority.LOW)
-    public void onPlayerChangeWorld(PlayerChangedWorldEvent e){
-        Player player = e.getPlayer();
-
-        Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
-            DEUUser user = DEUUser.getOrCreateUser(player);
-            user.resetTrackedPacketParts();
-        });
-    }
 
     //============Mythic====================
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
