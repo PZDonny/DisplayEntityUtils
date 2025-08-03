@@ -11,7 +11,7 @@ import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUInteractionListener;
 import net.donnypz.displayentityutils.listeners.entity.mythic.DEUMythicListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerChatListener;
-import net.donnypz.displayentityutils.listeners.player.DEUPlayerChunkUnloadListener;
+import net.donnypz.displayentityutils.listeners.player.DEUPlayerWorldListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerConnectionListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerPacketListener;
 import net.donnypz.displayentityutils.managers.LocalManager;
@@ -173,7 +173,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new DatapackEntitySpawned(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerChatListener(), this);
-        Bukkit.getPluginManager().registerEvents(new DEUPlayerChunkUnloadListener(), this);
+        Bukkit.getPluginManager().registerEvents(new DEUPlayerWorldListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUEntityListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
         Bukkit.getPluginManager().registerEvents(new DEUInteractionListener(), this);
