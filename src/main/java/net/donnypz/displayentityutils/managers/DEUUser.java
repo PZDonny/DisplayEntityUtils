@@ -244,9 +244,6 @@ public class DEUUser {
             if (condition != null && !condition.test(player)) continue;
 
             pg.showToPlayer(player, GroupSpawnedEvent.SpawnReason.PLAYER_SENT_CHUNK);
-
-            //Entity vehicle = pg.getVehicle();
-            //PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).updateGlobalPassengers(true, vehicle.getEntityId(), player);
         }
     }
 

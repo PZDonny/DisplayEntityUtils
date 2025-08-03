@@ -43,7 +43,6 @@ public class DEUPlayerPacketListener implements PacketListener {
                     //pg.refreshVehicle(player);
                 }
             });
-
         });
     }
 
@@ -72,6 +71,8 @@ public class DEUPlayerPacketListener implements PacketListener {
         Column column = packet.getColumn();
         UUID uuid = user.getUUID();
         DEUUser deuUser = DEUUser.getOrCreateUser(uuid);
-        deuUser.revealPacketGroupsFromSentChunk(column.getX(), column.getZ());
+        Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+            deuUser.revealPacketGroupsFromSentChunk(column.getX(), column.getZ());
+        }, 2);
     }
 }

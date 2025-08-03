@@ -719,6 +719,8 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
 
     public abstract @Nullable Entity getVehicle();
 
+    public abstract boolean isRiding();
+
     /**
      * Set the vertical translation offset of this group riding an entity. This will apply to animations
      * as long as this group is riding an entity.

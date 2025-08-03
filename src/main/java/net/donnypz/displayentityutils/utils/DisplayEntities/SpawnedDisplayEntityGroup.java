@@ -961,6 +961,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return vehicle;
     }
 
+    public boolean isRiding(){
+        return getVehicle() != null;
+    }
+
     private void alignInteractionWithMountedGroup(SpawnedDisplayEntityPart part, Entity vehicle){
         new BukkitRunnable() {
             final Interaction interaction = (Interaction) part.getEntity();
@@ -1000,7 +1004,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             return getMasterEntity().getVehicle();
         }
         catch(NullPointerException e){
-            e.printStackTrace();
             return null;
         }
     }
