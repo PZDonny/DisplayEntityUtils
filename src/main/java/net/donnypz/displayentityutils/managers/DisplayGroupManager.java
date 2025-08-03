@@ -614,6 +614,12 @@ public final class DisplayGroupManager {
         return true;
     }
 
+    public static boolean removeChunkPacketGroup(@NotNull PacketDisplayEntityGroup packetDisplayEntityGroup){
+        Location location = packetDisplayEntityGroup.getLocation();
+        if (location == null) return false;
+        return removeChunkPacketGroup(location.getChunk(), packetDisplayEntityGroup.getChunkPacketGroupId(), packetDisplayEntityGroup.getTag());
+    }
+
     public static boolean removeChunkPacketGroup(@NotNull Chunk chunk, int id, String groupTag){
         List<String> list = getChunkList(chunk.getPersistentDataContainer());
         Gson gson = new Gson();
