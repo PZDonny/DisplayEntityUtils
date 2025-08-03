@@ -1314,6 +1314,34 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
     }
 
+    public PacketDisplayEntityGroup toPacket(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow, boolean addToChunk){
+        if (DisplayEntityPlugin.autoPivotInteractions()){
+            HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
+            for (SpawnedDisplayEntityPart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
+                float oldYaw = part.getEntity().getYaw();
+                oldYaws.put(part, oldYaw);
+                part.pivot(-oldYaw);
+            }
+
+            DisplayEntityGroup group = toDisplayEntityGroup();
+            PacketDisplayEntityGroup cloned = group.createPacketGroup(location, playSpawnAnimation, autoShow);
+            if (addToChunk){
+                DisplayGroupManager.addChunkPacketGroup(location, group);
+            }
+
+            for (Map.Entry<SpawnedDisplayEntityPart, Float> entry : oldYaws.entrySet()){
+                SpawnedDisplayEntityPart part = entry.getKey();
+                float oldYaw = entry.getValue();
+                part.pivot(oldYaw);
+            }
+            oldYaws.clear();
+            return cloned;
+        }
+        else{
+            return toDisplayEntityGroup().createPacketGroup(location, playSpawnAnimation, autoShow);
+        }
+    }
+
     /**
      * Get a DisplayEntityGroup representative of this SpawnedDisplayEntityGroup
      * @return DisplayEntityGroup representing this

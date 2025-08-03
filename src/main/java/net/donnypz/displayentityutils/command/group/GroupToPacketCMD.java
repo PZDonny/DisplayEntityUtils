@@ -28,7 +28,7 @@ class GroupToPacketCMD extends PlayerSubCommand {
         }
 
         if (args.length >= 3 && args[2].equals("-confirm")){
-            DisplayGroupManager.addChunkPacketGroup(group.getLocation(), group.toDisplayEntityGroup());
+            group.toPacket(group.getLocation(), true, true, true);
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your selected group is now packet-based!", NamedTextColor.GREEN)));
             player.sendMessage(Component.text("The group is stored in its chunk's data. Make sure to save this world", NamedTextColor.YELLOW));
             if (args.length < 4 || !args[3].equals("-keep")){
