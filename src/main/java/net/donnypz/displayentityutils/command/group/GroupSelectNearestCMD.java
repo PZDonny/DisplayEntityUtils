@@ -74,6 +74,7 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
             if (DEUCommandUtils.removeRelativePoints(player)){
                 player.sendMessage(Component.text("Your previewed points have been despawned since you have changed your selected group", NamedTextColor.GRAY, TextDecoration.ITALIC));
             }
+            GroupCMD.groupToPacketInfo(player);
         } catch (NumberFormatException e) {
             player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Invalid distance! The distance must be a positive number.", NamedTextColor.RED)));
         }

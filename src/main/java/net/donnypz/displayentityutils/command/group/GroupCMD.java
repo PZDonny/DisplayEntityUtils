@@ -2,8 +2,12 @@ package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.command.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public final class GroupCMD extends ConsoleUsableSubCommand {
 
@@ -63,6 +67,10 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         else{
             DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
         }
+    }
+
+    static void groupToPacketInfo(Player player){
+        player.sendMessage(Component.text("| Selected groups can become packet-based with \"/mdis group topacket\"", NamedTextColor.GRAY, TextDecoration.ITALIC));
     }
 
 
