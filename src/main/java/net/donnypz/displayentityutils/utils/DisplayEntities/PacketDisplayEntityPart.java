@@ -591,7 +591,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
                                         .add(DisplayAttributes.Interpolation.DELAY, delayInTicks),
                                 getEntityId(),
                                 viewers);
-            }, delayInTicks*50L, TimeUnit.MILLISECONDS);
+            }, Math.max(1, delayInTicks)*50L, TimeUnit.MILLISECONDS);
         }
         return true;
     }
