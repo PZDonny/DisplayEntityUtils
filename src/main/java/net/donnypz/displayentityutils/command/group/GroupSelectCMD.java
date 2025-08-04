@@ -134,7 +134,7 @@ class GroupSelectCMD extends PlayerSubCommand {
                     .appendSpace()
                     .append(teleport);
             player.sendMessage(groupMessage);
-            GroupCMD.groupToPacketInfo(player);
         }
+        GroupCMD.groupToPacketInfo(player);
     }
 }
