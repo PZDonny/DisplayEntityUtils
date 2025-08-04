@@ -55,11 +55,11 @@ public final class DisplayUtils {
     }
 
     /**
-     * Get a {@link Transformation} from a transformation matrix
+     * Get a {@link Transformation} from a {@link Matrix4f}
      * @param matrix the matrix
      * @return a {@link Transformation}
      */
-    public static Transformation getTransformation(@NotNull Matrix4f matrix) {
+    public static @NotNull Transformation getTransformation(@NotNull Matrix4f matrix) {
         Vector3f translation = matrix.getTranslation(new Vector3f());
 
         Matrix3f leftRotMatrix = new Matrix3f(matrix); //Matrix w/o translation from matrix4f
@@ -79,6 +79,19 @@ public final class DisplayUtils {
 
         Quaternionf rightRotation = new Quaternionf().setFromUnnormalized(rightRotationMatrix);
         return new Transformation(translation, leftRotation, scale, rightRotation);
+    }
+
+    /**
+     * Get a {@link Matrix4f} from a {@link Transformation}
+     * @param transformation the transformation
+     * @return a {@link Matrix4f}
+     */
+    public static @NotNull Matrix4f getMatrix4f(@NotNull Transformation transformation) {
+        return new Matrix4f()
+                .translate(transformation.getTranslation())
+                .rotate(transformation.getLeftRotation())
+                .scale(transformation.getScale())
+                .rotate(transformation.getRightRotation());
     }
 
     /**
