@@ -592,7 +592,7 @@ public final class DisplayGroupManager {
         }
     }
 
-    public static int addChunkPacketGroup(@NotNull Location location, @NotNull DisplayEntityGroup displayEntityGroup){
+    public static PacketDisplayEntityGroup addChunkPacketGroup(@NotNull Location location, @NotNull DisplayEntityGroup displayEntityGroup){
         Chunk c = location.getChunk();
         PersistentDataContainer pdc = c.getPersistentDataContainer();
         Gson gson = new Gson();
@@ -605,13 +605,14 @@ public final class DisplayGroupManager {
             id = gson.fromJson(list.getLast(), ChunkPacketGroup.class).id+1;
         }
         ChunkPacketGroup cpg = ChunkPacketGroup.create(id, location, displayEntityGroup);
-        if (cpg == null) return -1;
+        if (cpg == null) return null;
 
         String json = gson.toJson(cpg);
         list.add(json);
         pdc.set(DisplayEntityPlugin.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
-        displayEntityGroup.createPacketGroup(location, true, true).setChunkPacketGroupId(id);
-        return id;
+        PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, true, true);
+        pdeg.setChunkPacketGroupId(id);
+        return pdeg;
     }
 
     public static boolean removeChunkPacketGroup(@NotNull PacketDisplayEntityGroup packetDisplayEntityGroup){

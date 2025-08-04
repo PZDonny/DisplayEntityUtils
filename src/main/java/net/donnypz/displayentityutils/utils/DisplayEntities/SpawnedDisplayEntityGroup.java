@@ -1324,10 +1324,12 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             }
 
             DisplayEntityGroup group = toDisplayEntityGroup();
-            PacketDisplayEntityGroup packetGroup = group.createPacketGroup(location, playSpawnAnimation, autoShow);
+            PacketDisplayEntityGroup packetGroup;
             if (addToChunk){
-                int id = DisplayGroupManager.addChunkPacketGroup(location, group);
-                if (id != -1) packetGroup.chunkPacketGroupId = id;
+                packetGroup = DisplayGroupManager.addChunkPacketGroup(location, group);
+            }
+            else{
+                packetGroup = group.createPacketGroup(location, playSpawnAnimation, autoShow);
             }
 
             for (Map.Entry<SpawnedDisplayEntityPart, Float> entry : oldYaws.entrySet()){
