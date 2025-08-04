@@ -19,16 +19,17 @@ public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDispla
      * @param partTag The part tag to include in the filter
      */
     public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull String partTag){
-        this(group, Set.of(partTag));
+        this(group, Set.of(partTag), false);
     }
 
     /**
      * Create a selection of parts with the specified part tags from a group.
      * @param group The group to get the parts from
      * @param partTags The part tags to include in the filter
+     * @param strictPartTagInclusion whether parts should be filtered strictly, requiring all given tags to be present
      */
-    public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull Collection<String> partTags){
-        this(group, new PartFilter().includePartTags(partTags));
+    public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull Collection<String> partTags, boolean strictPartTagInclusion){
+        this(group, new PartFilter().includePartTags(partTags).strictPartTagInclusion(strictPartTagInclusion));
     }
 
     /**

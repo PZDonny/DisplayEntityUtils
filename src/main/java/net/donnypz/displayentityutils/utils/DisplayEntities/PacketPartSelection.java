@@ -28,9 +28,10 @@ public class PacketPartSelection extends MultiPartSelection<PacketDisplayEntityP
      * Create a selection of parts with the specified part tags from a group.
      * @param group The group to get the parts from
      * @param partTags The part tags to include in the filter
+     * @param strictPartTagInclusion whether parts should be filtered strictly, requiring all given tags to be present
      */
-    public PacketPartSelection(@NotNull PacketDisplayEntityGroup group, @NotNull Collection<String> partTags) {
-        super(group, partTags);
+    public PacketPartSelection(@NotNull PacketDisplayEntityGroup group, @NotNull Collection<String> partTags, boolean strictPartTagInclusion) {
+        super(group, partTags, strictPartTagInclusion);
     }
 
     /**

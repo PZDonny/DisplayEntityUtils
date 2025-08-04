@@ -24,15 +24,16 @@ public abstract class MultiPartSelection<T extends ActivePart> extends PartSelec
     boolean includeBlockTypes;
 
     Collection<String> includedTags = new HashSet<>();
+    boolean strictPartTagInclusion = false;
     Collection<String> excludedTags = new HashSet<>();
 
     public MultiPartSelection(ActiveGroup<T> group, @NotNull String partTag){
-        this(group, Set.of(partTag));
+        this(group, Set.of(partTag), false);
     }
 
 
-    public MultiPartSelection(ActiveGroup<T> group, @NotNull Collection<String> partTags){
-        this(group, new PartFilter().includePartTags(partTags));
+    public MultiPartSelection(ActiveGroup<T> group, @NotNull Collection<String> partTags, boolean strictPartTagInclusion){
+        this(group, new PartFilter().includePartTags(partTags).strictPartTagInclusion(strictPartTagInclusion));
     }
 
     public MultiPartSelection(ActiveGroup<T> group){
@@ -87,6 +88,7 @@ public abstract class MultiPartSelection<T extends ActivePart> extends PartSelec
             this.partTypes.addAll(filter.partTypes);
         }
         this.includedTags.addAll(filter.includedTags);
+        this.strictPartTagInclusion = filter.strictPartTagInclusion;
         this.excludedTags.addAll(filter.excludedTags);
 
         if (this.itemTypes.isEmpty()){
@@ -144,12 +146,11 @@ public abstract class MultiPartSelection<T extends ActivePart> extends PartSelec
                 continue;
             }
 
-            Set<String> tags = new HashSet<>(list); //For faster searches
 
             //Part Has Excluded Tag (Don't Filter Part)
             boolean filterable = true;
             for (String excluded : excludedTags){
-                if (tags.contains(excluded)) {
+                if (list.contains(excluded)) {
                     filterable = false;
                     break;
                     //continue filter;
@@ -162,10 +163,15 @@ public abstract class MultiPartSelection<T extends ActivePart> extends PartSelec
             }
             //Part Has Included Tag (Filter Part)
             else{
-                for (String included : includedTags){
-                    if (tags.contains(included)){
-                        selectedParts.add(part);
-                        continue filter;
+                if (strictPartTagInclusion && list.containsAll(includedTags)) {
+                    selectedParts.add(part);
+                }
+                else if (!strictPartTagInclusion){
+                    for (String included : includedTags){
+                        if (list.contains(included)){
+                            selectedParts.add(part);
+                            continue filter;
+                        }
                     }
                 }
             }
@@ -561,6 +567,7 @@ public abstract class MultiPartSelection<T extends ActivePart> extends PartSelec
                 .setItemTypes(itemTypes, includeItemTypes)
                 .setBlockTypes(blockTypes, includeBlockTypes)
                 .includePartTags(includedTags)
+                .strictPartTagInclusion(strictPartTagInclusion)
                 .excludePartTags(excludedTags);
     }
 
