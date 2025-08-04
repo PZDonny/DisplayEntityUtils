@@ -8,9 +8,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.List;
-
 public final class AnimCMD extends ConsoleUsableSubCommand {
 
     public AnimCMD(){
@@ -38,7 +35,6 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
         new AnimAddSoundCMD(this);
         new AnimRemoveSoundCMD(this);
         new AnimAddParticleCMD(this);
-        new AnimCancelPointsCMD(this);
         new AnimReverseCMD(this);
         new AnimScaleRespectCMD(this);
         new AnimDataChangesCMD(this);

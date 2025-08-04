@@ -6,6 +6,7 @@ import io.lumine.mythic.api.skills.ITargetedEntitySkill;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
 import io.lumine.mythic.bukkit.BukkitAdapter;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
@@ -33,7 +34,7 @@ class DEUStateMythicMechanic implements ITargetedEntitySkill {
     @Override
     public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
         Entity entity = BukkitAdapter.adapt(target);
-        SpawnedDisplayEntityGroup group = DisplayControllerManager.getControllerGroup(entity);
+        ActiveGroup<?> group = DisplayControllerManager.getControllerGroup(entity);
         if (group != null){
             DisplayStateMachine stateMachine = group.getDisplayStateMachine();
             if (stateMachine != null){

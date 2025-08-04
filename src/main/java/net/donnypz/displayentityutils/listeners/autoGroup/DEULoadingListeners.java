@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.listeners.autoGroup;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -38,18 +39,18 @@ public final class DEULoadingListeners implements Listener {
     public void onWorldUnload(WorldUnloadEvent e){
         if (!DisplayEntityPlugin.automaticGroupDetection()) return;
 
-        String worldName = e.getWorld().getName();
-        ArrayList<Long> storedChunks = AutoGroup.readChunks.get(worldName);
-        if (storedChunks != null){
-            AutoGroup.readChunks.remove(e.getWorld().getName());
-            storedChunks.clear();
-        }
+        World world = e.getWorld();
+        String worldName = world.getName();
+        ArrayList<Long> storedChunks = AutoGroup.readChunks.remove(worldName);
+        if (storedChunks != null) storedChunks.clear();
 
         if (DisplayEntityPlugin.shouldUnregisterWorld(worldName)){
             for (SpawnedDisplayEntityGroup group : DisplayGroupManager.getSpawnedGroups(worldName)){
                 group.unregister(false, false);
             }
         }
+
+        PacketDisplayEntityGroup.removeWorld(world);
     }
 
     @EventHandler

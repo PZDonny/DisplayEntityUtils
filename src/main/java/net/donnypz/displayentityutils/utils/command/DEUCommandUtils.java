@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.command;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
@@ -48,9 +49,7 @@ public class DEUCommandUtils {
 
     @ApiStatus.Internal
     public static void spawnFramePointDisplays(SpawnedDisplayEntityGroup group, Player player, SpawnedDisplayAnimationFrame frame){
-        if (isViewingRelativePoints(player)) {
-            player.sendMessage(Component.text("You are already viewing points!", NamedTextColor.RED));
-            player.sendMessage(Component.text("| Run \"/mdis anim cancelpoints\" to stop viewing points", NamedTextColor.GRAY));
+        if (stopIfViewing(player)){
             return;
         }
 
@@ -60,21 +59,53 @@ public class DEUCommandUtils {
         }
 
         Set<RelativePointDisplay> displays = new HashSet<>();
-        Set<FramePoint> points = frame.getFramePoints();
-
-        for (FramePoint point : points){
+        for (FramePoint point : frame.getFramePoints()){
             Location spawnLoc = point.getLocation(group);
             spawnLoc.setPitch(0);
             FramePointDisplay pd = new FramePointDisplay(player, spawnLoc, point, frame);
             displays.add(pd);
         }
+        setDisplays(player, displays);
+    }
 
+
+    @ApiStatus.Internal
+    public static void spawnChunkPacketGroupPoints(Chunk chunk, Player player){
+        if (stopIfViewing(player)){
+            return;
+        }
+
+        List<DisplayGroupManager.ChunkPacketGroupInfo> infos = DisplayGroupManager.getChunkPacketGroupInfo(chunk);
+        if (infos.isEmpty()){
+            player.sendMessage(Component.text("Failed to view points! The chunk does not have any stored packet based groups!", NamedTextColor.RED));
+            return;
+        }
+
+        Set<RelativePointDisplay> displays = new HashSet<>();
+        for (DisplayGroupManager.ChunkPacketGroupInfo info : infos){
+            ChunkPacketGroupDisplay display = new ChunkPacketGroupDisplay(player, info);
+            displays.add(display);
+        }
+        setDisplays(player, displays);
+    }
+
+    private static void setDisplays(Player player, Set<RelativePointDisplay> displays){
         relativePointDisplays.put(player.getUniqueId(), displays);
         player.sendMessage(Component.text("Left click a point to select it", NamedTextColor.YELLOW));
-        player.sendMessage(Component.text("| Run \"/mdis anim cancelpoints\" to stop viewing points", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("| Run \"/mdis hidepoints\" to stop viewing points", NamedTextColor.GRAY));
+    }
+
+    private static boolean stopIfViewing(Player player){
+        if (isViewingRelativePoints(player)) {
+            player.sendMessage(Component.text("You are already viewing points!", NamedTextColor.RED));
+            player.sendMessage(Component.text("| Run \"/mdis hidepoints\" to stop viewing points", NamedTextColor.GRAY));
+            return true;
+        }
+        return false;
     }
 
     //Remove the visual representation of RelativePoints
+    @ApiStatus.Internal
     public static boolean removeRelativePoints(Player player){
         if (player == null) return false;
         Set<RelativePointDisplay> displays = relativePointDisplays.remove(player.getUniqueId());
@@ -116,8 +147,8 @@ public class DEUCommandUtils {
         if (oldPoint != null){
             oldPoint.deselect();
         }
+        player.playSound(player, Sound.ENTITY_ITEM_FRAME_PLACE, 1, 1);
         relativePoint.select();
-        player.sendMessage(Component.text("Clicked Point Selected!", NamedTextColor.GREEN));
     }
 
     public static void deselectRelativePoint(Player player){
@@ -261,6 +292,20 @@ public class DEUCommandUtils {
             catch(IllegalArgumentException ignored){}
         }
         return c;
+    }
+
+    public static byte getOpacityAsByte(float input){ //0-1
+        int opacity = Math.round(input * 255);
+
+        if (opacity >= 4 && opacity <= 26) { //Adjusted for Minecraft Shader Values (Rendering is discarded)
+            opacity = 25;
+        }
+
+        if (opacity > 127) { //Outside of byte range
+            opacity -= 256;
+        }
+
+        return (byte) opacity;
     }
 
     public static void sendGlowColor(Player player, Color color){

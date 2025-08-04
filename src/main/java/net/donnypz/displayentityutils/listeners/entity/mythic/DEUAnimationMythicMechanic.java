@@ -7,9 +7,9 @@ import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
 import io.lumine.mythic.bukkit.BukkitAdapter;
 import net.donnypz.displayentityutils.managers.LoadMethod;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import org.bukkit.entity.Entity;
@@ -62,7 +62,7 @@ class DEUAnimationMythicMechanic implements ITargetedEntitySkill {
     @Override
     public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
         Entity entity = BukkitAdapter.adapt(target);
-        SpawnedDisplayEntityGroup group = DisplayControllerManager.getControllerGroup(entity);
+        ActiveGroup<?> group = DisplayControllerManager.getControllerGroup(entity);
         if (group != null){
             group.setMachineState(state, state.getStateMachine());
         }

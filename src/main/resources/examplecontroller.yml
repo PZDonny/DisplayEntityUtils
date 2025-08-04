@@ -20,6 +20,8 @@ mythicMobs:
     verticalOffset: 0
     #Determine if the group should be visible by default when spawned
     visibleByDefault: true
+    #Determine if the group should be packet based
+    packetBased: true
 
 #-----------------------------------------------------------------------
 #Follow Properties:

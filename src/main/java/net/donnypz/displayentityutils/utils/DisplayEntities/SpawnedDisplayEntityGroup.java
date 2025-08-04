@@ -22,7 +22,7 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spawned {
+public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayEntityPart> implements Spawned {
     public static final long defaultPartUUIDSeed = 99;
     final Random partUUIDRandom = new Random(defaultPartUUIDSeed);
 
@@ -83,7 +83,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
     private Display getMasterEntity(){
-        return (Display)((SpawnedDisplayEntityPart) masterPart).getEntity();
+        return (Display) masterPart.getEntity();
     }
 
 
@@ -382,93 +382,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
 
-
-
-    /**
-     * {@inheritDoc}
-     * @return {@link SpawnedDisplayEntityPart} or null
-     */
-    @Override
-    public @Nullable SpawnedDisplayEntityPart getPart(@NotNull UUID partUUID){
-        return (SpawnedDisplayEntityPart) groupParts.get(partUUID);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return a list of {@link SpawnedDisplayEntityPart}
-     */
-    @Override
-    public List<SpawnedDisplayEntityPart> getParts() {
-        return groupParts
-                .values()
-                .stream()
-                .map(SpawnedDisplayEntityPart.class::cast)
-                .toList();
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return a list of {@link SpawnedDisplayEntityPart}
-     */
-    @Override
-    public List<SpawnedDisplayEntityPart> getParts(@NotNull SpawnedDisplayEntityPart.PartType partType){
-        List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
-        for (ActivePart part : groupParts.sequencedValues()){
-            if (partType == part.getType()){
-                partList.add((SpawnedDisplayEntityPart) part);
-            }
-        }
-        return partList;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return a list of {@link SpawnedDisplayEntityPart}
-     */
-    @Override
-    public List<SpawnedDisplayEntityPart> getDisplayParts(){
-        List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
-        for (ActivePart part : groupParts.sequencedValues()){
-            if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                partList.add((SpawnedDisplayEntityPart) part);
-            }
-        }
-        return partList;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return a list of {@link SpawnedDisplayEntityPart}
-     */
-    @Override
-    public List<SpawnedDisplayEntityPart> getParts(@NotNull String tag){
-        List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
-        for (ActivePart part : groupParts.sequencedValues()){
-            if (part.hasTag(tag)){
-                partList.add((SpawnedDisplayEntityPart) part);
-            }
-        }
-        return partList;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return a list of {@link SpawnedDisplayEntityPart}
-     */
-    @Override
-    public List<SpawnedDisplayEntityPart> getParts(@NotNull Collection<String> tags){
-        List<SpawnedDisplayEntityPart> partList = new ArrayList<>();
-        for (ActivePart part : groupParts.sequencedValues()){
-            for (String tag : tags){
-                if (part.hasTag(tag)){
-                    partList.add((SpawnedDisplayEntityPart) part);
-                    break;
-                }
-            }
-        }
-        return partList;
-    }
-
     /**
      * Get a list of parts specified by a part type as entities
      * @param partType the type of part to get
@@ -491,8 +404,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
      */
     public <T> List<T> getPartEntities(@NotNull Class<T> entityClazz){
         List<T> partList = new ArrayList<>();
-        for (ActivePart part : groupParts.sequencedValues()){
-            Entity partEntity = ((SpawnedDisplayEntityPart) part).getEntity();
+        for (SpawnedDisplayEntityPart part : groupParts.sequencedValues()){
+            Entity partEntity = part.getEntity();
             if (entityClazz.isInstance(partEntity)){
                 T entity = entityClazz.cast(partEntity);
                 partList.add(entity);
@@ -938,15 +851,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
     }
 
 
-
-    /**
-     * Get this group's master part
-     * @return This group's master part. Null if it could not be found
-     */
-    public @Nullable SpawnedDisplayEntityPart getMasterPart(){
-        return (SpawnedDisplayEntityPart) masterPart;
-    }
-
     /**
      * {@inheritDoc}
      * @return a {@link SpawnedPartSelection}
@@ -1057,6 +961,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         return vehicle;
     }
 
+    public boolean isRiding(){
+        return getVehicle() != null;
+    }
+
     private void alignInteractionWithMountedGroup(SpawnedDisplayEntityPart part, Entity vehicle){
         new BukkitRunnable() {
             final Interaction interaction = (Interaction) part.getEntity();
@@ -1096,7 +1004,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
             return getMasterEntity().getVehicle();
         }
         catch(NullPointerException e){
-            e.printStackTrace();
             return null;
         }
     }
@@ -1404,6 +1311,37 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup implements Spaw
         }
         else{
             return toDisplayEntityGroup().spawn(location, GroupSpawnedEvent.SpawnReason.CLONE);
+        }
+    }
+
+    public PacketDisplayEntityGroup toPacket(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow, boolean addToChunk){
+        if (DisplayEntityPlugin.autoPivotInteractions()){
+            HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
+            for (SpawnedDisplayEntityPart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
+                float oldYaw = part.getEntity().getYaw();
+                oldYaws.put(part, oldYaw);
+                part.pivot(-oldYaw);
+            }
+
+            DisplayEntityGroup group = toDisplayEntityGroup();
+            PacketDisplayEntityGroup packetGroup;
+            if (addToChunk){
+                packetGroup = DisplayGroupManager.addChunkPacketGroup(location, group);
+            }
+            else{
+                packetGroup = group.createPacketGroup(location, playSpawnAnimation, autoShow);
+            }
+
+            for (Map.Entry<SpawnedDisplayEntityPart, Float> entry : oldYaws.entrySet()){
+                SpawnedDisplayEntityPart part = entry.getKey();
+                float oldYaw = entry.getValue();
+                part.pivot(oldYaw);
+            }
+            oldYaws.clear();
+            return packetGroup;
+        }
+        else{
+            return toDisplayEntityGroup().createPacketGroup(location, playSpawnAnimation, autoShow);
         }
     }
 

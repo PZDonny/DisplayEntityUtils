@@ -2,15 +2,7 @@ package net.donnypz.displayentityutils.listeners.entity;
 
 import com.destroystokyo.paper.event.entity.EntityJumpEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
-import com.github.retrooper.packetevents.event.PacketListener;
-import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.util.Vector3f;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
@@ -26,46 +18,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.UUID;
 
 @ApiStatus.Internal
-public final class DEUEntityListener implements Listener, PacketListener {
-
-    //===========Packet Events=================
-    @Override
-    public void onPacketSend(PacketSendEvent event) {
-        User user = event.getUser();
-        if (event.getPacketType() != PacketType.Play.Server.ENTITY_METADATA){
-            return;
-        }
-        WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata(event);
-
-        int entityId = packet.getEntityId();
-        ActivePart part = ActivePart.getPart(entityId);
-        if (part == null) return;
-
-        UUID uuid = user.getUUID();
-        DEUUser deuUser = DEUUser.getOrCreateUser(uuid);
-        for (EntityData<?> data : packet.getEntityMetadata()){
-            if (data.getValue() instanceof Vector3f v) {
-                if (part.isAnimatingForPlayer(Bukkit.getPlayer(uuid)) && deuUser.unsuppressIfEqual(entityId, new org.joml.Vector3f(v.x, v.y, v.z))){
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-        }
-
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerTeleport(@NotNull PlayerChangedWorldEvent e){
-        DEUUser user = DEUUser.getOrCreateUser(e.getPlayer());
-        user.refreshTrackedPacketEntities(e.getPlayer());
-    }
+public final class DEUEntityListener implements Listener {
 
     //============Mythic====================
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -136,10 +92,17 @@ public final class DEUEntityListener implements Listener, PacketListener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDeath(EntityDeathEvent e){
         applyState(e.getEntity(), MachineState.StateType.DEATH);
+        ActiveGroup<?> controllerGroup = DisplayControllerManager.getControllerGroup(e.getEntity().getUniqueId());
+        boolean controllerTranslated = false;
         //Group Vertical Offset
         for (SpawnedDisplayEntityGroup group : DisplayUtils.getGroupPassengers(e.getEntity())){
             if (group.getVerticalRideOffset() == 0) continue;
+            if (group == controllerGroup) controllerTranslated = true;
             group.translate(Direction.UP, group.getVerticalRideOffset()*-1, -1, -1);
+        }
+
+        if (!controllerTranslated && controllerGroup != null){ //Must be packet based if not found above
+            controllerGroup.dismount();
         }
     }
 
@@ -153,7 +116,7 @@ public final class DEUEntityListener implements Listener, PacketListener {
     }
 
     private DisplayStateMachine applyState(Entity entity, MachineState.StateType stateType){
-        SpawnedDisplayEntityGroup group = DisplayControllerManager.getControllerGroup(entity);
+        ActiveGroup<?> group = DisplayControllerManager.getControllerGroup(entity);
         if (group == null){
             return null;
         }

@@ -4,7 +4,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -50,9 +49,11 @@ public class GroupSpawnedEvent extends Event {
         CLONE,
         DISPLAY_CONTROLLER,
         CUSTOM,
-        @ApiStatus.Internal
-        INTERNAL,
-        @ApiStatus.Internal
-        SKRIPT;
+        /**
+         * This is only applicable to the {@link PacketGroupSendEvent} and if a group is revealed to a player after a world switch
+         */
+        PLAYER_SENT_CHUNK,
+        SKRIPT,
+        INTERNAL;
     }
 }

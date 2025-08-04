@@ -7,11 +7,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -26,7 +22,6 @@ public final class LocalManager {
     static final File displayControllerFolder = new File(DisplayEntityPlugin.getInstance().getDataFolder(), "/displaycontrollers/");
     public static final String datapackConvertDeleteSubParentTag = "deu_delete_sub_parent";
     public static final String datapackUngroupedAddLaterTag = "deu_add_later";
-    static final CommandSender silentSender = Bukkit.createCommandSender(feedback -> {});
 
     private LocalManager(){}
 
@@ -47,17 +42,14 @@ public final class LocalManager {
 
             File saveFile = new File(groupSaveFolder, "/"+displayEntityGroup.getTag()+DisplayEntityGroup.fileExtension);
             if (saveFile.exists()){
-                if (DisplayEntityPlugin.overwritexistingSaves()){
-                    saveFile.delete();
-                }
-                else{
+                if (!DisplayEntityPlugin.overwritexistingSaves()){
                     if (saver != null){
                         saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display entity group locally!"));
                         saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
                     }
                     return false;
                 }
-
+                saveFile.delete();
             }
             saveFile.createNewFile();
             FileOutputStream fileOut = new FileOutputStream(saveFile);
@@ -150,21 +142,6 @@ public final class LocalManager {
         }
     }
 
-    @ApiStatus.Internal
-    public static void saveDatapackAnimation(@NotNull Player player, @NotNull String datapackName, @NotNull String groupSaveTag, @NotNull String animationSaveTag){
-        if (!datapackName.endsWith(".zip")){
-            datapackName = datapackName+".zip";
-        }
-        new DatapackConverter(player, datapackName, groupSaveTag, animationSaveTag);
-    }
-
-    @ApiStatus.Internal
-    public static void saveDatapackLegacyAnimation(@NotNull Player player, @NotNull String datapackName, @NotNull String groupSaveTag, @NotNull String animationSaveTag){
-        if (!datapackName.endsWith(".zip")){
-            datapackName = datapackName+".zip";
-        }
-        DatapackLegacyConverter.saveDatapackAnimation(player, datapackName, groupSaveTag, animationSaveTag);
-    }
 
 
 

@@ -6,10 +6,10 @@ load: POSTWORLD
 api-version: 1.20
 softdepend:
   - MythicMobs
+  - LibsDisguises
   - Skript
 depend:
   - packetevents
-  - PassengerAPI
 commands:
   managedisplays:
     aliases: [mdis]

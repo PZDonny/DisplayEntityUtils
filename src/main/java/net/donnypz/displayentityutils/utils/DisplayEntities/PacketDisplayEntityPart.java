@@ -119,7 +119,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
-        viewers.add(player.getUniqueId());
+        if (!viewers.add(player.getUniqueId())){  //Already viewing
+            return;
+        }
         DEUUser.getOrCreateUser(player).trackPacketEntity(this);
         attributeContainer.sendEntity(type, getEntityId(), player, getLocation());
     }
@@ -145,21 +147,26 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (packetLocation == null){
             throw new RuntimeException("Location must be set for packet-based part before showing it to players.");
         }
+        Collection<Player> plrs = new HashSet<>(players);
         for (Player player : players){
-            viewers.add(player.getUniqueId());
+            if (!viewers.add(player.getUniqueId())){ //Already viewing
+                plrs.remove(player);
+                continue;
+            }
             DEUUser.getOrCreateUser(player).trackPacketEntity(this);
         }
-        attributeContainer.sendEntityUsingPlayers(type, getEntityId(), players, getLocation());
+        attributeContainer.sendEntityUsingPlayers(type, getEntityId(), plrs, getLocation());
     }
 
     /**
      * Hide the packet-based entity from all players tracking this part
      */
     public void hide(){
+        if (viewers.isEmpty()) return;
         for (UUID uuid : getViewers()){
             Player player = Bukkit.getPlayer(uuid);
             if (player != null && player.isConnected()){
-                PacketUtils.destroyEntity(player, getEntityId());
+                PacketUtils.hideEntity(player, getEntityId());
             }
         }
         viewers.clear();
@@ -171,10 +178,18 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void hideFromPlayer(@NotNull Player player) {
-        if (player.isConnected()){
-            PacketUtils.destroyEntity(player, getEntityId());
+        if (viewers.remove(player.getUniqueId())){ //Was present and removed
+            PacketUtils.hideEntity(player, getEntityId());
+            DEUUser.getOrCreateUser(player).untrackPacketEntity(this);
         }
+
+    }
+
+    @ApiStatus.Internal
+    public void worldSwitchHide(@NotNull Player player, DEUUser user) {
         viewers.remove(player.getUniqueId());
+        user.untrackPacketEntity(this);
+        DEUUser.getOrCreateUser(player).untrackPacketEntity(this);
     }
 
     /**
@@ -183,9 +198,11 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void hideFromPlayers(@NotNull Collection<Player> players) {
-        PacketUtils.destroyEntity(players, getEntityId());
         for (Player p : players){
-            viewers.remove(p.getUniqueId());
+            if (viewers.remove(p.getUniqueId())){ //Was present and removed
+                PacketUtils.hideEntity(p, getEntityId());
+                DEUUser.getOrCreateUser(p).untrackPacketEntity(this);
+            }
         }
     }
 
@@ -271,9 +288,15 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
             return null;
         }
+        if (group == null) return null;
         return getInteractionTranslation(group.getLocation());
     }
 
+    /**
+     * Get the Interaction's translation vector relative to a location
+     * @param referenceLocation the reference location
+     * @return A vector or null if the part is not an interaction
+     */
     public Vector getInteractionTranslation(@NotNull Location referenceLocation){
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
             return null;
@@ -425,9 +448,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (pivotIfInteraction && type == SpawnedDisplayEntityPart.PartType.INTERACTION){
             pivot(yaw, pitch);
         }
-        else{
+        else if (!viewers.isEmpty()){
             WrapperPlayServerEntityRotation rotPacket = new WrapperPlayServerEntityRotation(getEntityId(), yaw, pitch, false);
-            for (UUID uuid : viewers){
+            for (UUID uuid : getViewers()){
                 PacketEvents.getAPI().getPlayerManager().sendPacket(Bukkit.getPlayer(uuid), rotPacket);
             }
         }
@@ -489,7 +512,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         packetLocation.setCoordinates(pivotedLoc);
 
 
-        for (UUID uuid : viewers){
+        for (UUID uuid : getViewers()){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
             PacketEvents.getAPI().getPlayerManager().sendPacket(player, new WrapperPlayServerEntityTeleport(getEntityId(),
@@ -501,12 +524,12 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
-     * Set the location of this packet-based entity.
+     * Set the location of this packet-based entity. The part should be hidden first with {@link #hide()} if being teleported to a different world.
      * @param location the location
      */
     public void teleport(@NotNull Location location){
         packetLocation = new PacketLocation(location);
-        for (UUID uuid : viewers){
+        for (UUID uuid : getViewers()){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
             PacketUtils.teleport(player, getEntityId(), location);
@@ -568,7 +591,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
                                         .add(DisplayAttributes.Interpolation.DELAY, delayInTicks),
                                 getEntityId(),
                                 viewers);
-            }, delayInTicks*50L, TimeUnit.MILLISECONDS);
+            }, Math.max(1, delayInTicks)*50L, TimeUnit.MILLISECONDS);
         }
         return true;
     }
@@ -675,7 +698,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         }
     }
 
-    private static final class PacketLocation {
+    static final class PacketLocation {
 
         String worldName;
         double x;

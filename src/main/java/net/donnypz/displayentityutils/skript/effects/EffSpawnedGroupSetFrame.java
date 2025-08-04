@@ -15,9 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 @Name("Show Animation Frame on Active Group")
 @Description("Play a single animation frame on an active group, optionally with custom duration and delay.")
 @Examples({"play frame with id 5 on {_spawnedgroup} from {_spawnedanimation}",
@@ -62,7 +59,7 @@ public class EffSpawnedGroupSetFrame extends Effect {
         Number n = frameID.getSingle(event);
         ActiveGroup g = group.getSingle(event);
         SpawnedDisplayAnimation a = animation.getSingle(event);
-        Player[] plrs = players.getAll(event);
+        Player[] plrs = players == null ? null : players.getAll(event);
         if (n == null || g == null || a == null){
             return;
         }

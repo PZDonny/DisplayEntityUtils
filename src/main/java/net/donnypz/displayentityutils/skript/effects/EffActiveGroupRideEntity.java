@@ -9,6 +9,8 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
@@ -17,23 +19,23 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Spawned Group Mount/Ride")
-@Description("Make a spawned group ride an entity or vice versa")
+@Name("Active Group Mount/Ride")
+@Description("Make an active group ride an entity or vice versa")
 @Examples({
         "#Use \"mount\" instead of \"ride\" if you experience unexpected behavior",
         "",
-        "#Spawned Group Ride Entity",
-        "deu make {_spawnedgroup} ride {_entity}",
+        "#Spawned/Packet Group Ride Entity",
+        "deu make {_packetgroup} ride {_entity}",
         "deu make {_spawnedgroup} mount {_entity} using controller with id \"mycontroller\"",
         "",
         "#Entity Ride Spawned Group",
         "deu make {_entity} mount {_spawnedgroup}",
         "deu make {_entity} ride {_spawnedgroup} using controller \"mycontroller2\""})
 @Since("2.6.2")
-public class EffSpawnedGroupRideEntity extends Effect {
+public class EffActiveGroupRideEntity extends Effect {
 
     static {
-        Skript.registerEffect(EffSpawnedGroupRideEntity.class,"[deu] make %spawnedgroup/entity% (mount|ride) %spawnedgroup/entity% [c:using controller [with id] %-string%]");
+        Skript.registerEffect(EffActiveGroupRideEntity.class,"[deu] make %activegroup/entity% (mount|ride) %activegroup/entity% [c:using controller [with id] %-string%]");
     }
 
     Expression<?> obj1;
@@ -63,24 +65,24 @@ public class EffSpawnedGroupRideEntity extends Effect {
             return;
         }
 
-        SpawnedDisplayEntityGroup g;
+        ActiveGroup<?> g;
         Entity e;
         boolean result;
 
-        boolean rideEntity = o1 instanceof SpawnedDisplayEntityGroup;
+        boolean rideEntity = o1 instanceof ActiveGroup<?>;
 
         //Group Ride Entity
         if (rideEntity){
-            g = (SpawnedDisplayEntityGroup) o1;
+            g = (ActiveGroup<?>) o1;
             e = (Entity) o2;
             result = g.rideEntity(e);
         }
 
         //Entity Ride Group
-        else{
+        else if (o2 instanceof SpawnedDisplayEntityGroup sg){
             e = (Entity) o1;
-            g = (SpawnedDisplayEntityGroup) o2;
-            SpawnedDisplayEntityPart masterPart = g.getMasterPart();
+            g = sg;
+            SpawnedDisplayEntityPart masterPart = sg.getMasterPart();
             if (masterPart == null){
                 return;
             }
@@ -89,6 +91,9 @@ public class EffSpawnedGroupRideEntity extends Effect {
                 return;
             }
             result = masterEntity.addPassenger(e);
+        }
+        else{
+            return;
         }
 
         if (!result){
@@ -104,7 +109,13 @@ public class EffSpawnedGroupRideEntity extends Effect {
                 prop.followGroup(g, e);
             }
             if (controller.hasStateMachine()){
-                controller.getStateMachine().addGroup(g);
+                if (g instanceof PacketDisplayEntityGroup pg){
+                    controller.getStateMachine().addGroup(pg);
+                }
+                else if (g instanceof SpawnedDisplayEntityGroup sg){
+                    controller.getStateMachine().addGroup(sg);
+                }
+
                 g.setVerticalRideOffset(controller.getVerticalOffset());
             }
         }

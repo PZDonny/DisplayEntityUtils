@@ -19,7 +19,7 @@ public class GroupPointDisplay extends RelativePointDisplay{
     }
 
     @Override
-    public void leftClick(@NotNull Player player) {
+    public void sendInfo(@NotNull Player player) {
 
     }
 

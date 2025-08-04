@@ -232,7 +232,7 @@ public final class TextDisplayDialog{
             display.text(text.font(Key.key("minecraft", view.getText(FONT))));
             display.setAlignment(TextDisplay.TextAlignment.valueOf(view.getText(ALIGNMENT)));
             display.setTextOpacity(getOpacityAsByte(view.getFloat(OPACITY)));
-            display.setLineWidth((int) Math.floor(view.getFloat(LINE_WIDTH)));
+            display.setLineWidth(view.getFloat(LINE_WIDTH).intValue());
 
             String bgColor = view.getText(BACKGROUND_COLOR);
             if (bgColor.isBlank()){

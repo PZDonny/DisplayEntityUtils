@@ -4,7 +4,7 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.managers.LocalManager;
+import net.donnypz.displayentityutils.utils.bdengine.convert.datapack.BDEngineLegacyDPConverter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -25,11 +25,11 @@ class BDEngineConvertLegacyAnimCMD extends PlayerSubCommand {
 
         String datapackName = args[2];
         String groupTag = args[3];
-        String animTag = args[4];
+        String animPrefix = args[4];
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Attempting to convert animation...", NamedTextColor.AQUA)));
         player.sendMessage(Component.text(" | DO NOT LEAVE THIS AREA UNTIL CONVERSION IS COMPLETED/FAILS", NamedTextColor.YELLOW));
         player.sendMessage(Component.text(" | Conversion time may vary.", NamedTextColor.YELLOW));
         player.sendMessage(Component.text(" | Entities may not be visible while converting", NamedTextColor.YELLOW));
-        LocalManager.saveDatapackLegacyAnimation(player, datapackName, groupTag, animTag);
+        BDEngineLegacyDPConverter.saveDatapackAnimation(player, datapackName, groupTag, animPrefix);
     }
 }

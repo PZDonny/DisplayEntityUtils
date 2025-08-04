@@ -1,10 +1,12 @@
 package net.donnypz.displayentityutils.managers;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -15,6 +17,7 @@ import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 public class DEUUser {
     static final HashMap<UUID, DEUUser> users = new HashMap<>();
@@ -26,7 +29,7 @@ public class DEUUser {
     ServerSideSelection selectedPartSelection;
     private AnimationParticleBuilder particleBuilder;
     private final Location[] pointPositions = new Location[3];
-    private final ConcurrentHashMap<Integer, PacketDisplayEntityPart> trackedPacketEntities = new ConcurrentHashMap<>();
+    private final Set<PacketDisplayEntityPart> trackedPacketEntities = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private static final ConcurrentHashMap<Integer, Vector3f> suppressedVectors = new ConcurrentHashMap<>();
 
 
@@ -164,42 +167,88 @@ public class DEUUser {
 
     @ApiStatus.Internal
     public void trackPacketEntity(@NotNull PacketDisplayEntityPart part){
-        trackPacketEntity(part.getEntityId(), part);
+        trackedPacketEntities.add(part);
     }
 
     @ApiStatus.Internal
-    public void trackPacketEntity(int entityId, @Nullable PacketDisplayEntityPart part){
-        trackedPacketEntities.put(entityId, part);
+    public void untrackPacketEntity(@NotNull PacketDisplayEntityPart part){
+        trackedPacketEntities.remove(part);
     }
 
     @ApiStatus.Internal
-    public void untrackPacketEntity(int entityId){
-        trackedPacketEntities.remove(entityId);
+    public void untrackPacketEntities(@NotNull Collection<PacketDisplayEntityPart> parts){
+        trackedPacketEntities.removeAll(parts);
     }
 
     @ApiStatus.Internal
-    public void untrackPacketEntities(int @NotNull [] entityIds){
-        for (int i : entityIds){
-            trackedPacketEntities.remove(i);
-        }
-    }
-
-    @ApiStatus.Internal
-    public void refreshTrackedPacketEntities(@NotNull Player player){
+    public void resetTrackedPacketParts(){
         if (trackedPacketEntities.isEmpty()) return;
-
-        String worldName = player.getWorld().getName();
-
-        Iterator<Map.Entry<Integer, PacketDisplayEntityPart>> iter = trackedPacketEntities.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<Integer, PacketDisplayEntityPart> entry = iter.next();
-            PacketDisplayEntityPart part = entry.getValue();
-            if (part == null) continue;
-            if (!worldName.equals(part.getWorldName())){
-                part.hideFromPlayer(player);
-            }
-            iter.remove();
+        Player player = Bukkit.getPlayer(userUUID);
+        for (PacketDisplayEntityPart part : new HashSet<>(trackedPacketEntities)){
+            part.worldSwitchHide(player, this);
         }
+    }
+
+    @ApiStatus.Internal
+    public void hideTrackedChunkGroups(@NotNull Chunk chunk){
+        if (trackedPacketEntities.isEmpty()){
+            return;
+        }
+
+        Player player = Bukkit.getPlayer(userUUID);
+        if (player == null || !player.isOnline()){
+            return;
+        }
+
+        if (!player.getWorld().equals(chunk.getWorld())){
+            return;
+        }
+
+        for (PacketDisplayEntityGroup g : PacketDisplayEntityGroup.getGroups(chunk)){
+            if (g.isAutoShow()){
+                g.hideFromPlayer(player);
+            }
+        }
+    }
+
+    private void revealPacketGroupsInWorld(){
+        Player player = Bukkit.getPlayer(userUUID);
+        if (player == null || !player.isOnline()){
+            return;
+        }
+        
+        World world = player.getWorld();
+        for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(world)){
+            if (!pg.isAutoShow()) continue;
+            Predicate<Player> condition = pg.getAutoShowCondition();
+            if (condition != null && !condition.test(player)) continue;
+            pg.showToPlayer(player, GroupSpawnedEvent.SpawnReason.PLAYER_SENT_CHUNK);
+
+            //Entity vehicle = pg.getVehicle();
+            //PassengerAPI.getAPI(DisplayEntityPlugin.getInstance()).updateGlobalPassengers(true, vehicle.getEntityId(), player);
+        }
+    }
+
+    @ApiStatus.Internal
+    public void revealPacketGroupsFromSentChunk(int x, int z){
+        Player player = Bukkit.getPlayer(userUUID);
+        if (player == null || !player.isOnline()){
+            return;
+        }
+
+        World w = player.getWorld();
+        for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(w, getChunkKey(x, z))){
+            if (!pg.isAutoShow()) continue;
+
+            Predicate<Player> condition = pg.getAutoShowCondition();
+            if (condition != null && !condition.test(player)) continue;
+
+            pg.showToPlayer(player, GroupSpawnedEvent.SpawnReason.PLAYER_SENT_CHUNK);
+        }
+    }
+
+    private long getChunkKey(int x, int z){
+        return ((long) z << 32) | (x & 0xFFFFFFFFL); //Order is inverted
     }
 
     /**
@@ -207,26 +256,8 @@ public class DEUUser {
      * @param part the {@link PacketDisplayEntityPart}
      * @return a boolean
      */
-    public boolean isTrackingPacketEntity(@NotNull PacketDisplayEntityPart part){
-        return isTrackingPacketEntity(part.getEntityId());
-    }
-
-    /**
-     * Check if this user is tracking a packet-based entity
-     * @param entityId the entity's entity id
-     * @return a boolean
-     */
-    public boolean isTrackingPacketEntity(int entityId){
-        return trackedPacketEntities.containsKey(entityId);
-    }
-
-    /**
-     * Get a {@link PacketDisplayEntityPart} a player is tracking by its entity id
-     * @param entityId the part's entity id
-     * @return a {@link PacketDisplayEntityPart} if present
-     */
-    public @Nullable PacketDisplayEntityPart getPacketDisplayEntityPart(int entityId){
-        return trackedPacketEntities.get(entityId);
+    public boolean isTrackingPart(@NotNull PacketDisplayEntityPart part){
+        return trackedPacketEntities.contains(part);
     }
 
     public int getTrackedPacketEntityCount(){
@@ -297,16 +328,14 @@ public class DEUUser {
 
         Player player = Bukkit.getPlayer(userUUID);
 
-        Iterator<Map.Entry<Integer, PacketDisplayEntityPart>> iter = trackedPacketEntities.entrySet().iterator();
+        Iterator<PacketDisplayEntityPart> iter = trackedPacketEntities.iterator();
         while (iter.hasNext()) {
-            Map.Entry<Integer, PacketDisplayEntityPart> entry = iter.next();
-            PacketDisplayEntityPart part = entry.getValue();
+            PacketDisplayEntityPart part = iter.next();
             if (part != null){
                 part.hideFromPlayer(player);
             }
             iter.remove();
         }
-
 
         DEUCommandUtils.removeRelativePoints(player);
     }

@@ -12,6 +12,7 @@ import net.donnypz.displayentityutils.events.InteractionClickEvent;
 import net.donnypz.displayentityutils.events.PacketInteractionClickEvent;
 import net.donnypz.displayentityutils.events.PreInteractionClickEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
@@ -21,6 +22,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Interaction;
@@ -53,48 +55,54 @@ public class DEUInteractionListener implements Listener, PacketListener {
                             InteractionClickEvent.ClickType.RIGHT;
 
         int entityId = interact.getEntityId();
+        ActivePart activePart = ActivePart.getPart(entityId);
+        if (!(activePart instanceof PacketDisplayEntityPart part)){
+            return;
+        }
+        if (!DEUUser.getOrCreateUser(user.getUUID()).isTrackingPart(part)){
+            return;
+        }
+
+        Player player = Bukkit.getPlayer(user.getUUID());
+
+        //Point Displays
+        if (RelativePointDisplay.isRelativePointPart(part)){
+            RelativePointDisplay pointDisplay = RelativePointDisplay.get(part);
+            if (pointDisplay == null){
+                player.sendMessage(Component.text("Failed to get point!", NamedTextColor.RED));
+                return;
+            }
+
+            //Left Click Action
+            if (clickType == InteractionClickEvent.ClickType.LEFT){
+                player.sendMessage(Component.empty());
+                player.sendMessage(Component.text("-------=Point Info=-------", NamedTextColor.AQUA, TextDecoration.BOLD));
+                pointDisplay.sendInfo(player);
+                player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Sneak+Right Click</gray> <red>to DELETE"));
+                player.sendMessage(Component.text("| Run \"/mdis hidepoints\" to stop viewing points", NamedTextColor.GRAY));
+                DEUCommandUtils.selectRelativePoint(player, pointDisplay);
+                return;
+            }
+
+            //Right Click Action
+            if (!player.isSneaking()){
+                pointDisplay.rightClick(player);
+                return;
+            }
+
+            //Right Click Action (Remove Point)
+            if (DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_REMOVE_FRAME_POINT)){
+                player.sendMessage(buildPointRemovalComponent(pointDisplay));
+                player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+            }
+            return;
+        }
+
+        if (!new PacketInteractionClickEvent(player, part, clickType).callEvent()){
+            return;
+        }
+
         Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
-            PacketDisplayEntityPart part = DEUUser
-                    .getOrCreateUser(user.getUUID())
-                    .getPacketDisplayEntityPart(entityId);
-            if (part == null) return;
-            Player player = Bukkit.getPlayer(user.getUUID());
-
-            //Point Displays
-
-            if (RelativePointDisplay.isRelativePointPart(part)){
-                RelativePointDisplay pointDisplay = RelativePointDisplay.get(part);
-                if (pointDisplay == null){
-                    player.sendMessage(Component.text("Failed to get point!", NamedTextColor.RED));
-                    return;
-                }
-
-                //Left Click Action
-                if (clickType == InteractionClickEvent.ClickType.LEFT){
-                    pointDisplay.leftClick(player);
-                    DEUCommandUtils.selectRelativePoint(player, pointDisplay);
-                    return;
-                }
-
-                //Right Click Action
-                if (!player.isSneaking()){
-                    pointDisplay.rightClick(player);
-                    return;
-                }
-
-                //Right Click Action (Remove Point)
-                if (DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_REMOVE_FRAME_POINT)){
-                    player.sendMessage(buildPointRemovalComponent(pointDisplay));
-                    player.playSound(player, Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
-                }
-                return;
-            }
-
-
-            if (!new PacketInteractionClickEvent(player, part, clickType).callEvent()){
-                return;
-            }
-
             //Execute Commands
             if (clickType == InteractionClickEvent.ClickType.LEFT){
                 for (String cmd : part.getLeftConsoleInteractionCommands()){
@@ -163,7 +171,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
                     boolean result = point.removeFromPointHolder();
                     DEUCommandUtils.removeRelativePoint(p, point);
                     if (result){
-                        p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully removed point from frame!", NamedTextColor.YELLOW)));
+                        p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully removed point!", NamedTextColor.YELLOW)));
                         point.despawn();
                     }
                     else{

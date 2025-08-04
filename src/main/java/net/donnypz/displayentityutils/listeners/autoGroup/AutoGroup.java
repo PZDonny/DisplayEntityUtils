@@ -63,6 +63,8 @@ final class AutoGroup {
             chunks.add(chunk.getChunkKey());
         }
 
+        DisplayGroupManager.spawnChunkPacketGroups(chunk);
+
 
         HashSet<SpawnedDisplayEntityGroup> foundGroups = new HashSet<>();
         HashMap<SpawnedDisplayEntityGroup, Collection<Interaction>> addedInteractionsForEvent = new HashMap<>();

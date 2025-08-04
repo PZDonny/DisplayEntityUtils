@@ -22,10 +22,10 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-public abstract class ActiveGroup implements Active{
+public abstract class ActiveGroup<T extends ActivePart> implements Active{
 
-    protected ActivePart masterPart;
-    protected LinkedHashMap<UUID, ActivePart> groupParts = new LinkedHashMap<>();
+    protected T masterPart;
+    protected LinkedHashMap<UUID, T> groupParts = new LinkedHashMap<>();
     protected String tag;
     protected Set<GroupEntityFollower> followers = new HashSet<>();
     GroupEntityFollower defaultFollower;
@@ -316,40 +316,93 @@ public abstract class ActiveGroup implements Active{
     /**
      * Get a part by its part uuid
      * @param partUUID the part uuid of the part
-     * @return an {@link ActivePart} or null if no part in this group contains the provided part uuid
+     * @return a part or null if no part in this group contains the provided part uuid
      */
-    public abstract ActivePart getPart(@NotNull UUID partUUID);
+    public @Nullable T getPart(@NotNull UUID partUUID){
+        return groupParts.get(partUUID);
+    }
 
     /**
      * Get all the parts contained in this group
-     * @return a list of {@link ActivePart}
+     * @return a list of parts
      */
-    public abstract List<? extends ActivePart> getParts();
+    public @NotNull List<T> getParts(){
+        return new ArrayList<>(groupParts.sequencedValues());
+    }
 
     /**
-     * Get a list of all parts with the given tag
-     * @return a list of {@link ActivePart}
+     * Get a list of all parts in this group with the given tag
+     * @return a list of parts
      */
-    public abstract List<? extends ActivePart> getParts(@NotNull String tag);
+    public List<T> getParts(@NotNull String tag){
+        List<T> partList = new ArrayList<>();
+        for (T part : groupParts.sequencedValues()){
+            if (part.hasTag(tag)){
+                partList.add(part);
+            }
+        }
+        return partList;
+    }
 
     /**
      * Get a list of all parts with at least one of the given tags
-     * @return a list of {@link ActivePart}
+     * @return a list of parts
      */
-    public abstract List<? extends ActivePart> getParts(@NotNull Collection<String> tags);
+    public List<T> getParts(@NotNull Collection<String> tags){
+        List<T> partList = new ArrayList<>();
+        for (T part : groupParts.sequencedValues()){
+            for (String tag : tags){
+                if (part.hasTag(tag)){
+                    partList.add(part);
+                    break;
+                }
+            }
+        }
+        return partList;
+    }
 
 
     /**
      * Get a collection of all parts of a certain type within this group.
      * @return a list of {@link ActivePart}
      */
-    public abstract List<? extends ActivePart> getParts(@NotNull SpawnedDisplayEntityPart.PartType partType);
+    public List<T> getParts(@NotNull SpawnedDisplayEntityPart.PartType partType){
+        List<T> partList = new ArrayList<>();
+        for (T part : groupParts.sequencedValues()){
+            if (partType == part.getType()){
+                partList.add(part);
+            }
+        }
+        return partList;
+    }
 
     /**
      * Get a list of all display entity parts (block, item, text display) within this group
      * @return a list of {@link ActivePart}
      */
-    public abstract List<? extends ActivePart> getDisplayParts();
+    public List<T> getDisplayParts(){
+        List<T> partList = new ArrayList<>();
+        for (T part : groupParts.sequencedValues()){
+            if (part.type != SpawnedDisplayEntityPart.PartType.INTERACTION){
+                partList.add(part);
+            }
+        }
+        return partList;
+    }
+
+    /**
+     * Get an array containing the entity ids of every part in this group
+     * @return an int array
+     */
+    public int[] getPartEntityIds(){
+        int[] ids = new int[groupParts.size()];
+        int i = 0;
+        for (ActivePart part : groupParts.sequencedValues()){
+            ids[i] = part.getEntityId();
+            i++;
+        }
+        return ids;
+    }
 
     /**
      * Get whether can player visibly see / is tracking this group
@@ -364,7 +417,13 @@ public abstract class ActiveGroup implements Active{
      */
     public abstract Collection<Player> getTrackingPlayers();
 
-    public abstract ActivePart getMasterPart();
+    /**
+     * Get this group's master part
+     * @return This group's master part. Null if it could not be found
+     */
+    public @Nullable T getMasterPart(){
+        return masterPart;
+    }
 
     public abstract Location getLocation();
 
@@ -659,6 +718,8 @@ public abstract class ActiveGroup implements Active{
     public abstract @Nullable Entity dismount();
 
     public abstract @Nullable Entity getVehicle();
+
+    public abstract boolean isRiding();
 
     /**
      * Set the vertical translation offset of this group riding an entity. This will apply to animations

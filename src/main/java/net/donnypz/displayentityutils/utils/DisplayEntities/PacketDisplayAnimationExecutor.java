@@ -24,7 +24,7 @@ final class PacketDisplayAnimationExecutor {
 
     PacketDisplayAnimationExecutor(@NotNull DisplayAnimator animator,
                                    @NotNull SpawnedDisplayAnimation animation,
-                                   @NotNull ActiveGroup group,
+                                   @NotNull ActiveGroup<?> group,
                                    @NotNull SpawnedDisplayAnimationFrame frame,
                                    int startFrameId,
                                    int delay,
@@ -41,7 +41,7 @@ final class PacketDisplayAnimationExecutor {
      * @param animation the animation the frame is from
      * @param frame the frame to display
      */
-    static void setGroupToFrame(@NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame){
+    static void setGroupToFrame(@NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
         new PacketDisplayAnimationExecutor(animator, animation, group, frame, -1, 0, true);
     }
@@ -54,16 +54,16 @@ final class PacketDisplayAnimationExecutor {
      * @param duration how long the frame should play
      * @param delay how long until the frame should start playing
      */
-    static void setGroupToFrame(@NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay){
+    static void setGroupToFrame(@NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
         SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
         clonedFrame.duration = duration;
         new PacketDisplayAnimationExecutor(animator, animation, group, clonedFrame, -1, delay, true);
     }
 
-    private void prepareAnimation(SpawnedDisplayAnimation animation, ActiveGroup group, SpawnedDisplayAnimationFrame frame, int frameId, int delay){
+    private void prepareAnimation(SpawnedDisplayAnimation animation, ActiveGroup<?> group, SpawnedDisplayAnimationFrame frame, int frameId, int delay){
         group.addActiveAnimator(animator);
-        MultiPartSelection selection = animation.hasFilter() ? group.createPartSelection(animation.filter) : group.createPartSelection();
+        MultiPartSelection<?> selection = animation.hasFilter() ? group.createPartSelection(animation.filter) : group.createPartSelection();
         Bukkit
                 .getScheduler()
                 .runTaskLaterAsynchronously(DisplayEntityPlugin.getInstance(),
@@ -71,7 +71,7 @@ final class PacketDisplayAnimationExecutor {
                         Math.max(delay, 0));
     }
 
-    private void executeAnimation(SpawnedDisplayAnimation animation, ActiveGroup group, MultiPartSelection selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame){
+    private void executeAnimation(SpawnedDisplayAnimation animation, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame){
         if (!group.isActiveAnimator(animator)){
             selection.remove();
             return;
@@ -186,7 +186,7 @@ final class PacketDisplayAnimationExecutor {
         }
     }
 
-    private void animateInteractions(Location groupLoc, SpawnedDisplayAnimationFrame frame, ActiveGroup group, MultiPartSelection selection, SpawnedDisplayAnimation animation){
+    private void animateInteractions(Location groupLoc, SpawnedDisplayAnimationFrame frame, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimation animation){
         for (Map.Entry<UUID, Vector3f> entry : frame.interactionTransformations.entrySet()){
             UUID partUUID = entry.getKey();
 
@@ -249,7 +249,7 @@ final class PacketDisplayAnimationExecutor {
         }
     }
 
-    private void animateDisplays(SpawnedDisplayAnimationFrame frame, ActiveGroup group, MultiPartSelection selection, SpawnedDisplayAnimation animation){
+    private void animateDisplays(SpawnedDisplayAnimationFrame frame, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimation animation){
         if (selection.selectedParts.size() >= frame.displayTransformations.size()){
             for (Map.Entry<UUID, DisplayTransformation> entry : frame.displayTransformations.entrySet()){
                 UUID partUUID = entry.getKey();
@@ -277,14 +277,14 @@ final class PacketDisplayAnimationExecutor {
         }
     }
 
-    private void animateDisplay(ActivePart part, DisplayTransformation transformation, ActiveGroup group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame){
+    private void animateDisplay(ActivePart part, DisplayTransformation transformation, ActiveGroup<?> group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame){
         //Prevents jittering in some cases
         DisplayTransformation last = prevFrame != null ? prevFrame.displayTransformations.get(part.getPartUUID()) : null;
         boolean applyDataOnly = last != null && transformation.isSimilar(part);
         applyDisplayTransformation(part, frame, animation, group, transformation, applyDataOnly);
     }
 
-    private void applyDisplayTransformation(ActivePart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, ActiveGroup group, DisplayTransformation transformation, boolean applyDataOnly){
+    private void applyDisplayTransformation(ActivePart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, ActiveGroup<?> group, DisplayTransformation transformation, boolean applyDataOnly){
         if (applyDataOnly){
             if (animation.allowsDataChanges()){
                 transformation.applyData(part);

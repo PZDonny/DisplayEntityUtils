@@ -1,10 +1,6 @@
 package net.donnypz.displayentityutils.listeners.player;
 
 import net.donnypz.displayentityutils.managers.DEUUser;
-import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

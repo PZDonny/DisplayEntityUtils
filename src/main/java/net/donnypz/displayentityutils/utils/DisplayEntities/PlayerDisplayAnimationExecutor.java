@@ -254,7 +254,7 @@ final class PlayerDisplayAnimationExecutor {
         }
     }
 
-    private void animateDisplays(SpawnedDisplayAnimationFrame frame, ActiveGroup group, MultiPartSelection selection, SpawnedDisplayAnimation animation){
+    private void animateDisplays(SpawnedDisplayAnimationFrame frame, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimation animation){
         if (selection.selectedParts.size() >= frame.displayTransformations.size()){
             for (Map.Entry<UUID, DisplayTransformation> entry : frame.displayTransformations.entrySet()){
                 UUID partUUID = entry.getKey();
@@ -344,7 +344,7 @@ final class PlayerDisplayAnimationExecutor {
         }
     }
 
-    private void addFollowerDisplayPivot(ActiveGroup group, ActivePart part, Vector3f translationVector) {
+    private void addFollowerDisplayPivot(ActiveGroup<?> group, ActivePart part, Vector3f translationVector) {
         for (GroupEntityFollower follower : group.followers) {
             if (!follower.selection.contains(part)) {
                 continue;

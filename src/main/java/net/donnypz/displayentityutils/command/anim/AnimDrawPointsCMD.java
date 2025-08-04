@@ -38,7 +38,7 @@ class AnimDrawPointsCMD extends PlayerSubCommand {
 
         if (DEUCommandUtils.isViewingRelativePoints(player)){
             player.sendMessage(Component.text("You cannot draw points while already viewing points!", NamedTextColor.RED));
-            player.sendMessage(Component.text("| Run \"/mdis anim cancelpoints\" to stop viewing points", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Run \"/mdis hidepoints\" to stop viewing points", NamedTextColor.GRAY));
             return;
         }
 

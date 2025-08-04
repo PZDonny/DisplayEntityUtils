@@ -1,7 +1,11 @@
-package net.donnypz.displayentityutils.managers;
+package net.donnypz.displayentityutils.utils.bdengine.convert.datapack;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.listeners.bdengine.DatapackEntitySpawned;
+import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
+import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.managers.LoadMethod;
+import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -14,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -26,8 +31,15 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-class DatapackLegacyConverter {
-    static void saveDatapackAnimation(Player player, String datapackName, @NotNull String groupSaveTag, @NotNull String animationSaveTag){
+@ApiStatus.Internal
+public class BDEngineLegacyDPConverter {
+
+    @ApiStatus.Internal
+    public static void saveDatapackAnimation(@NotNull Player player, @NotNull String datapackName, @NotNull String groupSaveTag, @NotNull String animationSaveTag){
+        if (!datapackName.endsWith(".zip")){
+            datapackName = datapackName+".zip";
+        }
+
         player.sendMessage(Component.text("Legacy Conversion - If no model/group/result is present, the datapack is likely a modern one", NamedTextColor.LIGHT_PURPLE));
         try{
             ZipFile zipFile = new ZipFile(LocalManager.getAnimationDatapackFolder()+"/"+datapackName);
@@ -240,7 +252,7 @@ class DatapackLegacyConverter {
                     continue;
                 }
 
-                Bukkit.dispatchCommand(LocalManager.silentSender, line);
+                Bukkit.dispatchCommand(BDEngineDPConverter.silentSender, line);
 
             }
             br.close();

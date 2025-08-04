@@ -11,7 +11,9 @@ import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUInteractionListener;
 import net.donnypz.displayentityutils.listeners.entity.mythic.DEUMythicListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerChatListener;
+import net.donnypz.displayentityutils.listeners.player.DEUPlayerWorldListener;
 import net.donnypz.displayentityutils.listeners.player.DEUPlayerConnectionListener;
+import net.donnypz.displayentityutils.listeners.player.DEUPlayerPacketListener;
 import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
@@ -58,6 +60,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     private static NamespacedKey spawnAnimationKey;
     private static NamespacedKey spawnAnimationTypeKey;
     private static NamespacedKey spawnAnimationLoadMethodKey;
+    private static NamespacedKey chunkPacketGroupsKey;
 
     private static final String legacyPartTagPrefix = "deu.parttag_";
     static boolean isMongoEnabled = false;
@@ -89,6 +92,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     static boolean registerPluginCommands;
 
     private static boolean isMythicMobsInstalled;
+    private static boolean isLibsDisguisesInstalled;
     private static boolean isSkriptInstalled;
 
     SkriptAddon addon;
@@ -99,7 +103,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         PacketEvents.getAPI().getEventManager().registerListener(
                 new DEUInteractionListener(), PacketListenerPriority.NORMAL);
         PacketEvents.getAPI().getEventManager().registerListener(
-                new DEUEntityListener(), PacketListenerPriority.NORMAL);
+                new DEUPlayerPacketListener(), PacketListenerPriority.NORMAL);
     }
 
     @Override
@@ -130,6 +134,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         spawnAnimationKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimation");
         spawnAnimationTypeKey = new NamespacedKey(this, "spawnanimationtype");
         spawnAnimationLoadMethodKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "spawnanimationloader");
+        chunkPacketGroupsKey = new NamespacedKey(this, "chunkpacketgroups");
     }
 
     private void initializeDependencies(){
@@ -139,6 +144,8 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             Bukkit.getPluginManager().registerEvents(new DEUMythicListener(), this);
         }
 
+        //LibsDisguises
+        isLibsDisguisesInstalled = Bukkit.getPluginManager().isPluginEnabled("LibsDisguises");
 
         //Skript
         isSkriptInstalled = Bukkit.getPluginManager().isPluginEnabled("Skript");
@@ -166,6 +173,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new DatapackEntitySpawned(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerChatListener(), this);
+        Bukkit.getPluginManager().registerEvents(new DEUPlayerWorldListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUEntityListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
         Bukkit.getPluginManager().registerEvents(new DEUInteractionListener(), this);
@@ -224,6 +232,10 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     public static NamespacedKey getSpawnAnimationLoadMethodKey() {
         return spawnAnimationLoadMethodKey;
+    }
+
+    public static NamespacedKey getChunkPacketGroupsKey() {
+        return chunkPacketGroupsKey;
     }
 
     public static DisplayEntityPlugin getInstance(){
@@ -431,6 +443,14 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
      */
     public static boolean isMythicMobsInstalled() {
         return isMythicMobsInstalled;
+    }
+
+    /**
+     * Get whether LibsDisguises is installed on this server
+     * @return true if MythicMobs is present
+     */
+    public static boolean isLibsDisguisesInstalled() {
+        return isLibsDisguisesInstalled;
     }
 
     /**

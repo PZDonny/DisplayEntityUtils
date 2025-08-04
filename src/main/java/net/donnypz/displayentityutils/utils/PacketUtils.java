@@ -6,6 +6,7 @@ import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
@@ -517,41 +518,43 @@ public final class PacketUtils {
         return null;
     }
 
-    public static void destroyEntity(@NotNull Player player, int entityId){
-        destroyEntities(player, new int[]{entityId});
+    /**
+     * Hide an entity from a player. This should not be used on a {@link PacketDisplayEntityPart}. Use {@link PacketDisplayEntityPart#hideFromPlayer(Player)} instead.
+     * @param player the player
+     * @param entityId the entity to hide
+     */
+    public static void hideEntity(@NotNull Player player, int entityId){
+        hideEntities(player, new int[]{entityId});
     }
 
-    public static void destroyEntity(@NotNull Collection<Player> players, int entityId){
-        WrapperPlayServerDestroyEntities destroyPacket = new WrapperPlayServerDestroyEntities(new int[]{entityId});
-        for (Player player : players){
-            DEUUser.getOrCreateUser(player).untrackPacketEntity(entityId);
-            PacketEvents.getAPI().getPlayerManager().sendPacket(player, destroyPacket);
-        }
+    /**
+     * Hide an entity from players. This should not be used on a {@link PacketDisplayEntityPart}. Use {@link PacketDisplayEntityPart#hideFromPlayers(Collection)} instead.
+     * @param players the players
+     * @param entityId the id of the entity to hide
+     */
+    public static void hideEntity(@NotNull Collection<Player> players, int entityId){
+        hideEntities(players, new int[]{entityId});
     }
 
-    public static void destroyEntities(@NotNull Player player, @NotNull SequencedCollection<PacketDisplayEntityPart> parts){
-        DEUUser user = DEUUser.getOrCreateUser(player);
-        int[] entityIds = getTrackedIntersection(user, parts); //untracks from part here
-        if (entityIds.length == 0) return;
-        destroyEntities(player, entityIds);
-    }
 
-    public static void destroyEntities(@NotNull Collection<Player> players, @NotNull SequencedCollection<PacketDisplayEntityPart> parts) {
-        for (Player player : players) {
-            destroyEntities(player, parts);
-        }
-    }
-
-    private static void destroyEntities(@NotNull Player player, int[] entityIds){
-        DEUUser.getOrCreateUser(player).untrackPacketEntities(entityIds);
+    /**
+     * Hide many entities from a player. This should not be used on a {@link PacketDisplayEntityGroup}'s parts. Use {@link PacketDisplayEntityGroup#hideFromPlayer(Player)} instead.
+     * @param player the player
+     * @param entityIds the ids of the entities to hide
+     */
+    public static void hideEntities(@NotNull Player player, int[] entityIds){
         WrapperPlayServerDestroyEntities destroyPacket = new WrapperPlayServerDestroyEntities(entityIds);
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, destroyPacket);
     }
 
-    private static void destroyEntities(@NotNull Collection<Player> players, int[] entityIds){
+    /**
+     * Hide many entities from players. This should not be used on a {@link PacketDisplayEntityGroup}'s parts. Use {@link PacketDisplayEntityGroup#hideFromPlayers(Collection)} instead.
+     * @param players the players
+     * @param entityIds the ids of the entities to hide
+     */
+    public static void hideEntities(@NotNull Collection<Player> players, int[] entityIds){
         WrapperPlayServerDestroyEntities destroyPacket = new WrapperPlayServerDestroyEntities(entityIds);
         for (Player player : players){
-            DEUUser.getOrCreateUser(player).untrackPacketEntities(entityIds);
             PacketEvents.getAPI().getPlayerManager().sendPacket(player, destroyPacket);
         }
     }

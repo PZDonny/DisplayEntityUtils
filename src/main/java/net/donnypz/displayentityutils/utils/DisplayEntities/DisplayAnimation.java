@@ -15,11 +15,13 @@ public final class DisplayAnimation implements Serializable {
     boolean dataChanges = true;
     PartFilter filter;
 
-    DisplayAnimation(){}
-
     @Serial
     private static final long serialVersionUID = 99L;
     public static final String fileExtension = ".deanim";
+
+
+    DisplayAnimation(){}
+
 
 
     public String getAnimationTag() {

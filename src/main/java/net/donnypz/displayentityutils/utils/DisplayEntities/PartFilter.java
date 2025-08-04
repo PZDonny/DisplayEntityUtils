@@ -10,14 +10,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class PartFilter implements Serializable, Cloneable {
 
     HashSet<String> includedTags = new HashSet<>();
+    boolean strictPartTagInclusion = false;
     HashSet<String> excludedTags = new HashSet<>();
     HashSet<SpawnedDisplayEntityPart.PartType> partTypes = new HashSet<>();
 
@@ -75,6 +73,16 @@ public class PartFilter implements Serializable, Cloneable {
      */
     public @NotNull PartFilter includePartTags(@NotNull Collection<String> partTags){
         this.includedTags.addAll(partTags);
+        return this;
+    }
+
+    /**
+     * Determine if all included part tags must be present on a part to be filtered in
+     * @param strictPartTagInclusion
+     * @return this
+     */
+    public @NotNull PartFilter strictPartTagInclusion(boolean strictPartTagInclusion){
+        this.strictPartTagInclusion = strictPartTagInclusion;
         return this;
     }
 
@@ -254,14 +262,7 @@ public class PartFilter implements Serializable, Cloneable {
         return includeBlockTypes;
     }
 
-    /**
-     * Create a {@link MultiPartSelection} from this filter
-     * @param group the group to create a selection from
-     * @return a {@link MultiPartSelection}
-     */
-    public @NotNull MultiPartSelection toPartSelection(@NotNull ActiveGroup group){
-        return group.createPartSelection(this);
-    }
+
 
 
     /**
@@ -269,14 +270,63 @@ public class PartFilter implements Serializable, Cloneable {
      * @return a {@link PartFilter} identical to this one
      */
     @Override
-    public PartFilter clone(){
-        try{
-            return (PartFilter) super.clone();
-        }
-        catch(CloneNotSupportedException e){
+    public PartFilter clone() {
+        try {
+            PartFilter cloned = (PartFilter) super.clone();
+
+            // Deep copy mutable collections
+            cloned.includedTags = new HashSet<>(this.includedTags);
+            cloned.excludedTags = new HashSet<>(this.excludedTags);
+            cloned.partTypes = new HashSet<>(this.partTypes);
+
+            cloned.itemTypes = new HashSet<>(this.itemTypes);
+            cloned.blockTypes = new HashSet<>(this.blockTypes);
+            cloned.serializedItemTypes.addAll(this.serializedItemTypes);
+            cloned.serializedBlockTypes.addAll(this.serializedBlockTypes);
+            return cloned;
+        } catch (CloneNotSupportedException e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PartFilter other)) return false;
+
+        return includedTags.equals(other.includedTags)
+                && strictPartTagInclusion == other.strictPartTagInclusion
+                && excludedTags.equals(other.excludedTags)
+                && partTypes.equals(other.partTypes)
+                && serializedItemTypes.equals(other.serializedItemTypes)
+                && serializedBlockTypes.equals(other.serializedBlockTypes)
+                && includeItemTypes == other.includeItemTypes
+                && includeBlockTypes == other.includeBlockTypes;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = includedTags.hashCode();
+        result = 31 * result + Boolean.hashCode(strictPartTagInclusion);
+        result = 31 * result + excludedTags.hashCode();
+        result = 31 * result + excludedTags.hashCode();
+        result = 31 * result + partTypes.hashCode();
+        result = 31 * result + serializedItemTypes.hashCode();
+        result = 31 * result + serializedBlockTypes.hashCode();
+        result = 31 * result + Boolean.hashCode(includeItemTypes);
+        result = 31 * result + Boolean.hashCode(includeBlockTypes);
+        return result;
+
+        /*return Objects.hash(
+                includedTags,
+                excludedTags,
+                partTypes,
+                serializedItemTypes,
+                serializedBlockTypes,
+                includeItemTypes,
+                includeBlockTypes
+        );*/
     }
 
     public enum FilterType{

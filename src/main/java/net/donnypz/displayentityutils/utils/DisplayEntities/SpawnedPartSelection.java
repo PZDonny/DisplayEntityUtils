@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public final class SpawnedPartSelection extends MultiPartSelection implements ServerSideSelection{
+public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDisplayEntityPart> implements ServerSideSelection{
 
     /**
      * Create a selection of parts with the specified part tag from a group.
@@ -19,16 +19,17 @@ public final class SpawnedPartSelection extends MultiPartSelection implements Se
      * @param partTag The part tag to include in the filter
      */
     public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull String partTag){
-        this(group, Set.of(partTag));
+        this(group, Set.of(partTag), false);
     }
 
     /**
      * Create a selection of parts with the specified part tags from a group.
      * @param group The group to get the parts from
      * @param partTags The part tags to include in the filter
+     * @param strictPartTagInclusion whether parts should be filtered strictly, requiring all given tags to be present
      */
-    public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull Collection<String> partTags){
-        this(group, new PartFilter().includePartTags(partTags));
+    public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull Collection<String> partTags, boolean strictPartTagInclusion){
+        this(group, new PartFilter().includePartTags(partTags).strictPartTagInclusion(strictPartTagInclusion));
     }
 
     /**
@@ -69,42 +70,16 @@ public final class SpawnedPartSelection extends MultiPartSelection implements Se
         return true;
     }
 
-    /**
-     * Get the {@link SpawnedDisplayEntityPart} within this selection
-     * @return the parts in this selection
-     */
     @Override
-    public SequencedCollection<SpawnedDisplayEntityPart> getSelectedParts() {
-        List<SpawnedDisplayEntityPart> parts = new ArrayList<>();
-        for (ActivePart part : selectedParts){
-            if (part instanceof SpawnedDisplayEntityPart p){
-                parts.add(p);
-            }
-        }
-        return parts;
-    }
-
-    @Override
-    BlockType getBlockType(ActivePart part) {
-        SpawnedDisplayEntityPart blockPart = (SpawnedDisplayEntityPart) part;
-        BlockDisplay display = (BlockDisplay) blockPart.getEntity();
+    BlockType getBlockType(SpawnedDisplayEntityPart part) {
+        BlockDisplay display = (BlockDisplay) part.getEntity();
         return display.getBlock().getMaterial().asBlockType();
     }
 
     @Override
-    ItemType getItemType(ActivePart part) {
-        SpawnedDisplayEntityPart itemPart = (SpawnedDisplayEntityPart) part;
-        ItemDisplay display = (ItemDisplay) itemPart.getEntity();
+    ItemType getItemType(SpawnedDisplayEntityPart part) {
+        ItemDisplay display = (ItemDisplay) part.getEntity();
         return display.getItemStack().getType().asItemType();
-    }
-
-    /**
-     * Get the part that is selected out of all the parts within this SpawnedPartSelection
-     * @return a {@link SpawnedDisplayEntityPart}. Null if a part is not selected
-     */
-    @Override
-    public SpawnedDisplayEntityPart getSelectedPart() {
-        return (SpawnedDisplayEntityPart) selectedPart;
     }
 
     /**
@@ -116,8 +91,8 @@ public final class SpawnedPartSelection extends MultiPartSelection implements Se
         if (!DisplayUtils.isValidTag(partTag)){
             return false;
         }
-        for (ActivePart part : selectedParts){
-            ((SpawnedDisplayEntityPart) part).addTag(partTag);
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            part.addTag(partTag);
         }
         return true;
     }
@@ -128,8 +103,8 @@ public final class SpawnedPartSelection extends MultiPartSelection implements Se
      * @return this
      */
     public SpawnedPartSelection removeTag(@NotNull String partTag){
-        for (ActivePart part : selectedParts){
-            ((SpawnedDisplayEntityPart) part).removeTag(partTag);
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            part.removeTag(partTag);
         }
         return this;
     }
@@ -140,8 +115,8 @@ public final class SpawnedPartSelection extends MultiPartSelection implements Se
      */
     @Override
     public void showToPlayer(@NotNull Player player){
-        for (ActivePart part : selectedParts){
-            ((SpawnedDisplayEntityPart) part).showToPlayer(player);
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            part.showToPlayer(player);
         }
     }
 
@@ -151,8 +126,8 @@ public final class SpawnedPartSelection extends MultiPartSelection implements Se
      */
     @Override
     public boolean isInLoadedChunk(){
-        for (ActivePart part : selectedParts){
-            if (!((SpawnedDisplayEntityPart) part).isInLoadedChunk()){
+        for (SpawnedDisplayEntityPart part : selectedParts){
+            if (!part.isInLoadedChunk()){
                 return false;
             }
         }
@@ -168,10 +143,10 @@ public final class SpawnedPartSelection extends MultiPartSelection implements Se
     public void randomizePartUUIDs(long seed){
         byte[] byteArray;
         Random random = new Random(seed);
-        for (ActivePart part : selectedParts){
+        for (SpawnedDisplayEntityPart part : selectedParts){
             byteArray = new byte[16];
             random.nextBytes(byteArray);
-            ((SpawnedDisplayEntityPart) part).setPartUUID(UUID.nameUUIDFromBytes(byteArray));
+            part.setPartUUID(UUID.nameUUIDFromBytes(byteArray));
         }
     }
 
@@ -180,7 +155,7 @@ public final class SpawnedPartSelection extends MultiPartSelection implements Se
      * @param part
      * @return true if the part was contained and removed
      */
-    public boolean removePart(SpawnedDisplayEntityPart part){
+    public boolean removePart(@NotNull SpawnedDisplayEntityPart part){
         boolean removed = selectedParts.remove(part);
         if (removed && selectedPart == part){
             if (!selectedParts.isEmpty()){
@@ -202,43 +177,6 @@ public final class SpawnedPartSelection extends MultiPartSelection implements Se
     public void remove(){
         DisplayGroupManager.removePartSelection(this);
     }
-
-
-
-    /**
-     * Change the translation of the SpawnedDisplayEntityParts in this SpawnedPartSelection.
-     * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
-     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
-     * @param direction The direction to translate the parts
-     * @param distance How far the part should be translated
-     * @param durationInTicks How long it should take for the translation to complete
-     * @param delayInTicks How long before the translation should begin
-     */
-    @Override
-    public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks){
-        for (ActivePart part : selectedParts){
-            part.translate(direction, distance, durationInTicks, delayInTicks);
-        }
-        return true;
-    }
-
-    /**
-     * Change the translation of the SpawnedDisplayEntityParts in this SpawnedPartSelection.
-     * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
-     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
-     * @param direction The direction to translate the parts
-     * @param distance How far the part should be translated
-     * @param durationInTicks How long it should take for the translation to complete
-     * @param delayInTicks How long before the translation should begin
-     */
-    @Override
-    public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks){
-        for (ActivePart part : selectedParts){
-            part.translate(direction, distance, durationInTicks, delayInTicks);
-        }
-        return true;
-    }
-
 
     void removeNoManager(){
         reset();

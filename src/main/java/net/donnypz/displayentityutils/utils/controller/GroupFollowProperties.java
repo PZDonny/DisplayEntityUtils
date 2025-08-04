@@ -118,7 +118,7 @@ public class GroupFollowProperties{
      * @param entity the entity
      * @throws IllegalArgumentException If followType is to {@link FollowType#BODY} and the specified entity is not a {@link LivingEntity}
      */
-    public void followGroup(@NotNull SpawnedDisplayEntityGroup group, @NotNull Entity entity) {
+    public void followGroup(@NotNull ActiveGroup<?> group, @NotNull Entity entity) {
         group.followEntityDirection(entity, this);
     }
 
@@ -132,7 +132,7 @@ public class GroupFollowProperties{
 
     /**
      * Get the follow type the group will use to follow/respect an entity's looking direction
-     * @return
+     * @return a {@link FollowType} or null
      */
     public @Nullable FollowType followType(){
         return followType;

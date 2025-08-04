@@ -34,6 +34,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
     public DisplayEntityPluginCommand(){
         subCommands.put("listgroups", new ListGroupsCMD());
         subCommands.put("listanims", new ListAnimationsCMD());
+        subCommands.put("hidepoints", new HidePointsCMD());
 
         subCommands.put("group", new GroupCMD());
         subCommands.put("parts", new PartsCMD());
@@ -71,7 +72,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
 
     public static void noGroupSelection(Player player){
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("You have not selected a spawned display entity group!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/mdis group selectnearest <interaction-distance>", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("/mdis group selectnearest <distance>", NamedTextColor.GRAY));
     }
 
     public static void noPartSelection(Player player){
@@ -150,6 +151,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         CMDUtils.sendCMD(sender, "/mdis interaction", "Commands related to manipulating Interaction entities");
         CMDUtils.sendCMD(sender, "/mdis listgroups <storage> [page-number]", "List all saved Display Entity Models/Groups");
         CMDUtils.sendCMD(sender, "/mdis listanims <storage> [page-number]", "List all saved Animations");
+        CMDUtils.sendCMD(sender, "/mdis hidepoints", "Hide any visible points (frame points, chunk packet group points, etc.)");
         CMDUtils.sendCMD(sender, "/mdis bdengine", "Import/Convert models from BDEngine");
         CMDUtils.sendCMD(sender, "/mdis reload <config | controllers>", "Reload the plugin's config or Display Controllers." +
                 " To reload Local, MySQL or MongoDB config save options, the server must be restarted");
@@ -184,7 +186,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                 case "group" -> {
                     switch (args[1].toLowerCase()){
                         case "selectnearest" -> {
-                            suggestions.add("<interaction-distance>");
+                            suggestions.add("<distance>");
                         }
                         case "glowcolor" -> {
                             addColors(suggestions);
@@ -200,6 +202,9 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                         }
                         case "ride", "dismount" -> {
                             return null;
+                        }
+                        case "topacket" -> {
+                            suggestions.add("-confirm");
                         }
                     }
                 }
@@ -291,6 +296,9 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                 }
                 else if (args[1].equalsIgnoreCase("dismount")){
                     return null;
+                }
+                else if (args[1].equalsIgnoreCase("topacket")){
+                    suggestions.add("-keep");
                 }
             }
             else if (args[0].equalsIgnoreCase("anim")){

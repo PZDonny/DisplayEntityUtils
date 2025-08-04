@@ -252,12 +252,12 @@ final class DisplayAnimatorExecutor {
             }
         }
         else{
-            for (ActivePart part : selection.selectedParts){
+            for (SpawnedDisplayEntityPart part : selection.selectedParts){
                 DisplayTransformation transformation = frame.displayTransformations.get(part.getPartUUID());
                 if (transformation == null){ //Part does not change transformation
                     continue;
                 }
-                animateDisplay((SpawnedDisplayEntityPart) part, transformation, group, animation, frame);
+                animateDisplay(part, transformation, group, animation, frame);
             }
         }
     }
@@ -331,7 +331,7 @@ final class DisplayAnimatorExecutor {
         }
     }
 
-    static void addFollowerDisplayPivot(ActiveGroup group, ActivePart part, Vector3f translationVector){
+    static void addFollowerDisplayPivot(ActiveGroup<?> group, ActivePart part, Vector3f translationVector){
         for (GroupEntityFollower follower : group.followers){
             if (!follower.hasSetDisplayPivotData()){
                 continue;

@@ -25,6 +25,7 @@ public class PacketInteractionClickEvent extends Event implements Cancellable {
      * Called when an {@link Interaction} is Left or Right-clicked.
      */
     public PacketInteractionClickEvent(@NotNull Player player, @NotNull PacketDisplayEntityPart part, @NotNull InteractionClickEvent.ClickType clickType){
+        super(true);
         this.player = player;
         this.interactionPart = part;
         this.clickType = clickType;
