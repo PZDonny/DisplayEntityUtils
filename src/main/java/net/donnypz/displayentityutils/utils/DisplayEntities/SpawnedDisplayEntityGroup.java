@@ -1324,9 +1324,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             }
 
             DisplayEntityGroup group = toDisplayEntityGroup();
-            PacketDisplayEntityGroup cloned = group.createPacketGroup(location, playSpawnAnimation, autoShow);
+            PacketDisplayEntityGroup packetGroup = group.createPacketGroup(location, playSpawnAnimation, autoShow);
             if (addToChunk){
-                DisplayGroupManager.addChunkPacketGroup(location, group);
+                int id = DisplayGroupManager.addChunkPacketGroup(location, group);
+                if (id != -1) packetGroup.chunkPacketGroupId = id;
             }
 
             for (Map.Entry<SpawnedDisplayEntityPart, Float> entry : oldYaws.entrySet()){
@@ -1335,7 +1336,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 part.pivot(oldYaw);
             }
             oldYaws.clear();
-            return cloned;
+            return packetGroup;
         }
         else{
             return toDisplayEntityGroup().createPacketGroup(location, playSpawnAnimation, autoShow);
