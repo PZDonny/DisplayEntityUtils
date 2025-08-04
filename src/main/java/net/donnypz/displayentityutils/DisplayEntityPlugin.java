@@ -194,9 +194,6 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         if (!LocalManager.getAnimationDatapackFolder().exists()){
             LocalManager.getAnimationDatapackFolder().mkdirs();
         }
-        if (!LocalManager.getBDEngineModelFolder().exists()){
-            LocalManager.getBDEngineModelFolder().mkdirs();
-        }
         if (!LocalManager.getDisplayControllerFolder().exists()){
             LocalManager.getDisplayControllerFolder().mkdirs();
             String exampleController = "examplecontroller.yml";
