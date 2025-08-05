@@ -93,6 +93,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     private static boolean isMythicMobsInstalled;
     private static boolean isLibsDisguisesInstalled;
+    private static boolean isViaVerInstalled;
     private static boolean isSkriptInstalled;
 
     SkriptAddon addon;
@@ -146,6 +147,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
         //LibsDisguises
         isLibsDisguisesInstalled = Bukkit.getPluginManager().isPluginEnabled("LibsDisguises");
+        isViaVerInstalled = Bukkit.getPluginManager().isPluginEnabled("ViaVersion");
 
         //Skript
         isSkriptInstalled = Bukkit.getPluginManager().isPluginEnabled("Skript");
@@ -451,6 +453,14 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
      */
     public static boolean isLibsDisguisesInstalled() {
         return isLibsDisguisesInstalled;
+    }
+
+    /**
+     * Get whether ViaVersion is installed on this server
+     * @return true if ViaVersion is present
+     */
+    public static boolean isViaVerInstalled(){
+        return isViaVerInstalled;
     }
 
     /**

@@ -241,8 +241,8 @@ public class DEUCommandUtils {
 
         //Block-ID
         else{
-            BlockType blockType = Registry.BLOCK.get(NamespacedKey.minecraft(block.toLowerCase().replace(".", "_")));
-            if (blockType == null){
+            Material blockType = Registry.MATERIAL.get(NamespacedKey.minecraft(block.toLowerCase().replace(".", "_")));
+            if (blockType == null || !blockType.isBlock()){
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Block not recognized! The block's name might have been misspelled or the block doesn't exist.", NamedTextColor.RED)));
                 return null;
             }
@@ -259,12 +259,12 @@ public class DEUCommandUtils {
 
         //Item-ID
         else{
-            ItemType itemType = Registry.ITEM.get(NamespacedKey.minecraft(item.toLowerCase().replace(".", "_")));
-            if (itemType == null){
+            Material itemType = Registry.MATERIAL.get(NamespacedKey.minecraft(item.toLowerCase().replace(".", "_")));
+            if (itemType == null || !itemType.isItem()){
                 player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Item not recognized! The item's name might have been misspelled.", NamedTextColor.RED)));
                 return null;
             }
-            return itemType.createItemStack();
+            return new ItemStack(itemType);
         }
     }
 

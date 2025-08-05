@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.utils.VersionUtils;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -19,8 +20,8 @@ public class PartFilter implements Serializable, Cloneable {
     HashSet<String> excludedTags = new HashSet<>();
     HashSet<SpawnedDisplayEntityPart.PartType> partTypes = new HashSet<>();
 
-    transient Set<ItemType> itemTypes = new HashSet<>();
-    transient Set<BlockType> blockTypes = new HashSet<>();
+    transient Set<Material> itemTypes = new HashSet<>();
+    transient Set<Material> blockTypes = new HashSet<>();
     private final HashSet<String> serializedItemTypes = new HashSet<>();
     private final HashSet<String> serializedBlockTypes = new HashSet<>();
     boolean includeItemTypes;
@@ -34,13 +35,13 @@ public class PartFilter implements Serializable, Cloneable {
         itemTypes = new HashSet<>();
         blockTypes = new HashSet<>();
         for (String type : serializedItemTypes){
-            ItemType item = Registry.ITEM.get(new NamespacedKey("minecraft", type));
-            if (item != null) itemTypes.add(item);
+            Material item = Registry.MATERIAL.get(NamespacedKey.minecraft(type));
+            if (item != null && item.isItem()) itemTypes.add(item);
         }
 
         for (String type : serializedBlockTypes){
-            BlockType block = Registry.BLOCK.get(new NamespacedKey("minecraft", type));
-            if (block != null) blockTypes.add(block);
+            Material block = Registry.MATERIAL.get(NamespacedKey.minecraft(type));
+            if (block != null && block.isBlock()) blockTypes.add(block);
         }
     }
 
@@ -132,7 +133,12 @@ public class PartFilter implements Serializable, Cloneable {
         if (!material.isBlock()){
             return this;
         }
-        return setBlockType(material.asBlockType(), isIncluding);
+        this.blockTypes.clear();
+        this.serializedBlockTypes.clear();
+        this.blockTypes.add(material);
+        this.serializedBlockTypes.add(material.key().asMinimalString());
+        this.includeBlockTypes = isIncluding;
+        return this;
     }
 
     /**
@@ -142,12 +148,7 @@ public class PartFilter implements Serializable, Cloneable {
      * @return this
      */
     public @NotNull PartFilter setBlockType(@NotNull BlockType blockType, boolean isIncluding){
-        this.blockTypes.clear();
-        this.serializedBlockTypes.clear();
-        this.blockTypes.add(blockType);
-        this.serializedBlockTypes.add(blockType.key().asMinimalString());
-        this.includeBlockTypes = isIncluding;
-        return this;
+        return setBlockType(VersionUtils.getMaterial(blockType), isIncluding);
     }
 
     /**
@@ -160,23 +161,23 @@ public class PartFilter implements Serializable, Cloneable {
         this.blockTypes.clear();
         this.serializedBlockTypes.clear();
         for (Object o : blockTypes){
-            BlockType blockType;
+            Material mat;
             if (o instanceof BlockType type){
-                blockType = type;
+                mat = VersionUtils.getMaterial(type);
             }
             else if (o instanceof Material material){
                 if (material.isBlock()){
-                    blockType = material.asBlockType();
+                    mat = material;
                 }
                 else{
                     continue;
                 }
             }
             else{
-                throw new IllegalArgumentException("Collection must be of type Material or BlockType");
+                throw new IllegalArgumentException("Collection can only contain Material or BlockType");
             }
-            this.blockTypes.add(blockType);
-            this.serializedBlockTypes.add(blockType.key().asMinimalString());
+            this.blockTypes.add(mat);
+            this.serializedBlockTypes.add(mat.key().asMinimalString());
         }
         this.includeBlockTypes = isIncluding;
         return this;
@@ -189,7 +190,15 @@ public class PartFilter implements Serializable, Cloneable {
      * @return this
      */
     public @NotNull PartFilter setItemType(@NotNull Material material, boolean isIncluding){
-        return setItemType(material.asItemType(), isIncluding);
+        if (!material.isItem()){
+            return this;
+        }
+        this.itemTypes.clear();
+        this.serializedItemTypes.clear();
+        this.itemTypes.add(material);
+        this.serializedItemTypes.add(material.key().asMinimalString());
+        this.includeItemTypes = isIncluding;
+        return this;
     }
 
     /**
@@ -199,12 +208,7 @@ public class PartFilter implements Serializable, Cloneable {
      * @return this
      */
     public @NotNull PartFilter setItemType(@NotNull ItemType itemType, boolean isIncluding){
-        this.itemTypes.clear();
-        this.serializedItemTypes.clear();
-        this.itemTypes.add(itemType);
-        this.serializedItemTypes.add(itemType.key().asMinimalString());
-        this.includeItemTypes = isIncluding;
-        return this;
+        return setItemType(VersionUtils.getMaterial(itemType), isIncluding);
     }
 
     /**
@@ -217,18 +221,23 @@ public class PartFilter implements Serializable, Cloneable {
         this.itemTypes.clear();
         this.serializedItemTypes.clear();
         for (Object o : itemTypes){
-            ItemType itemType;
+            Material mat;
             if (o instanceof ItemType type){
-                itemType = type;
+                mat = VersionUtils.getMaterial(type);
             }
             else if (o instanceof Material material){
-                itemType = material.asItemType();
+                if (material.isItem()){
+                    mat = material;
+                }
+                else{
+                    continue;
+                }
             }
             else{
-                throw new IllegalArgumentException("Collection must be of type Material or ItemType");
+                throw new IllegalArgumentException("Collection can only contain Material or ItemType");
             }
-            this.itemTypes.add(itemType);
-            this.serializedItemTypes.add(itemType.key().asMinimalString());
+            this.itemTypes.add(mat);
+            this.serializedItemTypes.add(mat.key().asMinimalString());
         }
         this.includeItemTypes = isIncluding;
         return this;
@@ -246,11 +255,11 @@ public class PartFilter implements Serializable, Cloneable {
         return new HashSet<>(partTypes);
     }
 
-    public HashSet<ItemType> getItemTypes() {
+    public HashSet<Material> getItemTypes() {
         return new HashSet<>(itemTypes);
     }
 
-    public HashSet<BlockType> getBlockTypes() {
+    public HashSet<Material> getBlockTypes() {
         return new HashSet<>(blockTypes);
     }
 

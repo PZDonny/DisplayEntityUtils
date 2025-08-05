@@ -132,13 +132,19 @@
             <id>md_5-public</id>
             <url>https://repo.md-5.net/content/groups/public/</url>
         </repository>
+
+
+        <repository>
+            <id>viaversion-repo</id>
+            <url>https://repo.viaversion.com</url>
+        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.7-R0.1-SNAPSHOT</version>
+            <version>1.21.8-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -194,6 +200,13 @@
             <groupId>me.libraryaddict.disguises</groupId>
             <artifactId>libsdisguises</artifactId>
             <version>11.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.viaversion</groupId>
+            <artifactId>viaversion-api</artifactId>
+            <version>5.4.2</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

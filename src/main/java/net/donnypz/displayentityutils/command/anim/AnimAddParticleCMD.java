@@ -34,7 +34,7 @@ class AnimAddParticleCMD extends PlayerSubCommand {
             return;
         }
 
-        if (VersionUtils.canViewDialogs(player, true)){
+        if (VersionUtils.canViewDialogs(player, false)){
             AnimationParticleSelectDialog.sendDialog(player);
         }
         else{

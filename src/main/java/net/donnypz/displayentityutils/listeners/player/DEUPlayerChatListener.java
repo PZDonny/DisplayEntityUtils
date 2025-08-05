@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.listeners.player;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
+import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -55,8 +56,13 @@ public final class DEUPlayerChatListener implements Listener {
                     else if (builder.isDustTransitionParticle()){
                         builder.advanceStep(AnimationParticleBuilder.Step.COLOR_TRANSITION);
                     }
-                    else if (builder.particle() == Particle.ENTITY_EFFECT){
-                        builder.advanceStep(AnimationParticleBuilder.Step.COLOR_ENTITY_EFFECT);
+                    else if (builder.particle() == VersionUtils.getEntityEffectParticle()){
+                        if (VersionUtils.IS_1_20_5){
+                            builder.advanceStep(AnimationParticleBuilder.Step.COLOR_ENTITY_EFFECT);
+                        }
+                        else{
+                            builder.advanceStep(AnimationParticleBuilder.Step.OFFSETS);
+                        }
                     }
                     else{
                         builder.advanceStep(AnimationParticleBuilder.Step.EXTRA);

@@ -5,7 +5,6 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.command.group.GroupInfoCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
@@ -14,11 +13,10 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.block.BlockType;
+import org.bukkit.Material;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -167,26 +165,26 @@ class PartsInfoCMD extends PlayerSubCommand {
 
         //Item Types
         player.sendMessage(Component.text("Item Types: "));
-        HashSet<ItemType> itemTypes = filter.getItemTypes();
+        HashSet<Material> itemTypes = filter.getItemTypes();
         if (itemTypes.isEmpty()){
             player.sendMessage(Component.text("- NOT SET", NamedTextColor.GRAY));
         }
         else{
             player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>| Inclusive: "+(filter.isIncludingItemTypes() ? "<green>TRUE" : "<red>FALSE")));
-            for (ItemType type : itemTypes){
+            for (Material type : itemTypes){
                 player.sendMessage(Component.text(" - "+type.key().value(), NamedTextColor.GRAY));
             }
         }
 
         //Block Types
         player.sendMessage(Component.text("Block Types: "));
-        HashSet<BlockType> blockTypes = filter.getBlockTypes();
+        HashSet<Material> blockTypes = filter.getBlockTypes();
         if (blockTypes.isEmpty()){
             player.sendMessage(Component.text("- NOT SET", NamedTextColor.GRAY));
         }
         else{
             player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>| Inclusive: "+(filter.isIncludingBlockTypes() ? "<green>TRUE" : "<red>FALSE")));
-            for (BlockType type : blockTypes){
+            for (Material type : blockTypes){
                 player.sendMessage(Component.text(" - "+type.key().value(), NamedTextColor.GRAY));
             }
         }

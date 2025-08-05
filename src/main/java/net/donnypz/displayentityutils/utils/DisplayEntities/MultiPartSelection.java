@@ -2,10 +2,9 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.Direction;
 import org.bukkit.Color;
-import org.bukkit.block.BlockType;
+import org.bukkit.Material;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,10 +16,10 @@ public abstract class MultiPartSelection<T extends ActivePart> extends PartSelec
     LinkedHashSet<T> selectedParts = new LinkedHashSet<>();
     Set<SpawnedDisplayEntityPart.PartType> partTypes = new HashSet<>();
 
-    Set<ItemType> itemTypes = new HashSet<>();
+    Set<Material> itemTypes = new HashSet<>();
     boolean includeItemTypes;
 
-    Set<BlockType> blockTypes = new HashSet<>();
+    Set<Material> blockTypes = new HashSet<>();
     boolean includeBlockTypes;
 
     Collection<String> includedTags = new HashSet<>();
@@ -183,9 +182,9 @@ public abstract class MultiPartSelection<T extends ActivePart> extends PartSelec
     }
 
 
-    abstract BlockType getBlockType(T part);
+    abstract Material getBlockType(T part);
 
-    abstract ItemType getItemType(T part);
+    abstract Material getItemType(T part);
 
 
     /**

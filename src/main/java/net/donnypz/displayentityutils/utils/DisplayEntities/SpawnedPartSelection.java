@@ -1,12 +1,9 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
-import org.bukkit.block.BlockType;
+import org.bukkit.Material;
 import org.bukkit.entity.*;
-import org.bukkit.inventory.ItemType;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -71,15 +68,15 @@ public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDispla
     }
 
     @Override
-    BlockType getBlockType(SpawnedDisplayEntityPart part) {
+    Material getBlockType(SpawnedDisplayEntityPart part) {
         BlockDisplay display = (BlockDisplay) part.getEntity();
-        return display.getBlock().getMaterial().asBlockType();
+        return display.getBlock().getMaterial();
     }
 
     @Override
-    ItemType getItemType(SpawnedDisplayEntityPart part) {
+    Material getItemType(SpawnedDisplayEntityPart part) {
         ItemDisplay display = (ItemDisplay) part.getEntity();
-        return display.getItemStack().getType().asItemType();
+        return display.getItemStack().getType();
     }
 
     /**
