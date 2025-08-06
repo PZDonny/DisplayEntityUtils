@@ -198,14 +198,17 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         }
         if (!LocalManager.getDisplayControllerFolder().exists()){
             LocalManager.getDisplayControllerFolder().mkdirs();
-            String exampleController = "examplecontroller.yml";
-            File exampleFile = new File(LocalManager.getDisplayControllerFolder(), exampleController);
-            InputStream stream = getResource(exampleController);
-            try {
-                Files.copy(stream, exampleFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                stream.close();
-            } catch (IOException e) {}
         }
+
+        //Always replace example controller w/ updated version
+        String exampleController = "examplecontroller.yml";
+        File exampleFile = new File(LocalManager.getDisplayControllerFolder(), exampleController);
+        InputStream stream = getResource(exampleController);
+        try {
+            Files.copy(stream, exampleFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            stream.close();
+        } catch (IOException e) {}
+
     }
 
     public static NamespacedKey getPartUUIDKey() {
