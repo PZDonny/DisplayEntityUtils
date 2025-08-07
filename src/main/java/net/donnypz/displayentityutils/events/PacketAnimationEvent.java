@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.events;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -18,7 +19,7 @@ abstract class PacketAnimationEvent extends Event {
     Collection<Player> players;
 
     PacketAnimationEvent(ActiveGroup activeGroup, DisplayAnimator animator, SpawnedDisplayAnimation animation, Collection<Player> players){
-        super(true);
+        super(!Bukkit.isPrimaryThread());
         this.activeGroup = activeGroup;
         this.animator = animator;
         this.animation = animation;

@@ -31,6 +31,7 @@ final class PacketDisplayAnimationExecutor {
                                    boolean playSingleFrame) {
         this.animator = animator;
         this.playSingleFrame = playSingleFrame;
+        if (!new PacketAnimationStartEvent(group, animator, animation, null).callEvent()) return;
         prepareAnimation(animation, group, frame, startFrameId, delay);
     }
 
@@ -187,6 +188,7 @@ final class PacketDisplayAnimationExecutor {
     }
 
     private void animateInteractions(Location groupLoc, SpawnedDisplayAnimationFrame frame, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimation animation){
+        if (!group.isActiveAnimator(animator)) return;
         for (Map.Entry<UUID, Vector3f> entry : frame.interactionTransformations.entrySet()){
             UUID partUUID = entry.getKey();
 
@@ -240,6 +242,7 @@ final class PacketDisplayAnimationExecutor {
             }
 
 
+            if (!group.isActiveAnimator(animator)) return;
             if (part instanceof SpawnedDisplayEntityPart sp){
                 PacketUtils.scaleInteraction(sp.getTrackingPlayers(), (Interaction) sp.getEntity(), height, width, frame.duration, 0);
             }
@@ -250,6 +253,7 @@ final class PacketDisplayAnimationExecutor {
     }
 
     private void animateDisplays(SpawnedDisplayAnimationFrame frame, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimation animation){
+        if (!group.isActiveAnimator(animator)) return;
         if (selection.selectedParts.size() >= frame.displayTransformations.size()){
             for (Map.Entry<UUID, DisplayTransformation> entry : frame.displayTransformations.entrySet()){
                 UUID partUUID = entry.getKey();
@@ -278,6 +282,7 @@ final class PacketDisplayAnimationExecutor {
     }
 
     private void animateDisplay(ActivePart part, DisplayTransformation transformation, ActiveGroup<?> group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame){
+        if (!group.isActiveAnimator(animator)) return;
         //Prevents jittering in some cases
         DisplayTransformation last = prevFrame != null ? prevFrame.displayTransformations.get(part.getPartUUID()) : null;
         boolean applyDataOnly = last != null && transformation.isSimilar(part);
@@ -330,6 +335,7 @@ final class PacketDisplayAnimationExecutor {
                 map.addTransformation(transformation);
             }
         }
+        if (!group.isActiveAnimator(animator)) return;
         part.setAttributes(map);
 
         if (animation.allowsDataChanges()){
