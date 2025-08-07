@@ -103,7 +103,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     @Override
     public boolean isInLoadedChunk(){
-        return DisplayUtils.isInLoadedChunk((SpawnedDisplayEntityPart) masterPart);
+        return DisplayUtils.isInLoadedChunk(masterPart);
     }
 
 
@@ -782,8 +782,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (event.isCancelled()){
             return false;
         }
-        for (ActivePart part : groupParts.values()){
-            ((SpawnedDisplayEntityPart)part).translateForce(direction, distance, durationInTicks, delayInTicks);
+        for (SpawnedDisplayEntityPart part : groupParts.values()){
+            part.translateForce(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }
@@ -803,6 +803,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (!isInLoadedChunk()){
             return false;
         }
+        if (distance == 0) return true;
         Entity masterEntity = getMasterEntity();
         Location destination = getLocation().clone().add(direction.getVector(masterEntity).normalize().multiply(distance));
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.VANILLATRANSLATE, destination);
@@ -811,8 +812,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             return false;
         }
 
-        for (ActivePart part : groupParts.values()){
-            ((SpawnedDisplayEntityPart)part).translateForce(direction, distance, durationInTicks, delayInTicks);
+        for (SpawnedDisplayEntityPart part : groupParts.values()){
+            part.translateForce(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }
@@ -824,8 +825,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     public SpawnedDisplayEntityGroup setTag(String tag){
         this.tag = tag;
-        for (ActivePart part : groupParts.values()){
-            ((SpawnedDisplayEntityPart) part).setGroupPDC();
+        for (SpawnedDisplayEntityPart part : groupParts.values()){
+            part.setGroupPDC();
         }
         return this;
     }
@@ -1013,11 +1014,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (verticalRideOffset == 0){
             return false;
         }
-        Entity vehicle = getVehicle();
-        if (vehicle == null){
-            return false;
-        }
-        return !vehicle.isDead();
+        return getVehicle() != null;
     }
 
     /**
