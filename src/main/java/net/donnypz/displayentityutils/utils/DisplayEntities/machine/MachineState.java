@@ -190,7 +190,7 @@ public class MachineState {
      * Get a random {@link DisplayAnimator} used for this machine state
      * @return a {@link DisplayAnimator} or null if no animators are present
      */
-    public @Nullable DisplayAnimator getRandomDisplayAnimator(){
+    public @Nullable DisplayAnimator getEligibleDisplayAnimator(){
         if (animators.isEmpty()) return null;
         return animators.get(random.nextInt(animators.size()));
     }

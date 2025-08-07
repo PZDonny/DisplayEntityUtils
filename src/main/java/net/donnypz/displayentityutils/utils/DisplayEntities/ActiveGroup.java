@@ -650,7 +650,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         }
         currentMachineState = state;
 
-        DisplayAnimator animator = state.getRandomDisplayAnimator();
+        DisplayAnimator animator = state.getEligibleDisplayAnimator();
 
         if (animator != null){
             animator.playUsingPackets(this, 0);
