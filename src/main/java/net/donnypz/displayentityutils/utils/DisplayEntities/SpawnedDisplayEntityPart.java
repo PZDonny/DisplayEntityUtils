@@ -1023,6 +1023,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap) {
         Entity entity = getEntity();
+        if (entity == null) return;
         new PacketAttributeContainer().setAttributes(attributeMap)
                 .sendAttributesUsingPlayers(entity.getTrackedBy(), getEntityId());
     }
