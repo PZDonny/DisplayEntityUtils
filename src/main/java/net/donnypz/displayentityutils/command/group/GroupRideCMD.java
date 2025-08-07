@@ -97,6 +97,26 @@ class GroupRideCMD extends ConsoleUsableSubCommand {
             return;
         }
 
+
+        //Apply Controller
+        if (controllerID != null){
+            DisplayController controller = DisplayController.getController(controllerID);
+            if (controller == null){
+                sender.sendMessage(Component.text("Failed to find a controller with the specified ID! ("+controllerID+")", NamedTextColor.RED));
+                return;
+            }
+            sender.sendMessage(Component.text("Applying controller properties!", NamedTextColor.YELLOW));
+            Collection<GroupFollowProperties> properties = controller.getFollowProperties();
+            for (GroupFollowProperties property : properties){
+                property.followGroup(group, vehicle);
+            }
+
+            if (controller.hasStateMachine()){
+                controller.getStateMachine().addGroup(group);
+            }
+            group.setVerticalRideOffset(controller.getVerticalOffset());
+        }
+
         boolean result = group.rideEntity(vehicle);
         if (!result){
             sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to mount the group! It was cancelled by another plugin!", NamedTextColor.RED)));
@@ -104,27 +124,6 @@ class GroupRideCMD extends ConsoleUsableSubCommand {
         }
 
         sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully mounted the group!", NamedTextColor.GREEN)));
-
-        //Apply Controller
-        if (controllerID == null){
-            return;
-        }
-        DisplayController controller = DisplayController.getController(controllerID);
-        if (controller == null){
-            sender.sendMessage(Component.text("Failed to find a controller with the specified ID! ("+controllerID+")", NamedTextColor.RED));
-            return;
-        }
-        sender.sendMessage(Component.text("Applied controller properties!", NamedTextColor.YELLOW));
-
-        Collection<GroupFollowProperties> properties = controller.getFollowProperties();
-        for (GroupFollowProperties property : properties){
-            property.followGroup(group, vehicle);
-        }
-
-        if (controller.hasStateMachine()){
-            controller.getStateMachine().addGroup(group);
-            group.setVerticalRideOffset(controller.getVerticalOffset());
-        }
     }
 
     static Entity getVehicle(CommandSender sender, String value){
