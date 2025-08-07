@@ -242,7 +242,11 @@ public class MachineState {
             return true;
         }
         if (transitionLock){
-            return !group.isAnimating();
+            for (DisplayAnimator animator : animators){
+                if (animator.isAnimating(group)){
+                    return false;
+                }
+            }
         }
         return true;
     }
