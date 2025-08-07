@@ -9,6 +9,7 @@ import net.donnypz.displayentityutils.events.PacketGroupSendEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
@@ -730,6 +731,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         for (PacketDisplayEntityPart part : new HashSet<>(groupParts.values())){
             part.removeFromGroup(true);
         }
+
+        DisplayStateMachine.unregisterFromStateMachine(this);
 
         activeAnimators.clear();
         masterPart = null;
