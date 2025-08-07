@@ -8,7 +8,7 @@ import java.util.Collection;
 
 /**
  * Called when a {@link DisplayAnimator} starts playing a {@link SpawnedDisplayAnimation}.
- * This is called once on an animator of the type {@link DisplayAnimator.AnimationType#LOOP}.
+ * This is called SYNC once on an animator of the type {@link DisplayAnimator.AnimationType#LOOP}.
  */
 public class PacketAnimationStartEvent extends PacketAnimationEvent implements Cancellable {
     private boolean isCancelled = false;
