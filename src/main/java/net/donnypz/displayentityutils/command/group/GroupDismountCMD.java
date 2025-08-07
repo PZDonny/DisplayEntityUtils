@@ -8,6 +8,7 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
@@ -48,7 +49,8 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
                 return;
             }
 
-            if (group.dismount() == null){
+            Entity vehicle = group.dismount();
+            if (vehicle == null){
                 sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your selected group is not riding an entity!", NamedTextColor.RED)));
             }
             else{
@@ -57,6 +59,7 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
                     group.unregister(true, true);
                     despawnMessage(sender);
                 }
+                DisplayControllerManager.unregisterEntity(vehicle);
             }
             return;
         }

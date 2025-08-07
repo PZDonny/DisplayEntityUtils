@@ -12,6 +12,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
+import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -114,6 +115,7 @@ class GroupRideCMD extends ConsoleUsableSubCommand {
             if (controller.hasStateMachine()){
                 controller.getStateMachine().addGroup(group);
             }
+            DisplayControllerManager.registerEntity(vehicle, group);
             group.setVerticalRideOffset(controller.getVerticalOffset());
         }
 
