@@ -81,7 +81,7 @@ public class DisplayStateMachine {
                     }
                     updateWithEntity(group);
                 }
-            }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, 1);
+            }.runTaskTimer(DisplayEntityPlugin.getInstance(), 1, 1);
         return true;
     }
 
@@ -93,12 +93,12 @@ public class DisplayStateMachine {
      * @return true if the group is not invalid and was successfully added (not already contained in this state machine)
      */
     public boolean addGroup(@NotNull PacketDisplayEntityGroup group){
-        DisplayStateMachine oldStateAnimator = groupMachines.get(group);
-        if (oldStateAnimator == this){
+        DisplayStateMachine oldStateMachine = groupMachines.get(group);
+        if (oldStateMachine == this){
             return false;
         }
-        if (oldStateAnimator != null){
-            oldStateAnimator.removeGroup(group);
+        if (oldStateMachine != null){
+            oldStateMachine.removeGroup(group);
         }
 
         group.unsetMachineState();
@@ -124,6 +124,7 @@ public class DisplayStateMachine {
                 return;
             }
         }
+
         MachineState currentState = group.getMachineState();
         if (currentState != null && currentState.isTransitionLocked() && group.isAnimating()){
             return;
@@ -131,7 +132,7 @@ public class DisplayStateMachine {
 
         //Default Task
         Entity entity = group.getVehicle();
-        if (entity == null || (entity instanceof LivingEntity le && !le.hasAI())){
+        if (entity == null || entity.isDead() || (entity instanceof LivingEntity le && !le.hasAI())){
             return;
         }
 
@@ -154,11 +155,11 @@ public class DisplayStateMachine {
         else {
             unsetIfState(group, getState(MachineState.StateType.FALLING));
             //Moving
-            if (Math.abs(velocity.getX()) > 0.001 || Math.abs(velocity.getZ()) > 0.001) {
+            if (Math.abs(velocity.getX()) > 0.005 || Math.abs(velocity.getZ()) > 0.005) {
                 setStateIfPresent(MachineState.StateType.WALK, group); //Set state to walking if moving
             }
             //Not moving
-            else {
+            else if (!entity.isDead()){
                 setStateIfPresent(MachineState.StateType.IDLE, group);
             }
         }

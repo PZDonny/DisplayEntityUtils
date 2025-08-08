@@ -90,7 +90,7 @@ final class AutoGroup {
                     if (!result.alreadyLoaded()){
                         events.put(group, new ChunkRegisterGroupEvent(group, chunk));
                         group.playSpawnAnimation();
-                        if (DisplayEntityPlugin.isMythicMobsInstalled() && DisplayControllerManager.isControllerGroup(group)){
+                        if (DisplayControllerManager.isControllerGroup(group)){
                             controllerGroups.add(group);
                         }
                     }

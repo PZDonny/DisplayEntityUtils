@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils.controller;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -116,7 +117,8 @@ public final class DisplayControllerManager {
 
     @ApiStatus.Internal
     public static void unregisterEntity(@NotNull Entity entity){
-        activeGroups.remove(entity.getUniqueId());
+        ActiveGroup<?> group = activeGroups.remove(entity.getUniqueId());
+        if (group != null) DisplayStateMachine.unregisterFromStateMachine(group);
     }
 
     public static boolean isControllerEntity(@NotNull Entity entity){
