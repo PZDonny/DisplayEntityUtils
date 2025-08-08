@@ -9,24 +9,35 @@ controllerID: "example"
 #----------------------------------------------------
 mythicMobs:
   mobs: ["ExampleMythicMob", "ExampleMythicMob2"]
+
+  #------------------Created  Group--------------------
+  # Set the group that will be created
+  # used when a MythicMob is summoned
+  #----------------------------------------------------
   group:
     tag: "group-tag"
     #Storages: LOCAL, MYSQL, MONGODB, NULL (Handled through API with NullGroupLoaderEvent)
     storage: LOCAL
-    #Reverses this group's follow property directions
-    #This is useful if your group was oriented in the opposite direction than intended
-    flip: false
-    #The vertical offset that should be applied to the group when riding an entity
-    verticalOffset: 0
-    #Determine if the group should be visible by default when spawned
-    visibleByDefault: true
     #Determine if the group should be packet based
     packetBased: true
 
-#-----------------------------------------------------------------------
-#Follow Properties:
+
+#-----------------Group Properties-------------------
+# Set the properties that will be applied to a group
+# that uses this controller
+#----------------------------------------------------
+groupProperties:
+  #Reverses this group's follow property directions
+  #This is useful if your group was oriented in the opposite direction than intended
+  flip: false
+  #The vertical offset that should be applied to the group when riding an entity
+  verticalOffset: 0
+  #Determine if the group should be visible by default when spawned
+  visibleByDefault: true
+
+#------------------Follow Properties------------------
 #Determine how the parts in a group will respect the looking direction of an entity
-#-----------------------------------------------------------------------
+#----------------------------------------------------
 defaultFollowProperties:
   #Controls how the group will orient itself in respect to the mythic mob direction:
   #Types: PITCH_AND_YAW, PITCH, YAW, BODY, NONE (disables)
@@ -92,27 +103,14 @@ partFollowProperties:
       states: []
       blacklist: true
 
+#------------------Animation States------------------
+# Set what animation should play based on the actions
+# of the entity this controller's group is
+# associated with
+#----------------------------------------------------
 states:
-  #------------------------------------------
-  #Playing Animations with Mythic Mobs Skills:
-  #For MythicMobs skills to perform animations, the following mechanic must be added to your skills
-  #
-  #- deuanimate{id=controller-id;anim=animation-tag;t=animation-type;s=storage-location} @self
-  #
-  #EXAMPLE: - deuanimate{id=mycontroller;anim=walking_animation;t=LINEAR;s=LOCAL} @self
-  #
-  #To switch to a different animation state use the following mechanic
-  #- deustate{id=controller-id;newState="state-id} @self
-  #
-  #This mechanic above is useful for changing to machine states created through the api
-  #
-  #EXAMPLE: - deustate{id=mycontroller;newState=idle} @self
-  #
-  #To stop an animation add the following mechanic
-  #- deustop @self
-  #------------------------------------------
 
-  #Below, animations can be triggered when an associated entity/mythic mob performs an action below
+  #This state is only triggered for associated Mythic Mobs
   spawn:
     #Multiple animations will be picked at random
     animations: ["spawn_animation_1", "spawn_animation_2"]
@@ -168,7 +166,7 @@ states:
     damageDelay: 0
 
     #The distance the victim must be from the attacker for the damage to apply, after the delay.
-    #THis does nothing if "damageDelay" is 0
+    #This does nothing if "damageDelay" is 0
     maxRange: 2
 
   shoot_bow:
