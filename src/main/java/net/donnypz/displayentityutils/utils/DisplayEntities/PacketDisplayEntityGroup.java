@@ -365,30 +365,34 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * Set the location of this group. If the teleport changes worlds, the group will automatically be hidden from players in the old world.<br>
      * It is not recommended to use this multiple times in the same tick, unexpected results may occur.
      * @param location the location
-     * @param pivotInteractions whether interaction entities should be pivoted
+     * @param respectEntityDirection whether interaction entities should be pivoted
      */
-    public void teleportSafe(@NotNull Location location, boolean pivotInteractions){
-        Location oldLoc = getLocation();
-
-        attemptLocationUpdate(oldLoc, location, true);
-        masterPart.teleportUnsetPassengers(location);
-        for (PacketDisplayEntityPart part : groupParts.values()){
-            part.setRotation(location.getPitch(), location.getYaw(), pivotInteractions);
-        }
+    public void teleportSafe(@NotNull Location location, boolean respectEntityDirection){
+        teleport(location, respectEntityDirection, true);
     }
 
     /**
-     * Set the location of this group. The group should be hidden first with {@link #hide()} if being teleported to a different world.<br>
-     * It is not recommended to use this multiple times in the same tick, unexpected results may occur.
-     * @param location the location
-     * @param pivotInteractions whether interaction entities should be pivoted
+     * {@inheritDoc}
+     * <br>It is not recommended to use this multiple times in the same tick, unexpected results may occur.
      */
-    public void teleport(@NotNull Location location, boolean pivotInteractions){
-        Location oldLoc = getLocation();
-        attemptLocationUpdate(oldLoc, location, false);
+    @Override
+    public boolean teleport(@NotNull Location location, boolean respectEntityDirection){
+        teleport(location, respectEntityDirection, false);
+        return true;
+    }
+
+    private void teleport(Location location, boolean respectGroupDirection, boolean hide){
+        Location oldMasterLoc = getLocation();
+        attemptLocationUpdate(oldMasterLoc, location, hide);
+
+        location = location.clone();
+        if (respectGroupDirection){
+            location.setPitch(oldMasterLoc.getPitch());
+            location.setYaw(oldMasterLoc.getYaw());
+        }
         masterPart.teleportUnsetPassengers(location);
         for (PacketDisplayEntityPart part : groupParts.values()){
-            part.setRotation(location.getPitch(), location.getYaw(), pivotInteractions);
+            part.setRotation(location.getPitch(), location.getYaw(), DisplayEntityPlugin.autoPivotInteractions());
         }
     }
 

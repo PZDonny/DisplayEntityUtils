@@ -565,13 +565,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return true;
     }
 
-    /**
-     * Change the actual location of all the SpawnedDisplayEntityParts with normal teleportation.
-     * @param location The location to teleport this SpawnedDisplayEntityGroup
-     * @param respectGroupDirection Whether to respect this group's pitch and yaw or the location's pitch and yaw
-     * @return The success status of the teleport, false if the teleport was cancelled
-     */
-    public boolean teleport(Location location, boolean respectGroupDirection){
+
+    @Override
+    public boolean teleport(@NotNull Location location, boolean respectGroupDirection){
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORT, location);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()){

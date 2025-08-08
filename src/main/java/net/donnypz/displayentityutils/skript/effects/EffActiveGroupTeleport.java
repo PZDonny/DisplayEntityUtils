@@ -10,8 +10,6 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -25,13 +23,13 @@ public class EffActiveGroupTeleport extends Effect {
         Skript.registerEffect(EffActiveGroupTeleport.class,"[deu ](move|teleport) %activegroup% to %location% [r:[and] (keep|respect) group (facing|direction|orientation)]");
     }
 
-    Expression<ActiveGroup> group;
+    Expression<ActiveGroup<?>> group;
     Expression<Location> location;
     boolean respect;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        group = (Expression<ActiveGroup>) expressions[0];
+        group = (Expression<ActiveGroup<?>>) expressions[0];
         location = (Expression<Location>) expressions[1];
         respect = parseResult.hasTag("r");
         return true;
@@ -39,18 +37,12 @@ public class EffActiveGroupTeleport extends Effect {
 
     @Override
     protected void execute(Event event) {
-        ActiveGroup g = group.getSingle(event);
+        ActiveGroup<?> g = group.getSingle(event);
         Location loc = location.getSingle(event);
         if (g == null || loc == null){
             return;
         }
-        if (g instanceof SpawnedDisplayEntityGroup sg){
-            sg.teleport(loc, respect);
-        }
-        else if (g instanceof PacketDisplayEntityGroup pg){
-            pg.teleport(loc, respect);
-        }
-
+        g.teleport(loc, respect);
     }
 
     @Override
