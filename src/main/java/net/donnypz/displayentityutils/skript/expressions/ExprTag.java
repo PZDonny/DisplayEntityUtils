@@ -14,20 +14,22 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Group/Animation Tag")
-@Description("Get or set the tag of a group/animation")
-@Examples({"#Only the tag of a active group/animation can be changed",
-            "reset {_spawnedgroup}'s tag",
+@Description("Get or set the tag of a group/animation. Only the tag of a active group/animation can be changed")
+@Examples({"reset {_spawnedgroup}'s tag",
             "set {_savedgrouptag} to {_savedgroup}'s tag",
             "",
             "set {_spawnedanimation}'s tag to \"newTag\"",
             "set {_savedanimationtag}'s tag to {_savedanimation}'s tag",
             "",
             "#3.0.0 and later",
-            "set {_packetgrouptag} to {_packetgroup}'s tag"})
+            "set {_packetgrouptag} to {_packetgroup}'s tag",
+            "",
+            "#3.2.1 and later",
+            "set {_framepointtag} to {_framepoint}'s tag"})
 @Since("2.6.2")
 public class ExprTag extends SimplePropertyExpression<Object, String> {
     static {
-        register(ExprTag.class, String.class, "[the] tag", "activegroup/savedgroup/spawnedanimation/savedanimation");
+        register(ExprTag.class, String.class, "[the] tag", "activegroup/savedgroup/spawnedanimation/savedanimation/framepoint");
     }
 
     @Override
@@ -49,6 +51,9 @@ public class ExprTag extends SimplePropertyExpression<Object, String> {
         }
         else if (obj instanceof DisplayAnimation a){
             return a.getAnimationTag();
+        }
+        else if (obj instanceof FramePoint f){
+            return f.getTag();
         }
         return null;
     }

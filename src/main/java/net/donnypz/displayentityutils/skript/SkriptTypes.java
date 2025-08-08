@@ -417,6 +417,32 @@ public class SkriptTypes {
                 })
         );
 
+        Classes.registerClass(new ClassInfo<>(FramePoint.class, "framepoint")
+                .user("frame( |-)?point")
+                .name("Frame Point")
+                .description("Represents a Frame Point from a Spawned Display Animation Frame")
+                .examples()
+                .defaultExpression(new EventValueExpression<>(FramePoint.class))
+                .since("3.2.1")
+                .parser(new Parser<>() {
+
+                    @Override
+                    public boolean canParse(ParseContext context) {
+                        return false;
+                    }
+
+                    @Override
+                    public String toString(FramePoint o, int flags) {
+                        return toVariableNameString(o);
+                    }
+
+                    @Override
+                    public String toVariableNameString(FramePoint o) {
+                        return "framepoint w/ tag: " + o.getTag();
+                    }
+                })
+        );
+
 
         Classes.registerClass(new ClassInfo<>(InteractionCommand.class, "interactioncommand")
                 .user("interaction( |-)?c(ommand|md)")

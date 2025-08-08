@@ -86,7 +86,7 @@ public abstract class RelativePoint implements Serializable {
      * @param group
      * @return a location
      */
-    public @NotNull Location getLocation(@NotNull ActiveGroup group){
+    public @NotNull Location getLocation(@NotNull ActiveGroup<?> group){
         Vector v = vectorFromOrigin.clone();
         v.multiply(group.getScaleMultiplier());
         Location groupLoc = group.getLocation();
@@ -101,6 +101,27 @@ public abstract class RelativePoint implements Serializable {
 
         groupLoc.add(v);
         return groupLoc;
+    }
+
+    /**
+     * Get the location that this point represents, relative to a given location
+     * @param fromLocation the location
+     * @return a location
+     */
+    public @NotNull Location getLocation(@NotNull Location fromLocation){
+        fromLocation = fromLocation.clone();
+        Vector v = vectorFromOrigin.clone();
+
+        double pitchDiff = fromLocation.getPitch() - groupPitchAtCreation;
+        double pitchAsRad = Math.toRadians(pitchDiff);
+        double sin = Math.sin(pitchAsRad);
+        double cos = Math.cos(pitchAsRad);
+
+        v.setY(-1*(v.length() * sin - v.getY() * cos)); //Adjust for pitch
+        v.rotateAroundY(Math.toRadians(groupYawAtCreation - fromLocation.getYaw())); //Pivot
+
+        fromLocation.add(v);
+        return fromLocation;
     }
 
     /**
