@@ -11,7 +11,7 @@ mythicMobs:
   mobs: ["ExampleMythicMob", "ExampleMythicMob2"]
 
   #------------------Created  Group--------------------
-  # Set the group that will be created
+  # Set the group that will be created and
   # used when a MythicMob is summoned
   #----------------------------------------------------
   group:
