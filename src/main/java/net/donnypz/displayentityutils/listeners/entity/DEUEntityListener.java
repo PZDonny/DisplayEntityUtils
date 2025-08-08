@@ -101,7 +101,6 @@ public final class DEUEntityListener implements Listener {
             if (DisplayEntityPlugin.isLibsDisguisesInstalled()){
                 Disguise disg = DisguiseAPI.getDisguise(entity);
                 if (disg != null && disg.isPlayerDisguise()){
-                    Bukkit.broadcastMessage(entity.getLocation().toString());
                     controllerGroup.dismount();
                     if (controllerGroup instanceof SpawnedDisplayEntityGroup g){
                         g.teleport(entity.getLocation(), true);
