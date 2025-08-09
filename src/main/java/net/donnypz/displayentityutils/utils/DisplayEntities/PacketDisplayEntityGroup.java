@@ -362,13 +362,14 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     /**
-     * Set the location of this group. If the teleport changes worlds, the group will automatically be hidden from players in the old world.<br>
-     * It is not recommended to use this multiple times in the same tick, unexpected results may occur.
-     * @param location the location
-     * @param respectEntityDirection whether interaction entities should be pivoted
+     * Change the true location of this group. If the teleport changes worlds, the group will automatically be hidden from players in the old world.<br>
+     * It is not recommended to use this multiple times in the same tick, as unexpected results may occur.
+     * @param location The location to teleport this group
+     * @param respectGroupDirection Whether to respect this group's pitch and yaw or the location's pitch and yaw
+
      */
-    public void teleportSafe(@NotNull Location location, boolean respectEntityDirection){
-        teleport(location, respectEntityDirection, true);
+    public void teleportSafe(@NotNull Location location, boolean respectGroupDirection){
+        teleport(location, respectGroupDirection, true);
     }
 
     /**
@@ -376,8 +377,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * <br>It is not recommended to use this multiple times in the same tick, unexpected results may occur.
      */
     @Override
-    public boolean teleport(@NotNull Location location, boolean respectEntityDirection){
-        teleport(location, respectEntityDirection, false);
+    public boolean teleport(@NotNull Location location, boolean respectGroupDirection){
+        teleport(location, respectGroupDirection, false);
         return true;
     }
 
