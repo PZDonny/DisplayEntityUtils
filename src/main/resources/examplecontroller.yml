@@ -1,3 +1,8 @@
+#---------------------------------------------------
+# Refer to the wiki to understand DisplayControllers
+# https://github.com/PZDonny/DisplayEntityUtils/wiki
+#---------------------------------------------------
+
 #The UNIQUE identifier for this controller
 controllerID: "example"
 
