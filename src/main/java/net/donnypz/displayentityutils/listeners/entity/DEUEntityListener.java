@@ -2,12 +2,12 @@ package net.donnypz.displayentityutils.listeners.entity;
 
 import com.destroystokyo.paper.event.entity.EntityJumpEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
+import me.libraryaddict.disguise.DisguiseAPI;
+import me.libraryaddict.disguise.disguisetypes.Disguise;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.damage.DamageSource;
@@ -26,7 +26,9 @@ public final class DEUEntityListener implements Listener {
     //============Mythic====================
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntitySpawn(EntitySpawnEvent e){
-        applyState(e.getEntity(), MachineState.StateType.SPAWN);
+        Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
+            if (e.getEntity().isValid()) applyState(e.getEntity(), MachineState.StateType.SPAWN);
+        });
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -74,7 +76,6 @@ public final class DEUEntityListener implements Listener {
                                 .build());
                     }
                 }, delay);
-
             }
         }
     }
@@ -91,26 +92,37 @@ public final class DEUEntityListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDeath(EntityDeathEvent e){
-        applyState(e.getEntity(), MachineState.StateType.DEATH);
-        ActiveGroup<?> controllerGroup = DisplayControllerManager.getControllerGroup(e.getEntity().getUniqueId());
-        boolean controllerTranslated = false;
+        Entity entity = e.getEntity();
+        applyState(entity, MachineState.StateType.DEATH);
+        ActiveGroup<?> controllerGroup = DisplayControllerManager.getControllerGroup(entity.getUniqueId());
         //Group Vertical Offset
-        for (SpawnedDisplayEntityGroup group : DisplayUtils.getGroupPassengers(e.getEntity())){
-            if (group.getVerticalRideOffset() == 0) continue;
-            if (group == controllerGroup) controllerTranslated = true;
-            group.translate(Direction.UP, group.getVerticalRideOffset()*-1, -1, -1);
-        }
-
-        if (!controllerTranslated && controllerGroup != null){ //Must be packet based if not found above
-            controllerGroup.dismount();
+        if (controllerGroup != null){
+            DisplayStateMachine.unregisterFromStateMachine(controllerGroup);
+            if (DisplayEntityPlugin.isLibsDisguisesInstalled()){
+                Disguise disg = DisguiseAPI.getDisguise(entity);
+                if (disg != null && disg.isPlayerDisguise()){
+                    controllerGroup.dismount();
+                    if (controllerGroup instanceof SpawnedDisplayEntityGroup g){
+                        g.teleport(entity.getLocation(), true);
+                    }
+                    else if (controllerGroup instanceof PacketDisplayEntityGroup g){
+                        g.teleport(entity.getLocation(), true);
+                    }
+                }
+            }
         }
     }
 
 
-    @EventHandler(priority = EventPriority.MONITOR)
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onRemoval(EntityRemoveFromWorldEvent e){
         Entity entity = e.getEntity();
         if (entity.isDead() || !entity.isInWorld()){
+            ActiveGroup<?> controllerGroup = DisplayControllerManager.getControllerGroup(e.getEntity().getUniqueId());
+            if (controllerGroup instanceof PacketDisplayEntityGroup){
+                controllerGroup.dismount();
+            }
             DisplayControllerManager.unregisterEntity(entity);
         }
     }

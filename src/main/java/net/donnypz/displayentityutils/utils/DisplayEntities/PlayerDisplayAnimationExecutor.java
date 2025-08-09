@@ -44,6 +44,7 @@ final class PlayerDisplayAnimationExecutor {
         this.animator = animator;
         this.playSingleFrame = playSingleFrame;
         this.players.addAll(players);
+        if (!new PacketAnimationStartEvent(group, animator, animation, players).callEvent()) return;
         prepareAnimation(animation, group, frame, startFrameId, delay);
     }
 

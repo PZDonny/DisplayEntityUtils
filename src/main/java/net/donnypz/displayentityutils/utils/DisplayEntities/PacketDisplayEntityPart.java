@@ -537,6 +537,28 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
+     * Set the location of this packet-based entity. The part should be hidden first with {@link #hide()} if being teleported to a different world.
+     * @param location the location
+     */
+    void teleportUnsetPassengers(@NotNull Location location){
+        packetLocation = new PacketLocation(location);
+        for (UUID uuid : getViewers()){
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null) continue;
+            if (isMaster && group != null){
+                group.unsetPassengers(player);
+                Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+                    PacketUtils.teleport(player, getEntityId(), location);
+                    group.setPassengers(player);
+                });
+            }
+            else{
+                PacketUtils.teleport(player, getEntityId(), location);
+            }
+        }
+    }
+
+    /**
      * Get the location of this packet-based entity.
      * @return a {@link Location} or null if not set
      */

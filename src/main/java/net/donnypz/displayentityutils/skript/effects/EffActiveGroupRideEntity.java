@@ -67,7 +67,6 @@ public class EffActiveGroupRideEntity extends Effect {
 
         ActiveGroup<?> g;
         Entity e;
-        boolean result;
 
         boolean rideEntity = o1 instanceof ActiveGroup<?>;
 
@@ -75,7 +74,8 @@ public class EffActiveGroupRideEntity extends Effect {
         if (rideEntity){
             g = (ActiveGroup<?>) o1;
             e = (Entity) o2;
-            result = g.rideEntity(e);
+            applyController(event, g, e);
+            g.rideEntity(e);
         }
 
         //Entity Ride Group
@@ -90,16 +90,12 @@ public class EffActiveGroupRideEntity extends Effect {
             if (masterEntity == null){
                 return;
             }
-            result = masterEntity.addPassenger(e);
+            applyController(event, g, e);
+            masterEntity.addPassenger(e);
         }
-        else{
-            return;
-        }
+    }
 
-        if (!result){
-            return;
-        }
-
+    private void applyController(Event event, ActiveGroup<?> g, Entity e){
         if (controllerID != null){
             DisplayController controller = DisplayController.getController(controllerID.getSingle(event));
             if (controller == null){

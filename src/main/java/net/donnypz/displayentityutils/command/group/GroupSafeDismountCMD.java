@@ -11,32 +11,33 @@ import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-class GroupDismountCMD extends ConsoleUsableSubCommand {
-    GroupDismountCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("dismount", parentSubCommand, Permission.GROUP_DISMOUNT);
+class GroupSafeDismountCMD extends ConsoleUsableSubCommand {
+    GroupSafeDismountCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("safedismount", parentSubCommand, Permission.GROUP_DISMOUNT);
     }
 
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length < 3) {
             if (!(sender instanceof Player)){
-                sender.sendMessage(Component.text("Incorrect Console Usage! /mdis group dismount <player-name | entity-uuid> [-despawn]", NamedTextColor.RED));
+                sender.sendMessage(Component.text("Incorrect Console Usage! /mdis group safedismount <player-name | entity-uuid>", NamedTextColor.RED));
                 return;
             }
             else{
-                sender.sendMessage(Component.text("Incorrect Usage! /mdis group dismount <-target | -selected | player-name | entity-uuid> [-despawn]", NamedTextColor.RED));
+                sender.sendMessage(Component.text("Incorrect Usage! /mdis group safedismount <-target | -selected | player-name | entity-uuid>", NamedTextColor.RED));
             }
             return;
         }
 
-        boolean despawn = args.length == 4 && args[3].equalsIgnoreCase("-despawn");
-
         String type = args[2];
+        boolean hadAI;
         if (type.equalsIgnoreCase("-selected")){
             if (!(sender instanceof Player p)){
                 sender.sendMessage(Component.text("You cannot use \"-selected\" in console!", NamedTextColor.RED));
@@ -50,15 +51,26 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
             }
 
             Entity vehicle = group.getVehicle();
-
             if (vehicle == null){
                 sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Your selected group is not riding an entity!", NamedTextColor.RED)));
             }
             else{
-                sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully dismounted your selected group!", NamedTextColor.GREEN)));
-                dismount(group, despawn);
-                if (despawn) despawnMessage(sender);
-                DisplayControllerManager.unregisterEntity(vehicle);
+                sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Wait a moment while your group is safely dismounted...", NamedTextColor.YELLOW)));
+                if (vehicle instanceof LivingEntity le){
+                    hadAI = le.hasAI();
+                }
+                else{
+                    hadAI = false;
+                }
+                vehicle.setRotation(vehicle.getYaw(), 0);
+                Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                    GroupDismountCMD.dismount(group, false);
+                    sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Safely dismounted your selected group!", NamedTextColor.GREEN)));
+                    if (hadAI){
+                        ((LivingEntity) vehicle).setAI(true);
+                    }
+                    DisplayControllerManager.unregisterEntity(vehicle);
+                }, 20);
             }
             return;
         }
@@ -67,29 +79,25 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
         if (vehicle == null){
             return;
         }
-
-        for (SpawnedDisplayEntityGroup g : DisplayUtils.getGroupPassengers(vehicle)){
-            dismount(g, despawn);
+        if (vehicle instanceof LivingEntity le){
+            hadAI = le.hasAI();
         }
+        else{
+            hadAI = false;
+        }
+
+        Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+            for (SpawnedDisplayEntityGroup g : DisplayUtils.getGroupPassengers(vehicle)){
+                GroupDismountCMD.dismount(g, false);
+            }
+            if (hadAI){
+                ((LivingEntity) vehicle).setAI(true);
+            }
+        }, 20);
+
 
         DisplayControllerManager.unregisterEntity(vehicle);
         sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully dismounted all groups riding the entity!", NamedTextColor.GREEN)));
-        if (despawn) despawnMessage(sender);
     }
 
-    private void despawnMessage(CommandSender sender){
-        sender.sendMessage(Component.text("| Despawned dismounted group(s)", NamedTextColor.GRAY));
-    }
-
-    static void dismount(SpawnedDisplayEntityGroup group, boolean despawn){
-        if (despawn){
-            group.unregister(true, true);
-        }
-        else{
-            group.dismount();
-            group.unsetMachineState();
-            group.setVerticalRideOffset(0);
-            group.stopFollowingEntity();
-        }
-    }
 }

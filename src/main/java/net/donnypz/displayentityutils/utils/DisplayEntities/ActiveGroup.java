@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ActiveGroup<T extends ActivePart> implements Active{
 
@@ -29,7 +30,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     protected String tag;
     protected Set<GroupEntityFollower> followers = new HashSet<>();
     GroupEntityFollower defaultFollower;
-    protected final HashSet<DisplayAnimator> activeAnimators = new HashSet<>();
+    protected final Set<DisplayAnimator> activeAnimators = Collections.newSetFromMap(new ConcurrentHashMap<>());
     protected String spawnAnimationTag;
     protected LoadMethod spawnAnimationLoadMethod;
     protected DisplayAnimator.AnimationType spawnAnimationType;
@@ -130,6 +131,14 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @throws IllegalArgumentException if newScaleMultiplier is less than or equal to 0
      */
     public abstract boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions);
+
+    /**
+     * Change the true location of this group.
+     * @param location The location to teleport this group
+     * @param respectGroupDirection Whether to respect this group's pitch and yaw or the location's pitch and yaw
+     * @return true if the teleport was successful
+     */
+    public abstract boolean teleport(@NotNull Location location, boolean respectGroupDirection);
 
 
     /**
@@ -623,7 +632,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * <p>- This group's state machine is locked by a MythicMobs skill</p>
      * <p>- Group is not contained in the state machine</p>
      * <p>- The state is part of a different state machine</p>
-     * <p>- GroupAnimationStateChangeEvent is cancelled</p>
+     * <p>- {@link AnimationStateChangeEvent} is cancelled</p>
      * <p>- The current state has a transition lock and the new state cannot ignore it</p>
      */
     public boolean setMachineState(@NotNull MachineState state, @NotNull DisplayStateMachine stateMachine){
@@ -650,7 +659,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         }
         currentMachineState = state;
 
-        DisplayAnimator animator = state.getRandomDisplayAnimator();
+        DisplayAnimator animator = state.getEligibleDisplayAnimator();
 
         if (animator != null){
             animator.playUsingPackets(this, 0);

@@ -49,6 +49,7 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         new GroupBillboardCMD(this);
         new GroupViewRangeCMD(this);
         new GroupRideCMD(this);
+        new GroupSafeDismountCMD(this);
         new GroupDismountCMD(this);
     }
 
@@ -118,12 +119,13 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group unglow", "Remove the glowing effect from all parts in this group");
             CMDUtils.sendCMD(sender, "/mdis group glowcolor <color | hex-code>", "Set the glow color for all parts in this group");
             CMDUtils.sendCMD(sender, "/mdis group ride <-target | player-name | entity-uuid> [group-tag] [storage] [controller-id]", "Make a group ride an entity. Values in brackets [] are optional");
+            CMDUtils.sendCMD(sender, "/mdis group safedismount <-target | -selected | player-name | entity-uuid>", "Safely dismount a group from an entity");
             CMDUtils.sendCMD(sender, "/mdis group dismount <-target | -selected | player-name | entity-uuid> [-despawn]", "Dismount a group from an entity, with optional despawning");
-            CMDUtils.sendCMD(sender, "/mdis group viewrange <view-range-multiplier>", "Set the view range multiplier for your selected group");
             CMDUtils.sendCMD(sender, "/mdis group setspawnanim <anim-tag> <storage> <linear | loop>", "Set an animation to play when this group is spawned/loaded");
             CMDUtils.sendCMD(sender, "/mdis group unsetspawnanim", "Remove the spawn animation that's set on your selected group");
         }
         else{
+            CMDUtils.sendCMD(sender, "/mdis group viewrange <view-range-multiplier>", "Set the view range multiplier for your selected group");
             CMDUtils.sendCMD(sender, "/mdis group togglepersist", "Toggle if your group should persist after a server shutdown");
             CMDUtils.sendCMD(sender, "/mdis group togglepersistoverride", "Toggle if your group's persistence can be overriden when loaded by a chunk, " +
                     "only if \"persistenceOverride\" is enabled in the config");

@@ -103,7 +103,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     @Override
     public boolean isInLoadedChunk(){
-        return DisplayUtils.isInLoadedChunk((SpawnedDisplayEntityPart) masterPart);
+        return DisplayUtils.isInLoadedChunk(masterPart);
     }
 
 
@@ -565,13 +565,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return true;
     }
 
-    /**
-     * Change the actual location of all the SpawnedDisplayEntityParts with normal teleportation.
-     * @param location The location to teleport this SpawnedDisplayEntityGroup
-     * @param respectGroupDirection Whether to respect this group's pitch and yaw or the location's pitch and yaw
-     * @return The success status of the teleport, false if the teleport was cancelled
-     */
-    public boolean teleport(Location location, boolean respectGroupDirection){
+
+    @Override
+    public boolean teleport(@NotNull Location location, boolean respectGroupDirection){
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORT, location);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()){
@@ -782,8 +778,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (event.isCancelled()){
             return false;
         }
-        for (ActivePart part : groupParts.values()){
-            ((SpawnedDisplayEntityPart)part).translateForce(direction, distance, durationInTicks, delayInTicks);
+        for (SpawnedDisplayEntityPart part : groupParts.values()){
+            part.translateForce(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }
@@ -803,6 +799,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (!isInLoadedChunk()){
             return false;
         }
+        if (distance == 0) return true;
         Entity masterEntity = getMasterEntity();
         Location destination = getLocation().clone().add(direction.getVector(masterEntity).normalize().multiply(distance));
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.VANILLATRANSLATE, destination);
@@ -811,8 +808,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             return false;
         }
 
-        for (ActivePart part : groupParts.values()){
-            ((SpawnedDisplayEntityPart)part).translateForce(direction, distance, durationInTicks, delayInTicks);
+        for (SpawnedDisplayEntityPart part : groupParts.values()){
+            part.translateForce(direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }
@@ -824,8 +821,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     public SpawnedDisplayEntityGroup setTag(String tag){
         this.tag = tag;
-        for (ActivePart part : groupParts.values()){
-            ((SpawnedDisplayEntityPart) part).setGroupPDC();
+        for (SpawnedDisplayEntityPart part : groupParts.values()){
+            part.setGroupPDC();
         }
         return this;
     }
@@ -1013,11 +1010,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (verticalRideOffset == 0){
             return false;
         }
-        Entity vehicle = getVehicle();
-        if (vehicle == null){
-            return false;
-        }
-        return !vehicle.isDead();
+        return getVehicle() != null;
     }
 
     /**

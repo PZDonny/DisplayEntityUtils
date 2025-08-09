@@ -1,9 +1,9 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities.particles;
 
+import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -22,8 +22,10 @@ class EntityEffectAnimationParticle extends AnimationParticle {
 
 
     EntityEffectAnimationParticle(AnimationParticleBuilder builder, Color color) {
-        super(builder, Particle.ENTITY_EFFECT);
-        updateColor(color);
+        super(builder, VersionUtils.getEntityEffectParticle());
+        if (VersionUtils.IS_1_20_5){
+            updateColor(color);
+        }
     }
 
     @ApiStatus.Internal
@@ -31,22 +33,25 @@ class EntityEffectAnimationParticle extends AnimationParticle {
 
     @Override
     public void spawn(Location location) {
-        location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, color);
+        location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, color == null ? Color.WHITE : color);
     }
 
     @Override
     public void spawn(Location location, @NotNull Player player) {
-        player.spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, color);
+        player.spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, color == null ? Color.WHITE : color);
     }
 
     @Override
     protected void initalize() {
-        color = Color.deserialize(colorAsMap);
+        if (colorAsMap != null && VersionUtils.IS_1_20_5){
+            color = Color.deserialize(colorAsMap);
+        }
     }
 
     @Override
     protected Component getUniqueInfo() {
-        return getEditMSG("| Color: "+color.asRGB(), AnimationParticleBuilder.Step.COLOR_ENTITY_EFFECT);
+        if (!VersionUtils.IS_1_20_5) return null;
+        return getEditMSG("| Color: "+(color == null ? "Unset": color.asRGB()), AnimationParticleBuilder.Step.COLOR_ENTITY_EFFECT);
     }
 
     @Override

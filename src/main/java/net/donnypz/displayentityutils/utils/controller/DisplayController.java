@@ -353,15 +353,25 @@ public class DisplayController {
             controller.setMythicMobs(mobs);
 
             //Group Properties
-            ConfigurationSection groupProps = mythicSect.getConfigurationSection("group");
-            String groupTag = groupProps.getString("tag");
-            boolean flip = groupProps.getBoolean("flip");
-            controller.verticalOffset = (float) groupProps.getDouble("verticalOffset");
-            controller.groupVisibleByDefault = groupProps.getBoolean("visibleByDefault", true);
-            controller.isPacketBased = groupProps.getBoolean("packetBased", false);
+            ConfigurationSection createdGroupSect = mythicSect.getConfigurationSection("group");
+            String groupTag = createdGroupSect.getString("tag");
+            controller.isPacketBased = createdGroupSect.getBoolean("packetBased", false);
+            boolean flip;
+
+            ConfigurationSection groupProp = config.getConfigurationSection("groupProperties");
+            if (groupProp != null){
+                controller.verticalOffset = (float) groupProp.getDouble("verticalOffset");
+                controller.groupVisibleByDefault = groupProp.getBoolean("visibleByDefault", true);
+                flip = groupProp.getBoolean("flip", false);
+            }
+            else{
+                flip = false;
+                Bukkit.getLogger().warning("Missing section \"groupProperties\" for outdated display controller: "+fileName+".");
+            }
+
             //LoadMethod
             try{ //Set with Config
-                LoadMethod method = LoadMethod.valueOf(groupProps.getString("storage").toUpperCase());
+                LoadMethod method = LoadMethod.valueOf(createdGroupSect.getString("storage").toUpperCase());
                 controller.setDisplayEntityGroup(groupTag, method);
             }
             catch(IllegalArgumentException e){ //Set with API Event
@@ -508,7 +518,7 @@ public class DisplayController {
         followProperties.filteredStates.clear();
         Map<String, Object> stateSect = (Map<String, Object>) map.get("stateFilter");
         if (stateSect != null){
-            for (String state : (List<String>) stateSect.getOrDefault("states", new ArrayList<String>())){
+            for (String state : (List<String>) stateSect.getOrDefault("states", new ArrayList<>())){
                 followProperties.addFilterState(state);
             }
             followProperties.filterBlacklist = (boolean) stateSect.getOrDefault("blacklist", true);
@@ -547,7 +557,7 @@ public class DisplayController {
 
         machine.addState(state);
         switch(stateType){
-            case DEATH -> {
+            case SPAWN, DEATH -> {
                 state.ignoreOtherTransitionLocks();
             }
             case MELEE -> {

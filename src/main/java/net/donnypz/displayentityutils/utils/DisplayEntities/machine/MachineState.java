@@ -190,7 +190,7 @@ public class MachineState {
      * Get a random {@link DisplayAnimator} used for this machine state
      * @return a {@link DisplayAnimator} or null if no animators are present
      */
-    public @Nullable DisplayAnimator getRandomDisplayAnimator(){
+    public @Nullable DisplayAnimator getEligibleDisplayAnimator(){
         if (animators.isEmpty()) return null;
         return animators.get(random.nextInt(animators.size()));
     }
@@ -242,7 +242,11 @@ public class MachineState {
             return true;
         }
         if (transitionLock){
-            return !group.isAnimating();
+            for (DisplayAnimator animator : animators){
+                if (animator.isAnimating(group)){
+                    return false;
+                }
+            }
         }
         return true;
     }

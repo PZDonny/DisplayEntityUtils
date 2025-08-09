@@ -16,7 +16,8 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.BlockType;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -41,17 +42,19 @@ class PartsCreateCMD extends PlayerSubCommand {
         switch (args[2].toLowerCase()){
             case "block" -> {
                 BlockDisplay entity = loc.getWorld().spawn(loc, BlockDisplay.class, e -> {
-                    e.setBlock(BlockType.STONE.createBlockData());
+                    e.setBlock(Registry.MATERIAL.get(NamespacedKey.minecraft("stone")).createBlockData());
                 });
                 selectEntity(player, entity.getUniqueId(), "Block Display");
             }
             case "item" -> {
                 ItemDisplay entity = loc.getWorld().spawn(loc, ItemDisplay.class, e -> {
-                    e.setItemStack(ItemStack.of(Material.STICK));
+                    e.setItemStack(new ItemStack(Material.STICK));
                 });
                 selectEntity(player, entity.getUniqueId(), "Item Display");
             }
             case "text" -> {
+                loc.setYaw(loc.getYaw()+180);
+                loc.setPitch(loc.getPitch()*-1);
                 TextDisplay entity = loc.getWorld().spawn(loc, TextDisplay.class, e -> {
                     e.text(Component.text("New Text Display Entity"));
                 });

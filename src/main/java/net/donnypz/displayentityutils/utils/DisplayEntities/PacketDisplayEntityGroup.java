@@ -9,6 +9,7 @@ import net.donnypz.displayentityutils.events.PacketGroupSendEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
@@ -268,7 +269,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             new BukkitRunnable(){
                 @Override
                 public void run() {
-                    if (vehicleUUID != finalUUID){
+                    if (PacketDisplayEntityGroup.this.vehicleUUID != finalUUID){
                         cancel();
                         return;
                     }
@@ -292,11 +293,9 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         Entity vehicle = getVehicle();
         if (vehicle == null) return null;
         vehicleUUID = null;
-        if (!vehicle.isDead()){
-            WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, false));
-            for (Player p : getTrackingPlayers()){
-                PacketEvents.getAPI().getPlayerManager().sendPacket(p, packet);
-            }
+        WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, false));
+        for (Player p : getTrackingPlayers()){
+            PacketEvents.getAPI().getPlayerManager().sendPacket(p, packet);
         }
         if (verticalRideOffset != 0){
             translate(Direction.UP, verticalRideOffset *-1, -1, -1);
@@ -363,19 +362,38 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     /**
-     * Set the location of this group. If the teleport changes worlds, the group will automatically be hidden from players in the old world
-     * @param location the location
-     * @param pivotInteractions whether interaction entities should be pivoted
-     */
-    public void teleportSafe(@NotNull Location location, boolean pivotInteractions){
-        Location oldLoc = getLocation();
+     * Change the true location of this group. If the teleport changes worlds, the group will automatically be hidden from players in the old world.<br>
+     * It is not recommended to use this multiple times in the same tick, as unexpected results may occur.
+     * @param location The location to teleport this group
+     * @param respectGroupDirection Whether to respect this group's pitch and yaw or the location's pitch and yaw
 
-        attemptLocationUpdate(oldLoc, location, true);
+     */
+    public void teleportSafe(@NotNull Location location, boolean respectGroupDirection){
+        teleport(location, respectGroupDirection, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <br>It is not recommended to use this multiple times in the same tick, unexpected results may occur.
+     */
+    @Override
+    public boolean teleport(@NotNull Location location, boolean respectGroupDirection){
+        teleport(location, respectGroupDirection, false);
+        return true;
+    }
+
+    private void teleport(Location location, boolean respectGroupDirection, boolean hide){
+        Location oldMasterLoc = getLocation();
+        attemptLocationUpdate(oldMasterLoc, location, hide);
+
+        location = location.clone();
+        if (respectGroupDirection){
+            location.setPitch(oldMasterLoc.getPitch());
+            location.setYaw(oldMasterLoc.getYaw());
+        }
+        masterPart.teleportUnsetPassengers(location);
         for (PacketDisplayEntityPart part : groupParts.values()){
-            if (part.isMaster){
-                part.teleport(location);
-            }
-            part.setRotation(location.getPitch(), location.getYaw(), pivotInteractions);
+            part.setRotation(location.getPitch(), location.getYaw(), DisplayEntityPlugin.autoPivotInteractions());
         }
     }
 
@@ -395,22 +413,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         Chunk c2 = newLoc.getChunk();
         if (c1.equals(c2)){
             updateChunkAndWorld(newLoc);
-        }
-    }
-
-    /**
-     * Set the location of this group. The group should be hidden first with {@link #hide()} if being teleported to a different world.
-     * @param location the location
-     * @param pivotInteractions whether interaction entities should be pivoted
-     */
-    public void teleport(@NotNull Location location, boolean pivotInteractions){
-        Location oldLoc = getLocation();
-        attemptLocationUpdate(oldLoc, location, false);
-        for (PacketDisplayEntityPart part : groupParts.values()){
-            if (part.isMaster){
-                part.teleport(location);
-            }
-            part.setRotation(location.getPitch(), location.getYaw(), pivotInteractions);
         }
     }
 
@@ -625,7 +627,13 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
     }
 
-    private void setPassengers(Player player){
+    void unsetPassengers(Player player){
+        int masterId = masterPart.getEntityId();
+        WrapperPlayServerSetPassengers passengerPacket = new WrapperPlayServerSetPassengers(masterId, new int[0]);
+        PacketEvents.getAPI().getPlayerManager().sendPacketSilently(player, passengerPacket);
+    }
+
+    void setPassengers(Player player){
         int masterId = masterPart.getEntityId();
         WrapperPlayServerSetPassengers passengerPacket = new WrapperPlayServerSetPassengers(masterId, passengerIds);
         PacketEvents.getAPI().getPlayerManager().sendPacketSilently(player, passengerPacket);
@@ -730,6 +738,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         for (PacketDisplayEntityPart part : new HashSet<>(groupParts.values())){
             part.removeFromGroup(true);
         }
+
+        DisplayStateMachine.unregisterFromStateMachine(this);
 
         activeAnimators.clear();
         masterPart = null;

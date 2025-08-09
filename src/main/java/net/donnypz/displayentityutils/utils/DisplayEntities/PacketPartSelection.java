@@ -1,13 +1,10 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
-import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Location;
-import org.bukkit.block.BlockType;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemType;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,21 +49,19 @@ public class PacketPartSelection extends MultiPartSelection<PacketDisplayEntityP
     }
 
     @Override
-    BlockType getBlockType(PacketDisplayEntityPart part) {
+    Material getBlockType(PacketDisplayEntityPart part) {
         return part
                 .attributeContainer
                 .getAttribute(DisplayAttributes.BlockDisplay.BLOCK_STATE)
-                .getMaterial()
-                .asBlockType();
+                .getMaterial();
     }
 
     @Override
-    ItemType getItemType(PacketDisplayEntityPart part) {
+    Material getItemType(PacketDisplayEntityPart part) {
         return part
                 .attributeContainer
                 .getAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK)
-                .getType()
-                .asItemType();
+                .getType();
     }
 
 

@@ -136,22 +136,21 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
         displayTransformations.clear();
         interactionTransformations.clear();
         Location gLoc = group.getLocation();
-        for (ActivePart p : group.groupParts.values()){
-            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) p;
-        //Ignore if part does not have specified tag
-            if (!part.hasTag(partTag)){
+        for (SpawnedDisplayEntityPart p : group.groupParts.values()){
+            //Ignore if part does not have specified tag
+            if (!p.hasTag(partTag)){
                 continue;
             }
 
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                Interaction i = (Interaction) part.getEntity();
+            if (p.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                Interaction i = (Interaction) p.getEntity();
 
                 InteractionTransformation transform = new InteractionTransformation(DisplayUtils.getInteractionTranslation(i).toVector3f(), gLoc.getYaw(), gLoc.getPitch(), i.getInteractionHeight(), i.getInteractionWidth());
-                setInteractionTransformation(part, transform);
+                setInteractionTransformation(p, transform);
             }
             else{
-                DisplayTransformation transform = DisplayTransformation.get((Display) part.getEntity());
-                setDisplayEntityTransformation(part, transform);
+                DisplayTransformation transform = DisplayTransformation.get((Display) p.getEntity());
+                setDisplayEntityTransformation(p, transform);
             }
         }
         return this;

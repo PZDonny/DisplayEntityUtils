@@ -104,15 +104,9 @@ public class DisplayAnimator {
      * @return this
      */
     public DisplayAnimator playUsingPackets(@NotNull ActiveGroup group, int startFrameId){
-        Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
-            if (!new PacketAnimationStartEvent(group, this, animation, null).callEvent()) {
-                return;
-            }
-
-            SpawnedDisplayAnimationFrame frame = animation.frames.get(startFrameId);
-            int delay = frame.delay;
-            new PacketDisplayAnimationExecutor(this, animation, group, frame, startFrameId, delay, false);
-        });
+        SpawnedDisplayAnimationFrame frame = animation.frames.get(startFrameId);
+        int delay = frame.delay;
+        new PacketDisplayAnimationExecutor(this, animation, group, frame, startFrameId, delay, false);
         return this;
     }
 
@@ -141,16 +135,10 @@ public class DisplayAnimator {
      * @return this
      */
     public DisplayAnimator play(@NotNull Collection<Player> players, @NotNull ActiveGroup group, int startFrameId){
-        Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
-            if (!new PacketAnimationStartEvent(group, this, animation, players).callEvent()) {
-                return;
-            }
-
-            SpawnedDisplayAnimationFrame frame = animation.frames.get(startFrameId);
-            int delay = frame.delay;
-            addPlayers(players, group);
-            new PlayerDisplayAnimationExecutor(players, this, animation, group, frame, startFrameId, delay, false);
-        });
+        SpawnedDisplayAnimationFrame frame = animation.frames.get(startFrameId);
+        int delay = frame.delay;
+        addPlayers(players, group);
+        new PlayerDisplayAnimationExecutor(players, this, animation, group, frame, startFrameId, delay, false);
         return this;
     }
 

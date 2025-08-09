@@ -4,6 +4,7 @@ import com.destroystokyo.paper.ParticleBuilder;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
+import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -24,7 +25,8 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     private static final Component prefix = DisplayEntityPlugin.pluginPrefix;
     private static final Component particleMSG = prefix.append(Component.text("Enter the name of the particle to use", NamedTextColor.YELLOW));
     private static final Component amountMSG = prefix.append(Component.text("Enter the amount of particles to spawn", NamedTextColor.YELLOW));
-    private static final Component colorMSG = prefix.append(Component.text("Enter the color to set for the particle(s) and a particle size", NamedTextColor.YELLOW));
+    private static final Component colorAndSizeMSG = prefix.append(Component.text("Enter the color to set for the particle(s) and a particle size", NamedTextColor.YELLOW));
+    private static final Component colorMSG = prefix.append(Component.text("Enter the color to set for the particle(s)", NamedTextColor.YELLOW));
     private static final Component colorTransitionMSG = prefix.append(Component.text("Enter the color transition to set for the particle(s) and a particle size", NamedTextColor.YELLOW));
     private static final Component extraMSG = prefix.append(Component.text("Enter the extra value for the particle(s)", NamedTextColor.YELLOW));
     private static final Component blockMSG = prefix.append(Component.text("Enter the block to use for the particle(s).\nType \"-held\" to use your held block item, \"-target\" for your targeted block, or the block's id.", NamedTextColor.YELLOW));
@@ -95,12 +97,16 @@ public class AnimationParticleBuilder extends ParticleBuilder{
                 player.sendMessage(amountMSG);
             }
             case COLOR -> {
-                player.sendMessage(colorMSG);
+                player.sendMessage(colorAndSizeMSG);
                 player.sendMessage(separatedMSG);
+            }
+            case COLOR_ENTITY_EFFECT -> {
+                player.sendMessage(colorMSG);
             }
             case COLOR_TRANSITION -> {
                 player.sendMessage(colorTransitionMSG);
                 player.sendMessage(separatedMSG);
+                player.sendMessage(Component.text("Example: red blue 2", NamedTextColor.GRAY));
             }
             case EXTRA -> {
                 player.sendMessage(extraMSG);
@@ -129,7 +135,7 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     }
 
     public boolean isItemParticle(){
-        return this.particle() == Particle.ITEM;
+        return this.particle() == VersionUtils.getItemParticle();
     }
 
     public boolean isDustOptionParticle(){
