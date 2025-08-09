@@ -12,6 +12,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,24 +40,26 @@ class GroupSaveCMD extends PlayerSubCommand {
         }
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<gray>Attempting to save spawned display entity group <white>(Tagged: "+group.getTag()+")")));
         DisplayEntityGroup displayGroup = group.toDisplayEntityGroup();
-        switch (args[2].toLowerCase()) {
-            case "all" -> {
-                DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.LOCAL, displayGroup, player);
-                DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.MONGODB, displayGroup, player);
-                DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.MYSQL, displayGroup, player);
+        Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+            switch (args[2].toLowerCase()) {
+                case "all" -> {
+                    DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.LOCAL, displayGroup, player);
+                    DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.MONGODB, displayGroup, player);
+                    DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.MYSQL, displayGroup, player);
+                }
+                case "local"->{
+                    DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.LOCAL, displayGroup, player);
+                }
+                case "mongodb" ->{
+                    DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.MONGODB, displayGroup, player);
+                }
+                case "mysql" ->{
+                    DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.MYSQL, displayGroup, player);
+                }
+                default ->{
+                    player.sendMessage(Component.text("Invalid storage option!", NamedTextColor.RED));
+                }
             }
-            case "local"->{
-                DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.LOCAL, displayGroup, player);
-            }
-            case "mongodb" ->{
-                DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.MONGODB, displayGroup, player);
-            }
-            case "mysql" ->{
-                DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.MYSQL, displayGroup, player);
-            }
-            default ->{
-                player.sendMessage(Component.text("Invalid storage option!", NamedTextColor.RED));
-            }
-        }
+        });
     }
 }

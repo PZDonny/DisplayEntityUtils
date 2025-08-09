@@ -9,6 +9,7 @@ import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,24 +27,26 @@ class GroupDeleteCMD extends PlayerSubCommand {
 
         String tag = args[2];
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<gray>Attempting to delete display entity group <white>(Tagged: "+tag+")")));
-        switch(args[3].toLowerCase()){
-            case "all" ->{
-                DisplayGroupManager.deleteDisplayEntityGroup(LoadMethod.LOCAL, tag, player);
-                DisplayGroupManager.deleteDisplayEntityGroup(LoadMethod.MONGODB, tag, player);
-                DisplayGroupManager.deleteDisplayEntityGroup(LoadMethod.MYSQL, tag, player);
+        Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+            switch(args[3].toLowerCase()){
+                case "all" ->{
+                    DisplayGroupManager.deleteDisplayEntityGroup(LoadMethod.LOCAL, tag, player);
+                    DisplayGroupManager.deleteDisplayEntityGroup(LoadMethod.MONGODB, tag, player);
+                    DisplayGroupManager.deleteDisplayEntityGroup(LoadMethod.MYSQL, tag, player);
+                }
+                case "local" -> {
+                    DisplayGroupManager.deleteDisplayEntityGroup(LoadMethod.LOCAL, tag, player);
+                }
+                case "mongodb" -> {
+                    DisplayGroupManager.deleteDisplayEntityGroup(LoadMethod.MONGODB, tag, player);
+                }
+                case "mysql" -> {
+                    DisplayGroupManager.deleteDisplayEntityGroup(LoadMethod.MYSQL, tag, player);
+                }
+                default ->{
+                    player.sendMessage(Component.text("Invalid storage option!", NamedTextColor.RED));
+                }
             }
-            case "local" -> {
-                DisplayGroupManager.deleteDisplayEntityGroup(LoadMethod.LOCAL, tag, player);
-            }
-            case "mongodb" -> {
-                DisplayGroupManager.deleteDisplayEntityGroup(LoadMethod.MONGODB, tag, player);
-            }
-            case "mysql" -> {
-                DisplayGroupManager.deleteDisplayEntityGroup(LoadMethod.MYSQL, tag, player);
-            }
-            default ->{
-                player.sendMessage(Component.text("Invalid storage option!", NamedTextColor.RED));
-            }
-        }
+        });
     }
 }

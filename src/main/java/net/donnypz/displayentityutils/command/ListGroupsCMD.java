@@ -9,6 +9,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -48,47 +49,49 @@ class ListGroupsCMD extends ConsoleUsableSubCommand {
     }
 
     static void list(CommandSender sender, LoadMethod method, String[] args, boolean isListingGroups){
-        List<String> tags;
-        if (isListingGroups){
-            tags = DisplayGroupManager.getSavedDisplayEntityGroups(method);
-        }
-        else{
-            tags = DisplayAnimationManager.getSavedDisplayAnimations(method);
-        }
-
-        sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
-        sender.sendMessage(MiniMessage.miniMessage().deserialize("Storage Location: <yellow>"+method.getDisplayName()));
-        if (tags.isEmpty()){
-            sender.sendMessage(Component.text("That storage location is empty!", NamedTextColor.RED));
-            return;
-        }
-
-        int pageNumber = 1;
-        if (args.length >= 3){
-            try{
-                pageNumber = Math.abs(Integer.parseInt(args[2]));
-                if (pageNumber == 0) pageNumber = 1;
-            }
-            catch(NumberFormatException ignored){}
-        }
-        int end = pageNumber*7;
-        int start = end-7;
-        sender.sendMessage(Component.text("Page Number: "+pageNumber, NamedTextColor.AQUA));
-        for (int i = start; i <= end; i++){
-            if (i >= tags.size()){
-                break;
-            }
-            Component message;
-            String tag = tags.get(i);
+        Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+            List<String> tags;
             if (isListingGroups){
-                message = spawnGroup(tag, method);
+                tags = DisplayGroupManager.getSavedDisplayEntityGroups(method);
             }
             else{
-                message = selectAnimation(tag, method);
+                tags = DisplayAnimationManager.getSavedDisplayAnimations(method);
             }
-            sender.sendMessage(message);
-        }
-        sender.sendMessage("------------------------");
+
+            sender.sendMessage(DisplayEntityPlugin.pluginPrefixLong);
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("Storage Location: <yellow>"+method.getDisplayName()));
+            if (tags.isEmpty()){
+                sender.sendMessage(Component.text("That storage location is empty!", NamedTextColor.RED));
+                return;
+            }
+
+            int pageNumber = 1;
+            if (args.length >= 3){
+                try{
+                    pageNumber = Math.abs(Integer.parseInt(args[2]));
+                    if (pageNumber == 0) pageNumber = 1;
+                }
+                catch(NumberFormatException ignored){}
+            }
+            int end = pageNumber*7;
+            int start = end-7;
+            sender.sendMessage(Component.text("Page Number: "+pageNumber, NamedTextColor.AQUA));
+            for (int i = start; i <= end; i++){
+                if (i >= tags.size()){
+                    break;
+                }
+                Component message;
+                String tag = tags.get(i);
+                if (isListingGroups){
+                    message = spawnGroup(tag, method);
+                }
+                else{
+                    message = selectAnimation(tag, method);
+                }
+                sender.sendMessage(message);
+            }
+            sender.sendMessage("------------------------");
+        });
     }
 
     private static Component spawnGroup(String tag, LoadMethod loadMethod){
