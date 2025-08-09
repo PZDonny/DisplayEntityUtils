@@ -19,28 +19,30 @@ import org.jetbrains.annotations.Nullable;
 @Since("3.2.1")
 public class EffActiveGroupFollowStop extends Effect {
     static {
-        Skript.registerEffect(EffActiveGroupFollowStop.class,"make %activegroup% stop follow[ing] [entit(y|ies)]");
+        Skript.registerEffect(EffActiveGroupFollowStop.class,"make %activegroups% stop follow[ing] [entit(y|ies)]");
     }
 
-    Expression<ActiveGroup<?>> group;
+    Expression<ActiveGroup<?>> groups;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        group = (Expression<ActiveGroup<?>>) expressions[0];
+        groups = (Expression<ActiveGroup<?>>) expressions[0];
         return true;
     }
 
     @Override
     protected void execute(Event event) {
-        ActiveGroup<?> g = group.getSingle(event);
-        if (g == null){
+        ActiveGroup<?>[] gs = groups.getArray(event);
+        if (gs == null){
             return;
         }
-        g.stopFollowingEntity();
+        for (ActiveGroup<?> g : gs){
+            g.stopFollowingEntity();
+        }
     }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return group.toString(event, debug)+" stop following entity";
+        return groups.toString(event, debug)+" stop following entity";
     }
 }

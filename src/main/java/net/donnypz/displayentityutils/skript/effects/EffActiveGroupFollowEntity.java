@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 public class EffActiveGroupFollowEntity extends Effect {
 
     static {
-        Skript.registerEffect(EffActiveGroupFollowEntity.class,"make %activegroup% (follow|respect) %entity% (with|using) %followtype% " +
+        Skript.registerEffect(EffActiveGroupFollowEntity.class,"make %activegroups% (follow|respect) %entity% (with|using) %followtype% " +
                 "[f:[and] flip group] [t:[and] (with|using) (teleport[ation] duration|smoothness) [of] %-number%] [d:[and] [after death] despawn after %-timespan%]");
     }
 
@@ -59,18 +59,20 @@ public class EffActiveGroupFollowEntity extends Effect {
 
     @Override
     protected void execute(Event event) {
-        ActiveGroup<?> g = group.getSingle(event);
+        ActiveGroup<?>[] gs = group.getArray(event);
         Entity e = entity.getSingle(event);
         FollowType type = followType.getSingle(event);
         int tpDur = tpDuration == null ? 0 : tpDuration.getSingle(event).intValue();
         int despawn = despawnTimespan == null ? -1 : (int) despawnTimespan.getSingle(event).getAs(Timespan.TimePeriod.TICK);
-        if (g == null || e == null || type == null) return;
+        if (gs == null || e == null || type == null) return;
 
-        g.followEntityDirection(e, GroupFollowProperties.builder(type)
-                .setFlip(flip)
-                .setTeleportationDuration(tpDur)
-                .setUnregisterDelay(despawn)
-                .build());
+        for (ActiveGroup<?> g : gs){
+            g.followEntityDirection(e, GroupFollowProperties.builder(type)
+                    .setFlip(flip)
+                    .setTeleportationDuration(tpDur)
+                    .setUnregisterDelay(despawn)
+                    .build());
+        }
     }
 
     @Override
