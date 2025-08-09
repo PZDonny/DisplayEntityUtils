@@ -19,8 +19,8 @@ public final class DisplayControllerManager {
     private static final HashMap<String, DisplayController> mythicControllers = new HashMap<>(); //Mythic Mob Id, Controller
     private static final HashMap<UUID, ActiveGroup<?>> activeGroups = new HashMap<>(); //Entity UUID, Groups
 
-    public static final NamespacedKey controllerGroupKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "controller_group");
-    public static final NamespacedKey preControllerGroupKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "mythic_persist");
+    public static final NamespacedKey controllerIdKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "controller_group");
+    public static final NamespacedKey legacyControllerGroupKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "mythic_persist");
 
 
     private DisplayControllerManager(){}
@@ -105,7 +105,7 @@ public final class DisplayControllerManager {
      */
     public static boolean isControllerGroup(@NotNull SpawnedDisplayEntityGroup group){
         PersistentDataContainer pdc = group.getMasterPart().getEntity().getPersistentDataContainer();
-        return pdc.has(controllerGroupKey);
+        return pdc.has(controllerIdKey);
     }
 
 

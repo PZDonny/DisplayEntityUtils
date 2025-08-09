@@ -76,34 +76,34 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         allPacketGroups.remove(world.getName());
     }
 
-        void updateChunkAndWorld(Location location){
-            Location oldLoc = getLocation();
-            //Remove from previous
-            if (oldLoc != null){
-                if (location.getWorld().equals(oldLoc.getWorld()) && location.getChunk().getChunkKey() == oldLoc.getChunk().getChunkKey()){
-                   return;
-                }
-                String oldWorldName = oldLoc.getWorld().getName();
-                WorldData data = allPacketGroups.get(oldWorldName);
-                if (data != null){
-                    long chunkKey = oldLoc.getChunk().getChunkKey();
-                    data.removeGroup(chunkKey, this);
-                    if (data.worldGroups.isEmpty() && !location.getWorld().getName().equals(oldWorldName)){
-                        allPacketGroups.remove(oldWorldName);
-                    }
-                }
+    void updateChunkAndWorld(Location location){
+        Location oldLoc = getLocation();
+        //Remove from previous
+        if (oldLoc != null){
+            if (location.getWorld().equals(oldLoc.getWorld()) && location.getChunk().getChunkKey() == oldLoc.getChunk().getChunkKey()){
+               return;
             }
-
-            World world = location.getWorld();
-            Chunk chunk = location.getChunk();
-            long chunkKey = chunk.getChunkKey();
-            allPacketGroups
-                    .computeIfAbsent(world.getName(), key -> new WorldData())
-                    .addGroup(chunkKey, this);
-            if (masterPart != null){
-                masterPart.packetLocation = new PacketDisplayEntityPart.PacketLocation(location);
+            String oldWorldName = oldLoc.getWorld().getName();
+            WorldData data = allPacketGroups.get(oldWorldName);
+            if (data != null){
+                long chunkKey = oldLoc.getChunk().getChunkKey();
+                data.removeGroup(chunkKey, this);
+                if (data.worldGroups.isEmpty() && !location.getWorld().getName().equals(oldWorldName)){
+                    allPacketGroups.remove(oldWorldName);
+                }
             }
         }
+
+        World world = location.getWorld();
+        Chunk chunk = location.getChunk();
+        long chunkKey = chunk.getChunkKey();
+        allPacketGroups
+                .computeIfAbsent(world.getName(), key -> new WorldData())
+                .addGroup(chunkKey, this);
+        if (masterPart != null){
+            masterPart.packetLocation = new PacketDisplayEntityPart.PacketLocation(location);
+        }
+    }
 
     void addPart(@NotNull PacketDisplayEntityPart part){
         if (part.partUUID == null){
@@ -257,6 +257,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         if (vehicle.isDead()){
             return false;
         }
+        if (vehicle.getUniqueId() == vehicleUUID) return true;
         vehicleUUID = vehicle.getUniqueId();
         vehicle.getPassengers();
         WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, true));
@@ -524,13 +525,14 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * Set whether this group should automatically handle revealing itself to players after they switch worlds
      * @param autoShow whether the group should autoShow
      */
-    public void setAutoShow(boolean autoShow){
+    public PacketDisplayEntityGroup setAutoShow(boolean autoShow){
         if (this.autoShow != autoShow && autoShow){
             Location loc = getLocation();
-            if (loc == null) return;
+            if (loc == null) return this;
             showToPlayers(new ArrayList<>(loc.getWorld().getPlayers()), GroupSpawnedEvent.SpawnReason.INTERNAL);
         }
         this.autoShow = autoShow;
+        return this;
     }
 
     /**

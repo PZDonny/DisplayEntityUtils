@@ -99,33 +99,24 @@ class GroupRideCMD extends ConsoleUsableSubCommand {
         }
 
 
+
+
         //Apply Controller
         if (controllerID != null){
             DisplayController controller = DisplayController.getController(controllerID);
             if (controller == null){
-                sender.sendMessage(Component.text("Failed to find a controller with the specified ID! ("+controllerID+")", NamedTextColor.RED));
+                sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to find a controller with the specified ID! ("+controllerID+")", NamedTextColor.RED)));
                 return;
             }
-            sender.sendMessage(Component.text("Applying controller properties!", NamedTextColor.YELLOW));
-            Collection<GroupFollowProperties> properties = controller.getFollowProperties();
-            for (GroupFollowProperties property : properties){
-                property.followGroup(group, vehicle);
-            }
-
-            if (controller.hasStateMachine()){
-                controller.getStateMachine().addGroup(group);
-            }
-            DisplayControllerManager.registerEntity(vehicle, group);
-            group.setVerticalRideOffset(controller.getVerticalOffset());
+            sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Mounting your group on the entity with a controller! ("+controllerID+")", NamedTextColor.GREEN)));
+            sender.sendMessage(Component.text("| If this action was not performed it was cancelled by another plugin!", NamedTextColor.GRAY));
+            controller.apply(vehicle, group, false);
         }
-
-        boolean result = group.rideEntity(vehicle);
-        if (!result){
-            sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Failed to mount the group! It was cancelled by another plugin!", NamedTextColor.RED)));
-            return;
+        else{
+            sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Mounting your group on the entity!", NamedTextColor.GREEN)));
+            sender.sendMessage(Component.text("| If this action was not performed it was cancelled by another plugin!", NamedTextColor.GRAY));
+            group.rideEntity(vehicle);
         }
-
-        sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Successfully mounted the group!", NamedTextColor.GREEN)));
     }
 
     static Entity getVehicle(CommandSender sender, String value){

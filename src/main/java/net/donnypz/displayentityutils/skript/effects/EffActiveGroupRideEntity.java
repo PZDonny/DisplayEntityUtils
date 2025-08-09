@@ -14,6 +14,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityG
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
+import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
@@ -76,6 +77,7 @@ public class EffActiveGroupRideEntity extends Effect {
             e = (Entity) o2;
             applyController(event, g, e);
             g.rideEntity(e);
+            DisplayControllerManager.registerEntity(e, g);
         }
 
         //Entity Ride Group

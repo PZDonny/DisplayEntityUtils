@@ -11,7 +11,6 @@ import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.GroupResult;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
-import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Display;
@@ -70,36 +69,55 @@ final class AutoGroup {
         HashMap<SpawnedDisplayEntityGroup, Collection<Interaction>> addedInteractionsForEvent = new HashMap<>();
         HashSet<Interaction> interactions = new HashSet<>();
         HashMap<SpawnedDisplayEntityGroup, ChunkRegisterGroupEvent> events = new HashMap<>();
-        HashSet<SpawnedDisplayEntityGroup> controllerGroups = new HashSet<>();
 
         for (Entity entity : entities){
             if (entity instanceof Display display){
                 if (!DisplayUtils.isMaster(display)){
                     continue;
                 }
-                //Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
-                    GroupResult result = DisplayGroupManager.getSpawnedGroup(display, null);
-                    if (result == null || foundGroups.contains(result.group())){
-                        continue;
-                    }
 
-                    SpawnedDisplayEntityGroup group = result.group();
-                    foundGroups.add(group);
-                    group.addMissingInteractionEntities(DisplayEntityPlugin.getMaximumInteractionSearchRange());
+                GroupResult result = DisplayGroupManager.getSpawnedGroup(display, null);
+                if (result == null || foundGroups.contains(result.group())){
+                    continue;
+                }
 
-                    if (!result.alreadyLoaded()){
-                        events.put(group, new ChunkRegisterGroupEvent(group, chunk));
-                        group.playSpawnAnimation();
-                        if (DisplayControllerManager.isControllerGroup(group)){
-                            controllerGroups.add(group);
+                SpawnedDisplayEntityGroup group = result.group();
+                foundGroups.add(group);
+                group.addMissingInteractionEntities(DisplayEntityPlugin.getMaximumInteractionSearchRange());
+
+                if (!result.alreadyLoaded()){
+                    group.playSpawnAnimation();
+
+                    //Display Controller Groups
+                    if (DisplayControllerManager.isControllerGroup(group)){
+                        Entity vehicle = group.getVehicle();
+                        if (vehicle != null){
+                            applyController(group, vehicle);
+                        }
+                        else{
+                            group.unregister(true, false);
+                            continue;
                         }
                     }
-                //});
+                    events.put(group, new ChunkRegisterGroupEvent(group, chunk));
+                }
             }
 
             //Interaction Entities (Required if the interaction happens to be in a different chunk)
             else if (entity instanceof Interaction interaction) {
                 interactions.add(interaction);
+            }
+            //Entity with Packet Based Controller
+            else{
+                PersistentDataContainer pdc = entity.getPersistentDataContainer();
+                String controllerID = pdc.get(DisplayControllerManager.controllerIdKey, PersistentDataType.STRING);
+                if (controllerID != null){ //Is Packet Based Controller
+                    DisplayController controller = DisplayController.getController(controllerID);
+                    if (controller != null) controller.apply(entity);
+
+                    //Previously packet based but not anymore
+                    if (!controller.isPacketBased()) pdc.remove(DisplayControllerManager.controllerIdKey);
+                }
             }
         }
 
@@ -129,51 +147,6 @@ final class AutoGroup {
             //});
         }
 
-        //Display Controllers
-        for (SpawnedDisplayEntityGroup group : controllerGroups){
-            Entity vehicle = group.getVehicle();
-            if (vehicle == null){
-                group.unregister(true, false);
-                events.remove(group);
-                continue;
-            }
-
-            PersistentDataContainer pdc = group.getMasterPart().getEntity().getPersistentDataContainer();
-            String data = pdc.get(DisplayControllerManager.controllerGroupKey, PersistentDataType.STRING);
-
-
-
-
-            DisplayController controller = DisplayController.getController(data);
-            //Data is controllerID from rework
-            if (controller != null){
-
-                Collection<GroupFollowProperties> properties = controller.getFollowProperties();
-                for (GroupFollowProperties property : properties){
-                    property.followGroup(group, vehicle);
-                }
-                if (controller.hasStateMachine()){
-                    controller.getStateMachine().addGroup(group);
-                    group.setVerticalRideOffset(controller.getVerticalOffset());
-                }
-            }
-
-            //Data is pre-rework mythic group follow properties ("mythicgroups.yml")
-            else{
-                String preReworkJson = pdc.get(DisplayControllerManager.preControllerGroupKey, PersistentDataType.STRING);
-                GroupFollowProperties properties = gson.fromJson(preReworkJson, GroupFollowProperties.class);
-                if (properties != null){
-                    properties.followGroup(group, vehicle);
-                }
-                else{
-                    group.unregister(true, true);
-                    events.remove(group);
-                    continue;
-                }
-            }
-            DisplayControllerManager.registerEntity(vehicle, group);
-        }
-
         //Call Events
         for (ChunkRegisterGroupEvent event : events.values()){
             //Persistence Override
@@ -196,6 +169,18 @@ final class AutoGroup {
             if (!coll.isEmpty()){
                 new ChunkAddGroupInteractionsEvent(g, addedInteractionsForEvent.get(g), chunk).callEvent();
             }
+        }
+    }
+
+    private static void applyController(SpawnedDisplayEntityGroup group, Entity vehicle){
+        PersistentDataContainer pdc = group.getMasterPart().getEntity().getPersistentDataContainer();
+        String data = pdc.get(DisplayControllerManager.controllerIdKey, PersistentDataType.STRING);
+
+
+        DisplayController controller = DisplayController.getController(data);
+        //DisplayController
+        if (controller != null){
+            controller.apply(vehicle, group, false);
         }
     }
 }
