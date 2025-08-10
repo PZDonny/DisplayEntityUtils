@@ -1,7 +1,5 @@
 package net.donnypz.displayentityutils.utils.controller;
 
-import io.lumine.mythic.bukkit.MythicBukkit;
-import io.lumine.mythic.core.mobs.ActiveMob;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.events.NullGroupLoaderEvent;
@@ -305,15 +303,13 @@ public class DisplayController {
     }
 
 
-    public void apply(@NotNull Entity entity){
-        if (group == null) return;
-
-        apply(entity, entity.isPersistent(), false);
+    public ActiveGroup<?> apply(@NotNull Entity entity){
+        return apply(entity, entity.isPersistent(), false);
     }
 
-    public void apply(@NotNull Entity entity, boolean persistGroup, boolean hasMythicDisguise){
+    public ActiveGroup<?> apply(@NotNull Entity entity, boolean persistGroup, boolean isDisguised){
         if (group == null){
-            return;
+            return null;
         }
 
         Location spawnLoc = entity.getLocation();
@@ -325,10 +321,10 @@ public class DisplayController {
                     .persistentByDefault(persistGroup)
                     .allowPersistenceOverride(false)
                     .visibleByDefault(groupVisibleByDefault, null));
-        if (activeGroup == null){
-            return;
+        if (activeGroup != null){
+            apply(entity, activeGroup, isDisguised);
         }
-        apply(entity, activeGroup, hasMythicDisguise);
+        return activeGroup;
     }
 
 

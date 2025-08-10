@@ -5,8 +5,11 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.ChunkAddGroupInteractionsEvent;
 import net.donnypz.displayentityutils.events.ChunkRegisterGroupEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.GroupResult;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
@@ -113,9 +116,15 @@ final class AutoGroup {
                 String controllerID = pdc.get(DisplayControllerManager.controllerIdKey, PersistentDataType.STRING);
                 if (controllerID != null){ //Is Packet Based Controller
                     DisplayController controller = DisplayController.getController(controllerID);
-                    if (controller != null) controller.apply(entity);
+                    if (controller != null){
+                        ActiveGroup<?> group = controller.apply(entity);
+                        if (group != null){
+                            DisplayStateMachine machine = controller.getStateMachine();
+                            if (machine != null) machine.setState(MachineState.StateType.IDLE, group);
+                        }
+                    }
 
-                    //Previously packet based but not anymore
+                    //Controller was previously packet based but isn't now
                     if (!controller.isPacketBased()) pdc.remove(DisplayControllerManager.controllerIdKey);
                 }
             }
@@ -180,7 +189,7 @@ final class AutoGroup {
         DisplayController controller = DisplayController.getController(data);
         //DisplayController
         if (controller != null){
-            controller.apply(vehicle, group, false);
+            controller.apply(vehicle, group, true);
         }
     }
 }
