@@ -75,9 +75,9 @@ public class EffActiveGroupRideEntity extends Effect {
         if (rideEntity){
             g = (ActiveGroup<?>) o1;
             e = (Entity) o2;
-            applyController(event, g, e);
+            boolean applied = applyController(event, g, e);
             g.rideEntity(e);
-            DisplayControllerManager.registerEntity(e, g);
+            if (applied) DisplayControllerManager.registerEntity(e, g);
         }
 
         //Entity Ride Group
@@ -97,11 +97,11 @@ public class EffActiveGroupRideEntity extends Effect {
         }
     }
 
-    private void applyController(Event event, ActiveGroup<?> g, Entity e){
+    private boolean applyController(Event event, ActiveGroup<?> g, Entity e){
         if (controllerID != null){
             DisplayController controller = DisplayController.getController(controllerID.getSingle(event));
             if (controller == null){
-                return;
+                return false;
             }
             for (GroupFollowProperties prop : controller.getFollowProperties()){
                 prop.followGroup(g, e);
@@ -116,7 +116,9 @@ public class EffActiveGroupRideEntity extends Effect {
 
                 g.setVerticalRideOffset(controller.getVerticalOffset());
             }
+            return true;
         }
+        return false;
     }
 
     @Override
