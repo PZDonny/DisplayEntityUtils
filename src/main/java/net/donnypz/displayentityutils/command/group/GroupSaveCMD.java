@@ -35,7 +35,8 @@ class GroupSaveCMD extends PlayerSubCommand {
         }
 
         if (group.getTag() == null){
-            player.sendMessage(Component.text("Failed to save display entity group, no tag provided! /mdis group settag <tag>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Failed to save display entity group, no tag provided!", NamedTextColor.RED));
+            player.sendMessage(Component.text("| Use \"/mdis group settag <tag>\"", NamedTextColor.GRAY));
             return;
         }
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<gray>Attempting to save spawned display entity group <white>(Tagged: "+group.getTag()+")")));

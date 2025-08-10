@@ -36,6 +36,7 @@ class AnimSaveCMD extends PlayerSubCommand {
 
         if (animation.getAnimationTag() == null){
             player.sendMessage(Component.text("Failed to save display animation, no tag provided! /mdis anim settag <tag>", NamedTextColor.RED));
+            player.sendMessage(Component.text("| Use \"/mdis anim settag <tag>\"", NamedTextColor.GRAY));
             return;
         }
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow> Attempting to save display animation <white> (Tagged:"+animation.getAnimationTag()+")")));
