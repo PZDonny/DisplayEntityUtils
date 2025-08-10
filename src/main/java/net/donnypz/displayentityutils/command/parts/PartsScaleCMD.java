@@ -27,10 +27,6 @@ class PartsScaleCMD extends PlayerSubCommand {
             return;
         }
 
-        if (PartsCMD.isUnwantedMultiSelection(player, selection)){
-            return;
-        }
-
         if (args.length < 4){
             player.sendMessage(Component.text("Incorrect Usage! /mdis parts scale <x | y | z | -all> <scale>", NamedTextColor.RED));
             return;
@@ -47,6 +43,7 @@ class PartsScaleCMD extends PlayerSubCommand {
             SpawnedDisplayEntityPart part = selection.getSelectedPart();
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 player.sendMessage(Component.text("You cannot do this with an interaction part entity!", NamedTextColor.RED));
+                player.sendMessage(Component.text("| Use \"/mdis interaction scale\" instead", NamedTextColor.GRAY));
                 return;
             }
             switch (dim.toLowerCase()){
