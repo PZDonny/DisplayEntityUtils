@@ -564,6 +564,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public @Nullable Location getLocation(){
+        if (!isMaster && group != null && type != SpawnedDisplayEntityPart.PartType.INTERACTION){
+            return group.getLocation();
+        }
         if (packetLocation != null){
             return packetLocation.toLocation();
         }
