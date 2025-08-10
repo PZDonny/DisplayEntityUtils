@@ -37,7 +37,7 @@ public class ExprActivePartTransLocation extends SimplePropertyExpression<Object
                 return part.getLocation();
             }
             else{
-                return DisplayUtils.getModelLocation((Display) part.getEntity(), true);
+                return DisplayUtils.getModelLocation((Display) part.getEntity());
             }
         }
         else if (o instanceof PacketDisplayEntityPart part){
@@ -45,11 +45,11 @@ public class ExprActivePartTransLocation extends SimplePropertyExpression<Object
                 return part.getLocation();
             }
             else{
-                return DisplayUtils.getModelLocation(part.getLocation(), part.getDisplayTransformation().getTranslation(), true);
+                return DisplayUtils.getModelLocation(part);
             }
         }
         else if (o instanceof Display d){
-            return DisplayUtils.getModelLocation(d, true);
+            return DisplayUtils.getModelLocation(d);
         }
         else if (o instanceof Interaction i){
             return i.getLocation();

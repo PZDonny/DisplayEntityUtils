@@ -392,11 +392,11 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                 group.masterPart = this;
             }
 
-            Entity master = ((SpawnedDisplayEntityPart) group.masterPart).getEntity();
+            Entity master = group.masterPart.getEntity();
 
             Vector translation;
             if (!isMaster()){
-                Vector worldPos = DisplayUtils.getModelLocation(display, false).toVector();
+                Vector worldPos = DisplayUtils.getModelLocation(display).toVector();
                 translation = worldPos.subtract(master.getLocation().toVector());
                 master.addPassenger(getEntity());
             }
@@ -615,7 +615,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
 
                 if (entity instanceof Display d){
-                    loc = DisplayUtils.getModelLocation(d, true);
+                    loc = DisplayUtils.getModelLocation(d);
                 }
                 else{
                     loc = entity.getLocation();
@@ -947,7 +947,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
         float width = scale.x;
         float height = scale.y;
-        Location spawnLoc = DisplayUtils.getModelLocation(display, true);
+        Location spawnLoc = DisplayUtils.getModelLocation(display);
         Interaction interaction = display.getWorld().spawn(spawnLoc, Interaction.class, i -> {
             i.setInteractionWidth(width);
             i.setInteractionHeight(height);

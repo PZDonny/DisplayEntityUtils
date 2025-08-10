@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
@@ -92,12 +93,8 @@ public abstract class RelativePoint implements Serializable {
         Location groupLoc = group.getLocation();
 
         double pitchDiff = groupLoc.getPitch() - groupPitchAtCreation;
-        double pitchAsRad = Math.toRadians(pitchDiff);
-        double sin = Math.sin(pitchAsRad);
-        double cos = Math.cos(pitchAsRad);
-
-        v.setY(-1*(v.length() * sin - v.getY() * cos)); //Adjust for pitch
-        v.rotateAroundY(Math.toRadians(groupYawAtCreation - groupLoc.getYaw())); //Pivot
+        double yawDiff = groupLoc.getYaw() - groupYawAtCreation;
+        DisplayUtils.pivotPitchAndYaw(v, (float) pitchDiff, (float) -yawDiff);
 
         groupLoc.add(v);
         return groupLoc;
@@ -112,13 +109,7 @@ public abstract class RelativePoint implements Serializable {
         fromLocation = fromLocation.clone();
         Vector v = vectorFromOrigin.clone();
 
-        double pitchDiff = fromLocation.getPitch() - groupPitchAtCreation;
-        double pitchAsRad = Math.toRadians(pitchDiff);
-        double sin = Math.sin(pitchAsRad);
-        double cos = Math.cos(pitchAsRad);
-
-        v.setY(-1*(v.length() * sin - v.getY() * cos)); //Adjust for pitch
-        v.rotateAroundY(Math.toRadians(groupYawAtCreation - fromLocation.getYaw())); //Pivot
+        DisplayUtils.pivotPitchAndYaw(v, fromLocation.getPitch(), fromLocation.getYaw());
 
         fromLocation.add(v);
         return fromLocation;

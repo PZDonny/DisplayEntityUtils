@@ -39,17 +39,15 @@ public class ExprFramePointRelativeLocation extends SimpleExpression<Location> {
         if (framePoint == null || o == null){
             return null;
         }
-        Location fromLoc;
         if (o instanceof ActiveGroup<?> g){
-            fromLoc = g.getLocation();
+            return new Location[]{framePoint.getLocation(g)};
         }
         else if (o instanceof Location l){
-            fromLoc = l;
+            return new Location[]{framePoint.getLocation(l)};
         }
         else{
             return null;
         }
-        return new Location[]{framePoint.getLocation(fromLoc)};
     }
 
     @Override
