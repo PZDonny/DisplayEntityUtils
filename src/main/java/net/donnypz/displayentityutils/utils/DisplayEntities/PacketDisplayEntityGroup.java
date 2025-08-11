@@ -380,7 +380,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
     @Override
     public boolean hasTrackingPlayers() {
-        return !masterPart.viewers.isEmpty();
+        return masterPart != null && masterPart.viewers.isEmpty();
     }
 
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap, SpawnedDisplayEntityPart.PartType... effectedPartTypes){
