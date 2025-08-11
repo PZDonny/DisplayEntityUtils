@@ -11,6 +11,7 @@ import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Bukkit;
@@ -35,6 +36,7 @@ import java.util.function.Predicate;
 public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPart> implements Packeted{
 
     private static final ConcurrentHashMap<String, WorldData> allPacketGroups = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<UUID, PassengerGroupData> groupVehicles = new ConcurrentHashMap<>();
     int interactionCount;
     int[] passengerIds;
     UUID vehicleUUID;
@@ -45,6 +47,24 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
     PacketDisplayEntityGroup(String tag){
         this.tag = tag;
+    }
+
+    public static boolean hasPassengerGroups(@NotNull Entity entity){
+        return hasPassengerGroups(entity.getUniqueId());
+    }
+
+    public static boolean hasPassengerGroups(@NotNull UUID entityUUID){
+        return groupVehicles.containsKey(entityUUID);
+    }
+
+
+    public static @NotNull Set<PacketDisplayEntityGroup> getPassengerGroups(@NotNull UUID entityUUID){
+        PassengerGroupData data = groupVehicles.get(entityUUID);
+        return data != null ? data.getGroups() : Collections.emptySet();
+    }
+
+    public static @NotNull Set<PacketDisplayEntityGroup> getPassengerGroups(@NotNull Entity entity){
+        return getPassengerGroups(entity.getUniqueId());
     }
 
     public static @NotNull Set<PacketDisplayEntityGroup> getGroups(@NotNull World world){
@@ -76,7 +96,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         allPacketGroups.remove(world.getName());
     }
 
-    void updateChunkAndWorld(Location location){
+    @ApiStatus.Internal
+    public void updateChunkAndWorld(@NotNull Location location){
         Location oldLoc = getLocation();
         //Remove from previous
         if (oldLoc != null){
@@ -88,7 +109,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             if (data != null){
                 long chunkKey = oldLoc.getChunk().getChunkKey();
                 data.removeGroup(chunkKey, this);
-                if (data.worldGroups.isEmpty() && !location.getWorld().getName().equals(oldWorldName)){
+                if (data.isEmpty() && !location.getWorld().getName().equals(oldWorldName)){
                     allPacketGroups.remove(oldWorldName);
                 }
             }
@@ -102,6 +123,14 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 .addGroup(chunkKey, this);
         if (masterPart != null){
             masterPart.packetLocation = new PacketDisplayEntityPart.PacketLocation(location);
+        }
+    }
+
+    @ApiStatus.Internal
+    public void chunkUnloadLocation(){
+        Entity vehicle = getVehicle();
+        if (vehicle != null){
+            updateChunkAndWorld(vehicle.getLocation());
         }
     }
 
@@ -264,18 +293,28 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         for (Player p : getTrackingPlayers()){
             PacketEvents.getAPI().getPlayerManager().sendPacket(p, packet);
         }
+        groupVehicles
+                .computeIfAbsent(vehicleUUID, key -> new PassengerGroupData())
+                .addGroup(vehicleUUID, this);
 
         if (runLocationUpdater){
             final UUID finalUUID = vehicle.getUniqueId();
             new BukkitRunnable(){
                 @Override
                 public void run() {
+                    if (masterPart == null){
+                        cancel();
+                        return;
+                    }
                     if (PacketDisplayEntityGroup.this.vehicleUUID != finalUUID){
                         cancel();
                         return;
                     }
                     Entity entity = Bukkit.getEntity(vehicleUUID);
                     if (entity == null){
+                        if (!DisplayControllerManager.isControllerEntity(vehicleUUID)){
+                            cancel();
+                        }
                         return;
                     }
                     if (entity.isDead()){
@@ -284,14 +323,29 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                     }
                     updateChunkAndWorld(entity.getLocation());
                 }
-            }.runTaskTimer(DisplayEntityPlugin.getInstance(), 40, 40);
+            }.runTaskTimer(DisplayEntityPlugin.getInstance(), 30, 30);
         }
         return true;
     }
 
+    private void removeAsPassenger(UUID entityUUID){
+        PassengerGroupData data = groupVehicles.get(vehicleUUID);
+        if (data == null) return;
+        data.removeGroup(entityUUID, this);
+        if (data.isEmpty()){
+            groupVehicles.remove(vehicleUUID);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <br>This method must be called sync
+     * @return
+     */
     @Override
     public @Nullable Entity dismount(){
         Entity vehicle = getVehicle();
+        removeAsPassenger(vehicleUUID);
         if (vehicle == null) return null;
         vehicleUUID = null;
         WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, false));
@@ -309,16 +363,10 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return vehicleUUID != null;
     }
 
-    @ApiStatus.Internal
-    public void unsetVehicle(){
-        vehicleUUID = null;
-    }
-
     @Override
     public @Nullable Entity getVehicle(){
         return vehicleUUID == null ? null : Bukkit.getEntity(vehicleUUID);
     }
-
 
     @Override
     public boolean isTrackedBy(@NotNull Player player) {
@@ -595,10 +643,12 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     @Override
     public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
         if (!sendShowEvent(List.of(player), spawnReason)) return;
-        for (PacketDisplayEntityPart part : groupParts.values()){
-            part.showToPlayer(player, spawnReason);
+        if (!masterPart.isTrackedBy(player)){
+            for (PacketDisplayEntityPart part : groupParts.values()){
+                part.showToPlayer(player, spawnReason);
+            }
+            setPassengers(player);
         }
-        setPassengers(player);
         refreshVehicle(player);
     }
 
@@ -641,15 +691,14 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         PacketEvents.getAPI().getPlayerManager().sendPacketSilently(player, passengerPacket);
     }
 
-    private void refreshVehicle(Player player){
-        Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
-            if (vehicleUUID == null) return;
+    void refreshVehicle(@NotNull Player player){
+        Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
             Entity vehicle = getVehicle();
             if (vehicle != null){
                 WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, true));
                 PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
             }
-        });
+        }, 2);
     }
 
     private boolean sendShowEvent(Collection<Player> players, GroupSpawnedEvent.SpawnReason spawnReason){
@@ -731,7 +780,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             WorldData data = allPacketGroups.get(worldName);
             if (data != null){
                 data.removeGroup(getLocation().getChunk().getChunkKey(), this);
-                if (data.worldGroups.isEmpty()){
+                if (data.groupMap.isEmpty()){
                     allPacketGroups.remove(worldName);
                 }
             }
@@ -747,40 +796,52 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         masterPart = null;
     }
 
-    static class WorldData{
-        Map<Long, Set<PacketDisplayEntityGroup>> worldGroups = new HashMap<>();
-
+    private static abstract class GroupHolder<T>{
+        Map<T, Set<PacketDisplayEntityGroup>> groupMap = new HashMap<>();
 
         Set<PacketDisplayEntityGroup> getGroups(){
             Set<PacketDisplayEntityGroup> groups = new HashSet<>();
-            for (Set<PacketDisplayEntityGroup> g : worldGroups.values()){
+            for (Set<PacketDisplayEntityGroup> g : groupMap.values()){
                 groups.addAll(g);
             }
             return groups;
         }
 
-        Set<PacketDisplayEntityGroup> getGroups(Chunk chunk){
-            return getGroups(chunk.getChunkKey());
-        }
-
-        Set<PacketDisplayEntityGroup> getGroups(long chunkKey){
-            Set<PacketDisplayEntityGroup> groups = worldGroups.get(chunkKey);
+        Set<PacketDisplayEntityGroup> getGroups(T key){
+            Set<PacketDisplayEntityGroup> groups = groupMap.get(key);
             return groups == null ? Collections.emptySet() : new HashSet<>(groups);
         }
 
-        void addGroup(long chunkKey, PacketDisplayEntityGroup group){
-            worldGroups
-                    .computeIfAbsent(chunkKey, key -> Collections.newSetFromMap(new ConcurrentHashMap<>()))
+        void addGroup(T key, PacketDisplayEntityGroup group){
+            groupMap
+                    .computeIfAbsent(key, k -> Collections.newSetFromMap(new ConcurrentHashMap<>()))
                     .add(group);
         }
 
-        void removeGroup(long chunkKey, PacketDisplayEntityGroup group){
-            Set<PacketDisplayEntityGroup> groups = worldGroups.get(chunkKey);
+        void removeGroup(T key, PacketDisplayEntityGroup group){
+            Set<PacketDisplayEntityGroup> groups = groupMap.get(key);
             if (groups == null) return;
             synchronized (groups){
                 groups.remove(group);
-                if (groups.isEmpty()) worldGroups.remove(chunkKey);
+                if (groups.isEmpty()) groupMap.remove(key);
             }
+        }
+
+        boolean isEmpty(){
+            return groupMap.isEmpty();
+        }
+
+    }
+
+    static class WorldData extends GroupHolder<Long>{
+        Set<PacketDisplayEntityGroup> getGroups(Chunk chunk){
+            return getGroups(chunk.getChunkKey());
+        }
+    }
+
+    static class PassengerGroupData extends GroupHolder<UUID>{
+        Set<PacketDisplayEntityGroup> getGroups(Entity entity){
+            return getGroups(entity.getUniqueId());
         }
     }
 }

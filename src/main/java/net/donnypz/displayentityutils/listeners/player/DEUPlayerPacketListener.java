@@ -9,14 +9,12 @@ import com.github.retrooper.packetevents.protocol.world.chunk.Column;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import org.bukkit.Bukkit;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public class DEUPlayerPacketListener implements PacketListener {
@@ -35,14 +33,11 @@ public class DEUPlayerPacketListener implements PacketListener {
 
     private void spawnEntity(User user, PacketSendEvent event){
         WrapperPlayServerSpawnEntity packet = new WrapperPlayServerSpawnEntity(event);
-        Optional<UUID> entityUUID = packet.getUUID();
-        entityUUID.ifPresent(uuid -> {
-            Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
-                ActiveGroup<?> group = DisplayControllerManager.getControllerGroup(uuid);
-                if (group instanceof PacketDisplayEntityGroup pg){
-                    //pg.refreshVehicle(player);
-                }
-            });
+        packet.getUUID().ifPresent(uuid -> {
+            if (!PacketDisplayEntityGroup.hasPassengerGroups(uuid)) return;
+            for (PacketDisplayEntityGroup g : PacketDisplayEntityGroup.getPassengerGroups(uuid)){
+                g.showToPlayer(event.getPlayer(), GroupSpawnedEvent.SpawnReason.PLAYER_SENT_CHUNK);
+            }
         });
     }
 
@@ -71,7 +66,7 @@ public class DEUPlayerPacketListener implements PacketListener {
         Column column = packet.getColumn();
         UUID uuid = user.getUUID();
         DEUUser deuUser = DEUUser.getOrCreateUser(uuid);
-        Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+        Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
             deuUser.revealPacketGroupsFromSentChunk(column.getX(), column.getZ());
         }, 2);
     }

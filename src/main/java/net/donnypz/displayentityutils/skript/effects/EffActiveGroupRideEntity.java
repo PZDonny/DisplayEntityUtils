@@ -103,19 +103,7 @@ public class EffActiveGroupRideEntity extends Effect {
             if (controller == null){
                 return false;
             }
-            for (GroupFollowProperties prop : controller.getFollowProperties()){
-                prop.followGroup(g, e);
-            }
-            if (controller.hasStateMachine()){
-                if (g instanceof PacketDisplayEntityGroup pg){
-                    controller.getStateMachine().addGroup(pg);
-                }
-                else if (g instanceof SpawnedDisplayEntityGroup sg){
-                    controller.getStateMachine().addGroup(sg);
-                }
-
-                g.setVerticalRideOffset(controller.getVerticalOffset());
-            }
+            controller.apply(e, g, false);
             return true;
         }
         return false;

@@ -1,7 +1,6 @@
 package net.donnypz.displayentityutils.listeners.entity;
 
 import com.destroystokyo.paper.event.entity.EntityJumpEvent;
-import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
@@ -87,7 +86,13 @@ public final class DEUEntityListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onTeleport(EntityTeleportEvent e){
+        Entity entity = e.getEntity();
         applyState(e.getEntity(), MachineState.StateType.TELEPORT);
+
+        ActiveGroup<?> controllerGroup = DisplayControllerManager.getControllerGroup(entity.getUniqueId());
+        if (controllerGroup instanceof PacketDisplayEntityGroup pg){
+            pg.updateChunkAndWorld(e.getTo());
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -115,9 +120,14 @@ public final class DEUEntityListener implements Listener {
 
 
 
+
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onRemoval(EntityRemoveFromWorldEvent e){
+    public void onRemoval(EntityRemoveEvent e){ //Non-Persistent Entities
+        EntityRemoveEvent.Cause cause = e.getCause();
         Entity entity = e.getEntity();
+        if (cause == EntityRemoveEvent.Cause.UNLOAD && entity.isPersistent()){
+            return;
+        }
         if (entity.isDead() || !entity.isInWorld()){
             ActiveGroup<?> controllerGroup = DisplayControllerManager.getControllerGroup(e.getEntity().getUniqueId());
             if (controllerGroup instanceof PacketDisplayEntityGroup){
