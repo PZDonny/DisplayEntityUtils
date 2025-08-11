@@ -577,7 +577,13 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         if (this.autoShow != autoShow && autoShow){
             Location loc = getLocation();
             if (loc == null) return this;
-            showToPlayers(new ArrayList<>(loc.getWorld().getPlayers()), GroupSpawnedEvent.SpawnReason.INTERNAL);
+
+            Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
+                Collection<Player> players = new ArrayList<>(loc.getChunk().getPlayersSeeingChunk());
+                Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+                    if (this.autoShow) showToPlayers(players, GroupSpawnedEvent.SpawnReason.INTERNAL);
+                });
+            });
         }
         this.autoShow = autoShow;
         return this;
@@ -671,10 +677,12 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     public void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
         if (!sendShowEvent(players, spawnReason)) return;
         for (Player player : players){
-            for (PacketDisplayEntityPart part : groupParts.sequencedValues()){
-                part.showToPlayer(player, spawnReason, groupSpawnSettings);
+            if (!masterPart.isTrackedBy(player)){
+                for (PacketDisplayEntityPart part : groupParts.sequencedValues()){
+                    part.showToPlayer(player, spawnReason, groupSpawnSettings);
+                }
+                setPassengers(player);
             }
-            setPassengers(player);
             refreshVehicle(player);
         }
     }
