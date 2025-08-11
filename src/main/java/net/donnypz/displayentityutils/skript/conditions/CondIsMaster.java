@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("SpawnedPart/Entity Is Master Part?")
 @Description("Check if a spawned part or an entity is the master part of a spawned group")
-@Examples({"if {_spawnedpart} is the master part:", "\tbroadcast\"All other parts are the passengers of this one!\""})
+@Examples({"if {_spawnedpart} is the master part:", "\tbroadcast \"All other parts are the passengers of this one!\""})
 @Since("2.6.2")
 public class CondIsMaster extends Condition {
 

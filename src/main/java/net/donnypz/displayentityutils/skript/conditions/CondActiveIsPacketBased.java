@@ -17,10 +17,10 @@ import org.jetbrains.annotations.Nullable;
 @Name("Active Object is Packet Based?")
 @Description("Check if an active object is a Packet Group")
 @Examples({"if {_group} is packet based:",
-        "\tbroadcast\"This group is packet based!\"",
+        "\tbroadcast \"This group is packet based!\"",
         "",
         "if {_selection} is not packet based:",
-        "\tbroadcast\"This selection is not packet based!\""})
+        "\tbroadcast \"This selection is not packet based!\""})
 @Since("3.0.0")
 public class CondActiveIsPacketBased extends Condition {
 

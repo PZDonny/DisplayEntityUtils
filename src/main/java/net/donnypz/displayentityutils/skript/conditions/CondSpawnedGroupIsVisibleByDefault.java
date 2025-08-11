@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Spawned Group Is Visible By Default?")
 @Description("Check if a spawned group is visible by default")
-@Examples({"if {_group} is visible by default:", "\tbroadcast\"Players can see the group by default!\""})
+@Examples({"if {_group} is visible by default:", "\tbroadcast \"Players can see the group by default!\""})
 @Since("2.6.2")
 public class CondSpawnedGroupIsVisibleByDefault extends Condition {
 

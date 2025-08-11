@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Spawned Group Is Spawned?")
 @Description("Check if a spawned group is present in the game world")
-@Examples({"if {_group} is spawned:", "\tbroadcast\"The group is spawned in the world!\""})
+@Examples({"if {_group} is spawned:", "\tbroadcast \"The group is spawned in the world!\""})
 @Since("2.6.2")
 public class CondSpawnedGroupIsSpawned extends Condition {
 

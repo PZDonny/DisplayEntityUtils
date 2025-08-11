@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Spawned Group Is Registered?")
 @Description("Check if a spawned group is registered")
-@Examples({"if {_group} is registered:", "\tbroadcast\"The plugin recognizes this group!\""})
+@Examples({"if {_group} is registered:", "\tbroadcast \"The plugin recognizes this group!\""})
 @Since("2.6.2")
 public class CondSpawnedGroupIsRegistered extends Condition {
 

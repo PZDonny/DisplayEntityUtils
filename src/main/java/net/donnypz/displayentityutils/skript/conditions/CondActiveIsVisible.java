@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Active Group is Visible?")
 @Description("Check if a player can see an active group or active part")
-@Examples({"if {_player} can see the deu {_group}:", "\tbroadcast\"The player can see this group\""})
+@Examples({"if {_player} can see the deu {_group}:", "\tbroadcast \"The player can see this group\""})
 @Since("3.0.0")
 public class CondActiveIsVisible extends Condition {
 

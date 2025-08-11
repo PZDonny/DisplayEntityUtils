@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Spawned Group Is In Loaded Chunk?")
 @Description("Check if a spawned group is in a loaded chunk")
-@Examples({"if {_group} is in a loaded chunk:", "\tbroadcast\"The group is in a loaded chunk!\""})
+@Examples({"if {_group} is in a loaded chunk:", "\tbroadcast \"The group is in a loaded chunk!\""})
 @Since("2.6.2")
 public class CondSpawnedGroupIsInLoadedChunk extends Condition {
 

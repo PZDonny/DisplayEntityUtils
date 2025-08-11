@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Spawned Group Persistence Override")
 @Description("Check if a spawned group allows chunk loading to override its persistence")
-@Examples({"if {_group} allows persistence override:", "\tbroadcast\"The group's persistence will be overriden by config settings'!\""})
+@Examples({"if {_group} allows persistence override:", "\tbroadcast \"The group's persistence will be overriden by config settings'!\""})
 @Since("2.6.3")
 public class CondSpawnedGroupAllowsPersistenceOverride extends Condition {
 

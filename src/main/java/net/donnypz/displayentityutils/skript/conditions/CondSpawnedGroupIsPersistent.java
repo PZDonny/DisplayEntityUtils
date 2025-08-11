@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Spawned Group Is Persistent")
 @Description("Check if a spawned group is persist")
-@Examples({"if {_group} is persistent:", "\tbroadcast\"The group wont despawn!\""})
+@Examples({"if {_group} is persistent:", "\tbroadcast \"The group wont despawn!\""})
 @Since("2.6.2")
 public class CondSpawnedGroupIsPersistent extends Condition {
 
