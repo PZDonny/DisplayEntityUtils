@@ -21,7 +21,13 @@ import java.util.Set;
 
 @Name("Part Selection Filter Set Items/Blocks")
 @Description("Set the items/blocks that should be filtered in a part selection")
-@Examples({"set block filter of {_selection} with stone"})
+@Examples({"#Filter Stone",
+            "set block filter of {_selection} with stone",
+            "",
+            "#Filter Glass and Stained Glass",
+            "set block filter of {_selection} with tag contents of minecraft tag \"impermeable\"",
+            "#",
+            "set item filter of {_selection} with tag contents of minecraft tag \"swords\""})
 @Since("2.6.2")
 public class EffPartSelectionFilterItemsBlocks extends Effect {
     static {
@@ -29,14 +35,14 @@ public class EffPartSelectionFilterItemsBlocks extends Effect {
     }
 
     Expression<MultiPartSelection<?>> selection;
-    Expression<ItemType> itemTypes;
+    Expression<?> itemTypes;
     boolean exclude;
     boolean isBlock;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         selection = (Expression<MultiPartSelection<?>>) expressions[0];
-        itemTypes = (Expression<ItemType>) expressions[1];
+        itemTypes = expressions[1];
         exclude = parseResult.hasTag("out");
         isBlock = parseResult.hasTag("block");
         return true;
@@ -48,25 +54,27 @@ public class EffPartSelectionFilterItemsBlocks extends Effect {
         if (sel == null){
             return;
         }
-        PartFilter builder = new PartFilter();
-        ItemType[] types = itemTypes.getArray(event);
+        ItemType[] types = (ItemType[]) itemTypes.getAll(event);
         if (types == null){
             return;
         }
+
         Set<Material> materials = new HashSet<>();
         for (ItemType type : types){
-            materials.add(type.getMaterial());
+            for (Material mat : type.getMaterials()){
+                materials.add(mat);
+            }
         }
 
+        PartFilter filter = new PartFilter();
         if (isBlock){
-            builder.setBlockTypes(materials, !exclude);
+            filter.setBlockTypes(materials, !exclude);
         }
         else{
-            builder.setItemTypes(materials, !exclude);
+            filter.setItemTypes(materials, !exclude);
         }
 
-
-        sel.applyFilter(builder, false);
+        sel.applyFilter(filter, false);
     }
 
     @Override
