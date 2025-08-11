@@ -392,11 +392,11 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                 group.masterPart = this;
             }
 
-            Entity master = ((SpawnedDisplayEntityPart) group.masterPart).getEntity();
+            Entity master = group.masterPart.getEntity();
 
             Vector translation;
             if (!isMaster()){
-                Vector worldPos = DisplayUtils.getModelLocation(display, false).toVector();
+                Vector worldPos = DisplayUtils.getModelLocation(display).toVector();
                 translation = worldPos.subtract(master.getLocation().toVector());
                 master.addPassenger(getEntity());
             }
@@ -615,7 +615,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
 
                 if (entity instanceof Display d){
-                    loc = DisplayUtils.getModelLocation(d, true);
+                    loc = DisplayUtils.getModelLocation(d);
                 }
                 else{
                     loc = entity.getLocation();
@@ -656,10 +656,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     /**
      * Change the X scale of this part
      * @param scale The X scale to set for this part
-     * @return false if this part is grouped or is an Interaction
+     * @return false if this part is an Interaction
      */
     public boolean setXScale(float scale){
-        if (!isSingle || type == PartType.INTERACTION){
+        if (type == PartType.INTERACTION){
             return false;
         }
         Transformation t = getDisplayTransformation();
@@ -672,10 +672,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     /**
      * Change the Y scale of this part
      * @param scale The Y scale to set for this part
-     * @return false if this part is grouped or is an Interaction
+     * @return false if this part is an Interaction
      */
     public boolean setYScale(float scale){
-        if (!isSingle || type == PartType.INTERACTION){
+        if (type == PartType.INTERACTION){
             return false;
         }
         Transformation t = getDisplayTransformation();
@@ -688,10 +688,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     /**
      * Change the Z scale of this part
      * @param scale The Z scale to set for this part
-     * @return false if this part is grouped or is an Interaction
+     * @return false if this part is an Interaction
      */
     public boolean setZScale(float scale){
-        if (!isSingle || type == PartType.INTERACTION){
+        if (type == PartType.INTERACTION){
             return false;
         }
         Transformation t = getDisplayTransformation();
@@ -707,10 +707,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @param x The X scale to set for this part
      * @param y The Y scale to set for this part
      * @param z The Z scale to set for this part
-     * @return false if this part is grouped or is an Interaction
+     * @return false if this part is an Interaction
      */
     public boolean setScale(float x, float y, float z){
-        if (!isSingle || type == PartType.INTERACTION){
+        if (type == PartType.INTERACTION){
             return false;
         }
         Transformation t = getDisplayTransformation();
@@ -947,7 +947,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
         float width = scale.x;
         float height = scale.y;
-        Location spawnLoc = DisplayUtils.getModelLocation(display, true);
+        Location spawnLoc = DisplayUtils.getModelLocation(display);
         Interaction interaction = display.getWorld().spawn(spawnLoc, Interaction.class, i -> {
             i.setInteractionWidth(width);
             i.setInteractionHeight(height);

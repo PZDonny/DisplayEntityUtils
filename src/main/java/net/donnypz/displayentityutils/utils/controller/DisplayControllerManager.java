@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -19,8 +20,8 @@ public final class DisplayControllerManager {
     private static final HashMap<String, DisplayController> mythicControllers = new HashMap<>(); //Mythic Mob Id, Controller
     private static final HashMap<UUID, ActiveGroup<?>> activeGroups = new HashMap<>(); //Entity UUID, Groups
 
-    public static final NamespacedKey controllerGroupKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "controller_group");
-    public static final NamespacedKey preControllerGroupKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "mythic_persist");
+    public static final NamespacedKey controllerIdKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "controller_group");
+    public static final NamespacedKey legacyControllerGroupKey = new NamespacedKey(DisplayEntityPlugin.getInstance(), "mythic_persist");
 
 
     private DisplayControllerManager(){}
@@ -105,7 +106,7 @@ public final class DisplayControllerManager {
      */
     public static boolean isControllerGroup(@NotNull SpawnedDisplayEntityGroup group){
         PersistentDataContainer pdc = group.getMasterPart().getEntity().getPersistentDataContainer();
-        return pdc.has(controllerGroupKey);
+        return pdc.has(controllerIdKey);
     }
 
 
@@ -118,10 +119,21 @@ public final class DisplayControllerManager {
     @ApiStatus.Internal
     public static void unregisterEntity(@NotNull Entity entity){
         ActiveGroup<?> group = activeGroups.remove(entity.getUniqueId());
-        if (group != null) DisplayStateMachine.unregisterFromStateMachine(group);
+        if (group != null){
+            DisplayStateMachine.unregisterFromStateMachine(group);
+        }
+        if (!Bukkit.isStopping()){
+            PersistentDataContainer pdc = entity.getPersistentDataContainer();
+            pdc.remove(DisplayControllerManager.controllerIdKey);
+        }
+
     }
 
     public static boolean isControllerEntity(@NotNull Entity entity){
-        return activeGroups.containsKey(entity.getUniqueId());
+        return isControllerEntity(entity.getUniqueId());
+    }
+
+    public static boolean isControllerEntity(@NotNull UUID entityUUID){
+        return activeGroups.containsKey(entityUUID);
     }
 }

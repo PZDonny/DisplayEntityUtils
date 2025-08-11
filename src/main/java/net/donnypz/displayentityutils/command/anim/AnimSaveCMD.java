@@ -11,6 +11,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,28 +36,32 @@ class AnimSaveCMD extends PlayerSubCommand {
 
         if (animation.getAnimationTag() == null){
             player.sendMessage(Component.text("Failed to save display animation, no tag provided! /mdis anim settag <tag>", NamedTextColor.RED));
+            player.sendMessage(Component.text("| Use \"/mdis anim settag <tag>\"", NamedTextColor.GRAY));
             return;
         }
         player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow> Attempting to save display animation <white> (Tagged:"+animation.getAnimationTag()+")")));
         DisplayAnimation anim = animation.toDisplayAnimation();
-        switch(args[2].toLowerCase()){
-            case "all" -> {
-                DisplayAnimationManager.saveDisplayAnimation(LoadMethod.LOCAL, anim, player);
-                DisplayAnimationManager.saveDisplayAnimation(LoadMethod.MONGODB, anim, player);
-                DisplayAnimationManager.saveDisplayAnimation(LoadMethod.MYSQL, anim, player);
+        Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+            switch(args[2].toLowerCase()){
+                case "all" -> {
+                    DisplayAnimationManager.saveDisplayAnimation(LoadMethod.LOCAL, anim, player);
+                    DisplayAnimationManager.saveDisplayAnimation(LoadMethod.MONGODB, anim, player);
+                    DisplayAnimationManager.saveDisplayAnimation(LoadMethod.MYSQL, anim, player);
+                }
+                case "local"->{
+                    DisplayAnimationManager.saveDisplayAnimation(LoadMethod.LOCAL, anim, player);
+                }
+                case "mongodb" ->{
+                    DisplayAnimationManager.saveDisplayAnimation(LoadMethod.MONGODB, anim, player);
+                }
+                case "mysql" ->{
+                    DisplayAnimationManager.saveDisplayAnimation(LoadMethod.MYSQL, anim, player);
+                }
+                default ->{
+                    player.sendMessage(Component.text("Invalid storage option!", NamedTextColor.RED));
+                }
             }
-            case "local"->{
-                DisplayAnimationManager.saveDisplayAnimation(LoadMethod.LOCAL, anim, player);
-            }
-            case "mongodb" ->{
-                DisplayAnimationManager.saveDisplayAnimation(LoadMethod.MONGODB, anim, player);
-            }
-            case "mysql" ->{
-                DisplayAnimationManager.saveDisplayAnimation(LoadMethod.MYSQL, anim, player);
-            }
-            default ->{
-                player.sendMessage(Component.text("Invalid storage option!", NamedTextColor.RED));
-            }
-        }
+        });
+
     }
 }

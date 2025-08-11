@@ -32,7 +32,7 @@ public class EffActiveGroupFollowEntity extends Effect {
 
     static {
         Skript.registerEffect(EffActiveGroupFollowEntity.class,"make %activegroups% (follow|respect) %entity% (with|using) %followtype% " +
-                "[f:[and] flip group] [t:[and] (with|using) (teleport[ation] duration|smoothness) [of] %-number%] [d:[and] [after death] despawn after %-timespan%]");
+                "[f: [and] flip group] [t: [and] (with|using) (teleport[ation] duration|smoothness) [of] %-number%] [d: [and] [after death] despawn after %-timespan%]"); //Keep the space between tag and "[and]"
     }
 
     Expression<ActiveGroup<?>> group;

@@ -14,6 +14,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityG
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
+import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
@@ -74,8 +75,9 @@ public class EffActiveGroupRideEntity extends Effect {
         if (rideEntity){
             g = (ActiveGroup<?>) o1;
             e = (Entity) o2;
-            applyController(event, g, e);
+            boolean applied = applyController(event, g, e);
             g.rideEntity(e);
+            if (applied) DisplayControllerManager.registerEntity(e, g);
         }
 
         //Entity Ride Group
@@ -95,26 +97,16 @@ public class EffActiveGroupRideEntity extends Effect {
         }
     }
 
-    private void applyController(Event event, ActiveGroup<?> g, Entity e){
+    private boolean applyController(Event event, ActiveGroup<?> g, Entity e){
         if (controllerID != null){
             DisplayController controller = DisplayController.getController(controllerID.getSingle(event));
             if (controller == null){
-                return;
+                return false;
             }
-            for (GroupFollowProperties prop : controller.getFollowProperties()){
-                prop.followGroup(g, e);
-            }
-            if (controller.hasStateMachine()){
-                if (g instanceof PacketDisplayEntityGroup pg){
-                    controller.getStateMachine().addGroup(pg);
-                }
-                else if (g instanceof SpawnedDisplayEntityGroup sg){
-                    controller.getStateMachine().addGroup(sg);
-                }
-
-                g.setVerticalRideOffset(controller.getVerticalOffset());
-            }
+            controller.apply(e, g, false);
+            return true;
         }
+        return false;
     }
 
     @Override

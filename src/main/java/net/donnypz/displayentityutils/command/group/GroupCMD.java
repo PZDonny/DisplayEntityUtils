@@ -101,7 +101,7 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group settag <group-tag>", "Set this group's tag, or identifier");
             CMDUtils.sendCMD(sender, "/mdis group yaw <yaw> [-pivot]","Set your selected group's yaw, \"-pivot\" pivots interaction entities around the group");
             CMDUtils.sendCMD(sender, "/mdis group pitch <pitch>", "Set your selected group's pitch");
-            CMDUtils.sendCMD(sender, "/mdis group scale <scale-multiplier> <tick-duration>", "Scale your selected group");
+            CMDUtils.sendCMD(sender, "/mdis group scale <scale-multiplier> <tick-duration>", "Scale your selected group with a given multiplier");
             CMDUtils.sendCMD(sender, "/mdis group brightness <block> <sky>", "Set your selected group's brightness. Enter values between 0-15. -1 resets");
             CMDUtils.sendCMD(sender, "/mdis group clone", "Spawn a cloned group at your selected group's location");
         }

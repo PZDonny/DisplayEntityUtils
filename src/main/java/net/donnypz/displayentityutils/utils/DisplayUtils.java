@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.PartTranslateEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import org.bukkit.Location;
@@ -20,11 +21,9 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
+import org.joml.*;
 
+import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -94,49 +93,84 @@ public final class DisplayUtils {
                 .rotate(transformation.getRightRotation());
     }
 
+    public static Vector3f pivotPitchAndYaw(@NotNull Vector3f vector, float pitch, float yaw){
+        //Apply Pitch
+        double pitchAsRad = Math.toRadians(pitch);
+        double sin = Math.sin(pitchAsRad);
+        double cos = Math.cos(pitchAsRad);
+        float originalY = vector.y;
+        float originalZ = vector.z;
+
+
+
+        vector.y = (float) (originalY * cos - originalZ * sin);
+        vector.z = (float) (originalY * sin + originalZ * cos);
+
+        //Apply Yaw
+        return new Quaternionf()
+                .rotateY((float) Math.toRadians(-yaw))
+                .transform(vector);
+    }
+
+    public static Vector pivotPitchAndYaw(@NotNull Vector vector, float pitch, float yaw){
+        return Vector.fromJOML(pivotPitchAndYaw(vector.toVector3f(), pitch, yaw));
+    }
+
     /**
-     * Get the location of the model of a display entity. Not the entity's actual location but the location
-     * based off of its transformation
+     * Get the location where a display entity is translated based off of its {@link Transformation}'s translation<br>
      * This may not be a perfect representation of where the model's location actually is, due to the shape of models varying (e.g.: Stone Block vs Stone Pressure Plate)
      * @param display The entity to get the location from
-     * @param includeRotation Determine if calculations should be made for the entity's yaw
-     * @return Model's World Location
+     * @return the location where the display entity is translated at
      */
-    public static Location getModelLocation(@NotNull Display display, boolean includeRotation){
+    public static @NotNull Location getModelLocation(@NotNull Display display){
         Transformation transformation = display.getTransformation();
         Location translationLoc = display.getLocation();
-        Vector translationVector = Vector.fromJOML(transformation.getTranslation());
+        Vector3f translationVector = transformation.getTranslation();
+        Vector3f scale = transformation.getScale();
 
-        if (includeRotation){
-            //Pivot with yaw
-            translationVector.rotateAroundY(Math.toRadians(display.getYaw()*-1));
+        if (display instanceof BlockDisplay) {
+            //Center of block display (similar to text display)
+            Vector3f centerVec = new Vector3f(scale.x / 2, scale.y / 2, scale.z / 2);
+            //Apply rotation to center vector
+            transformation.getLeftRotation().transform(centerVec);
+            translationVector.add(centerVec);
         }
 
+        pivotPitchAndYaw(translationVector, display.getPitch(), display.getYaw());
 
-        translationLoc.add(translationVector);
+        translationLoc.add(Vector.fromJOML(translationVector));
         return translationLoc;
     }
 
     /**
-     * Get the location of the model of a display entity. Not the entity's actual location but the location
-     * based off of its transformation
+     * Get the location where a {@link PacketDisplayEntityPart} display entity is translated based off of its {@link Transformation}'s translation<br>
      * This may not be a perfect representation of where the model's location actually is, due to the shape of models varying (e.g.: Stone Block vs Stone Pressure Plate)
-     * @param origin The origin location
-     * @param translation the translation
-     * @param includeRotation Determine if calculations should be made for the entity's yaw
-     * @return Model's World Location
+     * @param part The entity to get the location from
+     * @return the location where the part is translated at. Null if the part is an interaction entity
      */
-    public static Location getModelLocation(@NotNull Location origin, @NotNull Vector3f translation, boolean includeRotation){
-        Location translationLoc = origin.clone();
-        Vector translationVector = Vector.fromJOML(translation);
-
-        if (includeRotation){
-            //Pivot with yaw
-            translationVector.rotateAroundY(Math.toRadians(origin.getYaw()*-1));
+    public static @Nullable Location getModelLocation(@NotNull PacketDisplayEntityPart part){
+        if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            return null;
         }
 
+        Transformation transformation = part.getDisplayTransformation();
+        Location translationLoc = part.getLocation();
+        Vector3f translationVector = transformation.getTranslation();
+        float pitch = translationLoc.getPitch();
+        float yaw = translationLoc.getYaw();
+        Vector3f scale = transformation.getScale();
 
-        translationLoc.add(translationVector);
+        if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY) {
+            //Center of block display (similar to text display)
+            Vector3f centerVec = new Vector3f(scale.x / 2, scale.y / 2, scale.z / 2);
+            //Apply rotation to center vector
+            transformation.getLeftRotation().transform(centerVec);
+            translationVector.add(centerVec);
+        }
+
+        pivotPitchAndYaw(translationVector, pitch, yaw);
+
+        translationLoc.add(Vector.fromJOML(translationVector));
         return translationLoc;
     }
 
@@ -424,9 +458,11 @@ public final class DisplayUtils {
      * @param angleInDegrees the pivot angle in degrees
      */
     public static void pivot(@NotNull Interaction interaction, @NotNull Location center, double angleInDegrees){
-        Vector translationVector = DisplayUtils.getInteractionTranslation(interaction, center);
-        translationVector.rotateAroundY(Math.toRadians(angleInDegrees*-1));
-        Location newLoc = center.clone().subtract(translationVector);
+        Vector3f translationVector = DisplayUtils.getInteractionTranslation(interaction, center).toVector3f();
+        new Quaternionf()
+                .rotateY((float) Math.toRadians(angleInDegrees*-1))
+                .transform(translationVector);
+        Location newLoc = center.clone().subtract(Vector.fromJOML(translationVector));
         interaction.teleport(newLoc);
     }
 
@@ -448,8 +484,11 @@ public final class DisplayUtils {
      * @param angleInDegrees the pivot angle in degrees
      */
     public static Location getPivotLocation(@NotNull Vector translationVector, @NotNull Location center, double angleInDegrees){
-        translationVector.rotateAroundY(Math.toRadians(angleInDegrees*-1));
-        return center.clone().subtract(translationVector);
+        Vector3f v = translationVector.toVector3f();
+        new Quaternionf()
+                .rotateY((float) Math.toRadians(angleInDegrees*-1))
+                .transform(v);
+        return center.clone().subtract(Vector.fromJOML(v));
     }
 
     /**

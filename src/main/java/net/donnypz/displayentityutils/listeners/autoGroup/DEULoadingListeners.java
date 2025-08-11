@@ -12,6 +12,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.event.world.EntitiesLoadEvent;
+import org.bukkit.event.world.EntitiesUnloadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -32,6 +33,13 @@ public final class DEULoadingListeners implements Listener {
             futureChunk.thenAccept(c -> {
                 Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> AutoGroup.detectGroups(c, e.getEntities()));
             });
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onEntityUnload(EntitiesUnloadEvent e){
+        for (PacketDisplayEntityGroup pdeg : PacketDisplayEntityGroup.getGroups(e.getChunk())){
+            pdeg.chunkUnloadLocation();
         }
     }
 

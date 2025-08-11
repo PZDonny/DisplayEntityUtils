@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
+import net.donnypz.displayentityutils.utils.WorldUtils;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -237,18 +238,16 @@ public class DEUUser {
         }
 
         World w = player.getWorld();
-        for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(w, getChunkKey(x, z))){
-            if (!pg.isAutoShow()) continue;
+        for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(w, WorldUtils.getChunkKey(x, z))){
+            if (!pg.isAutoShow() || pg.isRiding()) continue;
 
             Predicate<Player> condition = pg.getAutoShowCondition();
             if (condition != null && !condition.test(player)) continue;
 
-            pg.showToPlayer(player, GroupSpawnedEvent.SpawnReason.PLAYER_SENT_CHUNK);
+            Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+                pg.showToPlayer(player, GroupSpawnedEvent.SpawnReason.PLAYER_SENT_CHUNK);
+            });
         }
-    }
-
-    private long getChunkKey(int x, int z){
-        return ((long) z << 32) | (x & 0xFFFFFFFFL); //Order is inverted
     }
 
     /**

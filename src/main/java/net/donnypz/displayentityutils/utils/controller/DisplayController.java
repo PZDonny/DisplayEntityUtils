@@ -1,5 +1,7 @@
 package net.donnypz.displayentityutils.utils.controller;
 
+import net.donnypz.displayentityutils.DisplayEntityPlugin;
+import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.events.NullGroupLoaderEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
@@ -10,8 +12,12 @@ import net.donnypz.displayentityutils.utils.FollowType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -294,6 +300,82 @@ public class DisplayController {
      */
     public static boolean isRegistered(String controllerID){
         return controllers.containsKey(controllerID);
+    }
+
+
+    public ActiveGroup<?> apply(@NotNull Entity entity){
+        return apply(entity, entity.isPersistent(), false);
+    }
+
+    public ActiveGroup<?> apply(@NotNull Entity entity, boolean persistGroup, boolean isDisguised){
+        if (group == null){
+            return null;
+        }
+
+        Location spawnLoc = entity.getLocation();
+        ActiveGroup<?> activeGroup = isPacketBased ?
+                group.createPacketGroup(spawnLoc, true)
+                        .setAutoShow(groupVisibleByDefault)
+                :
+                group.spawn(spawnLoc, GroupSpawnedEvent.SpawnReason.DISPLAY_CONTROLLER, new GroupSpawnSettings()
+                    .persistentByDefault(persistGroup)
+                    .allowPersistenceOverride(false)
+                    .visibleByDefault(groupVisibleByDefault, null));
+        if (activeGroup != null){
+            apply(entity, activeGroup, isDisguised);
+        }
+        return activeGroup;
+    }
+
+
+    public void apply(@NotNull Entity entity, @NotNull ActiveGroup<?> activeGroup, boolean isDisguised){
+
+        PersistentDataContainer pdc;
+        if (activeGroup instanceof PacketDisplayEntityGroup){
+            pdc = entity.getPersistentDataContainer();
+        }
+        else{
+            SpawnedDisplayEntityGroup sg = (SpawnedDisplayEntityGroup) activeGroup;
+            Entity masterEntity = sg.getMasterPart().getEntity();
+            pdc = masterEntity.getPersistentDataContainer();
+        }
+
+        if (!pdc.has(DisplayControllerManager.controllerIdKey)){
+            pdc.set(DisplayControllerManager.controllerIdKey, PersistentDataType.STRING, controllerID);
+        }
+
+        activeGroup.setVerticalRideOffset(verticalOffset);
+
+        //Possibly Disguised Mythic Mob
+        if (isDisguised){
+            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+                activeGroup.rideEntity(entity);
+                startFollowersAndMachine(entity, activeGroup);
+            }, 2);
+        }
+        else{
+            activeGroup.rideEntity(entity);
+            startFollowersAndMachine(entity, activeGroup);
+        }
+
+        activeGroup.setPitch(0);
+        DisplayControllerManager.registerEntity(entity, activeGroup);
+
+    }
+
+    private void startFollowersAndMachine(Entity entity, ActiveGroup<?> activeGroup){
+        for (GroupFollowProperties property : followProperties.values()){
+            activeGroup.followEntityDirection(entity, property);
+        }
+
+        if (stateMachine != null){
+            if (activeGroup instanceof PacketDisplayEntityGroup pg){
+                stateMachine.addGroup(pg);
+            }
+            else{
+                stateMachine.addGroup((SpawnedDisplayEntityGroup) activeGroup);
+            }
+        }
     }
 
 
