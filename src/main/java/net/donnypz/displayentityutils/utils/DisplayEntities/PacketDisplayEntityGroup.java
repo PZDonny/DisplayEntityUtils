@@ -330,6 +330,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     private void removeAsPassenger(UUID entityUUID){
+        if (vehicleUUID == null) return;
         PassengerGroupData data = groupVehicles.get(vehicleUUID);
         if (data == null) return;
         data.removeGroup(entityUUID, this);
