@@ -11,6 +11,7 @@ import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
@@ -579,7 +580,19 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             if (loc == null) return this;
 
             Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
-                Collection<Player> players = new ArrayList<>(loc.getChunk().getPlayersSeeingChunk());
+                Chunk chunk = loc.getChunk();
+                Collection<Player> players;
+                if (VersionUtils.IS_1_20_4 || Bukkit.getMinecraftVersion().equals("1.20.5")){
+                    players = new ArrayList<>();
+                    for (Player p : Bukkit.getOnlinePlayers()){
+                        if (p.isChunkSent(chunk)){
+                            players.add(p);
+                        }
+                    }
+                }
+                else{
+                    players = new ArrayList<>(chunk.getPlayersSeeingChunk());
+                }
                 Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
                     if (this.autoShow) showToPlayers(players, GroupSpawnedEvent.SpawnReason.INTERNAL);
                 });
@@ -600,7 +613,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      *
      */
     public void setAutoShow(boolean autoShow, @Nullable Predicate<Player> playerCondition){
-        this.autoShow = autoShow;
+        setAutoShow(autoShow);
         this.autoShowCondition = playerCondition;
     }
 
