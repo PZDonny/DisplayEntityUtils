@@ -354,8 +354,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         for (Player p : getTrackingPlayers()){
             PacketEvents.getAPI().getPlayerManager().sendPacket(p, packet);
         }
-        if (verticalRideOffset != 0){
-            translate(Direction.UP, verticalRideOffset *-1, -1, -1);
+
+        if (!vehicle.isDead()){
+            if (verticalRideOffset != 0){
+                translate(Direction.UP, verticalRideOffset *-1, -1, -1);
+            }
         }
         return vehicle;
     }
