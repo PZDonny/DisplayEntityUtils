@@ -120,7 +120,9 @@ final class AutoGroup {
                         ActiveGroup<?> group = controller.apply(entity);
                         if (group != null){
                             DisplayStateMachine machine = controller.getStateMachine();
-                            if (machine != null) machine.setState(MachineState.StateType.IDLE, group);
+                            if (machine != null){
+                                machine.setStateIfPresent(MachineState.StateType.IDLE, group);
+                            }
                         }
                     }
 
