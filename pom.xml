@@ -6,7 +6,7 @@
 
     <groupId>net.donnypz</groupId>
     <artifactId>displayentityutils</artifactId>
-    <version>3.2.2</version>
+    <version>3.2.3</version>
 
     <name>DisplayEntityUtils</name>
 
@@ -207,6 +207,13 @@
             <groupId>com.viaversion</groupId>
             <artifactId>viaversion-api</artifactId>
             <version>5.4.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-bukkit</artifactId>
+            <version>7.3.5</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
