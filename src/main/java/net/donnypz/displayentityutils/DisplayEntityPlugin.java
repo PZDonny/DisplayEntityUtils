@@ -25,6 +25,7 @@ import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.ChatColor;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -52,7 +53,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     @ApiStatus.Internal
     public static final Component pluginPrefix = Component.text("[DisplayEntityUtils] ", NamedTextColor.YELLOW);
     @ApiStatus.Internal
-    public static final String pluginPrefixLong = ChatColor.GRAY+"-------["+ChatColor.YELLOW+"DisplayEntityUtils"+ChatColor.GRAY+"]-------";
+    public static final Component pluginPrefixLong = MiniMessage.miniMessage().deserialize("<gray>-------[<yellow>DisplayEntityUtils<gray>]-------");
     private static NamespacedKey partUUIDKey;
     private static NamespacedKey partPDCTagKey;
     private static NamespacedKey groupTagKey;
