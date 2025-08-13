@@ -51,6 +51,7 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         new GroupRideCMD(this);
         new GroupSafeDismountCMD(this);
         new GroupDismountCMD(this);
+        new GroupWorldEditCMD(this);
     }
 
 
@@ -129,6 +130,7 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group togglepersist", "Toggle if your group should persist after a server shutdown");
             CMDUtils.sendCMD(sender, "/mdis group togglepersistoverride", "Toggle if your group's persistence can be overriden when loaded by a chunk, " +
                     "only if \"persistenceOverride\" is enabled in the config");
+            CMDUtils.sendCMD(sender, "/mdis group wetogroup [-remove]", "Convert your WorldEdit selection to a group, with its origin at your location (Requires WorldEdit). Use \"-remove\" to set all selected blocks to air");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }

@@ -103,7 +103,7 @@ public class EffActiveGroupRideEntity extends Effect {
             if (controller == null){
                 return false;
             }
-            controller.apply(e, g, false);
+            controller.apply(e, g);
             return true;
         }
         return false;

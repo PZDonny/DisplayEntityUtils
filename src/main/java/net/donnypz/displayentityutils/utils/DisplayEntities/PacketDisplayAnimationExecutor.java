@@ -2,7 +2,6 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.*;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
@@ -308,15 +307,12 @@ final class PacketDisplayAnimationExecutor {
         map.add(DisplayAttributes.Interpolation.DURATION, frame.duration);
 
         Vector3f translationVector = new Vector3f(transformation.getTranslation());
+        translationVector.add(0, group.getVerticalOffset(), 0);
         if (animation.respectGroupScale){
             Vector3f scaleVector = new Vector3f(transformation.getScale());
             if (group.getScaleMultiplier() != 1){
                 translationVector.mul(group.getScaleMultiplier());
                 scaleVector.mul(group.getScaleMultiplier());
-            }
-
-            if (group.canApplyVerticalRideOffset()){
-                translationVector.add(0, group.getVerticalRideOffset(), 0);
             }
             DisplayAnimatorExecutor.addFollowerDisplayPivot(group, part, translationVector);
 
@@ -325,15 +321,8 @@ final class PacketDisplayAnimationExecutor {
         }
         else{
             DisplayAnimatorExecutor.addFollowerDisplayPivot(group, part, translationVector);
-
-            if (group.canApplyVerticalRideOffset()){
-                translationVector.add(0, group.getVerticalRideOffset(), 0);
-                Transformation offsetTransformation = new DisplayTransformation(translationVector, transformation.getLeftRotation(), transformation.getScale(), transformation.getRightRotation());
-                map.addTransformation(offsetTransformation);
-            }
-            else{
-                map.addTransformation(transformation);
-            }
+            Transformation offsetTransformation = new DisplayTransformation(translationVector, transformation.getLeftRotation(), transformation.getScale(), transformation.getRightRotation());
+            map.addTransformation(offsetTransformation);
         }
         if (!group.isActiveAnimator(animator)) return;
         part.setAttributes(map);

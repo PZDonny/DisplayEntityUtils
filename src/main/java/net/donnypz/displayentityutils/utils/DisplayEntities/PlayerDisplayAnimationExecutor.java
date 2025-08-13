@@ -25,7 +25,7 @@ final class PlayerDisplayAnimationExecutor {
     PlayerDisplayAnimationExecutor(@NotNull Player player,
                                    @NotNull DisplayAnimator animator,
                                    @NotNull SpawnedDisplayAnimation animation,
-                                   @NotNull ActiveGroup group,
+                                   @NotNull ActiveGroup<?> group,
                                    @NotNull SpawnedDisplayAnimationFrame frame,
                                    int startFrameId,
                                    int delay,
@@ -36,7 +36,7 @@ final class PlayerDisplayAnimationExecutor {
     PlayerDisplayAnimationExecutor(@NotNull Collection<Player> players,
                                    @NotNull DisplayAnimator animator,
                                    @NotNull SpawnedDisplayAnimation animation,
-                                   @NotNull ActiveGroup group,
+                                   @NotNull ActiveGroup<?> group,
                                    @NotNull SpawnedDisplayAnimationFrame frame,
                                    int startFrameId,
                                    int delay,
@@ -55,7 +55,7 @@ final class PlayerDisplayAnimationExecutor {
      * @param animation the animation the frame is from
      * @param frame the frame to display
      */
-    static void setGroupToFrame(@NotNull Player player, @NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame){
+    static void setGroupToFrame(@NotNull Player player, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
         new PlayerDisplayAnimationExecutor(player, animator, animation, group, frame, -1, 0, true);
     }
@@ -68,14 +68,14 @@ final class PlayerDisplayAnimationExecutor {
      * @param duration how long the frame should play
      * @param delay how long until the frame should start playing
      */
-    static void setGroupToFrame(@NotNull Player player, @NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay){
+    static void setGroupToFrame(@NotNull Player player, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
         SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
         clonedFrame.duration = duration;
         new PlayerDisplayAnimationExecutor(player, animator, animation, group, clonedFrame, -1, delay, true);
     }
 
-    private void prepareAnimation(SpawnedDisplayAnimation animation, ActiveGroup group, SpawnedDisplayAnimationFrame frame, int frameId, int delay){
+    private void prepareAnimation(SpawnedDisplayAnimation animation, ActiveGroup<?> group, SpawnedDisplayAnimationFrame frame, int frameId, int delay){
         MultiPartSelection selection = animation.hasFilter() ? group.createPartSelection(animation.filter) : group.createPartSelection();
         selection.addPlayerExecutor(this);
         Bukkit
@@ -85,7 +85,7 @@ final class PlayerDisplayAnimationExecutor {
                         Math.max(delay, 0));
     }
 
-    private void executeAnimation(SpawnedDisplayAnimation animation, ActiveGroup group, MultiPartSelection selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame){
+    private void executeAnimation(SpawnedDisplayAnimation animation, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame){
         if (group.masterPart == null){
             animator.stop(players, group);
             return;
@@ -199,7 +199,7 @@ final class PlayerDisplayAnimationExecutor {
         }
     }
 
-    private void animateInteractions(Location groupLoc, SpawnedDisplayAnimationFrame frame, ActiveGroup group, MultiPartSelection selection, SpawnedDisplayAnimation animation){
+    private void animateInteractions(Location groupLoc, SpawnedDisplayAnimationFrame frame, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimation animation){
         for (Map.Entry<UUID, Vector3f> entry : frame.interactionTransformations.entrySet()){
             UUID partUUID = entry.getKey();
 
@@ -283,7 +283,7 @@ final class PlayerDisplayAnimationExecutor {
         }
     }
 
-    private void animateDisplay(ActivePart part, DisplayTransformation transformation, ActiveGroup group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame){
+    private void animateDisplay(ActivePart part, DisplayTransformation transformation, ActiveGroup<?> group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame){
         //Prevents jittering in some cases
         DisplayTransformation last = prevFrame != null ? prevFrame.displayTransformations.get(part.getPartUUID()) : null;
         boolean applyDataOnly = last != null && transformation.isSimilar(last);
@@ -309,6 +309,7 @@ final class PlayerDisplayAnimationExecutor {
         map.add(DisplayAttributes.Interpolation.DURATION, frame.duration);
 
         Vector3f translationVector = new Vector3f(transformation.getTranslation());
+        translationVector.add(0, group.getVerticalOffset(), 0);
         if (animation.respectGroupScale){
             Vector3f scaleVector = new Vector3f(transformation.getScale());
             if (group.getScaleMultiplier() != 1){
@@ -316,9 +317,6 @@ final class PlayerDisplayAnimationExecutor {
                 scaleVector.mul(group.getScaleMultiplier());
             }
 
-            if (group.canApplyVerticalRideOffset()){
-                translationVector.add(0, group.getVerticalRideOffset(), 0);
-            }
             addFollowerDisplayPivot(group, part, translationVector);
 
             Transformation respectTransform = new DisplayTransformation(translationVector, transformation.getLeftRotation(), scaleVector, transformation.getRightRotation());
@@ -326,15 +324,8 @@ final class PlayerDisplayAnimationExecutor {
         }
         else{
             addFollowerDisplayPivot(group, part, translationVector);
-
-            if (group.canApplyVerticalRideOffset()){
-                translationVector.add(0, group.getVerticalRideOffset(), 0);
-                Transformation offsetTransformation = new DisplayTransformation(translationVector, transformation.getLeftRotation(), transformation.getScale(), transformation.getRightRotation());
-                map.addTransformation(offsetTransformation);
-            }
-            else{
-                map.addTransformation(transformation);
-            }
+            Transformation offsetTransformation = new DisplayTransformation(translationVector, transformation.getLeftRotation(), transformation.getScale(), transformation.getRightRotation());
+            map.addTransformation(offsetTransformation);
         }
         for (Player p : players){
             PacketUtils.setAttributes(p, part.getEntityId(), map);
@@ -346,17 +337,20 @@ final class PlayerDisplayAnimationExecutor {
     }
 
     private void addFollowerDisplayPivot(ActiveGroup<?> group, ActivePart part, Vector3f translationVector) {
-        for (GroupEntityFollower follower : group.followers) {
-            if (!follower.selection.contains(part)) {
-                continue;
-            }
+        synchronized (group.followerLock){
+            for (GroupEntityFollower follower : group.followers) {
+                if (!follower.selection.contains(part)) {
+                    continue;
+                }
 
-            follower.laterManualPivot(part, translationVector);
-            break;
+                follower.laterManualPivot(part, translationVector);
+                break;
+            }
         }
+
     }
 
-    private void removeSelection(MultiPartSelection selection){
+    private void removeSelection(MultiPartSelection<?> selection){
         selection.removePlayerExecutor(this);
         selection.remove();
     }

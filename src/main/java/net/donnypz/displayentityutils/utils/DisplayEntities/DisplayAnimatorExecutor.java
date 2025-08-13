@@ -22,7 +22,7 @@ final class DisplayAnimatorExecutor {
 
     DisplayAnimatorExecutor(@NotNull DisplayAnimator animator,
                             @NotNull SpawnedDisplayAnimation animation,
-                            @NotNull ActiveGroup group,
+                            @NotNull SpawnedDisplayEntityGroup group,
                             @NotNull SpawnedDisplayAnimationFrame frame,
                             int startFrameId,
                             int delay,
@@ -32,7 +32,7 @@ final class DisplayAnimatorExecutor {
         this.animator = animator;
         this.isAsync = isAsync;
         this.playSingleFrame = playSingleFrame;
-        prepareAnimation(animation, (SpawnedDisplayEntityGroup) group, frame, startFrameId, delay);
+        prepareAnimation(animation, group, frame, startFrameId, delay);
     }
 
 
@@ -43,7 +43,7 @@ final class DisplayAnimatorExecutor {
      * @param frame the frame to display
      * @param isAsync whether this should be done asynchronously
      */
-    static void setGroupToFrame(@NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, boolean isAsync){
+    static void setGroupToFrame(@NotNull SpawnedDisplayEntityGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, boolean isAsync){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
         new DisplayAnimatorExecutor(animator, animation, group, frame, -1, 0, isAsync, true);
     }
@@ -57,7 +57,7 @@ final class DisplayAnimatorExecutor {
      * @param delay how long until the frame should start playing
      * @param isAsync whether this should be done asynchronously
      */
-    static void setGroupToFrame(@NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay, boolean isAsync){
+    static void setGroupToFrame(@NotNull SpawnedDisplayEntityGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay, boolean isAsync){
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
         SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
         clonedFrame.duration = duration;
@@ -298,15 +298,12 @@ final class DisplayAnimatorExecutor {
         display.setInterpolationDuration(frame.duration);
 
         Vector3f translationVector = new Vector3f(transformation.getTranslation());
+        translationVector.add(0, group.getVerticalOffset(), 0);
         if (animation.respectGroupScale){
             Vector3f scaleVector = new Vector3f(transformation.getScale());
             if (group.getScaleMultiplier() != 1){
                 translationVector.mul(group.getScaleMultiplier());
                 scaleVector.mul(group.getScaleMultiplier());
-            }
-
-            if (group.canApplyVerticalRideOffset()){
-                translationVector.add(0, group.getVerticalRideOffset(), 0);
             }
             addFollowerDisplayPivot(group, part, translationVector);
 
@@ -316,14 +313,8 @@ final class DisplayAnimatorExecutor {
         else{
             addFollowerDisplayPivot(group, part, translationVector);
 
-            if (group.canApplyVerticalRideOffset()){
-                translationVector.add(0, group.getVerticalRideOffset(), 0);
-                Transformation offsetTransformation = new DisplayTransformation(translationVector, transformation.getLeftRotation(), transformation.getScale(), transformation.getRightRotation());
-                display.setTransformation(offsetTransformation);
-            }
-            else{
-                display.setTransformation(transformation);
-            }
+            Transformation offsetTransformation = new DisplayTransformation(translationVector, transformation.getLeftRotation(), transformation.getScale(), transformation.getRightRotation());
+            display.setTransformation(offsetTransformation);
         }
 
         if (animation.allowsDataChanges()){
@@ -332,11 +323,13 @@ final class DisplayAnimatorExecutor {
     }
 
     static void addFollowerDisplayPivot(ActiveGroup<?> group, ActivePart part, Vector3f translationVector){
-        for (GroupEntityFollower follower : group.followers){
-            if (!follower.hasSetDisplayPivotData()){
-                continue;
+        synchronized (group.followerLock){
+            for (GroupEntityFollower follower : group.followers){
+                if (!follower.hasSetDisplayPivotData()){
+                    continue;
+                }
+                follower.laterManualPivot(part, translationVector);
             }
-            follower.laterManualPivot(part, translationVector);
         }
     }
 }

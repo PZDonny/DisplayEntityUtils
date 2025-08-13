@@ -8,6 +8,8 @@ softdepend:
   - MythicMobs
   - LibsDisguises
   - Skript
+  - ViaVersion
+  - WorldEdit
 depend:
   - packetevents
 commands:

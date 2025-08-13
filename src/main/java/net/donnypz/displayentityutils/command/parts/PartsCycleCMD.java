@@ -99,7 +99,8 @@ class PartsCycleCMD extends PlayerSubCommand {
 
             case TextDisplay display -> {
                 if (!display.getText().isBlank()) {
-                    desc = Component.text("(Text Display: \"", NamedTextColor.LIGHT_PURPLE).append(display.text())
+                    desc = Component.text("(Text Display: \"", NamedTextColor.LIGHT_PURPLE)
+                            .append(display.text())
                             .append(Component.text("\")", NamedTextColor.LIGHT_PURPLE));
                 }
             }

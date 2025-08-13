@@ -11,6 +11,7 @@ import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
@@ -256,14 +257,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return animator;
     }
 
-    @Override
-    @ApiStatus.Internal
-    public boolean canApplyVerticalRideOffset() {
-        if (verticalRideOffset == 0 || vehicleUUID == null){
-            return false;
-        }
-        return true;
-    }
 
     private int[] getPassengerArray(Entity vehicle, boolean includeGroup){
         List<Entity> passengers = vehicle.getPassengers();
@@ -288,7 +281,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
         if (vehicle.getUniqueId() == vehicleUUID) return true;
         vehicleUUID = vehicle.getUniqueId();
-        vehicle.getPassengers();
+
         WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, true));
         for (Player p : getTrackingPlayers()){
             PacketEvents.getAPI().getPlayerManager().sendPacket(p, packet);
@@ -297,12 +290,18 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 .computeIfAbsent(vehicleUUID, key -> new PassengerGroupData())
                 .addGroup(vehicleUUID, this);
 
+        if (verticalOffset != 0) {
+            translate(Direction.UP, verticalOffset, -1, -1);
+        }
+
+
         if (runLocationUpdater){
             final UUID finalUUID = vehicle.getUniqueId();
             new BukkitRunnable(){
                 @Override
                 public void run() {
                     if (masterPart == null){
+                        vehicleUUID = null;
                         cancel();
                         return;
                     }
@@ -323,12 +322,13 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                     }
                     updateChunkAndWorld(entity.getLocation());
                 }
-            }.runTaskTimer(DisplayEntityPlugin.getInstance(), 30, 30);
+            }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, 30);
         }
         return true;
     }
 
     private void removeAsPassenger(UUID entityUUID){
+        if (vehicleUUID == null) return;
         PassengerGroupData data = groupVehicles.get(vehicleUUID);
         if (data == null) return;
         data.removeGroup(entityUUID, this);
@@ -340,7 +340,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     /**
      * {@inheritDoc}
      * <br>This method must be called sync
-     * @return
      */
     @Override
     public @Nullable Entity dismount(){
@@ -348,14 +347,40 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         removeAsPassenger(vehicleUUID);
         if (vehicle == null) return null;
         vehicleUUID = null;
-        WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, false));
-        for (Player p : getTrackingPlayers()){
-            PacketEvents.getAPI().getPlayerManager().sendPacket(p, packet);
-        }
-        if (verticalRideOffset != 0){
-            translate(Direction.UP, verticalRideOffset *-1, -1, -1);
+        dismount(getTrackingPlayers());
+
+        if (!vehicle.isDead()){
+            if (verticalOffset != 0){
+                translate(Direction.DOWN, verticalOffset, -1, -1);
+            }
         }
         return vehicle;
+    }
+
+    /**
+     * Dismount this group from an entity for a given player
+     * @param player the player to receive the dismount
+     * <br>This method must be called sync
+     */
+    public void dismount(@NotNull Player player){
+        Entity vehicle = getVehicle();
+        if (vehicle == null) return;
+        WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, false));
+        PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
+    }
+
+    /**
+     * Dismount this group from an entity for given players
+     * @param players the players to receive the dismount
+     * <br>This method must be called sync
+     */
+    public void dismount(@NotNull Collection<Player> players){
+        Entity vehicle = getVehicle();
+        if (vehicle == null) return;
+        WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, false));
+        for (Player p : players){
+            PacketEvents.getAPI().getPlayerManager().sendPacket(p, packet);
+        }
     }
 
     @Override
@@ -380,7 +405,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
     @Override
     public boolean hasTrackingPlayers() {
-        return !masterPart.viewers.isEmpty();
+        return masterPart != null && !masterPart.viewers.isEmpty();
     }
 
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap, SpawnedDisplayEntityPart.PartType... effectedPartTypes){
@@ -579,7 +604,19 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             if (loc == null) return this;
 
             Bukkit.getScheduler().runTask(DisplayEntityPlugin.getInstance(), () -> {
-                Collection<Player> players = new ArrayList<>(loc.getChunk().getPlayersSeeingChunk());
+                Chunk chunk = loc.getChunk();
+                Collection<Player> players;
+                if (VersionUtils.IS_1_20_4 || Bukkit.getMinecraftVersion().equals("1.20.5")){
+                    players = new ArrayList<>();
+                    for (Player p : Bukkit.getOnlinePlayers()){
+                        if (p.isChunkSent(chunk)){
+                            players.add(p);
+                        }
+                    }
+                }
+                else{
+                    players = new ArrayList<>(chunk.getPlayersSeeingChunk());
+                }
                 Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
                     if (this.autoShow) showToPlayers(players, GroupSpawnedEvent.SpawnReason.INTERNAL);
                 });
@@ -600,7 +637,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      *
      */
     public void setAutoShow(boolean autoShow, @Nullable Predicate<Player> playerCondition){
-        this.autoShow = autoShow;
+        setAutoShow(autoShow);
         this.autoShowCondition = playerCondition;
     }
 
@@ -798,7 +835,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             part.removeFromGroup(true);
         }
 
-        DisplayStateMachine.unregisterFromStateMachine(this);
+        DisplayStateMachine.unregisterFromStateMachine(this, false); //Animators will auto-stop
 
         activeAnimators.clear();
         masterPart = null;

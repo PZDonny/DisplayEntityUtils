@@ -26,7 +26,7 @@ import java.util.Set;
             "",
             "#Filter Glass and Stained Glass",
             "set block filter of {_selection} with tag contents of minecraft tag \"impermeable\"",
-            "#",
+            "#Filter All Swords",
             "set item filter of {_selection} with tag contents of minecraft tag \"swords\""})
 @Since("2.6.2")
 public class EffPartSelectionFilterItemsBlocks extends Effect {

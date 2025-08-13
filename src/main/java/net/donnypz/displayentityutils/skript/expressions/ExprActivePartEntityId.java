@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 @Description("Get the entity id of an active part.")
 @Examples({"set {_id} to {_spawnedpart}'s deu entity id",
             "set {_id} to {_packetpart}'s deu entity id"})
-@Since("3.2.1")
+@Since("3.2.2")
 public class ExprActivePartEntityId extends SimplePropertyExpression<Object, Integer> {
 
     static {

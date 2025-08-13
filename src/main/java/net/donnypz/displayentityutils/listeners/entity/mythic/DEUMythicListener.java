@@ -3,19 +3,16 @@ package net.donnypz.displayentityutils.listeners.entity.mythic;
 import io.lumine.mythic.bukkit.events.MythicMechanicLoadEvent;
 import io.lumine.mythic.bukkit.events.MythicMobSpawnEvent;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
+import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
-import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
@@ -32,7 +29,22 @@ public final class DEUMythicListener implements Listener {
 
         boolean persist = e.getMob().getDespawnMode().getSavesToDisk();
         String disg = e.getMobType().getConfig().getString("Disguise");
-        controller.apply(entity, persist, (disg != null && disg.isBlank()));
+        ActiveGroup<?> group = controller.apply(entity, persist);
+
+        if (group == null) return;
+        DisplayStateMachine machine = group.getDisplayStateMachine();
+        if (machine == null) return;
+
+        if (disg != null && !disg.isBlank()){
+            Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
+               if (machine != null){
+                   machine.setStateIfPresent(MachineState.StateType.SPAWN, group);
+               }
+            }, 2);
+        }
+        else{
+
+        }
     }
 
     //Create MythicMob Mechanic

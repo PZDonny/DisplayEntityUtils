@@ -25,6 +25,7 @@ import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.ChatColor;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -52,7 +53,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     @ApiStatus.Internal
     public static final Component pluginPrefix = Component.text("[DisplayEntityUtils] ", NamedTextColor.YELLOW);
     @ApiStatus.Internal
-    public static final String pluginPrefixLong = ChatColor.GRAY+"-------["+ChatColor.YELLOW+"DisplayEntityUtils"+ChatColor.GRAY+"]-------";
+    public static final Component pluginPrefixLong = MiniMessage.miniMessage().deserialize("<gray>-------[<yellow>DisplayEntityUtils<gray>]-------");
     private static NamespacedKey partUUIDKey;
     private static NamespacedKey partPDCTagKey;
     private static NamespacedKey groupTagKey;
@@ -95,6 +96,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     private static boolean isLibsDisguisesInstalled;
     private static boolean isViaVerInstalled;
     private static boolean isSkriptInstalled;
+    private static boolean isWorldEditInstalled;
 
     SkriptAddon addon;
 
@@ -145,9 +147,9 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             Bukkit.getPluginManager().registerEvents(new DEUMythicListener(), this);
         }
 
-        //LibsDisguises
         isLibsDisguisesInstalled = Bukkit.getPluginManager().isPluginEnabled("LibsDisguises");
         isViaVerInstalled = Bukkit.getPluginManager().isPluginEnabled("ViaVersion");
+        isWorldEditInstalled = Bukkit.getPluginManager().isPluginEnabled("WorldEdit");
 
         //Skript
         isSkriptInstalled = Bukkit.getPluginManager().isPluginEnabled("Skript");
@@ -467,12 +469,21 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     }
 
     /**
+     * Get whether WorldEdit is installed on this server
+     * @return true if WorldEdit is present
+     */
+    public static boolean isWorldEditInstalled(){
+        return isWorldEditInstalled;
+    }
+
+    /**
      * Get whether Skript is installed on this server
      * @return true if Skript is present
      */
     public static boolean isSkriptInstalled() {
         return isSkriptInstalled;
     }
+
 
     /**
      * Determines whether {@link SpawnedDisplayEntityGroup}s should be unregistered in a world based

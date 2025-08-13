@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 public final class VersionUtils {
 
+    public static boolean IS_1_20_4 = Bukkit.getUnsafe().getProtocolVersion() >= 765;
     public static boolean IS_1_20_5 = Bukkit.getUnsafe().getProtocolVersion() >= 766;
     public static boolean IS_1_21 = Bukkit.getUnsafe().getProtocolVersion() >= 767;
     public static boolean IS_1_21_2 = Bukkit.getUnsafe().getProtocolVersion() >= 768;

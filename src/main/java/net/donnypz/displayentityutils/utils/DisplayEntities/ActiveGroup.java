@@ -28,7 +28,8 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     protected T masterPart;
     protected LinkedHashMap<UUID, T> groupParts = new LinkedHashMap<>();
     protected String tag;
-    protected Set<GroupEntityFollower> followers = new HashSet<>();
+    final Set<GroupEntityFollower> followers = new HashSet<>();
+    final Object followerLock = new Object();
     GroupEntityFollower defaultFollower;
     protected final Set<DisplayAnimator> activeAnimators = Collections.newSetFromMap(new ConcurrentHashMap<>());
     protected String spawnAnimationTag;
@@ -36,7 +37,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     protected DisplayAnimator.AnimationType spawnAnimationType;
     protected MachineState currentMachineState;
     protected float scaleMultiplier = 1;
-    protected float verticalRideOffset = 0;
+    protected float verticalOffset = 0;
     int lastAnimatedTick = -1;
 
     /**
@@ -573,7 +574,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     public void stopAnimations(boolean removeFromStateMachine){
         activeAnimators.clear();
         if (removeFromStateMachine){
-            DisplayStateMachine.unregisterFromStateMachine(this);
+            DisplayStateMachine.unregisterFromStateMachine(this, true);
         }
     }
 
@@ -704,7 +705,9 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      */
     public @NotNull GroupFollowProperties followEntityDirection(@NotNull Entity entity, @NotNull GroupFollowProperties properties){
         GroupEntityFollower follower = new GroupEntityFollower(this, properties);
-        followers.add(follower);
+        synchronized (followerLock){
+            followers.add(follower);
+        }
         follower.follow(entity);
         return properties;
     }
@@ -714,14 +717,16 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * {@link #followEntityDirection(Entity, GroupFollowProperties)}
      */
     public void stopFollowingEntity(){
-        for (GroupEntityFollower follower : new HashSet<>(followers)){
-            follower.remove();
+        synchronized (followerLock){
+            for (GroupEntityFollower follower : followers){
+                follower.remove();
+            }
+            if (defaultFollower != null){
+                defaultFollower.remove();
+                defaultFollower = null;
+            }
+            followers.clear();
         }
-        if (defaultFollower != null){
-            defaultFollower.remove();
-            defaultFollower = null;
-        }
-        followers.clear();
     }
 
     public abstract @Nullable Entity dismount();
@@ -731,28 +736,21 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     public abstract boolean isRiding();
 
     /**
-     * Set the vertical translation offset of this group riding an entity. This will apply to animations
-     * as long as this group is riding an entity.
+     * Set the vertical translation offset of this group, which will be used when riding entities and for animations
      * @param verticalRideOffset the offset
      */
-    public void setVerticalRideOffset(float verticalRideOffset) {
-        this.verticalRideOffset = verticalRideOffset;
+    public void setVerticalOffset(float verticalRideOffset) {
+        this.verticalOffset = verticalRideOffset;
     }
 
     /**
-     * Get the vertical translation offset of this group when riding an entity.
+     * Get the vertical translation offset of this group
      * @return a float
      */
-    public float getVerticalRideOffset() {
-        return verticalRideOffset;
+    public float getVerticalOffset() {
+        return verticalOffset;
     }
 
-
-    /**
-     * Determine if this group's vertical offset can be applied, typically when mounted on an entity
-     * @return a boolean
-     */
-    public abstract boolean canApplyVerticalRideOffset();
 
     void setSpawnAnimation(String animationTag, LoadMethod loadMethod, DisplayAnimator.AnimationType animationType){
         this.spawnAnimationTag = animationTag;

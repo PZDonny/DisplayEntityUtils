@@ -11,21 +11,17 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.util.Timespan;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.Active;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
-import org.bukkit.entity.Display;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Spawned Group/Part/ Part Selection Interpolation")
+@Name("Active Group/Part / Multi Part Selection Interpolation")
 @Description("Set the interpolation duration/delay of an active group / spawned part / part selection")
-@Examples({"deu set interpolation duration of {_spawnedpart} to 5 ticks", "deu set interpolation delay of {_spawnedgroup} to 2 ticks"})
+@Examples({"deu set interpolation duration of {_spawnedpart} to 5 ticks", "deu set {_spawnedgroup}'s interpolation delay to 2 ticks"})
 @Since("2.6.2")
 public class EffActiveInterpolation extends Effect {
     static {
-        Skript.registerEffect(EffActiveInterpolation.class,"[deu ]set interpolation (:duration|delay) of %spawnedparts/partselections/spawnedgroups% to %timespan%",
-                "[deu]set %spawnedgroup/partselection/spawnedparts/packetgroups/packetpartselections/packetparts%'s interpolation (:duration|delay) to %timespan%");
+        Skript.registerEffect(EffActiveInterpolation.class,"[deu ]set interpolation (:duration|delay) of %activegroups/multipartselections/activeparts% to %timespan%",
+                "[deu] set %activegroups/multipartselections/activeparts%'s interpolation (:duration|delay) to %timespan%");
     }
 
     Expression<?> object;

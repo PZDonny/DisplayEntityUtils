@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("DisplayAnimator is animating ActiveGroup?")
 @Description("Check if a displayanimator is animating an active group")
-@Examples({"if {_animator} is animating {_group}:", "\tbroadcast\"The animator is animating the group!\""})
+@Examples({"if {_animator} is animating {_group}:", "\tbroadcast \"The animator is animating the group!\""})
 @Since("2.6.2")
 public class CondActiveGroupAnimatorIsActive extends Condition {
 

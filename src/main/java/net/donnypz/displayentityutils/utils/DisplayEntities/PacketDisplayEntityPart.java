@@ -606,9 +606,10 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             PacketUtils.translateInteraction(this, direction, distance, durationInTicks, delayInTicks);
         }
         else{
+            Vector addVector = direction.normalize().multiply(distance);
             Bukkit.getAsyncScheduler().runDelayed(DisplayEntityPlugin.getInstance(), task -> {
                 Vector3f translation = attributeContainer.getAttribute(DisplayAttributes.Transform.TRANSLATION)
-                        .add(direction.toVector3f());
+                        .add(addVector.toVector3f());
                 attributeContainer
                         .setAttributesAndSend(new DisplayAttributeMap()
                                         .add(DisplayAttributes.Transform.TRANSLATION, translation)

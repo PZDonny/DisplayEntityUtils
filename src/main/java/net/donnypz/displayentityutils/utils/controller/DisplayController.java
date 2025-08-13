@@ -1,8 +1,10 @@
 package net.donnypz.displayentityutils.utils.controller;
 
+import io.lumine.mythic.bukkit.MythicBukkit;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.events.NullGroupLoaderEvent;
+import net.donnypz.displayentityutils.events.PreGroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
@@ -303,11 +305,22 @@ public class DisplayController {
     }
 
 
-    public ActiveGroup<?> apply(@NotNull Entity entity){
-        return apply(entity, entity.isPersistent(), false);
+    /**
+     * Apply this controller to an entity, automatically spawning an {@link ActiveGroup} for it
+     * @param entity the entity
+     * @return an {@link ActiveGroup} or null if the {@link PreGroupSpawnedEvent} is cancelled and the created group is a {@link SpawnedDisplayEntityGroup}
+     */
+    public @Nullable ActiveGroup<?> apply(@NotNull Entity entity){
+        return apply(entity, entity.isPersistent());
     }
 
-    public ActiveGroup<?> apply(@NotNull Entity entity, boolean persistGroup, boolean isDisguised){
+    /**
+     * Apply this controller to an entity, automatically spawning an {@link ActiveGroup} for it
+     * @param entity the entity
+     * @param persistGroup whether the group should stay persistent
+     * @return an {@link ActiveGroup} or null if the {@link PreGroupSpawnedEvent} is cancelled and the created group is a {@link SpawnedDisplayEntityGroup}
+     */
+    public @Nullable ActiveGroup<?> apply(@NotNull Entity entity, boolean persistGroup){
         if (group == null){
             return null;
         }
@@ -322,13 +335,13 @@ public class DisplayController {
                     .allowPersistenceOverride(false)
                     .visibleByDefault(groupVisibleByDefault, null));
         if (activeGroup != null){
-            apply(entity, activeGroup, isDisguised);
+            apply(entity, activeGroup);
         }
         return activeGroup;
     }
 
 
-    public void apply(@NotNull Entity entity, @NotNull ActiveGroup<?> activeGroup, boolean isDisguised){
+    public void apply(@NotNull Entity entity, @NotNull ActiveGroup<?> activeGroup){
 
         PersistentDataContainer pdc;
         if (activeGroup instanceof PacketDisplayEntityGroup){
@@ -344,12 +357,19 @@ public class DisplayController {
             pdc.set(DisplayControllerManager.controllerIdKey, PersistentDataType.STRING, controllerID);
         }
 
-        activeGroup.setVerticalRideOffset(verticalOffset);
+        activeGroup.setVerticalOffset(verticalOffset);
 
-        //Possibly Disguised Mythic Mob
+        //Disguised Mythic Mob
+        boolean isDisguised;
+        if (DisplayEntityPlugin.isLibsDisguisesInstalled()) {
+            isDisguised = MythicBukkit.inst().getMobManager().isActiveMob(entity.getUniqueId());
+        }
+        else{
+            isDisguised = false;
+        }
         if (isDisguised){
+            activeGroup.rideEntity(entity);
             Bukkit.getScheduler().runTaskLater(DisplayEntityPlugin.getInstance(), () -> {
-                activeGroup.rideEntity(entity);
                 startFollowersAndMachine(entity, activeGroup);
             }, 2);
         }
