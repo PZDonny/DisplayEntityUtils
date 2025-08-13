@@ -36,7 +36,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     protected DisplayAnimator.AnimationType spawnAnimationType;
     protected MachineState currentMachineState;
     protected float scaleMultiplier = 1;
-    protected float verticalRideOffset = 0;
+    protected float verticalOffset = 0;
     int lastAnimatedTick = -1;
 
     /**
@@ -731,28 +731,21 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     public abstract boolean isRiding();
 
     /**
-     * Set the vertical translation offset of this group riding an entity. This will apply to animations
-     * as long as this group is riding an entity.
+     * Set the vertical translation offset of this group, which will be used when riding entities and for animations
      * @param verticalRideOffset the offset
      */
-    public void setVerticalRideOffset(float verticalRideOffset) {
-        this.verticalRideOffset = verticalRideOffset;
+    public void setVerticalOffset(float verticalRideOffset) {
+        this.verticalOffset = verticalRideOffset;
     }
 
     /**
-     * Get the vertical translation offset of this group when riding an entity.
+     * Get the vertical translation offset of this group
      * @return a float
      */
-    public float getVerticalRideOffset() {
-        return verticalRideOffset;
+    public float getVerticalOffset() {
+        return verticalOffset;
     }
 
-
-    /**
-     * Determine if this group's vertical offset can be applied, typically when mounted on an entity
-     * @return a boolean
-     */
-    public abstract boolean canApplyVerticalRideOffset();
 
     void setSpawnAnimation(String animationTag, LoadMethod loadMethod, DisplayAnimator.AnimationType animationType){
         this.spawnAnimationTag = animationTag;

@@ -930,8 +930,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             return false;
         }
 
-        if (verticalRideOffset != 0) {
-            translate(Direction.UP, verticalRideOffset, -1, -1);
+        if (verticalOffset != 0) {
+            translate(Direction.UP, verticalOffset, -1, -1);
         }
 
         for (SpawnedDisplayEntityPart interactionPart: this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
@@ -950,8 +950,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         Entity masterEntity = getMasterEntity();
         if (masterEntity != null){
             if (masterEntity.leaveVehicle()){
-                if (verticalRideOffset != 0){
-                    translate(Direction.DOWN, verticalRideOffset, -1, -1);
+                if (verticalOffset != 0){
+                    translate(Direction.DOWN, verticalOffset, -1, -1);
                 }
             }
         }
@@ -1005,13 +1005,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
     }
 
-
-    public boolean canApplyVerticalRideOffset(){
-        if (verticalRideOffset == 0){
-            return false;
-        }
-        return getVehicle() != null;
-    }
 
     /**
      * Force this group to constantly look in the same direction as a given entity

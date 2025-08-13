@@ -132,7 +132,6 @@ public final class DEUEntityListener implements Listener {
         if (entity.isDead() || !entity.isInWorld()){
             ActiveGroup<?> controllerGroup = DisplayControllerManager.getControllerGroup(e.getEntity().getUniqueId());
             if (controllerGroup instanceof PacketDisplayEntityGroup pdeg){
-                pdeg.setVerticalRideOffset(0);
                 pdeg.dismount();
             }
             DisplayControllerManager.unregisterEntity(entity);

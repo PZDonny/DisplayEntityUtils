@@ -357,7 +357,7 @@ public class DisplayController {
             pdc.set(DisplayControllerManager.controllerIdKey, PersistentDataType.STRING, controllerID);
         }
 
-        activeGroup.setVerticalRideOffset(verticalOffset);
+        activeGroup.setVerticalOffset(verticalOffset);
 
         //Disguised Mythic Mob
         boolean isDisguised;

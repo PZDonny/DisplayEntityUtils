@@ -257,14 +257,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return animator;
     }
 
-    @Override
-    @ApiStatus.Internal
-    public boolean canApplyVerticalRideOffset() {
-        if (verticalRideOffset == 0 || vehicleUUID == null){
-            return false;
-        }
-        return true;
-    }
 
     private int[] getPassengerArray(Entity vehicle, boolean includeGroup){
         List<Entity> passengers = vehicle.getPassengers();
@@ -298,8 +290,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 .computeIfAbsent(vehicleUUID, key -> new PassengerGroupData())
                 .addGroup(vehicleUUID, this);
 
-        if (verticalRideOffset != 0) {
-            translate(Direction.UP, verticalRideOffset, -1, -1);
+        if (verticalOffset != 0) {
+            translate(Direction.UP, verticalOffset, -1, -1);
         }
 
 
@@ -358,8 +350,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         dismount(getTrackingPlayers());
 
         if (!vehicle.isDead()){
-            if (verticalRideOffset != 0){
-                translate(Direction.DOWN, verticalRideOffset, -1, -1);
+            if (verticalOffset != 0){
+                translate(Direction.DOWN, verticalOffset, -1, -1);
             }
         }
         return vehicle;

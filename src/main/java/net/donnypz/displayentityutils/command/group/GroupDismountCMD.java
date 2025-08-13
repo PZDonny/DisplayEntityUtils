@@ -88,7 +88,7 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
         else{
             group.dismount();
             group.unsetMachineState();
-            group.setVerticalRideOffset(0);
+            group.setVerticalOffset(0);
             group.stopFollowingEntity();
         }
     }
