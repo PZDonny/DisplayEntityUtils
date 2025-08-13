@@ -1378,7 +1378,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         DisplayGroupManager.removeSpawnedGroup(this, despawnParts, force);
         groupParts.clear();
         masterPart = null;
-        followers.clear();
+        synchronized (followerLock){
+            followers.clear();
+        }
         if (defaultFollower != null){
             defaultFollower.remove();
             defaultFollower = null;

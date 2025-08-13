@@ -323,11 +323,13 @@ final class DisplayAnimatorExecutor {
     }
 
     static void addFollowerDisplayPivot(ActiveGroup<?> group, ActivePart part, Vector3f translationVector){
-        for (GroupEntityFollower follower : group.followers){
-            if (!follower.hasSetDisplayPivotData()){
-                continue;
+        synchronized (group.followerLock){
+            for (GroupEntityFollower follower : group.followers){
+                if (!follower.hasSetDisplayPivotData()){
+                    continue;
+                }
+                follower.laterManualPivot(part, translationVector);
             }
-            follower.laterManualPivot(part, translationVector);
         }
     }
 }

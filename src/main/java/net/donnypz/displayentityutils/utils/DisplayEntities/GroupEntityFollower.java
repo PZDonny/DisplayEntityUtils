@@ -70,9 +70,11 @@ class GroupEntityFollower {
         new BukkitRunnable(){
             @Override
             public void run() {
-                if (!group.followers.contains(GroupEntityFollower.this) && !isDefaultFollower){
-                    cancel();
-                    return;
+                synchronized (group.followerLock){
+                    if (!group.followers.contains(GroupEntityFollower.this) && !isDefaultFollower){
+                        cancel();
+                        return;
+                    }
                 }
 
                 if (stopped || (group instanceof SpawnedDisplayEntityGroup sg && !sg.isSpawned())){
@@ -294,7 +296,9 @@ class GroupEntityFollower {
 
     void remove(){
         stopped = true;
-        group.followers.remove(this);
+        synchronized (group.followerLock){
+            group.followers.remove(this);
+        }
         if (isDefaultFollower){
             group.defaultFollower = null;
         }

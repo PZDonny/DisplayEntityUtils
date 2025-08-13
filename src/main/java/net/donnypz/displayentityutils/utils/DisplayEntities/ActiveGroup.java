@@ -28,7 +28,8 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     protected T masterPart;
     protected LinkedHashMap<UUID, T> groupParts = new LinkedHashMap<>();
     protected String tag;
-    protected Set<GroupEntityFollower> followers = new HashSet<>();
+    final Set<GroupEntityFollower> followers = new HashSet<>();
+    final Object followerLock = new Object();
     GroupEntityFollower defaultFollower;
     protected final Set<DisplayAnimator> activeAnimators = Collections.newSetFromMap(new ConcurrentHashMap<>());
     protected String spawnAnimationTag;
@@ -704,7 +705,9 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      */
     public @NotNull GroupFollowProperties followEntityDirection(@NotNull Entity entity, @NotNull GroupFollowProperties properties){
         GroupEntityFollower follower = new GroupEntityFollower(this, properties);
-        followers.add(follower);
+        synchronized (followerLock){
+            followers.add(follower);
+        }
         follower.follow(entity);
         return properties;
     }
@@ -714,14 +717,16 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * {@link #followEntityDirection(Entity, GroupFollowProperties)}
      */
     public void stopFollowingEntity(){
-        for (GroupEntityFollower follower : new HashSet<>(followers)){
-            follower.remove();
+        synchronized (followerLock){
+            for (GroupEntityFollower follower : followers){
+                follower.remove();
+            }
+            if (defaultFollower != null){
+                defaultFollower.remove();
+                defaultFollower = null;
+            }
+            followers.clear();
         }
-        if (defaultFollower != null){
-            defaultFollower.remove();
-            defaultFollower = null;
-        }
-        followers.clear();
     }
 
     public abstract @Nullable Entity dismount();
