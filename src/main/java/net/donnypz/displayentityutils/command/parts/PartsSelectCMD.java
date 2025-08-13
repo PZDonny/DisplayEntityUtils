@@ -14,7 +14,6 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -56,31 +55,38 @@ class PartsSelectCMD extends PlayerSubCommand {
             return;
         }
 
-        player.sendMessage(Component.text("| Entities found! Click to select.", NamedTextColor.GREEN));
+        player.sendMessage(Component.text("| Entities found! Click to select.", NamedTextColor.GREEN).appendNewline());
+        if (parts.size() == 1){
+            select(player, parts.getFirst().getUniqueId());
+            player.sendMessage(PartsCycleCMD.getPartInfo(parts.getFirst()).color(NamedTextColor.GRAY));
+            return;
+        }
+
         for (Entity e : parts){
             UUID entityUUID = e.getUniqueId();
             SpawnedDisplayEntityPart.PartType partType = SpawnedDisplayEntityPart.PartType.getDisplayType(e);
             String coords = DEUCommandUtils.getCoordinateString(e.getLocation());
-            Component comp = Component.text(partType.name()+": ")
+            Component comp = Component.text("- "+partType.name()+": ")
                     .append(PartsCycleCMD.getPartInfo(e))
                     .hoverEvent(HoverEvent.showText(Component.text("Location: ", NamedTextColor.AQUA).append(Component.text(coords, NamedTextColor.YELLOW))))
                     .clickEvent(ClickEvent.callback(audience -> {
                         Player p = (Player) audience;
-                        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.create(entityUUID);
-                        if (part == null){
-                            p.sendMessage(Component.text("That entity is no longer valid!", NamedTextColor.RED));
-                            return;
-                        }
-
-                        DEUUser
-                                .getOrCreateUser(p)
-                                .setSelectedPartSelection(new SinglePartSelection(part), false);
-                        part.glow(p, 30);
-                        p.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Part Selected!", NamedTextColor.GREEN)));
+                        select(p, entityUUID);
                     }, ClickCallback.Options.builder().uses(ClickCallback.UNLIMITED_USES).lifetime(Duration.ofMinutes(10)).build()));
             player.sendMessage(comp);
-
         }
     }
 
+    private void select(Player player, UUID entityUUID){
+        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.create(entityUUID);
+        if (part == null){
+            player.sendMessage(Component.text("That entity is no longer valid!", NamedTextColor.RED));
+            return;
+        }
+        DEUUser
+                .getOrCreateUser(player)
+                .setSelectedPartSelection(new SinglePartSelection(part), false);
+        part.glow(player, 30);
+        player.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Part Entity Selected!", NamedTextColor.GREEN)));
+    }
 }
