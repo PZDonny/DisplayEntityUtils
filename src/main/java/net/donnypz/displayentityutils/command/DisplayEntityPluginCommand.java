@@ -47,8 +47,14 @@ public class DisplayEntityPluginCommand implements TabExecutor {
 
     }
 
-    public List<String> getTabComplete(){
-        return subCommands.keySet().stream().toList();
+    public List<String> getTabComplete(String current){
+        List<String> list = new ArrayList<>();
+        for (String s : subCommands.keySet()){
+            if (s.startsWith(current.toLowerCase())){
+                list.add(s);
+            }
+        }
+        return list;
     }
 
     private List<String> getTabCompleteCommands(String subcommand, String current){
@@ -163,7 +169,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
             return empty;
         }
         if (args.length == 1) {
-            return getTabComplete();
+            return getTabComplete(args[0]);
         }
 
         List<String> suggestions = new ArrayList<>();
