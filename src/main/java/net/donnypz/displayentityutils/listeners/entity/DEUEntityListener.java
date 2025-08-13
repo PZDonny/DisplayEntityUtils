@@ -100,18 +100,19 @@ public final class DEUEntityListener implements Listener {
         Entity entity = e.getEntity();
         applyState(entity, MachineState.StateType.DEATH);
         ActiveGroup<?> controllerGroup = DisplayControllerManager.getControllerGroup(entity.getUniqueId());
-        //Group Vertical Offset
+
+        //Disguised Player Entity Vertical Offset
         if (controllerGroup != null){
-            DisplayStateMachine.unregisterFromStateMachine(controllerGroup);
             if (DisplayEntityPlugin.isLibsDisguisesInstalled()){
                 Disguise disg = DisguiseAPI.getDisguise(entity);
                 if (disg != null && disg.isPlayerDisguise()){
-                    controllerGroup.dismount();
-                    if (controllerGroup instanceof SpawnedDisplayEntityGroup g){
-                        g.teleport(entity.getLocation(), true);
+                    if (controllerGroup instanceof SpawnedDisplayEntityGroup){
+                        controllerGroup.dismount();
+                        controllerGroup.teleport(entity.getLocation(), true);
                     }
-                    else if (controllerGroup instanceof PacketDisplayEntityGroup g){
-                        g.teleport(entity.getLocation(), true);
+                    else{
+                        PacketDisplayEntityGroup pdeg = (PacketDisplayEntityGroup) controllerGroup;
+                        pdeg.dismount(controllerGroup.getTrackingPlayers());
                     }
                 }
             }
@@ -130,8 +131,9 @@ public final class DEUEntityListener implements Listener {
         }
         if (entity.isDead() || !entity.isInWorld()){
             ActiveGroup<?> controllerGroup = DisplayControllerManager.getControllerGroup(e.getEntity().getUniqueId());
-            if (controllerGroup instanceof PacketDisplayEntityGroup){
-                controllerGroup.dismount();
+            if (controllerGroup instanceof PacketDisplayEntityGroup pdeg){
+                pdeg.setVerticalRideOffset(0);
+                pdeg.dismount();
             }
             DisplayControllerManager.unregisterEntity(entity);
         }

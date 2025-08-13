@@ -951,7 +951,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (masterEntity != null){
             if (masterEntity.leaveVehicle()){
                 if (verticalRideOffset != 0){
-                    translate(Direction.UP, verticalRideOffset *-1, -1, -1);
+                    translate(Direction.DOWN, verticalRideOffset, -1, -1);
                 }
             }
         }
@@ -1381,7 +1381,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (masterPart == null){
             return;
         }
-        DisplayStateMachine.unregisterFromStateMachine(this);
+        DisplayStateMachine.unregisterFromStateMachine(this, false); //Animators will auto-stop
         DisplayGroupManager.removeSpawnedGroup(this, despawnParts, force);
         groupParts.clear();
         masterPart = null;

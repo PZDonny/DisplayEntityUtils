@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities.machine;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.Material;
@@ -349,7 +350,7 @@ public class DisplayStateMachine {
      * Unregisters this DisplayStateMachine, removing all states and stopping animations on every group added to this state machine
      */
     public void unregister(){
-        for (ActiveGroup group : groupMachines.keySet()){
+        for (ActiveGroup<?> group : groupMachines.keySet()){
             removeGroupConcurrent(group);
         }
 
@@ -358,11 +359,18 @@ public class DisplayStateMachine {
     }
 
 
-    public static void unregisterFromStateMachine(@NotNull ActiveGroup group){
-        DisplayStateMachine stateAnimator = groupMachines.get(group);
-        if (stateAnimator != null){
-            stateAnimator.removeGroup(group);
+    public static void unregisterFromStateMachine(@NotNull ActiveGroup<?> group, boolean stopAnimators){
+        DisplayStateMachine machine = groupMachines.get(group);
+        if (machine != null){
+            machine.removeGroup(group);
             groupMachines.remove(group);
+            if (stopAnimators){
+                for (MachineState state : machine.states.values()){
+                    for (DisplayAnimator animator : state.animators){
+                        animator.stop(group);
+                    }
+                }
+            }
         }
     }
 }

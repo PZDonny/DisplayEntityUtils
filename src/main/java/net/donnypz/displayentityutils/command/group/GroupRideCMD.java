@@ -110,7 +110,7 @@ class GroupRideCMD extends ConsoleUsableSubCommand {
             }
             sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Mounting your group on the entity with a controller! ("+controllerID+")", NamedTextColor.GREEN)));
             sender.sendMessage(Component.text("| If this action was not performed it was cancelled by another plugin!", NamedTextColor.GRAY));
-            controller.apply(vehicle, group, false);
+            controller.apply(vehicle, group);
         }
         else{
             sender.sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Mounting your group on the entity!", NamedTextColor.GREEN)));

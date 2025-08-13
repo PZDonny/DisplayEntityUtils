@@ -573,7 +573,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     public void stopAnimations(boolean removeFromStateMachine){
         activeAnimators.clear();
         if (removeFromStateMachine){
-            DisplayStateMachine.unregisterFromStateMachine(this);
+            DisplayStateMachine.unregisterFromStateMachine(this, true);
         }
     }
 

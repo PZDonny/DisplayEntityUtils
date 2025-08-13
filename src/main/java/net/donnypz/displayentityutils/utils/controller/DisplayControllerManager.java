@@ -120,7 +120,7 @@ public final class DisplayControllerManager {
     public static void unregisterEntity(@NotNull Entity entity){
         ActiveGroup<?> group = activeGroups.remove(entity.getUniqueId());
         if (group != null){
-            DisplayStateMachine.unregisterFromStateMachine(group);
+            DisplayStateMachine.unregisterFromStateMachine(group, false);
         }
         if (!Bukkit.isStopping()){
             PersistentDataContainer pdc = entity.getPersistentDataContainer();

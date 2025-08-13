@@ -289,7 +289,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
         if (vehicle.getUniqueId() == vehicleUUID) return true;
         vehicleUUID = vehicle.getUniqueId();
-        vehicle.getPassengers();
+
         WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, true));
         for (Player p : getTrackingPlayers()){
             PacketEvents.getAPI().getPlayerManager().sendPacket(p, packet);
@@ -298,12 +298,18 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 .computeIfAbsent(vehicleUUID, key -> new PassengerGroupData())
                 .addGroup(vehicleUUID, this);
 
+        if (verticalRideOffset != 0) {
+            translate(Direction.UP, verticalRideOffset, -1, -1);
+        }
+
+
         if (runLocationUpdater){
             final UUID finalUUID = vehicle.getUniqueId();
             new BukkitRunnable(){
                 @Override
                 public void run() {
                     if (masterPart == null){
+                        vehicleUUID = null;
                         cancel();
                         return;
                     }
@@ -324,7 +330,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                     }
                     updateChunkAndWorld(entity.getLocation());
                 }
-            }.runTaskTimer(DisplayEntityPlugin.getInstance(), 30, 30);
+            }.runTaskTimer(DisplayEntityPlugin.getInstance(), 0, 30);
         }
         return true;
     }
@@ -342,7 +348,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     /**
      * {@inheritDoc}
      * <br>This method must be called sync
-     * @return
      */
     @Override
     public @Nullable Entity dismount(){
@@ -350,17 +355,40 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         removeAsPassenger(vehicleUUID);
         if (vehicle == null) return null;
         vehicleUUID = null;
-        WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, false));
-        for (Player p : getTrackingPlayers()){
-            PacketEvents.getAPI().getPlayerManager().sendPacket(p, packet);
-        }
+        dismount(getTrackingPlayers());
 
         if (!vehicle.isDead()){
             if (verticalRideOffset != 0){
-                translate(Direction.UP, verticalRideOffset *-1, -1, -1);
+                translate(Direction.DOWN, verticalRideOffset, -1, -1);
             }
         }
         return vehicle;
+    }
+
+    /**
+     * Dismount this group from an entity for a given player
+     * @param player the player to receive the dismount
+     * <br>This method must be called sync
+     */
+    public void dismount(@NotNull Player player){
+        Entity vehicle = getVehicle();
+        if (vehicle == null) return;
+        WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, false));
+        PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
+    }
+
+    /**
+     * Dismount this group from an entity for given players
+     * @param players the players to receive the dismount
+     * <br>This method must be called sync
+     */
+    public void dismount(@NotNull Collection<Player> players){
+        Entity vehicle = getVehicle();
+        if (vehicle == null) return;
+        WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, false));
+        for (Player p : players){
+            PacketEvents.getAPI().getPlayerManager().sendPacket(p, packet);
+        }
     }
 
     @Override
@@ -815,7 +843,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             part.removeFromGroup(true);
         }
 
-        DisplayStateMachine.unregisterFromStateMachine(this);
+        DisplayStateMachine.unregisterFromStateMachine(this, false); //Animators will auto-stop
 
         activeAnimators.clear();
         masterPart = null;
