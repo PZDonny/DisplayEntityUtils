@@ -82,7 +82,7 @@ class GroupSelectCMD extends PlayerSubCommand {
                             audience.sendMessage(Component.text("Group no longer spawned or is invalid.", NamedTextColor.RED));
                             return;
                         }
-                        g.glow((Player) audience, 60);
+                        g.glowAndOutline((Player) audience, 60);
                     }, clickOptions));
             Component select = Component.text("[SELECT]", NamedTextColor.GREEN)
                     .clickEvent(ClickEvent.callback(audience -> {
