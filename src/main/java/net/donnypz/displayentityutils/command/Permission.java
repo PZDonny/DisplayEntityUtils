@@ -32,6 +32,7 @@ public enum Permission {
     GROUP_TOGGLE_PERSIST("deu.group.persist"),
     GROUP_BILLBOARD("deu.group.billboard"),
     GROUP_VIEWRANGE("deu.group.viewrange"),
+    GROUP_WORLD_EDIT("deu.group.worldedit"),
 
 
     PARTS_INFO("deu.parts.info"),

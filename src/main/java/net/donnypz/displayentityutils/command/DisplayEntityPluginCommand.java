@@ -212,6 +212,9 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                         case "topacket" -> {
                             suggestions.add("-confirm");
                         }
+                        case "wetogroup" -> {
+                            suggestions.add("-remove");
+                        }
                     }
                 }
                 case "anim" -> {

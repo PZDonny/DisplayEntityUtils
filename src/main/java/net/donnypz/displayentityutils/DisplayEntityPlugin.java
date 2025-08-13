@@ -96,6 +96,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     private static boolean isLibsDisguisesInstalled;
     private static boolean isViaVerInstalled;
     private static boolean isSkriptInstalled;
+    private static boolean isWorldEditInstalled;
 
     SkriptAddon addon;
 
@@ -146,9 +147,9 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             Bukkit.getPluginManager().registerEvents(new DEUMythicListener(), this);
         }
 
-        //LibsDisguises
         isLibsDisguisesInstalled = Bukkit.getPluginManager().isPluginEnabled("LibsDisguises");
         isViaVerInstalled = Bukkit.getPluginManager().isPluginEnabled("ViaVersion");
+        isWorldEditInstalled = Bukkit.getPluginManager().isPluginEnabled("WorldEdit");
 
         //Skript
         isSkriptInstalled = Bukkit.getPluginManager().isPluginEnabled("Skript");
@@ -468,12 +469,21 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     }
 
     /**
+     * Get whether WorldEdit is installed on this server
+     * @return true if WorldEdit is present
+     */
+    public static boolean isWorldEditInstalled(){
+        return isWorldEditInstalled;
+    }
+
+    /**
      * Get whether Skript is installed on this server
      * @return true if Skript is present
      */
     public static boolean isSkriptInstalled() {
         return isSkriptInstalled;
     }
+
 
     /**
      * Determines whether {@link SpawnedDisplayEntityGroup}s should be unregistered in a world based

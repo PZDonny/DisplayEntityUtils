@@ -9,6 +9,7 @@ softdepend:
   - LibsDisguises
   - Skript
   - ViaVersion
+  - WorldEdit
 depend:
   - packetevents
 commands:
