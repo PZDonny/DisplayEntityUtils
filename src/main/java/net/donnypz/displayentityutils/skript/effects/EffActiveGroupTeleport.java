@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class EffActiveGroupTeleport extends Effect {
     static {
-        Skript.registerEffect(EffActiveGroupTeleport.class,"[deu ](move|teleport) %activegroup% to %location% [r:[and] (keep|respect) group (facing|direction|orientation)]");
+        Skript.registerEffect(EffActiveGroupTeleport.class,"deu (move|teleport) %activegroup% to %location% [r:[and] (keep|respect) group (facing|direction|orientation)]");
     }
 
     Expression<ActiveGroup<?>> group;
