@@ -396,7 +396,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
             Vector translation;
             if (!isMaster()){
-                Vector worldPos = DisplayUtils.getModelLocation(display).toVector();
+                Vector worldPos = DisplayUtils.getFixedModelLocation(display).toVector();
                 translation = worldPos.subtract(master.getLocation().toVector());
                 master.addPassenger(getEntity());
             }

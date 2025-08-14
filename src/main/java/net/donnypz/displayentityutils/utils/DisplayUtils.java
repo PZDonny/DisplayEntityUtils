@@ -117,7 +117,20 @@ public final class DisplayUtils {
     }
 
     /**
-     * Get the location where a display entity is translated based off of its {@link Transformation}'s translation<br>
+     * Get the location where a display entity is translated based off of its {@link Transformation}'s translation alone.<br>
+     * This may not be a perfect representation of where the model's location actually is, due to the shape of models varying (e.g.: Stone Block vs Stone Pressure Plate)
+     * @param display The entity to get the location from
+     * @return the location where the display entity is translated at
+     */
+    public static @NotNull Location getFixedModelLocation(@NotNull Display display){
+        Transformation transformation = display.getTransformation();
+        Location translationLoc = display.getLocation();
+        translationLoc.add(Vector.fromJOML(transformation.getTranslation()));
+        return translationLoc;
+    }
+
+    /**
+     * Get the location where a display entity is translated based off of its {@link Transformation} and pitch and yaw.<br>
      * This may not be a perfect representation of where the model's location actually is, due to the shape of models varying (e.g.: Stone Block vs Stone Pressure Plate)
      * @param display The entity to get the location from
      * @return the location where the display entity is translated at
@@ -143,7 +156,26 @@ public final class DisplayUtils {
     }
 
     /**
-     * Get the location where a {@link PacketDisplayEntityPart} display entity is translated based off of its {@link Transformation}'s translation<br>
+     * Get the location where a {@link PacketDisplayEntityPart} display entity is translated based off of its {@link Transformation}'s translation alone.<br>
+     * This may not be a perfect representation of where the model's location actually is, due to the shape of models varying (e.g.: Stone Block vs Stone Pressure Plate)
+     * @param part The entity to get the location from
+     * @return the location where the part is translated at. Null if the part is an interaction entity or if the transformation/location of the entity is unset
+     */
+    public static @Nullable Location getFixedModelLocation(@NotNull PacketDisplayEntityPart part){
+        if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            return null;
+        }
+
+        Transformation transformation = part.getDisplayTransformation();
+        Location translationLoc = part.getLocation();
+        if (translationLoc == null || transformation == null) return null;
+
+        translationLoc.add(Vector.fromJOML(transformation.getTranslation()));
+        return translationLoc;
+    }
+
+    /**
+     * Get the location where a {@link PacketDisplayEntityPart} display entity is translated based off of its {@link Transformation} and pitch and yaw.<br>
      * This may not be a perfect representation of where the model's location actually is, due to the shape of models varying (e.g.: Stone Block vs Stone Pressure Plate)
      * @param part The entity to get the location from
      * @return the location where the part is translated at. Null if the part is an interaction entity
