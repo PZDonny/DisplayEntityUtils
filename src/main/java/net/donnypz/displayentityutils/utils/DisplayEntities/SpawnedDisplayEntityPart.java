@@ -162,20 +162,13 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         String value = pdc.get(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING);
     //New Part/Group
         if (value == null){
-            if (DisplayEntityPlugin.seededPartUUIDS()){
-                if (groupContainsUUID(partUUID) || partUUID == null){
-                    byte[] byteArray = new byte[16];
+            if (partUUID == null || groupContainsUUID(partUUID)){
+                byte[] byteArray;
+                do{
+                    byteArray = new byte[16];
                     random.nextBytes(byteArray);
                     partUUID = UUID.nameUUIDFromBytes(byteArray);
-                    while(groupContainsUUID(partUUID)){
-                        byteArray = new byte[16];
-                        random.nextBytes(byteArray);
-                        partUUID = UUID.nameUUIDFromBytes(byteArray);
-                    }
-                }
-            }
-            else{
-                partUUID = getRandomUUID();
+                }while(groupContainsUUID(partUUID));
             }
             pdc.set(DisplayEntityPlugin.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
         }

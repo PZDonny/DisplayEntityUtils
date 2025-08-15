@@ -68,7 +68,6 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     static boolean isMYSQLEnabled = false;
     static boolean isLocalEnabled;
 
-    static boolean seededPartUUIDs;
     static boolean automaticGroupDetection;
     static boolean defaultPersistence;
     static boolean persistenceOverride;
@@ -345,14 +344,6 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
      */
     public static boolean overwritexistingSaves() {
         return overwriteExistingSaves;
-    }
-
-    /**
-     * Gets the value of "seededPartUUIDs" in the config
-     * @return the boolean value set in config
-     */
-    public static boolean seededPartUUIDS() {
-        return seededPartUUIDs;
     }
 
     /**

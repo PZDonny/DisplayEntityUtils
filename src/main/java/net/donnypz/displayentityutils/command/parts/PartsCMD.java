@@ -34,7 +34,6 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         new PartsListTagsCMD(this);
         new PartsRemoveCMD(this);
         new PartsTranslateCMD(this);
-        new PartsSeedUUIDsCMD(this);
         new PartsSetBlockCMD(this);
         new PartsBillboardCMD(this);
         new PartsViewRangeCMD(this);
@@ -109,7 +108,6 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis parts move <direction> <distance>", "Change the actual location of your selected part");
             CMDUtils.sendCMD(sender, "/mdis parts movehere", "Change your selected part's actual location to your location");
             CMDUtils.sendCMD(sender, "/mdis parts setblock <\"-held\" | \"-target\" | block-id> [-all]", "Change the block of a block display part");
-            CMDUtils.sendCMD(sender, "/mdis parts seeduuids <group | selection> <seed>","Useful when wanting to use the same animation on similar groups");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }

@@ -46,7 +46,6 @@ public enum Permission {
     PARTS_REMOVE("deu.parts.remove"),
     PARTS_TRANSLATE("deu.parts.translate"),
     PARTS_TRANSFORM("deu.parts.transform"),
-    PARTS_SEED_UUIDS("deu.parts.seed"),
     PARTS_SET_BLOCK("deu.parts.setblock"),
     PARTS_BILLBOARD("deu.parts.billboard"),
     PARTS_BRIGHTNESS("deu.parts.brightness"),

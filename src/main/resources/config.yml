@@ -28,15 +28,6 @@ mysql:
 #Plugin commands can only be re-enabled after a server restart
 registerCommands: true
 
-#Determine whether the seed used to generate random part uuids should stay consistent with every group
-#This is useful when wanting to use the same animation on different groups
-
-# Merging groups will change the partUUIDS of the parts from the group merging in
-# May potentially lead to unexpected outcomes when animating
-
-#This feature can also be disabled and the command "/mdis parts randomizeuuids <seed>" can be used instead
-seededPartUUIDs: true
-
 #Determine whether a group can be selected by more than one player at a time
 #Leave this value as true to avoid conflicts when using "/mdis group selectnearest"
 limitGroupSelections: true
