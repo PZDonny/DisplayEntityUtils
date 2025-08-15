@@ -7,9 +7,9 @@ import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.events.PacketGroupDestroyEvent;
 import net.donnypz.displayentityutils.events.PacketGroupSendEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
-import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
@@ -174,9 +174,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             return true;
         }
 
-        float largestWidth = 0;
-        float largestHeight = 0;
-        CullOption cullOption = DisplayEntityPlugin.autoCulling();
         for (PacketDisplayEntityPart p : groupParts.values()){
             //Displays
             if (p.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
@@ -200,14 +197,10 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                         .addTransformation(transformation);
                 }
                 //Culling
-                if (cullOption == CullOption.LOCAL){
-                    float[] values = p.getAutoCullValues(DisplayEntityPlugin.widthCullingAdder(), DisplayEntityPlugin.heightCullingAdder());
+                if (DisplayEntityPlugin.autoCulling()){
+                    float[] values = DisplayUtils.getAutoCullValues(p, DisplayEntityPlugin.widthCullingAdder(), DisplayEntityPlugin.heightCullingAdder());
                     attributeMap.add(DisplayAttributes.Culling.HEIGHT, values[1])
                         .add(DisplayAttributes.Culling.WIDTH, values[0]);
-                }
-                else if (cullOption == CullOption.LARGEST){
-                    largestWidth = Math.max(largestWidth, Math.max(scale.x, scale.z));
-                    largestHeight = Math.max(largestHeight, scale.y);
                 }
 
                 p.attributeContainer.setAttributesAndSend(attributeMap, p.getEntityId(), p.viewers);
@@ -232,13 +225,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
                 Vector moveVector = oldVector.subtract(translationVector);
                 PacketUtils.translateInteraction(p, moveVector, moveVector.length(), durationInTicks, 0);
-            }
-        }
-
-    //Culling
-        if (DisplayEntityPlugin.autoCulling() == CullOption.LARGEST){
-            for (PacketDisplayEntityPart part : groupParts.values()){
-                part.cull(largestWidth+DisplayEntityPlugin.widthCullingAdder(), largestHeight+DisplayEntityPlugin.heightCullingAdder());
             }
         }
 

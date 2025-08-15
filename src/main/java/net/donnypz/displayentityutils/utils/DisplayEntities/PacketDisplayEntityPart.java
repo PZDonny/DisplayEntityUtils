@@ -338,13 +338,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public void autoCull(float widthAdder, float heightAdder) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
-        float[] values = getAutoCullValues(widthAdder, heightAdder);
-        cull(values[0], values[1]);
-    }
-
-    @Override
     public Collection<Player> getTrackingPlayers() {
         HashSet<Player> players = new HashSet<>();
         for (UUID uuid : viewers){
@@ -361,18 +354,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public @Nullable Color getGlowColor() {
         return attributeContainer.getAttribute(DisplayAttributes.GLOW_COLOR_OVERRIDE);
     }
-
-    /**
-     * Get the resulting auto cull width and height value, respectively.
-     * @param widthAdder the width adder
-     * @param heightAdder the height adder
-     * @return a float[]
-     */
-    float[] getAutoCullValues(float widthAdder, float heightAdder){
-        Vector3f scale = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.SCALE, new Vector3f());
-        return new float[]{(Math.max(scale.x, scale.z)*2f)+widthAdder, scale.y+heightAdder};
-    }
-
 
     @Override
     public void setGlowColor(@Nullable Color color) {
@@ -485,10 +466,10 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             return null;
         }
         return new Transformation(
-                attributeContainer.getAttribute(DisplayAttributes.Transform.TRANSLATION),
-                attributeContainer.getAttribute(DisplayAttributes.Transform.LEFT_ROTATION),
-                attributeContainer.getAttribute(DisplayAttributes.Transform.SCALE),
-                attributeContainer.getAttribute(DisplayAttributes.Transform.RIGHT_ROTATION)
+                new Vector3f(attributeContainer.getAttribute(DisplayAttributes.Transform.TRANSLATION)),
+                new Quaternionf(attributeContainer.getAttribute(DisplayAttributes.Transform.LEFT_ROTATION)),
+                new Vector3f(attributeContainer.getAttribute(DisplayAttributes.Transform.SCALE)),
+                new Quaternionf(attributeContainer.getAttribute(DisplayAttributes.Transform.RIGHT_ROTATION))
         );
     }
 

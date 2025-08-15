@@ -16,7 +16,8 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Active Group/Part / Multi Part Selection Interpolation")
 @Description("Set the interpolation duration/delay of an active group / spawned part / part selection")
-@Examples({"deu set interpolation duration of {_spawnedpart} to 5 ticks", "deu set {_spawnedgroup}'s interpolation delay to 2 ticks"})
+@Examples({"deu set interpolation duration of {_spawnedpart} to 5 ticks",
+        "deu set {_spawnedgroup}'s interpolation delay to 2 ticks"})
 @Since("2.6.2")
 public class EffActiveInterpolation extends Effect {
     static {

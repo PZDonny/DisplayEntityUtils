@@ -248,10 +248,6 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                             suggestions.add("next");
                             suggestions.add("last");
                         }
-                        case "seeduuids" -> {
-                            suggestions.add("group");
-                            suggestions.add("selection");
-                        }
                         case "setblock" -> {
                             suggestions.add("-target");
                             suggestions.add("-held");

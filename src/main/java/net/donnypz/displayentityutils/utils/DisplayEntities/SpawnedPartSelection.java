@@ -131,22 +131,6 @@ public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDispla
         return true;
     }
 
-
-    /**
-     * Randomize the part uuids of all parts in this SpawnedPartSelection.
-     * Useful when wanting to use the same animation on similar SpawnedDisplayEntityGroups.
-     * @param seed The seed to use for the part randomization
-     */
-    public void randomizePartUUIDs(long seed){
-        byte[] byteArray;
-        Random random = new Random(seed);
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            byteArray = new byte[16];
-            random.nextBytes(byteArray);
-            part.setPartUUID(UUID.nameUUIDFromBytes(byteArray));
-        }
-    }
-
     /**
      * Remove a {@link SpawnedDisplayEntityPart} from this selection
      * @param part

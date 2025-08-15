@@ -3,7 +3,6 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
-import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.FollowType;
@@ -15,10 +14,8 @@ import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -67,58 +64,29 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param partFilter the part filter
      * @return a {@link MultiPartSelection}
      */
-    public abstract @NotNull MultiPartSelection createPartSelection(@NotNull PartFilter partFilter);
-
+    public abstract @NotNull MultiPartSelection<T> createPartSelection(@NotNull PartFilter partFilter);
 
     /**
      * Attempt to automatically set the culling bounds for all parts within this group.
-     * Results may not be 100% accurate due to the varying shapes of Minecraft blocks.
-     * The culling bounds will be representative of the part's scaling.
-     * @param cullOption The {@link CullOption} to use
      * @param widthAdder The amount of width to be added to the culling range
      * @param heightAdder The amount of height to be added to the culling range
-     * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
      */
-    public void autoSetCulling(@NotNull CullOption cullOption, float widthAdder, float heightAdder){
+    public void autoCull(float widthAdder, float heightAdder){
         if (this instanceof SpawnedDisplayEntityGroup g){
             if (!g.isInLoadedChunk()){
                 return;
             }
         }
-        switch (cullOption){
-            case LARGEST -> this.largestCulling(widthAdder, heightAdder, getParts());
-            case LOCAL -> this.localCulling(widthAdder, heightAdder, getParts());
-            case NONE -> this.noneCulling(getParts());
-        }
-    }
-
-    protected void largestCulling(float widthAdder, float heightAdder, Collection<? extends ActivePart> parts){
-        float maxWidth = 0;
-        float maxHeight = 0;
-        for (ActivePart part : parts) {
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
-                continue;
-            }
-            Transformation transformation = part.getDisplayTransformation();
-            Vector3f scale = transformation.getScale();
-
-            maxWidth = Math.max(maxWidth, Math.max(scale.x, scale.z));
-            maxHeight = Math.max(maxHeight, scale.y);
-        }
-
-        for (ActivePart part : parts){
-            part.cull(maxWidth + widthAdder, maxHeight + heightAdder);
-        }
-    }
-
-    protected void localCulling(float widthAdder, float heightAdder, Collection<? extends ActivePart> parts){
-        for (ActivePart part : parts){
+        for (T part : groupParts.values()){
             part.autoCull(widthAdder, heightAdder);
         }
     }
 
-    protected void noneCulling(Collection<? extends ActivePart> parts){
-        for (ActivePart part : parts){
+    /**
+     * Reset the culling bounds for all parts within this group, stopping these parts from being culled.
+     */
+    public void removeCulling(){
+        for (T part : groupParts.values()){
             part.cull(0, 0);
         }
     }

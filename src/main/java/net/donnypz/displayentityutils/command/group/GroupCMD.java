@@ -52,6 +52,8 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         new GroupSafeDismountCMD(this);
         new GroupDismountCMD(this);
         new GroupWorldEditCMD(this);
+        new GroupAutoCullCMD(this);
+        new GroupRemoveCullCMD(this);
     }
 
 
@@ -127,6 +129,8 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         }
         else{
             CMDUtils.sendCMD(sender, "/mdis group viewrange <view-range-multiplier>", "Set the view range multiplier for your selected group");
+            CMDUtils.sendCMD(sender, "/mdis group autocull", "Calculate and set culling bounds for every part in your selected group");
+            CMDUtils.sendCMD(sender, "/mdis group removecull", "Remove the culling bounds for every part in your selected group");
             CMDUtils.sendCMD(sender, "/mdis group togglepersist", "Toggle if your group should persist after a server shutdown");
             CMDUtils.sendCMD(sender, "/mdis group togglepersistoverride", "Toggle if your group's persistence can be overriden when loaded by a chunk, " +
                     "only if \"persistenceOverride\" is enabled in the config");
