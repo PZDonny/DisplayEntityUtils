@@ -77,9 +77,11 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
         DisplayGroupManager.storeNewSpawnedGroup(this);
 
-        float widthCullingAdder = DisplayEntityPlugin.widthCullingAdder();
-        float heightCullingAdder = DisplayEntityPlugin.heightCullingAdder();
-        autoSetCulling(DisplayEntityPlugin.autoCulling(), widthCullingAdder, heightCullingAdder);
+        if (DisplayEntityPlugin.autoCulling()){
+            float widthCullingAdder = DisplayEntityPlugin.widthCullingAdder();
+            float heightCullingAdder = DisplayEntityPlugin.heightCullingAdder();
+            autoCull(widthCullingAdder, heightCullingAdder);
+        }
     }
 
     private Display getMasterEntity(){
@@ -490,13 +492,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             return false;
         }
 
-        float largestWidth = 0;
-        float largestHeight = 0;
-        for (ActivePart p : groupParts.values()){
-            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) p;
+        for (SpawnedDisplayEntityPart p : groupParts.values()){
             //Displays
-            if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                Display d = (Display) part.getEntity();
+            if (p.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
+                Display d = (Display) p.getEntity();
                 Transformation transformation = d.getTransformation();
 
                 //Reset Scale then multiply by newScaleMultiplier
@@ -518,17 +517,13 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                     d.setTransformation(transformation);
                 }
                 //Culling
-                if (DisplayEntityPlugin.autoCulling() == CullOption.LOCAL){
-                    part.autoCull(DisplayEntityPlugin.widthCullingAdder(), DisplayEntityPlugin.heightCullingAdder());
-                }
-                else if (DisplayEntityPlugin.autoCulling() == CullOption.LARGEST){
-                    largestWidth = Math.max(largestWidth, Math.max(scale.x, scale.z));
-                    largestHeight = Math.max(largestHeight, scale.y);
+                if (DisplayEntityPlugin.autoCulling()){
+                    p.autoCull(DisplayEntityPlugin.widthCullingAdder(), DisplayEntityPlugin.heightCullingAdder());
                 }
             }
             //Interactions
             else if (scaleInteractions){
-                Interaction i = (Interaction) part.getEntity();
+                Interaction i = (Interaction) p.getEntity();
 
                 //Reset Scale then multiply by newScaleMultiplier
                 float newHeight = (i.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier;
@@ -546,18 +541,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
 
                 Vector moveVector = oldVector.subtract(translationVector);
-                part.translateForce(moveVector, (float) moveVector.length(), durationInTicks, 0);
+                p.translateForce(moveVector, (float) moveVector.length(), durationInTicks, 0);
             }
         }
-
-    //Culling
-        if (DisplayEntityPlugin.autoCulling() == CullOption.LARGEST){
-            for (ActivePart part : groupParts.values()){
-                part.cull(largestWidth+DisplayEntityPlugin.widthCullingAdder(), largestHeight+DisplayEntityPlugin.heightCullingAdder());
-            }
-        }
-
-
 
         PersistentDataContainer pdc = getMasterEntity().getPersistentDataContainer();
         pdc.set(scaleKey, PersistentDataType.FLOAT, newScaleMultiplier);
@@ -702,7 +688,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * @param durationInTicks How long it should take for the translation to complete
      */
     public void teleportMove(@NotNull Direction direction, double distance, int durationInTicks){
-        teleportMove(direction.getVector((SpawnedDisplayEntityPart) masterPart), distance, durationInTicks);
+        teleportMove(direction.getVector(masterPart), distance, durationInTicks);
     }
 
     /**
@@ -1105,14 +1091,17 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         mergingGroup.removeAllPartSelections();
         mergingGroup.unregister(false, false);
 
-        float widthCullingAdder = DisplayEntityPlugin.widthCullingAdder();
-        float heightCullingAdder = DisplayEntityPlugin.heightCullingAdder();
-        autoSetCulling(DisplayEntityPlugin.autoCulling(), widthCullingAdder, heightCullingAdder);
+        if (DisplayEntityPlugin.autoCulling()){
+            float widthCullingAdder = DisplayEntityPlugin.widthCullingAdder();
+            float heightCullingAdder = DisplayEntityPlugin.heightCullingAdder();
+            autoCull(widthCullingAdder, heightCullingAdder);
+        }
         return this;
     }
 
 
-    /**Attempt to copy the transformations of one group to another.
+    /**
+     * Attempt to copy the transformations of one group to another.
      * Both groups must have the same parts (or same amount of display entity parts)
      * @param copyGroup the group to copy from
      */
@@ -1125,7 +1114,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             }
             SpawnedDisplayEntityPart part = displayParts.get(i);
             SpawnedDisplayEntityPart copyPart = copyParts.get(i);
-            part.setTransformation(((Display)copyPart.getEntity()).getTransformation());
+            part.setTransformation(copyPart.getDisplayTransformation());
         }
     }
 

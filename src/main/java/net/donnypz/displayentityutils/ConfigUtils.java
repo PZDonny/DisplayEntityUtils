@@ -4,7 +4,6 @@ import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
-import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -115,24 +114,14 @@ final class ConfigUtils {
 
         DisplayEntityPlugin.interactionPreviewBlock = blockData;
 
-        String cull = config.getString("cullOption");
-        try{
-            if (cull != null){
-                DisplayEntityPlugin.cullOption = CullOption.valueOf(cull.toUpperCase());
-            }
-            else{
-                DisplayEntityPlugin.cullOption = CullOption.NONE;
-            }
-        }
-        catch(IllegalArgumentException e){
-            DisplayEntityPlugin.cullOption = CullOption.NONE;
-        }
 
-        if (DisplayEntityPlugin.cullOption != CullOption.NONE){
-            DisplayEntityPlugin.widthCullingAdder = (float) config.getDouble("widthCullingAdder");
-            DisplayEntityPlugin.heightCullingAdder = (float) config.getDouble("heightCullingAdder");
+        if (config.getBoolean("autoCulling.enabled")){
+            DisplayEntityPlugin.autoCulling = true;
+            DisplayEntityPlugin.widthCullingAdder = (float) config.getDouble("autoCulling.widthCullingAdder");
+            DisplayEntityPlugin.heightCullingAdder = (float) config.getDouble("autoCulling.heightCullingAdder");
         }
         else{
+            DisplayEntityPlugin.autoCulling = false;
             DisplayEntityPlugin.widthCullingAdder = 0;
             DisplayEntityPlugin.heightCullingAdder = 0;
         }
@@ -148,27 +137,28 @@ final class ConfigUtils {
     static void updateConfig(){
         DisplayEntityPlugin plugin = DisplayEntityPlugin.getInstance();
         File configFile = new File(plugin.getDataFolder()+"/config.yml");
-        YamlConfiguration externalConfig = YamlConfiguration.loadConfiguration(configFile);
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
 
-        InputStreamReader defConfigStream = new InputStreamReader(plugin.getResource("config.yml"));
-        YamlConfiguration resourceConfig = YamlConfiguration.loadConfiguration(defConfigStream);
-
+        InputStreamReader defaultStream = new InputStreamReader(plugin.getResource("config.yml"));
+        YamlConfiguration resourceConfig = YamlConfiguration.loadConfiguration(defaultStream);
 
         boolean wasUpdated = false;
         for (String string : resourceConfig.getKeys(true)) {
-            if (!externalConfig.contains(string)) {
-                externalConfig.set(string, resourceConfig.get(string));
+            if (!config.contains(string)) {
+                config.set(string, resourceConfig.get(string));
                 wasUpdated = true;
             }
         }
 
         try {
-            externalConfig.save(configFile);
+            config.save(configFile);
             if (wasUpdated){
                 Bukkit.getConsoleSender().sendMessage(DisplayEntityPlugin.pluginPrefix.append(Component.text("Plugin Config Updated!", NamedTextColor.YELLOW)));
             }
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
+            Bukkit.getLogger().severe("DisplayEntityUtils failed to update the plugin config!");
             e.printStackTrace();
         }
     }

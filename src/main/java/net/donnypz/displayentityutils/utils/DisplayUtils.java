@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.PartTranslateEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
@@ -204,6 +205,57 @@ public final class DisplayUtils {
 
         translationLoc.add(Vector.fromJOML(translationVector));
         return translationLoc;
+    }
+
+    public static float[] getAutoCullValues(@NotNull Display display){
+        return getAutoCullValues(display, DisplayEntityPlugin.widthCullingAdder(), DisplayEntityPlugin.heightCullingAdder());
+    }
+
+    public static float[] getAutoCullValues(@NotNull Display display, float widthAdder, float heightAdder){
+        SpawnedDisplayEntityPart.PartType type = display instanceof BlockDisplay ? SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY : null;
+        Transformation t = display.getTransformation();
+        return getAutoCullValues(type, t.getTranslation(), t.getScale(), t.getLeftRotation(), widthAdder, heightAdder);
+    }
+
+    public static float[] getAutoCullValues(@NotNull ActivePart part){
+        return getAutoCullValues(part, DisplayEntityPlugin.widthCullingAdder(), DisplayEntityPlugin.heightCullingAdder());
+    }
+
+    public static float[] getAutoCullValues(@NotNull ActivePart part, float widthAdder, float heightAdder){
+        Transformation t = part.getDisplayTransformation();
+        return getAutoCullValues(part.getType(), t.getTranslation(), t.getScale(), t.getLeftRotation(), widthAdder, heightAdder);
+    }
+
+    public static float[] getAutoCullValues(SpawnedDisplayEntityPart.PartType type, @NotNull Vector3f translation, @NotNull Vector3f scale, @NotNull Quaternionf leftRotation, float widthAdder, float heightAdder){
+        boolean isTranslatedBelow = translation.y < 0;
+        float width = Math.max(scale.x, scale.z)*2;
+        float height = scale.y;
+        if (type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY){
+            //Center Translation by taking the scale and halving
+            Vector3f halvedScale = new Vector3f(scale.x / 2, scale.y / 2, scale.z / 2);
+            Vector3f rotAdjustedTranslation = new Vector3f(translation);
+
+            //Apply rotation to halved scale vector
+            leftRotation.transform(halvedScale);
+            rotAdjustedTranslation.add(halvedScale);
+
+            height+=Math.abs(rotAdjustedTranslation.y);
+            width+=Math.max(Math.abs(rotAdjustedTranslation.x), Math.abs(rotAdjustedTranslation.z));
+        }
+        else{
+            height+=Math.abs(translation.y);
+            width+=Math.max(Math.abs(translation.x), Math.abs(translation.z));
+        }
+
+        width+=widthAdder;
+        height+=heightAdder;
+
+        //Height culling works from the entity's origin upwards.
+        if (isTranslatedBelow){
+            height*=-1;
+        }
+
+        return new float[]{width, height};
     }
 
     /**

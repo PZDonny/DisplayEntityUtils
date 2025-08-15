@@ -1,11 +1,12 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
-import net.donnypz.displayentityutils.utils.CullOption;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
@@ -118,22 +119,29 @@ public abstract class ActivePart implements Active{
         return partTags.contains(tag);
     }
 
-    public abstract ActiveGroup getGroup();
+    public abstract ActiveGroup<?> getGroup();
 
     public abstract boolean hasGroup();
 
     protected abstract void cull(float width, float height);
 
     /**
-     * Attempt to automatically set the culling bounds for this part. This is the same as {@link ActiveGroup#autoSetCulling(CullOption, float, float)}
-     * with a CullSetting of {@link CullOption#LOCAL}.
-     * Results may not be 100% accurate due to the varying shapes of Minecraft blocks and variation is display entity transformations.
-     * The culling bounds will be representative of the part's scaling.
+     * Attempt to automatically set the culling bounds for this part.
+     * The culling bounds will be representative of the part's transformation.
      * @param widthAdder The amount of width to be added to the culling range
      * @param heightAdder The amount of height to be added to the culling range
-     * @implNote The width and height adders have no effect if the cullOption is set to {@link CullOption#NONE}
      */
-    public abstract void autoCull(float widthAdder, float heightAdder);
+    public void autoCull(float widthAdder, float heightAdder){
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
+        Transformation transformation = getDisplayTransformation();
+        if (transformation == null) return;
+        Bukkit.getScheduler().runTaskAsynchronously(DisplayEntityPlugin.getInstance(), () -> {
+            float[] values = DisplayUtils.getAutoCullValues(type, transformation.getTranslation(), transformation.getScale(), transformation.getLeftRotation(), widthAdder, heightAdder);
+            float width = values[0];
+            float height = values[1];
+            cull(width, height);
+        });
+    }
 
     /**
      * Get this part's type

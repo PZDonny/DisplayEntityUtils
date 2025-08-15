@@ -92,30 +92,17 @@ autoPivotInteractionsOnSpawn: true
 #Enable this to allow overwriting of existing saved DisplayEntityGroups and Animations
 overwriteExistingSaves: true
 
+#This setting attempts to automatically cull display groups/models, improving client performance for players:
+#If entities are culled too early, try increasing the width and height culling adders
+#
+#Culling may not be 100% perfect due to different positioning of block/item/text displays, and varying block/item shapes
+autoCulling:
+  enabled: false
 
-#This setting attempts to automatically cull Spawned Display Entity Groups based on the following options:
-#
-#    NONE: No Display Entities will be culled (Default Vanilla Option)
-#    LOCAL: Display Entities will be culled individually based on their transformation's scale
-#    LARGEST: All Display Entities within a group will have the same culling size as the largest culled entity in the group
-#
-#Use this setting at your own risk and ONLY if you know what you are doing.
-#This may have client performance benefits for players when selecting the correct option for your server.
-#LARGEST is the safest option to reduce Display Entities being culled too early, but may not bring any performance improvements
-#
-#That does not mean you SHOULD pick LARGEST, testing with LOCAL should be done first and if that brings about issue, adjusting culling adders should
-#be done next, then trying LARGEST if issues still persist
-# !KEEP IN MIND! it is NOT possible for the culling to be 100% perfect.
-autoCulling: NONE
-
-#The two settings below will add X amount of blocks to the culling range of all SpawnedDisplayEntityGroups
-#If a group's culling width/height is 0 on the width and height, the group's culling width/height will become whatever value you set below
-#Essentially, the value set below will be added to the group's culling width/height determined from "autoCulling"
-#
-#These settings will do nothing if "autoCulling" is set to NONE
-#ONLY CHANGE THESE SETTINGS IF YOU KNOW WHAT YOU ARE DOING
-widthCullingAdder: 1.5
-heightCullingAdder: 1.5
+  #Add fixed amount of blocks to the calculated culling bounds
+  #DO NOT USE NEGATIVE VALUES
+  widthCullingAdder: 1.0
+  heightCullingAdder: 1.0
 
 #Optionally cache animations after retrieving them from a storage location.
 #This option prevents constant server freezes/lag when retrieving animations at the cost of using more memory

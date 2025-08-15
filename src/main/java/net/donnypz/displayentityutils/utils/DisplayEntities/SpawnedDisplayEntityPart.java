@@ -828,18 +828,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void autoCull(float widthAdder, float heightAdder){
-        Entity entity = getEntity();
-        if (entity instanceof Display display){
-            Transformation transformation = display.getTransformation();
-            Vector3f scale = transformation.getScale();
-            cull((Math.max(scale.x, scale.z)*2)+widthAdder, scale.y+heightAdder);
-        }
-    }
 
     /**
      * Set the glow color of this part

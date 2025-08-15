@@ -18,7 +18,6 @@ import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
 import net.donnypz.displayentityutils.skript.SkriptTypes;
-import net.donnypz.displayentityutils.utils.CullOption;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
@@ -26,7 +25,6 @@ import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.md_5.bungee.api.ChatColor;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -83,11 +81,11 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     static boolean autoSelectGroups;
     static boolean limitGroupSelections;
     static BlockData interactionPreviewBlock;
-    static CullOption cullOption;
-    static boolean cacheAnimations;
-    static int cacheAnimationExpiration;
+    static boolean autoCulling;
     static float widthCullingAdder;
     static float heightCullingAdder;
+    static boolean cacheAnimations;
+    static int cacheAnimationExpiration;
     static boolean asynchronousAnimations;
     static boolean registerPluginCommands;
 
@@ -364,11 +362,27 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     }
 
     /**
-     * Gets the value of "autoCulling" in the config
-     * @return {@link CullOption} set in the config, null if not set or {@link CullOption#NONE} if an incorrect option was entered.
+     * Gets the value of "autoCulling.enabled" in the config
+     * @return the boolean value set in the config
      */
-    public static CullOption autoCulling(){
-        return cullOption;
+    public static boolean autoCulling(){
+        return autoCulling;
+    }
+
+    /**
+     * Gets the value of "autoCulling.widthCullingAdder" in the config
+     * @return the float value set in config
+     */
+    public static float widthCullingAdder() {
+        return widthCullingAdder;
+    }
+
+    /**
+     * Gets the value of "autoCulling.heightCullingAdder" in the config
+     * @return the float value set in config
+     */
+    public static float heightCullingAdder() {
+        return heightCullingAdder;
     }
 
     /**
@@ -387,21 +401,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         return cacheAnimationExpiration;
     }
 
-    /**
-     * Gets the value of "widthCullingAdder" in the config
-     * @return the float value set in config
-     */
-    public static float widthCullingAdder() {
-        return widthCullingAdder;
-    }
 
-    /**
-     * Gets the value of "heightCullingAdder" in the config
-     * @return the float value set in config
-     */
-    public static float heightCullingAdder() {
-        return heightCullingAdder;
-    }
 
     /**
      * Gets the value of "asynchronousAnimations" in the config

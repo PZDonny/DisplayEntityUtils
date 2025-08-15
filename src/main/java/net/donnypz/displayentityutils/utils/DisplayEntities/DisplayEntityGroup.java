@@ -227,9 +227,11 @@ public final class DisplayEntityGroup implements Serializable{
 
         DisplayGroupManager.addSpawnedGroup(group.getMasterPart(), group);
 
-        float widthCullingAdder = DisplayEntityPlugin.widthCullingAdder();
-        float heightCullingAdder = DisplayEntityPlugin.heightCullingAdder();
-        group.autoSetCulling(DisplayEntityPlugin.autoCulling(), widthCullingAdder, heightCullingAdder);
+        if (DisplayEntityPlugin.autoCulling()){
+            float widthCullingAdder = DisplayEntityPlugin.widthCullingAdder();
+            float heightCullingAdder = DisplayEntityPlugin.heightCullingAdder();
+            group.autoCull(widthCullingAdder, heightCullingAdder);
+        }
 
         new GroupSpawnedEvent(group, spawnReason).callEvent();
         group.playSpawnAnimation();
@@ -288,9 +290,11 @@ public final class DisplayEntityGroup implements Serializable{
         packetGroup.setAutoShow(autoShow);
 
 
-        float widthCullingAdder = DisplayEntityPlugin.widthCullingAdder();
-        float heightCullingAdder = DisplayEntityPlugin.heightCullingAdder();
-        packetGroup.autoSetCulling(DisplayEntityPlugin.autoCulling(), widthCullingAdder, heightCullingAdder);
+        if (DisplayEntityPlugin.autoCulling()){
+            float widthCullingAdder = DisplayEntityPlugin.widthCullingAdder();
+            float heightCullingAdder = DisplayEntityPlugin.heightCullingAdder();
+            packetGroup.autoCull(widthCullingAdder, heightCullingAdder);
+        }
 
         return packetGroup;
     }
