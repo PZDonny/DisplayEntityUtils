@@ -94,23 +94,21 @@ public final class DisplayUtils {
                 .rotate(transformation.getRightRotation());
     }
 
-    public static Vector3f pivotPitchAndYaw(@NotNull Vector3f vector, float pitch, float yaw){
+    public static Vector3f pivotPitchAndYaw(@NotNull Vector3f translation, float pitch, float yaw){
         //Apply Pitch
         double pitchAsRad = Math.toRadians(pitch);
         double sin = Math.sin(pitchAsRad);
         double cos = Math.cos(pitchAsRad);
-        float originalY = vector.y;
-        float originalZ = vector.z;
+        float translationY = translation.y;
+        float translationZ = translation.z;
 
-
-
-        vector.y = (float) (originalY * cos - originalZ * sin);
-        vector.z = (float) (originalY * sin + originalZ * cos);
+        translation.y = (float) (translationY * cos - translationZ * sin);
+        translation.z = (float) (translationY * sin + translationZ * cos);
 
         //Apply Yaw
         return new Quaternionf()
                 .rotateY((float) Math.toRadians(-yaw))
-                .transform(vector);
+                .transform(translation);
     }
 
     public static Vector pivotPitchAndYaw(@NotNull Vector vector, float pitch, float yaw){
@@ -144,10 +142,9 @@ public final class DisplayUtils {
 
         if (display instanceof BlockDisplay) {
             //Center of block display (similar to text display)
-            Vector3f centerVec = new Vector3f(scale.x / 2, scale.y / 2, scale.z / 2);
-            //Apply rotation to center vector
-            transformation.getLeftRotation().transform(centerVec);
-            translationVector.add(centerVec);
+            Vector3f centeringVec = new Vector3f(scale.x / 2, scale.y / 2, scale.z / 2);
+            transformation.getLeftRotation().transform(centeringVec);
+            translationVector.add(centeringVec);
         }
 
         pivotPitchAndYaw(translationVector, display.getPitch(), display.getYaw());
@@ -207,25 +204,59 @@ public final class DisplayUtils {
         return translationLoc;
     }
 
+    /**
+     * Calculate and get the culling values that would be applied to a {@link Display}
+     * @param display the display
+     * @return a float array containing the width and height, respectively
+     */
     public static float[] getAutoCullValues(@NotNull Display display){
         return getAutoCullValues(display, DisplayEntityPlugin.widthCullingAdder(), DisplayEntityPlugin.heightCullingAdder());
     }
 
+    /**
+     * Calculate and get the culling values that would be applied to a {@link Display}
+     * @param display the display
+     * @param widthAdder the fixed value to increase the calculated width by
+     * @param heightAdder the fixed value to increase the calculated height by
+     * @return a float array containing the width and height, respectively
+     */
     public static float[] getAutoCullValues(@NotNull Display display, float widthAdder, float heightAdder){
         SpawnedDisplayEntityPart.PartType type = display instanceof BlockDisplay ? SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY : null;
         Transformation t = display.getTransformation();
         return getAutoCullValues(type, t.getTranslation(), t.getScale(), t.getLeftRotation(), widthAdder, heightAdder);
     }
 
+    /**
+     * Calculate and get the culling values that would be applied to an {@link ActivePart}
+     * @param part the part
+     * @return a float array containing the width and height, respectively
+     */
     public static float[] getAutoCullValues(@NotNull ActivePart part){
         return getAutoCullValues(part, DisplayEntityPlugin.widthCullingAdder(), DisplayEntityPlugin.heightCullingAdder());
     }
 
+    /**
+     * Calculate and get the culling values that would be applied to an {@link ActivePart}
+     * @param part the part
+     * @param widthAdder the fixed value to increase the calculated width by
+     * @param heightAdder the fixed value to increase the calculated height by
+     * @return a float array containing the width and height, respectively
+     */
     public static float[] getAutoCullValues(@NotNull ActivePart part, float widthAdder, float heightAdder){
         Transformation t = part.getDisplayTransformation();
         return getAutoCullValues(part.getType(), t.getTranslation(), t.getScale(), t.getLeftRotation(), widthAdder, heightAdder);
     }
 
+    /**
+     * Calculate and get the culling values that would be applied to a Display entity with the given data
+     * @param type the part type
+     * @param translation the translation
+     * @param scale the scale
+     * @param leftRotation the left rotation
+     * @param widthAdder the fixed value to increase the calculated width by
+     * @param heightAdder the fixed value to increase the calculated height by
+     * @return a float array containing the width and height, respectively
+     */
     public static float[] getAutoCullValues(SpawnedDisplayEntityPart.PartType type, @NotNull Vector3f translation, @NotNull Vector3f scale, @NotNull Quaternionf leftRotation, float widthAdder, float heightAdder){
         boolean isTranslatedBelow = translation.y < 0;
         float width = Math.max(scale.x, scale.z)*2;
