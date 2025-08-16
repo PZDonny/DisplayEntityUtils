@@ -26,16 +26,16 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class EffActiveGroupUnregister extends Effect {
     static {
-        Skript.registerEffect(EffActiveGroupUnregister.class,"(unregister|delete|remove) %activegroup% [d:[and ]despawn [f:[with|and] forced [chunk loading]]]");
+        Skript.registerEffect(EffActiveGroupUnregister.class,"[deu] unregister %activegroup% [d:[and ]despawn [f:[with|and] forced [chunk loading]]]");
     }
 
-    Expression<ActiveGroup> group;
+    Expression<ActiveGroup<?>> group;
     boolean despawn;
     boolean forced;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        group = (Expression<ActiveGroup>) expressions[0];
+        group = (Expression<ActiveGroup<?>>) expressions[0];
         despawn = parseResult.hasTag("d");
         forced = parseResult.hasTag("f");
         return true;
@@ -43,7 +43,7 @@ public class EffActiveGroupUnregister extends Effect {
 
     @Override
     protected void execute(Event event) {
-        ActiveGroup g = group.getSingle(event);
+        ActiveGroup<?> g = group.getSingle(event);
         if (g instanceof SpawnedDisplayEntityGroup sg){
             sg.unregister(despawn, forced);
         }
@@ -54,6 +54,6 @@ public class EffActiveGroupUnregister extends Effect {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "unregister spawned group: "+group.toString(event, debug);
+        return "unregister active group: "+group.toString(event, debug);
     }
 }
