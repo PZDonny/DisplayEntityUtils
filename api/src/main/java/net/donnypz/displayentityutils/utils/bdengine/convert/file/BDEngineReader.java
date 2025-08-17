@@ -15,14 +15,12 @@ public final class BDEngineReader {
     /**
      * Read a saved project from BDEngine and convert its model and animations to this plugin's format
      * @param json the project's json
-     * @param groupTag the group tag to set for the DisplayEntityUtils group created after conversion
-     * @param animationPrefix the prefix to apply to all converted animations
      * @return a {@link BDEModel}
      */
-    public static BDEModel readJson(@NotNull String json, @NotNull String groupTag, @NotNull String animationPrefix){
+    public static BDEModel readJson(@NotNull String json){
         Type type = new TypeToken<List<Map<String, Object>>>() {}.getType();
         List<Map<String, Object>> list = new Gson().fromJson(json, type);
         Map<String, Object> model = list.getFirst();
-        return new BDEModel(model, groupTag, animationPrefix);
+        return new BDEModel(model);
     }
 }

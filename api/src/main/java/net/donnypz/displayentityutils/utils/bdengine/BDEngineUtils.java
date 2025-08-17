@@ -53,20 +53,14 @@ public final class BDEngineUtils {
         }
     }
 
-    private static String fileExtension(String fileName){
-        return fileName.endsWith(".bdengine") ? fileName : fileName+".bdengine";
-    }
-
     /**
-     * Read a saved project's model from BDEngine
-     * @param file the project file
-     * @param groupTag the group tag to set for the DisplayEntityUtils group created after conversion
-     * @param animationPrefix the prefix to apply to all converted animations
+     * Read a saved project's model from a ".bdengine" file's contents
+      * @param file the project file
      * @return a {@link BDEModel}
      */
-    public static BDEModel readFile(@NotNull File file, @NotNull String groupTag, @NotNull String animationPrefix) {
+    public static BDEModel readFile(@NotNull File file) {
         try(FileInputStream stream = new FileInputStream(file)) {
-            return readFile(stream, groupTag, animationPrefix);
+            return readFile(stream);
         } catch (IOException ex) {
             ex.printStackTrace();
             return null;
@@ -74,17 +68,15 @@ public final class BDEngineUtils {
     }
 
     /**
-     * Read a saved project's model from BDEngine
+     * Read a saved project's model from a ".bdengine" file's contents
      * @param plugin the plugin containing the project file
      * @param resourcePath the project's resource path
-     * @param groupTag the group tag to set for the DisplayEntityUtils group created after conversion
-     * @param animationPrefix the prefix to apply to all converted animations
      * @return a {@link BDEModel}
      */
-    public static BDEModel readFile(@NotNull JavaPlugin plugin, @NotNull String resourcePath, @NotNull String groupTag, @NotNull String animationPrefix) {
+    public static BDEModel readFile(@NotNull JavaPlugin plugin, @NotNull String resourcePath) {
         try(InputStream modelStream = plugin.getResource(resourcePath)){
             if (modelStream == null) return null;
-            return readFile(modelStream, groupTag, animationPrefix);
+            return readFile(modelStream);
         }
         catch(IOException e){
             e.printStackTrace();
@@ -93,13 +85,11 @@ public final class BDEngineUtils {
     }
 
     /**
-     * Read a saved project from BDEngine and convert its model and animations to this plugin's format
-     * @param inputStream the input stream containing the file
-     * @param groupTag the group tag to set for the DisplayEntityUtils group created after conversion
-     * @param animationPrefix the prefix to apply to all converted animations
+     * Read a saved project from a ".bdengine" file's contents
+     * @param inputStream the input stream containing the file's data
      * @return a {@link BDEModel}
      */
-    public static BDEModel readFile(@NotNull InputStream inputStream, @NotNull String groupTag, @NotNull String animationPrefix) {
+    public static BDEModel readFile(@NotNull InputStream inputStream) {
         try(Base64InputStream stream64 = new Base64InputStream(inputStream);
             GZIPInputStream gzipInputStream = new GZIPInputStream(stream64);
             BufferedReader reader = new BufferedReader(new InputStreamReader(gzipInputStream))
@@ -111,7 +101,7 @@ public final class BDEngineUtils {
                 builder.append(line).append("\n");
             }
 
-            return BDEngineReader.readJson(builder.toString(), groupTag, animationPrefix);
+            return BDEngineReader.readJson(builder.toString());
         }
         catch (IOException ex) {
             ex.printStackTrace();

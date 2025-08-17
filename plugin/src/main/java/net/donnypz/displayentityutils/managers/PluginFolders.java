@@ -14,6 +14,7 @@ public class PluginFolders{
     public static final File groupSaveFolder = new File(DisplayAPI.getPlugin().getDataFolder(), "/savedentities/");
     public static final File animSaveFolder = new File(DisplayAPI.getPlugin().getDataFolder(), "/animations/");
     public static final File animDatapackFolder = new File(DisplayAPI.getPlugin().getDataFolder(), "/bdenginedatapacks/");
+    public static final File bdeFilesFolder = new File(DisplayAPI.getPlugin().getDataFolder(), "/bdenginefiles/");
     public static final File displayControllerFolder = new File(DisplayAPI.getPlugin().getDataFolder(), "/displaycontrollers/");
 
     public static void createLocalSaveFolders(JavaPlugin plugin){
@@ -25,6 +26,9 @@ public class PluginFolders{
         }
         if (!animDatapackFolder.exists()){
             animDatapackFolder.mkdirs();
+        }
+        if (!bdeFilesFolder.exists()){
+            bdeFilesFolder.mkdirs();
         }
         if (!displayControllerFolder.exists()){
             displayControllerFolder.mkdirs();

@@ -11,11 +11,13 @@ import java.util.Map;
 public class BDEModel extends BDECollection{
     //Map<Integer, DisplayAnimation> animations = new TreeMap<>(); //id, anim
     String groupTag;
-    String animationPrefix;
-    BDEModel(Map<String, Object> map, String groupTag, String animationPrefix) {
+    //String animationPrefix;
+
+    //BDEModel(Map<String, Object> map, String groupTag, String animationPrefix) {
+    BDEModel(Map<String, Object> map) {
         super(map);
-        this.groupTag = groupTag.isBlank() ? (String) map.get("name") : groupTag;
-        this.animationPrefix = animationPrefix;
+        //this.groupTag = groupTag.isBlank() ? (String) map.get("name") : groupTag;
+        //this.animationPrefix = animationPrefix;
     }
 
     public @NotNull GroupResult spawn(@NotNull Location spawnLoc){
@@ -24,7 +26,7 @@ public class BDEModel extends BDECollection{
         });
         super.spawn(spawnLoc, parentDisplay, null);
         GroupResult result = DisplayGroupManager.getSpawnedGroup(parentDisplay, null);
-        result.group().setTag(groupTag);
+        //result.group().setTag(groupTag);
         return result;
     }
 
@@ -32,7 +34,7 @@ public class BDEModel extends BDECollection{
         return groupTag;
     }
 
-    public String getAnimationPrefix(){
-        return animationPrefix;
-    }
+//    public String getAnimationPrefix(){
+//        return animationPrefix;
+//    }
 }
