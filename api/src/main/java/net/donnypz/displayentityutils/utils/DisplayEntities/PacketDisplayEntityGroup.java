@@ -824,7 +824,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
         DisplayStateMachine.unregisterFromStateMachine(this, false); //Animators will auto-stop
 
-        activeAnimators.clear();
+        this.clearActiveAnimators();
         masterPart = null;
     }
 

@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ActiveGroup<T extends ActivePart> implements Active{
 
@@ -28,7 +27,8 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     final Set<GroupEntityFollower> followers = new HashSet<>();
     final Object followerLock = new Object();
     GroupEntityFollower defaultFollower;
-    protected final Set<DisplayAnimator> activeAnimators = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private final Object animatorLock = new Object();
+    protected final Set<DisplayAnimator> activeAnimators = new HashSet<>();
     protected String spawnAnimationTag;
     protected LoadMethod spawnAnimationLoadMethod;
     protected DisplayAnimator.AnimationType spawnAnimationType;
@@ -57,7 +57,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * Create a {@link MultiPartSelection} containing unfiltered parts from this group
      * @return a {@link MultiPartSelection}
      */
-    public abstract @NotNull MultiPartSelection createPartSelection();
+    public abstract @NotNull MultiPartSelection<?> createPartSelection();
 
     /**
      * Create a {@link MultiPartSelection} containing filtered parts from this group
@@ -432,11 +432,21 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     void addActiveAnimator(DisplayAnimator animator){
-        activeAnimators.add(animator);
+        synchronized(animatorLock){
+            activeAnimators.add(animator);
+        }
     }
 
     void removeActiveAnimator(DisplayAnimator animator){
-        activeAnimators.remove(animator);
+        synchronized(animatorLock){
+            activeAnimators.remove(animator);
+        }
+    }
+
+    void clearActiveAnimators(){
+        synchronized(animatorLock){
+            activeAnimators.clear();
+        }
     }
 
     /**
@@ -487,7 +497,9 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @return a boolean
      */
     public boolean isActiveAnimator(@NotNull DisplayAnimator animator){
-        return activeAnimators.contains(animator);
+        synchronized(animatorLock){
+            return activeAnimators.contains(animator);
+        }
     }
 
     /**
@@ -495,7 +507,9 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @return a boolean
      */
     public boolean isAnimating(){
-        return !activeAnimators.isEmpty();
+        synchronized(animatorLock){
+            return !activeAnimators.isEmpty();
+        }
     }
 
     void setLastAnimatedTick(){
@@ -540,7 +554,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param removeFromStateMachine removes this animation from its state machine if true
      */
     public void stopAnimations(boolean removeFromStateMachine){
-        activeAnimators.clear();
+        clearActiveAnimators();
         if (removeFromStateMachine){
             DisplayStateMachine.unregisterFromStateMachine(this, true);
         }
