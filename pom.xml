@@ -4,11 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.donnypz</groupId>
-    <artifactId>displayentityutils</artifactId>
-    <version>3.2.4</version>
+    <groupId>net.donnypz.displayentityutils</groupId>
+    <artifactId>deu</artifactId>
+    <version>3.3.0</version>
+    <packaging>pom</packaging>
 
     <name>DisplayEntityUtils</name>
+    <modules>
+        <module>api</module>
+        <module>plugin</module>
+    </modules>
 
     <properties>
         <java.version>21</java.version>
@@ -16,6 +21,21 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>net.donnypz.displayentityutils</groupId>
+                <artifactId>api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.donnypz.displayentityutils</groupId>
+                <artifactId>plugin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
@@ -142,78 +162,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.papermc.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.21.8-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver-sync</artifactId>
-            <version>5.1.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.lumine</groupId>
-            <artifactId>Mythic-Dist</artifactId>
-            <version>5.8.1</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/commons-dbutils/commons-dbutils -->
-        <dependency>
-            <groupId>commons-dbutils</groupId>
-            <artifactId>commons-dbutils</artifactId>
-            <version>1.8.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>5.1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.SkriptLang</groupId>
-            <artifactId>Skript</artifactId>
-            <version>2.10.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.bstats</groupId>
-            <artifactId>bstats-bukkit</artifactId>
-            <version>3.0.2</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!--Packet Events-->
-        <dependency>
             <groupId>com.github.retrooper</groupId>
             <artifactId>packetevents-spigot</artifactId>
             <version>2.9.1</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>me.libraryaddict.disguises</groupId>
-            <artifactId>libsdisguises</artifactId>
-            <version>11.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.viaversion</groupId>
-            <artifactId>viaversion-api</artifactId>
-            <version>5.4.2</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sk89q.worldedit</groupId>
-            <artifactId>worldedit-bukkit</artifactId>
-            <version>7.3.5</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

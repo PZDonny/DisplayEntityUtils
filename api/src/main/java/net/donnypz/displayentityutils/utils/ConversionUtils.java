@@ -1,0 +1,90 @@
+package net.donnypz.displayentityutils.utils;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
+
+public class ConversionUtils {
+
+    private static final Map<String, Color> defaultColors = Map.ofEntries(
+            Map.entry("white", Color.WHITE),
+            Map.entry("silver", Color.SILVER),
+            Map.entry("gray", Color.GRAY),
+            Map.entry("black", Color.BLACK),
+            Map.entry("red", Color.RED),
+            Map.entry("maroon", Color.MAROON),
+            Map.entry("yellow", Color.YELLOW),
+            Map.entry("olive", Color.OLIVE),
+            Map.entry("lime", Color.LIME),
+            Map.entry("green", Color.GREEN),
+            Map.entry("aqua", Color.AQUA),
+            Map.entry("teal", Color.TEAL),
+            Map.entry("blue", Color.BLUE),
+            Map.entry("navy", Color.NAVY),
+            Map.entry("fuchsia", Color.FUCHSIA),
+            Map.entry("purple", Color.PURPLE),
+            Map.entry("orange", Color.ORANGE));
+
+    public static Color getColorFromText(@NotNull String color){
+        Color c = defaultColors.get(color.toLowerCase());
+
+        if (c == null){ //Hex
+            try{
+                if (color.startsWith("0x")){
+                    color = color.substring(2);
+                }
+                else if (color.startsWith("#")){
+                    color = color.substring(1);
+                }
+                if (color.length() == 8){
+                    String col = color.substring(0, 6);
+                    String alpha = color.substring(6, 8);
+                    c = Color.fromRGB(Integer.parseInt(col, 16))
+                            .setAlpha(Integer.parseInt(alpha, 16));
+                }
+                else if (color.length() == 6){
+                    c = Color.fromRGB(Integer.parseInt(color, 16));
+                }
+            }
+            catch(IllegalArgumentException ignored){}
+        }
+        return c;
+    }
+
+    public static byte getOpacityAsByte(float input){ //0-1
+        int opacity = Math.round(input * 255);
+
+        if (opacity >= 4 && opacity <= 26) { //Adjusted for Minecraft Shader Values (Rendering is discarded)
+            opacity = 25;
+        }
+
+        if (opacity > 127) { //Outside of byte range
+            opacity -= 256;
+        }
+
+        return (byte) opacity;
+    }
+
+    public static String getCoordinateString(Location location){
+        return round(location.x())+" "+round(location.y())+" "+round(location.z());
+    }
+
+    private static double round(double coord){
+        return Math.round(coord * 100)/100.0;
+    }
+
+    public static String getExecuteCommandWorldName(World w){
+        String worldName;
+        if (w.equals(Bukkit.getWorlds().getFirst())){
+            worldName = "overworld";
+        }
+        else{
+            worldName = w.getName();
+        }
+        return worldName;
+    }
+}
