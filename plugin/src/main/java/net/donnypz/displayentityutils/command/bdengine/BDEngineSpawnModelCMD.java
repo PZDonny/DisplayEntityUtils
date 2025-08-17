@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.PluginFolders;
 import net.donnypz.displayentityutils.utils.bdengine.BDEngineUtils;
 import net.donnypz.displayentityutils.utils.bdengine.convert.file.BDEModel;
@@ -34,11 +35,11 @@ public class BDEngineSpawnModelCMD extends PlayerSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to read model from the given project file!", NamedTextColor.RED)));
             return;
         }
-        model.spawn(spawnLoc);
+        model.spawn(spawnLoc, GroupSpawnedEvent.SpawnReason.COMMAND);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Spawned a BDEngine model from its project file", NamedTextColor.GREEN)));
     }
 
-    private String fileExtension(String fileName){
+    public static String fileExtension(String fileName){
         return fileName.endsWith(".bdengine") ? fileName : fileName+".bdengine";
     }
 }

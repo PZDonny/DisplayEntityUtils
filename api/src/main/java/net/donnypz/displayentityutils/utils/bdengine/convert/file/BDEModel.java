@@ -1,6 +1,8 @@
 package net.donnypz.displayentityutils.utils.bdengine.convert.file;
 
+import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.GroupResult;
 import org.bukkit.Location;
 import org.bukkit.entity.BlockDisplay;
@@ -20,14 +22,17 @@ public class BDEModel extends BDECollection{
         //this.animationPrefix = animationPrefix;
     }
 
-    public @NotNull GroupResult spawn(@NotNull Location spawnLoc){
+    public @NotNull SpawnedDisplayEntityGroup spawn(@NotNull Location spawnLoc, @NotNull GroupSpawnedEvent.SpawnReason spawnReason){
         BlockDisplay parentDisplay = spawnLoc.getWorld().spawn(spawnLoc, BlockDisplay.class, bd -> {
             bd.setPersistent(false);
         });
         super.spawn(spawnLoc, parentDisplay, null);
+
         GroupResult result = DisplayGroupManager.getSpawnedGroup(parentDisplay, null);
+        SpawnedDisplayEntityGroup group = result.group();
+        new GroupSpawnedEvent(group, spawnReason).callEvent();
         //result.group().setTag(groupTag);
-        return result;
+        return group;
     }
 
     public String getGroupTag(){
