@@ -77,9 +77,6 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
         }
         else{
             ServerSideSelection selection = DisplayGroupManager.getPartSelection(player);
-            if (PartsCMD.isUnwantedSingleSelection(player, selection)){
-                return null;
-            }
             SpawnedPartSelection partSelection = (SpawnedPartSelection) selection;
             if (partSelection == null){
                 noPartSelectionInteraction(player);
