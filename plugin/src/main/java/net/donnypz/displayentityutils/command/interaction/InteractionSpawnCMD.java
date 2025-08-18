@@ -39,10 +39,6 @@ class InteractionSpawnCMD extends PlayerSubCommand {
         DisplayEntityPluginCommand.suggestUpdateSelection(player);
     }
 
-    static void spawnForGroup(Player player, Location spawnLocation, String[] args){
-
-    }
-
     static Interaction spawnInteraction(Player player, Location spawnLoc, String[] args){
         try{
 
