@@ -27,9 +27,9 @@ class GroupAddTargetCMD extends PlayerSubCommand {
             return;
         }
 
-        Entity entity = player.getTargetEntity(5);
+        Entity entity = player.getTargetEntity(10);
         if (!(entity instanceof Interaction interaction)) {
-            player.sendMessage(Component.text("Your targeted entity must be an interaction entity within 5 blocks of you", NamedTextColor.RED));
+            player.sendMessage(Component.text("Your targeted entity must be an interaction entity within 10 blocks of you", NamedTextColor.RED));
             return;
         }
         /*if (FramePointDisplay.isRelativePointEntity(entity)){
