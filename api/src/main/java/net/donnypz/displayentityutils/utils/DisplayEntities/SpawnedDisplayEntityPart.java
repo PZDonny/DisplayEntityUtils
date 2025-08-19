@@ -1,15 +1,12 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.DisplayConfig;
-import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
-import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
@@ -293,26 +290,14 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return partData;
     }
 
-    private static SpawnedDisplayEntityPart getPart(@NotNull Entity entity){
-        return allParts.get(new PartData(entity));
-    }
-
     /**
-     * Get the {@link SpawnedDisplayEntityPart} of a {@link Display}, during this play session. Use {@link #create(Display)} if the part is not grouped
-     * @param display the display entity
+     * Get the {@link SpawnedDisplayEntityPart} of an entity, during this play session. Use {@link #create(Display)} or similar methods if the part is not grouped.
+     * @param entity the part entity (Display/Interaction)
      * @return The SpawnedDisplayEntityPart. Null if not created during play session or not associated with any group
      */
-    public static SpawnedDisplayEntityPart getPart(@NotNull Display display){
-        return getPart((Entity) display);
-    }
-
-    /**
-     * Get the {@link SpawnedDisplayEntityPart} of an {@link Interaction}, during this play session. Use {@link #create(Interaction)} if the part is not grouped
-     * @param interaction the interaction entity
-     * @return a {@link SpawnedDisplayEntityPart}. Null if not created during play session or not associated with any group
-     */
-    public static SpawnedDisplayEntityPart getPart(Interaction interaction){
-        return getPart((Entity) interaction);
+    public static @Nullable SpawnedDisplayEntityPart getPart(@NotNull Entity entity){
+        if (!(entity instanceof Interaction || entity instanceof Display)) return null;
+        return allParts.get(new PartData(entity));
     }
 
     /**
@@ -1027,7 +1012,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         TEXT_DISPLAY,
         INTERACTION;
 
-        public static PartType getDisplayType(@NotNull Entity entity){
+        public static PartType getType(@NotNull Entity entity){
             switch (entity){
                 case Interaction i -> {
                     return INTERACTION;
@@ -1042,21 +1027,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                     return TEXT_DISPLAY;
                 }
                 default -> throw new IllegalStateException("Unexpected value: " + entity);
-            }
-        }
-
-        public static PartType getDisplayType(@NotNull Display display){
-            switch (display){
-                case BlockDisplay d -> {
-                    return BLOCK_DISPLAY;
-                }
-                case ItemDisplay d -> {
-                    return ITEM_DISPLAY;
-                }
-                case TextDisplay d -> {
-                    return TEXT_DISPLAY;
-                }
-                default -> throw new IllegalStateException("Unexpected value: " + display);
             }
         }
     }

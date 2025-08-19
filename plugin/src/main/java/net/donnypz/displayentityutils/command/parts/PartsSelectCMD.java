@@ -15,7 +15,9 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +34,7 @@ class PartsSelectCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 3){
-            player.sendMessage(Component.text("/mdis parts select <distance>", NamedTextColor.RED));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis parts select <distance> [-target]", NamedTextColor.RED)));
             return;
         }
         try{
@@ -40,8 +42,19 @@ class PartsSelectCMD extends PlayerSubCommand {
             if (distance <= 0){
                 throw new IllegalArgumentException();
             }
-            player.sendMessage(Component.text("Finding entities within "+distance+" blocks...", NamedTextColor.YELLOW));
-            getSelectableEntities(player, distance);
+
+            if (args.length >= 4 && args[3].equalsIgnoreCase("-target")){
+                Entity entity = player.getTargetEntity(10);
+                if (!(entity instanceof Interaction)) {
+                    player.sendMessage(Component.text("Your targeted entity must be an interaction entity within 10 blocks of you", NamedTextColor.RED));
+                    return;
+                }
+                select(player, entity.getUniqueId());
+            }
+            else{
+                player.sendMessage(Component.text("Finding entities within "+distance+" blocks...", NamedTextColor.YELLOW));
+                getSelectableEntities(player, distance);
+            }
         }
         catch(IllegalArgumentException e){
             player.sendMessage(Component.text("Invalid distance! The distance must be a positive number.", NamedTextColor.RED));
@@ -56,16 +69,16 @@ class PartsSelectCMD extends PlayerSubCommand {
             return;
         }
 
-        player.sendMessage(Component.text("| Entities found! Click to select.", NamedTextColor.GREEN).appendNewline());
         if (parts.size() == 1){
             select(player, parts.getFirst().getUniqueId());
             player.sendMessage(PartsCycleCMD.getPartInfo(parts.getFirst()).color(NamedTextColor.GRAY));
             return;
         }
 
+        player.sendMessage(Component.text("| Entities found! Click to select.", NamedTextColor.GREEN).appendNewline());
         for (Entity e : parts){
             UUID entityUUID = e.getUniqueId();
-            SpawnedDisplayEntityPart.PartType partType = SpawnedDisplayEntityPart.PartType.getDisplayType(e);
+            SpawnedDisplayEntityPart.PartType partType = SpawnedDisplayEntityPart.PartType.getType(e);
             String coords = ConversionUtils.getCoordinateString(e.getLocation());
             Component comp = Component.text("- "+partType.name()+": ")
                     .append(PartsCycleCMD.getPartInfo(e))
@@ -79,6 +92,12 @@ class PartsSelectCMD extends PlayerSubCommand {
     }
 
     private void select(Player player, UUID entityUUID){
+        SpawnedDisplayEntityPart existing = SpawnedDisplayEntityPart.getPart(Bukkit.getEntity(entityUUID));
+        if (existing != null){
+            player.sendMessage(Component.text("That part is already in a group! Select the group, then cycle through the group's parts!", NamedTextColor.RED));
+            return;
+        }
+
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.create(entityUUID);
         if (part == null){
             player.sendMessage(Component.text("That entity is no longer valid!", NamedTextColor.RED));
