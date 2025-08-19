@@ -133,7 +133,7 @@ class PartsCycleCMD extends PlayerSubCommand {
     private void displayPartInfo(Player p, SpawnedDisplayEntityPart part, SpawnedPartSelection partSelection){
         int markDuration = 30;
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            part.spawnInteractionOutline(p, markDuration);
+            part.markInteraction(p, markDuration);
         }
         else{
             PacketUtils.setGlowing(p, part.getEntity().getEntityId(), markDuration);

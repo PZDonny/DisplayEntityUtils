@@ -1,15 +1,20 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayConfig;
+import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
+import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -19,6 +24,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -186,7 +192,7 @@ public abstract class ActivePart implements Active{
 
     /**
      * Make this part glow for a player for a set period of time, if it's a block or item display
-     * @param player the player
+     * @param player the player to see the glowing
      * @param durationInTicks how long the glowing should last. -1 or less to last forever
      */
     @Override
@@ -198,6 +204,38 @@ public abstract class ActivePart implements Active{
             else{
                 PacketUtils.setGlowing(player, getEntityId(), durationInTicks);
             }
+        }
+    }
+
+    /**
+     * Mark an interaction entity with a packet-based block display, shown for the given duration. The block used is determined by {@link DisplayConfig#interactionPreviewBlock()}
+     * @param player the player to see the mark
+     * @param durationInTicks how long the interaction entity should be marked, -1 to last forever
+     */
+    public void markInteraction(@NotNull Player player, long durationInTicks){
+        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) return;
+        Location markLoc = getLocation();
+        if (markLoc == null) return;
+        markLoc.setPitch(0);
+        markLoc.setYaw(0);
+
+        float height = getInteractionHeight();
+        float width = getInteractionWidth();
+
+        PacketDisplayEntityPart part = new PacketAttributeContainer()
+                .setAttribute(DisplayAttributes.BlockDisplay.BLOCK_STATE, DisplayConfig.interactionPreviewBlock())
+                .setAttribute(DisplayAttributes.Transform.TRANSLATION, new Vector3f(-0.5f*width, 0, -0.5f*width))
+                .setAttribute(DisplayAttributes.Transform.SCALE, new Vector3f(width, height, width))
+                .setAttribute(DisplayAttributes.BRIGHTNESS, new Display.Brightness(7, 7))
+                .createPart(SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY, markLoc);
+        part.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
+
+        if (durationInTicks > -1) {
+            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+                if (player.isConnected()){
+                    part.hideFromPlayer(player);
+                }
+            }, durationInTicks);
         }
     }
 

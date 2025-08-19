@@ -87,7 +87,12 @@ class PartsSelectCMD extends PlayerSubCommand {
         DEUUser
                 .getOrCreateUser(player)
                 .setSelectedPartSelection(new SinglePartSelection(part), false);
-        part.glow(player, 30);
+        if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            part.markInteraction(player, 30);
+        }
+        else{
+            part.glow(player, 30);
+        }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Part Entity Selected!", NamedTextColor.GREEN)));
     }
 }

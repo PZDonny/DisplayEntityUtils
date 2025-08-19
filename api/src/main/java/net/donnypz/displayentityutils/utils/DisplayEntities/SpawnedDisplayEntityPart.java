@@ -505,10 +505,9 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
 
     /**
-     * Adds the glow effect to this SpawnDisplayEntityPart. This does <b><u>NOT</u></b> apply to Interaction or Text Display entities. Use {@link #spawnInteractionOutline(Player, long)} to show an outline of
+     * Adds the glow effect to this SpawnDisplayEntityPart. This does <b><u>NOT</u></b> apply to Interaction or Text Display entities. Use {@link #markInteraction(Player, long)} to show an outline of
      * an interaction for a specific player.
      */
-
     public void glow(){
         Entity entity = getEntity();
         if (type == PartType.INTERACTION || type == PartType.TEXT_DISPLAY) {
@@ -536,39 +535,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                 entity.setGlowing(false);
             }
         }.runTaskLater(DisplayAPI.getPlugin(), durationInTicks);
-    }
-
-
-
-    public void spawnInteractionOutline(Player player, long durationInTicks){
-        Interaction i = (Interaction) getEntity();
-        float width = i.getInteractionWidth();
-        float height = i.getInteractionHeight();
-        Location spawnLoc = i.getLocation();
-        spawnLoc.setPitch(0);
-        spawnLoc.setYaw(0);
-
-        PacketDisplayEntityPart part = new PacketAttributeContainer()
-                .setAttribute(DisplayAttributes.BlockDisplay.BLOCK_STATE, DisplayConfig.interactionPreviewBlock())
-                .setAttribute(DisplayAttributes.Transform.TRANSLATION, new Vector3f(-0.5f*width, 0, -0.5f*width))
-                .setAttribute(DisplayAttributes.Transform.SCALE, new Vector3f(width, height, width))
-                .setAttribute(DisplayAttributes.BRIGHTNESS, new Display.Brightness(7, 7))
-                .createPart(PartType.BLOCK_DISPLAY, spawnLoc);
-        part.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
-
-        if (durationInTicks == -1) {
-            if (player.isConnected()){
-                part.hideFromPlayer(player);
-            }
-        }
-        else{
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
-                if (player.isConnected()){
-                    part.hideFromPlayer(player);
-                }
-            }, durationInTicks);
-        }
-
     }
 
     /**

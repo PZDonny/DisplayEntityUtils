@@ -872,13 +872,12 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * @return this
      */
     public SpawnedDisplayEntityGroup glowAndOutline(@NotNull Player player, long durationInTicks){
-        for (ActivePart p : groupParts.values()){
-            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) p;
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                part.spawnInteractionOutline(player, durationInTicks);
+        for (SpawnedDisplayEntityPart p : groupParts.values()){
+            if (p.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                p.markInteraction(player, durationInTicks);
             }
             else {
-                Display display = (Display) part.getEntity();
+                Display display = (Display) p.getEntity();
                 if (display.isGlowing()){
                     continue;
                 }
