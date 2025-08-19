@@ -34,30 +34,30 @@ class PartsSelectCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 3){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis parts select <distance> [-target]", NamedTextColor.RED)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis parts select <distance | -target>", NamedTextColor.RED)));
             return;
         }
         try{
-            double distance = Double.parseDouble(args[2]);
-            if (distance <= 0){
-                throw new IllegalArgumentException();
-            }
-
-            if (args.length >= 4 && args[3].equalsIgnoreCase("-target")){
+            String arg = args[2];
+            if (arg.equalsIgnoreCase("-target")){
                 Entity entity = player.getTargetEntity(10);
                 if (!(entity instanceof Interaction)) {
                     player.sendMessage(Component.text("Your targeted entity must be an interaction entity within 10 blocks of you", NamedTextColor.RED));
                     return;
                 }
                 select(player, entity.getUniqueId());
+                return;
             }
-            else{
+            double distance = Double.parseDouble(arg);
+            if (distance <= 0){
+                throw new IllegalArgumentException();
+            }
+
                 player.sendMessage(Component.text("Finding entities within "+distance+" blocks...", NamedTextColor.YELLOW));
                 getSelectableEntities(player, distance);
-            }
         }
         catch(IllegalArgumentException e){
-            player.sendMessage(Component.text("Invalid distance! The distance must be a positive number.", NamedTextColor.RED));
+            player.sendMessage(Component.text("Invalid input! Enter a positive number for the distance, or -target to select a targeted Interaction entity", NamedTextColor.RED));
         }
     }
 

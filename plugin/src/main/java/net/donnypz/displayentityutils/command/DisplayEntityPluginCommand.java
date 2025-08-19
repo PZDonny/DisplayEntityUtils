@@ -224,6 +224,10 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                 }
                 case "parts" -> {
                     switch (args[1].toLowerCase()){
+                        case "select" -> {
+                            suggestions.add("-target");
+                            suggestions.add("<distance>");
+                        }
                         case "glowcolor" -> {
                             addColors(suggestions);
                         }
