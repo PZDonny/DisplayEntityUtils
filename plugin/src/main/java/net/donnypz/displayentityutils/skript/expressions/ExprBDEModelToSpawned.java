@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
-@Name("Saved Group to Spawned Group")
+@Name("BDEngine Model to Spawned Group")
 @Description("Spawn a model from a \".bdengine\" file, stored in DisplayEntityUtils' \"bdenginefiles\" folder")
 @Examples({"set {_spawnedgroup} to bdengine model \"mymodel\" spawned at {_location}",
             "set {_spawnedgroup} to bde model \"model.bdengine\" spawned at {_location}"})
