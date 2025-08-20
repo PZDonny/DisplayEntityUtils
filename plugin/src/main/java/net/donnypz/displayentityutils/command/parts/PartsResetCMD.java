@@ -30,7 +30,7 @@ class PartsResetCMD extends PlayerSubCommand {
             return;
         }
 
-        partSelection.reset();
+        partSelection.reset(true);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Part selection reset!", NamedTextColor.GREEN)));
     }
 }

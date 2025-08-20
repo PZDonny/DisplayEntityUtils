@@ -26,19 +26,19 @@ public class EffPartSelectionResetRefreshRemove extends Effect {
         Skript.registerEffect(EffPartSelectionResetRefreshRemove.class,"(1¦refresh|2¦reset|3¦remove) %multipartselections%");
     }
 
-    Expression<MultiPartSelection> selections;
+    Expression<MultiPartSelection<?>> selections;
     int option;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        selections = (Expression<MultiPartSelection>) expressions[0];
+        selections = (Expression<MultiPartSelection<?>>) expressions[0];
         option = parseResult.mark;
         return true;
     }
 
     @Override
     protected void execute(Event event) {
-        for (MultiPartSelection s : selections.getArray(event)){
+        for (MultiPartSelection<?> s : selections.getArray(event)){
             if (s == null){
                 continue;
             }
@@ -46,7 +46,7 @@ public class EffPartSelectionResetRefreshRemove extends Effect {
                 s.refresh();
             }
             else if (option == 2){ //reset
-                s.reset();
+                s.reset(true);
             }
             else{ //remove
                 s.remove();

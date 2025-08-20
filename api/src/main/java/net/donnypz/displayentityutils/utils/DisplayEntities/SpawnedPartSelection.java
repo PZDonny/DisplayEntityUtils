@@ -51,25 +51,6 @@ public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDispla
     }
 
 
-    /**
-     * Reset this part selection back to all the parts in this selection's group, removing all filters
-     * @return true if the selection's group is still valid
-     */
-    @Override
-    public boolean reset(){
-        if (group == null){
-            return false;
-        }
-        selectedParts.clear();
-        selectedPart = null;
-        this.partTypes.clear();
-        this.includedTags.clear();
-        this.excludedTags.clear();
-        this.itemTypes.clear();
-        this.blockTypes.clear();
-        return true;
-    }
-
     @Override
     Material getBlockType(SpawnedDisplayEntityPart part) {
         BlockDisplay display = (BlockDisplay) part.getEntity();
@@ -163,7 +144,7 @@ public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDispla
     }
 
     void removeNoManager(){
-        reset();
+        reset(false);
         ((SpawnedDisplayEntityGroup) group).partSelections.remove(this);
         group = null;
     }

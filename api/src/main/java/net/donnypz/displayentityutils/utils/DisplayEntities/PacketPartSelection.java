@@ -74,28 +74,12 @@ public class PacketPartSelection extends MultiPartSelection<PacketDisplayEntityP
         return (PacketDisplayEntityGroup) group;
     }
 
-
-    @Override
-    public boolean reset() {
-        if (group == null){
-            return false;
-        }
-        selectedParts.clear();
-        selectedPart = null;
-        this.partTypes.clear();
-        this.includedTags.clear();
-        this.excludedTags.clear();
-        this.itemTypes.clear();
-        this.blockTypes.clear();
-        return true;
-    }
-
     /**
      * Remove this part selection, making it invalid and unusable.
      */
     @Override
     public void remove() {
-        reset();
+        reset(false);
         group = null;
     }
 

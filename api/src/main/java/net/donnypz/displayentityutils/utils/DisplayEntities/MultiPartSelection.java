@@ -79,7 +79,7 @@ public abstract class MultiPartSelection<T extends ActivePart> extends PartSelec
         }
 
         if (reset){
-            reset();
+            reset(false);
         }
 
         if (!filter.partTypes.isEmpty()){
@@ -589,5 +589,23 @@ public abstract class MultiPartSelection<T extends ActivePart> extends PartSelec
 
     public abstract ActiveGroup<T> getGroup();
 
-    public abstract boolean reset();
+    /**
+     * Reset this part selection back to all the parts in this selection's group, removing all filters
+     * @param refresh whether the filter should be refreshed. If not, the selected part will be null
+     * @return true if the selection's group is still valid
+     */
+    public boolean reset(boolean refresh){
+        if (group == null){
+            return false;
+        }
+        selectedParts.clear();
+        selectedPart = null;
+        this.partTypes.clear();
+        this.includedTags.clear();
+        this.excludedTags.clear();
+        this.itemTypes.clear();
+        this.blockTypes.clear();
+        if (refresh) refresh();
+        return true;
+    }
 }
