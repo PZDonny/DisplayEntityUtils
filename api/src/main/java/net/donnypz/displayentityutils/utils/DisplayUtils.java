@@ -589,8 +589,9 @@ public final class DisplayUtils {
      * @param interactionLocation the interaction entity's location
      * @param center the location the interaction should pivot around
      * @param angleInDegrees the pivot angle in degrees
+     * @return a Location
      */
-    public static Location getPivotLocation(@NotNull Location interactionLocation, @NotNull Location center, double angleInDegrees){
+    public static @NotNull Location getPivotLocation(@NotNull Location interactionLocation, @NotNull Location center, double angleInDegrees){
         Vector translationVector = center.clone().subtract(interactionLocation).toVector();
         return getPivotLocation(translationVector, center, angleInDegrees);
     }
@@ -600,8 +601,9 @@ public final class DisplayUtils {
      * @param translationVector the translation offset for an interaction entity from a center location
      * @param center the location the interaction should pivot around
      * @param angleInDegrees the pivot angle in degrees
+     * @return a Location
      */
-    public static Location getPivotLocation(@NotNull Vector translationVector, @NotNull Location center, double angleInDegrees){
+    public static @NotNull Location getPivotLocation(@NotNull Vector translationVector, @NotNull Location center, double angleInDegrees){
         Vector3f v = translationVector.toVector3f();
         new Quaternionf()
                 .rotateY((float) Math.toRadians(angleInDegrees*-1))
@@ -671,7 +673,7 @@ public final class DisplayUtils {
      * @return Part UUID of the entity. Null if the entity is not part of a display entity group. Will still return a value if the entity
      * was previously part of a group, but later removed.
      */
-    public static UUID getPartUUID(Display display){
+    public static @Nullable UUID getPartUUID(Display display){
         return getPDCPartUUID(display);
     }
 
@@ -681,7 +683,7 @@ public final class DisplayUtils {
      * @return Part UUID of the entity. Null if the entity is not part of a display entity group. Will still return a value if the entity
      * was previously part of a group, but later removed.
      */
-    public static UUID getPartUUID(Interaction interaction){
+    public static @Nullable UUID getPartUUID(Interaction interaction){
         return getPDCPartUUID(interaction);
     }
 
@@ -699,7 +701,7 @@ public final class DisplayUtils {
      * @param interaction
      * @return List of commands stored on this interaction entity
      */
-    public static List<String> getInteractionCommands(Interaction interaction){
+    public static @NotNull List<String> getInteractionCommands(@NotNull Interaction interaction){
 
         List<String> commands = new ArrayList<>();
         commands.addAll(getInteractionLeftConsoleCommands(interaction));
@@ -714,7 +716,7 @@ public final class DisplayUtils {
      * @param interaction
      * @return List of commands stored on this interaction entity as {@link InteractionCommand}
      */
-    public static List<InteractionCommand> getInteractionCommandsWithData(Interaction interaction){
+    public static @NotNull List<InteractionCommand> getInteractionCommandsWithData(@NotNull Interaction interaction){
         List<InteractionCommand> cmd = new ArrayList<>();
         for (String s : getInteractionLeftConsoleCommands(interaction)){
             cmd.add(new InteractionCommand(s, true, true, leftClickConsole));
@@ -731,34 +733,28 @@ public final class DisplayUtils {
         return cmd;
     }
 
-    public static List<String> getInteractionLeftConsoleCommands(Interaction interaction){
+    public static @NotNull List<String> getInteractionLeftConsoleCommands(@NotNull Interaction interaction){
         return getPDCList(interaction, leftClickConsole);
     }
 
-    public static List<String> getInteractionLeftPlayerCommands(Interaction interaction){
+    public static @NotNull List<String> getInteractionLeftPlayerCommands(@NotNull Interaction interaction){
         return getPDCList(interaction, leftClickPlayer);
     }
 
-    public static List<String> getInteractionRightConsoleCommands(Interaction interaction){
+    public static @NotNull List<String> getInteractionRightConsoleCommands(@NotNull Interaction interaction){
         return getPDCList(interaction, rightClickConsole);
     }
 
-    public static List<String> getInteractionRightPlayerCommands(Interaction interaction){
+    public static @NotNull List<String> getInteractionRightPlayerCommands(@NotNull Interaction interaction){
         return getPDCList(interaction, rightClickPlayer);
     }
 
     /**
-     * Gets the part tags of this SpawnedDisplayEntityPart
-     * @return This part's part tags.
-     */
-    static @NotNull List<String> getInteractionCommand(@NotNull Entity entity){
-        return getPDCList(entity, DisplayAPI.getPartPDCTagKey());
-    }
-
-    /**
-     * Adds a command to an interaction entity to execute when clicked
+     * Adds a command to an Interaction entity to execute when clicked
      * @param interaction The entity to assign the command to
      * @param command The command to assign
+     * @param isLeftClick whether the command is executed on left click
+     * @param isConsole whether the command should be executed by console or the clicker
      */
     @ApiStatus.Internal
     public static void addInteractionCommand(@NotNull Interaction interaction, @NotNull String command, boolean isLeftClick, boolean isConsole){
