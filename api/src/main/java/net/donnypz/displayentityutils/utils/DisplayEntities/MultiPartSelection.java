@@ -111,6 +111,7 @@ public abstract class MultiPartSelection<T extends ActivePart> extends PartSelec
      */
     public void refresh(){
         selectedParts.clear();
+        boolean containsSelectedPart = false;
 
         filter:
         for (T part : group.groupParts.values()){
@@ -159,16 +160,19 @@ public abstract class MultiPartSelection<T extends ActivePart> extends PartSelec
             //No Included Tags for filtering and still filterable
             if (includedTags.isEmpty() && filterable){
                 selectedParts.add(part);
+                if (!containsSelectedPart) containsSelectedPart = selectedPart == part;
             }
             //Part Has Included Tag (Filter Part)
             else{
                 if (strictPartTagInclusion && list.containsAll(includedTags)) {
                     selectedParts.add(part);
+                    if (!containsSelectedPart) containsSelectedPart = selectedPart == part;
                 }
                 else if (!strictPartTagInclusion){
                     for (String included : includedTags){
                         if (list.contains(included)){
                             selectedParts.add(part);
+                            if (!containsSelectedPart) containsSelectedPart = selectedPart == part;
                             continue filter;
                         }
                     }
@@ -176,7 +180,7 @@ public abstract class MultiPartSelection<T extends ActivePart> extends PartSelec
             }
         }
 
-        if (!selectedParts.isEmpty()){
+        if (!containsSelectedPart && !selectedParts.isEmpty()){
             selectedPart = selectedParts.getFirst();
         }
     }

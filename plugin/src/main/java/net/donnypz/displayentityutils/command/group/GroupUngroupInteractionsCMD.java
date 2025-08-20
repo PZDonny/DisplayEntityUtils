@@ -7,6 +7,7 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -27,5 +28,7 @@ class GroupUngroupInteractionsCMD extends PlayerSubCommand {
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Removed any interactions entities attached to the spawned display entity group", NamedTextColor.RED)));
         group.removeInteractionEntities();
+        SpawnedPartSelection sel = (SpawnedPartSelection) DisplayGroupManager.getPartSelection(player);
+        sel.refresh();
     }
 }

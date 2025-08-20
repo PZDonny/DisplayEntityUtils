@@ -64,7 +64,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis interaction addcmd <player | console> <left | right | both> <command>", "Add a command to an interaction");
             CMDUtils.sendCMD(sender, "/mdis interaction listcmds", "List all commands stored on an interaction");
             CMDUtils.sendCMD(sender, "/mdis interaction pivot <angle>", " Pivot an interaction around it's group's actual location center");
-            CMDUtils.sendCMD(sender, "/mdis interaction pivotselection <angle>", "Pivot all Interactions in a part selection");
+            CMDUtils.sendCMD(sender, "/mdis interaction pivotselection <angle>", "Pivot all Interactions included in your selected group's part filter");
             CMDUtils.sendCMD(sender, "/mdis interaction responsive", "Toggle the hit sound of an interaction entity");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));

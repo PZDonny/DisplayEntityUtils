@@ -7,6 +7,7 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -35,8 +36,9 @@ class InteractionSpawnCMD extends PlayerSubCommand {
         Interaction i = spawnInteraction(player, group.getLocation(), args);
         if (i == null) return;
         group.addInteractionEntity(i);
+        SpawnedPartSelection sel = (SpawnedPartSelection) DisplayGroupManager.getPartSelection(player);
+        sel.refresh();
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("| The interaction has been added to your group!", NamedTextColor.YELLOW)));
-        DisplayEntityPluginCommand.suggestUpdateSelection(player);
     }
 
     static Interaction spawnInteraction(Player player, Location spawnLoc, String[] args){

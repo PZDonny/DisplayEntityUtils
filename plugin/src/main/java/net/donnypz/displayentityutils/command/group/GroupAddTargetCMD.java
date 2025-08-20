@@ -7,6 +7,7 @@ import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Entity;
@@ -47,6 +48,9 @@ class GroupAddTargetCMD extends PlayerSubCommand {
         }
         else {
             group.addInteractionEntity(interaction);
+            SpawnedPartSelection sel = (SpawnedPartSelection) DisplayGroupManager.getPartSelection(player);
+            sel.refresh();
+
         }
         player.sendMessage(Component.text("Successfully added interaction entity to your selected group!", NamedTextColor.GREEN));
     }

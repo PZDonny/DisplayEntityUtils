@@ -96,11 +96,6 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         player.sendMessage(Component.text("| The tag may also already exist or be set", NamedTextColor.GRAY, TextDecoration.ITALIC));
     }
 
-    public static void suggestUpdateSelection(Player player){
-        player.sendMessage(Component.text("| It is recommended to update/reset your part selection after adding parts!", NamedTextColor.GRAY));
-        player.sendMessage(Component.text("| Quickly reset with \"/mdis parts refresh", NamedTextColor.GRAY));
-    }
-
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
@@ -308,6 +303,9 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                 }
                 else if (args[1].equalsIgnoreCase("topacket")){
                     suggestions.add("-keep");
+                }
+                else if (args[1].equalsIgnoreCase("yaw")){
+                    suggestions.add("-pivot");
                 }
             }
             else if (args[0].equalsIgnoreCase("anim")){
