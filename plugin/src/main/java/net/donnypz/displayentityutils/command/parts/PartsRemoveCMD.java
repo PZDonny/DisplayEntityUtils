@@ -37,7 +37,7 @@ class PartsRemoveCMD extends PartsSubCommand {
 
     @Override
     protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ServerSideSelection selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
-        if (selectedPart.isMaster()){
+        if (selectedPart.isMaster() && !selection.isSinglePartSelection()){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot despawn the master/parent part!", NamedTextColor.RED)));
             return;
         }
@@ -49,8 +49,11 @@ class PartsRemoveCMD extends PartsSubCommand {
 
     private void removePartSelectionIfEmpty(Player player, ServerSideSelection selection){
         if (selection instanceof SpawnedPartSelection s && s.getSize() != 0) return;
+
         selection.remove();
-        player.sendMessage(Component.text("Part selection reset! (No parts remaining)", NamedTextColor.RED));
+        if (!selection.isSinglePartSelection()){
+            player.sendMessage(Component.text("Part selection reset! (No parts remaining)", NamedTextColor.RED));
+        }
     }
 
     private void removeGroupIfEmpty(Player player, SpawnedDisplayEntityGroup group){
