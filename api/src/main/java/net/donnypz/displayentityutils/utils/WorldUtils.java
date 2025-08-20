@@ -5,6 +5,7 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
@@ -45,13 +46,13 @@ public class WorldUtils {
         if (w == null) return null;
         try{
             org.bukkit.World bukkitWorld = player.getWorld();
-            Location masterLoc = player.getLocation();
-            masterLoc.setPitch(0);
-            masterLoc.setYaw(0);
+            Region region = worldEditSession.getSelection(BukkitAdapter.adapt(bukkitWorld));
+            int lowestY = region.getMinimumPoint().y();
+            Vector3 centerVec = region.getCenter();
+
+            Location masterLoc = new Location(bukkitWorld, centerVec.x(), lowestY, centerVec.z(), 0, 0);
             Vector masterVector = masterLoc.toVector();
 
-
-            Region region = worldEditSession.getSelection(BukkitAdapter.adapt(bukkitWorld));
             BlockDisplay master = bukkitWorld.spawn(masterLoc, BlockDisplay.class);
             SpawnedDisplayEntityGroup group = new SpawnedDisplayEntityGroup(master);
 
@@ -81,12 +82,10 @@ public class WorldUtils {
             }
 
             DisplayGroupManager.addSpawnedGroup(group.getMasterPart(), group);
-
             return group;
         }
         catch(IncompleteRegionException e){
             return null;
         }
     }
-
 }
