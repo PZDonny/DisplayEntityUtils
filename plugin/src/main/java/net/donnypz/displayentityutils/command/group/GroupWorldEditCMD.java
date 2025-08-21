@@ -37,7 +37,7 @@ class GroupWorldEditCMD extends PlayerSubCommand {
         }
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Converted your WorldEdit selection to a spawned group!", NamedTextColor.GREEN)));
-        player.sendMessage(Component.text("| Your group selection has been changed to the newly created group (Origin at your location)", NamedTextColor.GRAY, TextDecoration.ITALIC));
+        player.sendMessage(Component.text("| Your group selection has been changed to the newly created group", NamedTextColor.GRAY, TextDecoration.ITALIC));
 
         DisplayGroupManager.setSelectedSpawnedGroup(player, g);
         g.glow(player, 60);
