@@ -53,9 +53,28 @@ BDEngine is what you'll use to create models and animations that can be transfer
 > ![](https://github.com/user-attachments/assets/5c333cd4-71ba-4ad1-a631-f8ec648651f0)
 
 ## WIKI
-Access the wiki [HERE](https://github.com/PZDonny/DisplayEntityUtils/wiki)
+### Access the wiki [HERE](https://github.com/PZDonny/DisplayEntityUtils/wiki)
 
-## How can you access the API?
+## Plugin API
+
+### API for v3.3.0+
+```xml
+<repositories>
+  <repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+  </repository>
+</repositories>
+
+<dependency>
+  <groupId>com.github.PZDonny.DisplayEntityUtils</groupId>
+  <artifactId>api</artifactId>
+  <version>PLUGIN-VERSION</version>
+  <scope>provided</scope>
+</dependency>
+```
+
+### API for v3.3.0 and lower
 ```xml
 <repositories>
   <repository>
