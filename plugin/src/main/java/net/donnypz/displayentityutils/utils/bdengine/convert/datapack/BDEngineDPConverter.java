@@ -18,7 +18,6 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -32,22 +31,26 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-@ApiStatus.Internal
 public class BDEngineDPConverter {
 
-    private static final String createModelPath = "/create.mcfunction";
-    private String projectName = null;
-    private final LinkedHashMap<String, ArrayList<ZipEntry>> animations = new LinkedHashMap<>();
     static final CommandSender silentSender = Bukkit.createCommandSender(feedback -> {});
+    private static final String createModelPath = "/create.mcfunction";
 
-    @ApiStatus.Internal
-    public BDEngineDPConverter(@NotNull Player player, @NotNull String datapackName, @NotNull String groupSaveTag, @NotNull String animationSaveTag){
+    private String projectName = null;
+    private final String groupSaveTag;
+    private final String animationSavePrefix;
+    private final LinkedHashMap<String, ArrayList<ZipEntry>> animations = new LinkedHashMap<>();
+    private final String functionFolderName = VersionUtils.IS_1_21 ? "function" : "functions";
+
+    public BDEngineDPConverter(@NotNull Player player, @NotNull String datapackName, @NotNull String groupSaveTag, @NotNull String animationSavePrefix){
+        this.groupSaveTag = groupSaveTag;
+        this.animationSavePrefix = animationSavePrefix;
         if (!datapackName.endsWith(".zip")){
             datapackName = datapackName+".zip";
         }
         try{
             ZipFile zipFile = new ZipFile(PluginFolders.animDatapackFolder+"/"+datapackName);
-            searchEntries(player, datapackName, zipFile.entries(), zipFile, groupSaveTag, animationSaveTag);
+            searchEntries(player, datapackName, zipFile.entries(), zipFile);
         }
         catch (IOException e) {
             player.sendMessage(DisplayAPI.pluginPrefix
@@ -55,128 +58,106 @@ public class BDEngineDPConverter {
         }
     }
 
+    private boolean isAnimationEntry(String entryName){
+        return !entryName.endsWith(".mcfunction") && (entryName.contains("/"+ functionFolderName +"/a/") && !entryName.endsWith("/"+ functionFolderName +"/a/"));
+    }
+
+    private boolean isSoundPath(String entryName){
+        return entryName.contains("/"+ functionFolderName +"/k_s");
+    }
+
     private String getAnimationName(String entryName, String folder){
-        String animName;
-        if (VersionUtils.IS_1_21){
-            animName = entryName.split("function/"+folder+"/")[1];
-        }
-        else{
-            animName = entryName.split("functions/"+folder+"/")[1];
-        }
-        if (animName.endsWith(".mcfunction")){
-            animName = animName.split("/")[0];
-        }
-        else{
-            animName = animName.substring(0, animName.length()-1);
-        }
-        return animName;
+        String animName = entryName.split(functionFolderName +"/"+folder+"/")[1];
+        return animName.endsWith(".mcfunction") ? animName.split("/")[0] : animName.substring(0, animName.length()-1);
     }
 
-    private String getProjectName(String entryName){
+    private void getProjectName(String entryName){
         if (projectName == null){
-            String projectName;
-
-            if (VersionUtils.IS_1_21){
-                projectName = entryName.split("/function/")[0];
-            }
-            else{
-                projectName = entryName.split("/functions/")[0];
-            }
-            projectName = projectName.substring(5);
-            this.projectName = projectName;
+            this.projectName = entryName.split("/"+functionFolderName+"/")[0].substring(5);
         }
-        return projectName;
     }
 
-    private void searchEntries(Player player, String datapackName, Enumeration<? extends ZipEntry> entries, ZipFile zipFile, String groupSaveTag, String animationSaveTagPrefix){
-        Location pLoc = player.getLocation();
+    private void spawnModel(Player player, ZipEntry createModelEntry, ZipFile zipFile){
+        getProjectName(createModelEntry.getName());
+        executeCommands(createModelEntry, zipFile, player, player.getLocation());
+    }
 
+    private void addFrame(ZipEntry entry){
+        String animName = getAnimationName(entry.getName(), "k");
+        ArrayList<ZipEntry> frames = animations.computeIfAbsent(animName, k -> new ArrayList<>());
+        frames.add(entry);
+    }
 
-        String entryName;
-        ZipEntry modelEntry = null;
+    private void searchEntries(Player player, String datapackName, Enumeration<? extends ZipEntry> entries, ZipFile zipFile){
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
+            String entryName = entry.getName();
 
-            entryName = entry.getName();
-            if (!entryName.endsWith(".mcfunction") &&
-                    ((VersionUtils.IS_1_21 && entryName.contains("/function/a/") && !entryName.endsWith("/function/a/")) || ((entryName.contains("/functions/a/") && !entryName.endsWith("/functions/a/"))))){
+            //Summon model
+            if (entryName.endsWith(createModelPath)){
+                spawnModel(player, entry, zipFile);
+            }
+            //Add Animation
+            else if (isAnimationEntry(entryName)){ //Add animation
                 animations.putIfAbsent(getAnimationName(entryName, "a"), new ArrayList<>());
             }
-            else if (entryName.endsWith(createModelPath)) { //Summon Model for animation
-                modelEntry = entry;
-            }
-            else if (entryName.contains("/keyframe_") && entryName.endsWith(".mcfunction")){
-                String animName = getAnimationName(entryName, "k");
-                ArrayList<ZipEntry> list = animations.getOrDefault(animName, new ArrayList<>());
-                list.add(entry);
-                animations.put(animName, list);
+            //Add Animation Frame
+            else if (!isSoundPath(entryName) && entryName.contains("/keyframe_") && entryName.endsWith(".mcfunction")){
+                addFrame(entry);
             }
         }
 
-        if (modelEntry != null){
-            executeCommands(modelEntry, zipFile, player, pLoc);
-        }
-
-
-
-    //Save Animations
+        //Save Model and Animations
         Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () ->{
-            SpawnedDisplayEntityGroup createdGroup = DatapackEntitySpawned.getProjectGroup(projectName);
-
-            if (createdGroup == null){
-                player.sendMessage(Component.text("Failed to find model/group created from datapack!", NamedTextColor.RED));
-                player.sendMessage(Component.text("| The datapack may be a legacy one (before v1.13 of BDEngine). Try using /mdis bdengine convertanimleg", NamedTextColor.GRAY));
-                return;
-            }
-
-            DatapackEntitySpawned.finalizeAnimationPreparation(projectName);
-            createdGroup.seedPartUUIDs(SpawnedDisplayEntityGroup.defaultPartUUIDSeed);
-
-            player.sendMessage(Component.empty());
-            boolean save = !groupSaveTag.equals("-");
-            if (save){
-                if (groupSaveTag.isBlank()){
-                    createdGroup.setTag(datapackName.replace(".zip", "_auto"));
-                }
-                else{
-                    createdGroup.setTag(groupSaveTag);
-                }
-
-            }
-
-            int delay = 0;
-            for (String animName : animations.sequencedKeySet()){
-                List<ZipEntry> frames = animations.get(animName);
-                Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
-                    player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Converting Animation: <yellow>"+animName));
-                    processAnimation(createdGroup, zipFile, frames, datapackName, animName, player, animationSaveTagPrefix);
-                }, delay);
-
-                delay+=(frames.size()*2);
-            }
-
-            //Despawn group after all animation conversions
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
-                player.sendMessage(Component.empty());
-                if (save){
-                    DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.LOCAL, createdGroup.toDisplayEntityGroup(), player);
-                    player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Group Tag: <yellow>"+createdGroup.getTag()));
-                }
-                else{
-                    player.sendMessage(Component.text("The group will not be saved due to setting the group tag to \"-\"", NamedTextColor.GRAY));
-                }
-
-                Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> createdGroup.unregister(true, true));
-            }, delay+5);
+            playAndSave(player, datapackName, zipFile);
         }, 30);
     }
 
-    private void processAnimation(SpawnedDisplayEntityGroup createdGroup, ZipFile zipFile, List<ZipEntry> frames, String datapackName, String animName, @NotNull Player player, @NotNull String animationSaveTagPrefix){
+    private void playAndSave(Player player, String datapackName, ZipFile zipFile){
+        SpawnedDisplayEntityGroup createdGroup = DatapackEntitySpawned.getProjectGroup(projectName);
+        if (createdGroup == null){
+            player.sendMessage(Component.text("Failed to find model/group created from datapack!", NamedTextColor.RED));
+            player.sendMessage(Component.text("| The datapack may be a legacy one (before v1.13 of BDEngine). Try using /mdis bdengine convertanimleg", NamedTextColor.GRAY));
+            return;
+        }
 
-        final SpawnedDisplayAnimation anim = new SpawnedDisplayAnimation();
+        createdGroup.setTag(groupSaveTag.isBlank() ? datapackName.replace(".zip", "_auto") : groupSaveTag);
+        DatapackEntitySpawned.finalizeAnimationPreparation(projectName);
+        createdGroup.seedPartUUIDs(SpawnedDisplayEntityGroup.defaultPartUUIDSeed);
 
-        final int frameCount = frames.size();
+        player.sendMessage(Component.empty());
+        boolean save = !groupSaveTag.equals("-");
+
+        int delay = 0;
+        for (String animName : animations.sequencedKeySet()){
+            List<ZipEntry> frames = animations.get(animName);
+            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+                player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Converting Animation: <yellow>"+animName));
+                processAnimation(createdGroup, zipFile, frames, datapackName, animName, player);
+            }, delay);
+            delay+=(frames.size()*2);
+        }
+
+        //Despawn group after animation conversions
+        Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+            player.sendMessage(Component.empty());
+            if (save){
+                DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.LOCAL, createdGroup.toDisplayEntityGroup(), player);
+                player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Group Tag: <yellow>"+createdGroup.getTag()));
+            }
+            else{
+                player.sendMessage(Component.text("The group will not be saved due to setting the group tag to \"-\"", NamedTextColor.GRAY));
+            }
+
+            Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> createdGroup.unregister(true, true));
+        }, delay+5);
+    }
+
+
+    private void processAnimation(SpawnedDisplayEntityGroup createdGroup, ZipFile zipFile, List<ZipEntry> frames, String datapackName, String animName, Player player){
         new BukkitRunnable(){
+            final SpawnedDisplayAnimation anim = new SpawnedDisplayAnimation();
+            final int frameCount = frames.size();
             int i = 0;
             @Override
             public void run() {
@@ -188,26 +169,24 @@ public class BDEngineDPConverter {
 
                     //Save
                     Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
-                        if (animationSaveTagPrefix.isBlank()){
+                        if (animationSavePrefix.isBlank()){
                             anim.setAnimationTag(datapackName.replace(".zip", "_auto_"+animName));
                         }
                         else{
-                            anim.setAnimationTag(animationSaveTagPrefix+"_"+animName);
+                            anim.setAnimationTag(animationSavePrefix+"_"+animName);
                         }
                         boolean animationSuccess = DisplayAnimationManager.saveDisplayAnimation(LoadMethod.LOCAL, anim.toDisplayAnimation(), null);
                         anim.remove();
 
-
-
                         if (animationSuccess){
-                            player.sendMessage(MiniMessage.miniMessage().deserialize("<green>BDEngine Animation Conversion Successful! <gray>("+anim.getAnimationTag()+")"));
+                            player.sendMessage(MiniMessage.miniMessage().deserialize("<green>BDEngine Animation Converted! <gray>("+anim.getAnimationTag()+")"));
                             player.playSound(player, Sound.ENTITY_SHEEP_SHEAR, 1, 0.75f);
                         }
                         else{
                             player.sendMessage(MiniMessage.miniMessage().deserialize("<red>BDEngine Animation Conversion Failed! <gray>("+anim.getAnimationTag()+")"));
                             player.playSound(player, Sound.ENTITY_SHULKER_AMBIENT, 1, 1.5f);
                         }
-                    },1);
+                    }, 1);
                     cancel();
                     return;
                 }
@@ -222,7 +201,7 @@ public class BDEngineDPConverter {
                 anim.addFrame(frame);
                 i++;
             }
-        }.runTaskTimer(DisplayAPI.getPlugin(), 0, 2);
+        }.runTaskTimer(DisplayAPI.getPlugin(), 0, 2); //BDEngine Animation Frame Duration is 2 ticks
     }
 
 
@@ -249,7 +228,6 @@ public class BDEngineDPConverter {
 
                 //Summon Model from datapack
                 if (zipEntry.getName().endsWith(createModelPath)){
-                    String projectName = getProjectName(zipEntry.getName());
 
                     //Master Part
                     //if (line.contains("execute as @s")){
@@ -309,6 +287,4 @@ public class BDEngineDPConverter {
         }
         return commands;
     }
-
-
 }
