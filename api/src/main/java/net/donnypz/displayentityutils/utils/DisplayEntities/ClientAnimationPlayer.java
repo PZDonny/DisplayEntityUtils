@@ -299,7 +299,7 @@ final class ClientAnimationPlayer extends AnimationPlayer{
 
     private void applyDisplayTransformation(ActivePart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, ActiveGroup group, DisplayTransformation transformation, boolean applyDataOnly){
         if (applyDataOnly){
-            if (animation.allowsDataChanges()){
+            if (animation.allowsTextureChanges()){
                 transformation.applyData(part, players);
             }
             return;
@@ -338,7 +338,7 @@ final class ClientAnimationPlayer extends AnimationPlayer{
             PacketUtils.setAttributes(p, part.getEntityId(), map);
         }
 
-        if (animation.allowsDataChanges()){
+        if (animation.allowsTextureChanges()){
             transformation.applyData(part, players);
         }
     }

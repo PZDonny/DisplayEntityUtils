@@ -10,7 +10,6 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,7 +39,7 @@ public class EffSpawnedAnimTextureChanges extends Effect {
         if (animations == null) return;
         for (SpawnedDisplayAnimation a : animations){
             if (a != null){
-                a.allowDataChanges(enabled);
+                a.allowTextureChanges(enabled);
             }
         }
     }

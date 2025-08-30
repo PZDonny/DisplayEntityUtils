@@ -287,7 +287,7 @@ final class PacketAnimationPlayer extends AnimationPlayer{
 
     private void applyDisplayTransformation(ActivePart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, ActiveGroup<?> group, DisplayTransformation transformation, boolean applyDataOnly){
         if (applyDataOnly){
-            if (animation.allowsDataChanges()){
+            if (animation.allowsTextureChanges()){
                 transformation.applyData(part);
             }
             return;
@@ -324,7 +324,7 @@ final class PacketAnimationPlayer extends AnimationPlayer{
         if (!group.isActiveAnimator(animator)) return;
         part.setAttributes(map);
 
-        if (animation.allowsDataChanges()){
+        if (animation.allowsTextureChanges()){
             transformation.applyData(part);
         }
     }

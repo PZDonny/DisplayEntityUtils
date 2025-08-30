@@ -23,8 +23,8 @@ class AnimDataChangesCMD extends PlayerSubCommand {
             return;
         }
 
-        boolean dataChanges = !anim.allowsDataChanges();
-        anim.allowDataChanges(dataChanges);
+        boolean dataChanges = !anim.allowsTextureChanges();
+        anim.allowTextureChanges(dataChanges);
         player.sendMessage(Component.text("Animation Data Changes toggled to: ", NamedTextColor.GREEN).append(Component.text(dataChanges, NamedTextColor.YELLOW)));
         player.sendMessage(Component.text("| Data Changes Apply to:", NamedTextColor.GRAY));
         player.sendMessage(Component.text("- Block Display block changes", NamedTextColor.GRAY));

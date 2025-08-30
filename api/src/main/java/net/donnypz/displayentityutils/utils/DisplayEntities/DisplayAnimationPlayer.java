@@ -280,7 +280,7 @@ final class DisplayAnimationPlayer extends AnimationPlayer{
             return;
         }
         if (applyDataOnly){
-            if (animation.allowsDataChanges()){
+            if (animation.allowsTextureChanges()){
                 transformation.applyData(display);
             }
             return;
@@ -314,7 +314,7 @@ final class DisplayAnimationPlayer extends AnimationPlayer{
             display.setTransformation(offsetTransformation);
         }
 
-        if (animation.allowsDataChanges()){
+        if (animation.allowsTextureChanges()){
             transformation.applyData(display);
         }
     }
