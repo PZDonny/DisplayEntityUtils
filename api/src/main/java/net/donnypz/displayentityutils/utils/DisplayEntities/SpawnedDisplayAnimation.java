@@ -39,7 +39,7 @@ public final class SpawnedDisplayAnimation{
     }
 
     /**
-     * Get if this animation allows for data changes (texture changes to block/item displays, text display text and interaction size)
+     * Get if this animation allows for texture changes to block/item displays, text display text
      * @return a boolean
      */
     public boolean allowsTextureChanges(){

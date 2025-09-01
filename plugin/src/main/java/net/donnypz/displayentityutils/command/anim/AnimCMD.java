@@ -37,7 +37,7 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
         new AnimAddParticleCMD(this);
         new AnimReverseCMD(this);
         new AnimScaleRespectCMD(this);
-        new AnimDataChangesCMD(this);
+        new AnimTextureChangesCMD(this);
         new AnimSetTagCMD(this);
         new AnimSetFrameTagCMD(this);
         new AnimPreviewPlayCMD(this);
@@ -104,7 +104,7 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis anim addparticle", "Add a particle to play at a frame point");
             CMDUtils.sendCMD(sender, "/mdis anim reverse", "Reverse the order of frames in your selected animation");
             CMDUtils.sendCMD(sender, "/mdis anim togglescalerespect", "Toggle whether your selected animation should respect the group's scale");
-            CMDUtils.sendCMD(sender, "/mdis anim toggledatachanges", "Toggle whether your selected animation can change block display blocks, item display items, and text display text");
+            CMDUtils.sendCMD(sender, "/mdis anim toggletexturechanges", "Toggle whether your selected animation can change block display blocks, item display items, and text display text");
             CMDUtils.sendCMD(sender, "/mdis anim showframe <frame-id>", "Displays a frame on your selected group");
         }
         else{
