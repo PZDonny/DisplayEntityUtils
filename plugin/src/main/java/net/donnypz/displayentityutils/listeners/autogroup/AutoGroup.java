@@ -1,8 +1,6 @@
 package net.donnypz.displayentityutils.listeners.autogroup;
 
-import com.google.gson.Gson;
 import net.donnypz.displayentityutils.DisplayConfig;
-import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.events.ChunkAddGroupInteractionsEvent;
 import net.donnypz.displayentityutils.events.ChunkRegisterGroupEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
@@ -27,7 +25,6 @@ final class AutoGroup {
     private AutoGroup(){}
 
     static final HashMap<String, ArrayList<Long>> readChunks = new HashMap<>();
-    private static final Gson gson = new Gson();
 
     private static void refreshGroupPartEntities(List<Entity> entities){
         for (Entity e : entities){

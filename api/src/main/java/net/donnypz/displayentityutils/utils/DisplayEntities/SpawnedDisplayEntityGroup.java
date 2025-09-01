@@ -52,7 +52,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * @apiNote This should NEVER have to be called! Only do so if you truly know what you're doing
      */
     @ApiStatus.Internal
-    public SpawnedDisplayEntityGroup(Display masterDisplay){
+    public SpawnedDisplayEntityGroup(@NotNull Display masterDisplay){
         this.isVisibleByDefault = masterDisplay.isVisibleByDefault();
         PersistentDataContainer c = masterDisplay.getPersistentDataContainer();
         if (c.has(creationTimeKey)){
@@ -64,6 +64,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (c.has(persistenceOverrideKey)) {
             persistenceOverride = c.get(persistenceOverrideKey, PersistentDataType.BOOLEAN);
         }
+        setSpawnAnimation(c);
+
 
         //String tag1;
         /*for (String tag: masterDisplay.getScoreboardTags()){

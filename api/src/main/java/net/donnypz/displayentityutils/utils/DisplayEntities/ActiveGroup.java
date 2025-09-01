@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
@@ -14,6 +15,8 @@ import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -738,6 +741,23 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         this.spawnAnimationTag = animationTag;
         this.spawnAnimationLoadMethod = loadMethod;
         this.spawnAnimationType = animationType;
+    }
+
+    void setSpawnAnimation(PersistentDataContainer pdc){
+        if (pdc.has(DisplayAPI.getSpawnAnimationKey())){
+            spawnAnimationTag = pdc.get(DisplayAPI.getSpawnAnimationKey(), PersistentDataType.STRING);
+        }
+        if (pdc.has(DisplayAPI.getSpawnAnimationTypeKey())){
+            try{
+                spawnAnimationType = DisplayAnimator.AnimationType.valueOf(pdc.get(DisplayAPI.getSpawnAnimationTypeKey(), PersistentDataType.STRING));
+            }
+            catch(IllegalArgumentException e){
+                spawnAnimationType = DisplayAnimator.AnimationType.LOOP;
+            }
+        }
+        if (pdc.has(DisplayAPI.getSpawnAnimationKey())){
+            spawnAnimationLoadMethod = LoadMethod.valueOf(pdc.get(DisplayAPI.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING));
+        }
     }
 
     /**
