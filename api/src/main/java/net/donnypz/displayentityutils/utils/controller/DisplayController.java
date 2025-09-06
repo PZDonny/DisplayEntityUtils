@@ -33,7 +33,7 @@ import java.util.*;
 
 public class DisplayController {
     private static final HashMap<String, DisplayController> controllers = new HashMap<>();//Controller ID, Controller
-    private static final HashMap<DisplayController, String> grouplessControllers = new HashMap<>();
+    static final HashMap<DisplayController, String> grouplessControllers = new HashMap<>();
 
     String controllerID;
 
@@ -80,12 +80,6 @@ public class DisplayController {
         }
     }
 
-    @ApiStatus.Internal
-    public void setConfigController(){
-        this.configController = true;
-    }
-
-
     /**
      * Check if this controller was created from the plugin's "displaycontrollers" folder
      * @return a boolean
@@ -94,32 +88,11 @@ public class DisplayController {
         return configController;
     }
 
-    @ApiStatus.Internal
-    public void markNullLoader(String groupTag){
-        if (group == null){
-            grouplessControllers.put(this, groupTag);
-        }
-    }
-
     boolean isMarkedNull(){
         return grouplessControllers.containsKey(this);
     }
 
     @ApiStatus.Internal
-    public static void registerNullLoaderControllers(){
-        for (Map.Entry<DisplayController, String> entry : grouplessControllers.entrySet()){
-            DisplayController controller = entry.getKey();
-            String groupTag = entry.getValue();
-            NullGroupLoaderEvent e = new NullGroupLoaderEvent(controller, groupTag);
-            e.callEvent();
-            DisplayEntityGroup group = e.getGroup();
-            if (group != null){
-                controller.group = group;
-                controller.register();
-            }
-        }
-    }
-
     /**
      * Set the {@link DisplayEntityGroup} this controller should use
      * @param group
@@ -423,8 +396,6 @@ public class DisplayController {
         }
         InputStreamReader reader = new InputStreamReader(controllerStream);
         return read(YamlConfiguration.loadConfiguration(reader), resourcePath+" | FROM RESOURCES ("+plugin.getName()+")", false);
-
-
     }
 
     /**
@@ -447,7 +418,9 @@ public class DisplayController {
 
             DisplayController controller;
             controller = controllers.getOrDefault(controllerID, new DisplayController(controllerID));
-            if (fromFile) controller.setConfigController();
+            if (fromFile){
+                controller.configController = true;
+            }
 
             //Set Mythic Mobs
             ConfigurationSection mythicSect = config.getConfigurationSection("mythicMobs");
@@ -476,8 +449,11 @@ public class DisplayController {
                 LoadMethod method = LoadMethod.valueOf(createdGroupSect.getString("storage").toUpperCase());
                 controller.setDisplayEntityGroup(groupTag, method);
             }
+            //Mark Null Loader
             catch(IllegalArgumentException e){ //Set with API Event
-                controller.markNullLoader(groupTag);
+                if (controller.group == null){
+                    grouplessControllers.put(controller, groupTag);
+                }
             }
 
 
@@ -668,5 +644,4 @@ public class DisplayController {
             }
         }
     }
-
 }

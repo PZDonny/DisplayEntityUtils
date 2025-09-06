@@ -22,7 +22,7 @@ import net.donnypz.displayentityutils.managers.PluginFolders;
 import net.donnypz.displayentityutils.skript.SkriptTypes;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
-import net.donnypz.displayentityutils.utils.controller.DisplayController;
+import net.donnypz.displayentityutils.utils.controller.DisplayControllerUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bstats.bukkit.Metrics;
@@ -182,6 +182,6 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
             return;
         }
         MachineState.registerNullLoaderStates();
-        DisplayController.registerNullLoaderControllers();
+        DisplayControllerUtils.registerNullLoaderControllers();
     }
 }
