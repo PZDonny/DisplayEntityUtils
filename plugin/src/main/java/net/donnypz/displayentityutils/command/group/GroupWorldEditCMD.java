@@ -1,13 +1,12 @@
 package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.WorldUtils;
+import net.donnypz.displayentityutils.utils.WorldEditUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -27,7 +26,7 @@ class GroupWorldEditCMD extends PlayerSubCommand {
         }
 
         boolean removeBlocks = args.length >= 3 && args[2].equals("-remove");
-        SpawnedDisplayEntityGroup g = WorldUtils.createGroupFromWorldEditSelection(player, removeBlocks);
+        SpawnedDisplayEntityGroup g = WorldEditUtils.createGroupFromSelection(player, removeBlocks);
         if (g == null){
             player.sendMessage(Component.text("Failed to convert WorldEdit selection to a spawned group! Ensure that:", NamedTextColor.RED));
             player.sendMessage(Component.text("- Your selection is valid", NamedTextColor.GRAY));
