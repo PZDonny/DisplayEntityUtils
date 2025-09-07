@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
-public final class SinglePartSelection extends PartSelection<SpawnedDisplayEntityPart> implements ServerSideSelection{
+public final class SinglePartSelection extends PartSelection<SpawnedDisplayEntityPart> implements ServerSideSelection {
 
     @ApiStatus.Internal
     public SinglePartSelection(@NotNull SpawnedDisplayEntityPart part){

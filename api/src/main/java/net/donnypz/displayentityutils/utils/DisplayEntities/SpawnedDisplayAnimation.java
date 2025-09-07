@@ -64,7 +64,7 @@ public final class SpawnedDisplayAnimation{
      * @return this
      */
     public SpawnedDisplayAnimation setFilter(@NotNull SpawnedDisplayEntityGroup group, @NotNull PartFilter filter, boolean trim){
-        SpawnedPartSelection sel = new SpawnedPartSelection(group, filter);
+        SpawnedPartSelection sel = group.createPartSelection(filter);
         return setFilter(sel, filter, trim);
     }
 

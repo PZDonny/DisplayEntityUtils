@@ -153,7 +153,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      */
     @Override
     public @NotNull PacketPartSelection createPartSelection() {
-        return new PacketPartSelection(this);
+        return createPartSelection(new PartFilter());
     }
 
     /**

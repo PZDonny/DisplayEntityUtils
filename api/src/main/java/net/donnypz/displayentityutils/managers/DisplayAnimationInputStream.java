@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.managers;
 
-import net.donnypz.displayentityutils.utils.OldSound;
+import net.donnypz.displayentityutils.utils.DisplayEntities.saved.OldSound;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,6 +1,5 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.AnimationStartEvent;
 import net.donnypz.displayentityutils.events.PacketAnimationStartEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;

@@ -846,7 +846,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     @Override
     public @NotNull SpawnedPartSelection createPartSelection() {
-        return new SpawnedPartSelection(this);
+        return createPartSelection(new PartFilter());
     }
 
     /**
@@ -855,7 +855,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     @Override
     public @NotNull SpawnedPartSelection createPartSelection(@NotNull PartFilter partFilter) {
-        return new SpawnedPartSelection(this, partFilter);
+        SpawnedPartSelection sel = new SpawnedPartSelection(this, partFilter);
+        partSelections.add(sel);
+        return sel;
     }
 
     /**
