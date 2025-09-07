@@ -13,12 +13,12 @@ import java.util.Collection;
 
 abstract class PacketAnimationEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
-    ActiveGroup activeGroup;
+    ActiveGroup<?> activeGroup;
     DisplayAnimator animator;
     SpawnedDisplayAnimation animation;
     Collection<Player> players;
 
-    PacketAnimationEvent(ActiveGroup activeGroup, DisplayAnimator animator, SpawnedDisplayAnimation animation, Collection<Player> players){
+    PacketAnimationEvent(ActiveGroup<?> activeGroup, DisplayAnimator animator, SpawnedDisplayAnimation animation, Collection<Player> players){
         super(!Bukkit.isPrimaryThread());
         this.activeGroup = activeGroup;
         this.animator = animator;
@@ -30,7 +30,7 @@ abstract class PacketAnimationEvent extends Event {
      * Get the {@link ActiveGroup} involved in this event
      * @return a group
      */
-    public ActiveGroup getGroup() {
+    public ActiveGroup<?> getGroup() {
         return activeGroup;
     }
 

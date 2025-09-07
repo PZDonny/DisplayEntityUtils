@@ -29,24 +29,22 @@ import org.jetbrains.annotations.Nullable;
 public class EffSpawnedGroupSetFrame extends Effect {
     static {
         Skript.registerEffect(EffSpawnedGroupSetFrame.class,"(play|apply|show) frame with id %number% on %activegroup% (with|from) [anim[ation]] %spawnedanimation% " +
-                "[d:[and] with duration %-timespan% and delay %-timespan%] [:async[hronously]] [f:for %-players%]");
+                "[d:[and] with duration %-timespan% and delay %-timespan%] [f:for %-players%]");
 
     }
 
     Expression<Number> frameID;
-    Expression<ActiveGroup> group;
+    Expression<ActiveGroup<?>> group;
     Expression<SpawnedDisplayAnimation> animation;
     Expression<Timespan> duration;
     Expression<Timespan> delay;
     Expression<Player> players;
-    boolean async;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         frameID = (Expression<Number>) expressions[0];
-        group = (Expression<ActiveGroup>) expressions[1];
+        group = (Expression<ActiveGroup<?>>) expressions[1];
         animation = (Expression<SpawnedDisplayAnimation>) expressions[2];
-        async = parseResult.hasTag("async");
         if (parseResult.hasTag("d")){
             duration = (Expression<Timespan>) expressions[3];
             delay = (Expression<Timespan>) expressions[4];
@@ -60,7 +58,7 @@ public class EffSpawnedGroupSetFrame extends Effect {
     @Override
     protected void execute(Event event) {
         Number n = frameID.getSingle(event);
-        ActiveGroup g = group.getSingle(event);
+        ActiveGroup<?> g = group.getSingle(event);
         SpawnedDisplayAnimation a = animation.getSingle(event);
         Player[] plrs = players == null ? null : players.getAll(event);
         if (n == null || g == null || a == null){
@@ -76,7 +74,7 @@ public class EffSpawnedGroupSetFrame extends Effect {
                 }
                 else{
                     if (g instanceof SpawnedDisplayEntityGroup sg){
-                        sg.setToFrame(a, frameId, async);
+                        sg.setToFrame(a, frameId);
                     }
                     else if (g instanceof PacketDisplayEntityGroup pg) {
                         pg.setToFrame(a, frameId);
@@ -95,7 +93,7 @@ public class EffSpawnedGroupSetFrame extends Effect {
                     }
                     else{
                         if (g instanceof SpawnedDisplayEntityGroup sg){
-                            sg.setToFrame(a, frameId, async);
+                            sg.setToFrame(a, frameId);
                         }
                         else if (g instanceof PacketDisplayEntityGroup pg) {
                             pg.setToFrame(a, frameId);
@@ -111,7 +109,7 @@ public class EffSpawnedGroupSetFrame extends Effect {
                     }
                     else{
                         if (g instanceof SpawnedDisplayEntityGroup sg){
-                            sg.setToFrame(a, frameId, (int) dur.getAs(Timespan.TimePeriod.TICK), (int) del.getAs(Timespan.TimePeriod.TICK), async);
+                            sg.setToFrame(a, frameId, (int) dur.getAs(Timespan.TimePeriod.TICK), (int) del.getAs(Timespan.TimePeriod.TICK));
                         }
                         else if (g instanceof PacketDisplayEntityGroup pg) {
                             pg.setToFrame(a, frameId, (int) dur.getAs(Timespan.TimePeriod.TICK), (int) del.getAs(Timespan.TimePeriod.TICK));

@@ -29,7 +29,6 @@ public final class DisplayConfig {
     static float heightCullingAdder;
     static boolean cacheAnimations;
     static int cacheAnimationExpiration;
-    static boolean asynchronousAnimations;
     static boolean registerPluginCommands;
 
 
@@ -186,14 +185,6 @@ public final class DisplayConfig {
      */
     public static int cacheAnimationExpiration() {
         return cacheAnimationExpiration;
-    }
-
-    /**
-     * Gets the value of "asynchronousAnimations" in the config
-     * @return the boolean value set in config
-     */
-    public static boolean asynchronousAnimations() {
-        return asynchronousAnimations;
     }
 
     /**
