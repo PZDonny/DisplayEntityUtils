@@ -282,12 +282,13 @@ abstract class AnimationPlayer {
         boolean applyDataOnly;
         if (!packetAnimationPlayer){
             applyDataOnly = transformation.isSimilar(part.getDisplayTransformation());
+            applyDisplayTransformation(part, frame, animation, group, transformation, applyDataOnly);
         }
         else{
             DisplayTransformation last = prevFrame != null ? prevFrame.displayTransformations.get(part.getPartUUID()) : null;
             applyDataOnly = last != null && transformation.isSimilar(last);
+            applyDisplayTransformationWithPackets(players, part, frame, animation, group, transformation, applyDataOnly);
         }
-        applyDisplayTransformation(part, frame, animation, group, transformation, applyDataOnly);
     }
 
 
