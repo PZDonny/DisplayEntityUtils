@@ -237,7 +237,7 @@ public class DEUUser {
         }
 
         World w = player.getWorld();
-        for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(w, WorldUtils.getChunkKey(x, z))){
+        for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(w, ConversionUtils.getChunkKey(x, z))){
             if (!pg.isAutoShow() || pg.isRiding()) continue;
 
             Predicate<Player> condition = pg.getAutoShowCondition();
