@@ -54,7 +54,7 @@ public class DEUPlayerPacketListener implements PacketListener {
         DEUUser deuUser = DEUUser.getOrCreateUser(uuid);
         for (EntityData<?> data : packet.getEntityMetadata()){
             if (data.getValue() instanceof Vector3f v) {
-                if (part.isAnimatingForPlayer(Bukkit.getPlayer(uuid)) && deuUser.unsuppressIfEqual(entityId, new org.joml.Vector3f(v.x, v.y, v.z))){
+                if (deuUser.unsuppressIfEqual(entityId, new org.joml.Vector3f(v.x, v.y, v.z)) && part.isAnimatingForPlayer(Bukkit.getPlayer(uuid))){
                     event.setCancelled(true);
                     return;
                 }
