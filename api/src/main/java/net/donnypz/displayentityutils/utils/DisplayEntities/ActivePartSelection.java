@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-public abstract class PartSelection<T extends ActivePart> implements Active{
+public abstract class ActivePartSelection<T extends ActivePart> implements Active{
 
     protected T selectedPart = null;
 
