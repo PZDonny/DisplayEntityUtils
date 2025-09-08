@@ -516,58 +516,41 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return masterPart.getLocation();
     }
 
-
-    /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
-     * @param animation the animation the frame is from
-     * @param startFrameId the id of the frame to display
-     */
-    public void setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId) {
-        setToFrame(animation, animation.getFrame(startFrameId));
-    }
-
     /**
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
      * @param animation the animation the frame is from
      * @param frame the frame to display
      */
+    @Override
     public void setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
-        PacketAnimationPlayer.setGroupToFrame(this, animation, frame);
+        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
+        DisplayAPI.getAnimationPlayerService().playWithPackets(animator, animation, this, frame, -1, 0, true);
     }
 
-    /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}  on this group
-     * @param animation the animation the frame is from
-     * @param startFrameId the id of the frame to display
-     * @param duration how long the frame should play
-     * @param delay how long until the frame should start playing
-     */
-    public void setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId, int duration, int delay) {
-        setToFrame(animation, animation.getFrame(startFrameId), duration, delay);
-    }
 
-    /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}  on this group
-     * @param animation the animation the frame is from
-     * @param frame the frame to display
-     * @param duration how long the frame should play
-     * @param delay how long until the frame should start playing
-     */
+    @Override
     public void setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
-        PacketAnimationPlayer.setGroupToFrame(this, animation, frame, duration, delay);
+        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
+        SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
+        clonedFrame.duration = duration;
+        DisplayAPI.getAnimationPlayerService().playWithPackets(animator, animation, this, clonedFrame, -1, delay, true);
     }
 
     @Override
     public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
         if (masterPart.isTrackedBy(player)){
-            ClientAnimationPlayer.setGroupToFrame(player, this, animation, frame);
+            DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
+            DisplayAPI.getAnimationPlayerService().playForClient(Set.of(player), animator, animation, this, frame, -1, 0, true);
         }
     }
 
     @Override
     public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
         if (masterPart.isTrackedBy(player)){
-            ClientAnimationPlayer.setGroupToFrame(player, this, animation, frame, duration, delay);
+            DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
+            SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
+            clonedFrame.duration = duration;
+            DisplayAPI.getAnimationPlayerService().playForClient(Set.of(player), animator, animation, this, clonedFrame, -1, delay, true);
         }
     }
 
@@ -718,6 +701,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     void setPassengers(Player player){
+        if (passengerIds == null) return;
         int masterId = masterPart.getEntityId();
         WrapperPlayServerSetPassengers passengerPacket = new WrapperPlayServerSetPassengers(masterId, passengerIds);
         PacketEvents.getAPI().getPlayerManager().sendPacketSilently(player, passengerPacket);

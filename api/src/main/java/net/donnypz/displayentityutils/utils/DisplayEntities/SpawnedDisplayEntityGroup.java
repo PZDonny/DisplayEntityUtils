@@ -1185,37 +1185,15 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     /**
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
      * @param animation the animation the frame is from
-     * @param startFrameId the id of the frame to display
-     * @return false if this group is in an unloaded chunk
-     */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId) {
-        return setToFrame(animation, animation.getFrame(startFrameId));
-    }
-
-    /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
-     * @param animation the animation the frame is from
      * @param frame the frame to display
-     * @return false if this group is in an unloaded chunk
      */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
+    @Override
+    public void setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
         if (!isInLoadedChunk()){
-            return false;
+            return;
         }
-        DisplayAnimationPlayer.setGroupToFrame(this, animation, frame);
-        return true;
-    }
-
-    /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
-     * @param animation the animation the frame is from
-     * @param startFrameId the id of the frame to display
-     * @param duration how long the frame should play
-     * @param delay how long until the frame should start playing
-     * @return false if this group is in an unloaded chunk
-     */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId, int duration, int delay) {
-        return setToFrame(animation, animation.getFrame(startFrameId), duration, delay);
+        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
+        DisplayAPI.getAnimationPlayerService().play(animator, animation, this, frame, -1, 0, true);
     }
 
     /**
@@ -1224,14 +1202,16 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * @param frame the frame to display
      * @param duration how long the frame should play
      * @param delay how long until the frame should start playing
-     * @return false if this group is in an unloaded chunk
      */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
+    @Override
+    public void setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
         if (!isInLoadedChunk()){
-            return false;
+            return;
         }
-        DisplayAnimationPlayer.setGroupToFrame(this, animation, frame, duration, delay);
-        return true;
+        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
+        SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
+        clonedFrame.duration = duration;
+        DisplayAPI.getAnimationPlayerService().play(animator, animation, this, clonedFrame, -1, delay, true);
     }
 
 
@@ -1239,14 +1219,18 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     @Override
     public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
         if (isInLoadedChunk()){
-            ClientAnimationPlayer.setGroupToFrame(player, this, animation, frame);
+            DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
+            DisplayAPI.getAnimationPlayerService().playForClient(Set.of(player), animator, animation, this, frame, -1, 0, true);
         }
     }
 
     @Override
     public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
         if (isInLoadedChunk()){
-            ClientAnimationPlayer.setGroupToFrame(player, this, animation, frame, duration, delay);
+            DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
+            SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
+            clonedFrame.duration = duration;
+            DisplayAPI.getAnimationPlayerService().playForClient(Set.of(player), animator, animation, this, clonedFrame, -1, delay, true);
         }
     }
 

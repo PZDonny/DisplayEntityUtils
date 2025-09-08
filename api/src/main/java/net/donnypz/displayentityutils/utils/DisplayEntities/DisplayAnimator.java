@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.AnimationStartEvent;
 import net.donnypz.displayentityutils.events.PacketAnimationStartEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
@@ -92,7 +93,7 @@ public class DisplayAnimator {
 
         SpawnedDisplayAnimationFrame frame = animation.frames.get(startFrameId);
         int delay = frame.delay;
-        new DisplayAnimationPlayer(this, animation, group, frame, startFrameId, delay, false);
+        DisplayAPI.getAnimationPlayerService().play(this, animation, group, frame, startFrameId, delay, false);
         return true;
     }
 
@@ -110,7 +111,7 @@ public class DisplayAnimator {
         }
         SpawnedDisplayAnimationFrame frame = animation.frames.get(startFrameId);
         int delay = frame.delay;
-        new PacketAnimationPlayer(this, animation, group, frame, startFrameId, delay, false);
+        DisplayAPI.getAnimationPlayerService().playWithPackets(this, animation, group, frame, startFrameId, delay, false);
         return true;
     }
 
@@ -143,7 +144,7 @@ public class DisplayAnimator {
         SpawnedDisplayAnimationFrame frame = animation.frames.get(startFrameId);
         int delay = frame.delay;
         addPlayers(players, group);
-        new ClientAnimationPlayer(players, this, animation, group, frame, startFrameId, delay, false);
+        DisplayAPI.getAnimationPlayerService().playForClient(players, this, animation, group, frame, startFrameId, delay, false);
         return true;
     }
 

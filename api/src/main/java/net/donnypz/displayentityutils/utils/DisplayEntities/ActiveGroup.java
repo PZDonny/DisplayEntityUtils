@@ -453,6 +453,22 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * @param animation the animation the frame is from
+     * @param startFrameId the id of the frame to display
+     */
+    public void setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId) {
+        setToFrame(animation, animation.getFrame(startFrameId));
+    }
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * @param animation the animation the frame is from
+     * @param frame the frame to display
+     */
+    public abstract void setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame);
+
+    /**
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group for a player
      * @param player the player
      * @param animation the animation the frame is from
@@ -474,7 +490,6 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         setToFrame(player, animation, animation.getFrame(startFrameId), duration, delay);
     }
 
-
     /**
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group for a player
      * @param player the player
@@ -482,6 +497,26 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param frame the frame to display
      */
     public abstract void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame);
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}  on this group
+     * @param animation the animation the frame is from
+     * @param startFrameId the id of the frame to display
+     * @param duration how long the frame should play
+     * @param delay how long until the frame should start playing
+     */
+    public void setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId, int duration, int delay) {
+        setToFrame(animation, animation.getFrame(startFrameId), duration, delay);
+    }
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * @param animation the animation the frame is from
+     * @param frame the frame to display
+     * @param duration how long the frame should play
+     * @param delay how long until the frame should start playing
+     */
+    public abstract void setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay);
 
     /**
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group for a player

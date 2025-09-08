@@ -20,6 +20,7 @@ import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
 import net.donnypz.displayentityutils.managers.PluginFolders;
 import net.donnypz.displayentityutils.skript.SkriptTypes;
+import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationPlayerProviderImpl;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerUtils;
@@ -57,6 +58,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         DisplayAPI.LOCAL_STORAGE = new LocalManager();
         DisplayAPI.MONGODB_STORAGE = new MongoManager();
         DisplayAPI.MYSQL_STORAGE = new MYSQLManager();
+        DisplayAPI.ANIMATION_PLAYER_SERVICE = new AnimationPlayerProviderImpl();
 
         getConfig().options().copyDefaults(true);
         reloadPlugin(true);

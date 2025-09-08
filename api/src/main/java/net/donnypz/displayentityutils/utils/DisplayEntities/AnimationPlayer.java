@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 
-abstract class AnimationPlayer {
+public abstract class AnimationPlayer {
     final DisplayAnimator animator;
     private SpawnedDisplayAnimationFrame prevFrame;
     protected final boolean playSingleFrame;
@@ -485,4 +485,32 @@ abstract class AnimationPlayer {
     protected abstract void handleAnimationInterrupted(ActiveGroup<?> group, MultiPartSelection<?> selection);
 
     protected abstract void handleAnimationComplete(ActiveGroup<?> group, MultiPartSelection<?> selection);
+
+    public interface AnimationPlayerProvider {
+
+        AnimationPlayer play(@NotNull DisplayAnimator animator,
+                             @NotNull SpawnedDisplayAnimation animation,
+                             @NotNull SpawnedDisplayEntityGroup group,
+                             @NotNull SpawnedDisplayAnimationFrame frame,
+                             int startFrameId,
+                             int delay,
+                             boolean playSingleFrame);
+
+        AnimationPlayer playWithPackets(@NotNull DisplayAnimator animator,
+                                        @NotNull SpawnedDisplayAnimation animation,
+                                        @NotNull ActiveGroup<?> group,
+                                        @NotNull SpawnedDisplayAnimationFrame frame,
+                                        int startFrameId,
+                                        int delay,
+                                        boolean playSingleFrame);
+
+        AnimationPlayer playForClient(@NotNull Collection<Player> players,
+                                      @NotNull DisplayAnimator animator,
+                                      @NotNull SpawnedDisplayAnimation animation,
+                                      @NotNull ActiveGroup<?> group,
+                                      @NotNull SpawnedDisplayAnimationFrame frame,
+                                      int startFrameId,
+                                      int delay,
+                                      boolean playSingleFrame);
+    }
 }
