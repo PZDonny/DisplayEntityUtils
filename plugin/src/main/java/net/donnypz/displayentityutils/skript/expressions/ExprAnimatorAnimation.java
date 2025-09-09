@@ -9,7 +9,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Spawned Animation of Display Animator")
+@Name("Animation of Display Animator")
 @Description("Get the animation set for a display animator.")
 @Examples({"set {_animation} to {_displayanimator}'s animation"})
 @Since("3.3.1")

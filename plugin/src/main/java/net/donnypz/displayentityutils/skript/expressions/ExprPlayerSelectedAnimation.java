@@ -13,22 +13,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Player's Selected Spawned Animation")
-@Description("Get/Set the selected spawned animation of a player")
+@Name("Player's Selected Animation")
+@Description("Get/Set the selected animation of a player")
 @Examples({
         "#Get selected animation",
-        "set {_spawnedanim} to player's selected spawned animation",
+        "set {_spawnedanim} to player's selected animation",
         "",
         "#Set selected animation",
         "set player's selected anim to {_spawnedanim}",
         "",
         "#Reset animation selection",
-        "reset player's selected spawned animation"
+        "reset player's selected animation"
         })
 @Since("2.6.3")
 public class ExprPlayerSelectedAnimation extends SimplePropertyExpression<Player, SpawnedDisplayAnimation> {
     static {
-        register(ExprPlayerSelectedAnimation.class, SpawnedDisplayAnimation.class, "[the] selected [spawned[ |-]]anim[ation]", "player");
+        register(ExprPlayerSelectedAnimation.class, SpawnedDisplayAnimation.class, "[the] selected anim[ation]", "player");
     }
 
     @Override
@@ -47,7 +47,7 @@ public class ExprPlayerSelectedAnimation extends SimplePropertyExpression<Player
 
     @Override
     protected String getPropertyName() {
-        return "selected spawnedanimation";
+        return "selected animation";
     }
 
     @Override

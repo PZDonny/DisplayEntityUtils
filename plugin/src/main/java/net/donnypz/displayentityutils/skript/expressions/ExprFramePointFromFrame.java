@@ -17,12 +17,12 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Frame Point with tag from Animation Frame")
 @Description("Get a Frame Point with a given tag from an Animation Frame")
-@Examples({"set {_framepoint} to point with tag \"myframepoint\" from {_spawnedanimationframe}"})
+@Examples({"set {_framepoint} to point with tag \"myframepoint\" from {_animationframe}"})
 @Since("3.2.1")
 public class ExprFramePointFromFrame extends SimpleExpression<FramePoint> {
 
     static{
-        Skript.registerExpression(ExprFramePointFromFrame.class, FramePoint.class, ExpressionType.COMBINED, "[frame[ |-]]point with tag %string% from %spawnedanimationframe%");
+        Skript.registerExpression(ExprFramePointFromFrame.class, FramePoint.class, ExpressionType.COMBINED, "[frame[ |-]]point with tag %string% from %animationframe%");
     }
 
     Expression<SpawnedDisplayAnimationFrame> frame;

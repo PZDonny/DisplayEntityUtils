@@ -16,15 +16,15 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Saved Animation from Cache")
-@Description("Get a spawned animation that has been cached")
-@Examples({"set {_spawnedanim} to cached spawned anim tagged \"myanimation\"",
-            "set {_spawnedanim} to cached spawned anim tagged \"myotheranim\" or fallback with local storage"})
+@Name("Animation from Cache")
+@Description("Get an animation that has been cached")
+@Examples({"set {_anim} to cached anim tagged \"myanimation\"",
+            "set {_anim} to cached anim tagged \"myotheranim\" or fallback with local storage"})
 @Since("2.6.2")
-public class ExprSpawnedAnimFromCache extends SimpleExpression<SpawnedDisplayAnimation> {
+public class ExprAnimationFromCache extends SimpleExpression<SpawnedDisplayAnimation> {
 
     static{
-        Skript.registerExpression(ExprSpawnedAnimFromCache.class, SpawnedDisplayAnimation.class, ExpressionType.SIMPLE, "cached spawned[ |-]anim[ation] [tagged] %string% [o:or [fallback] (with|from) (1¦local|2¦mysql|3¦mongo[db]) [storage]]");
+        Skript.registerExpression(ExprAnimationFromCache.class, SpawnedDisplayAnimation.class, ExpressionType.SIMPLE, "cached anim[ation] [tagged] %string% [o:or [fallback] (with|from) (1¦local|2¦mysql|3¦mongo[db]) [storage]]");
     }
 
     Expression<String> tag;
@@ -63,7 +63,7 @@ public class ExprSpawnedAnimFromCache extends SimpleExpression<SpawnedDisplayAni
     @Override
     public String toString(@Nullable Event event, boolean debug) {
 
-        return "cached spawned animation, tagged: "+tag.toString(event, debug);
+        return "cached animation, tagged: "+tag.toString(event, debug);
     }
 
     @Override

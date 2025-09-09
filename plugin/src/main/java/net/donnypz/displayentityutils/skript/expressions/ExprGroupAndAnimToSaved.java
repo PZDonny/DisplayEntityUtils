@@ -14,17 +14,15 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Active Group or Animation to Saved")
-@Description("Get a saved group/animation from a active group or animation")
+@Name("Active Group to Saved")
+@Description("Get a saved group from a active group")
 @Examples({"set {_savedgroup} to {_spawnedgroup} as saved group",
-        "set {_savedanim} to {_spawnedanim} as saved animation",
-        "#3.3.1",
-        "set {_savedgroup} to {_packetgroup} as saved group"})
-@Since("2.6.2")
+            "set {_savedgroup} to {_packetgroup} as saved group"})
+@Since("3.3.1")
 public class ExprGroupAndAnimToSaved extends SimpleExpression<Object> {
 
     static{
-        Skript.registerExpression(ExprGroupAndAnimToSaved.class, Object.class, ExpressionType.SIMPLE, "%spawnedgroup/packetgroup/spawnedanimation% as saved[ |-](group|anim[ation])");
+        Skript.registerExpression(ExprGroupAndAnimToSaved.class, Object.class, ExpressionType.SIMPLE, "%spawnedgroup/packetgroup% as saved[ |-]group");
     }
 
     Expression<?> object;
@@ -34,10 +32,6 @@ public class ExprGroupAndAnimToSaved extends SimpleExpression<Object> {
         Object o = object.getSingle(event);
         if (o instanceof ActiveGroup<?> ag){
             return new DisplayEntityGroup[]{ag.toDisplayEntityGroup()};
-        }
-        if (o instanceof SpawnedDisplayAnimation anim){
-            DisplayAnimation a = anim.toDisplayAnimation();
-            return new DisplayAnimation[]{a};
         }
         return null;
     }

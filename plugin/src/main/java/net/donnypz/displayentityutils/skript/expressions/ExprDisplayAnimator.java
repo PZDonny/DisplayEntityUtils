@@ -16,14 +16,14 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Create Display Animator")
-@Description("Create a display animator to play an spawned animations on an active group")
-@Examples({"set {_animator} to a new linear display animator using {_spawnedanimation}",
-        "set {_loopanim} to a loop animator using {_spawnedanimation}"})
+@Description("Create a display animator to play animations on an active group")
+@Examples({"set {_animator} to a new linear display animator using {_animation}",
+        "set {_loopanimator} to a loop animator using {_animation}"})
 @Since("2.6.2")
 public class ExprDisplayAnimator extends SimpleExpression<DisplayAnimator> {
 
     static{
-        Skript.registerExpression(ExprDisplayAnimator.class, DisplayAnimator.class, ExpressionType.SIMPLE, "[a] [new] (linear|loop:loop[ing]) [display] animator using [spawned] [anim[ation]] %spawnedanimation%");
+        Skript.registerExpression(ExprDisplayAnimator.class, DisplayAnimator.class, ExpressionType.SIMPLE, "[a] [new] (linear|loop:loop[ing]) [display] animator using [anim[ation]] %animation%");
     }
 
     boolean loop;

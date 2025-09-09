@@ -13,14 +13,14 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Toggle Spawned Animation Texture Changes")
+@Name("Toggle Animation Texture Changes")
 @Description("Toggle whether textures should be updated during an animation. (Player Head Changes during animation, etc.)")
-@Examples({"set {_spawnedanimation} to allow texture changes",
-            "set {_spawnedanimation} to not allow texture changes"})
+@Examples({"set {_animation} to allow texture changes",
+            "set {_animation} to not allow texture changes"})
 @Since("3.3.1")
-public class EffSpawnedAnimTextureChanges extends Effect {
+public class EffAnimationTextureChanges extends Effect {
     static {
-        Skript.registerEffect(EffSpawnedAnimTextureChanges.class,"(make|set) %spawnedanimations% [to] [:not] allow texture change[s]");
+        Skript.registerEffect(EffAnimationTextureChanges.class,"(make|set) %animations% [to] [:not] allow texture change[s]");
     }
 
     Expression<SpawnedDisplayAnimation> object;
@@ -46,6 +46,6 @@ public class EffSpawnedAnimTextureChanges extends Effect {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "spawned animation texture changes: "+object.toString(event, debug);
+        return "animation texture changes: "+object.toString(event, debug);
     }
 }

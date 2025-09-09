@@ -71,15 +71,15 @@ public class SimpleEvents extends SimpleEvent {
             EventValues.registerEventValue(PacketGroupDestroyEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
 
             //Animation Start Event
-            Skript.registerEvent("Animation Start", SimpleEvents.class, AnimationStartEvent.class, "[spawned] [display] anim[ation] start[ed]")
-                    .description("Called when a display animator starts playing a spawned animation")
+            Skript.registerEvent("Animation Start", SimpleEvents.class, AnimationStartEvent.class, "[deu] anim[ation] start[ed]")
+                    .description("Called when a display animator starts playing an animation")
                     .since("3.2.1");
             EventValues.registerEventValue(AnimationStartEvent.class, SpawnedDisplayEntityGroup.class, AnimationStartEvent::getGroup);
             EventValues.registerEventValue(AnimationStartEvent.class, SpawnedDisplayAnimation.class, AnimationStartEvent::getAnimation);
             EventValues.registerEventValue(AnimationStartEvent.class, DisplayAnimator.class, AnimationStartEvent::getAnimator);
 
             //Animation Loop Start Event
-            Skript.registerEvent("Animation Loop Start", SimpleEvents.class, AnimationLoopStartEvent.class, "[spawned] [display] anim[ation] loop start[ed]")
+            Skript.registerEvent("Animation Loop Start", SimpleEvents.class, AnimationLoopStartEvent.class, "[deu] anim[ation] loop start[ed]")
                     .description("Called when a display animator begins a new animation loop")
                     .since("2.6.2");
             EventValues.registerEventValue(AnimationLoopStartEvent.class, ActiveGroup.class, AnimationLoopStartEvent::getGroup);
@@ -87,10 +87,9 @@ public class SimpleEvents extends SimpleEvent {
             EventValues.registerEventValue(AnimationLoopStartEvent.class, DisplayAnimator.class, AnimationLoopStartEvent::getAnimator);
 
             //Animation Frame Start Event
-            Skript.registerEvent("Animation Frame Start", SimpleEvents.class, AnimationFrameStartEvent.class, "[spawned] [display] anim[ation] frame start[ed]")
-                    .description("Called when a frame begins animating on a spawned group")
-                    .examples("#3.0.0 and later",
-                            "on spawned anim frame start:",
+            Skript.registerEvent("Animation Frame Start", SimpleEvents.class, AnimationFrameStartEvent.class, "[deu] anim[ation] frame start[ed]")
+                    .description("Called when a frame begins animating on an active group")
+                    .examples("on deu anim frame start:",
                             "\tset {_frameId} to event's frame id")
                     .since("2.6.2");
             EventValues.registerEventValue(AnimationFrameStartEvent.class, ActiveGroup.class, AnimationFrameStartEvent::getGroup);
@@ -99,11 +98,10 @@ public class SimpleEvents extends SimpleEvent {
             EventValues.registerEventValue(AnimationFrameStartEvent.class, DisplayAnimator.class, AnimationFrameStartEvent::getAnimator);
 
             //Animation Frame End Event
-            Skript.registerEvent("Animation Frame End", SimpleEvents.class, AnimationFrameEndEvent.class, "[spawned] [display] anim[ation] frame (complete[d]|end[ed])")
-                    .description("Called when a frame ends animating on a spawned group.",
+            Skript.registerEvent("Animation Frame End", SimpleEvents.class, AnimationFrameEndEvent.class, "[deu] anim[ation] frame (complete[d]|end[ed])")
+                    .description("Called when a frame ends animating on an active group.",
                             "Ignores frame delay and is called after translation of parts")
-                    .examples("#3.0.0 and later",
-                            "on spawned anim frame end:",
+                    .examples("on deu anim frame end:",
                             "\tset {_frameId} to event's frame id")
                     .since("2.6.2");
             EventValues.registerEventValue(AnimationFrameEndEvent.class, ActiveGroup.class, AnimationFrameEndEvent::getGroup);
@@ -112,16 +110,16 @@ public class SimpleEvents extends SimpleEvent {
             EventValues.registerEventValue(AnimationFrameEndEvent.class, DisplayAnimator.class, AnimationFrameEndEvent::getAnimator);
 
             //Animation Complete Event
-            Skript.registerEvent("Animation Complete", SimpleEvents.class, AnimationCompleteEvent.class, "[spawned] [display] anim[ation] (complete[d]|end[ed])")
-                    .description("Called at the completion of a spawned animation. This is not called for looping animations/animators")
+            Skript.registerEvent("Animation Complete", SimpleEvents.class, AnimationCompleteEvent.class, "[deu] anim[ation] (complete[d]|end[ed])")
+                    .description("Called at the completion of an animation. This is not called for looping animations/animators")
                     .since("2.6.2");
             EventValues.registerEventValue(AnimationCompleteEvent.class, ActiveGroup.class, AnimationCompleteEvent::getGroup);
             EventValues.registerEventValue(AnimationCompleteEvent.class, SpawnedDisplayAnimation.class, AnimationCompleteEvent::getAnimation);
             EventValues.registerEventValue(AnimationCompleteEvent.class, DisplayAnimator.class, AnimationCompleteEvent::getAnimator);
 
             //Packet Animation Start Event
-            Skript.registerEvent("Packet Animation Start", SimpleEvents.class, PacketAnimationStartEvent.class, "packet [display] anim[ation] start[ed]")
-                    .description("Called when a display animator starts playing a spawned animation using packets.",
+            Skript.registerEvent("Packet Animation Start", SimpleEvents.class, PacketAnimationStartEvent.class, "[deu] packet anim[ation] start[ed]")
+                    .description("Called when a display animator starts playing an animation using packets.",
                             "If players are not specified, the animation is shown to all players who can see the group")
                     .since("3.2.1");
             EventValues.registerEventValue(PacketAnimationStartEvent.class, SpawnedDisplayEntityGroup.class, g -> (SpawnedDisplayEntityGroup) g.getGroup());
@@ -130,7 +128,7 @@ public class SimpleEvents extends SimpleEvent {
             EventValues.registerEventValue(PacketAnimationStartEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
 
             //Packet Animation Loop Start Event
-            Skript.registerEvent("Packet Animation Loop Start", SimpleEvents.class, PacketAnimationLoopStartEvent.class, "packet [display] anim[ation] loop start[ed]")
+            Skript.registerEvent("Packet Animation Loop Start", SimpleEvents.class, PacketAnimationLoopStartEvent.class, "[deu] packet anim[ation] loop start[ed]")
                     .description("Called when a display animator begins a new animation loop using packets.",
                             "If players are not specified, the animation is shown to all players who can see the group.")
                     .since("3.0.0");
@@ -140,7 +138,7 @@ public class SimpleEvents extends SimpleEvent {
             EventValues.registerEventValue(PacketAnimationLoopStartEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
 
             //Packet Animation Frame Start Event
-            Skript.registerEvent("Packet Animation Frame Start", SimpleEvents.class, PacketAnimationFrameStartEvent.class, "packet [display] anim[ation] frame start[ed]")
+            Skript.registerEvent("Packet Animation Frame Start", SimpleEvents.class, PacketAnimationFrameStartEvent.class, "[deu] packet anim[ation] frame start[ed]")
                     .description("Called when a frame begins animating on a spawned group using packets.",
                             "If players are not specified, the animation is shown to all players who can see the group.")
                     .examples("on packet anim frame start:",
@@ -153,8 +151,8 @@ public class SimpleEvents extends SimpleEvent {
             EventValues.registerEventValue(PacketAnimationFrameStartEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
 
             //Packet Animation Frame End Event
-            Skript.registerEvent("Packet Animation Frame End", SimpleEvents.class, PacketAnimationFrameEndEvent.class, "packet [display] anim[ation] frame (complete[d]|end[ed])")
-                    .description("Called when a frame ends packet animation on a spawned group.",
+            Skript.registerEvent("Packet Animation Frame End", SimpleEvents.class, PacketAnimationFrameEndEvent.class, "[deu] packet anim[ation] frame (complete[d]|end[ed])")
+                    .description("Called when a frame ends animating on an active group.",
                             "Ignores frame delay and is called after translation of parts.",
                             "If players are not specified, the animation is shown to all players who can see the group.")
                     .examples("on packet anim frame end:",
@@ -167,8 +165,8 @@ public class SimpleEvents extends SimpleEvent {
             EventValues.registerEventValue(PacketAnimationFrameEndEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
 
             //Packet Animation Complete Event
-            Skript.registerEvent("Packet Animation Complete", SimpleEvents.class, PacketAnimationCompleteEvent.class, "packet [display] anim[ation] (complete[d]|end[ed])")
-                    .description("Called at the completion of a packet spawned animation. This is not called for looping animations/animators.",
+            Skript.registerEvent("Packet Animation Complete", SimpleEvents.class, PacketAnimationCompleteEvent.class, "[deu] packet anim[ation] (complete[d]|end[ed])")
+                    .description("Called at the completion of a packet-based animation. This is not called for looping animations/animators.",
                             "If players are not specified, the animation is shown to all players who can see the group.")
                     .since("3.0.0");
             EventValues.registerEventValue(PacketAnimationCompleteEvent.class, ActiveGroup.class, PacketAnimationCompleteEvent::getGroup);

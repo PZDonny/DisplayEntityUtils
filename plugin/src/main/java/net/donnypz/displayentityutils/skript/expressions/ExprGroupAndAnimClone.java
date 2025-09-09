@@ -22,7 +22,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Cloned Active Group or Animation")
-@Description("Create a clone version of a active group or animation")
+@Description("Create a cloned version of a active group or animation")
 @Examples({"set {_groupclone} to a clone of {_spawnedgroup}",
         "",
         "#Create a group clone at a certain location",
@@ -35,12 +35,12 @@ import org.jetbrains.annotations.Nullable;
         "set {_groupclone} to a clone of {_packetgroup}",
         "",
         "#Create an animation clone",
-        "set {_animclone} to a clone of {_spawnedanimation}"})
+        "set {_animclone} to a clone of {_animation}"})
 @Since("2.6.2")
 public class ExprGroupAndAnimClone extends SimpleExpression<Object> {
 
     static{
-        Skript.registerExpression(ExprGroupAndAnimClone.class, Object.class, ExpressionType.SIMPLE, "[a] (clone[d version]|cop[y|ied version]) of %spawnedgroup/packetgroup/spawnedanimation% [loc:at %-location%] [s:with %-groupspawnsettings%]");
+        Skript.registerExpression(ExprGroupAndAnimClone.class, Object.class, ExpressionType.SIMPLE, "[a] (clone[d version]|cop[y|ied version]) of %spawnedgroup/packetgroup/animation% [loc:at %-location%] [s:with %-groupspawnsettings%]");
     }
 
     Expression<?> object;

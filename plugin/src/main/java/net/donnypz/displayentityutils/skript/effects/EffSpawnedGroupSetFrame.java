@@ -20,15 +20,15 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Show Animation Frame on Active Group")
 @Description("Play a single animation frame on an active group, optionally with custom duration and delay.")
-@Examples({"play frame with id 5 on {_spawnedgroup} from {_spawnedanimation}",
+@Examples({"play frame with id 5 on {_spawnedgroup} from {_animation}",
         "",
         "#3.0.0 and later",
-        "show frame with id 2 on {_packetgroup} from {_spawnedanimation}",
-        "show frame with id 12 on {_spawnedgroup} with {_spawnedanimation} for {_player}"})
+        "show frame with id 2 on {_packetgroup} from {_animation}",
+        "show frame with id 12 on {_spawnedgroup} with {_animation} for {_player}"})
 @Since("2.6.2")
 public class EffSpawnedGroupSetFrame extends Effect {
     static {
-        Skript.registerEffect(EffSpawnedGroupSetFrame.class,"(play|apply|show) frame with id %number% on %activegroup% (with|from) [anim[ation]] %spawnedanimation% " +
+        Skript.registerEffect(EffSpawnedGroupSetFrame.class,"(play|apply|show) frame with id %number% on %activegroup% (with|from) [anim[ation]] %animation% " +
                 "[d:[and] with duration %-timespan% and delay %-timespan%] [f:for %-players%]");
 
     }
