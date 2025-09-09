@@ -13,20 +13,20 @@ import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Get Group/Animation From Storage")
 @Description("Get a saved group/animation from a load method (local, mongodb, mysql)")
-@Examples({"set {_savedanim} to saved animation tagged \"myanimation\" from mysql storage",
+@Examples({"set {_savedanim} to animation tagged \"myanimation\" from mysql storage",
         "set {_savedgroup} to saved group tagged \"mygroup\" from local storage"})
-@Since("2.6.2")
+@Since("3.3.1")
 public class ExprSavedFromLoadMethod extends SimpleExpression<Object> {
 
     static{
-        Skript.registerExpression(ExprSavedFromLoadMethod.class, Object.class, ExpressionType.SIMPLE, "saved[ |-](g:group|anim[ation]) [tagged] %string% from (1¦local|2¦mysql|3¦mongo[db]) [storage]");
+        Skript.registerExpression(ExprSavedFromLoadMethod.class, Object.class, ExpressionType.SIMPLE, "(g:saved group|anim[ation]) [tagged] %string% from (1¦local|2¦mysql|3¦mongo[db]) [storage]");
     }
 
     Expression<String> tag;
@@ -44,7 +44,7 @@ public class ExprSavedFromLoadMethod extends SimpleExpression<Object> {
             return new DisplayEntityGroup[]{DisplayGroupManager.getGroup(loadMethod, t)};
         }
         else{
-            return new DisplayAnimation[]{DisplayAnimationManager.getAnimation(loadMethod, t)};
+            return new SpawnedDisplayAnimation[]{DisplayAnimationManager.getSpawnedDisplayAnimation(t, loadMethod)};
         }
     }
 
@@ -60,7 +60,7 @@ public class ExprSavedFromLoadMethod extends SimpleExpression<Object> {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "getting saved(group/animation), tagged: "+tag.toString(event, debug);
+        return "getting (group/animation), tagged: "+tag.toString(event, debug);
     }
 
     @Override

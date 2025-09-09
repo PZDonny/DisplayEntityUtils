@@ -69,7 +69,7 @@ public class ConversionUtils {
         return (byte) opacity;
     }
 
-    public static String getCoordinateString(Location location){
+    public static String getCoordinateString(@NotNull Location location){
         return round(location.x())+" "+round(location.y())+" "+round(location.z());
     }
 
@@ -77,7 +77,7 @@ public class ConversionUtils {
         return Math.round(coord * 100)/100.0;
     }
 
-    public static String getExecuteCommandWorldName(World w){
+    public static String getExecuteCommandWorldName(@NotNull World w){
         String worldName;
         if (w.equals(Bukkit.getWorlds().getFirst())){
             worldName = "overworld";
@@ -86,5 +86,15 @@ public class ConversionUtils {
             worldName = w.getName();
         }
         return worldName;
+    }
+
+    /**
+     * Get a chunk key from a chunk's x and z coordinates
+     * @param x chunk's x coordinate
+     * @param z chunk's z coordinate
+     * @return a long, the chunk's key
+     */
+    public static long getChunkKey(int x, int z){
+        return ((long) z << 32) | (x & 0xFFFFFFFFL); //Order is inverted
     }
 }

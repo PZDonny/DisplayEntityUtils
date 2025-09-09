@@ -43,7 +43,7 @@ class PartsCycleCMD extends PlayerSubCommand {
             return;
         }
         else if (sel == null){
-            partSelection = new SpawnedPartSelection(group);
+            partSelection = group.createPartSelection();
             DisplayGroupManager.setPartSelection(player, partSelection, false);
         }
         else{

@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.DisplayConfig;
+import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.AnimationStartEvent;
 import net.donnypz.displayentityutils.events.PacketAnimationStartEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
@@ -47,7 +47,7 @@ public class DisplayAnimator {
      * @param animationType the animation type
      * @return the {@link DisplayAnimator} used to control the animation
      */
-    public static DisplayAnimator play(@NotNull Player player, @NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
+    public static DisplayAnimator play(@NotNull Player player, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
         return play(List.of(player), group, animation, animationType);
     }
 
@@ -59,9 +59,10 @@ public class DisplayAnimator {
      * @param animationType the animation type
      * @return the {@link DisplayAnimator} used to control the animation
      */
-    public static DisplayAnimator play(@NotNull Collection<Player> players, @NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
-        return new DisplayAnimator(animation, animationType)
-                .play(players, group, 0);
+    public static DisplayAnimator play(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
+        DisplayAnimator animator = new DisplayAnimator(animation, animationType);
+        animator.play(players, group, 0);
+        return animator;
     }
 
     /**
@@ -71,7 +72,7 @@ public class DisplayAnimator {
      * @param animation The animation to play
      * @return the {@link DisplayAnimator} used to play the animation
      */
-    public static DisplayAnimator playUsingPackets(@NotNull ActiveGroup group, @NotNull SpawnedDisplayAnimation animation){
+    public static DisplayAnimator playUsingPackets(@NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation){
         DisplayAnimator animator = new DisplayAnimator(animation, AnimationType.LINEAR);
         animator.playUsingPackets(group, 0);
         return animator;
@@ -80,7 +81,9 @@ public class DisplayAnimator {
     /**
      * Plays an animation for a {@link ActiveGroup}.
      * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(ActiveGroup)} is called.
+     * <br>
      * @param group The group to play the animation
+     * @param startFrameId the frame index the animation will start from
      * @return false if the playing was cancelled through the {@link AnimationStartEvent}.
      */
     public boolean play(@NotNull SpawnedDisplayEntityGroup group, int startFrameId){
@@ -90,7 +93,7 @@ public class DisplayAnimator {
 
         SpawnedDisplayAnimationFrame frame = animation.frames.get(startFrameId);
         int delay = frame.delay;
-        new DisplayAnimationPlayer(this, animation, group, frame, startFrameId, delay, DisplayConfig.asynchronousAnimations(), false);
+        DisplayAPI.getAnimationPlayerService().play(this, animation, group, frame, startFrameId, delay, false);
         return true;
     }
 
@@ -98,51 +101,54 @@ public class DisplayAnimator {
      * Plays an animation for a {@link ActiveGroup} through packets.
      * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(ActiveGroup)} is called.
      * <br>
-     * <br>This calls the {@link PacketAnimationStartEvent}
      * @param group The group to play the animation
      * @param startFrameId the frame index the animation will start from
-     * @return this
+     * @return false if the playing was cancelled through the {@link PacketAnimationStartEvent}.
      */
-    public DisplayAnimator playUsingPackets(@NotNull ActiveGroup group, int startFrameId){
+    public boolean playUsingPackets(@NotNull ActiveGroup<?> group, int startFrameId){
+        if (!new PacketAnimationStartEvent(group, this, animation, null).callEvent()) {
+            return false;
+        }
         SpawnedDisplayAnimationFrame frame = animation.frames.get(startFrameId);
         int delay = frame.delay;
-        new PacketAnimationPlayer(this, animation, group, frame, startFrameId, delay, false);
-        return this;
+        DisplayAPI.getAnimationPlayerService().playWithPackets(this, animation, group, frame, startFrameId, delay, false);
+        return true;
     }
 
     /**
      * Plays an animation for a {@link ActiveGroup} through packets, only for a given player.
      * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(Player, ActiveGroup)} or similar is called.
      * <br>
-     * <br>This calls the {@link PacketAnimationStartEvent}
      * @param player the player
      * @param group The group to play the animation
      * @param startFrameId the frame index the animation will start from
-     * @return this
+     * @return false if the playing was cancelled through the {@link PacketAnimationStartEvent}.
      */
-    public DisplayAnimator play(@NotNull Player player, @NotNull ActiveGroup group, int startFrameId){
+    public boolean play(@NotNull Player player, @NotNull ActiveGroup<?> group, int startFrameId){
         return play(List.of(player), group, startFrameId);
     }
 
     /**
-     * Plays an animation for a {@link ActiveGroup} through packets, only for the given playesr.
+     * Plays an animation for a {@link ActiveGroup} through packets, only for the given players.
      * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(Player, ActiveGroup)} or similar is called.
      * <br>
-     * <br>This calls the {@link PacketAnimationStartEvent}
      * @param players the players
      * @param group The group to play the animation
      * @param startFrameId the frame index the animation will start from
-     * @return this
+     * @return false if the playing was cancelled through the {@link PacketAnimationStartEvent}.
      */
-    public DisplayAnimator play(@NotNull Collection<Player> players, @NotNull ActiveGroup group, int startFrameId){
+    public boolean play(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, int startFrameId){
+        if (!new PacketAnimationStartEvent(group, this, animation, players).callEvent()) {
+            return false;
+        }
         SpawnedDisplayAnimationFrame frame = animation.frames.get(startFrameId);
         int delay = frame.delay;
         addPlayers(players, group);
-        new ClientAnimationPlayer(players, this, animation, group, frame, startFrameId, delay, false);
-        return this;
+        DisplayAPI.getAnimationPlayerService().playForClient(players, this, animation, group, frame, startFrameId, delay, false);
+        return true;
     }
 
-    private void addPlayers(Collection<Player> players, ActiveGroup group){
+    private void addPlayers(Collection<Player> players, ActiveGroup<?> group){
         for (Player p : players){
             this.players.computeIfAbsent(p.getUniqueId(), g -> new HashSet<>()).add(group);
         }
@@ -154,7 +160,7 @@ public class DisplayAnimator {
      * The group's translation will be representative of the frame the animation was stopped at.
      * @param group the group to stop animating
      */
-    public void stop(@NotNull ActiveGroup group){
+    public void stop(@NotNull ActiveGroup<?> group){
         group.removeActiveAnimator(this);
     }
 

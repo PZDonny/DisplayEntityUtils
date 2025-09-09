@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticle;
-import net.donnypz.displayentityutils.utils.OldSound;
+import net.donnypz.displayentityutils.utils.DisplayEntities.saved.OldSound;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;

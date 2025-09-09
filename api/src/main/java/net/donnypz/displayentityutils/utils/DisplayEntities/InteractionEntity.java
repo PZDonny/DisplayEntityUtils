@@ -51,6 +51,27 @@ final class InteractionEntity implements Serializable {
         }
     }
 
+    InteractionEntity(PacketDisplayEntityPart part){
+        //partTags = LegacyUtils.getLegacyPartTags(interaction);
+
+        PacketAttributeContainer c = part.attributeContainer;
+        this.height = c.getAttributeOrDefault(DisplayAttributes.Interaction.HEIGHT, 1f);
+        this.width = c.getAttributeOrDefault(DisplayAttributes.Interaction.WIDTH, 1f);
+        this.isResponsive = c.getAttributeOrDefault(DisplayAttributes.Interaction.RESPONSIVE, false);
+        this.vector = part.getInteractionTranslation().toVector3f();
+        this.partUUID = part.partUUID;
+
+        try{
+            ItemStack i = new ItemStack(Material.STICK);
+            PersistentDataContainer pdc = i.getItemMeta().getPersistentDataContainer();
+            pdc.set(DisplayAPI.getPartPDCTagKey(), PersistentDataType.LIST.strings(), new ArrayList<>(part.getTags()));
+            persistentDataContainer = pdc.serializeToBytes();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
     Interaction createEntity(Location location, GroupSpawnSettings settings){
         return location.getWorld().spawn(location, Interaction.class, spawn ->{
             spawn.setInteractionHeight(height);

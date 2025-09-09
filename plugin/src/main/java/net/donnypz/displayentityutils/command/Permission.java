@@ -99,7 +99,7 @@ public enum Permission {
     ANIM_ADD_PARTICLE("deu.anim.addparticle"),
     ANIM_REVERSE("deu.anim.reverse"),
     ANIM_TOGGLE_SCALE("deu.anim.scale"),
-    ANIM_TOGGLE_DATA_CHANGES("deu.anim.datachanges"),
+    ANIM_TOGGLE_TEXTURE_CHANGES("deu.anim.texturechanges"),
     ANIM_SET_TAG("deu.anim.settag"),
     ANIM_SET_FRAME_TAG("deu.anim.setframetag"),
     ANIM_PLAY("deu.anim.play"),

@@ -18,8 +18,7 @@ import org.jetbrains.annotations.Nullable;
 @Examples({"reset {_spawnedgroup}'s tag",
             "set {_savedgrouptag} to {_savedgroup}'s tag",
             "",
-            "set {_spawnedanimation}'s tag to \"newTag\"",
-            "set {_savedanimationtag}'s tag to {_savedanimation}'s tag",
+            "set {_animation}'s tag to \"newTag\"",
             "",
             "#3.0.0 and later",
             "set {_packetgrouptag} to {_packetgroup}'s tag",
@@ -29,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class ExprTag extends SimplePropertyExpression<Object, String> {
     static {
-        register(ExprTag.class, String.class, "[the] tag", "activegroup/savedgroup/spawnedanimation/savedanimation/framepoint");
+        register(ExprTag.class, String.class, "[the] tag", "activegroup/savedgroup/animation/framepoint");
     }
 
     @Override
@@ -100,7 +99,7 @@ public class ExprTag extends SimplePropertyExpression<Object, String> {
                 }
             }
         }
-        Skript.error("You can only set the tag of a spawned group or spawned animation", ErrorQuality.SEMANTIC_ERROR);
+        Skript.error("You can only set the tag of a spawned group or animation", ErrorQuality.SEMANTIC_ERROR);
 
     }
 

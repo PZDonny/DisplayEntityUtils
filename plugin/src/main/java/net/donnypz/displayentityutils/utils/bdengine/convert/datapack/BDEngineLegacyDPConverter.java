@@ -95,7 +95,7 @@ public class BDEngineLegacyDPConverter {
             public void run() {
                 if (i == frames.size()){
                     try{
-                        createdGroup.setToFrame(anim, anim.getFrames().getFirst(), false);
+                        createdGroup.setToFrame(anim, anim.getFrames().getFirst());
                     }
                     catch(IndexOutOfBoundsException ignored){}
 

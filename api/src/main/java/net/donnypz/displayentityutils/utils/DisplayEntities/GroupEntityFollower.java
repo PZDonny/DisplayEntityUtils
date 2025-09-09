@@ -20,7 +20,7 @@ import java.util.UUID;
 
 class GroupEntityFollower {
     private GroupFollowProperties properties;
-    private ActiveGroup group;
+    private ActiveGroup<?> group;
     MultiPartSelection selection;
     UUID followedEntity;
     private boolean isDefaultFollower;
@@ -30,7 +30,7 @@ class GroupEntityFollower {
     private int lastDisplayPivotTick = -1;
     private HashMap<ActivePart, PartFollowData> lastDisplayPivotData = new HashMap<>();
 
-    GroupEntityFollower(ActiveGroup group, GroupFollowProperties followProperties){
+    GroupEntityFollower(ActiveGroup<?> group, GroupFollowProperties followProperties){
         this.group = group;
         this.properties = followProperties;
         Collection<String> partTags = followProperties.partTags();

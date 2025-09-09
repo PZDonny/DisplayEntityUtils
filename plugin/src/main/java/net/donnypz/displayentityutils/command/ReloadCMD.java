@@ -4,7 +4,7 @@ import net.donnypz.displayentityutils.ConfigUtils;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
-import net.donnypz.displayentityutils.utils.controller.DisplayController;
+import net.donnypz.displayentityutils.utils.controller.DisplayControllerUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -24,7 +24,7 @@ class ReloadCMD extends ConsoleUsableSubCommand {
         if (args[1].equals("controllers")){
             ConfigUtils.registerDisplayControllers();
             MachineState.registerNullLoaderStates();
-            DisplayController.registerNullLoaderControllers();
+            DisplayControllerUtils.registerNullLoaderControllers();
             sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Attempted to reload Display Controllers! Ensure console does not contain any errors.", NamedTextColor.YELLOW)));
             sender.sendMessage(Component.text("| Existing Display Controllers may not have all changes applied a until server restart.", NamedTextColor.GRAY, TextDecoration.ITALIC));
         }

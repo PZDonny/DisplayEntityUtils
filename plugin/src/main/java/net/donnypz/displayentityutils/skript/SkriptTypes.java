@@ -314,9 +314,9 @@ public class SkriptTypes {
         );
 
         Classes.registerClass(new ClassInfo<>(DisplayAnimator.class, "displayanimator")
-                .user("(display)animator")
+                .user("(display)?animator")
                 .name("DisplayAnimator")
-                .description("Used to play an animation on a spawnedgroup")
+                .description("Used to play an animation on activegroups")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(DisplayAnimator.class))
                 .since("2.6.2")
@@ -340,13 +340,13 @@ public class SkriptTypes {
         );
 
 
-        Classes.registerClass(new ClassInfo<>(SpawnedDisplayAnimation.class, "spawnedanimation")
-                .user("spawned( |-)?anim(ation)?")
-                .name("Spawned Animation")
-                .description("Represents an animation that can be played on a spawned Display Entity Group/Model")
+        Classes.registerClass(new ClassInfo<>(SpawnedDisplayAnimation.class, "animation")
+                .user("[deu] anim(ation)?")
+                .name("Animation")
+                .description("Represents an animation that can be played on an activegroup")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(SpawnedDisplayAnimation.class))
-                .since("2.6.2")
+                .since("3.3.1")
                 .parser(new Parser<>() {
 
                     @Override
@@ -361,44 +361,18 @@ public class SkriptTypes {
 
                     @Override
                     public String toVariableNameString(SpawnedDisplayAnimation o) {
-                        return "spawnedanimation w/ tag: " + o.getAnimationTag();
+                        return "animation w/ tag: " + o.getAnimationTag();
                     }
                 })
         );
 
-        Classes.registerClass(new ClassInfo<>(DisplayAnimation.class, "savedanimation")
-                .user("saved( |-)?anim(ation)?")
-                .name("Saved Animation")
-                .description("Represents a saved animation")
-                .examples()
-                .defaultExpression(new EventValueExpression<>(DisplayAnimation.class))
-                .since("2.6.2")
-                .parser(new Parser<>() {
-
-                    @Override
-                    public boolean canParse(ParseContext context) {
-                        return false;
-                    }
-
-                    @Override
-                    public String toString(DisplayAnimation o, int flags) {
-                        return toVariableNameString(o);
-                    }
-
-                    @Override
-                    public String toVariableNameString(DisplayAnimation o) {
-                        return "savedanimation w/ tag: " + o.getAnimationTag();
-                    }
-                })
-        );
-
-        Classes.registerClass(new ClassInfo<>(SpawnedDisplayAnimationFrame.class, "spawnedanimationframe")
-                .user("spawned( |-)?(anim(ation)?)?( |-)?frame")
-                .name("Spawned Animation Frame")
-                .description("Represents an Animation Frame from a spawned Display Animation")
+        Classes.registerClass(new ClassInfo<>(SpawnedDisplayAnimationFrame.class, "animationframe")
+                .user("(anim(ation)?( |-)?)?frame")
+                .name("Animation Frame")
+                .description("Represents an Animation Frame from an Animation")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(SpawnedDisplayAnimationFrame.class))
-                .since("2.6.2")
+                .since("3.3.1")
                 .parser(new Parser<>() {
 
                     @Override
@@ -413,7 +387,7 @@ public class SkriptTypes {
 
                     @Override
                     public String toVariableNameString(SpawnedDisplayAnimationFrame o) {
-                        return "spawnedanimationframe w/ tag: " + o.getTag();
+                        return "animationframe w/ tag: " + o.getTag();
                     }
                 })
         );

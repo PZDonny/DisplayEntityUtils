@@ -18,14 +18,14 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Frame Points from Animation Frame")
 @Description("Get the Frame Points contained in an animation frame")
-@Examples({"set {_framepoints::*} to {_spawnedanimationframe}'s frame points",
-        "set {_framepoints::*} to {_spawnedanimationframe}'s points"})
+@Examples({"set {_framepoints::*} to {_animationframe}'s frame points",
+        "set {_framepoints::*} to {_animationframe}'s points"})
 @Since("3.2.1")
 public class ExprFramePointsFromFrame extends SimpleExpression<FramePoint> {
 
     static {
         String property = "[the] [frame[ |-]]points";
-        String fromType = "spawnedanimationframe";
+        String fromType = "animationframe";
         Skript.registerExpression(ExprFramePointsFromFrame.class, FramePoint.class, ExpressionType.PROPERTY, PropertyExpression.getPatterns(property, fromType));
     }
 

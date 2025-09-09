@@ -20,12 +20,12 @@ import org.jetbrains.annotations.Nullable;
 @Description("Check if a saved or spawned group/animation has a tag")
 @Examples({"if {_savedgroup} has tag:", "\tbroadcast \"This group has a tag!\"",
         "",
-        "if {_spawnedanimation} doesn't have a tag:", "\tbroadcast \"This animation is tagless!\""})
+        "if {_animation} doesn't have a tag:", "\tbroadcast \"This animation is tagless!\""})
 @Since({"2.6.2"})
 public class CondHasTag extends Condition {
 
     static {
-        Skript.registerCondition(CondHasTag.class, "%activegroup/savedgroup/spawnedanimation/savedanimation% (1¦has|2¦(has no|does(n't| not) have)) [a] tag");
+        Skript.registerCondition(CondHasTag.class, "%activegroup/savedgroup/animation% (1¦has|2¦(has no|does(n't| not) have)) [a] tag");
     }
 
     Expression<?> object;
@@ -33,16 +33,13 @@ public class CondHasTag extends Condition {
     @Override
     public boolean check(Event event) {
         Object obj = object.getSingle(event);
-        if (obj instanceof ActiveGroup g){
+        if (obj instanceof ActiveGroup<?> g){
             return (g.getTag() != null) == isNegated();
         }
         else if (obj instanceof DisplayEntityGroup g){
             return (g.getTag() != null) == isNegated();
         }
         else if (obj instanceof SpawnedDisplayAnimation a){
-            return (a.getAnimationTag() != null) == isNegated();
-        }
-        else if (obj instanceof DisplayAnimation a){
             return (a.getAnimationTag() != null) == isNegated();
         }
         return isNegated();

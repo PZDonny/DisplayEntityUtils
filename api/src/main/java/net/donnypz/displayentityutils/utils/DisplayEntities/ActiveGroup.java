@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
@@ -14,6 +15,8 @@ import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -450,6 +453,22 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * @param animation the animation the frame is from
+     * @param startFrameId the id of the frame to display
+     */
+    public void setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId) {
+        setToFrame(animation, animation.getFrame(startFrameId));
+    }
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * @param animation the animation the frame is from
+     * @param frame the frame to display
+     */
+    public abstract void setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame);
+
+    /**
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group for a player
      * @param player the player
      * @param animation the animation the frame is from
@@ -471,7 +490,6 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         setToFrame(player, animation, animation.getFrame(startFrameId), duration, delay);
     }
 
-
     /**
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group for a player
      * @param player the player
@@ -479,6 +497,26 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param frame the frame to display
      */
     public abstract void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame);
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame}  on this group
+     * @param animation the animation the frame is from
+     * @param startFrameId the id of the frame to display
+     * @param duration how long the frame should play
+     * @param delay how long until the frame should start playing
+     */
+    public void setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId, int duration, int delay) {
+        setToFrame(animation, animation.getFrame(startFrameId), duration, delay);
+    }
+
+    /**
+     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
+     * @param animation the animation the frame is from
+     * @param frame the frame to display
+     * @param duration how long the frame should play
+     * @param delay how long until the frame should start playing
+     */
+    public abstract void setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay);
 
     /**
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group for a player
@@ -489,6 +527,13 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param delay how long until the frame should start playing
      */
     public abstract void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay);
+
+    /**
+     * Creates a copy of this group at a location
+     * @param location where to spawn the cloned group
+     * @return a copy of this group
+     */
+    public abstract ActiveGroup<T> clone(@NotNull Location location);
 
 
     /**
@@ -740,6 +785,23 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         this.spawnAnimationType = animationType;
     }
 
+    void setSpawnAnimation(PersistentDataContainer pdc){
+        if (pdc.has(DisplayAPI.getSpawnAnimationKey())){
+            spawnAnimationTag = pdc.get(DisplayAPI.getSpawnAnimationKey(), PersistentDataType.STRING);
+        }
+        if (pdc.has(DisplayAPI.getSpawnAnimationTypeKey())){
+            try{
+                spawnAnimationType = DisplayAnimator.AnimationType.valueOf(pdc.get(DisplayAPI.getSpawnAnimationTypeKey(), PersistentDataType.STRING));
+            }
+            catch(IllegalArgumentException e){
+                spawnAnimationType = DisplayAnimator.AnimationType.LOOP;
+            }
+        }
+        if (pdc.has(DisplayAPI.getSpawnAnimationKey())){
+            spawnAnimationLoadMethod = LoadMethod.valueOf(pdc.get(DisplayAPI.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING));
+        }
+    }
+
     /**
      * Get the tag of the spawn animation used when this group is spawned
      * @return a string or null if unset
@@ -763,4 +825,10 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     public @Nullable DisplayAnimator.AnimationType getSpawnAnimationType() {
         return spawnAnimationType;
     }
+
+    /**
+     * Get a {@link DisplayEntityGroup} representative of this group
+     * @return {@link DisplayEntityGroup} representing this
+     */
+    public abstract @NotNull DisplayEntityGroup toDisplayEntityGroup();
 }

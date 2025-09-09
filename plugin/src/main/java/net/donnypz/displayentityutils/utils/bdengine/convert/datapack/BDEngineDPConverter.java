@@ -163,7 +163,7 @@ public class BDEngineDPConverter {
             public void run() {
                 if (i == frameCount){
                     try{
-                        createdGroup.setToFrame(anim, anim.getFrames().getFirst(), false);
+                        createdGroup.setToFrame(anim, anim.getFrames().getFirst());
                     }
                     catch(IndexOutOfBoundsException ignored){}
 

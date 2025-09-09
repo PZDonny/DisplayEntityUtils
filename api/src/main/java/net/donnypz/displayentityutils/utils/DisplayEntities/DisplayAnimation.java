@@ -71,7 +71,7 @@ public final class DisplayAnimation implements Serializable {
     }
 
     /**
-     * Get if this animation allows for data changes (texture changes to block/item displays and text display text)
+     * Get if this animation allows for texture changes to block/item displays and text display text
      * @return a boolean
      */
     public boolean allowsTextureChanges(){

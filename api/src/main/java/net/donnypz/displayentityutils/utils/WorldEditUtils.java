@@ -22,16 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-public class WorldUtils {
-    /**
-     * Get a chunk key from a chunk's x and z coordinates
-     * @param x chunk's x coordinate
-     * @param z chunk's z coordinate
-     * @return a long, the chunk's key
-     */
-    public static long getChunkKey(int x, int z){
-        return ((long) z << 32) | (x & 0xFFFFFFFFL); //Order is inverted
-    }
+public class WorldEditUtils {
 
     /**
      * Create a {@link SpawnedDisplayEntityGroup} from a player's WorldEdit selection
@@ -39,7 +30,7 @@ public class WorldUtils {
      * @param removeBlocks whether to replace all selected blocks to air
      * @return a {@link SpawnedDisplayEntityGroup} or null if the player's selection is invalid.
      */
-    public static @Nullable SpawnedDisplayEntityGroup createGroupFromWorldEditSelection(@NotNull Player player, boolean removeBlocks){
+    public static @Nullable SpawnedDisplayEntityGroup createGroupFromSelection(@NotNull Player player, boolean removeBlocks){
         LocalSession worldEditSession = WorldEdit.getInstance().getSessionManager().findByName(player.getName());
         if (worldEditSession == null) return null;
         World w = worldEditSession.getSelectionWorld();
@@ -67,8 +58,8 @@ public class WorldUtils {
                 Vector v = blockLoc.toVector().subtract(masterVector);
 
                 BlockDisplay display = bukkitWorld.spawn(masterLoc, BlockDisplay.class, d -> {
-                   d.setBlock(data);
-                   d.setTransformation(new Transformation(v.toVector3f(), new Quaternionf(), new Vector3f(1), new Quaternionf()));
+                    d.setBlock(data);
+                    d.setTransformation(new Transformation(v.toVector3f(), new Quaternionf(), new Vector3f(1), new Quaternionf()));
                 });
                 group.addDisplayEntity(display);
                 if (removeBlocks){

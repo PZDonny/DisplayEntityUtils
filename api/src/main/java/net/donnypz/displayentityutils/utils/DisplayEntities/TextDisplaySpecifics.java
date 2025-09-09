@@ -38,14 +38,40 @@ final class TextDisplaySpecifics extends DisplayEntitySpecifics implements Seria
         catch(NullPointerException ignored){}
 
         this.lineWidth = textDisplay.getLineWidth();
-        if (textDisplay.getBackgroundColor() != null){
-            this.backgroundColorARGB = textDisplay.getBackgroundColor().asARGB();
+        Color bgc = textDisplay.getBackgroundColor();
+        if (bgc != null){
+            this.backgroundColorARGB = bgc.asARGB();
         }
         this.textOpacity = textDisplay.getTextOpacity();
         this.shadowed = textDisplay.isShadowed();
         this.seeThrough = textDisplay.isSeeThrough();
         this.defaultBackground = textDisplay.isDefaultBackground();
         this.alignment = textDisplay.getAlignment();
+    }
+
+    TextDisplaySpecifics(PacketDisplayEntityPart part) {
+        super(part);
+
+        PacketAttributeContainer c = part.attributeContainer;
+        Component comp = c.getAttributeOrDefault(DisplayAttributes.TextDisplay.TEXT, Component.empty());
+        this.text = MiniMessage.miniMessage().serialize(comp);
+        try{
+            this.font = comp.font().asString();
+        }
+        catch(NullPointerException ignored){}
+
+        this.lineWidth = c.getAttributeOrDefault(DisplayAttributes.TextDisplay.LINE_WIDTH, 200);
+        Color bgc = c.getAttribute(DisplayAttributes.TextDisplay.BACKGROUND_COLOR);
+        if (bgc != null){
+            this.backgroundColorARGB = bgc.asARGB();
+        }
+
+        TextDisplayOptions options = c.getAttributeOrDefault(DisplayAttributes.TextDisplay.EXTRA_TEXT_OPTIONS, new TextDisplayOptions(false, false, false, TextDisplay.TextAlignment.LEFT));
+        this.textOpacity = c.getAttributeOrDefault(DisplayAttributes.TextDisplay.TEXT_OPACITY_PERCENTAGE, (byte) -1);
+        this.shadowed = options.textShadow();
+        this.seeThrough = options.seeThrough();
+        this.defaultBackground = options.defaultBackgroundColor();
+        this.alignment = options.textAlignment();
     }
 
     Component getText() {

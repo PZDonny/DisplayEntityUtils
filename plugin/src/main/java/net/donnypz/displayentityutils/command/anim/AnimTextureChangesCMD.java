@@ -10,9 +10,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-class AnimDataChangesCMD extends PlayerSubCommand {
-    AnimDataChangesCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("toggledatachanges", parentSubCommand, Permission.ANIM_TOGGLE_DATA_CHANGES);
+class AnimTextureChangesCMD extends PlayerSubCommand {
+    AnimTextureChangesCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("toggletexturechanges", parentSubCommand, Permission.ANIM_TOGGLE_TEXTURE_CHANGES);
     }
 
     @Override
@@ -23,10 +23,10 @@ class AnimDataChangesCMD extends PlayerSubCommand {
             return;
         }
 
-        boolean dataChanges = !anim.allowsDataChanges();
-        anim.allowDataChanges(dataChanges);
-        player.sendMessage(Component.text("Animation Data Changes toggled to: ", NamedTextColor.GREEN).append(Component.text(dataChanges, NamedTextColor.YELLOW)));
-        player.sendMessage(Component.text("| Data Changes Apply to:", NamedTextColor.GRAY));
+        boolean dataChanges = !anim.allowsTextureChanges();
+        anim.allowTextureChanges(dataChanges);
+        player.sendMessage(Component.text("Animation Texture Changes toggled to: ", NamedTextColor.GREEN).append(Component.text(dataChanges, NamedTextColor.YELLOW)));
+        player.sendMessage(Component.text("| Texture Changes Apply to:", NamedTextColor.GRAY));
         player.sendMessage(Component.text("- Block Display block changes", NamedTextColor.GRAY));
         player.sendMessage(Component.text("- Item Display item changes", NamedTextColor.GRAY));
         player.sendMessage(Component.text("- Text Display text changes", NamedTextColor.GRAY));

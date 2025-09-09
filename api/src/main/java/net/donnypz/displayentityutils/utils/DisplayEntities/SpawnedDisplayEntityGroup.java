@@ -52,7 +52,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * @apiNote This should NEVER have to be called! Only do so if you truly know what you're doing
      */
     @ApiStatus.Internal
-    public SpawnedDisplayEntityGroup(Display masterDisplay){
+    public SpawnedDisplayEntityGroup(@NotNull Display masterDisplay){
         this.isVisibleByDefault = masterDisplay.isVisibleByDefault();
         PersistentDataContainer c = masterDisplay.getPersistentDataContainer();
         if (c.has(creationTimeKey)){
@@ -64,6 +64,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (c.has(persistenceOverrideKey)) {
             persistenceOverride = c.get(persistenceOverrideKey, PersistentDataType.BOOLEAN);
         }
+        setSpawnAnimation(c);
+
 
         //String tag1;
         /*for (String tag: masterDisplay.getScoreboardTags()){
@@ -844,7 +846,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     @Override
     public @NotNull SpawnedPartSelection createPartSelection() {
-        return new SpawnedPartSelection(this);
+        return createPartSelection(new PartFilter());
     }
 
     /**
@@ -853,7 +855,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     @Override
     public @NotNull SpawnedPartSelection createPartSelection(@NotNull PartFilter partFilter) {
-        return new SpawnedPartSelection(this, partFilter);
+        SpawnedPartSelection sel = new SpawnedPartSelection(this, partFilter);
+        partSelections.add(sel);
+        return sel;
     }
 
     /**
@@ -1181,57 +1185,33 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     /**
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
      * @param animation the animation the frame is from
-     * @param startFrameId the id of the frame to display
-     * @param isAsync whether to show this frame asynchronously (unpredictable results)
-     * @return false if this group is in an unloaded chunk
+     * @param frame the frame to display
      */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId, boolean isAsync) {
-        return setToFrame(animation, animation.getFrame(startFrameId), isAsync);
+    @Override
+    public void setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
+        if (!isInLoadedChunk()){
+            return;
+        }
+        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
+        DisplayAPI.getAnimationPlayerService().play(animator, animation, this, frame, -1, 0, true);
     }
 
     /**
      * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
      * @param animation the animation the frame is from
      * @param frame the frame to display
-     * @param isAsync whether to show this frame asynchronously (unpredictable results)
-     * @return false if this group is in an unloaded chunk
-     */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, boolean isAsync) {
-        if (!isInLoadedChunk()){
-            return false;
-        }
-        DisplayAnimationPlayer.setGroupToFrame(this, animation, frame, isAsync);
-        return true;
-    }
-
-    /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
-     * @param animation the animation the frame is from
-     * @param startFrameId the id of the frame to display
-     * @param isAsync whether to show this frame asynchronously (unpredictable results)
      * @param duration how long the frame should play
      * @param delay how long until the frame should start playing
-     * @return false if this group is in an unloaded chunk
      */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, int startFrameId, int duration, int delay, boolean isAsync) {
-        return setToFrame(animation, animation.getFrame(startFrameId), duration, delay, isAsync);
-    }
-
-    /**
-     * Display the transformations of a {@link SpawnedDisplayAnimationFrame} on this group
-     * @param animation the animation the frame is from
-     * @param frame the frame to display
-     * @param isAsync whether to show this frame asynchronously (unpredictable results)
-     * @param duration how long the frame should play
-     * @param delay how long until the frame should start playing
-     * @return false if this group is in an unloaded chunk
-     */
-    public boolean setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay, boolean isAsync) {
+    @Override
+    public void setToFrame(@NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
         if (!isInLoadedChunk()){
-            return false;
+            return;
         }
-        DisplayAnimationPlayer.setGroupToFrame(this, animation, frame, duration, delay, isAsync);
-        return true;
+        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
+        SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
+        clonedFrame.duration = duration;
+        DisplayAPI.getAnimationPlayerService().play(animator, animation, this, clonedFrame, -1, delay, true);
     }
 
 
@@ -1239,39 +1219,41 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     @Override
     public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
         if (isInLoadedChunk()){
-            ClientAnimationPlayer.setGroupToFrame(player, this, animation, frame);
+            DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
+            DisplayAPI.getAnimationPlayerService().playForClient(Set.of(player), animator, animation, this, frame, -1, 0, true);
         }
     }
 
     @Override
     public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay) {
         if (isInLoadedChunk()){
-            ClientAnimationPlayer.setGroupToFrame(player, this, animation, frame, duration, delay);
+            DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
+            SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
+            clonedFrame.duration = duration;
+            DisplayAPI.getAnimationPlayerService().playForClient(Set.of(player), animator, animation, this, clonedFrame, -1, delay, true);
         }
     }
 
 
     /**
-     * Creates a copy of this group at a location
-     * @param location Where to spawn the clone
      * @return a cloned {@link SpawnedDisplayEntityGroup}
      */
+    @Override
     public SpawnedDisplayEntityGroup clone(@NotNull Location location){
         return clone(location, new GroupSpawnSettings());
     }
 
     /**
      * Creates a copy of this group at a location with {@link GroupSpawnSettings}
-     * @param location Where to spawn the clone
+     * @param location where to spawn the cloned group
      * @param settings the settings to use on the cloned group
      * @return a cloned {@link SpawnedDisplayEntityGroup}
      */
     public SpawnedDisplayEntityGroup clone(@NotNull Location location, @NotNull GroupSpawnSettings settings){
-
         if (DisplayConfig.autoPivotInteractions()){
             HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
             for (SpawnedDisplayEntityPart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
-                float oldYaw = part.getEntity().getYaw();
+                float oldYaw = part.getYaw();
                 oldYaws.put(part,  oldYaw);
                 part.pivot(-oldYaw);
             }
@@ -1323,11 +1305,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
     }
 
-    /**
-     * Get a DisplayEntityGroup representative of this SpawnedDisplayEntityGroup
-     * @return DisplayEntityGroup representing this
-     */
-    public DisplayEntityGroup toDisplayEntityGroup(){
+    @Override
+    public @NotNull DisplayEntityGroup toDisplayEntityGroup(){
         return new DisplayEntityGroup(this);
     }
 

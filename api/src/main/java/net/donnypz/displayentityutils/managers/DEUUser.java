@@ -3,9 +3,9 @@ package net.donnypz.displayentityutils.managers;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
+import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
-import net.donnypz.displayentityutils.utils.WorldUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -87,7 +87,7 @@ public class DEUUser {
                 return user.userUUID == userUUID;
             }
         }
-        setSelectedPartSelection(new SpawnedPartSelection(spawnedDisplayEntityGroup),true);
+        setSelectedPartSelection(spawnedDisplayEntityGroup.createPartSelection(),true);
         return true;
     }
 
@@ -237,7 +237,7 @@ public class DEUUser {
         }
 
         World w = player.getWorld();
-        for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(w, WorldUtils.getChunkKey(x, z))){
+        for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(w, ConversionUtils.getChunkKey(x, z))){
             if (!pg.isAutoShow() || pg.isRiding()) continue;
 
             Predicate<Player> condition = pg.getAutoShowCondition();

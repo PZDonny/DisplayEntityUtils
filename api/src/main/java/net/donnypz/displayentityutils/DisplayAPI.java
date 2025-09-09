@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils;
 
 import net.donnypz.displayentityutils.managers.DisplayStorage;
 import net.donnypz.displayentityutils.managers.LoadMethod;
+import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -37,11 +38,16 @@ public final class DisplayAPI {
     static DisplayStorage LOCAL_STORAGE;
     static DisplayStorage MYSQL_STORAGE;
     static DisplayStorage MONGODB_STORAGE;
+    static AnimationPlayer.AnimationPlayerProvider ANIMATION_PLAYER_SERVICE;
 
     private DisplayAPI(){}
 
     public static @NotNull JavaPlugin getPlugin(){
         return plugin;
+    }
+
+    public static @NotNull AnimationPlayer.AnimationPlayerProvider getAnimationPlayerService(){
+        return ANIMATION_PLAYER_SERVICE;
     }
 
     public static @NotNull NamespacedKey getPartUUIDKey() {
@@ -75,7 +81,6 @@ public final class DisplayAPI {
     public static @NotNull NamespacedKey getChunkPacketGroupsKey() {
         return chunkPacketGroupsKey;
     }
-
 
     /**
      * Used for older versions of DisplayEntityUtils Plugin

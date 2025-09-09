@@ -127,7 +127,6 @@ public final class ConfigUtils {
             DisplayConfig.heightCullingAdder = 0;
         }
 
-        DisplayConfig.asynchronousAnimations = config.getBoolean("asynchronousAnimations");
         DisplayConfig.registerPluginCommands = config.getBoolean("registerCommands");
         if (!DisplayConfig.registerPluginCommands){
             unregisterCommand(Bukkit.getPluginCommand("managedisplays"));

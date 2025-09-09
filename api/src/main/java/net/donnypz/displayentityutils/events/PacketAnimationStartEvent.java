@@ -15,7 +15,7 @@ import java.util.Collection;
 public class PacketAnimationStartEvent extends PacketAnimationEvent implements Cancellable {
     private boolean isCancelled = false;
 
-    public PacketAnimationStartEvent(ActiveGroup group, DisplayAnimator animator, SpawnedDisplayAnimation animation, Collection<Player> players){
+    public PacketAnimationStartEvent(ActiveGroup<?> group, DisplayAnimator animator, SpawnedDisplayAnimation animation, Collection<Player> players){
        super(group, animator, animation, players);
     }
 

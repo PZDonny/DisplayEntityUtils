@@ -50,8 +50,27 @@ abstract class DisplayEntitySpecifics implements Serializable {
         }
         Display.Brightness brightness = displayEntity.getBrightness();
         if (brightness != null) {
-            this.brightnessBlockLight = displayEntity.getBrightness().getBlockLight();
-            this.brightnessSkyLight = displayEntity.getBrightness().getSkyLight();
+            this.brightnessBlockLight = brightness.getBlockLight();
+            this.brightnessSkyLight = brightness.getSkyLight();
+        }
+    }
+
+    DisplayEntitySpecifics(PacketDisplayEntityPart part){
+        //this.partTags = DisplayUtils.getPartTags(displayEntity);
+        this.partUUID = part.partUUID;
+        this.serialTransformation = new SerialTransformation(part.getDisplayTransformation());
+        PacketAttributeContainer c = part.attributeContainer;
+        this.billboard = c.getAttributeOrDefault(DisplayAttributes.BILLBOARD, Display.Billboard.FIXED);
+        this.viewRange = c.getAttributeOrDefault(DisplayAttributes.VIEW_RANGE, 1f);
+        this.shadowRadius = c.getAttributeOrDefault(DisplayAttributes.Shadow.RADIUS, 0f);
+        this.shadowStrength = c.getAttributeOrDefault(DisplayAttributes.Shadow.STRENGTH, 0f);
+        this.displayWidth = c.getAttributeOrDefault(DisplayAttributes.Culling.WIDTH, 0f);
+        this.displayHeight = c.getAttributeOrDefault(DisplayAttributes.Culling.HEIGHT, 0f);
+        this.glowColorOverride = c.getAttributeOrDefault(DisplayAttributes.GLOW_COLOR_OVERRIDE, Color.WHITE).asRGB();
+        Display.Brightness brightness = c.getAttribute(DisplayAttributes.BRIGHTNESS);
+        if (brightness != null) {
+            this.brightnessBlockLight = brightness.getBlockLight();
+            this.brightnessSkyLight = brightness.getSkyLight();
         }
     }
 

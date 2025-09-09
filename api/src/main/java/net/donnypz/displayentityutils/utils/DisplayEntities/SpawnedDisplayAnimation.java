@@ -39,20 +39,20 @@ public final class SpawnedDisplayAnimation{
     }
 
     /**
-     * Get if this animation allows for data changes (texture changes to block/item displays, text display text and interaction size)
+     * Get if this animation allows for texture changes to block/item displays, text display text
      * @return a boolean
      */
-    public boolean allowsDataChanges(){
+    public boolean allowsTextureChanges(){
         return dataChanges;
     }
 
     /**
-     * Set whether this animation should allow data changes (texture changes to block/item displays and text display text)
-     * @param dataChanges
+     * Set whether this animation should allow texture changes to block/item displays and text display text
+     * @param textureChanges
      * @return this
      */
-    public SpawnedDisplayAnimation allowDataChanges(boolean dataChanges){
-        this.dataChanges = dataChanges;
+    public SpawnedDisplayAnimation allowTextureChanges(boolean textureChanges){
+        this.dataChanges = textureChanges;
         return this;
     }
 
@@ -64,7 +64,7 @@ public final class SpawnedDisplayAnimation{
      * @return this
      */
     public SpawnedDisplayAnimation setFilter(@NotNull SpawnedDisplayEntityGroup group, @NotNull PartFilter filter, boolean trim){
-        SpawnedPartSelection sel = new SpawnedPartSelection(group, filter);
+        SpawnedPartSelection sel = group.createPartSelection(filter);
         return setFilter(sel, filter, trim);
     }
 

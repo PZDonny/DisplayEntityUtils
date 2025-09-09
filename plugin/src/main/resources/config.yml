@@ -113,10 +113,6 @@ cacheAnimations:
   #-1 to disable expiration
   expireTimeInSeconds: 900
 
-#Attempt to improve server performance by playing animations asynchronously
-#Keep this value as false if animations do not display as intended or are choppy
-asynchronousAnimations: false
-
 
 
 

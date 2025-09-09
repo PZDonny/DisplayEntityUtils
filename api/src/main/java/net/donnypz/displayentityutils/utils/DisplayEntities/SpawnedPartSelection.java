@@ -8,46 +8,10 @@ import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.Set;
-
 public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDisplayEntityPart> implements ServerSideSelection{
 
-    /**
-     * Create a selection of parts with the specified part tag from a group.
-     * @param group The group to get the parts from
-     * @param partTag The part tag to include in the filter
-     */
-    public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull String partTag){
-        this(group, Set.of(partTag), false);
-    }
-
-    /**
-     * Create a selection of parts with the specified part tags from a group.
-     * @param group The group to get the parts from
-     * @param partTags The part tags to include in the filter
-     * @param strictPartTagInclusion whether parts should be filtered strictly, requiring all given tags to be present
-     */
-    public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull Collection<String> partTags, boolean strictPartTagInclusion){
-        this(group, new PartFilter().includePartTags(partTags).strictPartTagInclusion(strictPartTagInclusion));
-    }
-
-    /**
-     * Create a selection containing all parts from a group.
-     * @param group The group to cycle through for this selection.
-     */
-    public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group){
-        this(group, new PartFilter());
-    }
-
-    /**
-     * Create a selection containing filtered parts from a group.
-     * @param group The group to cycle through for this selection.
-     * @param filter The filter used to filter parts
-     */
-    public SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull PartFilter filter){
+    SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull PartFilter filter){
         super(group, filter);
-        group.partSelections.add(this);
     }
 
 

@@ -33,28 +33,39 @@ public final class DisplayEntityGroup implements Serializable{
         Display spawnedMasterEntity = (Display) spawnedGroup.getMasterPart().getEntity();
         this.masterEntity = addDisplayEntity(spawnedMasterEntity).setMaster();
 
-        //HashMap<UUID, DisplayEntity> displayPairs = new HashMap<>();
-        //HashMap<UUID, InteractionEntity> interactionPairs = new HashMap<>();
-
         for (SpawnedDisplayEntityPart part : spawnedGroup.getParts()){
 
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Interaction i = (Interaction) part.getEntity();
                 addInteractionEntity(i);
-                //InteractionEntity entity = addInteractionEntity(i);
-                //interactionPairs.put(part.getPartUUID(), entity);
             }
             else{
                 if (!part.isMaster()){
                     Display d = (Display) part.getEntity();
                     addDisplayEntity(d);
-                    //DisplayEntity entity = addDisplayEntity(d);
-                    //displayPairs.put(part.getPartUUID(), entity);
                 }
             }
         }
-
         this.isPersistent = spawnedGroup.isPersistent();
+    }
+
+    DisplayEntityGroup(PacketDisplayEntityGroup packetGroup){
+        this.tag = packetGroup.getTag();
+
+        this.masterEntity = addDisplayEntity(packetGroup.masterPart).setMaster();
+
+        for (PacketDisplayEntityPart part : packetGroup.getParts()){
+
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                addInteractionEntity(part);
+            }
+            else{
+                if (!part.isMaster()){
+                    addDisplayEntity(part);
+                }
+            }
+        }
+        this.isPersistent = false;
     }
 
     private DisplayEntity addDisplayEntity(Display entity){
@@ -74,8 +85,34 @@ public final class DisplayEntityGroup implements Serializable{
         return display;
     }
 
+    private DisplayEntity addDisplayEntity(PacketDisplayEntityPart part){
+        DisplayEntity display;
+        switch (part.type){
+            case TEXT_DISPLAY -> {
+                display = new DisplayEntity(part, DisplayEntity.Type.TEXT, this);
+            }
+            case BLOCK_DISPLAY -> {
+                display = new DisplayEntity(part, DisplayEntity.Type.BLOCK, this);
+            }
+            case ITEM_DISPLAY -> {
+                display = new DisplayEntity(part, DisplayEntity.Type.ITEM, this);
+            }
+            default -> {
+                return null;
+            }
+        }
+        displayEntities.add(display);
+        return display;
+    }
+
     private InteractionEntity addInteractionEntity(Interaction entity){
         InteractionEntity interaction = new InteractionEntity(entity);
+        interactionEntities.add(interaction);
+        return interaction;
+    }
+
+    private InteractionEntity addInteractionEntity(PacketDisplayEntityPart part){
+        InteractionEntity interaction = new InteractionEntity(part);
         interactionEntities.add(interaction);
         return interaction;
     }
