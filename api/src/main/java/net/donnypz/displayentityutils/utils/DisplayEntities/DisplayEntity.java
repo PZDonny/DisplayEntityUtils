@@ -48,6 +48,23 @@ final class DisplayEntity implements Serializable {
                 }
             }
         }
+
+        static Type fromPartType(SpawnedDisplayEntityPart.PartType type){
+            switch (type){
+                case ITEM_DISPLAY -> {
+                    return ITEM;
+                }
+                case TEXT_DISPLAY -> {
+                    return TEXT;
+                }
+                case BLOCK_DISPLAY -> {
+                    return BLOCK;
+                }
+                default -> {
+                    return null;
+                }
+            }
+        }
     }
 
     private final DisplayEntityGroup group;
@@ -59,17 +76,41 @@ final class DisplayEntity implements Serializable {
     DisplayEntity(Display entity, Type type, DisplayEntityGroup group){
         this.type = type;
         this.group = group;
-        if (entity instanceof BlockDisplay bd) {
-            specifics = new BlockDisplaySpecifics(bd);
+        if (type == Type.BLOCK) {
+            specifics = new BlockDisplaySpecifics((BlockDisplay) entity);
         }
-        else if (entity instanceof ItemDisplay id) {
-            specifics = new ItemDisplaySpecifics(id);
+        else if (type == Type.ITEM) {
+            specifics = new ItemDisplaySpecifics((ItemDisplay) entity);
         }
-        else if (entity instanceof TextDisplay td) {
-            specifics = new TextDisplaySpecifics(td);
+        else if (type == Type.TEXT) {
+            specifics = new TextDisplaySpecifics((TextDisplay) entity);
         }
         try{
             persistentDataContainer = entity.getPersistentDataContainer().serializeToBytes();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    DisplayEntity(PacketDisplayEntityPart part, Type type, DisplayEntityGroup group){
+        this.type = type;
+        this.group = group;
+        if (type == Type.BLOCK) {
+            specifics = new BlockDisplaySpecifics(part);
+        }
+        else if (type == Type.ITEM) {
+            specifics = new ItemDisplaySpecifics(part);
+        }
+        else if (type == Type.TEXT) {
+            specifics = new TextDisplaySpecifics(part);
+        }
+
+        try{
+            ItemStack i = new ItemStack(Material.STICK);
+            PersistentDataContainer pdc = i.getItemMeta().getPersistentDataContainer();
+            pdc.set(DisplayAPI.getPartPDCTagKey(), PersistentDataType.LIST.strings(), new ArrayList<>(part.getTags()));
+            persistentDataContainer = pdc.serializeToBytes();
         }
         catch(IOException e){
             e.printStackTrace();

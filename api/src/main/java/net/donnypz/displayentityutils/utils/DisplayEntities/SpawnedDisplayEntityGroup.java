@@ -1307,11 +1307,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
     }
 
-    /**
-     * Get a DisplayEntityGroup representative of this SpawnedDisplayEntityGroup
-     * @return DisplayEntityGroup representing this
-     */
-    public DisplayEntityGroup toDisplayEntityGroup(){
+    @Override
+    public @NotNull DisplayEntityGroup toDisplayEntityGroup(){
         return new DisplayEntityGroup(this);
     }
 

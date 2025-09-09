@@ -19,6 +19,11 @@ final class BlockDisplaySpecifics extends DisplayEntitySpecifics implements Seri
         blockData = display.getBlock().getAsString();
     }
 
+    BlockDisplaySpecifics(PacketDisplayEntityPart part) {
+        super(part);
+        blockData = part.attributeContainer.getAttribute(DisplayAttributes.BlockDisplay.BLOCK_STATE).getAsString();
+    }
+
     String getBlockData() {
         return blockData;
     }

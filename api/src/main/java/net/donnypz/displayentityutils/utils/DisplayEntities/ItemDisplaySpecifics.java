@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import org.bukkit.Material;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
@@ -21,6 +22,13 @@ final class ItemDisplaySpecifics extends DisplayEntitySpecifics implements Seria
         super(itemDisplay);
         this.itemDisplayTransform = itemDisplay.getItemDisplayTransform();
         this.itemStack = itemDisplay.getItemStack().serializeAsBytes();
+    }
+
+    ItemDisplaySpecifics(PacketDisplayEntityPart part) {
+        super(part);
+        this.itemDisplayTransform = part.getAttributeContainer().getAttributeOrDefault(DisplayAttributes.ItemDisplay.ITEM_DISPLAY_TRANSFORM, ItemDisplay.ItemDisplayTransform.NONE);
+        ItemStack item = part.getAttributeContainer().getAttributeOrDefault(DisplayAttributes.ItemDisplay.ITEMSTACK, new ItemStack(Material.AIR));
+        this.itemStack = item.serializeAsBytes();
     }
 
     ItemDisplay.ItemDisplayTransform getItemDisplayTransform() {

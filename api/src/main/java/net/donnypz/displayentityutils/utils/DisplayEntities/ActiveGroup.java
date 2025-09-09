@@ -818,4 +818,10 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     public @Nullable DisplayAnimator.AnimationType getSpawnAnimationType() {
         return spawnAnimationType;
     }
+
+    /**
+     * Get a {@link DisplayEntityGroup} representative of this group
+     * @return {@link DisplayEntityGroup} representing this
+     */
+    public abstract @NotNull DisplayEntityGroup toDisplayEntityGroup();
 }

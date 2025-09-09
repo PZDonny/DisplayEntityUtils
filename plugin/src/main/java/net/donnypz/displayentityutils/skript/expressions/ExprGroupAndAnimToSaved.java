@@ -10,22 +10,21 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Spawned Group/Animation to Saved")
-@Description("Get a saved group/animation from a spawned group/animation")
+@Name("Active Group or Animation to Saved")
+@Description("Get a saved group/animation from a active group or animation")
 @Examples({"set {_savedgroup} to {_spawnedgroup} as saved group",
-        "set {_savedanim} to {_spawnedanim} as saved animation"})
+        "set {_savedanim} to {_spawnedanim} as saved animation",
+        "#3.3.1",
+        "set {_savedgroup} to {_packetgroup} as saved group"})
 @Since("2.6.2")
-public class ExprSpawnedToSaved extends SimpleExpression<Object> {
+public class ExprGroupAndAnimToSaved extends SimpleExpression<Object> {
 
     static{
-        Skript.registerExpression(ExprSpawnedToSaved.class, Object.class, ExpressionType.SIMPLE, "%spawnedgroup/spawnedanimation% as saved[ |-](group|anim[ation])");
+        Skript.registerExpression(ExprGroupAndAnimToSaved.class, Object.class, ExpressionType.SIMPLE, "%spawnedgroup/packetgroup/spawnedanimation% as saved[ |-](group|anim[ation])");
     }
 
     Expression<?> object;
@@ -33,11 +32,10 @@ public class ExprSpawnedToSaved extends SimpleExpression<Object> {
     @Override
     protected Object @Nullable [] get(Event event) {
         Object o = object.getSingle(event);
-        if (o instanceof SpawnedDisplayEntityGroup group){
-            DisplayEntityGroup g = group.toDisplayEntityGroup();
-            return new DisplayEntityGroup[]{g};
+        if (o instanceof ActiveGroup<?> ag){
+            return new DisplayEntityGroup[]{ag.toDisplayEntityGroup()};
         }
-        else if (o instanceof SpawnedDisplayAnimation anim){
+        if (o instanceof SpawnedDisplayAnimation anim){
             DisplayAnimation a = anim.toDisplayAnimation();
             return new DisplayAnimation[]{a};
         }

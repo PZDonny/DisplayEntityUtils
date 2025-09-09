@@ -790,6 +790,12 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return true;
     }
 
+
+    @Override
+    public @NotNull DisplayEntityGroup toDisplayEntityGroup(){
+        return new DisplayEntityGroup(this);
+    }
+
     public void unregister(){
         String worldName = getWorldName();
         if (worldName != null){
