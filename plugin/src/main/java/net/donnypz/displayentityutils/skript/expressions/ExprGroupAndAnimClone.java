@@ -14,14 +14,15 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import net.donnypz.displayentityutils.events.PreGroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Cloned Spawned Group/Animation")
-@Description("Create a clone version of a active group/animation")
+@Name("Cloned Active Group or Animation")
+@Description("Create a clone version of a active group or animation")
 @Examples({"set {_groupclone} to a clone of {_spawnedgroup}",
         "",
         "#Create a group clone at a certain location",
@@ -30,13 +31,16 @@ import org.jetbrains.annotations.Nullable;
         "#Create a group clone with group spawn settings (2.7.7+)",
         "set {_groupclone} to a clone of {_spawnedgroup} with {_settings}",
         "",
+        "#Create a packet group clone (3.3.1+)",
+        "set {_groupclone} to a clone of {_packetgroup}",
+        "",
         "#Create an animation clone",
         "set {_animclone} to a clone of {_spawnedanimation}"})
 @Since("2.6.2")
-public class ExprSpawnedClone extends SimpleExpression<Object> {
+public class ExprGroupAndAnimClone extends SimpleExpression<Object> {
 
     static{
-        Skript.registerExpression(ExprSpawnedClone.class, Object.class, ExpressionType.SIMPLE, "[a] (clone[d version]|cop[y|ied version]) of %spawnedgroup/spawnedanimation% [loc:at %-location%] [s:with %-groupspawnsettings%]");
+        Skript.registerExpression(ExprGroupAndAnimClone.class, Object.class, ExpressionType.SIMPLE, "[a] (clone[d version]|cop[y|ied version]) of %spawnedgroup/packetgroup/spawnedanimation% [loc:at %-location%] [s:with %-groupspawnsettings%]");
     }
 
     Expression<?> object;
@@ -54,6 +58,10 @@ public class ExprSpawnedClone extends SimpleExpression<Object> {
                 return null;
             }
             return new SpawnedDisplayEntityGroup[]{g.clone(l, s)};
+        }
+        else if (obj instanceof PacketDisplayEntityGroup g){
+            Location l = location == null ? g.getLocation() : location.getSingle(event);
+            return new PacketDisplayEntityGroup[]{g.clone(l, false, g.isAutoShow())};
         }
         else if (obj instanceof SpawnedDisplayAnimation a){
             return new SpawnedDisplayAnimation[]{a.clone()};

@@ -555,6 +555,47 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     /**
+     *
+     * @return a cloned {@link PacketDisplayEntityGroup}
+     */
+    @Override
+    public PacketDisplayEntityGroup clone(@NotNull Location location){
+        return clone(location, true, true);
+    }
+
+    /**
+     * Creates a copy of this group at a location
+     * @param location where to spawn the clone
+     * @param playSpawnAnimation whether this packet group should automatically play its spawn animation when created
+     * @param autoShow whether this packet group should automatically handle revealing and hiding itself to players
+     * @return a cloned {@link PacketDisplayEntityGroup}
+     */
+    public PacketDisplayEntityGroup clone(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow){
+        if (DisplayConfig.autoPivotInteractions()){
+            HashMap<ActivePart, Float> oldYaws = new HashMap<>();
+            for (ActivePart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
+                float oldYaw = part.getYaw();
+                oldYaws.put(part,  oldYaw);
+                part.pivot(-oldYaw);
+            }
+
+            DisplayEntityGroup group = toDisplayEntityGroup();
+            PacketDisplayEntityGroup cloned = group.createPacketGroup(location, playSpawnAnimation, autoShow);
+
+            for (Map.Entry<ActivePart, Float> entry : oldYaws.entrySet()){
+                ActivePart part = entry.getKey();
+                float oldYaw = entry.getValue();
+                part.pivot(oldYaw);
+            }
+            oldYaws.clear();
+            return cloned;
+        }
+        else{
+            return toDisplayEntityGroup().createPacketGroup(location, playSpawnAnimation, autoShow);
+        }
+    }
+
+    /**
      * Get the name of the world this group is in
      * @return a string or null if the group's location was never set
      */

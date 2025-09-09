@@ -528,6 +528,13 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      */
     public abstract void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay);
 
+    /**
+     * Creates a copy of this group at a location
+     * @param location where to spawn the cloned group
+     * @return a copy of this group
+     */
+    public abstract ActiveGroup<T> clone(@NotNull Location location);
+
 
     /**
      * Check if an animator is animating on this group

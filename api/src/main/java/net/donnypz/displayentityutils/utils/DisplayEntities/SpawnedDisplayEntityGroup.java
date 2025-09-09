@@ -1236,26 +1236,24 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
 
     /**
-     * Creates a copy of this group at a location
-     * @param location Where to spawn the clone
      * @return a cloned {@link SpawnedDisplayEntityGroup}
      */
+    @Override
     public SpawnedDisplayEntityGroup clone(@NotNull Location location){
         return clone(location, new GroupSpawnSettings());
     }
 
     /**
      * Creates a copy of this group at a location with {@link GroupSpawnSettings}
-     * @param location Where to spawn the clone
+     * @param location where to spawn the cloned group
      * @param settings the settings to use on the cloned group
      * @return a cloned {@link SpawnedDisplayEntityGroup}
      */
     public SpawnedDisplayEntityGroup clone(@NotNull Location location, @NotNull GroupSpawnSettings settings){
-
         if (DisplayConfig.autoPivotInteractions()){
             HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
             for (SpawnedDisplayEntityPart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
-                float oldYaw = part.getEntity().getYaw();
+                float oldYaw = part.getYaw();
                 oldYaws.put(part,  oldYaw);
                 part.pivot(-oldYaw);
             }
