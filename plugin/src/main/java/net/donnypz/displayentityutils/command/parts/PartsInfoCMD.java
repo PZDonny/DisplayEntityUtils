@@ -76,9 +76,14 @@ class PartsInfoCMD extends PlayerSubCommand {
 
         if (!selection.isSinglePartSelection()){
             UUID partUUID = part.getPartUUID();
+            UUID entityUUID = part.getEntity().getUniqueId();
             player.sendMessage(MiniMessage.miniMessage().deserialize("Part UUID: <yellow>"+partUUID)
                     .hoverEvent(HoverEvent.showText(Component.text("Click to copy", NamedTextColor.GREEN)))
                     .clickEvent(ClickEvent.copyToClipboard(partUUID.toString())));
+
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Entity UUID: <yellow>"+entityUUID)
+                    .hoverEvent(HoverEvent.showText(Component.text("Click to copy", NamedTextColor.GREEN)))
+                    .clickEvent(ClickEvent.copyToClipboard(entityUUID.toString())));
 
             player.sendMessage(MiniMessage.miniMessage().deserialize("Is Master Part: "+(part.isMaster() ? "<green>TRUE" : "<red>FALSE")));
             player.sendMessage(Component.empty());
