@@ -72,7 +72,7 @@ public class WorldEditUtils {
                 return null;
             }
 
-            DisplayGroupManager.addSpawnedGroup(group.getMasterPart(), group);
+            DisplayGroupManager.addSpawnedGroup(group);
             return group;
         }
         catch(IncompleteRegionException e){

@@ -81,7 +81,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 addDisplayEntity((Display) entity);
             }
         }
-        DisplayGroupManager.storeNewSpawnedGroup(this);
+        DisplayGroupManager.addSpawnedGroup(this);
 
         if (DisplayConfig.autoCulling()){
             float widthCullingAdder = DisplayConfig.widthCullingAdder();
