@@ -25,16 +25,15 @@ public class ExprFramePointFromFrame extends SimpleExpression<FramePoint> {
         Skript.registerExpression(ExprFramePointFromFrame.class, FramePoint.class, ExpressionType.COMBINED, "[frame[ |-]]point with tag %string% from %animationframe%");
     }
 
-    Expression<SpawnedDisplayAnimationFrame> frame;
-    Expression<String> tag;
+    private Expression<SpawnedDisplayAnimationFrame> frame;
+    private Expression<String> tag;
 
     @Override
     protected FramePoint @Nullable [] get(Event event) {
         SpawnedDisplayAnimationFrame f = frame.getSingle(event);
+        if (f == null) return new FramePoint[0];
         String t = tag.getSingle(event);
-        if (t == null || f == null){
-            return null;
-        }
+        if (t == null) return new FramePoint[0];
         return new FramePoint[]{f.getFramePoint(t)};
     }
 
@@ -50,12 +49,12 @@ public class ExprFramePointFromFrame extends SimpleExpression<FramePoint> {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "frame point w/ tag "+tag.toString(event,debug)+" from "+frame;
+        return "frame point with tag " + tag.toString(event,debug)+" from " + frame.toString(event,debug);
     }
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        tag  = (Expression<String>) expressions[0];
+        tag = (Expression<String>) expressions[0];
         frame = (Expression<SpawnedDisplayAnimationFrame>) expressions[1];
         return true;
     }

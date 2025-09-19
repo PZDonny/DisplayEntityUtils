@@ -29,25 +29,21 @@ public class ExprFramePointRelativeLocation extends SimpleExpression<Location> {
         Skript.registerExpression(ExprFramePointRelativeLocation.class, Location.class, ExpressionType.SIMPLE, "%framepoint% location relative [to|of] %activegroup/location%");
     }
 
-    Expression<FramePoint> fp;
-    Expression<Object> obj;
+    private Expression<FramePoint> fp;
+    private Expression<Object> obj;
 
     @Override
     protected Location @Nullable [] get(Event event) {
         FramePoint framePoint = fp.getSingle(event);
-        Object o = obj.getSingle(event);
-        if (framePoint == null || o == null){
-            return null;
+        if (framePoint != null) {
+            Object o = obj.getSingle(event);
+            if (o instanceof ActiveGroup<?> g) {
+                return new Location[]{framePoint.getLocation(g)};
+            } else if (o instanceof Location l) {
+                return new Location[]{framePoint.getLocation(l)};
+            }
         }
-        if (o instanceof ActiveGroup<?> g){
-            return new Location[]{framePoint.getLocation(g)};
-        }
-        else if (o instanceof Location l){
-            return new Location[]{framePoint.getLocation(l)};
-        }
-        else{
-            return null;
-        }
+        return new Location[0];
     }
 
     @Override
@@ -62,7 +58,7 @@ public class ExprFramePointRelativeLocation extends SimpleExpression<Location> {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "location relative to: "+fp.toString(event, debug)+" | "+obj.toString();
+        return fp.toString(event, debug) + " location relative to " + obj.toString(event, debug);
     }
 
     @Override

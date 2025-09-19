@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprSpawnedPartType extends SimplePropertyExpression<ActivePart, SpawnedDisplayEntityPart.PartType> {
 
     static {
-        register(ExprSpawnedPartType.class, SpawnedDisplayEntityPart.PartType.class, "[the] [part( |-)?]type", "activepart");
+        register(ExprSpawnedPartType.class, SpawnedDisplayEntityPart.PartType.class, "active part type", "activeparts");
     }
 
     @Override
@@ -35,11 +35,7 @@ public class ExprSpawnedPartType extends SimplePropertyExpression<ActivePart, Sp
 
     @Override
     protected String getPropertyName() {
-        return "type";
+        return "active part type";
     }
 
-    @Override
-    public boolean isSingle() {
-        return true;
-    }
 }

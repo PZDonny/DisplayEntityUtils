@@ -27,7 +27,6 @@ public class ExprGroupSpawnSettings extends SimpleExpression<GroupSpawnSettings>
         Skript.registerExpression(ExprGroupSpawnSettings.class, GroupSpawnSettings.class, ExpressionType.SIMPLE, "[a] [new] [group] spawn setting[s]");
     }
 
-
     @Override
     protected GroupSpawnSettings @Nullable [] get(Event event) {
         return new GroupSpawnSettings[]{new GroupSpawnSettings()};
@@ -45,7 +44,7 @@ public class ExprGroupSpawnSettings extends SimpleExpression<GroupSpawnSettings>
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "group spawn setting";
+        return "a new group spawn setting";
     }
 
     @Override

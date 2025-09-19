@@ -29,9 +29,9 @@ public class ExprSavedFromLoadMethod extends SimpleExpression<Object> {
         Skript.registerExpression(ExprSavedFromLoadMethod.class, Object.class, ExpressionType.SIMPLE, "(g:saved group|anim[ation]) [tagged] %string% from (1¦local|2¦mysql|3¦mongo[db]) [storage]");
     }
 
-    Expression<String> tag;
-    LoadMethod loadMethod;
-    boolean isGroup;
+    private Expression<String> tag;
+    private LoadMethod loadMethod;
+    private boolean isGroup;
 
     @Override
     protected Object @Nullable [] get(Event event) {
@@ -60,7 +60,7 @@ public class ExprSavedFromLoadMethod extends SimpleExpression<Object> {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "getting (group/animation), tagged: "+tag.toString(event, debug);
+        return (isGroup ? "saved group" : "animation") + " tagged " + tag.toString(event, debug) + " from " + loadMethod.name().toLowerCase();
     }
 
     @Override

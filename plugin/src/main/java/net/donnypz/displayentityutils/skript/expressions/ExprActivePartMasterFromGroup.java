@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprActivePartMasterFromGroup extends SimplePropertyExpression<ActiveGroup<?>, ActivePart> {
 
     static {
-        register(ExprActivePartMasterFromGroup.class, ActivePart.class, "[the] (parent|master) [active] part", "activegroup");
+        register(ExprActivePartMasterFromGroup.class, ActivePart.class, "(parent|master) [active] part", "activegroups");
     }
 
     @Override

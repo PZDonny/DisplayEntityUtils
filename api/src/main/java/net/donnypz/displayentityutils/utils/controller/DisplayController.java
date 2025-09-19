@@ -3,7 +3,6 @@ package net.donnypz.displayentityutils.utils.controller;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
-import net.donnypz.displayentityutils.events.NullGroupLoaderEvent;
 import net.donnypz.displayentityutils.events.PreGroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;

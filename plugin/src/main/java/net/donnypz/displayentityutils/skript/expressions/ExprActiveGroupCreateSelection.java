@@ -30,7 +30,7 @@ public class ExprActiveGroupCreateSelection extends SimpleExpression<MultiPartSe
         Skript.registerExpression(ExprActiveGroupCreateSelection.class, MultiPartSelection.class, ExpressionType.SIMPLE, "[a] [new] part[ |-]selection [from|using|of] %activegroup%");
     }
 
-    Expression<ActiveGroup> group;
+    private Expression<ActiveGroup> group;
 
     @Override
     protected MultiPartSelection @Nullable [] get(Event event) {

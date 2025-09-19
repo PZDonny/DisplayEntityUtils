@@ -31,26 +31,24 @@ public class ExprSpawnedGroupNearLocation extends SimpleExpression<SpawnedDispla
         Skript.registerExpression(ExprSpawnedGroupNearLocation.class, SpawnedDisplayEntityGroup.class, ExpressionType.SIMPLE, "(1¦all|2¦nearest) spawned[ |-]group[s] within %number% [block[s]] of %location%");
     }
 
-    Expression<Number> range;
-    Expression<Location> location;
-    boolean isAll;
+    private Expression<Number> range;
+    private Expression<Location> location;
+    private boolean isAll;
 
     @Override
     protected SpawnedDisplayEntityGroup @Nullable [] get(Event event) {
         Number n = range.getSingle(event);
+        if (n == null) return new SpawnedDisplayEntityGroup[0];
         Location loc = location.getSingle(event);
-        if (n == null || loc == null){
-            return null;
-        }
-        if (isAll){
+        if (loc == null) return new SpawnedDisplayEntityGroup[0];
+        if (isAll) {
             List<GroupResult> results = DisplayGroupManager.getSpawnedGroupsNearLocation(loc, n.doubleValue());
             SpawnedDisplayEntityGroup[] arr = new SpawnedDisplayEntityGroup[results.size()];
             for (int i = 0; i < results.size(); i++){
                 arr[i] = results.get(i).group();
             }
             return arr;
-        }
-        else{
+        } else {
             GroupResult result = DisplayGroupManager.getSpawnedGroupNearLocation(loc, n.doubleValue());
             if (result == null){
                 return null;
@@ -71,7 +69,7 @@ public class ExprSpawnedGroupNearLocation extends SimpleExpression<SpawnedDispla
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "group(s) near location: "+location.toString(event, debug);
+        return (isAll ? "all" : "nearest") + " spawned group with " + range.toString(event, debug) + " of " + location.toString(event, debug);
     }
 
     @Override

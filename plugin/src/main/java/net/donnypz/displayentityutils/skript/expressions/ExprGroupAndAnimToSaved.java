@@ -10,7 +10,8 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
-import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,10 +23,10 @@ import org.jetbrains.annotations.Nullable;
 public class ExprGroupAndAnimToSaved extends SimpleExpression<Object> {
 
     static{
-        Skript.registerExpression(ExprGroupAndAnimToSaved.class, Object.class, ExpressionType.SIMPLE, "%spawnedgroup/packetgroup% as saved[ |-]group");
+        Skript.registerExpression(ExprGroupAndAnimToSaved.class, Object.class, ExpressionType.COMBINED, "%spawnedgroup/packetgroup% as saved[ |-]group");
     }
 
-    Expression<?> object;
+    private Expression<?> object;
 
     @Override
     protected Object @Nullable [] get(Event event) {
@@ -48,7 +49,7 @@ public class ExprGroupAndAnimToSaved extends SimpleExpression<Object> {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return object.toString(event,debug)+" to saved type";
+        return object.toString(event,debug)+" to saved group";
     }
 
     @Override

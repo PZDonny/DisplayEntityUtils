@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprActivePartTransLocation extends SimplePropertyExpression<Object, Location> {
 
     static {
-        register(ExprActivePartTransLocation.class, Location.class, "[the] translated location", "activepart/entity");
+        register(ExprActivePartTransLocation.class, Location.class, "translated location", "activeparts/entities");
     }
 
     @Override
@@ -62,8 +62,4 @@ public class ExprActivePartTransLocation extends SimplePropertyExpression<Object
         return "translated location";
     }
 
-    @Override
-    public boolean isSingle() {
-        return true;
-    }
 }

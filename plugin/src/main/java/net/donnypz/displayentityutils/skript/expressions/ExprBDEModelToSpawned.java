@@ -13,10 +13,7 @@ import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.command.bdengine.BDEngineSpawnModelCMD;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.PluginFolders;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.GroupResult;
 import net.donnypz.displayentityutils.utils.bdengine.BDEngineUtils;
 import net.donnypz.displayentityutils.utils.bdengine.convert.file.BDEModel;
 import org.bukkit.Location;
@@ -36,8 +33,8 @@ public class ExprBDEModelToSpawned extends SimpleExpression<SpawnedDisplayEntity
         Skript.registerExpression(ExprBDEModelToSpawned.class, SpawnedDisplayEntityGroup.class, ExpressionType.COMBINED, "bde[ngine] model %string% spawned at %location%");
     }
 
-    Expression<String> fileName;
-    Expression<Location> location;
+    private Expression<String> fileName;
+    private Expression<Location> location;
 
     @Override
     protected SpawnedDisplayEntityGroup @Nullable [] get(Event event) {

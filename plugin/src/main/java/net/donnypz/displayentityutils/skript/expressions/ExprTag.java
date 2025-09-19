@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class ExprTag extends SimplePropertyExpression<Object, String> {
     static {
-        register(ExprTag.class, String.class, "[the] tag", "activegroup/savedgroup/animation/framepoint");
+        register(ExprTag.class, String.class, "neu tag", "activegroups/savedgroups/animations/framepoints");
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ExprTag extends SimplePropertyExpression<Object, String> {
 
     @Override
     protected String getPropertyName() {
-        return "tag";
+        return "neu tag";
     }
 
     @Override

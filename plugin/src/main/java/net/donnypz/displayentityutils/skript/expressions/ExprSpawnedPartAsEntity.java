@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprSpawnedPartAsEntity extends SimplePropertyExpression<SpawnedDisplayEntityPart, Entity> {
 
     static {
-        register(ExprSpawnedPartAsEntity.class, Entity.class, "[the] [true] entity", "spawnedpart");
+        register(ExprSpawnedPartAsEntity.class, Entity.class, "[true] spawned part entity", "spawnedparts");
     }
 
     @Override
@@ -35,11 +35,7 @@ public class ExprSpawnedPartAsEntity extends SimplePropertyExpression<SpawnedDis
 
     @Override
     protected String getPropertyName() {
-        return "entity";
+        return "spawned part entity";
     }
 
-    @Override
-    public boolean isSingle() {
-        return true;
-    }
 }

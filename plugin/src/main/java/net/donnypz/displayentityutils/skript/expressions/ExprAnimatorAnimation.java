@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprAnimatorAnimation extends SimplePropertyExpression<DisplayAnimator, SpawnedDisplayAnimation> {
 
     static {
-        register(ExprAnimatorAnimation.class, SpawnedDisplayAnimation.class, "[deu] [spawned] animation", "displayanimator");
+        register(ExprAnimatorAnimation.class, SpawnedDisplayAnimation.class, "[deu] spawned animation", "displayanimators");
     }
 
     @Override
@@ -35,8 +35,4 @@ public class ExprAnimatorAnimation extends SimplePropertyExpression<DisplayAnima
         return "animation";
     }
 
-    @Override
-    public boolean isSingle() {
-        return true;
-    }
 }

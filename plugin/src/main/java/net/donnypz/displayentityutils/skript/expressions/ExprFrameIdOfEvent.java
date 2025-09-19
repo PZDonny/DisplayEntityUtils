@@ -24,22 +24,26 @@ import org.jetbrains.annotations.Nullable;
 public class ExprFrameIdOfEvent extends SimpleExpression<Number> {
 
     static{
-        Skript.registerExpression(ExprFrameIdOfEvent.class, Number.class, ExpressionType.SIMPLE, "[the] [deu] frame[ |-]id");
+        Skript.registerExpression(ExprFrameIdOfEvent.class, Number.class, ExpressionType.EVENT, "[the] [deu] frame[ |-]id");
     }
 
     @Override
     protected Number @Nullable [] get(Event event) {
+        Integer frameId = null;
         if (event instanceof AnimationFrameEndEvent e){
-            return new Number[]{e.getFrameId()};
+            frameId = e.getFrameId();
         }
         if (event instanceof PacketAnimationFrameEndEvent e){
-            return new Number[]{e.getFrameId()};
+            frameId = e.getFrameId();
         }
         if (event instanceof AnimationFrameStartEvent e){
-            return new Number[]{e.getFrameId()};
+            frameId = e.getFrameId();
         }
         if (event instanceof PacketAnimationFrameStartEvent e){
-            return new Number[]{e.getFrameId()};
+            frameId = e.getFrameId();
+        }
+        if (frameId != null) {
+            return new Number[]{frameId};
         }
         Skript.error("You can get the frame id in frame start / frame end events");
         return null;
@@ -57,11 +61,12 @@ public class ExprFrameIdOfEvent extends SimpleExpression<Number> {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "get event's frame id";
+        return "deu frame id";
     }
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
+        getParser().isCurrentEvent(AnimationFrameStartEvent.class, AnimationFrameEndEvent.class, PacketAnimationFrameEndEvent.class, PacketAnimationFrameStartEvent.class);
         return true;
     }
 }

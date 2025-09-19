@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class ExprPlayerSelectedGroup extends SimplePropertyExpression<Player, SpawnedDisplayEntityGroup> {
     static {
-        register(ExprPlayerSelectedGroup.class, SpawnedDisplayEntityGroup.class, "[the] selected [spawned[ |-]]group", "player");
+        register(ExprPlayerSelectedGroup.class, SpawnedDisplayEntityGroup.class, "selected [spawned[ |-]]group", "players");
     }
 
     @Override
@@ -47,7 +47,7 @@ public class ExprPlayerSelectedGroup extends SimplePropertyExpression<Player, Sp
 
     @Override
     protected String getPropertyName() {
-        return "selected spawnedgroup";
+        return "selected spawned group";
     }
 
     @Override

@@ -43,9 +43,9 @@ public class ExprGroupAndAnimClone extends SimpleExpression<Object> {
         Skript.registerExpression(ExprGroupAndAnimClone.class, Object.class, ExpressionType.SIMPLE, "[a] (clone[d version]|cop[y|ied version]) of %spawnedgroup/packetgroup/animation% [loc:at %-location%] [s:with %-groupspawnsettings%]");
     }
 
-    Expression<?> object;
-    Expression<Location> location;
-    Expression<GroupSpawnSettings> settings;
+    private Expression<?> object;
+    private Expression<Location> location;
+    private Expression<GroupSpawnSettings> settings;
 
     @Override
     protected Object @Nullable [] get(Event event) {
@@ -76,7 +76,7 @@ public class ExprGroupAndAnimClone extends SimpleExpression<Object> {
 
     @Override
     public Class<?> getReturnType() {
-        return Object.class;
+        return Object.class; // todo: this is not recommended
     }
 
     @Override
