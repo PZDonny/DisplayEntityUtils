@@ -16,12 +16,12 @@ import java.util.Arrays;
 
 @Name("Active Part's Tags")
 @Description("Get all the tags of an active part")
-@Examples({"set {_tags::*} to {_spawnedpart}'s part tags"})
+@Examples({"set {_tags::*} to {_spawnedpart}'s active part tags"})
 @Since("2.6.2")
-public class ExprSpawnedPartTags extends PropertyExpression<ActivePart, String> {
+public class ExprActivePartTags extends PropertyExpression<ActivePart, String> {
 
     static {
-        register(ExprSpawnedPartTags.class, String.class, "active part tags", "activeparts");
+        register(ExprActivePartTags.class, String.class, "[active] part tags", "activeparts");
     }
 
     @Override

@@ -15,20 +15,20 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Group/Animation Tag")
 @Description("Get or set the tag of a group/animation. Only the tag of a active group/animation can be changed")
-@Examples({"reset {_spawnedgroup}'s tag",
-            "set {_savedgrouptag} to {_savedgroup}'s tag",
+@Examples({"reset {_spawnedgroup}'s deu tag",
+            "set {_savedgrouptag} to {_savedgroup}'s deu tag",
             "",
-            "set {_animation}'s tag to \"newTag\"",
+            "set {_animation}'s deu tag to \"newTag\"",
             "",
             "#3.0.0 and later",
-            "set {_packetgrouptag} to {_packetgroup}'s tag",
+            "set {_packetgrouptag} to {_packetgroup}'s deu tag",
             "",
             "#3.2.1 and later",
-            "set {_framepointtag} to {_framepoint}'s tag"})
+            "set {_framepointtag} to {_framepoint}'s deu tag"})
 @Since("2.6.2")
 public class ExprTag extends SimplePropertyExpression<Object, String> {
     static {
-        register(ExprTag.class, String.class, "neu tag", "activegroups/savedgroups/animations/framepoints");
+        register(ExprTag.class, String.class, "deu tag", "activegroups/savedgroups/animations/framepoints");
     }
 
     @Override
