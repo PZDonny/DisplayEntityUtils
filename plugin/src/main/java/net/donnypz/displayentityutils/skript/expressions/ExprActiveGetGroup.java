@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprActiveGetGroup extends SimplePropertyExpression<Object, ActiveGroup> {
 
     static {
-        register(ExprActiveGetGroup.class, ActiveGroup.class, "[the] (active|spawned|packet)[ |-]group", "activepart/multipartselection/entity");
+        register(ExprActiveGetGroup.class, ActiveGroup.class, "(active|spawned|packet)[ |-]group", "activeparts/multipartselections/entities");
     }
 
     @Override

@@ -235,7 +235,7 @@ public class SkriptTypes {
         );
 
         Classes.registerClass(new ClassInfo<>(MultiPartSelection.class, "multipartselection")
-                .user("(multi( |-)?)?part( |-)?selection")
+                .user("(multi( |-)?)?part( |-)?selections?")
                 .name("Multi Part Selection")
                 .description("Represents a selection of spawned parts from a spawned Display Entity Group/Model.",
                             "This can be either a Spawned Part Selection or a Packet Part Selection")

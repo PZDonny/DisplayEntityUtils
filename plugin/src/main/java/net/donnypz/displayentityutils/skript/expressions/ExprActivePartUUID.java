@@ -20,7 +20,7 @@ import java.util.UUID;
 public class ExprActivePartUUID extends SimplePropertyExpression<ActivePart, UUID> {
 
     static {
-        register(ExprActivePartUUID.class, UUID.class, "[the] part uuid", "activepart");
+        register(ExprActivePartUUID.class, UUID.class, "part uuid", "activeparts");
     }
 
     @Override
@@ -42,8 +42,4 @@ public class ExprActivePartUUID extends SimplePropertyExpression<ActivePart, UUI
         return "part uuid";
     }
 
-    @Override
-    public boolean isSingle() {
-        return true;
-    }
 }

@@ -13,10 +13,10 @@ import org.jetbrains.annotations.Nullable;
 @Examples({"set {_id} to {_spawnedpart}'s deu entity id",
             "set {_id} to {_packetpart}'s deu entity id"})
 @Since("3.2.2")
-public class ExprActivePartEntityId extends SimplePropertyExpression<Object, Integer> {
+public class ExprActivePartEntityId extends SimplePropertyExpression<ActivePart, Integer> {
 
     static {
-        register(ExprActivePartEntityId.class, Integer.class, "[deu] entity id", "activepart");
+        register(ExprActivePartEntityId.class, Integer.class, "[deu] entity id", "activeparts");
     }
 
     @Override
@@ -26,11 +26,8 @@ public class ExprActivePartEntityId extends SimplePropertyExpression<Object, Int
 
     @Override
     @Nullable
-    public Integer convert(Object o) {
-        if (o instanceof ActivePart part){
-            return part.getEntityId();
-        }
-        return null;
+    public Integer convert(ActivePart part) {
+        return part.getEntityId();
     }
 
     @Override

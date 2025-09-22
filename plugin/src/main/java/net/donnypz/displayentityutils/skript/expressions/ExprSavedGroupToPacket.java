@@ -26,16 +26,15 @@ public class ExprSavedGroupToPacket extends SimpleExpression<PacketDisplayEntity
         Skript.registerExpression(ExprSavedGroupToPacket.class, PacketDisplayEntityGroup.class, ExpressionType.COMBINED, "packet [based] %savedgroup% spawned at %location%");
     }
 
-    Expression<DisplayEntityGroup> savedGroup;
-    Expression<Location> location;
+    private Expression<DisplayEntityGroup> savedGroup;
+    private Expression<Location> location;
 
     @Override
     protected PacketDisplayEntityGroup @Nullable [] get(Event event) {
         DisplayEntityGroup saved = savedGroup.getSingle(event);
+        if (saved == null) return new PacketDisplayEntityGroup[0];
         Location loc = location.getSingle(event);
-        if (saved == null || loc == null){
-            return null;
-        }
+        if (loc == null) return new PacketDisplayEntityGroup[0];
         return new PacketDisplayEntityGroup[]{saved.createPacketGroup(loc, true)};
     }
 
@@ -51,7 +50,7 @@ public class ExprSavedGroupToPacket extends SimpleExpression<PacketDisplayEntity
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return savedGroup.toString(event,debug)+" to packet group";
+        return "packet based " + savedGroup.toString(event, debug)+" spawned at " + location.toString(event, debug);
     }
 
     @Override
