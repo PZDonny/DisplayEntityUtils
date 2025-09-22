@@ -14,17 +14,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.joml.AxisAngle4f;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class AnimationPlayer {
     final DisplayAnimator animator;
     private SpawnedDisplayAnimationFrame prevFrame;
+    private Map<String, MultiPartSelection<?>> bonePartSelections = new HashMap<>(); //By delimited name
     protected final boolean playSingleFrame;
     private final boolean packetAnimationPlayer;
+
+    private static final float MAX_MATRIX_TRANSLATION_DIFF = 0.005f;
+    private static final float MAX_MATRIX_SCALE_DIFF = 0.01f;
+    private static final float MAX_MATRIX_ROT_DIFF = 0.01745329f * 1.5f; //1.5deg
 
     AnimationPlayer(@NotNull DisplayAnimator animator,
                     @NotNull SpawnedDisplayAnimation animation,
@@ -61,10 +66,14 @@ public abstract class AnimationPlayer {
     }
 
     protected void executeAnimation(Collection<Player> players, SpawnedDisplayAnimation animation, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame){
-        if (!onStartNewFrame(group, selection)) return;
+        if (!onStartNewFrame(group, selection)){
+            removeBones();
+            return;
+        }
         //Check if the animation can continue playing
         if (!canContinueAnimation(group)){
             handleAnimationInterrupted(group, selection);
+            removeBones();
             return;
         }
 
@@ -98,6 +107,7 @@ public abstract class AnimationPlayer {
         if (!packetAnimationPlayer || players != null || group.hasTrackingPlayers()){
             animateInteractions(players, groupLoc, frame, group, selection, animation);
             animateDisplays(players, frame, group, selection, animation);
+            animateBoneDisplays(players, frame, group, animation);
         }
 
         if (players == null) group.setLastAnimatedTick();
@@ -105,6 +115,7 @@ public abstract class AnimationPlayer {
 
         if (playSingleFrame){
             handleAnimationInterrupted(group, selection);
+            removeBones();
             return;
         }
 
@@ -242,7 +253,6 @@ public abstract class AnimationPlayer {
                     PacketUtils.scaleInteraction((PacketDisplayEntityPart) part, height, width, frame.duration, 0);
                 }
             }
-
         }
     }
 
@@ -278,7 +288,7 @@ public abstract class AnimationPlayer {
     }
 
     private void animateDisplay(Collection<Player> players, ActivePart part, DisplayTransformation transformation, ActiveGroup<?> group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame){
-        //Prevents jittering in some cases
+        //Prevents jittering
         boolean applyDataOnly;
         if (!packetAnimationPlayer){
             applyDataOnly = transformation.isSimilar(part.getDisplayTransformation());
@@ -289,6 +299,81 @@ public abstract class AnimationPlayer {
             applyDataOnly = last != null && transformation.isSimilar(last);
             applyDisplayTransformationWithPackets(players, part, frame, animation, group, transformation, applyDataOnly);
         }
+    }
+
+    private void animateBoneDisplays(Collection<Player> players, SpawnedDisplayAnimationFrame frame, ActiveGroup<?> group, SpawnedDisplayAnimation animation){
+        Map<MultiPartSelection<?>, Matrix4f> partMatrices = new HashMap<>();
+        for (AnimationBone bone : frame.bones){
+            buildMatrices(bone, group, partMatrices, null, new Matrix4f().identity());
+        }
+
+        for (Map.Entry<MultiPartSelection<?>, Matrix4f> entry : partMatrices.entrySet()){
+            MultiPartSelection<?> sel = entry.getKey();
+            Matrix4f matrix = entry.getValue();
+            for (ActivePart part : sel.selectedParts){
+                applyMatrix(part, new Matrix4f(matrix), frame);
+            }
+        }
+    }
+
+    private void buildMatrices(AnimationBone bone,
+                               ActiveGroup<?> group,
+                               Map<MultiPartSelection<?>, Matrix4f> matrices,
+                               MultiPartSelection parentSel,
+                               Matrix4f parentMatrix){
+        Vector3f customBonePivot, boneScale;
+        if (group.rigProperties == null){
+            customBonePivot = null;
+            boneScale = null;
+        }
+        else{
+            customBonePivot = group.rigProperties.getCustomBonePivot(bone.getDelimitedName());
+            boneScale = group.rigProperties.getDefaultBoneScale(bone.getDelimitedName());
+        }
+
+        Matrix4f localMatrix = bone.getLocalMatrix(customBonePivot, boneScale);
+        Matrix4f combinedMatrix = new Matrix4f(parentMatrix).mul(localMatrix);
+
+        MultiPartSelection<?> sel = bonePartSelections.computeIfAbsent(bone.getDelimitedName(), delimitedName -> {
+            MultiPartSelection<?> selection = group.createPartSelection(new PartFilter().includePartTag(delimitedName));
+            if (parentSel != null) parentSel.removeParts(selection);
+            return selection;
+        });
+
+        matrices.put(sel, combinedMatrix);
+
+        for (AnimationBone child : bone.children.values()){
+            buildMatrices(child, group, matrices, sel, combinedMatrix);
+        }
+    }
+
+    private void applyMatrix(ActivePart part, Matrix4f matrix, SpawnedDisplayAnimationFrame frame){
+        Matrix4f combinedMatrix = matrix
+                .mul(part.getBoneRigTransformation());
+
+        //Apply scale multiplier after all bone calculations are applied
+        float scaleMultiplier = part.getGroup().scaleMultiplier;
+        Matrix4f finalMatrix;
+        if (scaleMultiplier == 1){
+            finalMatrix = combinedMatrix;
+        }
+        else{
+            finalMatrix = new Matrix4f()
+                    .translate(combinedMatrix.getTranslation(new Vector3f())
+                            .mul(scaleMultiplier))
+                    .rotate(combinedMatrix.getRotation(new AxisAngle4f()))
+                    .scale(combinedMatrix.getScale(new Vector3f())
+                            .mul(scaleMultiplier));
+        }
+
+        Matrix4f currentMatrix = DisplayUtils.getMatrix4f(part.getDisplayTransformation());
+        //Prevent jittering
+        if (isSimilar(finalMatrix, currentMatrix)) {
+            return;
+        }
+        part.setInterpolationDelay(0);
+        part.setInterpolationDuration(frame.duration);
+        part.setTransformationMatrix(finalMatrix);
     }
 
 
@@ -369,6 +454,7 @@ public abstract class AnimationPlayer {
         else{
             new AnimationCompleteEvent((SpawnedDisplayEntityGroup) group, animator, animation).callEvent();
         }
+        removeBones();
     }
 
     private void applyDisplayTransformationWithPackets(Collection<Player> players, ActivePart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, ActiveGroup<?> group, DisplayTransformation transformation, boolean applyDataOnly){
@@ -476,6 +562,62 @@ public abstract class AnimationPlayer {
                 follower.laterManualPivot(part, translationVector);
             }
         }
+    }
+
+    private void removeBones(){
+        bonePartSelections.clear();
+    }
+
+    private boolean isSimilar(Matrix4f a, Matrix4f b){
+        if (a == b)
+            return true;
+        if (a == null || b == null)
+            return false;
+
+        //Scale
+        if (!org.joml.Runtime.equals(a.m00(), b.m00(), MAX_MATRIX_SCALE_DIFF))
+            return false;
+        if (!org.joml.Runtime.equals(a.m11(), b.m11(), MAX_MATRIX_SCALE_DIFF))
+            return false;
+
+        if (!org.joml.Runtime.equals(a.m22(), b.m22(), MAX_MATRIX_SCALE_DIFF))
+            return false;
+
+        //Left Rot (i think)
+        if (!org.joml.Runtime.equals(a.m01(), b.m01(), MAX_MATRIX_ROT_DIFF))
+            return false;
+        if (!org.joml.Runtime.equals(a.m02(), b.m02(), MAX_MATRIX_ROT_DIFF))
+            return false;
+        if (!org.joml.Runtime.equals(a.m10(), b.m10(), MAX_MATRIX_ROT_DIFF))
+            return false;
+
+        if (!org.joml.Runtime.equals(a.m12(), b.m12(), MAX_MATRIX_ROT_DIFF))
+            return false;
+        if (!org.joml.Runtime.equals(a.m20(), b.m20(), MAX_MATRIX_ROT_DIFF))
+            return false;
+        if (!org.joml.Runtime.equals(a.m21(), b.m21(), MAX_MATRIX_ROT_DIFF))
+            return false;
+
+
+        //Translation (4th col)
+        if (!org.joml.Runtime.equals(a.m03(), b.m03(), MAX_MATRIX_TRANSLATION_DIFF))
+            return false;
+        if (!org.joml.Runtime.equals(a.m13(), b.m13(), MAX_MATRIX_TRANSLATION_DIFF))
+            return false;
+        if (!org.joml.Runtime.equals(a.m23(), b.m23(), MAX_MATRIX_TRANSLATION_DIFF))
+            return false;
+
+        //Skew (Right rot)
+        if (!org.joml.Runtime.equals(a.m30(), b.m30(), MAX_MATRIX_TRANSLATION_DIFF))
+            return false;
+        if (!org.joml.Runtime.equals(a.m31(), b.m31(), MAX_MATRIX_TRANSLATION_DIFF))
+            return false;
+        if (!org.joml.Runtime.equals(a.m32(), b.m32(), MAX_MATRIX_TRANSLATION_DIFF))
+            return false;
+        if (!org.joml.Runtime.equals(a.m33(), b.m33(), MAX_MATRIX_TRANSLATION_DIFF))
+            return false;
+
+        return true;
     }
 
     protected abstract boolean onStartNewFrame(ActiveGroup<?> group, MultiPartSelection<?> selection);

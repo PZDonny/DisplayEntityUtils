@@ -149,8 +149,8 @@ public final class MongoManager implements DisplayStorage{
                 }
                 else{
                     if (saver != null){
-                        saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display animation to MongoDB!");
-                        saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display animation MongoDB! <gray>("+displayAnimation.getAnimationTag()+")"));
+                        saver.sendMessage(Component.text("| Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
                     }
                     return false;
                 }
@@ -161,7 +161,7 @@ public final class MongoManager implements DisplayStorage{
             }
 
             if (saver != null) {
-                saver.sendMessage(ChatColor.WHITE+"- "+ ChatColor.GREEN + "Successfully saved display animation to MongoDB!");
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("<green>Saved display animation to MongoDB! <gray>("+displayAnimation.getAnimationTag()+")"));
             }
             return true;
         }

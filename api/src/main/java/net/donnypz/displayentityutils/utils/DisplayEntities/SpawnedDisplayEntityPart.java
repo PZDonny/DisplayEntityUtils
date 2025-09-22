@@ -52,8 +52,14 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (isMaster()){
             group.masterPart = this;
         }
-        partTags.addAll(DisplayUtils.getTags(displayEntity));
-        isSingle = false;
+        this.partTags.addAll(DisplayUtils.getTags(displayEntity));
+        PersistentDataContainer pdc = displayEntity.getPersistentDataContainer();
+        List<Float> matrixList = pdc.get(DisplayUtils.boneRigTransformation, PersistentDataType.LIST.floats());
+        if (matrixList != null){
+            this.setBoneRigTransformation(DisplayUtils.listToMatrix(matrixList));
+        }
+
+        this.isSingle = false;
     }
 
 
@@ -63,8 +69,8 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         this.entity = interactionEntity;
         this.type = PartType.INTERACTION;
         applyData(random, interactionEntity);
-        partTags.addAll(DisplayUtils.getTags(interactionEntity));
-        isSingle = false;
+        this.partTags.addAll(DisplayUtils.getTags(interactionEntity));
+        this.isSingle = false;
     }
 
     SpawnedDisplayEntityPart(Entity entity){

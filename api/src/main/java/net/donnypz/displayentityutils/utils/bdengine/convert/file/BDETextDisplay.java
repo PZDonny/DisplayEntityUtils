@@ -17,8 +17,8 @@ public class BDETextDisplay extends BDEDisplay<TextDisplay>{
     int lineLength;
     TextDisplay.TextAlignment alignment;
 
-    BDETextDisplay(Map<String, Object> map, Matrix4f parentTransform) {
-        super(map, TextDisplay.class, parentTransform);
+    BDETextDisplay(Map<String, Object> map, Matrix4f parentMatrix) {
+        super(map, TextDisplay.class, parentMatrix);
         Map<String, Object> options = (Map<String, Object>) map.get("options");
 
         Color color = ConversionUtils.getColorFromText((String) options.get("color"));
@@ -34,7 +34,7 @@ public class BDETextDisplay extends BDEDisplay<TextDisplay>{
                 .decoration(TextDecoration.UNDERLINED, (boolean) options.getOrDefault("underline", false))
                 .decoration(TextDecoration.STRIKETHROUGH, (boolean) options.getOrDefault("strikethrough", false))
                 .decoration(TextDecoration.OBFUSCATED, (boolean) options.getOrDefault("obfuscated", false));
-        lineLength = (int) options.get("lineLength");
+        lineLength = ((Number) options.get("lineLength")).intValue();
         alignment = TextDisplay.TextAlignment.valueOf(((String) options.get("align")).toUpperCase());
     }
 

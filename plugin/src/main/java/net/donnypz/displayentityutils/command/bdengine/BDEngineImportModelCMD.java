@@ -21,7 +21,7 @@ import java.net.URISyntaxException;
 class BDEngineImportModelCMD extends PlayerSubCommand {
 
     BDEngineImportModelCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("importmodel", parentSubCommand, Permission.BDENGINE_SPAWN_MODEL);
+        super("importmodel", parentSubCommand, Permission.BDENGINE_IMPORT_MODEL);
     }
 
     @Override
@@ -42,7 +42,10 @@ class BDEngineImportModelCMD extends PlayerSubCommand {
 
                 Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> {
                     if (!result.spawn(spawnLoc)){
-                        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to spawn model! The spawn location's chunk is not loaded or the model was uploaded as a BDEngine file on the website (Spawning Commands not found), and that format is not supported!", NamedTextColor.RED)));
+                        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to spawn model!", NamedTextColor.RED)));
+                        player.sendMessage(Component.text("| The spawn location's chunk should be loaded", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                        //player.sendMessage(Component.text("| The model may have been BDEngine file on the website (Spawning Commands not found), which is unsupported", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                        player.sendMessage(Component.text("| BDEngine's API may be unavailable causing this error", NamedTextColor.GRAY, TextDecoration.ITALIC));
                         return;
                     }
                     player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Attempted to spawn model at your location!", NamedTextColor.GREEN)));
@@ -63,6 +66,7 @@ class BDEngineImportModelCMD extends PlayerSubCommand {
             }
             catch(InterruptedException | IOException | URISyntaxException e){
                 player.sendMessage(Component.text("An error occurred when attempting to retrieve the BDEngine model!", NamedTextColor.RED));
+                player.sendMessage(Component.text("| BDEngine's API may be unavailable causing this error", NamedTextColor.GRAY, TextDecoration.ITALIC));
                 e.printStackTrace();
             }
             catch(RuntimeException e){

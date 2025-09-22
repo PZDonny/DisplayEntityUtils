@@ -7,6 +7,7 @@ import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.FollowType;
+import net.donnypz.displayentityutils.utils.bdengine.convert.file.BDERigProperties;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -35,6 +36,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     protected String spawnAnimationTag;
     protected LoadMethod spawnAnimationLoadMethod;
     protected DisplayAnimator.AnimationType spawnAnimationType;
+    public BDERigProperties rigProperties;
     protected MachineState currentMachineState;
     protected float scaleMultiplier = 1;
     protected float verticalOffset = 0;
@@ -824,6 +826,10 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      */
     public @Nullable DisplayAnimator.AnimationType getSpawnAnimationType() {
         return spawnAnimationType;
+    }
+
+    public void setRigProperties(@Nullable BDERigProperties rigProperties){
+        this.rigProperties = rigProperties;
     }
 
     /**

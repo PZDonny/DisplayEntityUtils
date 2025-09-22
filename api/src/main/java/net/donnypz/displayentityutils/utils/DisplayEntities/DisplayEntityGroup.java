@@ -5,8 +5,10 @@ import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.events.PreGroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.bdengine.convert.file.BDERigProperties;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -213,7 +215,7 @@ public final class DisplayEntityGroup implements Serializable{
         }
 
         SpawnedDisplayEntityGroup group = new SpawnedDisplayEntityGroup(settings.visibleByDefault);
-        Display blockDisplay = masterEntity.createEntity(group, location, settings);
+        Display masterDisplay = masterEntity.createEntity(group, location, settings);
         if (isPersistent == null){
             group.setPersistent(true);
         }
@@ -223,7 +225,13 @@ public final class DisplayEntityGroup implements Serializable{
 
 
         group.setTag(tag);
-        group.addDisplayEntity(blockDisplay).setMaster();
+        group
+                .addDisplayEntity(masterDisplay)
+                .setMaster();
+        String rigPropertiesJson = masterDisplay.getPersistentDataContainer().get(DisplayUtils.groupRigProperties, PersistentDataType.STRING);
+        if (rigPropertiesJson != null){
+            group.setRigProperties(BDERigProperties.fromJson(rigPropertiesJson));
+        }
 
         for (DisplayEntity entity : displayEntities){ //Summon Display Entities
             if (entity.isMaster()) continue;

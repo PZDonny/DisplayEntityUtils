@@ -107,8 +107,9 @@ public enum Permission {
     ANIM_SELECT("deu.anim.select"),
     ANIM_PREVIEW("deu.anim.preview"),
 
-    BDENGINE_CONVERT_ANIM("deu.bdengine.convertanim"),
-    BDENGINE_SPAWN_MODEL("deu.bdengine.spawnmodel");
+    BDENGINE_DATAPACK("deu.bdengine.datapack"),
+    BDENGINE_IMPORT_MODEL("deu.bdengine.importmodel"),
+    BDENGINE_CONVERT_FILE("deu.bdengine.convertfile");
 
 
     private final String permission;

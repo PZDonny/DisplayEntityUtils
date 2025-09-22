@@ -17,6 +17,7 @@ import java.util.*;
 public final class SpawnedDisplayAnimationFrame implements Cloneable{
     HashMap<UUID, DisplayTransformation> displayTransformations = new HashMap<>(); //Part UUIDS
     HashMap<UUID, Vector3f>  interactionTransformations = new HashMap<>(); //Part UUIDS
+    List<AnimationBone> bones = new ArrayList<>();
 
     int delay;
     int duration;
@@ -101,6 +102,11 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     }
 
 
+    public SpawnedDisplayAnimationFrame setBones(@NotNull Collection<AnimationBone> bones){
+        this.bones.addAll(bones);
+        return this;
+    }
+
     /**
      * Change the transformation data of this frame to the transformation of a group.
      * @param group the group to get transformation data from
@@ -108,17 +114,16 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      */
     public SpawnedDisplayAnimationFrame setTransformation(@NotNull SpawnedDisplayEntityGroup group){
         Location gLoc = group.getLocation();
-        for (ActivePart p : group.groupParts.values()){
-            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) p;
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                Interaction i = (Interaction) part.getEntity();
+        for (SpawnedDisplayEntityPart p : group.groupParts.values()){
+            if (p.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                Interaction i = (Interaction) p.getEntity();
 
                 InteractionTransformation transform = new InteractionTransformation(DisplayUtils.getInteractionTranslation(i).toVector3f(), gLoc.getYaw(), gLoc.getPitch(), i.getInteractionHeight(), i.getInteractionWidth());
-                setInteractionTransformation(part, transform);
+                setInteractionTransformation(p, transform);
             }
             else{
-                DisplayTransformation transform = DisplayTransformation.get((Display) part.getEntity());
-                setDisplayEntityTransformation(part, transform);
+                DisplayTransformation transform = DisplayTransformation.get((Display) p.getEntity());
+                setDisplayEntityTransformation(p, transform);
             }
         }
         return this;
@@ -477,7 +482,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
 
     @ApiStatus.Internal
     public DisplayAnimationFrame toDisplayAnimationFrame(){
-        DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, framePoints, startCommands, endCommands, tag);
+        DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, framePoints, startCommands, endCommands, bones, tag);
         for (Map.Entry<UUID, DisplayTransformation> entry : displayTransformations.entrySet()){
             UUID uuid = entry.getKey();
             DisplayTransformation transformation = entry.getValue();

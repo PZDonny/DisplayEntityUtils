@@ -10,13 +10,10 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
-import net.donnypz.displayentityutils.command.bdengine.BDEngineSpawnModelCMD;
+import net.donnypz.displayentityutils.command.bdengine.BDEngineConvertFileCMD;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.PluginFolders;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.GroupResult;
 import net.donnypz.displayentityutils.utils.bdengine.BDEngineUtils;
 import net.donnypz.displayentityutils.utils.bdengine.convert.file.BDEModel;
 import org.bukkit.Location;
@@ -27,8 +24,8 @@ import java.io.File;
 
 @Name("BDEngine Model to Spawned Group")
 @Description("Spawn a model from a \".bdengine\" file, stored in DisplayEntityUtils' \"bdenginefiles\" folder")
-@Examples({"set {_spawnedgroup} to bdengine model \"mymodel\" spawned at {_location}",
-            "set {_spawnedgroup} to bde model \"model.bdengine\" spawned at {_location}"})
+@Examples({"set {_spawnedgroup} to bdengine model \"myproject\" spawned at {_location}",
+            "set {_spawnedgroup} to bde model \"project.bdengine\" spawned at {_location}"})
 @Since("3.3.0")
 public class ExprBDEModelToSpawned extends SimpleExpression<SpawnedDisplayEntityGroup> {
 
@@ -46,7 +43,7 @@ public class ExprBDEModelToSpawned extends SimpleExpression<SpawnedDisplayEntity
         if (file == null || loc == null){
             return null;
         }
-        BDEModel model = BDEngineUtils.readFile(new File(PluginFolders.bdeFilesFolder, BDEngineSpawnModelCMD.fileExtension(file)));
+        BDEModel model = BDEngineUtils.readFile(new File(PluginFolders.bdeFilesFolder, BDEngineConvertFileCMD.correctedFileName(file)), "", null);
         if (model == null) return null;
         return new SpawnedDisplayEntityGroup[]{model.spawn(loc, GroupSpawnedEvent.SpawnReason.SKRIPT)};
     }

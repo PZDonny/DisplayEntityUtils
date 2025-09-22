@@ -17,6 +17,7 @@ import java.util.*;
 public final class DisplayAnimationFrame implements Serializable {
     HashMap<UUID, SerialTransformation> displayTransformations = new HashMap<>();
     HashMap<UUID, Vector3f> interactionTranslations = new HashMap<>();
+    List<AnimationBone> bones;
     int delay;
     int duration;
 
@@ -44,6 +45,7 @@ public final class DisplayAnimationFrame implements Serializable {
             Map<String, FramePoint> framePoints,
             List<String> startCommands,
             List<String> endCommands,
+            List<AnimationBone> bones,
             String frameTag){
         this.delay = delay;
         this.duration = duration;
@@ -51,6 +53,12 @@ public final class DisplayAnimationFrame implements Serializable {
         this.startCommands = new ArrayList<>(startCommands);
         this.endCommands = new ArrayList<>(endCommands);
         this.frameTag = frameTag;
+        if (bones != null){
+            this.bones = new ArrayList<>();
+            for (AnimationBone bone : bones){
+                this.bones.add(new AnimationBone(bone));
+            }
+        }
     }
 
     void setDisplayEntityTransformation(UUID uuid, SerialTransformation transformation){
@@ -132,6 +140,14 @@ public final class DisplayAnimationFrame implements Serializable {
         if (framePoints != null){
             for (FramePoint fp : framePoints.values()){
                 frame.framePoints.put(fp.tag, new FramePoint(fp));
+            }
+        }
+
+        //Rig Bones
+        if (bones != null){
+            frame.bones = new ArrayList<>();
+            for (AnimationBone bone : bones){
+                frame.bones.add(new AnimationBone(bone));
             }
         }
 

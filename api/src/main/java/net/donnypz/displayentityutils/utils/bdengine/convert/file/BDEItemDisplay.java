@@ -19,8 +19,8 @@ class BDEItemDisplay extends BDEDisplay<ItemDisplay> {
     ItemDisplay.ItemDisplayTransform transform;
     String playerHeadTexture;
 
-    BDEItemDisplay(Map<String, Object> map, Matrix4f parentTransform) {
-        super(map, ItemDisplay.class, parentTransform);
+    BDEItemDisplay(Map<String, Object> map, Matrix4f parentMatrix) {
+        super(map, ItemDisplay.class, parentMatrix);
         String[] split = name.split("=");
         String leftSplit = split[0];
         name = leftSplit.substring(0, leftSplit.length()-8);

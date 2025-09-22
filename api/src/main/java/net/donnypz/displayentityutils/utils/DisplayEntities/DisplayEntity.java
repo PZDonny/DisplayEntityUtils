@@ -2,6 +2,8 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.managers.LoadMethod;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.bdengine.convert.file.BDERigProperties;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
@@ -170,12 +172,21 @@ final class DisplayEntity implements Serializable {
 
             part.partTags = getSetFromPDC(pdc, DisplayAPI.getPartPDCTagKey());
             part.partUUID = getPDCPartUUID(pdc);
+            List<Float> matrixList = pdc.get(DisplayUtils.boneRigTransformation, PersistentDataType.LIST.floats());
+            if (matrixList != null){
+                part.setBoneRigTransformation(DisplayUtils.listToMatrix(matrixList));
+            }
             if (group.masterPart == null && isMaster){
                 part.isMaster = true;
                 String animationTag = getSpawnAnimationTag(pdc);
                 LoadMethod loadMethod = getSpawnAnimationLoadMethod(pdc);
                 DisplayAnimator.AnimationType type = getSpawnAnimationType(pdc);
                 group.setSpawnAnimation(animationTag, loadMethod, type);
+
+                String rigPropertiesJson = pdc.get(DisplayUtils.groupRigProperties, PersistentDataType.STRING);
+                if (rigPropertiesJson != null){
+                    group.setRigProperties(BDERigProperties.fromJson(rigPropertiesJson));
+                }
             }
         }
 

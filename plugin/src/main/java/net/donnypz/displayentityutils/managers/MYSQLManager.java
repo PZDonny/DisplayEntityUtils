@@ -254,8 +254,8 @@ public final class MYSQLManager implements DisplayStorage{
                 }
                 else{
                     if (saver != null) {
-                        saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display animation to MYSQL!");
-                        saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display animation to MYSQL! <gray>("+displayAnimation.getAnimationTag()+")"));
+                        saver.sendMessage(Component.text("| Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
                     }
                     return false;
                 }
@@ -263,7 +263,7 @@ public final class MYSQLManager implements DisplayStorage{
             statement.executeUpdate();
             blobStream.close();
             if (saver != null) {
-                saver.sendMessage(ChatColor.WHITE+"- "+ ChatColor.GREEN + "Successfully saved display animation to MYSQL!");
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("<green>Saved display animation to MYSQL! <gray>("+displayAnimation.getAnimationTag()+")"));
             }
             return true;
         }

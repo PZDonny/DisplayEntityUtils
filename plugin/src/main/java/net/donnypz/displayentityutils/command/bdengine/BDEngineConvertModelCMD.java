@@ -22,34 +22,33 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.List;
 
-public class BDEngineConvertAnimCMD extends PlayerSubCommand {
+public class BDEngineConvertModelCMD extends PlayerSubCommand {
 
-    BDEngineConvertAnimCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("convertanim", parentSubCommand, Permission.BDENGINE_CONVERT_FILE);
+    BDEngineConvertModelCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("convertmodel", parentSubCommand, Permission.BDENGINE_CONVERT_FILE);
     }
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 5) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis bdengine convertanim <file-name> <anim-tag-prefix>", NamedTextColor.RED)));
+        if (args.length < 4) {
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis bdengine convertmodel <file-name> <group-tag>", NamedTextColor.RED)));
             return;
         }
         String fileName = args[2];
-        String animPrefix = args[3];
-        BDEModel model = BDEngineUtils.readFile(new File(PluginFolders.bdeFilesFolder, BDEngineConvertFileCMD.correctedFileName(fileName)), "", animPrefix);
+        String groupTag = args[3];
+        Location spawnLoc = player.getLocation();
+        BDEModel model = BDEngineUtils.readFile(new File(PluginFolders.bdeFilesFolder, BDEngineConvertFileCMD.correctedFileName(fileName)), groupTag, null);
         if (model == null){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to BDEngine project file!", NamedTextColor.RED)));
             return;
         }
 
-        List<SpawnedDisplayAnimation> animations = model.getAnimations();
-        if (animations.isEmpty()){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to find animations with frames in the project file!", NamedTextColor.RED)));
-            return;
-        }
+        SpawnedDisplayEntityGroup g = model.spawn(spawnLoc, GroupSpawnedEvent.SpawnReason.COMMAND);
 
-        for (SpawnedDisplayAnimation anim : animations){
-            DisplayAnimationManager.saveDisplayAnimation(LoadMethod.LOCAL, anim.toDisplayAnimation(), player);
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Spawned a BDEngine model from its project file", NamedTextColor.GREEN)));
+        if (player.isConnected() && DisplayConfig.autoSelectGroups()){
+            g.addPlayerSelection(player);
+            player.sendMessage(Component.text("The converted group has been automatically selected", NamedTextColor.GRAY));
         }
     }
 

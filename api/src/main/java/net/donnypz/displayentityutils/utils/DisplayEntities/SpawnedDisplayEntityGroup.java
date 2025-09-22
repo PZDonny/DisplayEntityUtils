@@ -11,6 +11,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayState
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.FollowType;
 import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.bdengine.convert.file.BDERigProperties;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -63,6 +64,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
         if (c.has(persistenceOverrideKey)) {
             persistenceOverride = c.get(persistenceOverrideKey, PersistentDataType.BOOLEAN);
+        }
+        if (c.has(DisplayUtils.groupRigProperties)) {
+            setRigProperties(BDERigProperties.fromJson(c.get(DisplayUtils.groupRigProperties, PersistentDataType.STRING)));
         }
         setSpawnAnimation(c);
 

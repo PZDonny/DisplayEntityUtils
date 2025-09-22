@@ -102,8 +102,8 @@ public final class LocalManager implements DisplayStorage{
                 }
                 else{
                     if (saver != null){
-                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display animation locally!"));
-                        saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display animation locally! <gray>("+displayAnimation.getAnimationTag()+")"));
+                        saver.sendMessage(Component.text("| Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
                     }
                     return false;
                 }
@@ -114,7 +114,7 @@ public final class LocalManager implements DisplayStorage{
             fileOut.write(data);
             fileOut.close();
             if (saver != null) {
-                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved display animation locally!"));
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("<green>Saved display animation locally! <gray>("+displayAnimation.getAnimationTag()+")"));
             }
             return true;
         }

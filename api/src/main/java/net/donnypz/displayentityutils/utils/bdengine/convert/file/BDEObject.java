@@ -11,24 +11,20 @@ abstract class BDEObject {
 
     String name;
     String nbt;
-    Matrix4f transformationMatrix;
+    Matrix4f transformMatrix;
+    Matrix4f combinedMatrix;
 
-    BDEObject(Map<String, Object> map){
-        readCommon(map);
+    BDEObject(Map<String, Object> bdeObject, Matrix4f parentMatrix){
+        this(bdeObject);
+        combinedMatrix = new Matrix4f(parentMatrix).mul(transformMatrix);
     }
 
-    BDEObject(Map<String, Object> map, Matrix4f parentTransform){
-        this(map);
-        //Multiplication order matters for matrices
-        transformationMatrix = new Matrix4f(parentTransform).mul(transformationMatrix);
-    }
-
-    private void readCommon(Map<String, Object> bdeObject){
+    BDEObject(Map<String, Object> bdeObject){
         name = ((String) bdeObject.get("name")).replace(" ", "_").toLowerCase();
         nbt = (String) bdeObject.get("nbt");
 
         List<Double> transformList = (List<Double>) bdeObject.get("transforms");
-        transformationMatrix = new Matrix4f(
+        transformMatrix = new Matrix4f(
                 transformList.get(0).floatValue(),
                 transformList.get(1).floatValue(),
                 transformList.get(2).floatValue(),
@@ -46,9 +42,8 @@ abstract class BDEObject {
                 transformList.get(14).floatValue(),
                 transformList.get(15).floatValue()
         ).transpose();
+        combinedMatrix = new Matrix4f().identity();
     }
-
-
 
     abstract void spawn(Location spawnLoc, BlockDisplay parent, BDECollection parentCollection);
 }

@@ -144,7 +144,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         }
         sender.sendMessage(DisplayAPI.pluginPrefixLong);
         sender.sendMessage(Component.text("v"+DisplayAPI.getPlugin().getPluginMeta().getVersion(), NamedTextColor.GRAY));
-        CMDUtils.sendCMD(sender, "/mdis group", "Display Entity Models/Groups related commands");
+        CMDUtils.sendCMD(sender, "/mdis group", "Display Entity Model/Group related commands");
         CMDUtils.sendCMD(sender, "/mdis anim", "Animation related commands");
         CMDUtils.sendCMD(sender, "/mdis parts", "Commands related to the parts (individual display entities) of a Display Entity Model/Group");
         CMDUtils.sendCMD(sender, "/mdis item", "Commands related to the Item Display parts of a Display Entity Model/Group");
@@ -153,7 +153,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         CMDUtils.sendCMD(sender, "/mdis listgroups <storage> [page-number]", "List all saved Display Entity Models/Groups");
         CMDUtils.sendCMD(sender, "/mdis listanims <storage> [page-number]", "List all saved Animations");
         CMDUtils.sendCMD(sender, "/mdis hidepoints", "Hide any visible points (frame points, chunk packet group points, etc.)");
-        CMDUtils.sendCMD(sender, "/mdis bdengine", "Import/Convert models from BDEngine");
+        CMDUtils.sendCMD(sender, "/mdis bdengine", "Import/Convert models and animations from BDEngine");
         CMDUtils.sendCMD(sender, "/mdis reload <config | controllers>", "Reload the plugin's config or Display Controllers." +
                 " To reload Local, MySQL or MongoDB config save options, the server must be restarted");
     }
@@ -291,6 +291,12 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                         suggestions.add("illageralt");
                     }
                 }
+                case "bdengine" -> {
+                    String arg = args[1];
+                    if (arg.equalsIgnoreCase("convertfile") || arg.equalsIgnoreCase("convertanim") || arg.equalsIgnoreCase("convertmodel")){
+                        suggestions.add("<file-name>");
+                    }
+                }
             }
         }
         else if (args.length == 4) {
@@ -321,12 +327,27 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                     suggestions.add("both");
                 }
             }
+            else if (args[0].equalsIgnoreCase("bdengine")){
+                String arg = args[1];
+                if (arg.equalsIgnoreCase("convertfile") || arg.equalsIgnoreCase("convertmodel")){
+                    suggestions.add("<group-tag>");
+                }
+                else if (arg.equalsIgnoreCase("convertanim")){
+                    suggestions.add("<anim-tag-prefix>");
+                }
+            }
         }
         else if (args.length == 5){
             if (args[0].equalsIgnoreCase("group")){
                 if (args[1].equalsIgnoreCase("setspawnanim")){
                     suggestions.add("linear");
                     suggestions.add("loop");
+                }
+            }
+            else if (args[0].equalsIgnoreCase("bdengine")){
+                String arg = args[1];
+                if (arg.equalsIgnoreCase("convertfile")){
+                    suggestions.add("<anim-tag-prefix>");
                 }
             }
         }

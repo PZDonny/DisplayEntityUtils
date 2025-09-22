@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -37,6 +38,7 @@ public abstract class ActivePart implements Active{
     protected Set<String> partTags = new HashSet<>();
     private boolean valid = true;
     final Set<ClientAnimationPlayer> clientAnimationPlayers = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    protected Matrix4f boneRigTransformation;
 
     protected ActivePart(int entityId, boolean mapped){
         this.entityId = entityId;
@@ -359,6 +361,16 @@ public abstract class ActivePart implements Active{
      * @return the teleport duration or -1 is the part is an interaction
      */
     public abstract int getTeleportDuration();
+
+    void setBoneRigTransformation(Matrix4f matrix4f){
+        this.boneRigTransformation = matrix4f;
+    }
+
+    @ApiStatus.Internal
+    Matrix4f getBoneRigTransformation(){
+        return boneRigTransformation == null ? new Matrix4f().identity() : new Matrix4f(boneRigTransformation);
+    }
+
 
     static class PartData {
 

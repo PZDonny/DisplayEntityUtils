@@ -38,6 +38,8 @@ public final class DisplayUtils {
     public static final NamespacedKey leftClickPlayer = new NamespacedKey(DisplayAPI.getPlugin(), "lcp");
     public static final NamespacedKey rightClickConsole = new NamespacedKey(DisplayAPI.getPlugin(), "rcc");
     public static final NamespacedKey rightClickPlayer = new NamespacedKey(DisplayAPI.getPlugin(), "rcp");
+    public static final NamespacedKey boneRigTransformation = new NamespacedKey(DisplayAPI.getPlugin(), "bone_rig_transform");
+    public static final NamespacedKey groupRigProperties = new NamespacedKey(DisplayAPI.getPlugin(), "group_rig_properties");
 
     private static final ListPersistentDataType<String, String> tagPDCType = PersistentDataType.LIST.strings();
     private DisplayUtils(){}
@@ -95,6 +97,35 @@ public final class DisplayUtils {
                 .rotate(transformation.getLeftRotation())
                 .scale(transformation.getScale())
                 .rotate(transformation.getRightRotation());
+    }
+
+    /**
+     * Convert a {@link Matrix4f} into a list of 16 floats, in column-major order.
+     * @param matrix the matrix to convert.
+     * @return a float list containing the 16 matrix elements.
+     */
+    public static List<Float> matrixToList(@NotNull Matrix4f matrix) {
+        List<Float> list = new ArrayList<>();
+        for (float f : matrix.get(new float[16])) {
+            list.add(f);
+        }
+        return list;
+    }
+
+    /**
+     * Convert a list of 16 floats into a {@link Matrix4f}.
+     * @param list the list of 16 elements, in column-major order.
+     * @return a {@link Matrix4f} or null if the list is invalid
+     */
+    public static @Nullable Matrix4f listToMatrix(@NotNull List<Float> list) {
+        if (list.size() != 16) {
+            return null;
+        }
+        float[] floats = new float[16];
+        for (int i = 0; i < 16; i++) {
+            floats[i] = list.get(i);
+        }
+        return new Matrix4f().set(floats);
     }
 
     public static Vector3f pivotPitchAndYaw(@NotNull Vector3f translation, float pitch, float yaw){
