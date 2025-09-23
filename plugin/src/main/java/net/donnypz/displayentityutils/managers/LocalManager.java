@@ -66,12 +66,12 @@ public final class LocalManager implements DisplayStorage{
         if (saveFile.exists()){
             saveFile.delete();
             if (deleter != null){
-                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted from local files!"));
+                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted group from local files!"));
                 return;
             }
         }
         if (deleter != null){
-            deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved Display Entity Group does not exist in local files!"));
+            deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved display entity group does not exist in local files!"));
         }
     }
 
@@ -102,7 +102,7 @@ public final class LocalManager implements DisplayStorage{
                 }
                 else{
                     if (saver != null){
-                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display animation locally!"));
+                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save animation locally!"));
                         saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
                     }
                     return false;
@@ -114,14 +114,14 @@ public final class LocalManager implements DisplayStorage{
             fileOut.write(data);
             fileOut.close();
             if (saver != null) {
-                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved display animation locally!"));
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved animation locally!"));
             }
             return true;
         }
         catch(IOException ex){
             ex.printStackTrace();
             if (saver != null) {
-                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display animation locally!"));
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save animation locally!"));
             }
             return false;
         }
@@ -135,12 +135,12 @@ public final class LocalManager implements DisplayStorage{
         if (saveFile.exists()){
             saveFile.delete();
             if (deleter != null){
-                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted from local files!"));
+                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted animation from local files!"));
                 return;
             }
         }
         if (deleter != null){
-            deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved Display Animation does not exist in local files!"));
+            deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved animation does not exist in local files!"));
         }
     }
 

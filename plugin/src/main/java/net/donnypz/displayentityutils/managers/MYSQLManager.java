@@ -11,7 +11,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.dbutils.DbUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +91,7 @@ public final class MYSQLManager implements DisplayStorage{
         }
         /*catch(SQLException e){
             e.printStackTrace();
-            Bukkit.getConsoleSender().sendMessage(ChatColor.RED+"There was an error closing the connection to the MYSQL Database");
+            Bukkit.getConsoleSender().sendMessage(Component.text("There was an error closing the connection to the MYSQL Database", NamedTextColor.RED);
         }*/
         finally {
             connected = false;
@@ -147,7 +146,7 @@ public final class MYSQLManager implements DisplayStorage{
                 }
                 else{
                     if (saver != null) {
-                        saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display entity group to MYSQL!");
+                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display entity group to MYSQL!"));
                         saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
                     }
                     return false;
@@ -156,20 +155,21 @@ public final class MYSQLManager implements DisplayStorage{
             statement.executeUpdate();
             blobStream.close();
             if (saver != null) {
-                saver.sendMessage(ChatColor.WHITE+"- "+ ChatColor.GREEN + "Successfully saved display entity group to MYSQL!");
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved display entity group to MYSQL!"));
             }
             return true;
         }
         catch(SQLIntegrityConstraintViolationException e){
             if (saver != null) {
-                saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display entity group to MYSQL. That group already exists!");
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display entity group to MYSQL!"));
+                saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
             }
             e.printStackTrace();
             return false;
         }
         catch(SQLException | IOException e){
             if (saver != null) {
-                saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display entity group to MYSQL!");
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display entity group to MYSQL!"));
             }
             e.printStackTrace();
             return false;
@@ -189,7 +189,7 @@ public final class MYSQLManager implements DisplayStorage{
 
             if (!hasSingleGroup(tag, connection)){
                 if (deleter != null){
-                    deleter.sendMessage(ChatColor.WHITE+"- "+ChatColor.RED+"Saved Display Entity Group does not exist in MYSQL database!");
+                    deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved display entity group does not exist in MYSQL database!"));
                 }
                 return;
             }
@@ -198,7 +198,7 @@ public final class MYSQLManager implements DisplayStorage{
             String delete = "DELETE FROM saved_displays WHERE tag = \""+tag+"\";";
             statement.executeUpdate(delete);
             if (deleter != null){
-                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted from MYSQL"));
+                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted group from MYSQL"));
             }
         }
         catch(SQLException e){
@@ -254,7 +254,7 @@ public final class MYSQLManager implements DisplayStorage{
                 }
                 else{
                     if (saver != null) {
-                        saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display animation to MYSQL!");
+                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save animation to MYSQL!"));
                         saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
                     }
                     return false;
@@ -263,13 +263,13 @@ public final class MYSQLManager implements DisplayStorage{
             statement.executeUpdate();
             blobStream.close();
             if (saver != null) {
-                saver.sendMessage(ChatColor.WHITE+"- "+ ChatColor.GREEN + "Successfully saved display animation to MYSQL!");
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved animation to MYSQL!"));
             }
             return true;
         }
         catch(SQLException | IOException e){
             if (saver != null) {
-                saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display animation to MYSQL!");
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save animation to MYSQL!"));
             }
             e.printStackTrace();
             return false;
@@ -292,7 +292,7 @@ public final class MYSQLManager implements DisplayStorage{
 
             if (!hasSingleAnimation(tag, connection)){
                 if (deleter != null){
-                    deleter.sendMessage(ChatColor.WHITE+"- "+ChatColor.RED+"Saved Display Animation does not exist in MYSQL database!");
+                    deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved animation does not exist in MYSQL database!"));
                 }
                 return;
             }
@@ -301,11 +301,13 @@ public final class MYSQLManager implements DisplayStorage{
             String delete = "DELETE FROM saved_animations WHERE tag = \""+tag+"\";";
             statement.executeUpdate(delete);
             if (deleter != null){
-                deleter.sendMessage(ChatColor.WHITE+"- "+ChatColor.LIGHT_PURPLE+"Successfully deleted from MYSQL!");
+
+                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted animation from MYSQL database!"));
             }
         }
         catch(SQLException e){
             e.printStackTrace();
+            deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved animation does not exist in MYSQL database!"));
         }
         finally {
             DbUtils.closeQuietly(resultSet);
