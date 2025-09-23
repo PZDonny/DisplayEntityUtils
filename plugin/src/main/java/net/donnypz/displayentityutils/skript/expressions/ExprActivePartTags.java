@@ -1,9 +1,6 @@
 package net.donnypz.displayentityutils.skript.expressions;
 
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
@@ -16,8 +13,8 @@ import java.util.Arrays;
 
 @Name("Active Part's Tags")
 @Description("Get all the tags of an active part")
-@Examples({"set {_tags::*} to {_spawnedpart}'s active part tags"})
-@Since("2.6.2")
+@Examples({"set {_tags::*} to {_spawnedpart}'s part tags"})
+@Since("2.6.2, 3.0.0 (Packet), 3.3.2 (Plural)")
 public class ExprActivePartTags extends PropertyExpression<ActivePart, String> {
 
     static {

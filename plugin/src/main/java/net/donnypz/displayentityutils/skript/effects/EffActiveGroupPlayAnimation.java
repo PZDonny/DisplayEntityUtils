@@ -26,7 +26,7 @@ import java.util.Collection;
         "#3.0.0 or later",
         "start packet animation on {_packetgroup} with {_displayanimator} starting at frame 3",
         "start packet animation on {_group} using {_displayanimator} for {_player}"})
-@Since("2.6.2")
+@Since("2.6.2, 3.0.0 (Packet)")
 public class EffActiveGroupPlayAnimation extends Effect {
     static {
         Skript.registerEffect(EffActiveGroupPlayAnimation.class,"(start|play) [p:packet] anim[ation] on %activegroup% (using|with) %displayanimator% [frame:[starting ](at|on) frame %-number%] [f:for %-players%]");

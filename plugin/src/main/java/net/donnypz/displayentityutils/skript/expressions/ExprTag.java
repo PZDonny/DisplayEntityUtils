@@ -21,11 +21,8 @@ import org.jetbrains.annotations.Nullable;
             "set {_animation}'s deu tag to \"newTag\"",
             "",
             "#3.0.0 and later",
-            "set {_packetgrouptag} to {_packetgroup}'s deu tag",
-            "",
-            "#3.2.1 and later",
-            "set {_framepointtag} to {_framepoint}'s deu tag"})
-@Since("2.6.2")
+            "set {_packetgrouptag} to {_packetgroup}'s deu tag"})
+@Since("2.6.2, 3.0.0 (Packet), 3.2.1 (Frame Point), 3.3.2 (Plural)")
 public class ExprTag extends SimplePropertyExpression<Object, String> {
     static {
         register(ExprTag.class, String.class, "deu tag", "activegroups/savedgroups/animations/framepoints");

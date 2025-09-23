@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
         "",
         "#3.0.0 and later",
         "set {_packetgroup}'s deu teleport duration to 1 tick"})
-@Since("2.7.2")
+@Since("2.7.2, 3.0.0 (Packet), 3.3.2 (Plural)")
 public class ExprActiveTeleportDuration extends SimplePropertyExpression<Active, Number> {
 
     static {

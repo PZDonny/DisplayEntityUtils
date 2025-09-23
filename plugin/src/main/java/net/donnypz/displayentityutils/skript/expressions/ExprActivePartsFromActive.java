@@ -23,7 +23,7 @@ import java.util.stream.Stream;
         "",
         "#3.0.0 and later",
         "set {_packetparts::*} to {_packetpartselection}'s parts"})
-@Since("2.6.2")
+@Since("2.6.2, 3.0.0 (Packet), 3.3.2 (Plural)")
 public class ExprActivePartsFromActive extends PropertyExpression<Object, ActivePart> {
 
     static {

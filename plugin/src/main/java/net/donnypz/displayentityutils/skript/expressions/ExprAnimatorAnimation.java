@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 @Name("Animation of Display Animator")
 @Description("Get the animation set for a display animator.")
 @Examples({"set {_animation} to {_displayanimator}'s deu animation"})
-@Since("3.3.1")
+@Since("3.3.1, 3.3.2 (Plural)")
 public class ExprAnimatorAnimation extends SimplePropertyExpression<DisplayAnimator, SpawnedDisplayAnimation> {
 
     static {

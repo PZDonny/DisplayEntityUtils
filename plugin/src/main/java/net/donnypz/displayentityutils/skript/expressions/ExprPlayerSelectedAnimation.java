@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
         "#Reset animation selection",
         "reset player's selected animation"
         })
-@Since("2.6.3")
+@Since("2.6.3, 3.3.2 (Plural)")
 public class ExprPlayerSelectedAnimation extends SimplePropertyExpression<Player, SpawnedDisplayAnimation> {
     static {
         register(ExprPlayerSelectedAnimation.class, SpawnedDisplayAnimation.class, "selected anim[ation]", "players");

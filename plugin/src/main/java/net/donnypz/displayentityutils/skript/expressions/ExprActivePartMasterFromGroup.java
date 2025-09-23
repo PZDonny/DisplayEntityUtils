@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 @Name("Parent/Master Part of Active Group")
 @Description("Get the Parent/Master part of an active group, that all other parts are passengers of")
 @Examples({"set {_masterpart} to {_spawnedgroup}'s master part"})
-@Since("3.3.2")
+@Since("3.3.2, 3.0.0 (Packet), 3.3.2 (Plural)")
 public class ExprActivePartMasterFromGroup extends SimplePropertyExpression<ActiveGroup<?>, ActivePart> {
 
     static {

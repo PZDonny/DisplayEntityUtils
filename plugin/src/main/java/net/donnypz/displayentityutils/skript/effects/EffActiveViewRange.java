@@ -15,8 +15,9 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Active Group/Part/Selection View Range")
 @Description("Change the view range of an active group, part, or part selection")
-@Examples({"set {_spawnedgroup}'s view range multiplier to 5", "make {_spawnedpart}'s view range multiplier 0.5"})
-@Since("2.6.2")
+@Examples({"set {_spawnedgroup}'s view range multiplier to 5",
+        "make {_spawnedpart}'s view range multiplier 0.5"})
+@Since("2.6.2, 3.0.0 (Packet)")
 public class EffActiveViewRange extends Effect {
     static {
         Skript.registerEffect(EffActiveViewRange.class,"(make|set) %activegroups/activeparts/multipartselections%['s] view range multiplier [to] %number%");

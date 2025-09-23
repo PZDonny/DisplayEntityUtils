@@ -81,7 +81,7 @@ public class ExprGroupAndAnimClone extends SimpleExpression<Object> {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "group spawn setting";
+        return "clone "+object.toString(event, debug);
     }
 
     @Override

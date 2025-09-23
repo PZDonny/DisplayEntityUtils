@@ -19,7 +19,7 @@ import java.util.Arrays;
 @Description("Get the Frame Points contained in an animation frame")
 @Examples({"set {_framepoints::*} to {_animationframe}'s frame points",
         "set {_framepoints::*} to {_animationframe}'s points"})
-@Since("3.2.1")
+@Since("3.2.1, 3.3.2 (Plural)")
 public class ExprFramePointsFromFrame extends PropertyExpression<SpawnedDisplayAnimationFrame, FramePoint> {
 
     static {

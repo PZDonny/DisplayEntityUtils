@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
             "set {_activegroup} to {_part}'s active group",
             "3.3.2 and later",
             "set {_spawnedgroup} to {_display}'s spawned group"})
-@Since("2.6.2")
+@Since("2.6.2, 3.0.0 (Packet), 3.3.2 (Plural)")
 public class ExprActiveGetGroup extends SimplePropertyExpression<Object, ActiveGroup> {
 
     static {

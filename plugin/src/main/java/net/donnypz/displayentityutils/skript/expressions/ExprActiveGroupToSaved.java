@@ -1,10 +1,7 @@
 package net.donnypz.displayentityutils.skript.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
@@ -20,10 +17,10 @@ import org.jetbrains.annotations.Nullable;
 @Examples({"set {_savedgroup} to {_spawnedgroup} as saved group",
             "set {_savedgroup} to {_packetgroup} as saved group"})
 @Since("3.3.1")
-public class ExprGroupAndAnimToSaved extends SimpleExpression<Object> {
+public class ExprActiveGroupToSaved extends SimpleExpression<Object> {
 
     static{
-        Skript.registerExpression(ExprGroupAndAnimToSaved.class, Object.class, ExpressionType.COMBINED, "%spawnedgroup/packetgroup% as saved[ |-]group");
+        Skript.registerExpression(ExprActiveGroupToSaved.class, Object.class, ExpressionType.COMBINED, "%spawnedgroup/packetgroup% as saved[ |-]group");
     }
 
     private Expression<?> object;

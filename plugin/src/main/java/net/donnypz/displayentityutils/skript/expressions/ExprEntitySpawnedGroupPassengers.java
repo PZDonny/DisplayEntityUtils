@@ -19,8 +19,9 @@ import java.util.Objects;
 
 @Name("Spawned Group Passengers")
 @Description("Get the spawned groups riding an entity")
-@Examples({"set {_spawnedgroups::*} to spawned group passengers of {_entity}", "set {_spawnedgroups::*} to {_entity}'s spawned group passengers"})
-@Since("2.6.2")
+@Examples({"set {_spawnedgroups::*} to spawned group passengers of {_entity}",
+        "set {_spawnedgroups::*} to {_entity}'s spawned group passengers"})
+@Since("2.6.2, 3.3.2 (Plural)")
 public class ExprEntitySpawnedGroupPassengers extends PropertyExpression<Entity,SpawnedDisplayEntityGroup> {
 
     static {

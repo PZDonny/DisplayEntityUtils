@@ -13,14 +13,14 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Stop All Animations ")
+@Name("Stop All Animations")
 @Description("Stop all animations playing on an active group")
 @Examples({"stop all animations on {_spawnedgroup}",
         "stop animations on {_spawnedgroup} and remove from state machine",
         "",
         "#3.0.0 and later",
         "stop all animations on {_packetgroup}"})
-@Since("2.6.2")
+@Since("2.6.2, 3.0.0 (Packet)")
 public class EffActiveGroupStopAllAnimations extends Effect {
     static {
         Skript.registerEffect(EffActiveGroupStopAllAnimations.class,"stop [all] animations on %activegroup% [r:[and ]remove from [state] machine]");

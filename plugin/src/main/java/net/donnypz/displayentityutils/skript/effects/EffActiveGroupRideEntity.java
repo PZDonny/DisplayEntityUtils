@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
         "#Entity Ride Spawned Group",
         "deu make {_entity} mount {_spawnedgroup}",
         "deu make {_entity} ride {_spawnedgroup} using controller \"mycontroller2\""})
-@Since("2.6.2")
+@Since("2.6.2, 3.0.0 (Packet)")
 public class EffActiveGroupRideEntity extends Effect {
 
     static {

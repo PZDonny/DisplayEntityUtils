@@ -11,8 +11,11 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Entity of Spawned Part")
 @Description("Get the Display or Interaction entity that a spawned part represents")
-@Examples({"set {_entity} to {_spawnedpart}'s true entity"})
-@Since("2.6.2")
+@Examples({"set {_entity} to {_spawnedpart}'s true entity",
+            "",
+            "#3.3.2 and later",
+            "set {_entity} to {_spawnedpart}'s spawned part entity"})
+@Since("2.6.2, 3.3.2 (Plural)")
 public class ExprSpawnedPartAsEntity extends SimplePropertyExpression<SpawnedDisplayEntityPart, Entity> {
 
     static {

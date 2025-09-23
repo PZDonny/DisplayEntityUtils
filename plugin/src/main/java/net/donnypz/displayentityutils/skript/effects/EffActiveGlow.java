@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
             ,"make {_spawnedgroup} glow for 35 ticks"
             ,"make {_packetgroup} glow for 20 ticks for {_players::*}"
             ,"make {_part} unglowing for {_player}"})
-@Since("2.6.2")
+@Since("2.6.2, 3.0.0 (Packet)")
 public class EffActiveGlow extends Effect {
     static {
         Skript.registerEffect(EffActiveGlow.class,"[deu ](make|set) %activegroups/activeparts/multipartselections% (1¦glow[ing] [t:for %-timespan%] [p:for %-players%]|2¦unglow[ing] [p:for %-players%])");

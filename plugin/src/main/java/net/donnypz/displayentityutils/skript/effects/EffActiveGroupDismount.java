@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 @Name("Dismount Active Group")
 @Description("Make an active group stop riding an entity")
 @Examples({"deu dismount {_spawnedgroup}"})
-@Since("2.6.2")
+@Since("2.6.2, 3.0.0 (Packet)")
 public class EffActiveGroupDismount extends Effect {
     static {
         Skript.registerEffect(EffActiveGroupDismount.class,"[deu] dismount %activegroup%");
