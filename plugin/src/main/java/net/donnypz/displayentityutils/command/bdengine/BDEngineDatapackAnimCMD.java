@@ -17,7 +17,7 @@ class BDEngineDatapackAnimCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 4) {
+        if (args.length < 5) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis bdengine datapackanim <datapack-name> <group-tag-to-set> <anim-tag-prefix-to-set>", NamedTextColor.RED)));
             player.sendMessage(Component.text("Use \"-\" for the group tag if you do not want to save the group", NamedTextColor.GRAY));
             return;

@@ -30,7 +30,7 @@ public class BDEngineConvertAnimCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 5) {
+        if (args.length < 4) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis bdengine convertanim <file-name> <anim-tag-prefix>", NamedTextColor.RED)));
             return;
         }
