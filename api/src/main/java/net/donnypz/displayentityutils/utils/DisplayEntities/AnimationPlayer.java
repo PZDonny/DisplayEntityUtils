@@ -335,7 +335,8 @@ public abstract class AnimationPlayer {
         Matrix4f combinedMatrix = new Matrix4f(parentMatrix).mul(localMatrix);
 
         MultiPartSelection<?> sel = bonePartSelections.computeIfAbsent(bone.getDelimitedName(), delimitedName -> {
-            MultiPartSelection<?> selection = group.createPartSelection(new PartFilter().includePartTag(delimitedName));
+            MultiPartSelection<?> selection = group.createPartSelection(new PartFilter()
+                    .includeRigBone(delimitedName));
             if (parentSel != null) parentSel.removeParts(selection);
             return selection;
         });
