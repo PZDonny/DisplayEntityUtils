@@ -18,9 +18,15 @@ import java.util.Set;
 
 public class PartFilter implements Serializable, Cloneable {
 
-    HashSet<String> includedTags = new HashSet<>();
+
     boolean strictPartTagInclusion = false;
+    HashSet<String> includedTags = new HashSet<>();
     HashSet<String> excludedTags = new HashSet<>();
+
+    boolean strictRigBoneInclusion = false;
+    HashSet<String> includedRigBones = new HashSet<>();
+    HashSet<String> excludedRigBones = new HashSet<>();
+
     HashSet<SpawnedDisplayEntityPart.PartType> partTypes = new HashSet<>();
 
     transient Set<Material> itemTypes = new HashSet<>();
@@ -71,22 +77,22 @@ public class PartFilter implements Serializable, Cloneable {
     }
 
     /**
-     * Add part tags that will be included in this filter
-     * @param partTags the tags to include
-     * @return this
-     */
-    public @NotNull PartFilter includePartTags(@NotNull Collection<String> partTags){
-        this.includedTags.addAll(partTags);
-        return this;
-    }
-
-    /**
      * Determine if all included part tags must be present on a part to be filtered in
      * @param strictPartTagInclusion
      * @return this
      */
     public @NotNull PartFilter strictPartTagInclusion(boolean strictPartTagInclusion){
         this.strictPartTagInclusion = strictPartTagInclusion;
+        return this;
+    }
+
+    /**
+     * Add part tags that will be included in this filter
+     * @param partTags the tags to include
+     * @return this
+     */
+    public @NotNull PartFilter includePartTags(@NotNull Collection<String> partTags){
+        this.includedTags.addAll(partTags);
         return this;
     }
 
@@ -99,6 +105,61 @@ public class PartFilter implements Serializable, Cloneable {
      */
     public @NotNull PartFilter excludePartTags(@NotNull Collection<String> partTags){
         this.excludedTags.addAll(partTags);
+        return this;
+    }
+
+    /**
+     * Determine if all included rig bones must be present on a part to be filtered in
+     * @param strictRigBoneInclusion
+     * @return this
+     */
+    public @NotNull PartFilter strictRigBoneInclusion(boolean strictRigBoneInclusion){
+        this.strictRigBoneInclusion = strictRigBoneInclusion;
+        return this;
+    }
+
+    /**
+     * Add the name of a rig bone that will be included in this filter
+     * @param boneName the bone to include
+     * @return this
+     */
+    public @NotNull PartFilter includeRigBone(@NotNull String boneName){
+        this.includedRigBones.add(boneName);
+        return this;
+    }
+
+    /**
+     * Add the name of a rig bone that will be excluded in this filter.
+     * <br>
+     * This will exclude ANY parts with the given bone name from this filter, even if the given part has a bone that marks it to be included in the filter
+     * @param boneName the bone of exclude
+     * @return this
+     */
+    public @NotNull PartFilter excludeRigBone(@NotNull String boneName){
+        this.excludedRigBones.add(boneName);
+        return this;
+    }
+
+    /**
+     * Add the names of rig bones that will be included in this filter
+     * @param boneNames the bones to include
+     * @return this
+     */
+    public @NotNull PartFilter includeRigBones(@NotNull Collection<String> boneNames){
+        this.includedRigBones.addAll(boneNames);
+        return this;
+    }
+
+
+    /**
+     * Add the names of rig bones that will be excluded in this filter.
+     * <br>
+     * This will exclude ANY parts with the given bones names from this filter, even if the given part has a bone that marks it to be included in the filter
+     * @param boneNames the bones of exclude
+     * @return this
+     */
+    public @NotNull PartFilter excludeRigBones(@NotNull Collection<String> boneNames){
+        this.excludedRigBones.addAll(boneNames);
         return this;
     }
 
@@ -254,6 +315,14 @@ public class PartFilter implements Serializable, Cloneable {
         return new HashSet<>(excludedTags);
     }
 
+    public HashSet<String> getIncludedRigBones() {
+        return includedRigBones != null ? new HashSet<>(includedRigBones) : new HashSet<>();
+    }
+
+    public HashSet<String> getExcludedRigBones() {
+        return excludedRigBones != null ? new HashSet<>(excludedRigBones) : new HashSet<>();
+    }
+
     public HashSet<SpawnedDisplayEntityPart.PartType> getPartTypes() {
         return new HashSet<>(partTypes);
     }
@@ -286,9 +355,14 @@ public class PartFilter implements Serializable, Cloneable {
         try {
             PartFilter cloned = (PartFilter) super.clone();
 
-            // Deep copy mutable collections
+            cloned.strictPartTagInclusion = this.strictPartTagInclusion;
             cloned.includedTags = new HashSet<>(this.includedTags);
             cloned.excludedTags = new HashSet<>(this.excludedTags);
+
+            cloned.strictRigBoneInclusion = this.strictRigBoneInclusion;
+            if (includedRigBones != null) cloned.includedRigBones = new HashSet<>(this.includedRigBones);
+            if (excludedRigBones != null) cloned.excludedRigBones = new HashSet<>(this.excludedRigBones);
+
             cloned.partTypes = new HashSet<>(this.partTypes);
 
             cloned.itemTypes = new HashSet<>(this.itemTypes);
@@ -307,9 +381,12 @@ public class PartFilter implements Serializable, Cloneable {
         if (this == o) return true;
         if (!(o instanceof PartFilter other)) return false;
 
-        return includedTags.equals(other.includedTags)
-                && strictPartTagInclusion == other.strictPartTagInclusion
+        return strictPartTagInclusion == other.strictPartTagInclusion
+                && includedTags.equals(other.includedTags)
                 && excludedTags.equals(other.excludedTags)
+                && strictRigBoneInclusion == other.strictRigBoneInclusion
+                && includedRigBones.equals(other.includedRigBones)
+                && excludedRigBones.equals(other.excludedRigBones)
                 && partTypes.equals(other.partTypes)
                 && serializedItemTypes.equals(other.serializedItemTypes)
                 && serializedBlockTypes.equals(other.serializedBlockTypes)
@@ -322,7 +399,9 @@ public class PartFilter implements Serializable, Cloneable {
         int result = includedTags.hashCode();
         result = 31 * result + Boolean.hashCode(strictPartTagInclusion);
         result = 31 * result + excludedTags.hashCode();
-        result = 31 * result + excludedTags.hashCode();
+        result = 31 * result + Boolean.hashCode(strictRigBoneInclusion);
+        result = 31 * result + includedRigBones.hashCode();
+        result = 31 * result + excludedRigBones.hashCode();
         result = 31 * result + partTypes.hashCode();
         result = 31 * result + serializedItemTypes.hashCode();
         result = 31 * result + serializedBlockTypes.hashCode();
@@ -344,6 +423,8 @@ public class PartFilter implements Serializable, Cloneable {
     public enum FilterType{
         INCLUDED_TAGS,
         EXCLUDED_TAGS,
+        INCLUDED_RIG_BONES,
+        EXCLUDED_RIG_BONES,
         BLOCK_TYPE,
         ITEM_TYPE,
         PART_TYPE

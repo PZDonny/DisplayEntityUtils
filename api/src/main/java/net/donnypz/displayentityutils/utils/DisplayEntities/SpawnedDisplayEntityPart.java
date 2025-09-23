@@ -58,6 +58,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (matrixList != null){
             this.setBoneRigTransformation(DisplayUtils.listToMatrix(matrixList));
         }
+        List<String> bones = pdc.get(DisplayAPI.getRigBoneKey(), PersistentDataType.LIST.strings());
+        if (bones != null){
+            this.bones = new ArrayList<>(bones);
+        }
 
         this.isSingle = false;
     }

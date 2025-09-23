@@ -77,9 +77,10 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     }
 
 
-    private void initializeNamespacedKeys(){ //DO NOT CHANGE
+    private void initializeNamespacedKeys(){ //DO NOT EDIT
         DisplayAPI.partUUIDKey = new NamespacedKey(this, "partUUID");
         DisplayAPI.partPDCTagKey = new NamespacedKey(this, "pdcTag");
+        DisplayAPI.rigBoneKey = new NamespacedKey(this, "rigBones");
         DisplayAPI.groupTagKey = new NamespacedKey(this, "groupTag");
         DisplayAPI.masterKey = new NamespacedKey(this, "isMaster");
         DisplayAPI.spawnAnimationKey = new NamespacedKey(this, "spawnanimation");

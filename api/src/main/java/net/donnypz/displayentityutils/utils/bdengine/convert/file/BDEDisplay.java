@@ -47,10 +47,9 @@ abstract class BDEDisplay<T extends Display> extends BDEObject{
                     }
                     tagsToAdd.add(delimitedTag);
                 }
-                DisplayUtils.addTags(d, tagsToAdd);
+                DisplayUtils.setBones(d, tagsToAdd);
             }
             PersistentDataContainer pdc = d.getPersistentDataContainer();
-
             pdc.set(DisplayUtils.boneRigTransformation, PersistentDataType.LIST.floats(), DisplayUtils.matrixToList(transformMatrix));
             apply(d);
         });

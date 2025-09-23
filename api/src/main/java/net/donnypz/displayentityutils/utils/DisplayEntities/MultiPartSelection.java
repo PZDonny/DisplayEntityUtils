@@ -22,9 +22,13 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
     Set<Material> blockTypes = new HashSet<>();
     boolean includeBlockTypes;
 
-    Collection<String> includedTags = new HashSet<>();
+
     boolean strictPartTagInclusion = false;
+    Collection<String> includedTags = new HashSet<>();
     Collection<String> excludedTags = new HashSet<>();
+    boolean strictRigBoneInclusion = false;
+    Collection<String> includedRigBones = new HashSet<>();
+    Collection<String> excludedRigBones = new HashSet<>();
 
     public MultiPartSelection(ActiveGroup<T> group, @NotNull String partTag){
         this(group, Set.of(partTag), false);
@@ -86,9 +90,19 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
             this.partTypes.clear();
             this.partTypes.addAll(filter.partTypes);
         }
+
         this.includedTags.addAll(filter.includedTags);
         this.strictPartTagInclusion = filter.strictPartTagInclusion;
         this.excludedTags.addAll(filter.excludedTags);
+
+
+        this.strictRigBoneInclusion = filter.strictRigBoneInclusion;
+        if (filter.includedRigBones != null){
+            this.includedRigBones.addAll(filter.includedRigBones);
+        }
+        if (filter.excludedRigBones != null){
+            this.excludedRigBones.addAll(filter.excludedRigBones);
+        }
 
         if (this.itemTypes.isEmpty()){
             this.includeItemTypes = filter.includeItemTypes;
@@ -111,7 +125,6 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
      */
     public void refresh(){
         selectedParts.clear();
-        boolean containsSelectedPart = false;
 
         filter:
         for (T part : group.groupParts.values()){
@@ -139,50 +152,52 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
                 }
             }
 
-            Collection<String> list = part.getTags();
+            boolean tagFilterable = stringCompare(part, includedTags, excludedTags, part.getTags(), strictPartTagInclusion);
+            boolean boneFilterable = stringCompare(part, includedRigBones, excludedRigBones, part.getBones(), strictRigBoneInclusion);
 
-            //Part has no tags, but tags are required for filtering
-            if (list.isEmpty() && !includedTags.isEmpty()){
-                continue;
-            }
-
-
-            //Part Has Excluded Tag (Don't Filter Part)
-            boolean filterable = true;
-            for (String excluded : excludedTags){
-                if (list.contains(excluded)) {
-                    filterable = false;
-                    break;
-                    //continue filter;
-                }
-            }
-
-            //No Included Tags for filtering and still filterable
-            if (includedTags.isEmpty() && filterable){
+            if (tagFilterable && boneFilterable){
                 selectedParts.add(part);
-                if (!containsSelectedPart) containsSelectedPart = selectedPart == part;
             }
-            //Part Has Included Tag (Filter Part)
-            else{
-                if (strictPartTagInclusion && list.containsAll(includedTags)) {
-                    selectedParts.add(part);
-                    if (!containsSelectedPart) containsSelectedPart = selectedPart == part;
-                }
-                else if (!strictPartTagInclusion){
-                    for (String included : includedTags){
-                        if (list.contains(included)){
-                            selectedParts.add(part);
-                            if (!containsSelectedPart) containsSelectedPart = selectedPart == part;
-                            continue filter;
-                        }
+        }
+
+        if (!selectedParts.contains(selectedPart) && !selectedParts.isEmpty()){
+            selectedPart = selectedParts.getFirst();
+        }
+    }
+
+    private boolean stringCompare(T part, Collection<String> includeList, Collection<String> excludeList, Collection<String> partList, boolean strict){
+        //Part has no tags, but tags are required for filtering
+        if (partList.isEmpty() && !includeList.isEmpty()){
+            return false;
+        }
+
+        //Part Has Excluded Tag (Don't Filter Part)
+        boolean filterable = true;
+        for (String excluded : excludeList){
+            if (partList.contains(excluded)) {
+                filterable = false;
+                break;
+            }
+        }
+
+        //No Included Tags for filtering and still filterable
+        if (includeList.isEmpty() && filterable){
+            return true;
+        }
+        //Part Has Included Tag (Filter Part)
+        else{
+            if (strict && partList.containsAll(includeList)) {
+                return true;
+            }
+            else if (!strict){
+                for (String included : includeList){
+                    if (partList.contains(included)){
+                        return true;
                     }
                 }
             }
         }
-
-        if (!containsSelectedPart && !selectedParts.isEmpty()){
-            selectedPart = selectedParts.getFirst();
-        }
+        return false;
     }
 
 
@@ -200,6 +215,8 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
                 !(partTypes.isEmpty()
                         && includedTags.isEmpty()
                         && excludedTags.isEmpty()
+                        && includedRigBones.isEmpty()
+                        && excludedRigBones.isEmpty()
                         && itemTypes.isEmpty()
                         && blockTypes.isEmpty());
     }
@@ -214,6 +231,8 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
             case PART_TYPE -> partTypes.clear();
             case INCLUDED_TAGS -> includedTags.clear();
             case EXCLUDED_TAGS ->  excludedTags.clear();
+            case INCLUDED_RIG_BONES -> includedRigBones.clear();
+            case EXCLUDED_RIG_BONES -> excludedRigBones.clear();
             case ITEM_TYPE -> itemTypes.clear();
             case BLOCK_TYPE -> blockTypes.clear();
         }
@@ -539,28 +558,6 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
     }
 
     /**
-     * Gets the included part tags of this part selection
-     * @return The included part tags.
-     */
-    public @NotNull Collection<String> getIncludedPartTags(){
-        if (includedTags.isEmpty()){
-            return new HashSet<>();
-        }
-        return new HashSet<>(includedTags);
-    }
-
-    /**
-     * Gets the excluded part tags of this part selection
-     * @return The excluded part tags.
-     */
-    public @NotNull Collection<String> getExcludedPartTags(){
-        if (excludedTags.isEmpty()){
-            return new HashSet<>();
-        }
-        return new HashSet<>(excludedTags);
-    }
-
-    /**
      * Create a {@link PartFilter} based on all filters previously applied to this selection
      * @return a {@link PartFilter}
      */
@@ -569,9 +566,12 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
                 .setPartTypes(partTypes)
                 .setItemTypes(itemTypes, includeItemTypes)
                 .setBlockTypes(blockTypes, includeBlockTypes)
-                .includePartTags(includedTags)
                 .strictPartTagInclusion(strictPartTagInclusion)
-                .excludePartTags(excludedTags);
+                .includePartTags(includedTags)
+                .excludePartTags(excludedTags)
+                .strictRigBoneInclusion(strictRigBoneInclusion)
+                .includeRigBones(includedRigBones)
+                .excludeRigBones(excludedRigBones);
     }
 
     @Override
@@ -598,11 +598,13 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
         if (group == null){
             return false;
         }
-        selectedParts.clear();
-        selectedPart = null;
+        this.selectedParts.clear();
+        this.selectedPart = null;
         this.partTypes.clear();
         this.includedTags.clear();
         this.excludedTags.clear();
+        this.includedRigBones.clear();
+        this.excludedRigBones.clear();
         this.itemTypes.clear();
         this.blockTypes.clear();
         if (refresh) refresh();

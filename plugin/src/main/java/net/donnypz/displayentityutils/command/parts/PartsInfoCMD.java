@@ -102,6 +102,8 @@ class PartsInfoCMD extends PlayerSubCommand {
         player.sendMessage(Component.empty());
         player.sendMessage(Component.text("| Click to view Part Tags", NamedTextColor.GOLD)
                 .clickEvent(ClickEvent.suggestCommand("/mdis parts listtags")));
+        player.sendMessage(Component.text("| Click to view Rig Bones", NamedTextColor.GOLD)
+                .clickEvent(ClickEvent.suggestCommand("/mdis parts listrigbones")));
 
     }
 
@@ -147,6 +149,30 @@ class PartsInfoCMD extends PlayerSubCommand {
         }
         else{
             for (String s : excluded){
+                player.sendMessage(Component.text(" - "+s, NamedTextColor.GRAY));
+            }
+        }
+
+        //Included Rig Bones
+        player.sendMessage(Component.text("Included Rig Bones: "));
+        HashSet<String> includedBones = filter.getIncludedPartTags();
+        if (includedBones.isEmpty()){
+            player.sendMessage(Component.text("- NOT SET", NamedTextColor.GRAY));
+        }
+        else{
+            for (String s : includedBones){
+                player.sendMessage(Component.text(" - "+s, NamedTextColor.GRAY));
+            }
+        }
+
+        //Excluded Rig Bones
+        player.sendMessage(Component.text("Excluded Rig Bones: "));
+        HashSet<String> excludedBones = filter.getExcludedPartTags();
+        if (excludedBones.isEmpty()){
+            player.sendMessage(Component.text("- NOT SET", NamedTextColor.GRAY));
+        }
+        else{
+            for (String s : excludedBones){
                 player.sendMessage(Component.text(" - "+s, NamedTextColor.GRAY));
             }
         }

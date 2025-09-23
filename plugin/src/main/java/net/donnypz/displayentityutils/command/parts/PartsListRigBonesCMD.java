@@ -11,11 +11,12 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Set;
 
-class PartsListTagsCMD extends PlayerSubCommand {
-    PartsListTagsCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("listtags", parentSubCommand, Permission.PARTS_LIST_TAGS);
+class PartsListRigBonesCMD extends PlayerSubCommand {
+    PartsListRigBonesCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("listrigbones", parentSubCommand, Permission.PARTS_LIST_RIG_BONES);
     }
 
     @Override
@@ -32,17 +33,17 @@ class PartsListTagsCMD extends PlayerSubCommand {
             return;
         }
 
-        Set<String> tags;
+        List<String> bones;
         player.sendMessage(Component.empty());
-        player.sendMessage(Component.text("Part's Tags:", NamedTextColor.YELLOW));
-        tags = partSelection.getSelectedPart().getTags();
+        player.sendMessage(Component.text("Part's Rig Bones:", NamedTextColor.YELLOW));
+        bones = partSelection.getSelectedPart().getBones();
 
 
-        if (tags.isEmpty()){
-            player.sendMessage(Component.text("- No part tags", NamedTextColor.GRAY));
+        if (bones.isEmpty()){
+            player.sendMessage(Component.text("- No rig bones", NamedTextColor.GRAY));
         }
         else{
-            for (String s : tags){
+            for (String s : bones){
                 player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>- <yellow>"+s));
             }
         }

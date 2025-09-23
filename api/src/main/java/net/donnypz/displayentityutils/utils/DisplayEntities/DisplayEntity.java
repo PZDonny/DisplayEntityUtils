@@ -176,6 +176,11 @@ final class DisplayEntity implements Serializable {
             if (matrixList != null){
                 part.setBoneRigTransformation(DisplayUtils.listToMatrix(matrixList));
             }
+            List<String> bones = pdc.get(DisplayAPI.getRigBoneKey(), PersistentDataType.LIST.strings());
+            if (bones != null){
+                part.bones = new ArrayList<>(bones);
+            }
+
             if (group.masterPart == null && isMaster){
                 part.isMaster = true;
                 String animationTag = getSpawnAnimationTag(pdc);

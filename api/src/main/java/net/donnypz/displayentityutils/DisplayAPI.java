@@ -20,6 +20,7 @@ public final class DisplayAPI {
 
     static NamespacedKey partUUIDKey;
     static NamespacedKey partPDCTagKey;
+    static NamespacedKey rigBoneKey;
     static NamespacedKey groupTagKey;
     static NamespacedKey masterKey;
     static NamespacedKey spawnAnimationKey;
@@ -56,6 +57,10 @@ public final class DisplayAPI {
 
     public static @NotNull NamespacedKey getPartPDCTagKey() {
         return partPDCTagKey;
+    }
+
+    public static @NotNull NamespacedKey getRigBoneKey(){
+        return rigBoneKey;
     }
 
     public static @NotNull NamespacedKey getGroupTagKey() {

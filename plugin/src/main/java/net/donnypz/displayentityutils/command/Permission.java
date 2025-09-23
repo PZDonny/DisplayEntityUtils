@@ -44,6 +44,7 @@ public enum Permission {
     PARTS_SELECT("deu.parts.select"),
     PARTS_TAG("deu.parts.tag"),
     PARTS_LIST_TAGS("deu.parts.tag.list"),
+    PARTS_LIST_RIG_BONES("deu.parts.rigbones.list"),
     PARTS_REMOVE("deu.parts.remove"),
     PARTS_TRANSLATE("deu.parts.translate"),
     PARTS_TRANSFORM("deu.parts.transform"),

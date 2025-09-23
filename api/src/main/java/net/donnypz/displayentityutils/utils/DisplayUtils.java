@@ -38,8 +38,8 @@ public final class DisplayUtils {
     public static final NamespacedKey leftClickPlayer = new NamespacedKey(DisplayAPI.getPlugin(), "lcp");
     public static final NamespacedKey rightClickConsole = new NamespacedKey(DisplayAPI.getPlugin(), "rcc");
     public static final NamespacedKey rightClickPlayer = new NamespacedKey(DisplayAPI.getPlugin(), "rcp");
-    public static final NamespacedKey boneRigTransformation = new NamespacedKey(DisplayAPI.getPlugin(), "bone_rig_transform");
-    public static final NamespacedKey groupRigProperties = new NamespacedKey(DisplayAPI.getPlugin(), "group_rig_properties");
+    public static final NamespacedKey boneRigTransformation = new NamespacedKey(DisplayAPI.getPlugin(), "boneRigTransform");
+    public static final NamespacedKey groupRigProperties = new NamespacedKey(DisplayAPI.getPlugin(), "groupRigProperties");
 
     private static final ListPersistentDataType<String, String> tagPDCType = PersistentDataType.LIST.strings();
     private DisplayUtils(){}
@@ -832,6 +832,11 @@ public final class DisplayUtils {
      */
     public static void addTags(@NotNull Entity entity, @NotNull List<String> partTags){
         addManyToPDCList(entity, partTags, DisplayAPI.getPartPDCTagKey());
+    }
+
+    public static void setBones(@NotNull Entity entity, @NotNull List<String> bones){
+        PersistentDataContainer pdc = entity.getPersistentDataContainer();
+        pdc.set(DisplayAPI.getRigBoneKey(), PersistentDataType.LIST.strings(), bones);
     }
 
     static boolean addToPDCList(@NotNull Entity entity, @NotNull String element, NamespacedKey key){

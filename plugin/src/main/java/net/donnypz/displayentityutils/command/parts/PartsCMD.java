@@ -23,6 +23,7 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         new PartsUnglowCMD(this);
         new PartsGlowColorCMD(this);
         new PartsFilterTagsCMD(this);
+        new PartsFilterRigBonesCMD(this);
         new PartsFilterTypesCMD(this);
         new PartsFilterBlocksCMD(this);
         new PartsFilterItemsCMD(this);
@@ -32,6 +33,7 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         new PartsAddTagCMD(this);
         new PartsRemoveTagCMD(this);
         new PartsListTagsCMD(this);
+        new PartsListRigBonesCMD(this);
         new PartsRemoveCMD(this);
         new PartsTranslateCMD(this);
         new PartsSetBlockCMD(this);
@@ -82,28 +84,29 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
                     "Adapt scoreboard tags to tags usable by DisplayEntityUtils. Applied to selected parts."+
                             " \"-remove\" removes tag from scoreboard");
             CMDUtils.sendCMD(sender, "/mdis parts listtags ", "List tags of the currently selected part");
-            CMDUtils.sendCMD(sender, "/mdis parts filtertags <part-tags>", "Filter parts by part tags, comma separated. Exclude A tag by prefixing it with \"!\"");
-            CMDUtils.sendCMD(sender, "/mdis parts filtertypes <part-types>", "Filter parts by their type. Exclude ALL filtered types by prefixing with \"!\"");
+            CMDUtils.sendCMD(sender, "/mdis parts filtertags <part-tags>", "Filter parts by part tags, comma separated. Exclude a tag by prefixing it with \"!\"");
+            CMDUtils.sendCMD(sender, "/mdis parts filterrigbones <rig-bone-names>", "Filter parts by rig bones, comma separated. Exclude a rig bone by prefixing it with \"!\"");
         }
         else if (page == 3){
+            CMDUtils.sendCMD(sender, "/mdis parts filtertypes <part-types>", "Filter parts by their type. Exclude ALL filtered types by prefixing with \"!\"");
             CMDUtils.sendCMD(sender, "/mdis parts filterblocks <block-ids>", "Filter blocks of BLOCK parts. Exclude ALL filtered blocks by prefixing with \"!\"");
             CMDUtils.sendCMD(sender, "/mdis parts filteritems <item-ids>", "Filter items of ITEM parts. Exclude ALL filtered items by prefixing with \"!\"");
             CMDUtils.sendCMD(sender, "/mdis parts refresh", "Refresh your part selection after making some type of change");
             CMDUtils.sendCMD(sender, "/mdis parts reset", "Reset your part selection and any filters");
             CMDUtils.sendCMD(sender, "/mdis parts remove [-all]", "Despawn and remove your selected part from a group");
             CMDUtils.sendCMD(sender, "/mdis parts glow [-all]", "Make your selected part glow");
-            CMDUtils.sendCMD(sender, "/mdis parts unglow [-all]", "Remove the glow from your selected part");
         }
         else if (page == 4){
+            CMDUtils.sendCMD(sender, "/mdis parts unglow [-all]", "Remove the glow from your selected part");
             CMDUtils.sendCMD(sender, "/mdis parts glowcolor <color | hex-code> [-all]", "Set your selected part's glow color");
             CMDUtils.sendCMD(sender, "/mdis parts brightness <block> <sky> [-all]", "Set your selected part's brightness. Enter values between 0-15. -1 resets");
-            CMDUtils.sendCMD(sender, "/mdis parts viewrange <view-range-multiplier> [-all]", "Set the view range multiplier for your selected part");
             CMDUtils.sendCMD(sender, "/mdis parts billboard <fixed | vertical | horizontal | center> [-all]", "Set the billboard of your selected part");
             CMDUtils.sendCMD(sender, "/mdis parts translate <direction> <distance> <tick-duration> [-all]", "Translate your selected part");
             CMDUtils.sendCMD(sender, "/mdis parts pitch <pitch>", "Set the pitch of an ungrouped part entity");
             CMDUtils.sendCMD(sender, "/mdis parts yaw <yaw>", "Set the yaw of an ungrouped part entity");
         }
         else{
+            CMDUtils.sendCMD(sender, "/mdis parts viewrange <view-range-multiplier> [-all]", "Set the view range multiplier for your selected part");
             CMDUtils.sendCMD(sender, "/mdis parts scale <x | y | z | -all> <scale> [-all]", "Change the scale of your selected part, by axis");
             CMDUtils.sendCMD(sender, "/mdis parts move <direction> <distance>", "Change the actual location of your selected part");
             CMDUtils.sendCMD(sender, "/mdis parts movehere", "Change your selected part's actual location to your location");

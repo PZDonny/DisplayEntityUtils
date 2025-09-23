@@ -39,6 +39,7 @@ public abstract class ActivePart implements Active{
     private boolean valid = true;
     final Set<ClientAnimationPlayer> clientAnimationPlayers = Collections.newSetFromMap(new ConcurrentHashMap<>());
     protected Matrix4f boneRigTransformation;
+    protected List<String> bones;
 
     protected ActivePart(int entityId, boolean mapped){
         this.entityId = entityId;
@@ -369,6 +370,10 @@ public abstract class ActivePart implements Active{
     @ApiStatus.Internal
     Matrix4f getBoneRigTransformation(){
         return boneRigTransformation == null ? new Matrix4f().identity() : new Matrix4f(boneRigTransformation);
+    }
+
+    public List<String> getBones(){
+        return bones == null ? List.of() : new ArrayList<>(bones);
     }
 
 
