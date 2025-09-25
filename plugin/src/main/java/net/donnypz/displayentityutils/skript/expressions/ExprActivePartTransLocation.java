@@ -17,11 +17,11 @@ import org.jetbrains.annotations.Nullable;
 @Description("Get the location relative to a active part's true location, based off of its translation.")
 @Examples({"set {_loc} to {_spawnedpart}'s translated location",
             "set {_loc} to {_displayentity}'s translated location"})
-@Since("3.1.2")
+@Since("3.1.2, 3.3.2 (Plural)")
 public class ExprActivePartTransLocation extends SimplePropertyExpression<Object, Location> {
 
     static {
-        register(ExprActivePartTransLocation.class, Location.class, "[the] translated location", "activepart/entity");
+        register(ExprActivePartTransLocation.class, Location.class, "translated location", "activeparts/entities");
     }
 
     @Override
@@ -62,8 +62,4 @@ public class ExprActivePartTransLocation extends SimplePropertyExpression<Object
         return "translated location";
     }
 
-    @Override
-    public boolean isSingle() {
-        return true;
-    }
 }

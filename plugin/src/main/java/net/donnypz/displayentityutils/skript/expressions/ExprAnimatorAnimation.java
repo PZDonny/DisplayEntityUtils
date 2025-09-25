@@ -11,12 +11,12 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Animation of Display Animator")
 @Description("Get the animation set for a display animator.")
-@Examples({"set {_animation} to {_displayanimator}'s animation"})
-@Since("3.3.1")
+@Examples({"set {_animation} to {_displayanimator}'s deu animation"})
+@Since("3.3.1, 3.3.2 (Plural)")
 public class ExprAnimatorAnimation extends SimplePropertyExpression<DisplayAnimator, SpawnedDisplayAnimation> {
 
     static {
-        register(ExprAnimatorAnimation.class, SpawnedDisplayAnimation.class, "[deu] [spawned] animation", "displayanimator");
+        register(ExprAnimatorAnimation.class, SpawnedDisplayAnimation.class, "deu animation", "displayanimators");
     }
 
     @Override
@@ -35,8 +35,4 @@ public class ExprAnimatorAnimation extends SimplePropertyExpression<DisplayAnima
         return "animation";
     }
 
-    @Override
-    public boolean isSingle() {
-        return true;
-    }
 }

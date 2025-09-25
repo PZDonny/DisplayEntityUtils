@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
         "#3.0.0 and later",
         "set {_packetgroup}'s billboard to horizontal"
         })
-@Since("2.6.2")
+@Since("2.6.2, 3.0.0 (Packet Types)")
 public class EffActiveBillboard extends Effect {
     static {
         Skript.registerEffect(EffActiveBillboard.class,"[deu] (set|change) %activegroup/activepart/multipartselection%['s] [display] billboard to %billboard%");

@@ -39,7 +39,7 @@ public class CondActiveIsPacketBased extends Condition {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "Group is packet-based?: "+active.toString(event, debug);
+        return "Is packet-based?: "+active.toString(event, debug);
     }
 
     @SuppressWarnings("unchecked")

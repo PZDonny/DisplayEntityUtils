@@ -21,11 +21,11 @@ import org.jetbrains.annotations.Nullable;
         "",
         "#3.0.0 and later",
         "set {_packetgroup}'s deu teleport duration to 1 tick"})
-@Since("2.7.2")
+@Since("2.7.2, 3.0.0 (Packet), 3.3.2 (Plural)")
 public class ExprActiveTeleportDuration extends SimplePropertyExpression<Active, Number> {
 
     static {
-        register(ExprActiveTeleportDuration.class, Number.class, "[the] [deu] teleport[ation][ |-]duration", "activegroup/activepart/multipartselection");
+        register(ExprActiveTeleportDuration.class, Number.class, "[deu] teleport[ation][ |-]duration", "activegroups/activeparts/multipartselections");
     }
 
     @Override
@@ -51,13 +51,9 @@ public class ExprActiveTeleportDuration extends SimplePropertyExpression<Active,
 
     @Override
     protected String getPropertyName() {
-        return "teleportduration";
+        return "teleport duration";
     }
 
-    @Override
-    public boolean isSingle() {
-        return true;
-    }
 
     @Override
     public void change(Event event, Object[] delta, Changer.ChangeMode mode){
@@ -74,9 +70,7 @@ public class ExprActiveTeleportDuration extends SimplePropertyExpression<Active,
                 Timespan timespan = (Timespan) delta[0];
                 active.setTeleportDuration((int) timespan.getAs(Timespan.TimePeriod.TICK));
             }
-            case RESET -> {
-                active.setTeleportDuration(0);
-            }
+            case RESET -> active.setTeleportDuration(0);
         }
     }
 

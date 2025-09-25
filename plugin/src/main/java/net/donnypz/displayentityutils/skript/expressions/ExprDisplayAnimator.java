@@ -26,8 +26,8 @@ public class ExprDisplayAnimator extends SimpleExpression<DisplayAnimator> {
         Skript.registerExpression(ExprDisplayAnimator.class, DisplayAnimator.class, ExpressionType.SIMPLE, "[a] [new] (linear|loop:loop[ing]) [display] animator using [anim[ation]] %animation%");
     }
 
-    boolean loop;
-    Expression<SpawnedDisplayAnimation> animation;
+    private boolean loop;
+    private Expression<SpawnedDisplayAnimation> animation;
 
     @Override
     protected DisplayAnimator @Nullable [] get(Event event) {
@@ -51,7 +51,7 @@ public class ExprDisplayAnimator extends SimpleExpression<DisplayAnimator> {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "new display animator: "+event.toString();
+        return (loop ? "loop" : "") + " display animator "+animation.toString(event, debug);
     }
 
     @Override

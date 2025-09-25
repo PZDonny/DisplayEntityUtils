@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 @Name("Active Group Scale Multiplier")
 @Description("Change the scale multiplier of an active group")
 @Examples({"set {_spawnedgroup}'s scale multiplier to 7 over 0 ticks", "make {_spawnedgroup}'s scale multiplier 0.5 over 10 ticks"})
-@Since("2.6.3")
+@Since("2.6.3, 3.0.0 (Packet)")
 public class EffActiveGroupScaleMultiplier extends Effect {
     static {
         Skript.registerEffect(EffActiveGroupScaleMultiplier.class,"(make|set) %activegroup%['s] scale [multiplier] [to] %number% (for|over) %timespan% [i:and [scale] interactions]");

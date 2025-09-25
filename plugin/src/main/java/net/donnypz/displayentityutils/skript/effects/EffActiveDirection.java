@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 @Description("Set the pitch and yaw of a spawned group/part/selection. Optionally pivot interactions")
 @Examples({"deu set {_spawnedgroup}'s yaw with interaction pivot to 35",
         "deu set {_spawnedpart}'s pitch to -90"})
-@Since("2.6.2")
+@Since("2.6.2, 3.0.0 (Packet)")
 public class EffActiveDirection extends Effect {
     static {
         Skript.registerEffect(EffActiveDirection.class,"[deu ](make|set) %activegroups/activeparts/multipartselections%['s] (1¦yaw [p:with [interaction ]pivot]|2¦pitch) [to|as] %-number%");

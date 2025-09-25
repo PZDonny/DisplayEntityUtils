@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprActiveGroupLocation extends SimplePropertyExpression<ActiveGroup, Location> {
 
     static {
-        register(ExprActiveGroupLocation.class, Location.class, "[the] true location", "activegroup");
+        register(ExprActiveGroupLocation.class, Location.class, "true location", "activegroup");
     }
 
     @Override

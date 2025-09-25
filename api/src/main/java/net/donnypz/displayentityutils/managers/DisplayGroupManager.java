@@ -40,8 +40,8 @@ public final class DisplayGroupManager {
      * DO NOT CALL THIS METHOD
      */
     @ApiStatus.Internal
-    public static void addSpawnedGroup(SpawnedDisplayEntityPart part, SpawnedDisplayEntityGroup spawnedGroup) {
-        allSpawnedGroups.put(part, spawnedGroup);
+    public static void addSpawnedGroup(SpawnedDisplayEntityGroup spawnedGroup) {
+        allSpawnedGroups.put(spawnedGroup.getMasterPart(), spawnedGroup);
     }
 
     /**
@@ -320,14 +320,11 @@ public final class DisplayGroupManager {
      * @param getter The player searching for a group (For commands, otherwise null)
      */
     public static @Nullable GroupResult getSpawnedGroup(@NotNull Display displayEntity, @Nullable Player getter) {
-        //Check for existing group
-        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(displayEntity);
-        if (part != null && part.getGroup() != null) {
-            if (part.getGroup().isSpawned() && part.getGroup().isRegistered()){
-                return new GroupResult(part.getGroup(), true);
-            }
+        //Check for already registered group
+        SpawnedDisplayEntityPart existingPart = SpawnedDisplayEntityPart.getPart(displayEntity);
+        if (existingPart != null){
+            return new GroupResult(existingPart.getGroup(), true);
         }
-
 
         //Check for non-existing group on new session
         SpawnedDisplayEntityGroup group;
@@ -362,17 +359,6 @@ public final class DisplayGroupManager {
         return new GroupResult(group, false);
     }
 
-    /**
-     * Store a newly created SpawnedDisplayEntityGroup in a map
-     *
-     * @param group The SpawnedDisplayEntityGroup to store
-     * @apiNote This will NEVER have to be called manually
-     */
-    @ApiStatus.Internal
-    public static void storeNewSpawnedGroup(SpawnedDisplayEntityGroup group) {
-        allSpawnedGroups.put(group.getMasterPart(), group);
-    }
-
 
     /**
      * Get a Spawned Display Entity Group through an interaction entity
@@ -387,14 +373,15 @@ public final class DisplayGroupManager {
         if (part != null && part.getGroup() != null) {
             return part.getGroup();
         }
-        //Get Nearby Group
-        GroupResult result = getSpawnedGroupNearLocation(interaction.getLocation(), radius);
-        if (result == null || result.group() == null) {
+
+        //Get Nearby Groups
+        List<GroupResult> results = getSpawnedGroupsNearLocation(interaction.getLocation(), radius);
+        if (results.isEmpty()){
             return null;
         }
         //Check if Interaction is part of group
         part = SpawnedDisplayEntityPart.getPart(interaction);
-        return part == null ? null : result.group();
+        return part == null ? null : part.getGroup();
 
     }
 
@@ -465,12 +452,26 @@ public final class DisplayGroupManager {
      * @return A list of {@link GroupResult}
      */
     public static @NotNull List<GroupResult> getSpawnedGroupsNearLocation(@NotNull Location location, double radius) {
+        return getSpawnedGroupsNearLocation(location, radius, true);
+    }
+
+    /**
+     * Gets all the Spawned Display Entity Groups near a location
+     *
+     * @param location Center of the search location
+     * @param radius The radius to check for {@link SpawnedDisplayEntityGroup}s
+     * @return A list of {@link GroupResult}
+     */
+    public static @NotNull List<GroupResult> getSpawnedGroupsNearLocation(@NotNull Location location, double radius, boolean addInteractions) {
         List<GroupResult> results = new ArrayList<>();
         for (BlockDisplay display : location.getNearbyEntitiesByType(BlockDisplay.class, radius)) {
-        //Check if found display is a part of a group
+            //Check if found display is a part of a group
             GroupResult result = getSpawnedGroup(display, null);
             if (result == null || results.stream().anyMatch(r -> r.group().equals(result.group()))) {
                 continue;
+            }
+            if (addInteractions){
+                result.group().addMissingInteractionEntities(DisplayConfig.getMaximumInteractionSearchRange());
             }
             results.add(result);
         }
@@ -494,12 +495,12 @@ public final class DisplayGroupManager {
 
     /**
      * Get the list of all the {@link SpawnedDisplayEntityGroup}s that have been registered during this play session.
-     *
      * @return List of all registered SpawnedDisplayEntityGroups
      */
     public static List<SpawnedDisplayEntityGroup> getAllSpawnedGroups() {
         return new ArrayList<>(allSpawnedGroups.values());
     }
+
 
     private static Display getNearestPotentialMasterDisplay(Location loc, double radius, String groupTag) {
         Display nearest = null;

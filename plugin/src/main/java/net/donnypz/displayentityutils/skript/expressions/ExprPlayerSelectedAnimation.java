@@ -25,10 +25,10 @@ import org.jetbrains.annotations.Nullable;
         "#Reset animation selection",
         "reset player's selected animation"
         })
-@Since("2.6.3")
+@Since("2.6.3, 3.3.2 (Plural)")
 public class ExprPlayerSelectedAnimation extends SimplePropertyExpression<Player, SpawnedDisplayAnimation> {
     static {
-        register(ExprPlayerSelectedAnimation.class, SpawnedDisplayAnimation.class, "[the] selected anim[ation]", "player");
+        register(ExprPlayerSelectedAnimation.class, SpawnedDisplayAnimation.class, "selected anim[ation]", "players");
     }
 
     @Override
@@ -69,9 +69,7 @@ public class ExprPlayerSelectedAnimation extends SimplePropertyExpression<Player
                 }
                 DisplayAnimationManager.setSelectedSpawnedAnimation(p.getPlayer(), (SpawnedDisplayAnimation) delta[0]);
             }
-            case RESET -> {
-                DisplayAnimationManager.deselectSpawnedAnimation(p);
-            }
+            case RESET -> DisplayAnimationManager.deselectSpawnedAnimation(p);
         }
     }
 

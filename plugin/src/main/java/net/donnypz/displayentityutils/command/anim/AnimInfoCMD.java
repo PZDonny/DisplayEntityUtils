@@ -12,7 +12,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -34,56 +33,58 @@ class AnimInfoCMD extends PlayerSubCommand {
         }
 
         player.sendMessage(DisplayAPI.pluginPrefixLong);
-        String animTag = animation.getAnimationTag() == null ? ChatColor.RED + "NOT SET" : ChatColor.YELLOW + animation.getAnimationTag();
 
-        player.sendMessage("Animation Tag: " + ChatColor.YELLOW + animTag);
-        player.sendMessage("Total Frames: " + ChatColor.YELLOW + animation.getFrames().size());
-        player.sendMessage("Total Duration: "+ChatColor.YELLOW + animation.getDuration()+" ticks");
-        player.sendMessage("Respect Scale: " + ChatColor.YELLOW + animation.groupScaleRespect());
-        player.sendMessage("Allows Texture Changes: "+ChatColor.YELLOW + animation.allowsTextureChanges());
+        String animTag = animation.getAnimationTag() == null ? "<red>NOT SET" : "<yellow>"+animation.getAnimationTag();
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Animation Tag: "+animTag));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Total Frames: <yellow>"+animation.getFrames().size()));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Total Duration: <yellow>"+animation.getDuration()+" ticks"));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Respect Scale: <yellow>"+animation.groupScaleRespect()));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Allows Texture Changes: <yellow>"+animation.allowsTextureChanges()));
+
         if (!animation.hasFilter()) {
             player.sendMessage(MiniMessage.miniMessage().deserialize("<white>Animation Part Filter: <red>NOT SET"));
-        } else {
-            player.sendMessage(Component.empty());
-            player.sendMessage("Animation Part Filter:");
-            PartFilter filter = animation.getFilter();
+            return;
+        }
 
-            player.sendMessage(Component.text("| Included Part Tags", NamedTextColor.GRAY));
-            for (String s : filter.getIncludedPartTags()){
-                player.sendMessage(Component.text("- "+s, NamedTextColor.YELLOW));
-            }
+        player.sendMessage(Component.empty());
+        player.sendMessage("Animation Part Filter:");
+        PartFilter filter = animation.getFilter();
 
-            player.sendMessage(Component.text("| Excluded Part Tags:", NamedTextColor.GRAY));
-            for (String s : filter.getExcludedPartTags()){
-                player.sendMessage(Component.text("- "+s, NamedTextColor.YELLOW));
-            }
+        player.sendMessage(Component.text("| Included Part Tags", NamedTextColor.GRAY));
+        for (String s : filter.getIncludedPartTags()){
+            player.sendMessage(Component.text("- "+s, NamedTextColor.YELLOW));
+        }
 
-            player.sendMessage(Component.text("| Part Types:", NamedTextColor.GRAY));
-            for (SpawnedDisplayEntityPart.PartType type : filter.getPartTypes()){
-                player.sendMessage(Component.text("- "+type, NamedTextColor.YELLOW));
-            }
+        player.sendMessage(Component.text("| Excluded Part Tags:", NamedTextColor.GRAY));
+        for (String s : filter.getExcludedPartTags()){
+            player.sendMessage(Component.text("- "+s, NamedTextColor.YELLOW));
+        }
 
-            if (filter.isIncludingBlockTypes()){
-                player.sendMessage(Component.text("| Block Types (Included):", NamedTextColor.GRAY));
-            }
-            else{
-                player.sendMessage(Component.text("| Block Types (Excluded):", NamedTextColor.GRAY));
-            }
+        player.sendMessage(Component.text("| Part Types:", NamedTextColor.GRAY));
+        for (SpawnedDisplayEntityPart.PartType type : filter.getPartTypes()){
+            player.sendMessage(Component.text("- "+type, NamedTextColor.YELLOW));
+        }
 
-            for (Material type: filter.getBlockTypes()){
-                player.sendMessage(Component.text("- "+type.getKey().asMinimalString(), NamedTextColor.YELLOW));
-            }
+        if (filter.isIncludingBlockTypes()){
+            player.sendMessage(Component.text("| Block Types (Included):", NamedTextColor.GRAY));
+        }
+        else{
+            player.sendMessage(Component.text("| Block Types (Excluded):", NamedTextColor.GRAY));
+        }
 
-            if (filter.isIncludingItemTypes()){
-                player.sendMessage(Component.text("| Item Types (Included):", NamedTextColor.GRAY));
-            }
-            else{
-                player.sendMessage(Component.text("| Item Types (Excluded):", NamedTextColor.GRAY));
-            }
+        for (Material type: filter.getBlockTypes()){
+            player.sendMessage(Component.text("- "+type.getKey().asMinimalString(), NamedTextColor.YELLOW));
+        }
 
-            for (Material type : filter.getItemTypes()){
-                player.sendMessage(Component.text("- "+type.getKey().asMinimalString(), NamedTextColor.YELLOW));
-            }
+        if (filter.isIncludingItemTypes()){
+            player.sendMessage(Component.text("| Item Types (Included):", NamedTextColor.GRAY));
+        }
+        else{
+            player.sendMessage(Component.text("| Item Types (Excluded):", NamedTextColor.GRAY));
+        }
+
+        for (Material type : filter.getItemTypes()){
+            player.sendMessage(Component.text("- "+type.getKey().asMinimalString(), NamedTextColor.YELLOW));
         }
     }
 }

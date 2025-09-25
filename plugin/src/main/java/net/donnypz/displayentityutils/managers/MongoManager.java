@@ -17,7 +17,6 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.Binary;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.ApiStatus;
@@ -66,8 +65,8 @@ public final class MongoManager implements DisplayStorage{
                 }
                 else{
                     if (saver != null){
-                        saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display entity group to MongoDB!");
-                        saver.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Save with tag already exists!");
+                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display entity group to MongoDB!"));
+                        saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
                     }
                     return false;
                 }
@@ -78,14 +77,14 @@ public final class MongoManager implements DisplayStorage{
             }
 
             if (saver != null) {
-                saver.sendMessage(ChatColor.WHITE+"- "+ ChatColor.GREEN + "Successfully saved display entity group to MongoDB!");
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved display entity group to MongoDB!"));
             }
             return true;
         }
         catch(IOException ex){
             ex.printStackTrace();
             if (saver != null) {
-                saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display entity group to MongoDB!");
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display entity group to MongoDB!"));
             }
             return false;
         }
@@ -100,12 +99,13 @@ public final class MongoManager implements DisplayStorage{
                 if (doc != null){
                     groupCollection.deleteOne(doc);
                     if (deleter != null){
-                        deleter.sendMessage(ChatColor.WHITE+"- "+ChatColor.LIGHT_PURPLE+"Successfully deleted from MongoDB!");
+
+                        deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted group from MongoDB!"));
                         return;
                     }
                 }
                 if (deleter != null){
-                    deleter.sendMessage(ChatColor.WHITE+"- "+ChatColor.RED+"Saved Display Entity does not exist in MongoDB database!");
+                    deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved display entity group does not exist in MongoDB database!"));
                 }
             }
         }.runTaskAsynchronously(DisplayAPI.getPlugin());
@@ -149,7 +149,7 @@ public final class MongoManager implements DisplayStorage{
                 }
                 else{
                     if (saver != null){
-                        saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display animation to MongoDB!");
+                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save animation to MongoDB!"));
                         saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
                     }
                     return false;
@@ -161,14 +161,14 @@ public final class MongoManager implements DisplayStorage{
             }
 
             if (saver != null) {
-                saver.sendMessage(ChatColor.WHITE+"- "+ ChatColor.GREEN + "Successfully saved display animation to MongoDB!");
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved animation to MongoDB!"));
             }
             return true;
         }
         catch(IOException ex){
             ex.printStackTrace();
             if (saver != null) {
-                saver.sendMessage(ChatColor.WHITE+"- " + ChatColor.RED + "Failed to save display animation to MongoDB!");
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save animation to MongoDB!"));
             }
             return false;
         }
@@ -183,12 +183,12 @@ public final class MongoManager implements DisplayStorage{
                 if (doc != null){
                     animationCollection.deleteOne(doc);
                     if (deleter != null){
-                        deleter.sendMessage(ChatColor.WHITE+"- "+ChatColor.LIGHT_PURPLE+"Successfully deleted from MongoDB!");
+                        deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted animation from MongoDB database!"));
                         return;
                     }
                 }
                 if (deleter != null){
-                    deleter.sendMessage(ChatColor.WHITE+"- "+ChatColor.RED+"Saved Display Animation does not exist in MongoDB database!");
+                    deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved animation does not exist in MongoDB database!"));
                 }
             }
         }.runTaskAsynchronously(DisplayAPI.getPlugin());

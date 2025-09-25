@@ -29,21 +29,19 @@ public class ExprSavedGroupToSpawned extends SimpleExpression<SpawnedDisplayEnti
         Skript.registerExpression(ExprSavedGroupToSpawned.class, SpawnedDisplayEntityGroup.class, ExpressionType.COMBINED, "%savedgroup% spawned at %location% [w:with %-groupspawnsetting%]");
     }
 
-    Expression<DisplayEntityGroup> savedGroup;
-    Expression<Location> location;
-    Expression<GroupSpawnSettings> groupSpawnSettings;
+    private Expression<DisplayEntityGroup> savedGroup;
+    private Expression<Location> location;
+    private Expression<GroupSpawnSettings> groupSpawnSettings = null;
 
     @Override
     protected SpawnedDisplayEntityGroup @Nullable [] get(Event event) {
         DisplayEntityGroup saved = savedGroup.getSingle(event);
+        if (saved == null) return new SpawnedDisplayEntityGroup[0];
         Location loc = location.getSingle(event);
-        if (saved == null || loc == null){
-            return null;
-        }
-        if (groupSpawnSettings == null){
+        if (loc == null) return new SpawnedDisplayEntityGroup[0];
+        if (groupSpawnSettings == null) {
             return new SpawnedDisplayEntityGroup[]{saved.spawn(loc, GroupSpawnedEvent.SpawnReason.SKRIPT)};
-        }
-        else{
+        } else {
             GroupSpawnSettings settings = groupSpawnSettings.getSingle(event);
             if (settings == null){
                 return null;
@@ -64,7 +62,7 @@ public class ExprSavedGroupToSpawned extends SimpleExpression<SpawnedDisplayEnti
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return savedGroup.toString(event,debug)+" to spawned group";
+        return savedGroup.toString(event,debug)+" spawned at " + location.toString(event, debug) + (groupSpawnSettings == null ? "" : groupSpawnSettings.toString(event, debug));
     }
 
     @Override

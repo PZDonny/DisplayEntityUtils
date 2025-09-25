@@ -12,7 +12,6 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -173,9 +172,9 @@ public class DEUCommandUtils {
     public static void sendGlowColor(Player player, Color color){
         if (color != null) {
             player.sendMessage(Component.text("Glow Color: ").append(Component.text("COLOR", TextColor.color(color.getRed(), color.getGreen(), color.getBlue()))));
-            player.sendMessage("| " + net.md_5.bungee.api.ChatColor.RED + "R: " + color.getRed());
-            player.sendMessage("| " + net.md_5.bungee.api.ChatColor.GREEN + "G: " + color.getGreen());
-            player.sendMessage("| " + ChatColor.BLUE + "B: " + color.getBlue());
+            player.sendMessage(MiniMessage.miniMessage().deserialize("| <red>"+color.getRed()));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("| <green>"+color.getGreen()));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("| <blue>"+color.getBlue()));
 
             String redString = Integer.toHexString(color.getRed());
             if (redString.equals("0")) {

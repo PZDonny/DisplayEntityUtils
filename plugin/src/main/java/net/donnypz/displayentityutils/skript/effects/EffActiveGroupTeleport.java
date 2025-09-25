@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 @Name("Teleport Active Group")
 @Description("Teleport an Active group to a location")
 @Examples({"deu teleport {_spawnedgroup} to player", "deu move {_spawnedgroup} to {_location} and respect group facing"})
-@Since("2.6.2")
+@Since("2.6.2, 3.0.0 (Packet)")
 public class EffActiveGroupTeleport extends Effect {
     static {
         Skript.registerEffect(EffActiveGroupTeleport.class,"deu (move|teleport) %activegroup% to %location% [r:[and] (keep|respect) group (facing|direction|orientation)]");

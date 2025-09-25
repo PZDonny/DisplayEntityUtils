@@ -213,7 +213,7 @@ public final class DisplayEntityGroup implements Serializable{
         }
 
         SpawnedDisplayEntityGroup group = new SpawnedDisplayEntityGroup(settings.visibleByDefault);
-        Display blockDisplay = masterEntity.createEntity(group, location, settings);
+        Display masterDisplay = masterEntity.createEntity(group, location, settings);
         if (isPersistent == null){
             group.setPersistent(true);
         }
@@ -223,7 +223,7 @@ public final class DisplayEntityGroup implements Serializable{
 
 
         group.setTag(tag);
-        group.addDisplayEntity(blockDisplay).setMaster();
+        group.addDisplayEntity(masterDisplay).setMaster();
 
         for (DisplayEntity entity : displayEntities){ //Summon Display Entities
             if (entity.isMaster()) continue;
@@ -241,7 +241,7 @@ public final class DisplayEntityGroup implements Serializable{
 
         for (InteractionEntity entity : interactionEntities){ //Summon Interaction Entities
             Vector v = entity.getVector();
-            Location spawnLocation = group.getMasterPart().getEntity().getLocation().clone().subtract(v);
+            Location spawnLocation = masterDisplay.getLocation().clone().subtract(v);
 
             Interaction interaction = entity.createEntity(spawnLocation, settings);
 
@@ -263,7 +263,7 @@ public final class DisplayEntityGroup implements Serializable{
             group.setTag(tag);
         }
 
-        DisplayGroupManager.addSpawnedGroup(group.getMasterPart(), group);
+        DisplayGroupManager.addSpawnedGroup(group);
 
         if (DisplayConfig.autoCulling()){
             float widthCullingAdder = DisplayConfig.widthCullingAdder();

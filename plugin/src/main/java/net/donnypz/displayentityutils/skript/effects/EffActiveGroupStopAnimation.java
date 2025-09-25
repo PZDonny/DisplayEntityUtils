@@ -24,7 +24,7 @@ import java.util.Collection;
             "",
             "#3.0.0 and later",
             "stop packet animation on {_packetgroup} from {_displayanimator} for {_players::*}"})
-@Since("2.6.2")
+@Since("2.6.2, 3.0.0 (Packet)")
 public class EffActiveGroupStopAnimation extends Effect {
     static {
         Skript.registerEffect(EffActiveGroupStopAnimation.class,"stop [packet] animation on %activegroup% from %displayanimator% [f:for %-players%]");

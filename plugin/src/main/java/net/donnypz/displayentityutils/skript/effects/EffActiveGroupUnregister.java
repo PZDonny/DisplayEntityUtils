@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
         "",
         "#3.0.0 and later",
         "unregister {_packetgroup}"})
-@Since("2.6.2")
+@Since("2.6.2, 3.0.0 (Packet)")
 public class EffActiveGroupUnregister extends Effect {
     static {
         Skript.registerEffect(EffActiveGroupUnregister.class,"[deu] unregister %activegroup% [d:[and ]despawn [f:[with|and] forced [chunk loading]]]");

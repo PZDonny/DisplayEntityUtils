@@ -16,14 +16,14 @@ import org.bukkit.entity.Display;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("SpawnedPart/Entity Is Master Part?")
-@Description("Check if a spawned part or an entity is the master part of a spawned group")
+@Name("ActivePart / Display Is Master Part?")
+@Description("Check if an active part or a display entity is the master part of an active group")
 @Examples({"if {_spawnedpart} is the master part:", "\tbroadcast \"All other parts are the passengers of this one!\""})
 @Since("2.6.2")
 public class CondIsMaster extends Condition {
 
     static {
-        Skript.registerCondition(CondIsMaster.class, "%activepart/display% (1¦is|2¦is(n't| not)) [the] master part [of a [spawned]group]");
+        Skript.registerCondition(CondIsMaster.class, "%activepart/display% (1¦is|2¦is(n't| not)) [the] master part [of a [spawned|packet] group]");
     }
 
     Expression<?> object;

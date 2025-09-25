@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
         "",
         "#3.0.0 or later",
         "deu show {_packetgroup} to {_players::*}"})
-@Since("2.6.2")
+@Since("2.6.2, 3.0.0 (Packet)")
 public class EffActivePlayerVisibility extends Effect {
     static {
         Skript.registerEffect(EffActivePlayerVisibility.class,"deu (1¦(show|reveal)|2¦hide) %spawnedgroups/spawnedparts/partselections/packetgroups/packetparts/packetpartselections% (to|from) %players%");

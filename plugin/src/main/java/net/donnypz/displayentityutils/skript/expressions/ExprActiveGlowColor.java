@@ -25,10 +25,10 @@ import org.jetbrains.annotations.Nullable;
         "",
         "#3.0.0 or later",
         "set {_packetgroup}'s deu glow color to green"})
-@Since("2.6.2")
+@Since("2.6.2, 3.0.0 (Packet), 3.3.2 (Plural)")
 public class ExprActiveGlowColor extends SimplePropertyExpression<Object, Color> {
     static {
-        register(ExprActiveGlowColor.class, Color.class, "[the] deu glow[ing] colo[u]r [override]", "activegroups/activeparts/multipartselections");
+        register(ExprActiveGlowColor.class, Color.class, "deu glow[ing] colo[u]r [override]", "activegroups/activeparts/multipartselections");
     }
 
     @Override

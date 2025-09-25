@@ -16,11 +16,11 @@ import java.util.UUID;
             "",
             "#3.0.0 and later",
             "set {_uuid} to {_packetpart}'s part uuid"})
-@Since("2.6.2")
+@Since("2.6.2, 3.0.0 (Packet), 3.3.2 (Plural)")
 public class ExprActivePartUUID extends SimplePropertyExpression<ActivePart, UUID> {
 
     static {
-        register(ExprActivePartUUID.class, UUID.class, "[the] part uuid", "activepart");
+        register(ExprActivePartUUID.class, UUID.class, "part uuid", "activeparts");
     }
 
     @Override
@@ -42,8 +42,4 @@ public class ExprActivePartUUID extends SimplePropertyExpression<ActivePart, UUI
         return "part uuid";
     }
 
-    @Override
-    public boolean isSingle() {
-        return true;
-    }
 }
