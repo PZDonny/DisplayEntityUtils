@@ -17,8 +17,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Active Group/Part/Selection Player Visibility")
-@Description("Show/Hide a DisplayEntityUtils object to/from a player")
+@Name("Active Group/Part/Selection Visibility")
+@Description("Show or hide a DisplayEntityUtils object to/from a player")
 @Examples({"deu hide {_partselection} from player",
         "deu show {_spawnedpart} to player",
         "",
@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2, 3.0.0 (Packet)")
 public class EffActivePlayerVisibility extends Effect {
     static {
-        Skript.registerEffect(EffActivePlayerVisibility.class,"deu (1¦(show|reveal)|2¦hide) %spawnedgroups/spawnedparts/partselections/packetgroups/packetparts/packetpartselections% (to|from) %players%");
+        Skript.registerEffect(EffActivePlayerVisibility.class,"deu (1¦(show|reveal)|2¦hide) %activegrups/activeparts/multipartselections% (to|from) %players%");
     }
 
     Expression<?> object;
@@ -75,6 +75,6 @@ public class EffActivePlayerVisibility extends Effect {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "visibility for players: "+object.toString(event, debug);
+        return "deu visibility for players: "+object.toString(event, debug);
     }
 }

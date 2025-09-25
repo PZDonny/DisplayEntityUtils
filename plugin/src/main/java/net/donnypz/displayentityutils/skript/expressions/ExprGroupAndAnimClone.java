@@ -40,7 +40,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprGroupAndAnimClone extends SimpleExpression<Object> {
 
     static{
-        Skript.registerExpression(ExprGroupAndAnimClone.class, Object.class, ExpressionType.SIMPLE, "[a] (clone[d version]|cop[y|ied version]) of %spawnedgroup/packetgroup/animation% [loc:at %-location%] [s:with %-groupspawnsettings%]");
+        Skript.registerExpression(ExprGroupAndAnimClone.class, Object.class, ExpressionType.SIMPLE, "[a] (clone[d version]|cop[y|ied version]) of %activegroup/animation% [loc:at %-location%] [s:with %-groupspawnsettings%]");
     }
 
     private Expression<?> object;

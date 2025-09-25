@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprActiveGroupToSaved extends SimpleExpression<Object> {
 
     static{
-        Skript.registerExpression(ExprActiveGroupToSaved.class, Object.class, ExpressionType.COMBINED, "%spawnedgroup/packetgroup% as saved[ |-]group");
+        Skript.registerExpression(ExprActiveGroupToSaved.class, Object.class, ExpressionType.COMBINED, "%activegroup% as saved[ |-]group");
     }
 
     private Expression<?> object;
