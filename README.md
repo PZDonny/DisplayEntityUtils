@@ -8,7 +8,7 @@ DisplayEntityUtils is a extensive plugin designed to make the usage of Display/I
 ## What you'll need
 ### Dependencies:
 - **[PacketEvents](https://modrinth.com/plugin/packetevents)**
-  - **_This dependency allows for usage of packet-based display entities, and is used throughout the plugin_** 
+  - **_This dependency allows for usage of packet-based display entities and animations, and is used throughout the plugin_** 
 
 ### BDEngine (Recommended)
 BDEngine is what you'll use to create models and animations that can be transferred into your game world. Info on BDEngine and the Block Display Place, the collection of BDEngine models and animations, can be found [HERE](block-display.com)
@@ -74,7 +74,7 @@ BDEngine is what you'll use to create models and animations that can be transfer
 </dependency>
 ```
 
-### API for v3.3.0 and lower
+### API for versions before v3.3.0
 ```xml
 <repositories>
   <repository>
