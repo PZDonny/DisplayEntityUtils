@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-@Name("Spawned/Packet Parts of Group / Part Selection")
+@Name("Active Parts of Group / Part Selection")
 @Description("Get the active/packet parts of a group or part selection")
 @Examples({"set {_spawnedparts::*} to {_spawnedgroup}'s parts",
         "",
@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 public class ExprActivePartsFromActive extends PropertyExpression<Object, ActivePart> {
 
     static {
-        register(ExprActivePartsFromActive.class, ActivePart.class, "active parts", "activegroups/multipartselections");
+        register(ExprActivePartsFromActive.class, ActivePart.class, "[active] parts", "activegroups/multipartselections");
     }
 
     @Override
