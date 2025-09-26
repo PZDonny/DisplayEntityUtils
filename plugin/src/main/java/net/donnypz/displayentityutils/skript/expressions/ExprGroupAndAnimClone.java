@@ -1,7 +1,6 @@
 package net.donnypz.displayentityutils.skript.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.classes.Changer;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -11,8 +10,6 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
-import ch.njol.util.coll.CollectionUtils;
-import net.donnypz.displayentityutils.events.PreGroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
@@ -94,20 +91,5 @@ public class ExprGroupAndAnimClone extends SimpleExpression<Object> {
             settings = (Expression<GroupSpawnSettings>) expressions[2];
         }
         return true;
-    }
-
-    @Override
-    @Nullable
-    public Class<?>[] acceptChange(final Changer.ChangeMode mode) {
-        if (mode == Changer.ChangeMode.SET)
-            return CollectionUtils.array(GroupSpawnSettings.class);
-        return null;
-    }
-
-    @Override
-    public void change(final Event e, final @Nullable Object[] delta, final Changer.ChangeMode mode) {
-        if (e instanceof PreGroupSpawnedEvent ev && mode == Changer.ChangeMode.SET){
-            ev.setGroupSpawnSettings((GroupSpawnSettings) delta[0]);
-        }
     }
 }
