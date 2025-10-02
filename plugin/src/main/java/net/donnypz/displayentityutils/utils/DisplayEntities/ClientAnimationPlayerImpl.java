@@ -19,7 +19,7 @@ final class ClientAnimationPlayerImpl extends ClientAnimationPlayer{
                               int delay,
                               boolean playSingleFrame)
     {
-        super(animator, animation, group, frame, startFrameId, delay, playSingleFrame, true);
+        super(animator, animation, group, frame, startFrameId, delay, playSingleFrame);
         this.players.addAll(players);
     }
 

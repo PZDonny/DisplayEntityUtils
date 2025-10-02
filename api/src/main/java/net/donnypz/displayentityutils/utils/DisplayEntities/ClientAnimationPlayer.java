@@ -12,8 +12,8 @@ abstract class ClientAnimationPlayer extends AnimationPlayer{
     final Object playerLock = new Object();
     final Set<Player> players = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    ClientAnimationPlayer(@NotNull DisplayAnimator animator, @NotNull SpawnedDisplayAnimation animation, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimationFrame frame, int startFrameId, int delay, boolean playSingleFrame, boolean packetAnimationPlayer) {
-        super(animator, animation, group, frame, startFrameId, delay, playSingleFrame, packetAnimationPlayer);
+    ClientAnimationPlayer(@NotNull DisplayAnimator animator, @NotNull SpawnedDisplayAnimation animation, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimationFrame frame, int startFrameId, int delay, boolean playSingleFrame) {
+        super(animator, animation, group, frame, startFrameId, delay, playSingleFrame, true);
     }
 
     boolean contains(Player player){
