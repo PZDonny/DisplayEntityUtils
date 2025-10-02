@@ -18,7 +18,6 @@ import org.bukkit.event.world.EntitiesUnloadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
@@ -51,8 +50,7 @@ public final class DEULoadingListeners implements Listener {
 
         World world = e.getWorld();
         String worldName = world.getName();
-        ArrayList<Long> storedChunks = AutoGroup.readChunks.remove(worldName);
-        if (storedChunks != null) storedChunks.clear();
+        AutoGroup.readChunks.remove(worldName);
 
         if (DisplayEntityPlugin.shouldUnregisterWorld(worldName)){
             for (SpawnedDisplayEntityGroup group : DisplayGroupManager.getSpawnedGroups(worldName)){
