@@ -95,7 +95,7 @@ public abstract class AnimationPlayer {
             frame.playEffects(group, animator, true);
         }
 
-        if (!packetAnimationPlayer || players != null || group.hasTrackingPlayers()){
+        if ((!packetAnimationPlayer && group.getLocation().getChunk().isEntitiesLoaded()) || players != null || group.hasTrackingPlayers()){
             animateInteractions(players, groupLoc, frame, group, selection, animation);
             animateDisplays(players, frame, group, selection, animation);
         }
