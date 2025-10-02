@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2, 3.0.0 (Packet)")
 public class EffActivePlayerVisibility extends Effect {
     static {
-        Skript.registerEffect(EffActivePlayerVisibility.class,"deu (1¦(show|reveal)|2¦hide) %activegrups/activeparts/multipartselections% (to|from) %players%");
+        Skript.registerEffect(EffActivePlayerVisibility.class,"deu (1¦(show|reveal)|2¦hide) %activegroups/activeparts/multipartselections% (to|from) %players%");
     }
 
     Expression<?> object;
