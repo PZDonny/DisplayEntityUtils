@@ -353,7 +353,7 @@ public final class DisplayUtils {
      * @return true if the entity is in a loaded chunk
      */
     public static boolean isInLoadedChunk(Entity entity){
-        return entity.getLocation().getChunk().isLoaded();
+        return entity.getLocation().isChunkLoaded();
     }
 
     /**
