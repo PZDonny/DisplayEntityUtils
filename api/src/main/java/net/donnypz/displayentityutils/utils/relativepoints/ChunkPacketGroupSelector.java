@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.relativepoints;
 
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.RelativePoint;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -42,6 +43,8 @@ public class ChunkPacketGroupSelector extends RelativePointSelector<RelativePoin
     public void sendInfo(Player player) {
         player.sendMessage(Component.text("ID: "+id, NamedTextColor.YELLOW));
         player.sendMessage(Component.text("Chunk Key: "+chunkKey, NamedTextColor.YELLOW));
+        int[] coords = ConversionUtils.getChunkCoordinates(chunkKey);
+        player.sendMessage(Component.text("Chunk X,Z: "+coords[0]+","+coords[1], NamedTextColor.YELLOW));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: "+(groupTag == null ? "<red>NOT SET" : "<yellow>"+groupTag)));
     }
 
