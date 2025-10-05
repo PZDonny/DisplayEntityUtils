@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public abstract class AnimationPlayer {
+    final ActiveGroup<?> group;
     final DisplayAnimator animator;
     private SpawnedDisplayAnimationFrame prevFrame;
     protected final boolean playSingleFrame;
@@ -35,9 +36,20 @@ public abstract class AnimationPlayer {
                     boolean playSingleFrame,
                     boolean packetAnimationPlayer){
         this.animator = animator;
+        this.group = group;
         this.playSingleFrame = playSingleFrame;
         this.packetAnimationPlayer = packetAnimationPlayer;
         prepareAnimation(animation, group, frame, startFrameId, delay);
+    }
+
+    AnimationPlayer(@NotNull DisplayAnimator animator,
+                    @NotNull ActiveGroup<?> group,
+                    boolean playSingleFrame,
+                    boolean packetAnimationPlayer){
+        this.animator = animator;
+        this.group = group;
+        this.playSingleFrame = playSingleFrame;
+        this.packetAnimationPlayer = packetAnimationPlayer;
     }
 
     protected void prepareAnimation(SpawnedDisplayAnimation animation, ActiveGroup<?> group, SpawnedDisplayAnimationFrame frame, int frameId, int delay){
