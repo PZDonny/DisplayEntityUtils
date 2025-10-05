@@ -16,8 +16,8 @@ import java.util.*;
 
 public class RelativePointUtils {
 
-    public static final HashMap<UUID, Set<RelativePointDisplay>> relativePointDisplays = new HashMap<>();
-    public static final HashMap<UUID, RelativePointDisplay> selectedRelativePoint = new HashMap<>();
+    public static final HashMap<UUID, Set<RelativePointSelector<?>>> relativePointSelectors = new HashMap<>();
+    public static final HashMap<UUID, RelativePointSelector<?>> selectedSelector = new HashMap<>();
 
     @ApiStatus.Internal
     public static void spawnFramePointDisplays(SpawnedDisplayEntityGroup group, Player player, SpawnedDisplayAnimationFrame frame){
@@ -30,11 +30,11 @@ public class RelativePointUtils {
             return;
         }
 
-        Set<RelativePointDisplay> displays = new HashSet<>();
+        Set<RelativePointSelector<?>> displays = new HashSet<>();
         for (FramePoint point : frame.getFramePoints()){
             Location spawnLoc = point.getLocation(group);
             spawnLoc.setPitch(0);
-            FramePointDisplay pd = new FramePointDisplay(player, spawnLoc, point, frame);
+            FramePointSelector pd = new FramePointSelector(player, spawnLoc, point, frame);
             displays.add(pd);
         }
         setDisplays(player, displays);
@@ -53,9 +53,9 @@ public class RelativePointUtils {
             return;
         }
 
-        Set<RelativePointDisplay> displays = new HashSet<>();
+        Set<RelativePointSelector<?>> displays = new HashSet<>();
         for (DisplayGroupManager.ChunkPacketGroupInfo info : infos){
-            ChunkPacketGroupDisplay display = new ChunkPacketGroupDisplay(player, info);
+            ChunkPacketGroupSelector display = new ChunkPacketGroupSelector(player, info);
             displays.add(display);
         }
         setDisplays(player, displays);
@@ -70,31 +70,31 @@ public class RelativePointUtils {
         return false;
     }
 
-    private static void setDisplays(Player player, Set<RelativePointDisplay> displays){
-        relativePointDisplays.put(player.getUniqueId(), displays);
+    private static void setDisplays(Player player, Set<RelativePointSelector<?>> selectors){
+        relativePointSelectors.put(player.getUniqueId(), selectors);
         player.sendMessage(Component.text("Left click a point to select it", NamedTextColor.YELLOW));
         player.sendMessage(Component.text("| Run \"/mdis hidepoints\" to stop viewing points", NamedTextColor.GRAY));
     }
 
     public static boolean isViewingRelativePoints(Player player){
-        return relativePointDisplays.containsKey(player.getUniqueId());
+        return relativePointSelectors.containsKey(player.getUniqueId());
     }
 
 
-    public static RelativePointDisplay getSelectedRelativePoint(Player player){
-        return selectedRelativePoint.get(player.getUniqueId());
+    public static RelativePointSelector<?> getRelativePointSelector(Player player){
+        return selectedSelector.get(player.getUniqueId());
     }
 
-    public static void selectRelativePoint(Player player, RelativePointDisplay relativePoint){
-        RelativePointDisplay oldPoint = selectedRelativePoint.put(player.getUniqueId(), relativePoint);
+    public static void selectRelativePoint(Player player, RelativePointSelector<?> selector){
+        RelativePointSelector<?> oldPoint = selectedSelector.put(player.getUniqueId(), selector);
         if (oldPoint != null){
             oldPoint.deselect();
         }
         player.playSound(player, Sound.ENTITY_ITEM_FRAME_PLACE, 1, 1);
-        relativePoint.select();
+        selector.select();
     }
 
     public static void deselectRelativePoint(Player player){
-        selectedRelativePoint.remove(player.getUniqueId());
+        selectedSelector.remove(player.getUniqueId());
     }
 }

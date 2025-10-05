@@ -7,8 +7,8 @@ import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.relativepoints.FramePointDisplay;
-import net.donnypz.displayentityutils.utils.relativepoints.RelativePointDisplay;
+import net.donnypz.displayentityutils.utils.relativepoints.FramePointSelector;
+import net.donnypz.displayentityutils.utils.relativepoints.RelativePointSelector;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -28,8 +28,8 @@ class AnimRemoveSoundCMD extends PlayerSubCommand {
             return;
         }
 
-        RelativePointDisplay rp = RelativePointUtils.getSelectedRelativePoint(player);
-        if (!(rp instanceof FramePointDisplay display)){
+        RelativePointSelector rp = RelativePointUtils.getRelativePointSelector(player);
+        if (!(rp instanceof FramePointSelector display)){
             AnimCMD.noFramePointSelection(player);
             return;
         }

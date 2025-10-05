@@ -13,13 +13,13 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
-public class ChunkPacketGroupDisplay extends RelativePointDisplay{
+public class ChunkPacketGroupSelector extends RelativePointSelector<RelativePoint> {
 
     int id;
     long chunkKey;
     String worldName;
     String groupTag;
-    ChunkPacketGroupDisplay(Player player, DisplayGroupManager.ChunkPacketGroupInfo info) {
+    ChunkPacketGroupSelector(Player player, DisplayGroupManager.ChunkPacketGroupInfo info) {
         super(player, getPitchCorrectedLocation(info.location()), null, Material.ORANGE_CONCRETE);
         this.id = info.id();
         this.chunkKey = info.location().getChunk().getChunkKey();

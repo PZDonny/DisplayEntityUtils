@@ -8,8 +8,8 @@ import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.relativepoints.FramePointDisplay;
-import net.donnypz.displayentityutils.utils.relativepoints.RelativePointDisplay;
+import net.donnypz.displayentityutils.utils.relativepoints.FramePointSelector;
+import net.donnypz.displayentityutils.utils.relativepoints.RelativePointSelector;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -36,8 +36,8 @@ class AnimMovePointCMD extends PlayerSubCommand {
             return;
         }
 
-        RelativePointDisplay rp = RelativePointUtils.getSelectedRelativePoint(player);
-        if (!(rp instanceof FramePointDisplay)){
+        RelativePointSelector rp = RelativePointUtils.getRelativePointSelector(player);
+        if (!(rp instanceof FramePointSelector)){
             AnimCMD.noFramePointSelection(player);
             return;
         }

@@ -8,8 +8,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
 import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.donnypz.displayentityutils.utils.dialogs.animationparticles.AnimationParticleSelectDialog;
-import net.donnypz.displayentityutils.utils.relativepoints.FramePointDisplay;
-import net.donnypz.displayentityutils.utils.relativepoints.RelativePointDisplay;
+import net.donnypz.displayentityutils.utils.relativepoints.FramePointSelector;
+import net.donnypz.displayentityutils.utils.relativepoints.RelativePointSelector;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -27,8 +27,8 @@ class AnimAddParticleCMD extends PlayerSubCommand {
             return;
         }
 
-        RelativePointDisplay rp = RelativePointUtils.getSelectedRelativePoint(player);
-        if (!(rp instanceof FramePointDisplay display)){
+        RelativePointSelector rp = RelativePointUtils.getRelativePointSelector(player);
+        if (!(rp instanceof FramePointSelector display)){
             AnimCMD.noFramePointSelection(player);
             return;
         }

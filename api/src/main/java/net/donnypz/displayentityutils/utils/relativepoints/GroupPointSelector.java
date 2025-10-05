@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.relativepoints;
 
+import net.donnypz.displayentityutils.utils.DisplayEntities.GroupPoint;
 import net.donnypz.displayentityutils.utils.DisplayEntities.RelativePoint;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.Location;
@@ -10,10 +11,10 @@ import org.jetbrains.annotations.NotNull;
 
 @ApiStatus.Internal
 @ApiStatus.Experimental
-public class GroupPointDisplay extends RelativePointDisplay{
+public class GroupPointSelector extends RelativePointSelector<GroupPoint> {
     SpawnedDisplayEntityGroup group;
 
-    GroupPointDisplay(Player player, Location spawnLocation, RelativePoint relativePoint, SpawnedDisplayEntityGroup group){
+    GroupPointSelector(Player player, Location spawnLocation, GroupPoint relativePoint, SpawnedDisplayEntityGroup group){
         super(player, spawnLocation, relativePoint, Material.ORANGE_CONCRETE);
         this.group = group;
     }
@@ -32,11 +33,6 @@ public class GroupPointDisplay extends RelativePointDisplay{
     public boolean removeFromPointHolder() {
         //group.relativePoints.remove(relativePoint);
         return true;
-    }
-
-    @Override
-    public RelativePoint getRelativePoint() {
-        return relativePoint;
     }
 
 
