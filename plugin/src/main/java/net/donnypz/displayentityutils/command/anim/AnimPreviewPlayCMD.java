@@ -49,7 +49,7 @@ class AnimPreviewPlayCMD extends PlayerSubCommand {
         Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayAPI.getPlugin(), () -> {
             if (player.isConnected()){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Animation test complete!", NamedTextColor.GREEN)));
-                player.sendMessage(Component.text("| Use \"/mdis anim restore\" to restore entity data", NamedTextColor.GRAY));
+                player.sendMessage(Component.text("| Use \"/mdis anim restore\" to restore your group's original state", NamedTextColor.GRAY));
             }
         }, anim.getDuration());
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Test playing animation!", NamedTextColor.AQUA)));

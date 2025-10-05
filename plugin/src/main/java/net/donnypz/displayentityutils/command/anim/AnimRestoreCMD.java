@@ -27,7 +27,6 @@ class AnimRestoreCMD extends PlayerSubCommand {
 
         group.hideFromPlayer(player);
         group.showToPlayer(player);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Restored group entity data", NamedTextColor.GRAY, TextDecoration.ITALIC)));
-        player.sendMessage(Component.text("Animation successfully reversed!", NamedTextColor.GREEN));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Restored group transformations, removing animation preview changes", NamedTextColor.GREEN)));
     }
 }
