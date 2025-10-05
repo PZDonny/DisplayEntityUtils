@@ -409,7 +409,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     }
 
     private void executeCommands(Location location, List<String> commands){
-        if (location == null || !location.isChunkLoaded() || endCommands.isEmpty()) {
+        if (location == null || !location.isChunkLoaded() || commands.isEmpty()) {
             return;
         }
         String coordinates = ConversionUtils.getCoordinateString(location);
