@@ -62,7 +62,6 @@ public abstract class AnimationPlayer {
 
     protected void executeAnimation(Collection<Player> players, SpawnedDisplayAnimation animation, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame){
         if (!onStartNewFrame(group, selection)) return;
-        Bukkit.broadcastMessage("OSNF");
         //Check if the animation can continue playing
         if (!canContinueAnimation(group)){
             handleAnimationInterrupted(group, selection);
