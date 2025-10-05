@@ -397,9 +397,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     public List<Entity> getPartEntities(@NotNull SpawnedDisplayEntityPart.PartType partType){
         List<Entity> partList = new ArrayList<>();
-        for (ActivePart part : groupParts.sequencedValues()){
+        for (SpawnedDisplayEntityPart part : groupParts.sequencedValues()){
             if (partType == part.getType()){
-                partList.add(((SpawnedDisplayEntityPart) part).getEntity());
+                partList.add(part.getEntity());
             }
         }
         return partList;
