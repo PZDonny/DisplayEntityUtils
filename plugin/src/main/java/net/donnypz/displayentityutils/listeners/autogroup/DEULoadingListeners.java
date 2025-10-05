@@ -1,6 +1,5 @@
 package net.donnypz.displayentityutils.listeners.autogroup;
 
-import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.DisplayEntityPlugin;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
@@ -19,22 +18,21 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Arrays;
-import java.util.concurrent.CompletableFuture;
 
 @ApiStatus.Internal
 public final class DEULoadingListeners implements Listener {
     @EventHandler(priority =  EventPriority.HIGHEST)
     public void onEntityLoad(EntitiesLoadEvent e){
         Chunk chunk = e.getChunk();
-        if (e.getChunk().isLoaded()){
+        //if (chunk.isLoaded()){
             AutoGroup.detectGroups(chunk, e.getEntities());
-        }
-        else{
-            CompletableFuture<Chunk> futureChunk = e.getWorld().getChunkAtAsync(chunk.getX(), chunk.getZ());
-            futureChunk.thenAccept(c -> {
-                Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> AutoGroup.detectGroups(c, e.getEntities()));
-            });
-        }
+        //}
+//        else{
+//            CompletableFuture<Chunk> futureChunk = e.getWorld().getChunkAtAsync(chunk.getX(), chunk.getZ());
+//            futureChunk.thenAccept(c -> {
+//                Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> AutoGroup.detectGroups(c, e.getEntities()));
+//            });
+//        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
