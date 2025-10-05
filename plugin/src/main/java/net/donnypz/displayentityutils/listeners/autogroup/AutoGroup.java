@@ -29,6 +29,7 @@ final class AutoGroup {
     static final HashMap<String, HashSet<Long>> readChunks = new HashMap<>();
 
     private static void refreshGroupPartEntities(List<Entity> entities){
+        if (entities.isEmpty()) return;
         Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
             for (Entity e : entities){
                 SpawnedDisplayEntityPart p = SpawnedDisplayEntityPart.getPart(e);
@@ -47,6 +48,7 @@ final class AutoGroup {
         String worldName = world.getName();
         HashSet<Long> chunks = readChunks.computeIfAbsent(worldName, name -> new HashSet<>());
 
+        //Bukkit.broadcastMessage(chunk.getX()+" X | "+chunk.getZ()+" Z | TICK="+Bukkit.getCurrentTick());
         if (chunks.contains(chunk.getChunkKey())){
             refreshGroupPartEntities(entities);
             if (!DisplayConfig.readSameChunks()) return;
@@ -57,6 +59,8 @@ final class AutoGroup {
 
         DisplayGroupManager.spawnChunkPacketGroups(chunk);
 
+
+        if (entities.isEmpty()) return;
 
         HashSet<SpawnedDisplayEntityGroup> foundGroups = new HashSet<>();
         HashMap<SpawnedDisplayEntityGroup, Collection<Interaction>> addedInteractionsForEvent = new HashMap<>();
