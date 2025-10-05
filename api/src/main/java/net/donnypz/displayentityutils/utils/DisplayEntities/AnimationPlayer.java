@@ -62,6 +62,7 @@ public abstract class AnimationPlayer {
 
     protected void executeAnimation(Collection<Player> players, SpawnedDisplayAnimation animation, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame){
         if (!onStartNewFrame(group, selection)) return;
+        Bukkit.broadcastMessage("OSNF");
         //Check if the animation can continue playing
         if (!canContinueAnimation(group)){
             handleAnimationInterrupted(group, selection);
@@ -88,6 +89,8 @@ public abstract class AnimationPlayer {
             callAnimationSetFrame(players, group, animation, frame);
         }
 
+        boolean isChunkLoaded = groupLoc.isChunkLoaded();
+
         if (players != null){
             frame.playEffects(players, group);
         }
@@ -95,7 +98,7 @@ public abstract class AnimationPlayer {
             frame.playEffects(group, animator, true);
         }
 
-        if ((!packetAnimationPlayer && group.getLocation().getChunk().isEntitiesLoaded()) || players != null || group.hasTrackingPlayers()){
+        if ((!packetAnimationPlayer && isChunkLoaded) || players != null || group.hasTrackingPlayers()){
             animateInteractions(players, groupLoc, frame, group, selection, animation);
             animateDisplays(players, frame, group, selection, animation);
         }
@@ -116,13 +119,13 @@ public abstract class AnimationPlayer {
                 delay++;
             }
             if (frame.duration > 0){
-                playEndCommands(players, group, frame, group.getLocation());
+                playEndCommands(players, group, frame, groupLoc);
                 useScheduler(() -> {
                     callAnimationFrameEnd(players, group, animation, frame, frameId);
                 }, frame.duration);
             }
             else{
-                playEndCommands(players, group, frame, group.getLocation());
+                playEndCommands(players, group, frame, groupLoc);
                 callAnimationFrameEnd(players, group, animation, frame, frameId);
             }
 
@@ -137,13 +140,13 @@ public abstract class AnimationPlayer {
             if (animator.type != DisplayAnimator.AnimationType.LOOP) {
                 if (frame.duration > 0) {
                     useScheduler(() -> {
-                        playEndCommands(players, group, frame, group.getLocation());
+                        playEndCommands(players, group, frame, groupLoc);
                         callAnimationComplete(players, group, animation);
                         handleAnimationComplete(group, selection);
                     }, frame.duration);
                 }
                 else {
-                    playEndCommands(players, group, frame, group.getLocation());
+                    playEndCommands(players, group, frame, groupLoc);
                     callAnimationComplete(players, group, animation);
                     handleAnimationComplete(group, selection);
                 }
@@ -152,14 +155,14 @@ public abstract class AnimationPlayer {
             //Loop Animation
             else {
                 if (frame.duration > 0) {
-                    playEndCommands(players, group, frame, group.getLocation());
+                    playEndCommands(players, group, frame, groupLoc);
                     SpawnedDisplayAnimationFrame firstFrame = animation.frames.getFirst();
                     useScheduler(() -> {
                         executeAnimation(players, animation, group, selection, firstFrame, 0, false);
                     }, frame.duration);
                 }
                 else {
-                    playEndCommands(players, group, frame, group.getLocation());
+                    playEndCommands(players, group, frame, groupLoc);
                     executeAnimation(players, animation, group, selection, animation.frames.getFirst(), 0, false);
                 }
             }
