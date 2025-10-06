@@ -100,8 +100,6 @@ public abstract class AnimationPlayer {
             callAnimationSetFrame(players, group, animation, frame);
         }
 
-        boolean isChunkLoaded = groupLoc.isChunkLoaded();
-
         if (players != null){
             frame.playEffects(players, group);
         }
@@ -109,7 +107,7 @@ public abstract class AnimationPlayer {
             frame.playEffects(group, animator, true);
         }
 
-        if ((!packetAnimationPlayer && isChunkLoaded) || players != null || group.hasTrackingPlayers()){
+        if ((!packetAnimationPlayer && groupLoc.isChunkLoaded()) || players != null || group.hasTrackingPlayers()){
             animateInteractions(players, groupLoc, frame, group, selection, animation);
             animateDisplays(players, frame, group, selection, animation);
         }
@@ -441,6 +439,7 @@ public abstract class AnimationPlayer {
     private void applyDisplayTransformation(ActivePart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, ActiveGroup<?> group, DisplayTransformation transformation, boolean applyDataOnly){
         SpawnedDisplayEntityPart sp = (SpawnedDisplayEntityPart) part;
         Display display = (Display) sp.getEntity();
+        if (!display.isValid()) return;
         if (applyDataOnly){
             if (animation.allowsTextureChanges()){
                 transformation.applyData(display);
