@@ -89,7 +89,7 @@ public final class DEUPlayerConnectionListener implements Listener {
 
     //-1 = v1 is prev ver
     //0 = same ver
-    //1 = v1 is later ver
+    //1 = v1 is dev version
     static boolean compareVersions(Player player, String v1, String v2) {
         int vPart1 = 0;
         int vPart2 = 0;
@@ -105,7 +105,8 @@ public final class DEUPlayerConnectionListener implements Listener {
                             + (c - '0');
                 }
                 else{
-
+                    devVersion(player);
+                    return true;
                 }
                 i1++;
             }
@@ -119,6 +120,7 @@ public final class DEUPlayerConnectionListener implements Listener {
                 }
                 else{
                     devVersion(player);
+                    return true;
                 }
                 i2++;
             }
@@ -137,6 +139,6 @@ public final class DEUPlayerConnectionListener implements Listener {
     }
 
     private static void devVersion(Player player){
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You are using a dev plugin version, a new version may be available.", NamedTextColor.YELLOW)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You are using a dev plugin version, a new version may be available.", NamedTextColor.LIGHT_PURPLE)));
     }
 }
