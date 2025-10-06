@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public abstract class AnimationPlayer {
+    final ActiveGroup<?> group;
     final DisplayAnimator animator;
     private SpawnedDisplayAnimationFrame prevFrame;
     protected final boolean playSingleFrame;
@@ -35,9 +36,20 @@ public abstract class AnimationPlayer {
                     boolean playSingleFrame,
                     boolean packetAnimationPlayer){
         this.animator = animator;
+        this.group = group;
         this.playSingleFrame = playSingleFrame;
         this.packetAnimationPlayer = packetAnimationPlayer;
         prepareAnimation(animation, group, frame, startFrameId, delay);
+    }
+
+    AnimationPlayer(@NotNull DisplayAnimator animator,
+                    @NotNull ActiveGroup<?> group,
+                    boolean playSingleFrame,
+                    boolean packetAnimationPlayer){
+        this.animator = animator;
+        this.group = group;
+        this.playSingleFrame = playSingleFrame;
+        this.packetAnimationPlayer = packetAnimationPlayer;
     }
 
     protected void prepareAnimation(SpawnedDisplayAnimation animation, ActiveGroup<?> group, SpawnedDisplayAnimationFrame frame, int frameId, int delay){
@@ -95,7 +107,7 @@ public abstract class AnimationPlayer {
             frame.playEffects(group, animator, true);
         }
 
-        if (!packetAnimationPlayer || players != null || group.hasTrackingPlayers()){
+        if ((!packetAnimationPlayer && groupLoc.isChunkLoaded()) || players != null || group.hasTrackingPlayers()){
             animateInteractions(players, groupLoc, frame, group, selection, animation);
             animateDisplays(players, frame, group, selection, animation);
         }
@@ -116,13 +128,13 @@ public abstract class AnimationPlayer {
                 delay++;
             }
             if (frame.duration > 0){
-                playEndCommands(players, group, frame, group.getLocation());
+                playEndCommands(players, group, frame, groupLoc);
                 useScheduler(() -> {
                     callAnimationFrameEnd(players, group, animation, frame, frameId);
                 }, frame.duration);
             }
             else{
-                playEndCommands(players, group, frame, group.getLocation());
+                playEndCommands(players, group, frame, groupLoc);
                 callAnimationFrameEnd(players, group, animation, frame, frameId);
             }
 
@@ -137,13 +149,13 @@ public abstract class AnimationPlayer {
             if (animator.type != DisplayAnimator.AnimationType.LOOP) {
                 if (frame.duration > 0) {
                     useScheduler(() -> {
-                        playEndCommands(players, group, frame, group.getLocation());
+                        playEndCommands(players, group, frame, groupLoc);
                         callAnimationComplete(players, group, animation);
                         handleAnimationComplete(group, selection);
                     }, frame.duration);
                 }
                 else {
-                    playEndCommands(players, group, frame, group.getLocation());
+                    playEndCommands(players, group, frame, groupLoc);
                     callAnimationComplete(players, group, animation);
                     handleAnimationComplete(group, selection);
                 }
@@ -152,14 +164,14 @@ public abstract class AnimationPlayer {
             //Loop Animation
             else {
                 if (frame.duration > 0) {
-                    playEndCommands(players, group, frame, group.getLocation());
+                    playEndCommands(players, group, frame, groupLoc);
                     SpawnedDisplayAnimationFrame firstFrame = animation.frames.getFirst();
                     useScheduler(() -> {
                         executeAnimation(players, animation, group, selection, firstFrame, 0, false);
                     }, frame.duration);
                 }
                 else {
-                    playEndCommands(players, group, frame, group.getLocation());
+                    playEndCommands(players, group, frame, groupLoc);
                     executeAnimation(players, animation, group, selection, animation.frames.getFirst(), 0, false);
                 }
             }
@@ -427,6 +439,7 @@ public abstract class AnimationPlayer {
     private void applyDisplayTransformation(ActivePart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, ActiveGroup<?> group, DisplayTransformation transformation, boolean applyDataOnly){
         SpawnedDisplayEntityPart sp = (SpawnedDisplayEntityPart) part;
         Display display = (Display) sp.getEntity();
+        if (!display.isValid()) return;
         if (applyDataOnly){
             if (animation.allowsTextureChanges()){
                 transformation.applyData(display);

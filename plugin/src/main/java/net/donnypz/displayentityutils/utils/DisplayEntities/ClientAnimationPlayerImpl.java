@@ -19,8 +19,7 @@ final class ClientAnimationPlayerImpl extends ClientAnimationPlayer{
                               int delay,
                               boolean playSingleFrame)
     {
-        super(animator, animation, group, frame, startFrameId, delay, playSingleFrame, true);
-        this.players.addAll(players);
+        super(players, animator, animation, group, frame, startFrameId, delay, playSingleFrame);
     }
 
     @Override
@@ -37,12 +36,15 @@ final class ClientAnimationPlayerImpl extends ClientAnimationPlayer{
 
     @Override
     protected boolean canContinueAnimation(ActiveGroup<?> group) {
-        return group.masterPart != null && group instanceof SpawnedDisplayEntityGroup g && g.isRegistered();
+        if (group instanceof SpawnedDisplayEntityGroup g && !g.isRegistered()){
+            return false;
+        }
+        return group.masterPart != null;
     }
 
     @Override
     protected void handleAnimationInterrupted(ActiveGroup<?> group, MultiPartSelection<?> selection) {
-        animator.stop(players, group);
+        animator.stop(players, this);
         if (group instanceof SpawnedDisplayEntityGroup g){
             if (!g.isRegistered()){
                 removeSelection(selection);
@@ -52,7 +54,7 @@ final class ClientAnimationPlayerImpl extends ClientAnimationPlayer{
 
     @Override
     protected void handleAnimationComplete(ActiveGroup<?> group, MultiPartSelection<?> selection) {
-        animator.stop(players, group);
+        animator.stop(players, this);
         removeSelection(selection);
     }
 
@@ -66,7 +68,7 @@ final class ClientAnimationPlayerImpl extends ClientAnimationPlayer{
                     animator.stop(p);
                     iter.remove();
                 }
-                else if (!animator.isAnimating(p, group)){
+                else if (!animator.isAnimating(p, this)){
                     iter.remove();
                 }
             }

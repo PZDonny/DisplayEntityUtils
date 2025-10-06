@@ -13,7 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DisplayAnimator {
     final SpawnedDisplayAnimation animation;
     final AnimationType type;
-    final ConcurrentHashMap<UUID, Set<ActiveGroup<?>>> players = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, Set<ClientAnimationPlayer>> clientPlayers = new ConcurrentHashMap<>();
+    private final Object clientPlayerLock = new Object();
 
     /**
      * Create a display animator that manages playing and stopping animations for {@link ActiveGroup}s.
@@ -117,7 +118,7 @@ public class DisplayAnimator {
 
     /**
      * Plays an animation for a {@link ActiveGroup} through packets, only for a given player.
-     * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(Player, ActiveGroup)} or similar is called.
+     * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(Player, ClientAnimationPlayer)} or similar is called.
      * <br>
      * @param player the player
      * @param group The group to play the animation
@@ -130,7 +131,7 @@ public class DisplayAnimator {
 
     /**
      * Plays an animation for a {@link ActiveGroup} through packets, only for the given players.
-     * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(Player, ActiveGroup)} or similar is called.
+     * Looping DisplayAnimators will run forever until {@link DisplayAnimator#stop(Player, ClientAnimationPlayer)} or similar is called.
      * <br>
      * @param players the players
      * @param group The group to play the animation
@@ -143,14 +144,15 @@ public class DisplayAnimator {
         }
         SpawnedDisplayAnimationFrame frame = animation.frames.get(startFrameId);
         int delay = frame.delay;
-        addPlayers(players, group);
         DisplayAPI.getAnimationPlayerService().playForClient(players, this, animation, group, frame, startFrameId, delay, false);
         return true;
     }
 
-    private void addPlayers(Collection<Player> players, ActiveGroup<?> group){
-        for (Player p : players){
-            this.players.computeIfAbsent(p.getUniqueId(), g -> new HashSet<>()).add(group);
+    void addPlayers(Collection<Player> players, ClientAnimationPlayer animationPlayer){
+        synchronized (clientPlayerLock){
+            for (Player p : players){
+                this.clientPlayers.computeIfAbsent(p.getUniqueId(), g -> new HashSet<>()).add(animationPlayer);
+            }
         }
     }
 
@@ -177,32 +179,56 @@ public class DisplayAnimator {
      * @param playerUUID the player
      */
     public void stop(@NotNull UUID playerUUID){
-        Set<ActiveGroup<?>> groups = players.remove(playerUUID);
-        if (groups != null){
-            groups.clear();
+        synchronized (clientPlayerLock){
+            clientPlayers.remove(playerUUID);
+        }
+    }
+
+    void stop(@NotNull Player player, @NotNull ClientAnimationPlayer clientAnimationPlayer){
+        synchronized (clientPlayerLock){
+            Set<ClientAnimationPlayer> clientPlayers = this.clientPlayers.get(player.getUniqueId());
+            if (clientPlayers == null){
+                return;
+            }
+            clientPlayers.remove(clientAnimationPlayer);
+            if (clientPlayers.isEmpty()){
+                this.clientPlayers.remove(player.getUniqueId());
+            }
+        }
+    }
+
+    void stop(@NotNull Collection<Player> players, @NotNull ClientAnimationPlayer clientAnimationPlayer){
+        for (Player p : players){
+            stop(p, clientAnimationPlayer);
         }
     }
 
     /**
      * Stop the individualized, packet-based animations being sent to a player, only for the given group that is animating
      * @param player the player
-     * @param group the group to stop animating
+     * @param group the group
      */
     public void stop(@NotNull Player player, @NotNull ActiveGroup<?> group){
-        Set<ActiveGroup<?>> groups = players.get(player.getUniqueId());
-        if (groups == null){
-            return;
-        }
-        groups.remove(group);
-        if (groups.isEmpty()){
-            players.remove(player.getUniqueId());
+        synchronized (clientPlayerLock){
+            Set<ClientAnimationPlayer> clientPlayers = this.clientPlayers.get(player.getUniqueId());
+            if (clientPlayers == null){
+                return;
+            }
+            Iterator<ClientAnimationPlayer> iter = clientPlayers.iterator();
+            while (iter.hasNext()){
+                ClientAnimationPlayer plr = iter.next();
+                if (plr.group.equals(group)) iter.remove();
+            }
+            if (clientPlayers.isEmpty()){
+                this.clientPlayers.remove(player.getUniqueId());
+            }
         }
     }
 
     /**
-     * Stop the individualized, packet-based animations being sent to players, only for the given group that is animating.
+     * Stop the individualized, packet-based animations being sent to players, only for the given group that is animating
      * @param players the players
-     * @param group the group to stop animating
+     * @param group the group
      */
     public void stop(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group){
         for (Player p : players){
@@ -210,17 +236,45 @@ public class DisplayAnimator {
         }
     }
 
+    boolean isAnimating(@NotNull Player player, @NotNull ClientAnimationPlayer clientAnimationPlayer){
+        synchronized (clientPlayerLock){
+            Set<ClientAnimationPlayer> clientPlrs = clientPlayers.get(player.getUniqueId());
+            if (clientPlrs == null){
+                return false;
+            }
+            return clientPlrs.contains(clientAnimationPlayer);
+        }
+    }
+
+
     /**
      * Check if this animator is animating a group for a player with packets
      * @param group the group
      * @return a boolean
      */
     public boolean isAnimating(@NotNull Player player, @NotNull ActiveGroup<?> group){
-        Set<ActiveGroup<?>> groups = players.get(player.getUniqueId());
-        if (groups == null){
+        synchronized (clientPlayerLock){
+            Set<ClientAnimationPlayer> clientPlrs = clientPlayers.get(player.getUniqueId());
+            if (clientPlrs == null){
+                return false;
+            }
+            for (ClientAnimationPlayer plr : clientPlrs){
+                if (plr.group.equals(group)) return true;
+            }
             return false;
         }
-        return groups.contains(group);
+    }
+
+
+    /**
+     * Check if this animator is animating one or more groups for a player with packets
+     * @return a boolean
+     */
+    public boolean isAnimating(@NotNull Player player){
+        synchronized (clientPlayerLock){
+            Set<ClientAnimationPlayer> groups = clientPlayers.get(player.getUniqueId());
+            return groups != null;
+        }
     }
 
     /**

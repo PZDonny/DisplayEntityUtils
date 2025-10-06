@@ -97,4 +97,15 @@ public class ConversionUtils {
     public static long getChunkKey(int x, int z){
         return ((long) z << 32) | (x & 0xFFFFFFFFL); //Order is inverted
     }
+
+    /**
+     * Get a chunk's x and z coordinates from a chunk's key
+     * @param chunkKey chunk's key
+     * @return a int array containing the x and z coordinates, respectively
+     */
+    public static int[] getChunkCoordinates(long chunkKey){
+        int z = (int) (chunkKey >> 32);
+        int x = (int) chunkKey;
+        return new int[]{x, z};
+    }
 }

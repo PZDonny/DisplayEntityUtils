@@ -40,10 +40,12 @@ public abstract class ActivePart implements Active{
 
     protected ActivePart(int entityId, boolean mapped){
         this.entityId = entityId;
-        if (mapped) partsById.put(entityId, this);
+        if (mapped) {
+            partsById.put(entityId, this);
+        }
     }
 
-    protected void unregister(){
+    protected synchronized void unregister(){
         partsById.remove(entityId);
         valid = false;
     }
@@ -105,10 +107,10 @@ public abstract class ActivePart implements Active{
         return entityId;
     }
 
-    protected void refreshEntityId(int newEntityId){
+    protected synchronized void refreshEntityId(int newEntityId){
         partsById.remove(entityId);
         entityId = newEntityId;
-        partsById.put(entityId, this);
+        partsById.put(newEntityId, this);
     }
 
     /**

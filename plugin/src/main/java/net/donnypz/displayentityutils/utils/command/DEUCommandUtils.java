@@ -4,7 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.donnypz.displayentityutils.utils.relativepoints.RelativePointDisplay;
+import net.donnypz.displayentityutils.utils.relativepoints.RelativePointSelector;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -36,27 +36,25 @@ public class DEUCommandUtils {
     @ApiStatus.Internal
     public static boolean removeRelativePoints(Player player){
         if (player == null) return false;
-        Set<RelativePointDisplay> displays = RelativePointUtils.relativePointDisplays.remove(player.getUniqueId());
-        if (displays != null){
-            for (RelativePointDisplay d : displays){
+        Set<RelativePointSelector<?>> selectors = RelativePointUtils.relativePointSelectors.remove(player.getUniqueId());
+        if (selectors != null){
+            for (RelativePointSelector<?> d : selectors){
                 d.despawn();
             }
         }
         RelativePointUtils.deselectRelativePoint(player);
-        return displays != null;
+        return selectors != null;
     }
 
-    public static void removeRelativePoint(Player player, RelativePointDisplay point){
+    public static void removeRelativePoint(Player player, RelativePointSelector<?> selector){
         UUID playerUUID = player.getUniqueId();
-        RelativePointUtils.selectedRelativePoint.remove(playerUUID, point);
-        Set<RelativePointDisplay> displays = RelativePointUtils.relativePointDisplays.get(playerUUID);
-        displays.remove(point);
+        RelativePointUtils.selectedSelector.remove(playerUUID, selector);
+        Set<RelativePointSelector<?>> displays = RelativePointUtils.relativePointSelectors.get(playerUUID);
+        displays.remove(selector);
         if (displays.isEmpty()){
-            RelativePointUtils.relativePointDisplays.remove(playerUUID);
+            RelativePointUtils.relativePointSelectors.remove(playerUUID);
         }
     }
-
-
 
 
     public static int[] commaSeparatedIDs(String idString) throws IllegalArgumentException{

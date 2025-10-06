@@ -9,10 +9,10 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 @ApiStatus.Internal
-public class FramePointDisplay extends RelativePointDisplay{
+public class FramePointSelector extends RelativePointSelector<FramePoint> {
     SpawnedDisplayAnimationFrame frame;
 
-    FramePointDisplay(Player player, Location spawnLocation, FramePoint framePoint, SpawnedDisplayAnimationFrame frame){
+    FramePointSelector(Player player, Location spawnLocation, FramePoint framePoint, SpawnedDisplayAnimationFrame frame){
         super(player, spawnLocation, framePoint, Material.LIGHT_BLUE_CONCRETE);
         this.frame = frame;
     }
@@ -31,12 +31,6 @@ public class FramePointDisplay extends RelativePointDisplay{
     public boolean removeFromPointHolder() {
         return frame.removeFramePoint(getRelativePoint());
     }
-
-    @Override
-    public FramePoint getRelativePoint() {
-        return (FramePoint) relativePoint;
-    }
-
 
     @Override
     public void despawn(){

@@ -11,7 +11,7 @@ import io.papermc.paper.registry.data.dialog.type.DialogType;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
-import net.donnypz.displayentityutils.utils.relativepoints.FramePointDisplay;
+import net.donnypz.displayentityutils.utils.relativepoints.FramePointSelector;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -66,7 +66,7 @@ public abstract class ParticleDialog {
         double yOffset = (double) view.getFloat(Y_OFFSET);
         double zOffset = (double) view.getFloat(Z_OFFSET);
         Player p = (Player) audience;
-        FramePointDisplay display = (FramePointDisplay) RelativePointUtils.getSelectedRelativePoint(p);
+        FramePointSelector display = (FramePointSelector) RelativePointUtils.getRelativePointSelector(p);
         FramePoint framePoint = display.getRelativePoint();
         AnimationParticleBuilder builder = AnimationParticleBuilder.create(framePoint, particle, count, xOffset, yOffset, zOffset, extra, data);
         builder.build();

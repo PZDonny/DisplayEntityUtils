@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.listeners.autogroup;
 
+import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.ChunkAddGroupInteractionsEvent;
 import net.donnypz.displayentityutils.events.ChunkRegisterGroupEvent;
@@ -10,6 +11,7 @@ import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.GroupResult;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Display;
@@ -24,19 +26,16 @@ final class AutoGroup {
 
     private AutoGroup(){}
 
-    static final HashMap<String, ArrayList<Long>> readChunks = new HashMap<>();
+    static final HashMap<String, HashSet<Long>> readChunks = new HashMap<>();
 
     private static void refreshGroupPartEntities(List<Entity> entities){
-        for (Entity e : entities){
-            if (e instanceof Interaction i){
-                SpawnedDisplayEntityPart p = SpawnedDisplayEntityPart.getPart(i);
-                if (p != null) p.refreshEntity();
+        if (entities.isEmpty()) return;
+        Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
+            for (Entity e : entities){
+                SpawnedDisplayEntityPart p = SpawnedDisplayEntityPart.getPart(e);
+                if (p != null) p.refreshEntity(e);
             }
-            else if (e instanceof Display d){
-                SpawnedDisplayEntityPart p = SpawnedDisplayEntityPart.getPart(d);
-                if (p != null) p.refreshEntity();
-            }
-        }
+        });
     }
 
     static void detectGroups(Chunk chunk, List<Entity> entities){
@@ -47,14 +46,12 @@ final class AutoGroup {
 
         World world = chunk.getWorld();
         String worldName = world.getName();
-        readChunks.putIfAbsent(worldName, new ArrayList<>());
+        HashSet<Long> chunks = readChunks.computeIfAbsent(worldName, name -> new HashSet<>());
 
-        ArrayList<Long> chunks = readChunks.get(worldName);
+        //Bukkit.broadcastMessage(chunk.getX()+" X | "+chunk.getZ()+" Z | TICK="+Bukkit.getCurrentTick());
         if (chunks.contains(chunk.getChunkKey())){
             refreshGroupPartEntities(entities);
-            if (!DisplayConfig.readSameChunks()){
-                return;
-            }
+            if (!DisplayConfig.readSameChunks()) return;
         }
         else{
             chunks.add(chunk.getChunkKey());
@@ -62,6 +59,8 @@ final class AutoGroup {
 
         DisplayGroupManager.spawnChunkPacketGroups(chunk);
 
+
+        if (entities.isEmpty()) return;
 
         HashSet<SpawnedDisplayEntityGroup> foundGroups = new HashSet<>();
         HashMap<SpawnedDisplayEntityGroup, Collection<Interaction>> addedInteractionsForEvent = new HashMap<>();
@@ -174,7 +173,6 @@ final class AutoGroup {
     private static void applyController(SpawnedDisplayEntityGroup group, Entity vehicle){
         PersistentDataContainer pdc = group.getMasterPart().getEntity().getPersistentDataContainer();
         String data = pdc.get(DisplayControllerManager.controllerIdKey, PersistentDataType.STRING);
-
 
         DisplayController controller = DisplayController.getController(data);
         //DisplayController

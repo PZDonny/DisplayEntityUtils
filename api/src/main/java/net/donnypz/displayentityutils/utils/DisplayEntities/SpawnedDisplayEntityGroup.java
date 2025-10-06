@@ -397,9 +397,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     public List<Entity> getPartEntities(@NotNull SpawnedDisplayEntityPart.PartType partType){
         List<Entity> partList = new ArrayList<>();
-        for (ActivePart part : groupParts.sequencedValues()){
+        for (SpawnedDisplayEntityPart part : groupParts.sequencedValues()){
             if (partType == part.getType()){
-                partList.add(((SpawnedDisplayEntityPart) part).getEntity());
+                partList.add(part.getEntity());
             }
         }
         return partList;
@@ -1081,8 +1081,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     /**
-     * Merge the parts of two groups together into one group
-     * @param mergingGroup the group to merge
+     * Merge the parts of two groups together into one group. The group merging in to this group will become unusable afterward
+     * @param mergingGroup the group to merge into this one
      * @return This display entity group with the other group merged
      */
     public SpawnedDisplayEntityGroup merge(@NotNull SpawnedDisplayEntityGroup mergingGroup){

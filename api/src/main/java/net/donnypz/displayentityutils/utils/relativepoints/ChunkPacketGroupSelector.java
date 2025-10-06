@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.relativepoints;
 
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.RelativePoint;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -13,13 +14,13 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
-public class ChunkPacketGroupDisplay extends RelativePointDisplay{
+public class ChunkPacketGroupSelector extends RelativePointSelector<RelativePoint> {
 
     int id;
     long chunkKey;
     String worldName;
     String groupTag;
-    ChunkPacketGroupDisplay(Player player, DisplayGroupManager.ChunkPacketGroupInfo info) {
+    ChunkPacketGroupSelector(Player player, DisplayGroupManager.ChunkPacketGroupInfo info) {
         super(player, getPitchCorrectedLocation(info.location()), null, Material.ORANGE_CONCRETE);
         this.id = info.id();
         this.chunkKey = info.location().getChunk().getChunkKey();
@@ -42,6 +43,8 @@ public class ChunkPacketGroupDisplay extends RelativePointDisplay{
     public void sendInfo(Player player) {
         player.sendMessage(Component.text("ID: "+id, NamedTextColor.YELLOW));
         player.sendMessage(Component.text("Chunk Key: "+chunkKey, NamedTextColor.YELLOW));
+        int[] coords = ConversionUtils.getChunkCoordinates(chunkKey);
+        player.sendMessage(Component.text("Chunk X,Z: "+coords[0]+","+coords[1], NamedTextColor.YELLOW));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: "+(groupTag == null ? "<red>NOT SET" : "<yellow>"+groupTag)));
     }
 

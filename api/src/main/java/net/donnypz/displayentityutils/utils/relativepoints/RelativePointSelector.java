@@ -1,10 +1,7 @@
 package net.donnypz.displayentityutils.utils.relativepoints;
 
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
-import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.RelativePoint;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Bukkit;
@@ -23,23 +20,23 @@ import java.util.HashMap;
 import java.util.UUID;
 
 @ApiStatus.Internal
-public abstract class RelativePointDisplay {
+public abstract class RelativePointSelector<T extends RelativePoint> {
 
     private static final float scale  = 0.25f;
     private static final String pointDisplayTag = "deu_point_display_internal";
-    private static final HashMap<PacketDisplayEntityPart, RelativePointDisplay> interactionParts = new HashMap<>();
+    private static final HashMap<PacketDisplayEntityPart, RelativePointSelector> interactionParts = new HashMap<>();
 
     private UUID playerUUID;
-    private PacketDisplayEntityPart interactionPart;
+    private PacketDisplayEntityPart selectPart;
     private PacketDisplayEntityPart displayPart;
 
-    RelativePoint relativePoint;
+    T relativePoint;
     Location spawnLocation;
 
     protected boolean isValid = true;
 
 
-    RelativePointDisplay(Player player, Location spawnLocation, RelativePoint relativePoint, Material itemType){
+    RelativePointSelector(Player player, Location spawnLocation, T relativePoint, Material itemType){
         this.playerUUID = player.getUniqueId();
         ItemStack stack = new ItemStack(itemType);
         displayPart = new PacketAttributeContainer()
@@ -52,13 +49,13 @@ public abstract class RelativePointDisplay {
                 .createPart(SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY, spawnLocation, pointDisplayTag);
         displayPart.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
 
-        interactionPart = new PacketAttributeContainer()
+        selectPart = new PacketAttributeContainer()
                 .setAttribute(DisplayAttributes.Interaction.WIDTH, scale)
                 .setAttribute(DisplayAttributes.Interaction.HEIGHT, scale)
                 .createPart(SpawnedDisplayEntityPart.PartType.INTERACTION, spawnLocation, pointDisplayTag);
-        interactionPart.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
+        selectPart.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
 
-        interactionParts.put(interactionPart, this);
+        interactionParts.put(selectPart, this);
 
         this.spawnLocation = spawnLocation;
         this.relativePoint = relativePoint;
@@ -80,14 +77,14 @@ public abstract class RelativePointDisplay {
             return;
         }
         displayPart.teleport(location);
-        interactionPart.teleport(location);
+        selectPart.teleport(location);
         spawnLocation = location;
         relativePoint.setLocation(group, location);
     }
 
     public abstract boolean removeFromPointHolder();
 
-    public static @Nullable RelativePointDisplay get(@NotNull PacketDisplayEntityPart part){
+    public static @Nullable RelativePointSelector get(@NotNull PacketDisplayEntityPart part){
         return interactionParts.get(part);
     }
 
@@ -95,7 +92,9 @@ public abstract class RelativePointDisplay {
         return part.getTags().contains(pointDisplayTag);
     }
 
-    public abstract RelativePoint getRelativePoint();
+    public T getRelativePoint(){
+        return (T) relativePoint;
+    }
 
     public abstract void sendInfo(Player player);
 
@@ -106,12 +105,12 @@ public abstract class RelativePointDisplay {
             return;
         }
         spawnLocation = null;
-        interactionParts.remove(interactionPart);
+        interactionParts.remove(selectPart);
         relativePoint = null;
         Player player = Bukkit.getPlayer(playerUUID);
         if (player != null){
             displayPart.hideFromPlayer(player);
-            interactionPart.hideFromPlayer(player);
+            selectPart.hideFromPlayer(player);
         }
         isValid = false;
     }

@@ -427,7 +427,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
-     * Get whether any players can visibly see / are trakcing this group. This is done by checking if the master (parent) part of the group is tracked.
+     * Get whether any players can visibly see / are tracking this group. This is done by checking if the master (parent) part of the group is tracked.
      * @return a boolean
      */
     public boolean hasTrackingPlayers() {

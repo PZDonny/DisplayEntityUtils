@@ -270,10 +270,17 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @ApiStatus.Internal
     public void refreshEntity(){
         Entity nonStale = Bukkit.getEntity(entityUUID);
-        if (entity != nonStale && nonStale != null) {
-            entity = nonStale;
-            refreshEntityId(entity.getEntityId());
+        if (nonStale != null){
+            refreshEntity(nonStale);
         }
+    }
+
+    @ApiStatus.Internal
+    public void refreshEntity(@NotNull Entity nonStaleEntity){
+        if (entity == nonStaleEntity) return;
+        if (!nonStaleEntity.getUniqueId().equals(entityUUID)) return;
+        entity = nonStaleEntity;
+        refreshEntityId(nonStaleEntity.getEntityId());
     }
 
     /**

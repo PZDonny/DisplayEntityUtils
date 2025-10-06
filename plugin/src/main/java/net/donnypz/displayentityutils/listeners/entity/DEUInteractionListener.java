@@ -17,7 +17,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityP
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
-import net.donnypz.displayentityutils.utils.relativepoints.RelativePointDisplay;
+import net.donnypz.displayentityutils.utils.relativepoints.RelativePointSelector;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -67,8 +67,8 @@ public class DEUInteractionListener implements Listener, PacketListener {
         Player player = Bukkit.getPlayer(user.getUUID());
 
         //Point Displays
-        if (RelativePointDisplay.isRelativePointPart(part)){
-            RelativePointDisplay pointDisplay = RelativePointDisplay.get(part);
+        if (RelativePointSelector.isRelativePointPart(part)){
+            RelativePointSelector pointDisplay = RelativePointSelector.get(part);
             if (pointDisplay == null){
                 player.sendMessage(Component.text("Failed to get point!", NamedTextColor.RED));
                 return;
@@ -165,7 +165,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
     }
 
 
-    private Component buildPointRemovalComponent(RelativePointDisplay point){
+    private Component buildPointRemovalComponent(RelativePointSelector point){
         return Component.text("Click here to confirm point REMOVAL", NamedTextColor.DARK_RED, TextDecoration.UNDERLINED)
                 .clickEvent(ClickEvent.callback(a -> {
                     Player p = (Player) a;
