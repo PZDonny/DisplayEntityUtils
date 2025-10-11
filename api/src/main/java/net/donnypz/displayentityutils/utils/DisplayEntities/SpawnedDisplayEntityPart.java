@@ -364,8 +364,8 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return this;
     }
 
-    public SpawnedDisplayEntityPart setGroup(@NotNull SpawnedDisplayEntityGroup group){
-        if (this.group == group || isSingle){
+    public SpawnedDisplayEntityPart setGroup(@NotNull SpawnedDisplayEntityGroup newGroup){
+        if (this.group == newGroup || isSingle){
             return this;
         }
 
@@ -374,20 +374,20 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             this.group.groupParts.remove(partUUID);
         }
 
-        this.group = group;
+        this.group = newGroup;
         if (type != PartType.INTERACTION){
             Display display = (Display) getEntity();
-            if (isMaster() && this != group.masterPart){
-                group.masterPart = this;
+            if (isMaster() && this != newGroup.masterPart){
+                newGroup.masterPart = this;
             }
 
-            Entity master = group.masterPart.getEntity();
+            Entity master = newGroup.masterPart.getEntity();
 
             Vector translation;
             if (!isMaster()){
                 Vector worldPos = DisplayUtils.getFixedModelLocation(display).toVector();
                 translation = worldPos.subtract(master.getLocation().toVector());
-                master.addPassenger(getEntity());
+                master.addPassenger(display);
             }
             else{
                 translation = new Vector();
@@ -399,17 +399,17 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
 
         if (partUUID == null || groupContainsUUID(partUUID)){
-            setPartUUID(group.partUUIDRandom);
+            setPartUUID(newGroup.partUUIDRandom);
         }
         else{
             setPartUUID(partUUID);
         }
 
         PersistentDataContainer pdc = getEntity().getPersistentDataContainer();
-        pdc.set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, group.getCreationTime());
+        pdc.set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, newGroup.getCreationTime());
         setGroupPDC();
 
-        getEntity().setPersistent(group.isPersistent());
+        getEntity().setPersistent(newGroup.isPersistent());
         return this;
     }
 
