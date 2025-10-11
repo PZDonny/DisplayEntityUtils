@@ -81,7 +81,7 @@ public class BDEngineLegacyDPConverter {
         SpawnedDisplayEntityGroup createdGroup = DatapackEntitySpawned.getTimestampGroup(timeStamp);
         if (createdGroup == null){
             player.sendMessage(Component.text("Failed to find model/group created from datapack!", NamedTextColor.RED));
-            player.sendMessage(Component.text("| The datapack may be a modern one (v1.13+ of BDEngine). Try using /mdis bdengine convertanimleg"));
+            player.sendMessage(Component.text("| The datapack may be a modern one (v1.13+ of BDEngine). Try using /mdis bdengine convertdp"));
             return;
         }
 
