@@ -10,6 +10,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -64,7 +65,11 @@ class PartsFilterTagsCMD extends PlayerSubCommand {
         }
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Part Tag Filters Applied!")));
-        partSelection.glow(player, 30);
+        if (!partSelection.hasSelectedParts()){
+            player.sendMessage(Component.text("| Your filter does not apply to any parts", NamedTextColor.GRAY, TextDecoration.ITALIC));
+        }
+        else{
+            partSelection.glow(player, 30);
+        }
     }
-
 }

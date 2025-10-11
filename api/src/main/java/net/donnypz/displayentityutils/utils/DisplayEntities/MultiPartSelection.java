@@ -205,6 +205,14 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
     }
 
     /**
+     * Get whether this selection has parts that are included in this selection's filter
+     * @return a boolean
+     */
+    public boolean hasSelectedParts(){
+        return !selectedParts.isEmpty();
+    }
+
+    /**
      * Remove any filters applied, based on the {@link PartFilter.FilterType}.
      * @param filterType the type that should be unfiltered
      * @param refresh true if the parts in the selection should be updated

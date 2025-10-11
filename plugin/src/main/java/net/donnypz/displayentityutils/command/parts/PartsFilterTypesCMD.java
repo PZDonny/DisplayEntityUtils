@@ -108,7 +108,12 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
         }
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Part Type Filters Applied!")));
-        partSelection.glow(player, 30);
+        if (!partSelection.hasSelectedParts()){
+            player.sendMessage(Component.text("| Your filter does not apply to any parts", NamedTextColor.GRAY, TextDecoration.ITALIC));
+        }
+        else{
+            partSelection.glow(player, 30);
+        }
     }
 
 }

@@ -90,7 +90,12 @@ class PartsFilterBlocksCMD extends PlayerSubCommand {
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Block Type Filters Applied!")));
         player.sendMessage(Component.text("This has no effect if Block Displays are filtered out of your selection", NamedTextColor.GRAY, TextDecoration.ITALIC));
-        partSelection.glow(player, 30);
+        if (!partSelection.hasSelectedParts()){
+            player.sendMessage(Component.text("| Your filter does not apply to any parts", NamedTextColor.GRAY, TextDecoration.ITALIC));
+        }
+        else{
+            partSelection.glow(player, 30);
+        }
     }
 
 }
