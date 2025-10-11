@@ -427,10 +427,6 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param limited whether the effects should only be played to players who can see the group
      */
     public void playEffects(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
-        Location groupLoc = group.getLocation();
-        if (groupLoc != null){
-            executeStartCommands(groupLoc);
-        }
         playSounds(group, animator, limited);
         showParticles(group, animator, limited);
     }
