@@ -12,9 +12,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-class PartsResetCMD extends PlayerSubCommand {
-    PartsResetCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("reset", parentSubCommand, Permission.PARTS_SELECT);
+class PartsRefreshFilterCMD extends PlayerSubCommand {
+    PartsRefreshFilterCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("refresh", parentSubCommand, Permission.PARTS_SELECT);
     }
 
     @Override
@@ -25,12 +25,13 @@ class PartsResetCMD extends PlayerSubCommand {
             return;
         }
 
-        SpawnedPartSelection partSelection = (SpawnedPartSelection) sel;
         if (PartsCMD.isUnwantedSingleSelection(player, sel)){
             return;
         }
 
-        partSelection.reset(true);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Part selection reset!", NamedTextColor.GREEN)));
+        SpawnedPartSelection partSelection = (SpawnedPartSelection) sel;
+
+        partSelection.refresh();
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Part Selection Filter Refreshed!", NamedTextColor.GREEN)));
     }
 }

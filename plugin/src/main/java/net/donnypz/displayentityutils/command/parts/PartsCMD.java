@@ -26,8 +26,8 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         new PartsFilterTypesCMD(this);
         new PartsFilterBlocksCMD(this);
         new PartsFilterItemsCMD(this);
-        new PartsRefreshCMD(this);
-        new PartsResetCMD(this);
+        new PartsRefreshFilterCMD(this);
+        new PartsResetFilterCMD(this);
         new PartsAdaptTagsCMD(this);
         new PartsAddTagCMD(this);
         new PartsRemoveTagCMD(this);
@@ -88,8 +88,8 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         else if (page == 3){
             CMDUtils.sendCMD(sender, "/mdis parts filterblocks <block-ids>", "Filter blocks of BLOCK parts. Exclude ALL filtered blocks by prefixing with \"!\"");
             CMDUtils.sendCMD(sender, "/mdis parts filteritems <item-ids>", "Filter items of ITEM parts. Exclude ALL filtered items by prefixing with \"!\"");
-            CMDUtils.sendCMD(sender, "/mdis parts refresh", "Refresh your part selection after making some type of change");
-            CMDUtils.sendCMD(sender, "/mdis parts reset", "Reset your part selection and any filters");
+            CMDUtils.sendCMD(sender, "/mdis parts refreshfilter", "Refresh your part selection after making some type of change");
+            CMDUtils.sendCMD(sender, "/mdis parts resetfilter", "Reset your part selection and any filters");
             CMDUtils.sendCMD(sender, "/mdis parts remove [-all]", "Despawn and remove your selected part from a group");
             CMDUtils.sendCMD(sender, "/mdis parts glow [-all]", "Make your selected part glow");
             CMDUtils.sendCMD(sender, "/mdis parts unglow [-all]", "Remove the glow from your selected part");
