@@ -28,15 +28,16 @@ public class GroupSpawnCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 4) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis group spawn <group-tag> <storage>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /mdis group spawn <group-tag> <storage> [-packet]", NamedTextColor.RED));
             return;
         }
         String tag = args[2];
         String storage = args[3];
-        spawnGroup(player, tag, storage);
+        boolean isPacket = args.length > 4 && args[4].equalsIgnoreCase("-packet");
+        spawnGroup(player, tag, storage, isPacket);
     }
 
-    private static void spawnGroup(Player p, String tag, String storage){
+    private static void spawnGroup(Player p, String tag, String storage, boolean isPacket){
         if (storage.equals("all")){
             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Attempting to spawn display entity group from all storage locations", NamedTextColor.YELLOW)));
             attemptAll(p, tag, LoadMethod.LOCAL, true);
@@ -63,10 +64,14 @@ public class GroupSpawnCMD extends PlayerSubCommand {
             return;
         }
         Location spawnLoc = p.getLocation();
-        group.spawn(spawnLoc, GroupSpawnedEvent.SpawnReason.COMMAND);
-
-
-        p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully spawned display entity group at your location! <white>(Tagged: "+tag+")")));
+        if (isPacket){
+            DisplayGroupManager.addChunkPacketGroup(spawnLoc, group);
+            p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Spawned a <light_purple>packet-based <green>display entity group at your location! <white>(Tagged: "+tag+")")));
+        }
+        else{
+            group.spawn(spawnLoc, GroupSpawnedEvent.SpawnReason.COMMAND);
+            p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Spawned a display entity group at your location! <white>(Tagged: "+tag+")")));
+        }
     }
 
 

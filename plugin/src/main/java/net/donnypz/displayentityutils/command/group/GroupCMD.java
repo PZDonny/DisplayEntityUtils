@@ -86,7 +86,7 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group selectnearest <distance>", "Select the nearest group within the given distance");
             CMDUtils.sendCMD(sender, "/mdis group deselect", "Clear your group selection");
             CMDUtils.sendCMD(sender, "/mdis group info", "List information about your selected group");
-            CMDUtils.sendCMD(sender, "/mdis group spawn <group-tag> <storage>", "Spawn a saved DisplayEntityGroup from a storage location");
+            CMDUtils.sendCMD(sender, "/mdis group spawn <group-tag> <storage> [-packet]", "Spawn a saved display entity group/model from a storage location. \"-packet\" will spawn the group/model using packets");
             CMDUtils.sendCMD(sender, "/mdis group despawn", "Despawn your selected group");
         }
         else if (page == 2){
