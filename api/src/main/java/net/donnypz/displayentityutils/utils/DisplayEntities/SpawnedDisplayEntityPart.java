@@ -428,7 +428,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @return Whether the display is the master part
      */
     public boolean isMaster(){
-        return this.getEntity().getPersistentDataContainer().has(new NamespacedKey(DisplayAPI.getPlugin(), "ismaster"), PersistentDataType.BOOLEAN);
+        return this.getEntity().getPersistentDataContainer().has(DisplayAPI.getMasterKey(), PersistentDataType.BOOLEAN);
     }
 
     /**

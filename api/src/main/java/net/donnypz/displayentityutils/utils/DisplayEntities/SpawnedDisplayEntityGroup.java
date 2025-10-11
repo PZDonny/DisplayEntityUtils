@@ -866,7 +866,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * @return Whether the display is the master part
      */
     public boolean isMasterPart(@NotNull Display display){
-        return display.getPersistentDataContainer().has(new NamespacedKey(DisplayAPI.getPlugin(), "ismaster"), PersistentDataType.BOOLEAN);
+        return DisplayUtils.isMaster(display);
     }
 
     /**
