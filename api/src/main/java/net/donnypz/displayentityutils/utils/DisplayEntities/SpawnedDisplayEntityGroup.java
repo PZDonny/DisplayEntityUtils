@@ -1103,6 +1103,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             float heightCullingAdder = DisplayConfig.heightCullingAdder();
             autoCull(widthCullingAdder, heightCullingAdder);
         }
+        for (SpawnedPartSelection sel : partSelections){
+            sel.refresh();
+        }
         return this;
     }
 
