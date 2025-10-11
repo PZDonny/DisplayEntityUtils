@@ -712,10 +712,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
             if (spawnAnimationType == null){
                 return;
             }
-            switch(spawnAnimationType){
-                case LINEAR -> this.animate(anim);
-                case LOOP -> this.animateLooping(anim);
-            }
+            new DisplayAnimator(anim, spawnAnimationType).playUsingPackets(this, 0);
         }
     }
 
