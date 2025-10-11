@@ -107,7 +107,7 @@ public enum Permission {
     ANIM_SELECT("deu.anim.select"),
     ANIM_PREVIEW("deu.anim.preview"),
 
-    BDENGINE_CONVERT_ANIM("deu.bdengine.convertanim"),
+    BDENGINE_CONVERT_DATAPACK("deu.bdengine.convertdp"),
     BDENGINE_SPAWN_MODEL("deu.bdengine.spawnmodel");
 
 
