@@ -15,8 +15,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Create Spawned Part Selection")
-@Description("Create a spawned or packet part selection containing the parts of a active group")
+@Name("Create Part Selection")
+@Description("Create a selection, containing the parts of a active group, which can later be filtered")
 @Examples({"#2.7.7 and earlier",
         "set {_selection} to a new spawned part selection from {_spawnedgroup}",
         "",
