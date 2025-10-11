@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class EffPartSelectionFilterTags extends Effect {
     static {
-        Skript.registerEffect(EffPartSelectionFilterTags.class,"add filter to %multipartselection% [in:with [part( |-)?]tag[s] %strings%] [ex:[and ]without [part( |-)?]tag[s] %strings%]");
+        Skript.registerEffect(EffPartSelectionFilterTags.class,"add filter to %multipartselection% [in:with [part( |-)?]tag[s] %-strings%] [ex:[and ]without [part( |-)?]tag[s] %-strings%]");
     }
 
     Expression<MultiPartSelection> selection;
