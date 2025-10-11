@@ -42,15 +42,38 @@ class AnimPlayCMD extends PlayerSubCommand {
             AnimCMD.hasNoFrames(player);
             return;
         }
+        boolean loop = false;
+        boolean packet = false;
+        Component optionResult = Component.empty();
+        for (int i = 2; i < args.length; i++){
+            String arg = args[i];
+            if (arg.equalsIgnoreCase("-loop") && !loop){
+                loop = true;
+                optionResult = optionResult.append(Component.text(" (LOOPING)", NamedTextColor.YELLOW));
+            }
+            else if (arg.equalsIgnoreCase("-packet") && !packet){
+                packet = true;
+                optionResult = optionResult.append(Component.text(" (PACKET-BASED)", NamedTextColor.LIGHT_PURPLE));
+            }
+        }
 
-        if (args.length >= 3 && args[2].equalsIgnoreCase("-loop")){
-            group.animateLooping(anim);
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Playing Animation!", NamedTextColor.GREEN))
-                    .append(Component.text(" (LOOPING)", NamedTextColor.YELLOW)));
+        if (loop){
+            if (packet){
+                group.animateLoopingUsingPackets(anim);
+            }
+            else{
+                group.animateLooping(anim);
+            }
         }
         else{
-            group.animate(anim);
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Playing Animation!", NamedTextColor.GREEN)));
+            if (packet){
+                group.animateUsingPackets(anim);
+            }
+            else{
+                group.animate(anim);
+            }
         }
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Playing Animation!", NamedTextColor.GREEN))
+                .append(optionResult));
     }
 }
