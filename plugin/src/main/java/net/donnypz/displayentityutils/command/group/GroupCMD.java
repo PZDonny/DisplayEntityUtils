@@ -95,8 +95,8 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group topacket [-confirm] [-keep]", "Make your selected group packet-based, making it unselectable. \"-confirm\" confirms the action."+
                     " \"-keep\" keeps the non-packet based version of your group spawned.");
             CMDUtils.sendCMD(sender, "/mdis group markpacketgroups", "Create markers for all packet groups stored in your current chunk");
-            CMDUtils.sendCMD(sender, "/mdis group showpacketgroups", "Show all chunk-based, packet-based groups in your current chunk");
-            CMDUtils.sendCMD(sender, "/mdis group hidepacketgroups", "Hide all chunk-based, packet-based groups in your current chunk");
+            CMDUtils.sendCMD(sender, "/mdis group showpacketgroups [-self]", "Show all persistent packet-based groups in your current chunk. \n\"-self\" shows the group only for you");
+            CMDUtils.sendCMD(sender, "/mdis group hidepacketgroups [-self]", "Hide all persistent packet-based groups in your current chunk. \n\"-self\" hides the group only for you");
             CMDUtils.sendCMD(sender, "/mdis group addtarget", "Add a targeted interaction entity to your group");
         }
         else if (page == 3){
