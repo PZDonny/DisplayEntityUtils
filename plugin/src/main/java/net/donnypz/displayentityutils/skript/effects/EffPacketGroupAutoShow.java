@@ -16,20 +16,25 @@ import org.jetbrains.annotations.Nullable;
 @Name("Packet Group Autoshow")
 @Description("Determine if a Packet Group should automatically reveal itself to players")
 @Examples({"make {_packetgroup} autoshow",
-            "make {_packetgroup} stop autoshowing"})
-@Since("3.2.0")
+            "make {_packetgroup} stop autoshowing",
+            "",
+            "3.3.4+",
+            "make {_packetgroup} stop autoshowing and hide from current viewers"})
+@Since("3.2.0, 3.3.4 (Hide)")
 public class EffPacketGroupAutoShow extends Effect {
     static {
-        Skript.registerEffect(EffPacketGroupAutoShow.class,"make %packetgroups% [:stop] autoshow[ing]");
+        Skript.registerEffect(EffPacketGroupAutoShow.class,"make %packetgroups% [:stop] autoshow[ing] [h:and hide from current [players|viewers]]");
     }
 
     Expression<PacketDisplayEntityGroup> group;
     boolean autoshow;
+    boolean hide;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         group = (Expression<PacketDisplayEntityGroup>) expressions[0];
         autoshow = !parseResult.hasTag("stop");
+        hide = parseResult.hasTag("h");
         return true;
     }
 
@@ -40,6 +45,9 @@ public class EffPacketGroupAutoShow extends Effect {
         for (PacketDisplayEntityGroup g : groups){
             if (g != null){
                 g.setAutoShow(autoshow);
+                if (!autoshow && hide){
+                    g.hide();
+                }
             }
         }
     }
