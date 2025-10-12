@@ -19,8 +19,8 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         new GroupSaveCMD(this);
         new GroupToPacketCMD(this);
         new GroupMarkPacketGroupsCMD(this);
-        new GroupHideChunkPacketGroupsCMD(this);
-        new GroupShowChunkPacketGroupsCMD(this);
+        new GroupHidePersistentPacketGroupsCMD(this);
+        new GroupShowPersistentPacketGroupsCMD(this);
         new GroupDeleteCMD(this);
         new GroupSpawnCMD(this);
         new GroupDespawnCMD(this);

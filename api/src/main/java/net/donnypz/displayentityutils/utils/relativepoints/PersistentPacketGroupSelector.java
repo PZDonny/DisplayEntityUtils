@@ -14,13 +14,13 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
-public class ChunkPacketGroupSelector extends RelativePointSelector<RelativePoint> {
+public class PersistentPacketGroupSelector extends RelativePointSelector<RelativePoint> {
 
     int id;
     long chunkKey;
     String worldName;
     String groupTag;
-    ChunkPacketGroupSelector(Player player, DisplayGroupManager.ChunkPacketGroupInfo info) {
+    PersistentPacketGroupSelector(Player player, DisplayGroupManager.ChunkPacketGroupInfo info) {
         super(player, getPitchCorrectedLocation(info.location()), null, Material.ORANGE_CONCRETE);
         this.id = info.id();
         this.chunkKey = info.location().getChunk().getChunkKey();
@@ -31,7 +31,7 @@ public class ChunkPacketGroupSelector extends RelativePointSelector<RelativePoin
     @Override
     public boolean removeFromPointHolder() {
         World w = Bukkit.getWorld(worldName);
-        return DisplayGroupManager.removeChunkPacketGroup(w.getChunkAt(chunkKey), id, groupTag);
+        return DisplayGroupManager.removePersistentPacketGroup(w.getChunkAt(chunkKey), id, groupTag);
     }
 
     @Override

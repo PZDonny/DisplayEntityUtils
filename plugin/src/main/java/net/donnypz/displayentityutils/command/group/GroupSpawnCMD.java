@@ -65,7 +65,7 @@ public class GroupSpawnCMD extends PlayerSubCommand {
         }
         Location spawnLoc = p.getLocation();
         if (isPacket){
-            DisplayGroupManager.addChunkPacketGroup(spawnLoc, group);
+            DisplayGroupManager.addPersistentPacketGroup(spawnLoc, group, true);
             p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Spawned a <light_purple>packet-based <green>display entity group at your location! <white>(Tagged: "+tag+")")));
         }
         else{

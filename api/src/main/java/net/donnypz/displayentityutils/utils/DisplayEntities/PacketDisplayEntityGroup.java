@@ -617,7 +617,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> {
                 Chunk chunk = loc.getChunk();
                 Collection<Player> players;
-                if (VersionUtils.IS_1_20_4 || Bukkit.getMinecraftVersion().equals("1.20.5")){
+                if (VersionUtils.IS_1_20_4 || VersionUtils.IS_1_20_5){
                     players = new ArrayList<>();
                     for (Player p : Bukkit.getOnlinePlayers()){
                         if (p.isChunkSent(chunk)){

@@ -1278,6 +1278,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     public PacketDisplayEntityGroup toPacket(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow, boolean addToChunk){
+        DisplayEntityGroup savedGroup = toDisplayEntityGroup();
+        PacketDisplayEntityGroup packetGroup;
         if (DisplayConfig.autoPivotInteractions()){
             HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
             for (SpawnedDisplayEntityPart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
@@ -1286,13 +1288,11 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 part.pivot(-oldYaw);
             }
 
-            DisplayEntityGroup group = toDisplayEntityGroup();
-            PacketDisplayEntityGroup packetGroup;
             if (addToChunk){
-                packetGroup = DisplayGroupManager.addChunkPacketGroup(location, group);
+                packetGroup = DisplayGroupManager.addPersistentPacketGroup(location, savedGroup, autoShow);
             }
             else{
-                packetGroup = group.createPacketGroup(location, playSpawnAnimation, autoShow);
+                packetGroup = savedGroup.createPacketGroup(location, playSpawnAnimation, autoShow);
             }
 
             for (Map.Entry<SpawnedDisplayEntityPart, Float> entry : oldYaws.entrySet()){
@@ -1304,8 +1304,14 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             return packetGroup;
         }
         else{
-            return toDisplayEntityGroup().createPacketGroup(location, playSpawnAnimation, autoShow);
+            if (addToChunk){
+                packetGroup = DisplayGroupManager.addPersistentPacketGroup(location, savedGroup, autoShow);
+            }
+            else{
+                packetGroup = savedGroup.createPacketGroup(location, playSpawnAnimation, autoShow);
+            }
         }
+        return packetGroup;
     }
 
     @Override

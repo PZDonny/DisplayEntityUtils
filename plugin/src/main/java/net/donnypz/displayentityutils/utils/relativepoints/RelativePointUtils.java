@@ -42,20 +42,20 @@ public class RelativePointUtils {
 
 
     @ApiStatus.Internal
-    public static void spawnChunkPacketGroupPoints(Chunk chunk, Player player){
+    public static void spawnPersistentPacketGroupPoints(Chunk chunk, Player player){
         if (stopIfViewing(player)){
             return;
         }
 
-        List<DisplayGroupManager.ChunkPacketGroupInfo> infos = DisplayGroupManager.getChunkPacketGroupInfo(chunk);
+        List<DisplayGroupManager.ChunkPacketGroupInfo> infos = DisplayGroupManager.getPersistentPacketGroupInfo(chunk);
         if (infos.isEmpty()){
-            player.sendMessage(Component.text("Failed to view points! The chunk does not have any stored packet based groups!", NamedTextColor.RED));
+            player.sendMessage(Component.text("Failed to view points! The chunk does not have any persistent packet based groups!", NamedTextColor.RED));
             return;
         }
 
         Set<RelativePointSelector<?>> displays = new HashSet<>();
         for (DisplayGroupManager.ChunkPacketGroupInfo info : infos){
-            ChunkPacketGroupSelector display = new ChunkPacketGroupSelector(player, info);
+            PersistentPacketGroupSelector display = new PersistentPacketGroupSelector(player, info);
             displays.add(display);
         }
         setDisplays(player, displays);

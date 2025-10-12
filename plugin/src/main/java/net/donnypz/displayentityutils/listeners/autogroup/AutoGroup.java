@@ -57,7 +57,7 @@ final class AutoGroup {
             chunks.add(chunk.getChunkKey());
         }
 
-        DisplayGroupManager.spawnChunkPacketGroups(chunk);
+        DisplayGroupManager.spawnPersistentPacketGroups(chunk);
 
 
         if (entities.isEmpty()) return;
