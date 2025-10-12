@@ -328,6 +328,9 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                     suggestions.add("linear");
                     suggestions.add("loop");
                 }
+                if (args[1].equalsIgnoreCase("spawn")){
+                    suggestions.add("-packet");
+                }
             }
         }
         return suggestions;
