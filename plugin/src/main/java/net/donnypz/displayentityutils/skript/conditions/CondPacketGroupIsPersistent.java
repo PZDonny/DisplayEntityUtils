@@ -9,38 +9,38 @@ import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Spawned Group Is Persistent")
-@Description("Check if a spawned group is persistent")
-@Examples({"if {_spawnedgroup} is persistent:", "\tbroadcast \"The group wont despawn!\""})
-@Since("2.6.2")
-public class CondSpawnedGroupIsPersistent extends Condition {
+@Name("Packet Group Is Persistent")
+@Description("Check if a packet group is persistent.")
+@Examples({"if {_packetgroup} is persistent:", "\tbroadcast \"The group will exist after server restarts!\""})
+@Since("3.3.4")
+public class CondPacketGroupIsPersistent extends Condition {
 
     static {
-        Skript.registerCondition(CondSpawnedGroupIsPersistent.class, "%spawnedgroup% (1¦is|2¦is(n't| not)) persistent");
+        Skript.registerCondition(CondPacketGroupIsPersistent.class, "%packetgroup% (1¦is|2¦is(n't| not)) persistent");
     }
 
-    Expression<SpawnedDisplayEntityGroup> group;
+    Expression<PacketDisplayEntityGroup> group;
 
     @Override
     public boolean check(Event event) {
-        SpawnedDisplayEntityGroup g = group.getSingle(event);
+        PacketDisplayEntityGroup g = group.getSingle(event);
         if (g == null) return isNegated();
-        return g.isPersistent() == isNegated();
+        return g.isPersistentPacketGroup() == isNegated();
     }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "Spawned Group persistent: "+group.toString(event, debug);
+        return "Packet Group persistent: "+group.toString(event, debug);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        this.group = (Expression<SpawnedDisplayEntityGroup>) expressions[0];
+        this.group = (Expression<PacketDisplayEntityGroup>) expressions[0];
         setNegated(parseResult.mark == 1);
         return true;
     }

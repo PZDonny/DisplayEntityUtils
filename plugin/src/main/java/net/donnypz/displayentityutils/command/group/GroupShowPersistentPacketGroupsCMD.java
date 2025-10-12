@@ -21,7 +21,7 @@ class GroupShowPersistentPacketGroupsCMD extends PlayerSubCommand {
         boolean showForSelf = args.length > 2 && args[2].equalsIgnoreCase("-self");
 
         for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(player.getChunk())){
-            if (pg.getChunkPacketGroupId() != -1){
+            if (pg.isPersistentPacketGroup()){
                 if (showForSelf){
                     pg.showToPlayer(player, GroupSpawnedEvent.SpawnReason.COMMAND);
                 }

@@ -542,36 +542,57 @@ public final class DisplayGroupManager {
         else{
             id = gson.fromJson(list.getLast(), PersistentPacketGroup.class).id+1;
         }
-        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup);
+        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, autoShow);
         if (cpg == null) return null;
 
         String json = gson.toJson(cpg);
         list.add(json);
         pdc.set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
         PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, true, autoShow);
-        pdeg.setChunkPacketGroupId(id);
+        pdeg.setPersistentIds(id, c);
         return pdeg;
     }
 
-    public static boolean removePersistentPacketGroup(@NotNull PacketDisplayEntityGroup packetDisplayEntityGroup){
-        Location location = packetDisplayEntityGroup.getLocation();
-        if (location == null) return false;
-        return removePersistentPacketGroup(location.getChunk(), packetDisplayEntityGroup.getChunkPacketGroupId(), packetDisplayEntityGroup.getTag());
+    @ApiStatus.Internal
+    public static void updatePersistentPacketGroupAutoShow(@NotNull PacketDisplayEntityGroup packetDisplayEntityGroup, boolean autoShow){
+        if (!packetDisplayEntityGroup.isPersistentPacketGroup()){
+            return;
+        }
+        PersistentDataContainer pdc = packetDisplayEntityGroup.getLocation().getChunk().getPersistentDataContainer();
+        List<String> list = getChunkList(pdc);
+        Gson gson = new Gson();
+        for (int i = 0; i < list.size(); i++){
+            String json = list.get(i);
+            PersistentPacketGroup cpg = gson.fromJson(json, PersistentPacketGroup.class);
+            if (cpg == null || cpg.id != packetDisplayEntityGroup.getPersistentLocalId()) continue;
+            cpg.autoShow = autoShow;
+            list.set(i, new Gson().toJson(cpg));
+            pdc.set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
+            return;
+        }
     }
 
-    public static boolean removePersistentPacketGroup(@NotNull Chunk chunk, int id, String groupTag){
+    public static boolean removePersistentPacketGroup(@NotNull PacketDisplayEntityGroup packetDisplayEntityGroup, boolean unregister){
+        Location location = packetDisplayEntityGroup.getLocation();
+        if (location == null) return false;
+        return removePersistentPacketGroup(location.getChunk(), packetDisplayEntityGroup.getPersistentLocalId(), unregister);
+    }
+
+    public static boolean removePersistentPacketGroup(@NotNull Chunk chunk, int id, boolean unregister){
         List<String> list = getChunkList(chunk.getPersistentDataContainer());
         Gson gson = new Gson();
         for (int i = 0; i < list.size(); i++){
             String json = list.get(i);
             PersistentPacketGroup cpg = gson.fromJson(json, PersistentPacketGroup.class);
             if (cpg == null) continue;
-            if (cpg.id == id && Objects.equals(cpg.groupTag, groupTag)){
+            if (cpg.id == id){
                 list.remove(json);
                 chunk.getPersistentDataContainer().set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
+                if (!unregister) return true;
+
                 Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
                    for (PacketDisplayEntityGroup g : PacketDisplayEntityGroup.getGroups(chunk)){
-                       if (g.getChunkPacketGroupId() == id){
+                       if (g.getPersistentLocalId() == id){
                            g.unregister();
                            return;
                        }
@@ -593,7 +614,7 @@ public final class DisplayGroupManager {
         Gson gson = new Gson();
         for (String json : list){
             PersistentPacketGroup cpg = gson.fromJson(json, PersistentPacketGroup.class);
-            cpg.spawn(chunk).setChunkPacketGroupId(cpg.id);
+            cpg.spawn(chunk).setPersistentIds(cpg.id, chunk);
         }
     }
 
@@ -626,10 +647,11 @@ public final class DisplayGroupManager {
         float pitch;
         String groupBase64;
         String groupTag;
+        boolean autoShow = true; //Don't change
 
         private PersistentPacketGroup(){}
 
-        static PersistentPacketGroup create(int id, Location location, DisplayEntityGroup group){
+        static PersistentPacketGroup create(int id, Location location, DisplayEntityGroup group, boolean autoShow){
             PersistentPacketGroup cpg = new PersistentPacketGroup();
             cpg.id = id;
             cpg.x = location.x();
@@ -638,6 +660,7 @@ public final class DisplayGroupManager {
             cpg.yaw = location.getYaw();
             cpg.pitch = location.getPitch();
             cpg.groupTag = group.getTag();
+            cpg.autoShow = autoShow;
             try{
                 ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
                 GZIPOutputStream gzipOut = new GZIPOutputStream(byteOut);
@@ -677,7 +700,7 @@ public final class DisplayGroupManager {
             Location spawnLoc = getLocation(chunk);
             DisplayEntityGroup g = getGroup();
             if (spawnLoc == null || g == null) return null;
-            return g.createPacketGroup(spawnLoc, true, true);
+            return g.createPacketGroup(spawnLoc, true, autoShow);
         }
     }
 }

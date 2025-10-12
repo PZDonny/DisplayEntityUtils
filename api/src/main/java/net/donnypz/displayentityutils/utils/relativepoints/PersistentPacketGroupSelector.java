@@ -2,8 +2,10 @@ package net.donnypz.displayentityutils.utils.relativepoints;
 
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.RelativePoint;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -17,12 +19,14 @@ import org.jetbrains.annotations.ApiStatus;
 public class PersistentPacketGroupSelector extends RelativePointSelector<RelativePoint> {
 
     int id;
+    String globalId;
     long chunkKey;
     String worldName;
     String groupTag;
     PersistentPacketGroupSelector(Player player, DisplayGroupManager.ChunkPacketGroupInfo info) {
         super(player, getPitchCorrectedLocation(info.location()), null, Material.ORANGE_CONCRETE);
         this.id = info.id();
+        this.globalId = PacketDisplayEntityGroup.buildPersistentGlobalId(info.location().getChunk(), this.id);
         this.chunkKey = info.location().getChunk().getChunkKey();
         this.worldName = info.location().getWorld().getName();
         this.groupTag = info.groupTag();
@@ -31,7 +35,7 @@ public class PersistentPacketGroupSelector extends RelativePointSelector<Relativ
     @Override
     public boolean removeFromPointHolder() {
         World w = Bukkit.getWorld(worldName);
-        return DisplayGroupManager.removePersistentPacketGroup(w.getChunkAt(chunkKey), id, groupTag);
+        return DisplayGroupManager.removePersistentPacketGroup(w.getChunkAt(chunkKey), id, true);
     }
 
     @Override
@@ -42,6 +46,8 @@ public class PersistentPacketGroupSelector extends RelativePointSelector<Relativ
     @Override
     public void sendInfo(Player player) {
         player.sendMessage(Component.text("ID: "+id, NamedTextColor.YELLOW));
+        player.sendMessage(Component.text("[GLOBAL ID | Click to copy]", NamedTextColor.GOLD)
+                .clickEvent(ClickEvent.copyToClipboard(globalId)));
         player.sendMessage(Component.text("Chunk Key: "+chunkKey, NamedTextColor.YELLOW));
         int[] coords = ConversionUtils.getChunkCoordinates(chunkKey);
         player.sendMessage(Component.text("Chunk X,Z: "+coords[0]+","+coords[1], NamedTextColor.YELLOW));
