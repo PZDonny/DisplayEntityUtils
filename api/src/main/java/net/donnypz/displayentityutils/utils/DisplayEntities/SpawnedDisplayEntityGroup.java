@@ -1277,7 +1277,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
     }
 
-    public PacketDisplayEntityGroup toPacket(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow, boolean addToChunk){
+    public PacketDisplayEntityGroup toPacket(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow, boolean persistent){
         DisplayEntityGroup savedGroup = toDisplayEntityGroup();
         PacketDisplayEntityGroup packetGroup;
         if (DisplayConfig.autoPivotInteractions()){
@@ -1288,7 +1288,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 part.pivot(-oldYaw);
             }
 
-            if (addToChunk){
+            if (persistent){
                 packetGroup = DisplayGroupManager.addPersistentPacketGroup(location, savedGroup, autoShow);
             }
             else{
@@ -1304,7 +1304,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             return packetGroup;
         }
         else{
-            if (addToChunk){
+            if (persistent){
                 packetGroup = DisplayGroupManager.addPersistentPacketGroup(location, savedGroup, autoShow);
             }
             else{

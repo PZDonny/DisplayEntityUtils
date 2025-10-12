@@ -14,8 +14,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityG
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-
-
 @Name("Persistent Packet Group From Id")
 @Description("Get a Persistent Packet Group from its ID")
 @Examples({
@@ -41,7 +39,7 @@ public class ExprPersistentPacketGroupFromId extends SimpleExpression<PacketDisp
             return null;
         }
         PacketDisplayEntityGroup pdeg = PacketDisplayEntityGroup.getGroup(id);
-        if (pdeg == null) return null;
+        if (pdeg == null) return new PacketDisplayEntityGroup[0];
         return new PacketDisplayEntityGroup[]{pdeg};
     }
 
