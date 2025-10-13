@@ -658,8 +658,10 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * @param autoShow whether the group should autoShow
      */
     public PacketDisplayEntityGroup setAutoShow(boolean autoShow){
-        if (this.autoShow != autoShow){
-            DisplayGroupManager.updatePersistentPacketGroupAutoShow(this, autoShow);
+        boolean oldAutoshow = this.autoShow;
+        this.autoShow = autoShow;
+        if (oldAutoshow != autoShow){
+            DisplayGroupManager.updatePersistentPacketGroup(this);
             if (autoShow){
                 Location loc = getLocation();
                 if (loc != null){
@@ -684,7 +686,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 }
             }
         }
-        this.autoShow = autoShow;
         return this;
     }
 
@@ -887,6 +888,10 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return new DisplayEntityGroup(this);
     }
 
+    /**
+     * Unregister this {@link PacketDisplayEntityGroup}, "despawning" it. This does not stop a persistent packet group from persisting in the future.
+     * Use {@link DisplayGroupManager#removePersistentPacketGroup(PacketDisplayEntityGroup, boolean)} to unregister and stop persistence.
+     */
     public void unregister(){
         String worldName = getWorldName();
         if (worldName != null){
@@ -904,7 +909,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
 
         DisplayStateMachine.unregisterFromStateMachine(this, false); //Animators will auto-stop
-
         this.clearActiveAnimators();
         masterPart = null;
     }

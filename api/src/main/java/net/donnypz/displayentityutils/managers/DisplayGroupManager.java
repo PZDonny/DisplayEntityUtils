@@ -554,7 +554,7 @@ public final class DisplayGroupManager {
     }
 
     @ApiStatus.Internal
-    public static void updatePersistentPacketGroupAutoShow(@NotNull PacketDisplayEntityGroup packetDisplayEntityGroup, boolean autoShow){
+    public static void updatePersistentPacketGroup(@NotNull PacketDisplayEntityGroup packetDisplayEntityGroup){
         if (!packetDisplayEntityGroup.isPersistentPacketGroup()){
             return;
         }
@@ -565,7 +565,8 @@ public final class DisplayGroupManager {
             String json = list.get(i);
             PersistentPacketGroup cpg = gson.fromJson(json, PersistentPacketGroup.class);
             if (cpg == null || cpg.id != packetDisplayEntityGroup.getPersistentLocalId()) continue;
-            cpg.autoShow = autoShow;
+            cpg.autoShow = packetDisplayEntityGroup.isAutoShow();
+            cpg.setGroup(packetDisplayEntityGroup.toDisplayEntityGroup());
             list.set(i, new Gson().toJson(cpg));
             pdc.set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
             return;
@@ -661,6 +662,11 @@ public final class DisplayGroupManager {
             cpg.pitch = location.getPitch();
             cpg.groupTag = group.getTag();
             cpg.autoShow = autoShow;
+            cpg.setGroup(group);
+            return (cpg.groupBase64 == null) ? null : cpg;
+        }
+
+        void setGroup(DisplayEntityGroup group){
             try{
                 ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
                 GZIPOutputStream gzipOut = new GZIPOutputStream(byteOut);
@@ -670,16 +676,12 @@ public final class DisplayGroupManager {
                 gzipOut.close();
                 objOut.close();
 
-                cpg.groupBase64 = Base64.getEncoder().encodeToString(byteOut.toByteArray());
+                this.groupBase64 = Base64.getEncoder().encodeToString(byteOut.toByteArray());
 
                 byteOut.close();
             }
-            catch(IOException e){
-                return null;
-            }
-            return cpg;
+            catch(IOException e){}
         }
-
 
         Location getLocation(Chunk chunk){
             World w = chunk.getWorld();
