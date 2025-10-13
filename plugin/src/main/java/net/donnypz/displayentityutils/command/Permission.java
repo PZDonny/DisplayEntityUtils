@@ -27,7 +27,6 @@ public enum Permission {
     GROUP_CLONE("deu.group.clone"),
     GROUP_GLOW("deu.group.glow"),
     GROUP_GLOW_COLOR("deu.group.glow.set"),
-    GROUP_COPY_POSE("deu.group.copy"),
     GROUP_SET_SPAWN_ANIM("deu.group.spawnanim"),
     GROUP_TOGGLE_PERSIST("deu.group.persist"),
     GROUP_BILLBOARD("deu.group.billboard"),

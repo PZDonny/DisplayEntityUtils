@@ -1109,25 +1109,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return this;
     }
 
-
-    /**
-     * Attempt to copy the transformations of one group to another.
-     * Both groups must have the same parts (or same amount of display entity parts)
-     * @param copyGroup the group to copy from
-     */
-    public void copyTransformation(SpawnedDisplayEntityGroup copyGroup){
-        List<SpawnedDisplayEntityPart> displayParts = getDisplayParts();
-        List<SpawnedDisplayEntityPart> copyParts = copyGroup.getDisplayParts();
-        for (int i = 0; i < displayParts.size(); i++){
-            if (copyParts.size() < i+1){
-                return;
-            }
-            SpawnedDisplayEntityPart part = displayParts.get(i);
-            SpawnedDisplayEntityPart copyPart = copyParts.get(i);
-            part.setTransformation(copyPart.getDisplayTransformation());
-        }
-    }
-
     /**
      * Set the animation to apply to a group when it is spawned, by its tag.
      * A null animation tag will remove any existing spawn animation from this group. If this is done, the other parameters can be set to any value

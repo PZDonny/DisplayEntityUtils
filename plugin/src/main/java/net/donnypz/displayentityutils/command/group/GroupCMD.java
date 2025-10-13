@@ -41,7 +41,6 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         new GroupGlowCMD(this);
         new GroupUnglowCMD(this);
         new GroupGlowColorCMD(this);
-        new GroupCopyPoseCMD(this);
         new GroupSetSpawnAnimationCMD(this);
         new GroupUnsetSpawnAnimationCMD(this);
         new GroupPersistCMD(this);
@@ -114,13 +113,12 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group translate <direction> <distance> <tick-duration>","Changes your selected group's translation, use \"move\" instead if this group uses animations");
             CMDUtils.sendCMD(sender, "/mdis group movehere", "Change your selected group's actual location to your location");
             CMDUtils.sendCMD(sender, "/mdis group merge <distance>","Merge groups near your selected group");
-            CMDUtils.sendCMD(sender, "/mdis group copypose", "Copies the transformations of the group you're closest to, to your selected group");
             CMDUtils.sendCMD(sender, "/mdis group billboard <fixed | vertical | horizontal | center>", "Set the billboard of all parts in this group");
+            CMDUtils.sendCMD(sender, "/mdis group glowcolor <color | hex-code>", "Set the glow color for all parts in this group");
         }
         else if (page == 5){
             CMDUtils.sendCMD(sender, "/mdis group glow", "Make all parts in this group glow");
             CMDUtils.sendCMD(sender, "/mdis group unglow", "Remove the glowing effect from all parts in this group");
-            CMDUtils.sendCMD(sender, "/mdis group glowcolor <color | hex-code>", "Set the glow color for all parts in this group");
             CMDUtils.sendCMD(sender, "/mdis group ride <-target | player-name | entity-uuid> [group-tag] [storage] [controller-id]", "Make a group ride an entity. Values in brackets [] are optional");
             CMDUtils.sendCMD(sender, "/mdis group safedismount <-target | -selected | player-name | entity-uuid>", "Safely dismount a group from an entity");
             CMDUtils.sendCMD(sender, "/mdis group dismount <-target | -selected | player-name | entity-uuid> [-despawn]", "Dismount a group from an entity, with optional despawning");
