@@ -692,6 +692,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * @return a cloned {@link PacketDisplayEntityGroup}
      */
     public PacketDisplayEntityGroup clone(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow){
+        PacketDisplayEntityGroup clone;
         if (DisplayConfig.autoPivotInteractions()){
             HashMap<ActivePart, Float> oldYaws = new HashMap<>();
             for (ActivePart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
@@ -701,7 +702,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             }
 
             DisplayEntityGroup group = toDisplayEntityGroup();
-            PacketDisplayEntityGroup cloned = group.createPacketGroup(location, playSpawnAnimation, autoShow);
+            clone = group.createPacketGroup(location, playSpawnAnimation, autoShow);
 
             for (Map.Entry<ActivePart, Float> entry : oldYaws.entrySet()){
                 ActivePart part = entry.getKey();
@@ -709,11 +710,12 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 part.pivot(oldYaw);
             }
             oldYaws.clear();
-            return cloned;
         }
         else{
-            return toDisplayEntityGroup().createPacketGroup(location, playSpawnAnimation, autoShow);
+            clone = toDisplayEntityGroup().createPacketGroup(location, playSpawnAnimation, autoShow);
         }
+        if (this.isPersistent()) clone.setPersistent(true);
+        return clone;
     }
 
     /**
