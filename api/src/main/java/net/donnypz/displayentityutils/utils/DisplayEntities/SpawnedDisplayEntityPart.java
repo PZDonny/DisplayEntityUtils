@@ -506,7 +506,8 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public boolean isGlowing() {
-        return getEntity().isGlowing();
+        Entity e = getEntity();
+        return e != null && e.isGlowing();
     }
 
     /**
