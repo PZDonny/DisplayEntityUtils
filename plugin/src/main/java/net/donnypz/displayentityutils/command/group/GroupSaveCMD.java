@@ -7,6 +7,7 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
@@ -28,7 +29,7 @@ class GroupSaveCMD extends PlayerSubCommand {
             return;
         }
 
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
+        ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);
             return;
@@ -39,7 +40,7 @@ class GroupSaveCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("| Use \"/mdis group settag <tag>\"", NamedTextColor.GRAY));
             return;
         }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<gray>Attempting to save spawned display entity group <white>(Tagged: "+group.getTag()+")")));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<gray>Attempting to save your selected group <white>(Tagged: "+group.getTag()+")")));
         DisplayEntityGroup displayGroup = group.toDisplayEntityGroup();
         Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
             switch (args[2].toLowerCase()) {

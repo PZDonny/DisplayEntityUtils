@@ -11,7 +11,8 @@ import io.papermc.paper.registry.data.dialog.type.DialogType;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -73,6 +74,29 @@ public final class TextDisplayDialog{
     /**
      * Send this dialog to a player
      * @param player the player
+     * @param textDisplayPart the text display part to edit
+     * @param miniMessageFormatted whether the text display's text should be formatted as minimessage or ampersand
+     */
+    public static void sendDialog(@NotNull Player player, @NotNull ActivePart textDisplayPart, boolean miniMessageFormatted){
+        if (textDisplayPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) return;
+        Dialog dialog = Dialog.create(builder -> {
+            builder.empty()
+                    .base(DialogBase.builder(Component.text("Edit a Text Display"))
+                            .inputs(getInputs(textDisplayPart, miniMessageFormatted))
+                            .build())
+                    .type(DialogType.confirmation(ActionButton.create(Component.text("Confirm", NamedTextColor.GREEN),
+                                    Component.text("Set your selected text display's text", NamedTextColor.YELLOW),
+                                    200, CONFIRM_ACTION),
+                            ActionButton.create(Component.text("Cancel", NamedTextColor.RED),
+                                    Component.text("Cancel this action", NamedTextColor.YELLOW),
+                                    200, null)));
+        });
+        player.showDialog(dialog);
+    }
+
+    /**
+     * Send this dialog to a player
+     * @param player the player
      * @param entityUUID the text display to edit
      * @param miniMessageFormatted whether the text display's text should be formatted as minimessage or ampersand
      */
@@ -83,18 +107,6 @@ public final class TextDisplayDialog{
             return;
         }
         sendDialog(player, textDisplay, miniMessageFormatted);
-    }
-
-    /**
-     * Send this dialog to a player. This does nothing if the provided part is not a text display
-     * @param player the player
-     * @param part the text display part to edit
-     * @param miniMessageFormatted whether the text display's text should be formatted as minimessage or ampersand
-     */
-    public static void sendDialog(@NotNull Player player, @NotNull SpawnedDisplayEntityPart part, boolean miniMessageFormatted){
-        if (part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
-            sendDialog(player, (TextDisplay) part.getEntity(), miniMessageFormatted);
-        }
     }
 
     private static List<DialogInput> getInputs(TextDisplay textDisplay, boolean miniMessageFormatted){
@@ -109,6 +121,22 @@ public final class TextDisplayDialog{
                 getShadow(textDisplay.isShadowed()),
                 getSeeThrough(textDisplay.isSeeThrough()),
                 getDefaultBackground(textDisplay.isDefaultBackground())
+        );
+    }
+
+    private static List<DialogInput> getInputs(ActivePart part, boolean miniMessageFormatted){
+        Component text = part.getTextDisplayText();
+        return List.of(
+                getColorType(miniMessageFormatted),
+                getTextInput(text, miniMessageFormatted),
+                getFont(text.font()),
+                getAlignment(part.getTextDisplayAlignment()),
+                getLineWidth(part.getTextDisplayLineWidth()),
+                getOpacity(part.getTextDisplayTextOpacity()),
+                getBackgroundColor(),
+                getShadow(part.isTextDisplayShadowed()),
+                getSeeThrough(part.isTextDisplaySeeThrough()),
+                getDefaultBackground(part.isTextDisplayDefaultBackground())
         );
     }
 
@@ -206,17 +234,16 @@ public final class TextDisplayDialog{
     private static DialogAction getConfirmAction(){
         return DialogAction.customClick((view, audience) -> {
             Player p = (Player) audience;
-            ServerSideSelection selection = DisplayGroupManager.getPartSelection(p);
+            ActivePartSelection<?> selection = DisplayGroupManager.getPartSelection(p);
             if (selection == null){
                 p.sendMessage(Component.text("Part selection lost!", NamedTextColor.RED));
                 return;
             }
-            SpawnedDisplayEntityPart part = selection.getSelectedPart();
+            ActivePart part = selection.getSelectedPart();
             if (part == null || part.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
                 p.sendMessage(Component.text("You do not have a text display selected!", NamedTextColor.RED));
                 return;
             }
-            TextDisplay display = (TextDisplay) part.getEntity();
 
             //Set Text Display Properties
             Component text;
@@ -229,10 +256,10 @@ public final class TextDisplayDialog{
             }
 
             boolean backgroundColorSuccess = false;
-            display.text(text.font(Key.key("minecraft", view.getText(FONT))));
-            display.setAlignment(TextDisplay.TextAlignment.valueOf(view.getText(ALIGNMENT)));
-            display.setTextOpacity(getOpacityAsByte(view.getFloat(OPACITY)));
-            display.setLineWidth(view.getFloat(LINE_WIDTH).intValue());
+            part.setTextDisplayText(text.font(Key.key("minecraft", view.getText(FONT))));
+            part.setTextDisplayAlignment(TextDisplay.TextAlignment.valueOf(view.getText(ALIGNMENT)));
+            part.setTextDisplayTextOpacity(getOpacityAsByte(view.getFloat(OPACITY)));
+            part.setTextDisplayLineWidth(view.getFloat(LINE_WIDTH).intValue());
 
             String bgColor = view.getText(BACKGROUND_COLOR);
             if (bgColor.isBlank()){
@@ -241,19 +268,19 @@ public final class TextDisplayDialog{
             else if (!bgColor.equals("transparent")){
                 Color color = ConversionUtils.getColorFromText(bgColor);
                 if (color != null){
-                    display.setBackgroundColor(color);
+                    part.setTextDisplayBackgroundColor(color);
                     backgroundColorSuccess = true;
                 }
             }
             else{
-                display.setBackgroundColor(Color.fromARGB(0));
+                part.setTextDisplayBackgroundColor(Color.fromARGB(0));
                 backgroundColorSuccess = true;
             }
 
 
-            display.setShadowed(view.getBoolean(SHADOW));
-            display.setSeeThrough(view.getBoolean(SEE_THROUGH));
-            display.setDefaultBackground(view.getBoolean(DEFAULT_BACKGROUND));
+            part.setTextDisplayShadowed(view.getBoolean(SHADOW));
+            part.setTextDisplaySeeThrough(view.getBoolean(SEE_THROUGH));
+            part.setTextDisplayDefaultBackground(view.getBoolean(DEFAULT_BACKGROUND));
             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Text Display Updated!", NamedTextColor.GREEN)));
             if (!backgroundColorSuccess) p.sendMessage(Component.text("| Failed to set background color. Invalid color input.", NamedTextColor.YELLOW));
 

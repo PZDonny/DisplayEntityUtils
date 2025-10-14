@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Display;
@@ -190,6 +191,32 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
 
     abstract Material getItemType(T part);
 
+    /**
+     * Adds a part tag to the parts in this selection. The tag will not be added if it starts with an "!" or is blank
+     * @param partTag The part tag to give the parts in this selection
+     * @return true if the tag was successfully added
+     */
+    public boolean addTag(@NotNull String partTag){
+        if (!DisplayUtils.isValidTag(partTag)){
+            return false;
+        }
+        for (T part : selectedParts){
+            part.addTag(partTag);
+        }
+        return true;
+    }
+
+    /**
+     * Removes a part tag from the parts in this selection
+     * @param partTag The part tag to remove from the parts in this selection
+     * @return this
+     */
+    public MultiPartSelection<T> removeTag(@NotNull String partTag){
+        for (T part : selectedParts){
+            part.removeTag(partTag);
+        }
+        return this;
+    }
 
     /**
      * Check if this selection has any filters applied to it

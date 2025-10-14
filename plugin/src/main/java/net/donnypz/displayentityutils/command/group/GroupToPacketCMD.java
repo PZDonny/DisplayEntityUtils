@@ -7,6 +7,8 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -21,23 +23,31 @@ class GroupToPacketCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
+        ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);
             return;
         }
 
+        if (group instanceof PacketDisplayEntityGroup){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your selected group is already packet-based!", NamedTextColor.RED)));
+            return;
+        }
+
+        SpawnedDisplayEntityGroup sg = (SpawnedDisplayEntityGroup) group;
+
         if (args.length >= 3 && args[2].equals("-confirm")){
-            group.toPacket(group.getLocation(), true, true, true);
+            PacketDisplayEntityGroup pg = sg.toPacket(group.getLocation(), true, true, true);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your selected group is now packet-based!", NamedTextColor.GREEN)));
-            player.sendMessage(Component.text("The group is stored in its chunk's data. Make sure to save this world", NamedTextColor.YELLOW));
+            player.sendMessage(Component.text("The packet-based group is stored in its current chunk's data. Save this world!", NamedTextColor.YELLOW));
             if (args.length < 4 || !args[3].equals("-keep")){
-                DEUUser.getOrCreateUser(player).deselectSpawnedGroup();
-                group.unregister(true, true);
+                DEUUser.getOrCreateUser(player).deselectGroup();
+                sg.unregister(true, true);
             }
             else{
                 player.sendMessage(Component.text("| Your selected group was not despawned", NamedTextColor.GRAY, TextDecoration.ITALIC));
             }
+            pg.addPlayerSelection(player);
             return;
         }
 

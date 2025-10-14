@@ -2,11 +2,10 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers;
+import io.papermc.paper.entity.TeleportFlag;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
-import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
-import net.donnypz.displayentityutils.events.PacketGroupDestroyEvent;
-import net.donnypz.displayentityutils.events.PacketGroupSendEvent;
+import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.Direction;
@@ -22,6 +21,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
@@ -132,11 +132,25 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return chunk.getWorld().getName()+"|"+chunk.getChunkKey()+"|"+localId; //world,chunkkey,localid
     }
 
+    @Override
+    public void setPersistent(boolean persistent) {
+        if (persistent){
+            if (isRiding()) return;
+            if (!isPersistent()){
+                DisplayGroupManager.addPersistentPacketGroup(getLocation(), toDisplayEntityGroup(), autoShow);
+            }
+        }
+        else{
+            if (isPersistent()) DisplayGroupManager.removePersistentPacketGroup(this, false);
+        }
+    }
+
     /**
      * Get whether this {@link PacketDisplayEntityGroup} is saved in chunk data, and will persist after restarts
      * @return a boolean
      */
-    public boolean isPersistentPacketGroup(){
+    @Override
+    public boolean isPersistent(){
         return this.persistentLocalId != -1;
     }
 
@@ -184,12 +198,14 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
     }
 
-    void addPart(@NotNull PacketDisplayEntityPart part){
+    public void addPart(@NotNull PacketDisplayEntityPart part){
         if (part.partUUID == null){
-            part.partUUID = UUID.randomUUID(); //for parts in old models that do not contain pdc data / part uuids
+            do{
+                part.partUUID = UUID.randomUUID(); //for parts in old models that do not contain pdc data / part uuids AND new ungrouped parts
+            } while(groupParts.containsKey(part.partUUID));
         }
-        if (part.isMaster) masterPart = part;
 
+        if (part.isMaster) masterPart = part;
         groupParts.put(part.partUUID, part);
         part.group = this;
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) interactionCount++;
@@ -311,7 +327,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     public boolean rideEntity(@NotNull Entity vehicle, boolean runLocationUpdater){
-        if (vehicle.isDead()){
+        if (isPersistent() || vehicle.isDead()){
             return false;
         }
         if (vehicle.getUniqueId() == vehicleUUID) return true;
@@ -438,9 +454,18 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return masterPart.getTrackingPlayers();
     }
 
+
+
     @Override
     public boolean hasTrackingPlayers() {
         return masterPart != null && !masterPart.viewers.isEmpty();
+    }
+
+    @Override
+    public void removeInteractions() {
+        for (PacketDisplayEntityPart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
+            part.remove();
+        }
     }
 
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap, SpawnedDisplayEntityPart.PartType... effectedPartTypes){
@@ -491,6 +516,49 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return true;
     }
 
+    @Override
+    public void teleportMove(Vector direction, double distance, int durationInTicks) {
+        Location destination = getLocation().add(direction.clone().normalize().multiply(distance));
+
+        double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
+        Vector incrementVector = direction
+                .clone()
+                .normalize()
+                .multiply(movementIncrement);
+
+        for (PacketDisplayEntityPart part : groupParts.values()){
+            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                PacketUtils.translateInteraction(part, direction, distance, durationInTicks, 0);
+            }
+            else{
+                new BukkitRunnable(){
+                    double currentDistance = 0;
+                    @Override
+                    public void run() {
+                        if (masterPart == null){
+                            cancel();
+                            return;
+                        }
+                        currentDistance+=Math.abs(movementIncrement);
+                        Location tpLoc = getLocation().add(incrementVector);
+
+                        part.setRotation(tpLoc.getYaw(), tpLoc.getPitch(), false);
+                        if (currentDistance >= distance){
+                            if (part.isMaster()){
+                                part.teleportUnsetPassengers(destination);
+                            }
+                            cancel();
+                            DisplayGroupManager.updatePersistentPacketGroup(PacketDisplayEntityGroup.this);
+                        }
+                        else if (part.isMaster()){
+                            part.teleportUnsetPassengers(destination);
+                        }
+                    }
+                }.runTaskTimer(DisplayAPI.getPlugin(), 0, 1);
+            }
+        }
+    }
+
     private void teleport(Location location, boolean respectGroupDirection, boolean hide){
         Location oldMasterLoc = getLocation();
         attemptLocationUpdate(oldMasterLoc, location, hide);
@@ -504,24 +572,29 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         for (PacketDisplayEntityPart part : groupParts.values()){
             part.setRotation(location.getPitch(), location.getYaw(), DisplayConfig.autoPivotInteractions());
         }
+        DisplayGroupManager.updatePersistentPacketGroup(this);
     }
 
     private void attemptLocationUpdate(Location oldLoc, Location newLoc, boolean allowHide){
         if (oldLoc == null) {
             updateChunkAndWorld(newLoc);
-            return;
         }
-        World w1 = oldLoc.getWorld();
-        World w2 = newLoc.getWorld();
-        if (!w1.equals(w2)){
-            if (allowHide) hide();
-            updateChunkAndWorld(newLoc);
-            return;
-        }
-        Chunk c1 = oldLoc.getChunk();
-        Chunk c2 = newLoc.getChunk();
-        if (c1.equals(c2)){
-            updateChunkAndWorld(newLoc);
+        else{
+            World w1 = oldLoc.getWorld();
+            World w2 = newLoc.getWorld();
+            if (!w1.equals(w2)){
+                if (allowHide){
+                    hide();
+                }
+                updateChunkAndWorld(newLoc);
+            }
+            else{
+                Chunk c1 = oldLoc.getChunk();
+                Chunk c2 = newLoc.getChunk();
+                if (c1.equals(c2)){
+                    updateChunkAndWorld(newLoc);
+                }
+            }
         }
     }
 

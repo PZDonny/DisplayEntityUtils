@@ -1,28 +1,23 @@
 package net.donnypz.displayentityutils.command.group;
 
-import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.*;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-class GroupCloneHereCMD extends PlayerSubCommand {
+class GroupCloneHereCMD extends GroupSubCommand {
     GroupCloneHereCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("clonehere", parentSubCommand, Permission.GROUP_CLONE);
+        super("clonehere", parentSubCommand, Permission.GROUP_CLONE, 0, false);
     }
 
     @Override
-    public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
-        if (group == null) {
-            DisplayEntityPluginCommand.noGroupSelection(player);
-            return;
-        }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
+    @Override
+    protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
         GroupCloneCMD.clone(player, group.clone(player.getLocation()));
     }
-
 }

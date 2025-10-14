@@ -106,19 +106,22 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param group the group to get transformation data from
      * @return this
      */
-    public SpawnedDisplayAnimationFrame setTransformation(@NotNull SpawnedDisplayEntityGroup group){
+    public SpawnedDisplayAnimationFrame setTransformation(@NotNull ActiveGroup<?> group){
         Location gLoc = group.getLocation();
         for (ActivePart p : group.groupParts.values()){
-            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) p;
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                Interaction i = (Interaction) part.getEntity();
+            if (p.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
 
-                InteractionTransformation transform = new InteractionTransformation(DisplayUtils.getInteractionTranslation(i).toVector3f(), gLoc.getYaw(), gLoc.getPitch(), i.getInteractionHeight(), i.getInteractionWidth());
-                setInteractionTransformation(part, transform);
+                InteractionTransformation transform = new InteractionTransformation(
+                        p.getInteractionTranslation().toVector3f(),
+                        gLoc.getYaw(),
+                        gLoc.getPitch(),
+                        p.getInteractionHeight(),
+                        p.getInteractionWidth());
+                setInteractionTransformation(p, transform);
             }
             else{
-                DisplayTransformation transform = DisplayTransformation.get((Display) part.getEntity());
-                setDisplayEntityTransformation(part, transform);
+                DisplayTransformation transform = DisplayTransformation.get(p);
+                setDisplayEntityTransformation(p, transform);
             }
         }
         return this;
@@ -132,24 +135,26 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param partTag the part tag that is required for a part's transformation to be contained in this frame
      * @return this
      */
-    public SpawnedDisplayAnimationFrame setTransformation(@NotNull SpawnedDisplayEntityGroup group, @NotNull String partTag){
+    public SpawnedDisplayAnimationFrame setTransformation(@NotNull ActiveGroup<?> group, @NotNull String partTag){
         displayTransformations.clear();
         interactionTransformations.clear();
         Location gLoc = group.getLocation();
-        for (SpawnedDisplayEntityPart p : group.groupParts.values()){
-            //Ignore if part does not have specified tag
-            if (!p.hasTag(partTag)){
-                continue;
-            }
+        for (ActivePart p : group.groupParts.values()){
+            if (!p.hasTag(partTag)) continue;
 
             if (p.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                Interaction i = (Interaction) p.getEntity();
 
-                InteractionTransformation transform = new InteractionTransformation(DisplayUtils.getInteractionTranslation(i).toVector3f(), gLoc.getYaw(), gLoc.getPitch(), i.getInteractionHeight(), i.getInteractionWidth());
+                InteractionTransformation transform = new InteractionTransformation(
+                        p.getInteractionTranslation().toVector3f(),
+                        gLoc.getYaw(),
+                        gLoc.getPitch(),
+                        p.getInteractionHeight(),
+                        p.getInteractionWidth());
+                setInteractionTransformation(p, transform);
                 setInteractionTransformation(p, transform);
             }
             else{
-                DisplayTransformation transform = DisplayTransformation.get((Display) p.getEntity());
+                DisplayTransformation transform = DisplayTransformation.get(p);
                 setDisplayEntityTransformation(p, transform);
             }
         }
@@ -172,7 +177,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param location the relative location that the frame point represents
      * @return true if a point with the given tag doesn't already exist. false if it exists or the tag is invalid
      */
-    public boolean addFramePoint(@NotNull String pointTag, @NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
+    public boolean addFramePoint(@NotNull String pointTag, @NotNull ActiveGroup<?> group, @NotNull Location location){
         if (!DisplayUtils.isValidTag(pointTag)) {
             return false;
         }
@@ -452,7 +457,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
         showParticles(players, group);
     }
 
-    void setDisplayEntityTransformation(SpawnedDisplayEntityPart part, DisplayTransformation transformation){
+    void setDisplayEntityTransformation(ActivePart part, DisplayTransformation transformation){
         this.setDisplayEntityTransformation(part.getPartUUID(), transformation);
     }
 
@@ -461,7 +466,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     }
 
 
-    boolean setInteractionTransformation(SpawnedDisplayEntityPart part, Vector3f transformation){
+    boolean setInteractionTransformation(ActivePart part, Vector3f transformation){
         setInteractionTransformation(part.getPartUUID(), transformation);
         return true;
     }

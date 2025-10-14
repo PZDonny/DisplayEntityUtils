@@ -31,21 +31,6 @@ import java.util.UUID;
 @ApiStatus.Internal
 public class DEUCommandUtils {
 
-
-    //Remove the visual representation of RelativePoints
-    @ApiStatus.Internal
-    public static boolean removeRelativePoints(Player player){
-        if (player == null) return false;
-        Set<RelativePointSelector<?>> selectors = RelativePointUtils.relativePointSelectors.remove(player.getUniqueId());
-        if (selectors != null){
-            for (RelativePointSelector<?> d : selectors){
-                d.despawn();
-            }
-        }
-        RelativePointUtils.deselectRelativePoint(player);
-        return selectors != null;
-    }
-
     public static void removeRelativePoint(Player player, RelativePointSelector<?> selector){
         UUID playerUUID = player.getUniqueId();
         RelativePointUtils.selectedSelector.remove(playerUUID, selector);

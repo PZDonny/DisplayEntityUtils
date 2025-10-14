@@ -77,8 +77,12 @@ public class DisplayEntityPluginCommand implements TabExecutor {
     }
 
     public static void noGroupSelection(Player player){
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You have not selected a spawned display entity group!", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You must have selected a display entity group to run this command!", NamedTextColor.RED)));
         player.sendMessage(Component.text("/mdis group selectnearest <distance>", NamedTextColor.GRAY));
+    }
+
+    public static void disallowPacketGroup(Player player){
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot do this with a packet-based group!", NamedTextColor.RED)));
     }
 
     public static void noPartSelection(Player player){

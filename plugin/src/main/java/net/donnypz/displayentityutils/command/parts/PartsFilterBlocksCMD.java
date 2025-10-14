@@ -5,8 +5,8 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PartFilter;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -27,7 +27,7 @@ class PartsFilterBlocksCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        ServerSideSelection sel = DisplayGroupManager.getPartSelection(player);
+        ActivePartSelection<?> sel = DisplayGroupManager.getPartSelection(player);
         if (sel == null){
             PartsCMD.noPartSelection(player);
             return;

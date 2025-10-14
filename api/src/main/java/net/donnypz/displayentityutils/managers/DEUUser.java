@@ -25,9 +25,9 @@ public class DEUUser {
 
     private final UUID userUUID;
     private boolean isValid = true;
-    private SpawnedDisplayEntityGroup selectedGroup;
+    private ActiveGroup<?> selectedGroup;
     private SpawnedDisplayAnimation selectedAnimation;
-    ServerSideSelection selectedPartSelection;
+    ActivePartSelection<?> selectedPartSelection;
     private AnimationParticleBuilder particleBuilder;
     private final Location[] pointPositions = new Location[3];
     private final Set<PacketDisplayEntityPart> trackedPacketEntities = Collections.newSetFromMap(new ConcurrentHashMap<>());
@@ -76,30 +76,29 @@ public class DEUUser {
     }
 
     /**
-     * Set the selected {@link SpawnedDisplayEntityGroup} of a user to the specified group
-     *
-     * @param spawnedDisplayEntityGroup SpawnedDisplayEntityGroup to be set to the player
-     * @return false if {@link DisplayConfig#limitGroupSelections()} is true and a player already has the group selected
+     * Set the selected {@link ActiveGroup} of a user
+     * @param activeGroup the group
+     * @return false if {@link DisplayConfig#limitGroupSelections()} is true and another player already has the group selected
      */
-    public boolean setSelectedSpawnedGroup(@NotNull SpawnedDisplayEntityGroup spawnedDisplayEntityGroup) {
+    public boolean setSelectedGroup(@NotNull ActiveGroup<?> activeGroup) {
         for (DEUUser user : DEUUser.users.values()){
-            if (user.getSelectedGroup() == spawnedDisplayEntityGroup){
+            if (user.getSelectedGroup() == activeGroup){
                 return user.userUUID == userUUID;
             }
         }
-        setSelectedPartSelection(spawnedDisplayEntityGroup.createPartSelection(),true);
+        setSelectedPartSelection(activeGroup.createPartSelection(),true);
         return true;
     }
 
     /**
-     * Set a user's selected {@link ServerSideSelection} and their group to the part's group
+     * Set a user's selected {@link ActivePartSelection} and their group to the part's group
      *
      * @param selection The selection for the user to have selected
      * @param setGroup Whether to set the user's selected group to the selection's group
      */
-    public void setSelectedPartSelection(@NotNull ServerSideSelection selection, boolean setGroup) {
+    public void setSelectedPartSelection(@NotNull ActivePartSelection<?> selection, boolean setGroup) {
         deselectPartSelection();
-        if (selection instanceof SpawnedPartSelection newSel && setGroup){
+        if (selection instanceof MultiPartSelection<?> newSel && setGroup){
             selectedGroup = newSel.getGroup();
         }
         selectedPartSelection = selection;
@@ -134,9 +133,9 @@ public class DEUUser {
     }
 
     /**
-     * Remove a user's {@link SpawnedDisplayEntityGroup} selection
+     * Remove a user's {@link ActiveGroup} selection
      */
-    public void deselectSpawnedGroup() {
+    public void deselectGroup() {
         selectedGroup = null;
     }
 
@@ -262,11 +261,11 @@ public class DEUUser {
         return trackedPacketEntities.size();
     }
 
-    public @Nullable SpawnedDisplayEntityGroup getSelectedGroup(){
+    public @Nullable ActiveGroup<?> getSelectedGroup(){
         return selectedGroup;
     }
 
-    public @Nullable ServerSideSelection getSelectedPartSelection(){
+    public @Nullable ActivePartSelection<?> getSelectedPartSelection(){
         return selectedPartSelection;
     }
 

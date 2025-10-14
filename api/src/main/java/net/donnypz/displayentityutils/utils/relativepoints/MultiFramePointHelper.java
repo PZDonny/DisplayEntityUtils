@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.relativepoints;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class MultiFramePointHelper {
 
-    public static void addArcPoints(@NotNull SpawnedDisplayEntityGroup group,
+    public static void addArcPoints(@NotNull ActiveGroup<?> group,
                                            @NotNull SpawnedDisplayAnimation animation,
                                            @NotNull Location loc1,
                                            @NotNull Location loc2,
@@ -26,7 +27,7 @@ public class MultiFramePointHelper {
         addArcPoints(group, animation, loc1, loc2, loc3, startFrame, endFrame, pointsPerFrame, pointTag, null);
     }
 
-    public static void addArcPoints(@NotNull SpawnedDisplayEntityGroup group,
+    public static void addArcPoints(@NotNull ActiveGroup<?> group,
                                     @NotNull SpawnedDisplayAnimation animation,
                                     @NotNull Location loc1,
                                     @NotNull Location loc2,
@@ -39,7 +40,7 @@ public class MultiFramePointHelper {
         calculateArcPoints(group, animation, loc1, loc2, loc3, startFrame, endFrame, pointsPerFrame, pointTag, player, true);
     }
 
-    public static void previewArcPoints(@NotNull SpawnedDisplayEntityGroup group,
+    public static void previewArcPoints(@NotNull ActiveGroup<?> group,
                                         @NotNull SpawnedDisplayAnimation animation,
                                         @NotNull Location loc1,
                                         @NotNull Location loc2,
@@ -51,7 +52,7 @@ public class MultiFramePointHelper {
         calculateArcPoints(group, animation, loc1, loc2, loc3, startFrame, endFrame, pointsPerFrame, "", player, false);
     }
 
-    private static void calculateArcPoints(@NotNull SpawnedDisplayEntityGroup group,
+    private static void calculateArcPoints(@NotNull ActiveGroup<?> group,
                                         @NotNull SpawnedDisplayAnimation animation,
                                         @NotNull Location loc1,
                                         @NotNull Location loc2,
@@ -118,7 +119,7 @@ public class MultiFramePointHelper {
     }
 
 
-    public static void addLinearPoints(@NotNull SpawnedDisplayEntityGroup group,
+    public static void addLinearPoints(@NotNull ActiveGroup<?> group,
                                        @NotNull SpawnedDisplayAnimation animation,
                                        @NotNull Location loc1,
                                        @NotNull Location loc2,
@@ -129,7 +130,7 @@ public class MultiFramePointHelper {
         addLinearPoints(group , animation, loc1, loc2, startFrame, endFrame, pointsPerFrame, pointTag, null);
     }
 
-    public static void addLinearPoints(@NotNull SpawnedDisplayEntityGroup group,
+    public static void addLinearPoints(@NotNull ActiveGroup<?> group,
                                        @NotNull SpawnedDisplayAnimation animation,
                                        @NotNull Location loc1,
                                        @NotNull Location loc2,
@@ -141,7 +142,7 @@ public class MultiFramePointHelper {
         calculateLinearPoints(group, animation, loc1, loc2, startFrame, endFrame, pointsPerFrame, pointTag, player, true);
     }
 
-    public static void previewLinearPoints(@NotNull SpawnedDisplayEntityGroup group,
+    public static void previewLinearPoints(@NotNull ActiveGroup<?> group,
                                            @NotNull SpawnedDisplayAnimation animation,
                                            @NotNull Location loc1,
                                            @NotNull Location loc2,
@@ -152,7 +153,7 @@ public class MultiFramePointHelper {
         calculateLinearPoints(group, animation, loc1, loc2, startFrame, endFrame, pointsPerFrame, "", player, false);
     }
 
-    private static void calculateLinearPoints(@NotNull SpawnedDisplayEntityGroup group,
+    private static void calculateLinearPoints(@NotNull ActiveGroup<?> group,
                                               @NotNull SpawnedDisplayAnimation animation,
                                               @NotNull Location loc1,
                                               @NotNull Location loc2,

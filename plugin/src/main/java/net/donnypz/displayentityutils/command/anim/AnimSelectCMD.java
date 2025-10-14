@@ -8,7 +8,7 @@ import net.donnypz.displayentityutils.command.group.GroupSpawnCMD;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
+import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -63,7 +63,7 @@ class AnimSelectCMD extends PlayerSubCommand {
 
         p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully selected animation! <white>(Tagged: "+anim.getAnimationTag()+")")));
 
-        if (DEUCommandUtils.removeRelativePoints(p)){
+        if (RelativePointUtils.removeRelativePoints(p)){
             p.sendMessage(Component.text("Your previewed points have been despawned since you have changed your selected animation", NamedTextColor.GRAY, TextDecoration.ITALIC));
         }
     }

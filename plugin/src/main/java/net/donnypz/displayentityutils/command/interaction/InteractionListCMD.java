@@ -26,14 +26,14 @@ class InteractionListCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
 
-        Interaction interaction = InteractionCMD.getInteraction(player, true);
+        InteractionCMD.SelectedInteraction interaction = InteractionCMD.getInteraction(player, true);
         if (interaction == null){
             return;
         }
         player.sendMessage(DisplayAPI.pluginPrefixLong);
         player.sendMessage(Component.text("Interaction Commands:", NamedTextColor.GRAY));
 
-        List<InteractionCommand> commands = DisplayUtils.getInteractionCommandsWithData(interaction);
+        List<InteractionCommand> commands = interaction.getInteractionCommandsWithData();
         for (InteractionCommand cmd : commands) {
             String clickType = cmd.isLeftClick() ? "LEFT" : "RIGHT";
             String execType = cmd.isConsoleCommand() ? "CONSOLE" : "PLAYER";
@@ -43,7 +43,7 @@ class InteractionListCMD extends PlayerSubCommand {
             if (player.hasPermission(Permission.INTERACTION_REMOVE_CMD.getPermission())) {
                 remove = Component.text("[REMOVE]", NamedTextColor.RED, TextDecoration.UNDERLINED).clickEvent(ClickEvent.callback(click -> {
                     click.sendMessage(Component.text("Command Removed! ", NamedTextColor.RED).append(Component.text(cmd.getCommand(), NamedTextColor.GRAY)));
-                    DisplayUtils.removeInteractionCommand(interaction, cmd.getCommand(), cmd.getKey());
+                    interaction.removeInteractionCommand(cmd);
                 }, ClickCallback.Options.builder().lifetime(Duration.ofMinutes(5)).build()));
             } else {
                 remove = Component.empty();

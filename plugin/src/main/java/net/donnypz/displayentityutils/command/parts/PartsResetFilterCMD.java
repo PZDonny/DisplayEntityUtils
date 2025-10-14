@@ -5,7 +5,9 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -19,18 +21,18 @@ class PartsResetFilterCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        ServerSideSelection sel = DisplayGroupManager.getPartSelection(player);
+        ActivePartSelection<?> sel = DisplayGroupManager.getPartSelection(player);
         if (sel == null){
             PartsCMD.noPartSelection(player);
             return;
         }
 
-        SpawnedPartSelection partSelection = (SpawnedPartSelection) sel;
+
         if (PartsCMD.isUnwantedSingleSelection(player, sel)){
             return;
         }
 
-        partSelection.reset(true);
+        ((MultiPartSelection<?>) sel).reset(true);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Part Selection Filter Reset!", NamedTextColor.YELLOW)));
     }
 }

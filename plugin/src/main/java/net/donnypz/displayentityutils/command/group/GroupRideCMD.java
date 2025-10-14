@@ -8,6 +8,7 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -49,7 +50,7 @@ class GroupRideCMD extends ConsoleUsableSubCommand {
                 return;
             }
 
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
+            ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(player);
             if (group == null) {
                 DisplayEntityPluginCommand.noGroupSelection(player);
                 player.sendMessage(Component.text("Provide a group tag and storage location if you want to spawn a new group instead.", NamedTextColor.GRAY, TextDecoration.ITALIC));
@@ -89,14 +90,11 @@ class GroupRideCMD extends ConsoleUsableSubCommand {
         attemptRide(vehicle, group, sender, args.length == 6 ? args[5] : null);
     }
 
-    private void attemptRide(Entity vehicle, SpawnedDisplayEntityGroup group, CommandSender sender, String controllerID){
+    private void attemptRide(Entity vehicle, ActiveGroup<?> group, CommandSender sender, String controllerID){
         if (group.getVehicle() == vehicle){
             sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("That group is already riding that entity!", NamedTextColor.RED)));
             return;
         }
-
-
-
 
         //Apply Controller
         if (controllerID != null){
@@ -105,15 +103,28 @@ class GroupRideCMD extends ConsoleUsableSubCommand {
                 sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to find a controller with the specified ID! ("+controllerID+")", NamedTextColor.RED)));
                 return;
             }
-            sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Mounting your group on the entity with a controller! ("+controllerID+")", NamedTextColor.GREEN)));
-            sender.sendMessage(Component.text("| If this action was not performed it was cancelled by another plugin!", NamedTextColor.GRAY));
-            controller.apply(vehicle, group);
+
+            if (controller.apply(vehicle, group)){
+                sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Mounting your group on the entity with a controller! ("+controllerID+")", NamedTextColor.GREEN)));
+            }
+            else{
+                sendFail(sender);
+            }
         }
         else{
-            sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Mounting your group on the entity!", NamedTextColor.GREEN)));
-            sender.sendMessage(Component.text("| If this action was not performed it was cancelled by another plugin!", NamedTextColor.GRAY));
-            group.rideEntity(vehicle);
+            if (group.rideEntity(vehicle)){
+                sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Mounted your group on the entity!", NamedTextColor.GREEN)));
+            }
+            else{
+                sendFail(sender);
+            }
         }
+    }
+
+    private void sendFail(CommandSender sender){
+        sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to mount your group on the entity!", NamedTextColor.RED)));
+        sender.sendMessage(Component.text("| If the group is both persistent and packet-based, this will always fail", NamedTextColor.GRAY, TextDecoration.ITALIC));
+        sender.sendMessage(Component.text("| This can fail for other unknown reasons, or if the riding was cancelled by another plugin", NamedTextColor.GRAY, TextDecoration.ITALIC));
     }
 
     static Entity getVehicle(CommandSender sender, String value){

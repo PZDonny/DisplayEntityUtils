@@ -11,10 +11,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 
 public interface Active {
-    /**
-     * @param teleportDuration the teleport duration
-     */
-   void setTeleportDuration(int teleportDuration);
+
+    void setTeleportDuration(int teleportDuration);
 
     void setInterpolationDuration(int interpolationDuration);
 

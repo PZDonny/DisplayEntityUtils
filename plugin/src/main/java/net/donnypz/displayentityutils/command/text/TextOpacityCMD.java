@@ -7,12 +7,12 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
 
 class TextOpacityCMD extends PlayerSubCommand {
@@ -28,7 +28,7 @@ class TextOpacityCMD extends PlayerSubCommand {
         }
 
 
-        ServerSideSelection partSelection = DisplayGroupManager.getPartSelection(player);
+        ActivePartSelection<?> partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){
             DisplayEntityPluginCommand.noPartSelection(player);
             return;
@@ -37,12 +37,12 @@ class TextOpacityCMD extends PlayerSubCommand {
             PartsCMD.invalidPartSelection(player);
         }
 
-        SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
+        ActivePart selected = partSelection.getSelectedPart();
         if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
             return;
         }
-        TextDisplay display = (TextDisplay) selected.getEntity();
+
         try{
             double change = Double.parseDouble(args[2]);
             if (change < 0 || change > 1){
@@ -58,7 +58,7 @@ class TextOpacityCMD extends PlayerSubCommand {
                 opacity = 25;
             }
 
-            display.setTextOpacity(opacity);
+            selected.setTextDisplayTextOpacity(opacity);
             player.sendMessage(Component.text("Successfully set text display's opacity to "+change, NamedTextColor.GREEN));
         }
         catch(NumberFormatException e){

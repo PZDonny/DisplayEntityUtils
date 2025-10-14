@@ -7,7 +7,8 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,7 +23,7 @@ class TextAlignCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        ServerSideSelection partSelection = DisplayGroupManager.getPartSelection(player);
+        ActivePartSelection<?> partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){
             DisplayEntityPluginCommand.noPartSelection(player);
             return;
@@ -32,7 +33,7 @@ class TextAlignCMD extends PlayerSubCommand {
             PartsCMD.invalidPartSelection(player);
         }
 
-        SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
+        ActivePart selected = partSelection.getSelectedPart();
         if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
             return;
@@ -43,10 +44,8 @@ class TextAlignCMD extends PlayerSubCommand {
             return;
         }
 
-        TextDisplay display = (TextDisplay) selected.getEntity();
-
         try{
-            display.setAlignment(TextDisplay.TextAlignment.valueOf(args[2].toUpperCase()));
+            selected.setTextDisplayAlignment(TextDisplay.TextAlignment.valueOf(args[2].toUpperCase()));
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Alignment successfully set to "+args[2], NamedTextColor.GREEN)));
         }
         catch(IllegalArgumentException e){

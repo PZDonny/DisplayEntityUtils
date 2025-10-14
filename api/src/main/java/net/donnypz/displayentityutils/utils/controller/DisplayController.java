@@ -313,10 +313,10 @@ public class DisplayController {
     }
 
 
-    public void apply(@NotNull Entity entity, @NotNull ActiveGroup<?> activeGroup){
-
+    public boolean apply(@NotNull Entity entity, @NotNull ActiveGroup<?> activeGroup){
         PersistentDataContainer pdc;
-        if (activeGroup instanceof PacketDisplayEntityGroup){
+        if (activeGroup instanceof PacketDisplayEntityGroup pg){
+            if (pg.isPersistent()) return false;
             pdc = entity.getPersistentDataContainer();
         }
         else{
@@ -340,19 +340,23 @@ public class DisplayController {
             isDisguised = false;
         }
         if (isDisguised){
-            activeGroup.rideEntity(entity);
+            if (!activeGroup.rideEntity(entity)){
+                return false;
+            }
             Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
                 startFollowersAndMachine(entity, activeGroup);
             }, 2);
         }
         else{
-            activeGroup.rideEntity(entity);
+            if (!activeGroup.rideEntity(entity)){
+                return false;
+            }
             startFollowersAndMachine(entity, activeGroup);
         }
 
         activeGroup.setPitch(0);
         DisplayControllerManager.registerEntity(entity, activeGroup);
-
+        return true;
     }
 
     private void startFollowersAndMachine(Entity entity, ActiveGroup<?> activeGroup){

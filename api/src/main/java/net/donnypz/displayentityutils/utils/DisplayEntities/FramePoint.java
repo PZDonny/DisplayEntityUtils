@@ -27,7 +27,7 @@ public class FramePoint extends RelativePoint implements Serializable {
     @Serial
     private static final long serialVersionUID = 99L;
 
-    public FramePoint(@NotNull String pointTag, @NotNull SpawnedDisplayEntityGroup group, @NotNull Location location) {
+    public FramePoint(@NotNull String pointTag, @NotNull ActiveGroup<?> group, @NotNull Location location) {
         super(pointTag, group, location);
     }
 

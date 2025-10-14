@@ -6,6 +6,8 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
@@ -21,7 +23,7 @@ class AnimPlayCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
+        ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(player);
         if (group == null) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You must have a group selected to do this animation command!", NamedTextColor.RED)));
             return;
@@ -59,7 +61,8 @@ class AnimPlayCMD extends PlayerSubCommand {
 
         if (loop){
             if (packet){
-                group.animateLoopingUsingPackets(anim);
+                new DisplayAnimator(anim, DisplayAnimator.AnimationType.LOOP)
+                        .playUsingPackets(group, 0);
             }
             else{
                 group.animateLooping(anim);
@@ -67,7 +70,7 @@ class AnimPlayCMD extends PlayerSubCommand {
         }
         else{
             if (packet){
-                group.animateUsingPackets(anim);
+                DisplayAnimator.playUsingPackets(group, anim);
             }
             else{
                 group.animate(anim);

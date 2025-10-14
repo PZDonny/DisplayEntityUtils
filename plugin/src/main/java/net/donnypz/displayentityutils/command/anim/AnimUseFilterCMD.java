@@ -2,15 +2,14 @@ package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
+import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.group.GroupCMD;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -23,9 +22,8 @@ class AnimUseFilterCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
-        if (group == null) {
-            player.sendMessage(Component.text("You must have a group selected to do this animation command!", NamedTextColor.RED));
+        if (DisplayGroupManager.getSelectedGroup(player) == null) {
+            DisplayEntityPluginCommand.noGroupSelection(player);
             return;
         }
 
@@ -35,7 +33,7 @@ class AnimUseFilterCMD extends PlayerSubCommand {
             return;
         }
 
-        ServerSideSelection selection = DisplayGroupManager.getPartSelection(player);
+        ActivePartSelection<?> selection = DisplayGroupManager.getPartSelection(player);
         if (PartsCMD.isUnwantedSingleSelection(player, selection)){
             return;
         }
@@ -43,6 +41,7 @@ class AnimUseFilterCMD extends PlayerSubCommand {
             PartsCMD.noPartSelection(player);
             return;
         }
+
         boolean trim = args.length > 0 && args[0].equalsIgnoreCase("-trim");
         anim.setFilter((SpawnedPartSelection) selection, trim);
 

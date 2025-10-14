@@ -6,6 +6,8 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
@@ -43,7 +45,7 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
                 return;
             }
 
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
+            ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(p);
             if (group == null) {
                 DisplayEntityPluginCommand.noGroupSelection(p);
                 return;
@@ -73,7 +75,7 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
         }
 
         DisplayControllerManager.unregisterEntity(vehicle);
-        sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully dismounted all groups riding the entity!", NamedTextColor.GREEN)));
+        sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully dismounted all non-packet groups riding the entity!", NamedTextColor.GREEN)));
         if (despawn) despawnMessage(sender);
     }
 
@@ -81,9 +83,14 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
         sender.sendMessage(Component.text("| Despawned dismounted group(s)", NamedTextColor.GRAY));
     }
 
-    static void dismount(SpawnedDisplayEntityGroup group, boolean despawn){
+    static void dismount(ActiveGroup<?> group, boolean despawn){
         if (despawn){
-            group.unregister(true, true);
+            if (group instanceof SpawnedDisplayEntityGroup sg){
+                sg.unregister(true, true);
+            }
+            else if (group instanceof PacketDisplayEntityGroup pdeg){
+                pdeg.unregister();
+            }
         }
         else{
             group.dismount();

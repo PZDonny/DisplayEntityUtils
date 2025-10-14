@@ -25,20 +25,20 @@ class InteractionHeightCMD extends PlayerSubCommand {
     }
 
     static void setInteractionDimensions(Player p , String[] args, String dim){
-        Interaction interaction = InteractionCMD.getInteraction(p, true);
-        if (interaction == null){
+        InteractionCMD.SelectedInteraction i = InteractionCMD.getInteraction(p, true);
+        if (i == null){
             return;
         }
         try{
             float change = Float.parseFloat(args[2]);
             if (dim.equals("height")){
-                interaction.setInteractionHeight(change);
+                i.setHeight(change);
             }
             else{
-                interaction.setInteractionWidth(change);
+                i.setWidth(change);
             }
 
-            p.sendMessage(Component.text("Successfully set interaction entity's "+dim+" to "+change, NamedTextColor.GREEN));
+            p.sendMessage(Component.text("Successfully set interaction's "+dim+" to "+change, NamedTextColor.GREEN));
         }
         catch(NumberFormatException e) {
             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid " + dim + ", enter a number!", NamedTextColor.RED)));

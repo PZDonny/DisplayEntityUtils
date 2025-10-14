@@ -2,9 +2,8 @@ package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SinglePartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -121,7 +120,7 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your part selection is invalid!", NamedTextColor.RED)));
     }
 
-    public static boolean isUnwantedMultiSelection(Player player, ServerSideSelection selection){
+    public static boolean isUnwantedMultiSelection(Player player, ActivePartSelection<?> selection){
         if (selection instanceof MultiPartSelection){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot do this with a grouped part!", NamedTextColor.RED)));
             return true;
@@ -129,16 +128,16 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         return false;
     }
 
-    public static boolean isUnwantedSingleSelection(Player player, ServerSideSelection selection){
-        if (selection instanceof SinglePartSelection){
+    public static boolean isUnwantedSingleSelection(Player player, ActivePartSelection<?> selection){
+        if (selection.isSinglePartSelection()){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot do this with an ungrouped selected part entity!", NamedTextColor.RED)));
             return true;
         }
         return false;
     }
 
-    public static boolean isUnwantedSingleSelectionAll(Player player, ServerSideSelection selection){
-        if (selection instanceof SinglePartSelection){
+    public static boolean isUnwantedSingleSelectionAll(Player player, ActivePartSelection<?> selection){
+        if (selection.isSinglePartSelection()){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot use \"-all\" with an ungrouped selected part entity!", NamedTextColor.RED)));
             return true;
         }

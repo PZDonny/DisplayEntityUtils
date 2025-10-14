@@ -20,7 +20,7 @@ class GroupHidePersistentPacketGroupsCMD extends PlayerSubCommand {
         boolean hideForSelf = args.length > 2 && args[2].equalsIgnoreCase("-self");
 
         for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(player.getChunk())){
-            if (pg.isPersistentPacketGroup()){
+            if (pg.isPersistent()){
                 if (hideForSelf){
                     pg.hideFromPlayer(player);
                 }

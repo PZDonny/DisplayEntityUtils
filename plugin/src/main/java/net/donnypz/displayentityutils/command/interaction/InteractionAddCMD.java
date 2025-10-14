@@ -58,7 +58,7 @@ class InteractionAddCMD extends PlayerSubCommand {
             return;
         }
 
-        Interaction interaction = InteractionCMD.getInteraction(player, true);
+        InteractionCMD.SelectedInteraction interaction = InteractionCMD.getInteraction(player, true);
         if (interaction == null){
             return;
         }
@@ -70,13 +70,13 @@ class InteractionAddCMD extends PlayerSubCommand {
         }
         String command = builder.toString();
         if (isBoth){
-            DisplayUtils.addInteractionCommand(interaction, command, true, isConsole);
-            DisplayUtils.addInteractionCommand(interaction, command, false, isConsole);
+            interaction.addInteractionCommand(command, true, isConsole);
+            interaction.addInteractionCommand(command, false, isConsole);
             player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Command Added! <yellow>("+command+")")));
         }
         else{
-            DisplayUtils.addInteractionCommand(interaction, command, isLeftClick, isConsole);
-            int cmdID = DisplayUtils.getInteractionCommands(interaction).size()-1;
+            interaction.addInteractionCommand(command, isLeftClick, isConsole);
+            int cmdID = interaction.getInteractionCommands().size()-1;
             player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Command Added! <yellow>(ID: "+cmdID+" | "+command+")")));
         }
     }

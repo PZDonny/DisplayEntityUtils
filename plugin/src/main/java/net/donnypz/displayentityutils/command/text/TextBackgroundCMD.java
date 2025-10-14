@@ -8,7 +8,8 @@ import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -30,7 +31,7 @@ class TextBackgroundCMD extends PlayerSubCommand {
         }
 
 
-        ServerSideSelection partSelection = DisplayGroupManager.getPartSelection(player);
+        ActivePartSelection<?> partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){
             DisplayEntityPluginCommand.noPartSelection(player);
             return;
@@ -47,13 +48,12 @@ class TextBackgroundCMD extends PlayerSubCommand {
             return;
         }
 
-        SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
+        ActivePart selected = partSelection.getSelectedPart();
         if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
             return;
         }
 
-        TextDisplay display = (TextDisplay) selected.getEntity();
         try{
             double change = Double.parseDouble(args[3]);
             if (change < 0 || change > 1){
@@ -65,7 +65,7 @@ class TextBackgroundCMD extends PlayerSubCommand {
                 multiplied = 26;
             }
 
-            display.setBackgroundColor(c.setAlpha((int) multiplied));
+            selected.setTextDisplayBackgroundColor(c.setAlpha((int) multiplied));
             player.sendMessage(Component.text("Successfully set text display's background color", NamedTextColor.GREEN));
         }
         catch(NumberFormatException e){

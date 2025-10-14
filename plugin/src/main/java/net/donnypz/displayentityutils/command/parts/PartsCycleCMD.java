@@ -6,17 +6,16 @@ import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 class PartsCycleCMD extends PlayerSubCommand {
@@ -26,7 +25,7 @@ class PartsCycleCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
+        ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);
             return;
@@ -37,17 +36,17 @@ class PartsCycleCMD extends PlayerSubCommand {
             return;
         }
 
-        ServerSideSelection sel = DisplayGroupManager.getPartSelection(player);
-        SpawnedPartSelection partSelection;
-        if (PartsCMD.isUnwantedSingleSelection(player, sel)){
-            return;
-        }
-        else if (sel == null){
+        ActivePartSelection<?> sel = DisplayGroupManager.getPartSelection(player);
+        MultiPartSelection<?> partSelection;
+        if (sel == null){
             partSelection = group.createPartSelection();
             DisplayGroupManager.setPartSelection(player, partSelection, false);
         }
+        else if (PartsCMD.isUnwantedSingleSelection(player, sel)){
+            return;
+        }
         else{
-            partSelection = (SpawnedPartSelection) sel;
+            partSelection = (MultiPartSelection<?>) sel;
         }
 
         int jump;
@@ -90,21 +89,57 @@ class PartsCycleCMD extends PlayerSubCommand {
         }
     }
 
+    static Component getPartInfo(@NotNull ActivePart part){
+        Component desc;
+        switch(part.getType()){
+            case INTERACTION -> {
+                desc = MiniMessage.miniMessage().deserialize("<dark_aqua>(Interaction, H: "+part.getInteractionHeight()+" W:"+part.getInteractionWidth()+")");
+            }
+            case TEXT_DISPLAY -> {
+                Component comp = part.getTextDisplayText();
+                if (comp == null){
+                    comp = Component.text("Failed to get text...", NamedTextColor.GRAY, TextDecoration.ITALIC);
+                }
+                desc = Component.text("(Text Display: \"", NamedTextColor.LIGHT_PURPLE)
+                        .append(comp)
+                        .append(Component.text("\")", NamedTextColor.LIGHT_PURPLE));
+            }
+            case BLOCK_DISPLAY -> {
+                if (part.isMaster()){
+                    desc = Component.text("(Master Entity/Part)", NamedTextColor.GOLD);
+                }
+                else if (part.getBlockDisplayBlock().getMaterial() == Material.AIR){
+                    desc = Component.text("(Invisible Block Display | AIR, CAVE_AIR, or VOID_AIR)", NamedTextColor.GRAY);
+                }
+                else{
+                    desc = Component.text("("+part.getBlockDisplayBlock().getMaterial().key().value()+")", NamedTextColor.YELLOW);
+                }
+            }
+            case ITEM_DISPLAY -> {
+                ItemStack i = part.getItemDisplayItem();
+                if (i.getType() == Material.AIR){
+                    desc = Component.text("(Invisible Item Display | AIR, CAVE_AIR, or VOID_AIR)", NamedTextColor.GRAY);
+                }
+                else{
+                    desc = Component.text("("+i.getType().key().value()+")", NamedTextColor.AQUA);
+                }
+            }
+            default -> throw new IllegalStateException("Unexpected part type");
+        }
+        return desc;
+    }
+
     static Component getPartInfo(@NotNull Entity entity){
-        Component desc = Component.empty();
+        Component desc;
         switch(entity){
             case Interaction i -> {
                 desc = MiniMessage.miniMessage().deserialize("<dark_aqua>(Interaction, H: "+i.getInteractionHeight()+" W:"+i.getInteractionWidth()+")");
             }
-
             case TextDisplay display -> {
-                if (!display.getText().isBlank()) {
-                    desc = Component.text("(Text Display: \"", NamedTextColor.LIGHT_PURPLE)
-                            .append(display.text())
-                            .append(Component.text("\")", NamedTextColor.LIGHT_PURPLE));
-                }
+                desc = Component.text("(Text Display: \"", NamedTextColor.LIGHT_PURPLE)
+                        .append(display.text())
+                        .append(Component.text("\")", NamedTextColor.LIGHT_PURPLE));
             }
-
             case BlockDisplay display -> {
                 if (DisplayUtils.isMaster(display)){
                     desc = Component.text("(Master Entity/Part)", NamedTextColor.GOLD);
@@ -116,7 +151,6 @@ class PartsCycleCMD extends PlayerSubCommand {
                     desc = Component.text("("+display.getBlock().getMaterial().key().value()+")", NamedTextColor.YELLOW);
                 }
             }
-
             case ItemDisplay display -> {
                 if (display.getItemStack().getType() == Material.AIR){
                     desc = Component.text("(Invisible Item Display | AIR, CAVE_AIR, or VOID_AIR)", NamedTextColor.GRAY);
@@ -130,13 +164,13 @@ class PartsCycleCMD extends PlayerSubCommand {
         return desc;
     }
 
-    private void displayPartInfo(Player p, SpawnedDisplayEntityPart part, SpawnedPartSelection partSelection){
+    private void displayPartInfo(Player p, ActivePart part, MultiPartSelection partSelection){
         int markDuration = 30;
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
             part.markInteraction(p, markDuration);
         }
         else{
-            PacketUtils.setGlowing(p, part.getEntity().getEntityId(), markDuration);
+            PacketUtils.setGlowing(p, part.getEntityId(), markDuration);
         }
 
         if (partSelection != null){
@@ -146,7 +180,7 @@ class PartsCycleCMD extends PlayerSubCommand {
             p.sendMessage(DisplayAPI.pluginPrefix
                     .append(Component.text("Selected Part! ", NamedTextColor.GREEN))
                     .append(ratio)
-                    .append(getPartInfo(part.getEntity())));
+                    .append(getPartInfo(part)));
         }
 
     }

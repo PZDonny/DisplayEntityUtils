@@ -23,7 +23,7 @@ class InteractionScaleCMD extends PlayerSubCommand {
             return;
         }
 
-        Interaction interaction = InteractionCMD.getInteraction(player, true);
+        InteractionCMD.SelectedInteraction interaction = InteractionCMD.getInteraction(player, true);
         if (interaction == null){
             return;
         }
@@ -35,7 +35,7 @@ class InteractionScaleCMD extends PlayerSubCommand {
             if (duration < 0 || delay < 0){
                 throw new NumberFormatException();
             }
-            DisplayUtils.scaleInteraction(interaction, height, width, duration, delay);
+            interaction.scale(height, width, duration, delay);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Scaling Interaction Entity over "+duration+" ticks!", NamedTextColor.GREEN)));
             player.sendMessage(Component.text("| Height: "+height, NamedTextColor.GRAY));
             player.sendMessage(Component.text("| Width: "+width, NamedTextColor.GRAY));

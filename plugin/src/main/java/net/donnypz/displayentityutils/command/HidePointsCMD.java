@@ -18,7 +18,7 @@ class HidePointsCMD extends PlayerSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You are not viewing any points!", NamedTextColor.RED)));
             return;
         }
-        DEUCommandUtils.removeRelativePoints(player);
+        RelativePointUtils.removeRelativePoints(player);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Removed all visible points!", NamedTextColor.GREEN)));
     }
 }

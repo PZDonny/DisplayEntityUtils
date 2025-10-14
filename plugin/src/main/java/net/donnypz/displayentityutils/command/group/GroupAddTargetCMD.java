@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
@@ -22,9 +23,13 @@ class GroupAddTargetCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
-        if (group == null) {
+        ActiveGroup<?> g = DisplayGroupManager.getSelectedGroup(player);
+        if (g == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);
+            return;
+        }
+        if (!(g instanceof SpawnedDisplayEntityGroup group)){
+            DisplayEntityPluginCommand.disallowPacketGroup(player);
             return;
         }
 
@@ -41,7 +46,8 @@ class GroupAddTargetCMD extends PlayerSubCommand {
         if (part != null) {
             if (part.getGroup() == group) {
                 player.sendMessage(Component.text("That interaction entity is already apart of your selected group!", NamedTextColor.RED));
-            } else {
+            }
+            else {
                 part.setGroup(group);
             }
             return;
@@ -50,7 +56,6 @@ class GroupAddTargetCMD extends PlayerSubCommand {
             group.addInteractionEntity(interaction);
             SpawnedPartSelection sel = (SpawnedPartSelection) DisplayGroupManager.getPartSelection(player);
             sel.refresh();
-
         }
         player.sendMessage(Component.text("Successfully added interaction entity to your selected group!", NamedTextColor.GREEN));
     }

@@ -4,7 +4,7 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -21,7 +21,7 @@ class PartsListTagsCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
 
-        ServerSideSelection partSelection = DisplayGroupManager.getPartSelection(player);
+        ActivePartSelection<?> partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){
             PartsCMD.noPartSelection(player);
             return;

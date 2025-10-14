@@ -17,20 +17,20 @@ class InteractionInfoCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        Interaction interaction = InteractionCMD.getInteraction(player, true);
+        InteractionCMD.SelectedInteraction interaction = InteractionCMD.getInteraction(player, true);
         if (interaction == null){
             return;
         }
 
         player.sendMessage(DisplayAPI.pluginPrefixLong);
 
-        String groupTag = DisplayUtils.getGroupTag(interaction);
+        String groupTag = interaction.getGroupTag();
         if (groupTag == null){
             groupTag = "<gray>NOT GROUPED";
         }
 
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Height: <yellow>"+interaction.getInteractionHeight()));
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Width: <yellow>"+interaction.getInteractionWidth()));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Height: <yellow>"+interaction.getHeight()));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Width: <yellow>"+interaction.getWidth()));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Responsive: "+(interaction.isResponsive() ? "<green>ENABLED" : "<red>DISABLED")));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: <yellow>"+groupTag));
     }

@@ -29,7 +29,7 @@ public class CondPacketGroupIsPersistent extends Condition {
     public boolean check(Event event) {
         PacketDisplayEntityGroup g = group.getSingle(event);
         if (g == null) return isNegated();
-        return g.isPersistentPacketGroup() == isNegated();
+        return g.isPersistent() == isNegated();
     }
 
     @Override

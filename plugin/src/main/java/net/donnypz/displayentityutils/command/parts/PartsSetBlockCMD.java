@@ -4,15 +4,11 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,10 +24,10 @@ class PartsSetBlockCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull SpawnedPartSelection selection, @NotNull String[] args) {
+    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         BlockData blockData = DEUCommandUtils.getBlockFromText(args[2], player);
         if (blockData == null) return;
-        for (SpawnedDisplayEntityPart part : selection.getSelectedParts()){
+        for (ActivePart part : selection.getSelectedParts()){
             if (part.isMaster()) continue;
             if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY) {
                 setBlock(part, blockData);
@@ -41,7 +37,7 @@ class PartsSetBlockCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ServerSideSelection selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ActivePartSelection<?> selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
         BlockData blockData = DEUCommandUtils.getBlockFromText(args[2], player);
         if (blockData == null) return;
         if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY) {
@@ -53,8 +49,7 @@ class PartsSetBlockCMD extends PartsSubCommand {
         setBlock(selectedPart, blockData);
     }
 
-    private void setBlock(SpawnedDisplayEntityPart part, BlockData blockData){
-        BlockDisplay display = (BlockDisplay) part.getEntity();
-        display.setBlock(blockData);
+    private void setBlock(ActivePart part, BlockData blockData){
+        part.setBlockDisplayBlock(blockData);
     }
 }

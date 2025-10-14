@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
@@ -44,7 +45,7 @@ class GroupSafeDismountCMD extends ConsoleUsableSubCommand {
                 return;
             }
 
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
+            ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(p);
             if (group == null) {
                 DisplayEntityPluginCommand.noGroupSelection(p);
                 return;

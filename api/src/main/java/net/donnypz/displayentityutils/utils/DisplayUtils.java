@@ -776,12 +776,10 @@ public final class DisplayUtils {
      * @param interaction The entity to assign the command to
      * @param command The command to remove
      */
-    @ApiStatus.Internal
-    public static void removeInteractionCommand(@NotNull Interaction interaction, @NotNull String command, NamespacedKey key){
-        if (command.isBlank()){
-            return;
-        }
-        removeFromPDCList(interaction, command, key);
+    public static void removeInteractionCommand(@NotNull Interaction interaction, @NotNull InteractionCommand command){
+        String cmd = command.command;
+        NamespacedKey key = command.key;
+        removeFromPDCList(interaction, cmd, key);
     }
 
     /**

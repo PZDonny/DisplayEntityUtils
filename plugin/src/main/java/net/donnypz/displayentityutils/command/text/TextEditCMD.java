@@ -7,7 +7,8 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.donnypz.displayentityutils.utils.dialogs.TextDisplayDialog;
@@ -25,7 +26,7 @@ class TextEditCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
 
-        ServerSideSelection partSelection = DisplayGroupManager.getPartSelection(player);
+        ActivePartSelection<?> partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){
             DisplayEntityPluginCommand.noPartSelection(player);
             return;
@@ -35,7 +36,7 @@ class TextEditCMD extends PlayerSubCommand {
             PartsCMD.invalidPartSelection(player);
         }
 
-        SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
+        ActivePart selected = partSelection.getSelectedPart();
         if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
             return;

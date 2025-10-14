@@ -7,7 +7,8 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -30,7 +31,7 @@ class TextSetCMD extends PlayerSubCommand {
             return;
         }
 
-        ServerSideSelection partSelection = DisplayGroupManager.getPartSelection(player);
+        ActivePartSelection<?> partSelection = DisplayGroupManager.getPartSelection(player);
         if (partSelection == null){
             DisplayEntityPluginCommand.noPartSelection(player);
             return;
@@ -40,14 +41,14 @@ class TextSetCMD extends PlayerSubCommand {
             PartsCMD.invalidPartSelection(player);
         }
 
-        SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
+        ActivePart selected = partSelection.getSelectedPart();
         if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
             return;
         }
 
 
-        TextDisplay display = (TextDisplay) selected.getEntity();
+
         StringBuilder builder = new StringBuilder();
         for (int i = 2; i < args.length; i++){
             builder.append(args[i]);
@@ -55,10 +56,11 @@ class TextSetCMD extends PlayerSubCommand {
                 builder.append(" ");
             }
         }
+        Component currentText = selected.getTextDisplayText();
         String textResult = builder.toString().replace("\\n", "\n");
-        Key oldFont = display.text().font();
+        Key oldFont = currentText.font();
         Component comp = LegacyComponentSerializer.legacyAmpersand().deserialize(textResult);
-        display.text(comp.font(oldFont));
+        selected.setTextDisplayText(comp.font(oldFont));
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set text on text display!", NamedTextColor.GREEN)));
         player.sendMessage(Component.text("Keep in mind, you can include \"\\n\" in your text display to create a new line.", NamedTextColor.GRAY));
     }

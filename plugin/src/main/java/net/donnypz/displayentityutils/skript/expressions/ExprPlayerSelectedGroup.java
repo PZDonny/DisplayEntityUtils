@@ -8,46 +8,50 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Player's Selected Spawned Group")
+@Name("Player's Selected Active Group")
 @Description("Get/Set the selected spawned group of a player")
 @Examples({
         "#Get selected group",
-        "set {_spawnedgroup} to player's selected spawned group",
+        "set {_activegroup} to player's selected group",
         "",
         "#Set selected group",
-        "set player's selected group to {_spawnedgroup}",
+        "set player's selected group to {_activegroup}",
         "",
         "#Reset group selection",
-        "reset player's selected spawned group"
+        "reset player's selected group",
+        "",
+        "#Pre-3.3.4",
+        "set {_spawnedgroup} to player's selected spawned group"
         })
-@Since("2.6.2, 3.3.2 (Plural)")
-public class ExprPlayerSelectedGroup extends SimplePropertyExpression<Player, SpawnedDisplayEntityGroup> {
+@Since("2.6.2, 3.3.2 (Plural), 3.3.4 (Packet Group)")
+public class ExprPlayerSelectedGroup extends SimplePropertyExpression<Player, ActiveGroup> {
     static {
-        register(ExprPlayerSelectedGroup.class, SpawnedDisplayEntityGroup.class, "selected [spawned[ |-]]group", "players");
+        register(ExprPlayerSelectedGroup.class, ActiveGroup.class, "selected [active] [display] [entity] group", "players");
     }
 
     @Override
-    public Class<? extends SpawnedDisplayEntityGroup> getReturnType() {
-        return SpawnedDisplayEntityGroup.class;
+    public Class<? extends ActiveGroup> getReturnType() {
+        return ActiveGroup.class;
     }
 
     @Override
     @Nullable
-    public SpawnedDisplayEntityGroup convert(Player player) {;
+    public ActiveGroup convert(Player player) {;
         if (player != null){
-            return DisplayGroupManager.getSelectedSpawnedGroup(player);
+            return DisplayGroupManager.getSelectedGroup(player);
         }
         return null;
     }
 
     @Override
     protected String getPropertyName() {
-        return "selected spawned group";
+        return "selected active display entity group";
     }
 
     @Override
@@ -62,17 +66,16 @@ public class ExprPlayerSelectedGroup extends SimplePropertyExpression<Player, Sp
             return;
         }
 
-
         switch (mode) {
             case SET -> {
                 if (delta == null){
                     return;
                 }
-                SpawnedDisplayEntityGroup deltaGroup = (SpawnedDisplayEntityGroup) delta[0];
+                ActiveGroup<?> deltaGroup = (ActiveGroup<?>) delta[0];
                 deltaGroup.addPlayerSelection(p);
             }
             case RESET -> {
-                DisplayGroupManager.deselectSpawnedGroup(p);
+                DisplayGroupManager.deselectGroup(p);
             }
         }
     }
