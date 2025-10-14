@@ -1183,7 +1183,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     public PacketDisplayEntityGroup toPacket(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow, boolean persistent){
-        DisplayEntityGroup savedGroup = toDisplayEntityGroup();
+        DisplayEntityGroup savedGroup;
         PacketDisplayEntityGroup packetGroup;
         if (DisplayConfig.autoPivotInteractions()){
             HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
@@ -1192,6 +1192,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 oldYaws.put(part, oldYaw);
                 part.pivot(-oldYaw);
             }
+            savedGroup = toDisplayEntityGroup();
 
             if (persistent){
                 packetGroup = DisplayGroupManager.addPersistentPacketGroup(location, savedGroup, autoShow);
@@ -1209,6 +1210,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             return packetGroup;
         }
         else{
+            savedGroup = toDisplayEntityGroup();
             if (persistent){
                 packetGroup = DisplayGroupManager.addPersistentPacketGroup(location, savedGroup, autoShow);
             }

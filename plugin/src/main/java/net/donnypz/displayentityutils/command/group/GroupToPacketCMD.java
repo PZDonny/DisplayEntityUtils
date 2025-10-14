@@ -37,9 +37,16 @@ class GroupToPacketCMD extends PlayerSubCommand {
         SpawnedDisplayEntityGroup sg = (SpawnedDisplayEntityGroup) group;
 
         if (args.length >= 3 && args[2].equals("-confirm")){
-            PacketDisplayEntityGroup pg = sg.toPacket(group.getLocation(), true, true, true);
+            boolean persistent = group.isPersistent();
+            PacketDisplayEntityGroup pg = sg.toPacket(group.getLocation(), true, true, persistent);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your selected group is now packet-based!", NamedTextColor.GREEN)));
-            player.sendMessage(Component.text("The packet-based group is stored in its current chunk's data. Save this world!", NamedTextColor.YELLOW));
+            if (persistent){
+                player.sendMessage(Component.text("| The packet-based group is stored in its current chunk's data. Save this world!", NamedTextColor.YELLOW));
+            }
+            else{
+                player.sendMessage(Component.text("| Your newly created group is not persistent!", NamedTextColor.RED));
+            }
+
             if (args.length < 4 || !args[3].equals("-keep")){
                 DEUUser.getOrCreateUser(player).deselectGroup();
                 sg.unregister(true, true);
