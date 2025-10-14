@@ -2,7 +2,6 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers;
-import io.papermc.paper.entity.TeleportFlag;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.*;
@@ -21,7 +20,6 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
@@ -559,18 +557,25 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
     }
 
-    private void teleport(Location location, boolean respectGroupDirection, boolean hide){
+    private void teleport(Location tpLocation, boolean respectGroupDirection, boolean hide){
         Location oldMasterLoc = getLocation();
-        attemptLocationUpdate(oldMasterLoc, location, hide);
+        attemptLocationUpdate(oldMasterLoc, tpLocation, hide);
 
-        location = location.clone();
+        tpLocation = tpLocation.clone();
         if (respectGroupDirection){
-            location.setPitch(oldMasterLoc.getPitch());
-            location.setYaw(oldMasterLoc.getYaw());
+            tpLocation.setPitch(oldMasterLoc.getPitch());
+            tpLocation.setYaw(oldMasterLoc.getYaw());
         }
-        masterPart.teleportUnsetPassengers(location);
+        masterPart.teleportUnsetPassengers(tpLocation);
         for (PacketDisplayEntityPart part : groupParts.values()){
-            part.setRotation(location.getPitch(), location.getYaw(), DisplayConfig.autoPivotInteractions());
+            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                Vector vector = oldMasterLoc.toVector().subtract(part.getLocation().toVector());
+                Location interactionTpLoc = tpLocation.clone().subtract(vector);
+                part.teleport(interactionTpLoc);
+            }
+            else{
+                part.setRotation(tpLocation.getPitch(), tpLocation.getYaw(), DisplayConfig.autoPivotInteractions());
+            }
         }
         DisplayGroupManager.updatePersistentPacketGroup(this);
     }
