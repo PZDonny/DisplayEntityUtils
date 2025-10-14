@@ -528,33 +528,28 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 PacketUtils.translateInteraction(part, direction, distance, durationInTicks, 0);
             }
-            else{
-                new BukkitRunnable(){
-                    double currentDistance = 0;
-                    @Override
-                    public void run() {
-                        if (masterPart == null){
-                            cancel();
-                            return;
-                        }
-                        currentDistance+=Math.abs(movementIncrement);
-                        Location tpLoc = getLocation().add(incrementVector);
-
-                        part.setRotation(tpLoc.getYaw(), tpLoc.getPitch(), false);
-                        if (currentDistance >= distance){
-                            if (part.isMaster()){
-                                part.teleportUnsetPassengers(destination);
-                            }
-                            cancel();
-                            DisplayGroupManager.updatePersistentPacketGroup(PacketDisplayEntityGroup.this);
-                        }
-                        else if (part.isMaster()){
-                            part.teleportUnsetPassengers(destination);
-                        }
-                    }
-                }.runTaskTimer(DisplayAPI.getPlugin(), 0, 1);
-            }
         }
+        new BukkitRunnable(){
+            double currentDistance = 0;
+            @Override
+            public void run() {
+                if (masterPart == null){
+                    cancel();
+                    return;
+                }
+                currentDistance+=Math.abs(movementIncrement);
+                Location tpLoc = getLocation().add(incrementVector);
+
+                if (currentDistance >= distance){
+                    masterPart.teleportUnsetPassengers(destination);
+                    cancel();
+                    DisplayGroupManager.updatePersistentPacketGroup(PacketDisplayEntityGroup.this);
+                }
+                else{
+                    masterPart.teleportUnsetPassengers(tpLoc);
+                }
+            }
+        }.runTaskTimerAsynchronously(DisplayAPI.getPlugin(), 0, 1);
     }
 
     private void teleport(Location tpLocation, boolean respectGroupDirection, boolean hide){

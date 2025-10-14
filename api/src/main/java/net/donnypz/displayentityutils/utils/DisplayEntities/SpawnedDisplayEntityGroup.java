@@ -601,8 +601,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
     @Override
     public void teleportMove(@NotNull Vector direction, double distance, int durationInTicks){
-        Entity master = getMasterEntity();
-        Location destination = master.getLocation().clone().add(direction.clone().normalize().multiply(distance));
+        Entity masterEntity = getMasterEntity();
+        Location destination = masterEntity.getLocation().clone().add(direction.clone().normalize().multiply(distance));
         if (!new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent()){
             return;
         }
@@ -617,34 +617,30 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 translateInteractionEventless((Interaction) part.getEntity(), direction, distance, durationInTicks, 0);
             }
-            else{
-                new BukkitRunnable(){
-                    double currentDistance = 0;
-                    @Override
-                    public void run() {
-                        if (!isSpawned()){
-                            cancel();
-                            return;
-                        }
-                        currentDistance+=Math.abs(movementIncrement);
-                        Location tpLoc = master.getLocation().clone().add(incrementVector);
-
-                        part.getEntity().setRotation(tpLoc.getYaw(), tpLoc.getPitch());
-                        if (currentDistance >= distance){
-                            if (part.isMaster()){
-                                master.teleport(destination, TeleportFlag.EntityState.RETAIN_PASSENGERS);
-                            }
-                            new GroupTeleportMoveEndEvent(SpawnedDisplayEntityGroup.this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent();
-                            cancel();
-                        }
-                        else if (part.isMaster()){
-                            master.teleport(tpLoc, TeleportFlag.EntityState.RETAIN_PASSENGERS);
-                        }
-
-                    }
-                }.runTaskTimer(DisplayAPI.getPlugin(), 0, 1);
-            }
         }
+        new BukkitRunnable(){
+            double currentDistance = 0;
+            @Override
+            public void run() {
+                if (!isSpawned()){
+                    cancel();
+                    return;
+                }
+                currentDistance+=Math.abs(movementIncrement);
+                Location tpLoc = masterEntity.getLocation().clone().add(incrementVector);
+
+                masterEntity.setRotation(tpLoc.getYaw(), tpLoc.getPitch());
+                if (currentDistance >= distance){
+                    masterEntity.teleport(destination, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                    new GroupTeleportMoveEndEvent(SpawnedDisplayEntityGroup.this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent();
+                    cancel();
+                }
+                else{
+                    masterEntity.teleport(tpLoc, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                }
+
+            }
+        }.runTaskTimer(DisplayAPI.getPlugin(), 0, 1);
     }
 
     /**
