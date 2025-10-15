@@ -39,7 +39,7 @@ class GroupScaleCMD extends GroupSubCommand {
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a whole number, 0 or greater, for the duration!", NamedTextColor.RED)));
                 return;
             }
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Scaling spawned display entity group!", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Scaling your selected group!", NamedTextColor.GREEN)));
             player.sendMessage(Component.text("Old Scale: "+group.getScaleMultiplier()+"x", NamedTextColor.GRAY));
             player.sendMessage(Component.text("New Scale: "+multiplier+"x", NamedTextColor.YELLOW));
             group.scale(multiplier, duration, true);

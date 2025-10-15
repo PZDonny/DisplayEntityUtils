@@ -42,7 +42,7 @@ class GroupTranslateCMD extends GroupSubCommand {
                 duration = 0;
             }
             group.translate(direction, (float) distance, duration, -1);
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Translating spawned display entity group!", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Translating your selected group!", NamedTextColor.GREEN)));
         }
         catch(IllegalArgumentException e){
             if (e instanceof NumberFormatException){
