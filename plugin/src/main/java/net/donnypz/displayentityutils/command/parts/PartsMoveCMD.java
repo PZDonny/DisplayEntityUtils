@@ -53,13 +53,11 @@ class PartsMoveCMD extends PlayerSubCommand {
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number greater than 0 for the distance!", NamedTextColor.RED)));
                 return;
             }
-            Entity e = ((SpawnedDisplayEntityPart) selection.getSelectedPart()).getEntity();
-            Location loc = e.getLocation();
-            Vector v = direction.getVector(loc).normalize().multiply(distance);
+            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) selection.getSelectedPart();
+            Location loc = part.getLocation();
+            Vector v = direction.getVector(selection.getSelectedPart(), false).normalize().multiply(distance);
             loc.add(v);
-            loc.setYaw(e.getYaw());
-            loc.setPitch(e.getPitch());
-            e.teleport(loc);
+            part.getEntity().teleport(loc);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Moved your selected part!", NamedTextColor.GREEN)));
         }
         catch(NumberFormatException e){

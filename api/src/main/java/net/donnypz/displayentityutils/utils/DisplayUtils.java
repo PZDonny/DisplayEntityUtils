@@ -424,6 +424,7 @@ public final class DisplayUtils {
      * @param delayInTicks How long before the translation should begin
      */
     public static void translate(@NotNull Display display, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
+        if (distance == 0) return;
         if (delayInTicks < 0){
             delayInTicks = -1;
         }
@@ -455,13 +456,8 @@ public final class DisplayUtils {
      * @param delayInTicks How long before the translation should begin
      */
     public static void translate(@NotNull Display display, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
-        Vector v = direction.getVector(display);
-        if (direction != Direction.UP && direction != Direction.DOWN){
-            v.rotateAroundY(Math.toRadians(display.getYaw()));
-            v.setY(0);
-        }
-
-        translate(display, v, distance, durationInTicks, delayInTicks);
+        if (distance == 0) return;
+        translate(display, direction.getVector(display, true), distance, durationInTicks, delayInTicks);
     }
 
     /**
@@ -475,6 +471,7 @@ public final class DisplayUtils {
      * @param delayInTicks How long before the translation should begin
      */
     public static void translate(@NotNull Interaction interaction, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
+        if (distance == 0) return;
         Location destination = interaction.getLocation().clone().add(direction.clone().normalize().multiply(distance));
         if (!new PartTranslateEvent(interaction, destination, null,null).callEvent()){
             return;
@@ -527,7 +524,7 @@ public final class DisplayUtils {
      * @param delayInTicks How long before the translation should begin
      */
     public static void translate(@NotNull Interaction interaction, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
-        translate(interaction, direction.getVector(interaction), distance, durationInTicks, delayInTicks);
+        translate(interaction, direction.getVector(interaction, true), distance, durationInTicks, delayInTicks);
     }
 
     /**
@@ -561,7 +558,7 @@ public final class DisplayUtils {
     public static void translate(@NotNull SpawnedDisplayEntityPart part, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
             Interaction interaction = (Interaction) part.getEntity();
-            translate(interaction, direction.getVector(interaction), distance, durationInTicks, delayInTicks);
+            translate(interaction, direction.getVector(interaction, true), distance, durationInTicks, delayInTicks);
             return;
         }
         Display display = (Display) part.getEntity();

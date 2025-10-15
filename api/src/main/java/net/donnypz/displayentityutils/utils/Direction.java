@@ -1,8 +1,10 @@
 package net.donnypz.displayentityutils.utils;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Interaction;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -25,10 +27,11 @@ public enum Direction {
     /**
      * Get the vector based on the Direction selection
      * @param location The location to base this vector upon
+     * @param localSpace whether this vector should be considered for local or world space
      * @return A vector
      */
     @ApiStatus.Internal
-    public Vector getVector(@NotNull Location location){
+    public Vector getVector(@NotNull Location location, boolean localSpace){
         Vector vector;
         Vector locVector = location.getDirection();
         switch(this){
@@ -38,7 +41,6 @@ public enum Direction {
             case DOWN -> {
                 vector = new Vector(0, -1, 0);
             }
-
             case LEFT -> {
                 vector = locVector.rotateAroundY(Math.PI/2);
             }
@@ -67,6 +69,17 @@ public enum Direction {
                 return null;
             }
         }
+        if (this == UP || this == DOWN) return vector;
+
+        if (localSpace){
+            vector.rotateAroundY(Math.toRadians(location.getYaw()));
+            if (this != FORWARD && this != BACK) {
+                vector.setY(0);
+            }
+        }
+        else if (this != FORWARD && this != BACK){
+            vector.setY(0);
+        }
         return vector;
     }
 
@@ -75,8 +88,9 @@ public enum Direction {
      * @param entity The entity to base this vector upon
      * @return A vector
      */
-    public Vector getVector(@NotNull Entity entity) {
-        return getVector(entity.getLocation());
+    public Vector getVector(@NotNull Entity entity, boolean localSpace) {
+        boolean isInteraction = entity instanceof Interaction;
+        return getVector(entity.getLocation(), localSpace && !isInteraction);
     }
 
     /**
@@ -84,7 +98,23 @@ public enum Direction {
      * @param part The {@link ActivePart} to base this vector upon
      * @return A vector
      */
-    public Vector getVector(@NotNull ActivePart part) {
-        return getVector(part.getLocation());
+    public Vector getVector(@NotNull ActivePart part, boolean localSpace) {
+        boolean isInteraction = part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION;
+        return getVector(part.getLocation(), localSpace && !isInteraction);
+    }
+
+    /**
+     * Get whether this {@link Direction} is {@link #NORTH}, {@link #SOUTH}, {@link #EAST}, or {@link #WEST}
+     * @return a boolean
+     */
+    public boolean isCardinal(){
+        switch(this){
+            case NORTH, SOUTH, EAST, WEST -> {
+                return true;
+            }
+            default -> {
+                return false;
+            }
+        }
     }
 }

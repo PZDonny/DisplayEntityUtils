@@ -38,7 +38,6 @@ import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     final Set<UUID> viewers = Collections.newSetFromMap(new ConcurrentHashMap<>());
@@ -916,18 +915,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             PacketUtils.translateInteraction(this, direction, distance, durationInTicks, delayInTicks);
         }
         else{
-            Vector addVector = direction.normalize().multiply(distance);
-            Bukkit.getAsyncScheduler().runDelayed(DisplayAPI.getPlugin(), task -> {
-                Vector3f translation = attributeContainer.getAttribute(DisplayAttributes.Transform.TRANSLATION)
-                        .add(addVector.toVector3f());
-                attributeContainer
-                        .setAttributesAndSend(new DisplayAttributeMap()
-                                        .add(DisplayAttributes.Transform.TRANSLATION, translation)
-                                        .add(DisplayAttributes.Interpolation.DURATION, durationInTicks)
-                                        .add(DisplayAttributes.Interpolation.DELAY, delayInTicks),
-                                getEntityId(),
-                                viewers);
-            }, Math.max(1, delayInTicks)*50L, TimeUnit.MILLISECONDS);
+            PacketUtils.translate(this, direction, distance, durationInTicks, delayInTicks);
         }
         return true;
     }
@@ -943,7 +931,8 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks) {
-        return translate(direction.getVector(this), distance, durationInTicks, delayInTicks);
+        PacketUtils.translate(this, direction, distance, durationInTicks, delayInTicks);
+        return true;
     }
 
     /**

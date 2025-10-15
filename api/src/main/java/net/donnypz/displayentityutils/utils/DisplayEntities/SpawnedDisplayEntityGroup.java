@@ -710,6 +710,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (!isInLoadedChunk()){
             return false;
         }
+
+        if (distance == 0) return true;
         Location destination = getMasterEntity().getLocation().clone().add(direction.clone().normalize().multiply(distance));
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.VANILLATRANSLATE, destination);
         Bukkit.getPluginManager().callEvent(event);
@@ -739,7 +741,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
         if (distance == 0) return true;
         Entity masterEntity = getMasterEntity();
-        Location destination = getLocation().clone().add(direction.getVector(masterEntity).normalize().multiply(distance));
+        Location destination = getLocation().clone().add(direction.getVector(masterEntity, true).normalize().multiply(distance));
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.VANILLATRANSLATE, destination);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()){

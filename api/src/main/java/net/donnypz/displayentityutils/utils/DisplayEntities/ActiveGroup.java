@@ -146,7 +146,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param durationInTicks How long it should take for the translation to complete
      */
     public void teleportMove(@NotNull Direction direction, double distance, int durationInTicks){
-        teleportMove(direction.getVector(masterPart), distance, durationInTicks);
+        teleportMove(direction.getVector(masterPart, false), distance, durationInTicks);
     }
 
     /**

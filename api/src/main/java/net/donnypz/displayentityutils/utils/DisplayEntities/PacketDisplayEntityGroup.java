@@ -943,6 +943,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
     @Override
     public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks) {
+        if (distance == 0) return true;
         for (PacketDisplayEntityPart part : groupParts.values()){
             part.translate(direction, distance, durationInTicks, delayInTicks);
         }
@@ -951,6 +952,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
     @Override
     public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks) {
+        if (distance == 0) return true;
         for (PacketDisplayEntityPart part : groupParts.values()){
             part.translate(direction, distance, durationInTicks, delayInTicks);
         }
