@@ -9,14 +9,17 @@ import com.github.retrooper.packetevents.protocol.world.chunk.Column;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
+import net.donnypz.displayentityutils.listeners.ListenerUtils;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import org.bukkit.Bukkit;
 
+import java.util.Set;
 import java.util.UUID;
 
 public class DEUPlayerPacketListener implements PacketListener {
@@ -29,6 +32,7 @@ public class DEUPlayerPacketListener implements PacketListener {
             case PacketType.Play.Server.SPAWN_ENTITY -> spawnEntity(user, event);
             case PacketType.Play.Server.ENTITY_METADATA -> entityMetadata(user, event);
             case PacketType.Play.Server.CHUNK_DATA -> chunkData(user, event);
+            case PacketType.Play.Server.SET_PASSENGERS -> setPassengers(user, event);
             default -> {}
         }
     }
@@ -62,7 +66,6 @@ public class DEUPlayerPacketListener implements PacketListener {
         }
     }
 
-
     private void chunkData(User user, PacketSendEvent event){
         WrapperPlayServerChunkData packet = new WrapperPlayServerChunkData(event);
         Column column = packet.getColumn();
@@ -71,5 +74,27 @@ public class DEUPlayerPacketListener implements PacketListener {
         Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
             deuUser.revealPacketGroupsFromSentChunk(column.getX(), column.getZ());
         }, 2);
+    }
+
+    private void setPassengers(User user, PacketSendEvent event){
+        WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(event);
+        UUID entityUUID = ListenerUtils.getEntityUUID(packet.getEntityId());
+        if (entityUUID == null) return;
+
+        Set<PacketDisplayEntityGroup> groups = PacketDisplayEntityGroup.getPassengerGroups(entityUUID);
+        if (groups.isEmpty()) return;
+
+        int[] current = packet.getPassengers();
+        int[] ids = new int[groups.size()+current.length];
+        int index = 0;
+        while (index < current.length){
+            ids[index] = current[index];
+            index++;
+        }
+        for (PacketDisplayEntityGroup g : groups){
+            ids[index] = g.getMasterPart().getEntityId();
+            index++;
+        }
+        packet.setPassengers(ids);
     }
 }

@@ -333,8 +333,9 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
         WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, true));
         for (Player p : getTrackingPlayers()){
-            PacketEvents.getAPI().getPlayerManager().sendPacket(p, packet);
+            PacketEvents.getAPI().getPlayerManager().sendPacketSilently(p, packet);
         }
+
         groupVehicles
                 .computeIfAbsent(vehicleUUID, key -> new PassengerGroupData())
                 .addGroup(vehicleUUID, this);
@@ -880,7 +881,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             Entity vehicle = getVehicle();
             if (vehicle != null){
                 WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, true));
-                PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
+                PacketEvents.getAPI().getPlayerManager().sendPacketSilently(player, packet);
             }
         }, 2);
     }
