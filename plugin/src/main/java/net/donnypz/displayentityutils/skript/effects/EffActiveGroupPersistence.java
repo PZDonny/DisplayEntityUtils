@@ -1,42 +1,41 @@
 package net.donnypz.displayentityutils.skript.effects;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Spawned Group Persistence")
+@Name("Active Group Persistence")
 @Description("Change the persistence state of a spawned group")
-@Examples({"set {_spawnedgroup} to not persistent"})
-@Since("2.6.3")
-public class EffSpawnedGroupPersistence extends Effect {
+@Examples({"set {_spawnedgroup} to not persistent",
+            "make {_packetgroup} to persistent"})
+@Since("2.6.3, 3.3.4 (Packet)")
+@DocumentationId("EffSpawnedGroupPersistence")
+public class EffActiveGroupPersistence extends Effect {
     static {
-        Skript.registerEffect(EffSpawnedGroupPersistence.class,"(make|set) %spawnedgroups% [to] [:not] persistent");
+        Skript.registerEffect(EffActiveGroupPersistence.class,"(make|set) %spawnedgroups% [to] [:not] persistent");
     }
 
-    Expression<SpawnedDisplayEntityGroup> object;
+    Expression<ActiveGroup<?>> object;
     boolean persistent;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        object = (Expression<SpawnedDisplayEntityGroup>) expressions[0];
+        object = (Expression<ActiveGroup<?>>) expressions[0];
         persistent = !parseResult.hasTag("not");
         return true;
     }
 
     @Override
     protected void execute(Event event) {
-        SpawnedDisplayEntityGroup[] groups = object.getArray(event);
+        ActiveGroup<?>[] groups = object.getArray(event);
         if (groups == null) return;
-        for (SpawnedDisplayEntityGroup g : groups){
+        for (ActiveGroup<?> g : groups){
             if (g != null){
                 g.setPersistent(persistent);
             }
@@ -45,6 +44,6 @@ public class EffSpawnedGroupPersistence extends Effect {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "spawned group persistence: "+object.toString(event, debug);
+        return "active group persistence: "+object.toString(event, debug);
     }
 }
