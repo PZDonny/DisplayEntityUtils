@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class EffPartSelectionResetRefreshRemove extends Effect {
     static {
-        Skript.registerEffect(EffPartSelectionResetRefreshRemove.class,"(1¦refresh|2¦reset|3¦remove) %multipartselections%");
+        Skript.registerEffect(EffPartSelectionResetRefreshRemove.class,"(1¦refresh|2¦reset|3¦remove) %multipartfilters%");
     }
 
     Expression<MultiPartSelection<?>> selections;

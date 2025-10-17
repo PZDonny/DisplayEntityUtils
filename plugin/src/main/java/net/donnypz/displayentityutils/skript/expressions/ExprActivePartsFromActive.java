@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 public class ExprActivePartsFromActive extends PropertyExpression<Object, ActivePart> {
 
     static {
-        register(ExprActivePartsFromActive.class, ActivePart.class, "[active] parts", "activegroups/multipartselections");
+        register(ExprActivePartsFromActive.class, ActivePart.class, "[active] parts", "activegroups/multipartfilters");
     }
 
     @Override
