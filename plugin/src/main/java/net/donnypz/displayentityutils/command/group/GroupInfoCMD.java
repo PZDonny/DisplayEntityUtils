@@ -12,6 +12,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -36,13 +38,23 @@ public class GroupInfoCMD extends PlayerSubCommand {
         groupTag = groupTag == null ? "<red>NOT SET" : "<yellow>"+groupTag;
 
         player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: <yellow>"+groupTag));
-        player.sendMessage(MiniMessage.miniMessage().deserialize("World: <yellow>"+group.getWorldName()));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Total Parts: <yellow>"+(group.getParts().size())));
         String packetBased = group instanceof PacketDisplayEntityGroup ? "<green>TRUE" : "<red>FALSE";
-        String persistence = group.isPersistent() ? "<green>TRUE" : "<red>FALSE";
+        Component persistence;
+        if (group.isPersistent()){
+            persistence = MiniMessage.miniMessage().deserialize("Is Persistent: <green>TRUE");
+            if (group instanceof PacketDisplayEntityGroup pdeg){
+                persistence = persistence
+                        .append(MiniMessage.miniMessage().deserialize(" <gold>[COPY ID]")
+                                .clickEvent(ClickEvent.copyToClipboard(pdeg.getPersistentGlobalId())));
+            }
+        }
+        else{
+            persistence = MiniMessage.miniMessage().deserialize("Is Persistent: <red>FALSE");
+        }
 
         player.sendMessage(MiniMessage.miniMessage().deserialize("Is Packet Based: "+packetBased));
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Is Persistent: "+persistence));
+        player.sendMessage(persistence);
 
         if (group instanceof SpawnedDisplayEntityGroup sg){
             player.sendMessage(MiniMessage.miniMessage().deserialize("Chunk Load Persistence Overriding: <yellow>"+sg.allowsPersistenceOverriding()));
