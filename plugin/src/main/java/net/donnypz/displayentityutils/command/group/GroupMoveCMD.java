@@ -2,10 +2,8 @@ package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -15,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupMoveCMD extends GroupSubCommand {
     GroupMoveCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("move", parentSubCommand, Permission.GROUP_TRANSFORM, 5, true);
+        super("move", parentSubCommand, Permission.GROUP_TRANSFORM, 5, false);
     }
 
 

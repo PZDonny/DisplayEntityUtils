@@ -582,9 +582,7 @@ public final class DisplayGroupManager {
 
     @ApiStatus.Internal
     public static void updatePersistentPacketGroup(@NotNull PacketDisplayEntityGroup packetDisplayEntityGroup){
-        if (!packetDisplayEntityGroup.isPersistent()){
-            return;
-        }
+        if (!packetDisplayEntityGroup.isPersistent()) return;
         String persistentGlobalId = packetDisplayEntityGroup.getPersistentGlobalId();
         String[] split = persistentGlobalId.split("\\|");
         long chunkKey = Long.parseLong(split[1]);
@@ -617,9 +615,7 @@ public final class DisplayGroupManager {
             if (cpg == null || cpg.id != localId) continue;
 
             Location currentLoc = group.getLocation();
-            int chunkX = currentLoc.blockX() >> 4;
-            int chunkZ = currentLoc.blockZ() >> 4;
-            if (storedChunk.getChunkKey() != ConversionUtils.getChunkKey(chunkX, chunkZ)){ //Group in new location
+            if (storedChunk.getChunkKey() != ConversionUtils.getChunkKey(currentLoc)){ //Group in new location
                 //Remove and add to new chunk
                 list.remove(i);
                 addPersistentPacketGroupSilent(group, currentLoc, group.toDisplayEntityGroup());

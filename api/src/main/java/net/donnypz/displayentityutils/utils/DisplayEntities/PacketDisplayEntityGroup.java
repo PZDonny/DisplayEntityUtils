@@ -7,11 +7,8 @@ import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.donnypz.displayentityutils.utils.PacketUtils;
-import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
@@ -105,7 +102,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     @ApiStatus.Internal
     public void setPersistentIds(int localId, Chunk chunk){
         this.persistentLocalId = localId;
-        this.persistentGlobalId = buildPersistentGlobalId(chunk, localId);
+        this.persistentGlobalId = chunk != null ? buildPersistentGlobalId(chunk, localId) : null;
     }
 
 
@@ -135,11 +132,14 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         if (persistent){
             if (isRiding()) return;
             if (!isPersistent()){
-                DisplayGroupManager.addPersistentPacketGroup(getLocation(), toDisplayEntityGroup(), autoShow);
+                DisplayGroupManager.addPersistentPacketGroup(this, getLocation());
             }
         }
         else{
-            if (isPersistent()) DisplayGroupManager.removePersistentPacketGroup(this, false);
+            if (isPersistent()){
+                DisplayGroupManager.removePersistentPacketGroup(this, false);
+                setPersistentIds(-1, null);
+            }
         }
     }
 
@@ -169,7 +169,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             String oldWorldName = oldLoc.getWorld().getName();
             WorldData data = allPacketGroups.get(oldWorldName);
             if (data != null){
-                long chunkKey = oldLoc.getChunk().getChunkKey();
+                long chunkKey = ConversionUtils.getChunkKey(oldLoc);
                 data.removeGroup(chunkKey, this);
                 if (data.isEmpty() && !location.getWorld().getName().equals(oldWorldName)){
                     allPacketGroups.remove(oldWorldName);
@@ -178,8 +178,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
 
         World world = location.getWorld();
-        Chunk chunk = location.getChunk();
-        long chunkKey = chunk.getChunkKey();
+        long chunkKey = ConversionUtils.getChunkKey(location);
         allPacketGroups
                 .computeIfAbsent(world.getName(), key -> new WorldData())
                 .addGroup(chunkKey, this);
@@ -539,16 +538,18 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                     return;
                 }
                 currentDistance+=Math.abs(movementIncrement);
-                Location tpLoc = getLocation().add(incrementVector);
+                Location tpLocation = getLocation().add(incrementVector);
 
+                attemptLocationUpdate(getLocation(), tpLocation, false);
                 if (currentDistance >= distance){
                     masterPart.teleportUnsetPassengers(destination);
                     cancel();
-                    DisplayGroupManager.updatePersistentPacketGroup(PacketDisplayEntityGroup.this);
                 }
                 else{
-                    masterPart.teleportUnsetPassengers(tpLoc);
+                    masterPart.teleportUnsetPassengers(tpLocation);
                 }
+                DisplayGroupManager.updatePersistentPacketGroup(PacketDisplayEntityGroup.this);
+
             }
         }.runTaskTimerAsynchronously(DisplayAPI.getPlugin(), 0, 1);
     }
@@ -590,11 +591,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 updateChunkAndWorld(newLoc);
             }
             else{
-                Chunk c1 = oldLoc.getChunk();
-                Chunk c2 = newLoc.getChunk();
-                if (c1.equals(c2)){
-                    updateChunkAndWorld(newLoc);
-                }
+                updateChunkAndWorld(newLoc);
             }
         }
     }
