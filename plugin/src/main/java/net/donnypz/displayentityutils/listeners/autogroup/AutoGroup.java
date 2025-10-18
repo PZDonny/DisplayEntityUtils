@@ -73,7 +73,7 @@ final class AutoGroup {
                     continue;
                 }
 
-                GroupResult result = DisplayGroupManager.getSpawnedGroup(display, null);
+                GroupResult result = DisplayGroupManager.getSpawnedGroup(display);
                 if (result == null || foundGroups.contains(result.group())){
                     continue;
                 }

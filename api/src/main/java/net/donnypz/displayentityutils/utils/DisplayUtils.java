@@ -375,7 +375,7 @@ public final class DisplayUtils {
         List<SpawnedDisplayEntityGroup> groups = new ArrayList<>();
         for (Entity e : vehicleEntity.getPassengers()){
             if (e instanceof Display display){
-                GroupResult result = DisplayGroupManager.getSpawnedGroup(display, null);
+                GroupResult result = DisplayGroupManager.getSpawnedGroup(display);
                 if (result == null || result.group() == null){
                     continue;
                 }
@@ -399,7 +399,7 @@ public final class DisplayUtils {
         List<SpawnedDisplayEntityGroup> groups = new ArrayList<>();
         for (Entity e : vehicleEntity.getPassengers()){
             if (e instanceof Display display){
-                GroupResult result = DisplayGroupManager.getSpawnedGroup(display, null);
+                GroupResult result = DisplayGroupManager.getSpawnedGroup(display);
                 if (result == null || result.group() == null){
                     continue;
                 }

@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprPersistentPacketGroupFromId extends SimpleExpression<PacketDisplayEntityGroup> {
 
     static{
-        Skript.registerExpression(ExprPersistentPacketGroupFromId.class, PacketDisplayEntityGroup.class, ExpressionType.SIMPLE, "persistent packet group with id %string%");
+        Skript.registerExpression(ExprPersistentPacketGroupFromId.class, PacketDisplayEntityGroup.class, ExpressionType.SIMPLE, "persistent packet group with [global] id %string%");
     }
 
     private Expression<String> id;

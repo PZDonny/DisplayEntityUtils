@@ -2,12 +2,11 @@ package net.donnypz.displayentityutils.events;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.entity.Display;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * Called when a {@link SpawnedDisplayEntityGroup} is registered by nearby selection, or {@link net.donnypz.displayentityutils.managers.DisplayGroupManager#getSpawnedGroup(Display, Player)}
+ * Called when a {@link SpawnedDisplayEntityGroup} is registered by nearby selection, or {@link net.donnypz.displayentityutils.managers.DisplayGroupManager#getSpawnedGroup(Display)}
  */
 public class GroupRegisteredEvent extends Event {
 

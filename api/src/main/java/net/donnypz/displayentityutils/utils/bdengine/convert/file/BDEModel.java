@@ -28,7 +28,7 @@ public class BDEModel extends BDECollection{
         });
         super.spawn(spawnLoc, parentDisplay, null);
 
-        GroupResult result = DisplayGroupManager.getSpawnedGroup(parentDisplay, null);
+        GroupResult result = DisplayGroupManager.getSpawnedGroup(parentDisplay);
         SpawnedDisplayEntityGroup group = result.group();
         new GroupSpawnedEvent(group, spawnReason).callEvent();
         //result.group().setTag(groupTag);

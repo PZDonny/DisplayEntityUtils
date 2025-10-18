@@ -46,7 +46,7 @@ public class ExprActiveGetGroup extends SimplePropertyExpression<Object, ActiveG
             return sel.getGroup();
         }
         else if (obj instanceof Display display){
-            GroupResult result = DisplayGroupManager.getSpawnedGroup(display, null);
+            GroupResult result = DisplayGroupManager.getSpawnedGroup(display);
             if (result == null) return null;
             return result.group();
         }

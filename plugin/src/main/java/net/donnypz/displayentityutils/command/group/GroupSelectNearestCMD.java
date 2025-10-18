@@ -34,8 +34,10 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
         try {
             double searchDistance = Double.parseDouble(args[2]);
             if (searchDistance <= 0 ) throw new NumberFormatException();
-            GroupResult result = DisplayGroupManager.getSpawnedGroupNearLocation(player.getLocation(), searchDistance, player);
+            GroupResult result = DisplayGroupManager.getSpawnedGroupNearLocation(player.getLocation(), searchDistance);
             if (result == null || result.group() == null){
+                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You are not near any spawned display entity groups!", NamedTextColor.RED)));
+                player.sendMessage(Component.text("| Use \"/mdis group markpacketgroups\" to mark packet-based groups in your current chunk.", NamedTextColor.GRAY, TextDecoration.ITALIC));
                 return;
             }
             SpawnedDisplayEntityGroup group = result.group();
@@ -53,7 +55,7 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
             int selectDuration = 50;
             group.glowAndMarkInteractions(player, selectDuration);
             new BukkitRunnable(){
-                int maxIterations = selectDuration/2;
+                final int maxIterations = selectDuration/2;
                 int iteration = 0;
                 @Override
                 public void run() {

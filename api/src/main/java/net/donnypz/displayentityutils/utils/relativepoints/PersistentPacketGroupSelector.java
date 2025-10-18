@@ -59,7 +59,7 @@ public class PersistentPacketGroupSelector extends RelativePointSelector<Relativ
     public void sendInfo(Player player) {
         if (group.isPersistent()){
             player.sendMessage(MiniMessage.miniMessage().deserialize("Persistent: <green>TRUE"));
-            player.sendMessage(Component.text("ID: "+id, NamedTextColor.YELLOW));
+            player.sendMessage(Component.text("Local ID: "+id, NamedTextColor.YELLOW));
             player.sendMessage(Component.text("[GLOBAL ID | Click to copy]", NamedTextColor.GOLD)
                     .clickEvent(ClickEvent.copyToClipboard(globalId)));
         }
