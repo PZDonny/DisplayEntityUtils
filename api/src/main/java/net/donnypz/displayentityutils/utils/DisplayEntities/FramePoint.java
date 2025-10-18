@@ -56,18 +56,19 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param animator the animator attempting to play group effects
      * @param limited whether to spawn the effects only to players who can visibly see the group
      */
-    public void playEffects(@NotNull SpawnedDisplayEntityGroup group, @Nullable DisplayAnimator animator, boolean limited){
-        showParticles(group, animator, limited);
-        playSounds(group, animator, limited);
+    public void playEffects(@NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, boolean limited){
+        Location spawnLoc = group.getLocation();
+        showParticles(group, spawnLoc, animator, limited);
+        playSounds(group, spawnLoc, animator, limited);
     }
 
     /**
-     * Immediately play the effects of this point at this point's location relative to a {@link SpawnedDisplayEntityGroup}
+     * Immediately play the effects of this point at this point's location relative to a {@link ActiveGroup}
      * Effects include sounds and particles
      * @param group the relative group
      * @param limited whether to spawn the effects only to players who can visibly see the group
      */
-    public void playEffects(@NotNull SpawnedDisplayEntityGroup group, boolean limited){
+    public void playEffects(@NotNull ActiveGroup<?> group, boolean limited){
         Location location = getLocation(group);
         if (limited){
             playEffects(location, getPlayers(group));
@@ -105,7 +106,7 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param group the relative group
      * @param player the player
      */
-    public void playEffects(@NotNull ActiveGroup group, @NotNull Player player){
+    public void playEffects(@NotNull ActiveGroup<?> group, @NotNull Player player){
         playEffects(getLocation(group), player);
     }
 
@@ -115,7 +116,7 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param group the relative group
      * @param players the players
      */
-    public void playEffects(@NotNull ActiveGroup group, @NotNull Collection<Player> players){
+    public void playEffects(@NotNull ActiveGroup<?> group, @NotNull Collection<Player> players){
         playEffects(getLocation(group), players);
     }
 
@@ -129,7 +130,7 @@ public class FramePoint extends RelativePoint implements Serializable {
         playSounds(location);
     }
 
-    private Collection<Player> getPlayers(ActiveGroup group){
+    private Collection<Player> getPlayers(ActiveGroup<?> group){
         return group.getTrackingPlayers();
     }
 
@@ -139,14 +140,24 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param animator the animator attempting to play group effects
      * @param limited whether to spawn the particles only to players who can visibly see the group
      */
-    public void showParticles(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
-        Location spawnLoc = getLocation(group);
+    public void showParticles(@NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, boolean limited){
+        showParticles(group, getLocation(group), animator, limited);
+    }
+
+    /**
+     * Show the particles of this point at a specified location, with their intended delays.
+     * @param group the relative group
+     * @param location the location to show the particles
+     * @param animator the animator attempting to play group effects
+     * @param limited whether to spawn the particles only to players who can visibly see the group
+     */
+    public void showParticles(@NotNull ActiveGroup<?> group, @NotNull Location location, @Nullable DisplayAnimator animator, boolean limited){
         for (AnimationParticle particle : particles){
             if (limited){
-                particle.spawn(spawnLoc, group, animator, getPlayers(group));
+                particle.spawn(location, group, animator, getPlayers(group));
             }
             else{
-                particle.spawn(spawnLoc, group, animator);
+                particle.spawn(location, group, animator);
             }
         }
     }
@@ -156,7 +167,7 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param group the relative group
      * @param limited whether to spawn the effects only to players who can visibly see the group
      */
-    public void showParticles(@NotNull ActiveGroup group, boolean limited){
+    public void showParticles(@NotNull ActiveGroup<?> group, boolean limited){
         Location location = getLocation(group);
         if (limited){
             showParticles(location, getPlayers(group));
@@ -193,7 +204,7 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param group the relative group
      * @param player the player that can see the particles
      */
-    public void showParticles(@NotNull ActiveGroup group, @NotNull Player player){
+    public void showParticles(@NotNull ActiveGroup<?> group, @NotNull Player player){
         showParticles(getLocation(group), player);
     }
 
@@ -202,7 +213,7 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param group the relative group
      * @param players the players
      */
-    public void showParticles(@NotNull ActiveGroup group, @NotNull Collection<Player> players){
+    public void showParticles(@NotNull ActiveGroup<?> group, @NotNull Collection<Player> players){
         showParticles(getLocation(group), players);
     }
 
@@ -222,7 +233,7 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param animator the animator attempting to play group effects
      * @param limited whether to limit the played audio only to players who can visibly see the group
      */
-    public void playSounds(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
+    public void playSounds(@NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, boolean limited){
         for (AnimationSound sound : sounds.values()){
             if (limited){
                 sound.playSound(getLocation(group), group, animator, getPlayers(group));
@@ -230,7 +241,24 @@ public class FramePoint extends RelativePoint implements Serializable {
             else{
                 sound.playSound(getLocation(group), group, animator);
             }
+        }
+    }
 
+    /**
+     * Play the sounds of this point at a specified location, with their intended delays.
+     * @param group the relative group
+     * @param location the location to show the particles
+     * @param animator the animator attempting to play group effects
+     * @param limited whether to limit the played audio only to players who can visibly see the group
+     */
+    public void playSounds(@NotNull ActiveGroup<?> group, @NotNull Location location, @Nullable DisplayAnimator animator, boolean limited){
+        for (AnimationSound sound : sounds.values()){
+            if (limited){
+                sound.playSound(location, group, animator, getPlayers(group));
+            }
+            else{
+                sound.playSound(location, group, animator);
+            }
         }
     }
 
@@ -239,7 +267,7 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param group the relative group
      * @param limited whether to limit the played audio only to players who can visibly see the group
      */
-    public void playSounds(@NotNull ActiveGroup group, boolean limited){
+    public void playSounds(@NotNull ActiveGroup<?> group, boolean limited){
         Location location = getLocation(group);
         if (limited){
             playSounds(location, getPlayers(group));

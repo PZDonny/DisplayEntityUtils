@@ -4,8 +4,6 @@ import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -304,7 +302,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a location relative to a {@link ActiveGroup}
      * @param group the relative group
      */
-    public void playSounds(@NotNull ActiveGroup group){
+    public void playSounds(@NotNull ActiveGroup<?> group){
         playSounds(group, null, true);
     }
 
@@ -314,7 +312,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param animator the animator attempting to play the sounds
      * @param limited whether the effects should only be played to players who can see the group
      */
-    public void playSounds(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
+    public void playSounds(@NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, boolean limited){
         for (FramePoint framePoint : framePoints.values()){
             framePoint.playSounds(group, animator, limited);
         }
@@ -325,7 +323,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param player the player
      * @param group the relative group
      */
-    public void playSounds(@NotNull Player player, @NotNull ActiveGroup group){
+    public void playSounds(@NotNull Player player, @NotNull ActiveGroup<?> group){
         for (FramePoint framePoint : framePoints.values()){
             framePoint.playSounds(group, player);
         }
@@ -357,7 +355,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * Show the particles that will be displayed at the start of this frame
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
      */
-    public void showParticles(@NotNull ActiveGroup group){
+    public void showParticles(@NotNull ActiveGroup<?> group){
         showParticles(group, null, true);
     }
 
@@ -368,7 +366,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param animator the animator attempting to show the particles
      * @param limited whether the effects should only be played to players who can see the group
      */
-    public void showParticles(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
+    public void showParticles(@NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, boolean limited){
         for (FramePoint framePoint : framePoints.values()){
             framePoint.showParticles(group, animator, limited);
         }
@@ -379,7 +377,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param player
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
      */
-    public void showParticles(@NotNull Player player, @NotNull ActiveGroup group){
+    public void showParticles(@NotNull Player player, @NotNull ActiveGroup<?> group){
         for (FramePoint framePoint : framePoints.values()){
             framePoint.showParticles(group, player);
         }
@@ -390,7 +388,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param players
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
      */
-    public void showParticles(@NotNull Collection<Player> players, @NotNull ActiveGroup group){
+    public void showParticles(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group){
         for (FramePoint framePoint : framePoints.values()){
             framePoint.showParticles(group, players);
         }
@@ -431,9 +429,10 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param animator the animator attempting to play the effects
      * @param limited whether the effects should only be played to players who can see the group
      */
-    public void playEffects(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
-        playSounds(group, animator, limited);
-        showParticles(group, animator, limited);
+    public void playEffects(@NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, boolean limited){
+        for (FramePoint point : framePoints.values()){
+            point.playEffects(group, animator, limited);
+        }
     }
 
     /**
@@ -442,9 +441,10 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param player the player to show the effects to
      * @param group the group to play these effects for
      */
-    public void playEffects(@NotNull Player player, @NotNull ActiveGroup group){
-        playSounds(player, group);
-        showParticles(player, group);
+    public void playEffects(@NotNull Player player, @NotNull ActiveGroup<?> group){
+        for (FramePoint point : framePoints.values()){
+            point.playEffects(group, player);
+        }
     }
     /**
      * Play all effects that are contained within every {@link FramePoint}
@@ -452,9 +452,10 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param players the players to show the effects to
      * @param group the group to play these effects for
      */
-    public void playEffects(@NotNull Collection<Player> players, @NotNull ActiveGroup group){
-        playSounds(players, group);
-        showParticles(players, group);
+    public void playEffects(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group){
+        for (FramePoint point : framePoints.values()){
+            point.playEffects(group, players);
+        }
     }
 
     void setDisplayEntityTransformation(ActivePart part, DisplayTransformation transformation){

@@ -23,11 +23,11 @@ public abstract class RelativePoint implements Serializable {
     float groupPitchAtCreation;
 
     /**
-     * Create a point that is relative to the origin of a {@link SpawnedDisplayEntityGroup}
+     * Create a point that is relative to the origin of a {@link ActiveGroup}
      * @param group the group that the point relative to
      * @param location the relative location that the point represents
      */
-    public RelativePoint(@NotNull String pointTag, @NotNull ActiveGroup<?> group, @NotNull Location location){
+    RelativePoint(@NotNull String pointTag, @NotNull ActiveGroup<?> group, @NotNull Location location){
         this(pointTag, location.toVector().subtract(group.getLocation().toVector()), group.getLocation().getYaw(), group.getLocation().getPitch());
     }
 
