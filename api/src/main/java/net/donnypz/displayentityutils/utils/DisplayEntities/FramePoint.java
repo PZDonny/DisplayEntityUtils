@@ -57,7 +57,7 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param limited whether to spawn the effects only to players who can visibly see the group
      */
     public void playEffects(@NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, boolean limited){
-        Location spawnLoc = group.getLocation();
+        Location spawnLoc = getLocation(group);
         showParticles(group, spawnLoc, animator, limited);
         playSounds(group, spawnLoc, animator, limited);
     }
