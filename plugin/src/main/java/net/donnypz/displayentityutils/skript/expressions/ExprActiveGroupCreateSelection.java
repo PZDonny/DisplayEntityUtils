@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
         "set {_selection} to a new part selection of {_spawnedgroup}",
         "",
         "#3.3.4 and later",
-        "set {_selection} to a new part selection from {_packetgroup}"})
+        "set {_selection} to a new part filter from {_packetgroup}"})
 @Since("2.6.2, 3.3.4 (Filter Syntax)")
 public class ExprActiveGroupCreateSelection extends SimpleExpression<MultiPartSelection> {
 
