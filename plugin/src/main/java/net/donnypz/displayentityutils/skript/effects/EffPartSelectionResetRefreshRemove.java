@@ -56,6 +56,6 @@ public class EffPartSelectionResetRefreshRemove extends Effect {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "refresh/reset/remove part selection: "+selections.toString(event, debug);
+        return "refresh/reset/remove part filter: "+selections.toString(event, debug);
     }
 }
