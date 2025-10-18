@@ -38,14 +38,14 @@ public class GroupInfoCMD extends PlayerSubCommand {
         player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: <yellow>"+groupTag));
         player.sendMessage(MiniMessage.miniMessage().deserialize("World: <yellow>"+group.getWorldName()));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Total Parts: <yellow>"+(group.getParts().size())));
+        String packetBased = group instanceof PacketDisplayEntityGroup ? "<green>TRUE" : "<red>FALSE";
+        String persistence = group.isPersistent() ? "<green>TRUE" : "<red>FALSE";
+
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Is Packet Based: "+packetBased));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Is Persistent: "+persistence));
+
         if (group instanceof SpawnedDisplayEntityGroup sg){
-            player.sendMessage(MiniMessage.miniMessage().deserialize("Is Packet Based: <red>FALSE"));
-            player.sendMessage(MiniMessage.miniMessage().deserialize("Is Persistent: <yellow>"+sg.isPersistent()));
             player.sendMessage(MiniMessage.miniMessage().deserialize("Chunk Load Persistence Overriding: <yellow>"+sg.allowsPersistenceOverriding()));
-        }
-        else if (group instanceof PacketDisplayEntityGroup pg){
-            player.sendMessage(MiniMessage.miniMessage().deserialize("Is Packet Based: <green>TRUE"));
-            player.sendMessage(MiniMessage.miniMessage().deserialize("Is Persistent (Exists after restart): <yellow>"+pg.isPersistent()));
         }
 
         Location loc = group.getLocation();
