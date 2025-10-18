@@ -97,25 +97,37 @@ public final class DisplayUtils {
                 .rotate(transformation.getRightRotation());
     }
 
-    public static Vector3f pivotPitchAndYaw(@NotNull Vector3f translation, float pitch, float yaw){
+    /**
+     * Pivot a vector with a given pitch and yaw change
+     * @param vector the vector
+     * @param pitchChange the pitch change
+     * @param yawChange the yaw change
+     * @return a new vector with the pivot applied
+     */
+    public static Vector3f pivotPitchAndYaw(@NotNull Vector3f vector, float pitchChange, float yawChange){
         //Apply Pitch
-        double pitchAsRad = Math.toRadians(pitch);
+        double pitchAsRad = Math.toRadians(pitchChange);
         double sin = Math.sin(pitchAsRad);
         double cos = Math.cos(pitchAsRad);
-        float translationY = translation.y;
-        float translationZ = translation.z;
 
-        translation.y = (float) (translationY * cos - translationZ * sin);
-        translation.z = (float) (translationY * sin + translationZ * cos);
+        float y = (float) (vector.y * cos - vector.z * sin);
+        float z = (float) (vector.y * sin + vector.z * cos);
 
         //Apply Yaw
         return new Quaternionf()
-                .rotateY((float) Math.toRadians(-yaw))
-                .transform(translation);
+                .rotateY((float) Math.toRadians(-yawChange))
+                .transform(new Vector3f(vector.x, y, z));
     }
 
-    public static Vector pivotPitchAndYaw(@NotNull Vector vector, float pitch, float yaw){
-        return Vector.fromJOML(pivotPitchAndYaw(vector.toVector3f(), pitch, yaw));
+    /**
+     * Pivot a vector with a given pitch and yaw change
+     * @param vector the vector
+     * @param pitchChange the pitch change
+     * @param yawChange the yaw change
+     * @return a new vector with the pivot applied
+     */
+    public static Vector pivotPitchAndYaw(@NotNull Vector vector, float pitchChange, float yawChange){
+        return Vector.fromJOML(pivotPitchAndYaw(vector.toVector3f(), pitchChange, yawChange));
     }
 
     /**
@@ -150,9 +162,8 @@ public final class DisplayUtils {
             translationVector.add(centeringVec);
         }
 
-        pivotPitchAndYaw(translationVector, display.getPitch(), display.getYaw());
-
-        translationLoc.add(Vector.fromJOML(translationVector));
+        Vector3f pivotedVector = pivotPitchAndYaw(translationVector, display.getPitch(), display.getYaw());
+        translationLoc.add(Vector.fromJOML(pivotedVector));
         return translationLoc;
     }
 
@@ -181,7 +192,7 @@ public final class DisplayUtils {
      * @param part The entity to get the location from
      * @return the location where the part is translated at. Null if the part is an interaction entity
      */
-    public static @Nullable Location getModelLocation(@NotNull PacketDisplayEntityPart part){
+    public static @Nullable Location getModelLocation(@NotNull ActivePart part){
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
             return null;
         }
@@ -201,9 +212,8 @@ public final class DisplayUtils {
             translationVector.add(centerVec);
         }
 
-        pivotPitchAndYaw(translationVector, pitch, yaw);
-
-        translationLoc.add(Vector.fromJOML(translationVector));
+        Vector3f pivotedVector = pivotPitchAndYaw(translationVector, pitch, yaw);
+        translationLoc.add(Vector.fromJOML(pivotedVector));
         return translationLoc;
     }
 
