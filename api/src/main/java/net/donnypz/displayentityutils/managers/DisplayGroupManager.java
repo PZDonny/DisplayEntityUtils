@@ -529,7 +529,13 @@ public final class DisplayGroupManager {
         return DisplayAPI.getStorage(loadMethod).getGroupTags();
     }
 
-    static void addPersistentPacketGroupSilent(@NotNull Location location, @NotNull DisplayEntityGroup displayEntityGroup, boolean autoShow){
+    @ApiStatus.Internal
+    public static void addPersistentPacketGroup(@NotNull PacketDisplayEntityGroup group, @NotNull Location location){
+        if (group.isPersistent()) return;
+        addPersistentPacketGroupSilent(group, location, group.toDisplayEntityGroup());
+    }
+
+    static void addPersistentPacketGroupSilent(@NotNull PacketDisplayEntityGroup group, @NotNull Location location, @NotNull DisplayEntityGroup displayEntityGroup){
         Chunk c = location.getChunk();
         PersistentDataContainer pdc = c.getPersistentDataContainer();
         Gson gson = new Gson();
@@ -541,12 +547,13 @@ public final class DisplayGroupManager {
         else{
             id = gson.fromJson(list.getLast(), PersistentPacketGroup.class).id+1;
         }
-        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, autoShow);
+        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, group.isAutoShow());
         if (cpg == null) return;
 
         String json = gson.toJson(cpg);
         list.add(json);
         pdc.set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
+        group.setPersistentIds(id, c);
     }
 
     @ApiStatus.Internal
@@ -615,7 +622,7 @@ public final class DisplayGroupManager {
             if (storedChunk.getChunkKey() != ConversionUtils.getChunkKey(chunkX, chunkZ)){ //Group in new location
                 //Remove and add to new chunk
                 list.remove(i);
-                addPersistentPacketGroupSilent(currentLoc, group.toDisplayEntityGroup(), group.isAutoShow());
+                addPersistentPacketGroupSilent(group, currentLoc, group.toDisplayEntityGroup());
             }
             else{
                 cpg.autoShow = group.isAutoShow();
