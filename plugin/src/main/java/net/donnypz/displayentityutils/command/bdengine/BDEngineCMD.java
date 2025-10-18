@@ -5,12 +5,11 @@ import net.donnypz.displayentityutils.command.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
-public final class BDEngineCMD extends PlayerSubCommand {
+public final class BDEngineCMD extends ConsoleUsableSubCommand {
 
     public BDEngineCMD(){
-        super(Permission.HELP, true);
+        super(Permission.HELP, new BDEngineHelpCMD());
         new BDEngineConvertDatapackCMD(this);
         new BDEngineConvertLegacyDatapackCMD(this);
         new BDEngineImportModelCMD(this);
@@ -18,22 +17,22 @@ public final class BDEngineCMD extends PlayerSubCommand {
     }
 
     @Override
-    public void execute(Player player, String[] args) {
+    public void execute(CommandSender sender, String[] args) {
         if (args.length < 2){
-            conversionHelp(player);
+            help(sender, 1);
             return;
         }
         String arg = args[1];
         DEUSubCommand subCommand = subCommands.get(arg);
         if (subCommand == null){
-            conversionHelp(player);
+            help(sender, 1);
         }
         else{
-            DisplayEntityPluginCommand.executeCommand(subCommand, player, args);
+            DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
         }
     }
 
-    static void conversionHelp(CommandSender sender){
+    static void help(CommandSender sender, int page){
         sender.sendMessage(DisplayAPI.pluginPrefixLong);
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Use <yellow>\"block-display.com\" (BDEngine) <aqua>to create convertable models and animations"));
         sender.sendMessage(Component.empty());
@@ -44,6 +43,6 @@ public final class BDEngineCMD extends PlayerSubCommand {
                 "Convert a datapack from BDEngine into group and animation files usable for DisplayEntityUtils");
         CMDUtils.sendCMD(sender, "/mdis bdengine convertdpleg <datapack-name> <group-tag-to-set> <anim-tag-to-set>",
                 "Convert an old datapack from BDEngine, before BDEngine v1.13 (Dec. 8th 2024), into group and animation files usable for DisplayEntityUtils");
-        sender.sendMessage(Component.empty());
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>--------------------------"));
     }
 }

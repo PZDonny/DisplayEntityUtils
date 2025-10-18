@@ -8,9 +8,8 @@ public abstract class DEUSubCommand {
     Permission permission;
     protected final HashMap<String, DEUSubCommand> subCommands = new HashMap<>();
 
-    DEUSubCommand(@NotNull Permission permission, boolean hasHelpCommand){
+    DEUSubCommand(@NotNull Permission permission){
         this.permission = permission;
-        if (hasHelpCommand) subCommands.put("help", null);
     }
 
     DEUSubCommand(@NotNull Permission permission, @NotNull DEUSubCommand helpSubCommand){
@@ -19,12 +18,18 @@ public abstract class DEUSubCommand {
     }
 
     DEUSubCommand(String commandName, @NotNull DEUSubCommand parentSubCommand, @NotNull Permission permission){
-        parentSubCommand.subCommands.put(commandName, this);
         this.permission = permission;
+        parentSubCommand.subCommands.put(commandName, this);
+
     }
 
     public Permission getPermission() {
         return permission;
     }
+
+    public boolean isHelpCommand(){
+        return permission == Permission.HELP;
+    }
+
 
 }

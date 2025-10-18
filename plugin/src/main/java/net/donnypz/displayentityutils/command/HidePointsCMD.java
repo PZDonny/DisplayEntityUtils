@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 class HidePointsCMD extends PlayerSubCommand {
     HidePointsCMD() {
-        super(Permission.HELP, false);
+        super(Permission.HELP);
     }
 
     @Override

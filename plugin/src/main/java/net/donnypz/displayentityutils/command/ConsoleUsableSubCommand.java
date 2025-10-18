@@ -4,8 +4,8 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class ConsoleUsableSubCommand extends DEUSubCommand {
-    public ConsoleUsableSubCommand(@NotNull Permission permission, boolean hasHelpCommand) {
-        super(permission, hasHelpCommand);
+    public ConsoleUsableSubCommand(@NotNull Permission permission) {
+        super(permission);
     }
 
     public ConsoleUsableSubCommand(@NotNull Permission permission, @NotNull DEUSubCommand helpSubCommand) {

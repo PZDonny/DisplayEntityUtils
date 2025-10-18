@@ -1,28 +1,27 @@
-package net.donnypz.displayentityutils.command.interaction;
+package net.donnypz.displayentityutils.command.bdengine;
 
 import net.donnypz.displayentityutils.command.ConsoleUsableSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import org.bukkit.command.CommandSender;
 
-class InteractionHelpCMD extends ConsoleUsableSubCommand {
+public class BDEngineHelpCMD extends ConsoleUsableSubCommand {
 
-    InteractionHelpCMD() {
+    public BDEngineHelpCMD() {
         super(Permission.HELP);
     }
 
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length < 3){
-            InteractionCMD.interactionHelp(sender, 1);
+            BDEngineCMD.help(sender, 1);
         }
         else{
             try{
-                InteractionCMD.interactionHelp(sender, Integer.parseInt(args[2]));
+                BDEngineCMD.help(sender, Integer.parseInt(args[2]));
             }
             catch(NumberFormatException e){
-                InteractionCMD.interactionHelp(sender, 1);
+                BDEngineCMD.help(sender, 1);
             }
         }
     }
-
 }
