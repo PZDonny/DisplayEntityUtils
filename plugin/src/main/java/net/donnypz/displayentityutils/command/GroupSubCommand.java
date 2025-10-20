@@ -19,13 +19,6 @@ public abstract class GroupSubCommand extends PlayerSubCommand{
         this.refreshIfPersistentPacket = refreshIfPersistentPacket;
     }
 
-    public GroupSubCommand(@NotNull String commandName, @NotNull DEUSubCommand parentSubCommand, @NotNull Permission permission, int minimumArgs, boolean refreshIfPersistentPacket, boolean requireGroupSelection) {
-        super(commandName, parentSubCommand, permission);
-        this.minimumArgs = minimumArgs;
-        this.requireGroupSelection = requireGroupSelection;
-        this.refreshIfPersistentPacket = refreshIfPersistentPacket;
-    }
-
     @Override
     public void execute(Player player, String[] args) {
         ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(player);
