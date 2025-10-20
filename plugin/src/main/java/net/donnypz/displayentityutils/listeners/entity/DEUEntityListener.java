@@ -94,7 +94,7 @@ public final class DEUEntityListener implements Listener {
 
         ActiveGroup<?> controllerGroup = DisplayControllerManager.getControllerGroup(entity.getUniqueId());
         if (controllerGroup instanceof PacketDisplayEntityGroup pg){
-            pg.updateChunkAndWorld(e.getTo());
+            pg.teleport(e.getTo(), true);
         }
     }
 

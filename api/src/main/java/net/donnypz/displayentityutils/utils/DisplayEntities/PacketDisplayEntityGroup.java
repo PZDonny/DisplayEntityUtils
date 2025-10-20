@@ -158,8 +158,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         allPacketGroups.remove(world.getName());
     }
 
-    @ApiStatus.Internal
-    public void updateChunkAndWorld(@NotNull Location location){
+    void updateChunkAndWorld(@NotNull Location location){
         Location oldLoc = getLocation();
         //Remove from previous
         if (oldLoc != null){
@@ -548,8 +547,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 else{
                     masterPart.teleportUnsetPassengers(tpLocation);
                 }
-                DisplayGroupManager.updatePersistentPacketGroup(PacketDisplayEntityGroup.this);
-
+                PacketDisplayEntityGroup.this.refresh();
             }
         }.runTaskTimerAsynchronously(DisplayAPI.getPlugin(), 0, 1);
     }
@@ -574,7 +572,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 part.setRotation(tpLocation.getPitch(), tpLocation.getYaw(), false);
             }
         }
-        DisplayGroupManager.updatePersistentPacketGroup(this);
+        this.refresh();
     }
 
     private void attemptLocationUpdate(Location oldLoc, Location newLoc, boolean allowHide){
@@ -674,6 +672,16 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     /**
+     * Refresh this {@link PacketDisplayEntityGroup}'s saved data after any changes are made to it. <br>
+     * This only applies to persistent groups that need any changes done to apply to the next server session.
+     */
+    public void refresh(){
+        if (isPersistent()){
+            DisplayGroupManager.refreshPersistentPacketGroup(this);
+        }
+    }
+
+    /**
      *
      * @return a cloned {@link PacketDisplayEntityGroup}
      */
@@ -729,7 +737,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         boolean oldAutoshow = this.autoShow;
         this.autoShow = autoShow;
         if (oldAutoshow != autoShow){
-            DisplayGroupManager.updatePersistentPacketGroup(this);
+            this.refresh();
             if (autoShow){
                 Location loc = getLocation();
                 if (loc != null){

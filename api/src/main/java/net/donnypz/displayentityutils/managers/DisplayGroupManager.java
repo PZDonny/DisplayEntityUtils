@@ -553,30 +553,30 @@ public final class DisplayGroupManager {
     }
 
     @ApiStatus.Internal
-    public static void updatePersistentPacketGroup(@NotNull PacketDisplayEntityGroup packetDisplayEntityGroup){
+    public static void refreshPersistentPacketGroup(@NotNull PacketDisplayEntityGroup packetDisplayEntityGroup){
         if (!packetDisplayEntityGroup.isPersistent()) return;
         String persistentGlobalId = packetDisplayEntityGroup.getPersistentGlobalId();
         String[] split = persistentGlobalId.split("\\|");
         long chunkKey = Long.parseLong(split[1]);
         int localId = Integer.parseInt(split[2]);
-        updatePersistentPacketGroup(packetDisplayEntityGroup, Bukkit.getWorld(split[0]), chunkKey, localId);
+        refreshPersistentPacketGroup(packetDisplayEntityGroup, Bukkit.getWorld(split[0]), chunkKey, localId);
 
     }
 
     @ApiStatus.Internal
-    public static void updatePersistentPacketGroup(@NotNull String persistentGlobalId){
+    public static void refreshPersistentPacketGroup(@NotNull String persistentGlobalId){
         try{
             PacketDisplayEntityGroup g = PacketDisplayEntityGroup.getGroup(persistentGlobalId);
             if (g == null || !g.isPersistent()) return;
             String[] split = persistentGlobalId.split("\\|");
             long chunkKey = Long.parseLong(split[1]);
             int localId = Integer.parseInt(split[2]);
-            updatePersistentPacketGroup(g, Bukkit.getWorld(split[0]), chunkKey, localId);
+            refreshPersistentPacketGroup(g, Bukkit.getWorld(split[0]), chunkKey, localId);
         }
         catch(IndexOutOfBoundsException | NumberFormatException e){}
     }
 
-    private static void updatePersistentPacketGroup(PacketDisplayEntityGroup group, World world, long chunkKey, int localId){
+    private static void refreshPersistentPacketGroup(PacketDisplayEntityGroup group, World world, long chunkKey, int localId){
         Chunk storedChunk = world.getChunkAt(chunkKey);
         PersistentDataContainer pdc = storedChunk.getPersistentDataContainer();
         List<String> list = getChunkList(pdc);

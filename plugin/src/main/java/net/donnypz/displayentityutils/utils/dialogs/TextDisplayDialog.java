@@ -284,7 +284,7 @@ public final class TextDisplayDialog{
             if (!backgroundColorSuccess) p.sendMessage(Component.text("| Failed to set background color. Invalid color input.", NamedTextColor.YELLOW));
             ActiveGroup<?> selected = DEUUser.getOrCreateUser(p).getSelectedGroup();
             if (selected instanceof PacketDisplayEntityGroup pdeg && pdeg.isPersistent()){
-                DisplayGroupManager.updatePersistentPacketGroup(pdeg);
+                pdeg.refresh();
             }
 
         }, ClickCallback.Options.builder().uses(ClickCallback.UNLIMITED_USES).build());
