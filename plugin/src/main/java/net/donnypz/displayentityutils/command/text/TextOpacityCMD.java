@@ -13,7 +13,8 @@ import org.jetbrains.annotations.Nullable;
 
 class TextOpacityCMD extends PartsSubCommand {
     TextOpacityCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("opacity", parentSubCommand, Permission.TEXT_OPACITY, 3, 4);
+        super("opacity", parentSubCommand, Permission.TEXT_OPACITY, 3, 3);
+        setTabComplete(2, "<0-1>");
     }
 
     @Override

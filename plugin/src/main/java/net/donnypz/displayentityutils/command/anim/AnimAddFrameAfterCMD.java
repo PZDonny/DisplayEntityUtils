@@ -21,6 +21,9 @@ import java.util.List;
 class AnimAddFrameAfterCMD extends PlayerSubCommand {
     AnimAddFrameAfterCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("addframeafter", parentSubCommand, Permission.ANIM_ADD_FRAME);
+        setTabComplete(2, "<frame-id>");
+        setTabComplete(3, "<tick-delay>");
+        setTabComplete(4, "<tick-duration>");
     }
 
     @Override

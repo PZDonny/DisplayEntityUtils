@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 class PartsGlowColorCMD extends PartsSubCommand {
     PartsGlowColorCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("glowcolor", parentSubCommand, Permission.PARTS_GLOW_COLOR, 3, 3);
+        setTabComplete(2, TabSuggestion.COLORS);
     }
 
     @Override

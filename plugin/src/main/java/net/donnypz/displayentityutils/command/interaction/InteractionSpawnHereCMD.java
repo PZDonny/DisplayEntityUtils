@@ -12,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 class InteractionSpawnHereCMD extends PlayerSubCommand {
     InteractionSpawnHereCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("spawnhere", parentSubCommand, Permission.INTERACTION_SPAWN);
+        setTabComplete(2, "<height>");
+        setTabComplete(3, "<width>");
     }
 
     @Override

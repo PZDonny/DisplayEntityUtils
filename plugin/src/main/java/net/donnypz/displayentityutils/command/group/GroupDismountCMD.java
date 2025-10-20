@@ -18,9 +18,13 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 class GroupDismountCMD extends ConsoleUsableSubCommand {
     GroupDismountCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("dismount", parentSubCommand, Permission.GROUP_DISMOUNT);
+        setTabComplete(2, List.of("-target", "-selected", "player-name", "entity-uuid"));
+        setTabComplete(3, "-despawn");
     }
 
     @Override

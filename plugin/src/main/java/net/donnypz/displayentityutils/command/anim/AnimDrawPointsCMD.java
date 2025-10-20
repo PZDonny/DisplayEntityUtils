@@ -18,9 +18,20 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 class AnimDrawPointsCMD extends PlayerSubCommand {
     AnimDrawPointsCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("drawpoints", parentSubCommand, Permission.ANIM_DRAW_FRAME_POINTS);
+        setTabComplete(2, List.of("straight", "arc"));
+        setTabComplete(3, "<point-tag>");
+        setTabComplete(4, "<start-frame>");
+        setTabComplete(5, "<end-frame>");
+        setTabComplete(6, "[points-per-frame]");
+    }
+
+    private void incorrectUsage(Player player){
+        player.sendMessage(Component.text("Incorrect Usage! /mdis anim drawpoints <straight | arc> <point-tag> <start-frame> <end-frame> [points-per-frame]", NamedTextColor.RED));
     }
 
     @Override
@@ -133,10 +144,6 @@ class AnimDrawPointsCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("| Start Frame ID cannot be < 0", NamedTextColor.RED));
             player.sendMessage(Component.text("| End Frame ID cannot be >= # of frames in animation", NamedTextColor.RED));
         }
-    }
-
-    private void incorrectUsage(Player player){
-        player.sendMessage(Component.text("Incorrect Usage! /mdis anim drawpoints <straight | arc> <point-tag> <start-frame> <end-frame> [points-per-frame]", NamedTextColor.RED));
     }
 
     private void invalidPos(Player player){

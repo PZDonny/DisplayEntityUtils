@@ -22,6 +22,10 @@ import org.jetbrains.annotations.NotNull;
 class AnimAddSoundCMD extends PlayerSubCommand {
     AnimAddSoundCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("addsound", parentSubCommand, Permission.ANIM_ADD_SOUND);
+        setTabComplete(2, "<sound>");
+        setTabComplete(3, "<volume>");
+        setTabComplete(4, "<pitch>");
+        setTabComplete(5, "<delay-in-ticks>");
     }
 
     @Override
@@ -33,7 +37,7 @@ class AnimAddSoundCMD extends PlayerSubCommand {
             return;
         }
 
-        RelativePointSelector rp = RelativePointUtils.getRelativePointSelector(player);
+        RelativePointSelector<?> rp = RelativePointUtils.getRelativePointSelector(player);
         if (!(rp instanceof FramePointSelector display)){
             AnimCMD.noFramePointSelection(player);
             return;

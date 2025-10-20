@@ -13,6 +13,9 @@ import org.jetbrains.annotations.NotNull;
 class BDEngineConvertDatapackCMD extends PlayerSubCommand {
     BDEngineConvertDatapackCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("convertdp", parentSubCommand, Permission.BDENGINE_CONVERT_DATAPACK);
+        setTabComplete(2, "<datapack-name>");
+        setTabComplete(3, "<group-tag-to-set>");
+        setTabComplete(4, "<anim-tag-prefix-to-set>");
     }
 
     @Override

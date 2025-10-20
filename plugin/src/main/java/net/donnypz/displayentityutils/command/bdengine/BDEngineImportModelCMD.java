@@ -22,6 +22,7 @@ class BDEngineImportModelCMD extends PlayerSubCommand {
 
     BDEngineImportModelCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("importmodel", parentSubCommand, Permission.BDENGINE_SPAWN_MODEL);
+        setTabComplete(2, "<model-id>");
     }
 
     @Override

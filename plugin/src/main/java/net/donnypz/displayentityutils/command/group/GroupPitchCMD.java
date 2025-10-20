@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 class GroupPitchCMD extends GroupSubCommand {
     GroupPitchCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("pitch", parentSubCommand, Permission.GROUP_TRANSFORM, 3, true);
+        setTabComplete(2, "<pitch>");
     }
 
     @Override

@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 class PartsFilterTagsCMD extends PlayerSubCommand {
     PartsFilterTagsCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("filtertags", parentSubCommand, Permission.PARTS_SELECT);
+        setTabComplete(2, "<part-tags>");
     }
 
     @Override

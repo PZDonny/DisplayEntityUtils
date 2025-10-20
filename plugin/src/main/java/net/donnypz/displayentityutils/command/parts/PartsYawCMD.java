@@ -18,6 +18,7 @@ class PartsYawCMD extends PlayerSubCommand {
 
     PartsYawCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("yaw", parentSubCommand, Permission.PARTS_TRANSFORM);
+        setTabComplete(2, "<yaw>");
     }
 
     @Override

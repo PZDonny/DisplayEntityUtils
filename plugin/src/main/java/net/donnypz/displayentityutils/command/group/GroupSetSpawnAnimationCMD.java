@@ -14,9 +14,14 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 class GroupSetSpawnAnimationCMD extends GroupSubCommand {
     GroupSetSpawnAnimationCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("setspawnanim", parentSubCommand, Permission.GROUP_SET_SPAWN_ANIM, 5, true);
+        setTabComplete(2, "<anim-tag>");
+        setTabComplete(3, TabSuggestion.STORAGES);
+        setTabComplete(3, List.of("linear", "loop"));
     }
 
     @Override

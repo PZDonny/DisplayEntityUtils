@@ -15,6 +15,8 @@ import org.jetbrains.annotations.Nullable;
 class GroupScaleCMD extends GroupSubCommand {
     GroupScaleCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("scale", parentSubCommand, Permission.GROUP_TRANSFORM, 4, true);
+        setTabComplete(2, "<scale-multiplier>");
+        setTabComplete(3, "<tick-duration>");
     }
 
     @Override

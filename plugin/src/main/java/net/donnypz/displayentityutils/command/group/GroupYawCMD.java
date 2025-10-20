@@ -15,6 +15,8 @@ import org.jetbrains.annotations.Nullable;
 class GroupYawCMD extends GroupSubCommand {
     GroupYawCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("yaw", parentSubCommand, Permission.GROUP_TRANSFORM, 3, true);
+        setTabComplete(2, "<yaw>");
+        setTabComplete(3, "-pivot");
     }
 
     @Override

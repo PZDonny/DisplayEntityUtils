@@ -14,10 +14,14 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.List;
 
 class AnimEditFrameCMD extends PlayerSubCommand {
     AnimEditFrameCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("editframe", parentSubCommand, Permission.ANIM_EDIT_FRAME);
+        setTabComplete(2, List.of("<frame-ids>", "<frame-tag>"));
+        setTabComplete(3, "<tick-delay>");
+        setTabComplete(4, "<tick-duration>");
     }
 
     @Override
@@ -30,7 +34,7 @@ class AnimEditFrameCMD extends PlayerSubCommand {
 
         if (args.length < 5) {
             player.sendMessage(Component.text("Incorrect Usage! /mdis anim editframe <frame-ids | frame-tag> <tick-delay> <tick-duration>", NamedTextColor.RED));
-            player.sendMessage(Component.text("| Enter a frame-tag, a single frame-id, or multiple commas separated ids.", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Enter a frame-tag, a single frame-id, or multiple comma separated ids.", NamedTextColor.GRAY));
             player.sendMessage(Component.text("| First frame is 0, Second frame is 1, and so on...", NamedTextColor.GRAY));
             return;
         }

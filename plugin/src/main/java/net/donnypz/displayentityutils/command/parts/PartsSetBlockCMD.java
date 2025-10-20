@@ -13,9 +13,12 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 class PartsSetBlockCMD extends PartsSubCommand {
     PartsSetBlockCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("setblock", parentSubCommand, Permission.PARTS_SET_BLOCK, 3, 3);
+        setTabComplete(2, List.of("-held", "-target", "<block-id>"));
     }
 
     @Override

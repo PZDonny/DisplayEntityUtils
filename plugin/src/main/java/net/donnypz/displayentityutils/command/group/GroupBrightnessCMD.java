@@ -15,6 +15,8 @@ import org.jetbrains.annotations.Nullable;
 class GroupBrightnessCMD extends GroupSubCommand {
     GroupBrightnessCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("brightness", parentSubCommand, Permission.GROUP_BRIGHTNESS, 4, true);
+        setTabComplete(2, "<block>");
+        setTabComplete(2, "<sky>");
     }
 
     @Override

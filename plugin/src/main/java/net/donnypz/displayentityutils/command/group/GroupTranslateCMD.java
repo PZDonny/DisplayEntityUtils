@@ -17,6 +17,9 @@ import org.jetbrains.annotations.Nullable;
 class GroupTranslateCMD extends GroupSubCommand {
     GroupTranslateCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("translate", parentSubCommand, Permission.GROUP_TRANSFORM, 5, true);
+        setTabComplete(2, TabSuggestion.DIRECTIONS);
+        setTabComplete(3, "<distance>");
+        setTabComplete(4, "<tick-duration>");
     }
 
     @Override

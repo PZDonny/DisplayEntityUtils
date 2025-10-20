@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 class AnimSetTagCMD extends PlayerSubCommand {
     AnimSetTagCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("settag", parentSubCommand, Permission.ANIM_SET_TAG);
+        setTabComplete(2, "<anim-tag>");
     }
 
     @Override

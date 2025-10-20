@@ -23,11 +23,16 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.UUID;
 
 class GroupRideCMD extends ConsoleUsableSubCommand {
     GroupRideCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("ride", parentSubCommand, Permission.GROUP_RIDE);
+        setTabComplete(2, List.of("-target", "player-name | entity-uuid"));
+        setTabComplete(3, "[group-tag]");
+        setTabComplete(4, "[storage]");
+        setTabComplete(5, "[controller-id]");
     }
 
     @Override

@@ -89,8 +89,8 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group despawn", "Despawn your selected group");
         }
         else if (page == 2){
-            CMDUtils.sendCMD(sender, "/mdis group save <storage-location>", "Save your selected group");
-            CMDUtils.sendCMD(sender, "/mdis group delete <group-tag> <storage-location>", "Delete a saved group from a storage location");
+            CMDUtils.sendCMD(sender, "/mdis group save <storage>", "Save your selected group");
+            CMDUtils.sendCMD(sender, "/mdis group delete <group-tag> <storage>", "Delete a saved group from a storage location");
             CMDUtils.sendCMD(sender, "/mdis group topacket [-confirm] [-keep]", "Make your selected group packet-based, making it unselectable. \"-confirm\" confirms the action."+
                     " \"-keep\" keeps the non-packet based version of your group spawned.");
             CMDUtils.sendCMD(sender, "/mdis group markpacketgroups", "Create markers for all packet groups stored in your current chunk");

@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 class GroupSaveCMD extends PlayerSubCommand {
     GroupSaveCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("save", parentSubCommand, Permission.GROUP_SAVE);
+        setTabComplete(2, TabSuggestion.STORAGES);
     }
 
     @Override

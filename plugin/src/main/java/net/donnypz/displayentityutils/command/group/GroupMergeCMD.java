@@ -18,6 +18,7 @@ import java.util.List;
 class GroupMergeCMD extends GroupSubCommand {
     GroupMergeCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("merge", parentSubCommand, Permission.GROUP_MERGE, 3, false);
+        setTabComplete(2, "<distance>");
     }
 
     @Override

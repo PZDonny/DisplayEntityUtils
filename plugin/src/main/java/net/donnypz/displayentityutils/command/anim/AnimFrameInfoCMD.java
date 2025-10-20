@@ -23,6 +23,7 @@ class AnimFrameInfoCMD extends PlayerSubCommand {
 
     AnimFrameInfoCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("frameinfo", parentSubCommand, Permission.ANIM_FRAME_INFO);
+        setTabComplete(2, "<frame-id>");
     }
 
     @Override

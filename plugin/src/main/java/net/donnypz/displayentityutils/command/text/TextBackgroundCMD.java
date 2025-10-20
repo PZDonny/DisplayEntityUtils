@@ -15,7 +15,9 @@ import org.jetbrains.annotations.Nullable;
 
 class TextBackgroundCMD extends PartsSubCommand {
     TextBackgroundCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("background", parentSubCommand, Permission.TEXT_BACKGROUND, 4, 5);
+        super("background", parentSubCommand, Permission.TEXT_BACKGROUND, 4, 4);
+        setTabComplete(2, TabSuggestion.COLORS);
+        setTabComplete(3, "<0-1>");
     }
 
     @Override

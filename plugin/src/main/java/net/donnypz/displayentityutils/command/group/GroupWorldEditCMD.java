@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 class GroupWorldEditCMD extends PlayerSubCommand {
     GroupWorldEditCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("wetogroup", parentSubCommand, Permission.GROUP_WORLD_EDIT);
+        setTabComplete(2, "-remove");
     }
 
     @Override

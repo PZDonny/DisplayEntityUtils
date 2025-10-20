@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 class InteractionWidthCMD extends PlayerSubCommand {
     InteractionWidthCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("width", parentSubCommand, Permission.INTERACTION_DIMENSION);
+        setTabComplete(2, "<width>");
     }
 
     @Override

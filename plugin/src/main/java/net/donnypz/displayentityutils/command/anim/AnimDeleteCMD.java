@@ -16,12 +16,14 @@ import org.jetbrains.annotations.NotNull;
 class AnimDeleteCMD extends PlayerSubCommand {
     AnimDeleteCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("delete", parentSubCommand, Permission.ANIM_DELETE);
+        setTabComplete(2, "<anim-tag>");
+        setTabComplete(3, TabSuggestion.STORAGES);
     }
 
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 4) {
-            player.sendMessage(Component.text("/mdis anim delete <anim-tag> <storage-location>", NamedTextColor.RED));
+            player.sendMessage(Component.text("/mdis anim delete <anim-tag> <storage>", NamedTextColor.RED));
             return;
         }
 

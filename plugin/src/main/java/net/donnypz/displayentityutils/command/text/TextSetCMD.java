@@ -20,6 +20,7 @@ class TextSetCMD extends PartsSubCommand {
 
     public TextSetCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("set", parentSubCommand, Permission.TEXT_SET_TEXT, 3, 0);
+        setTabComplete(2, "<text>");
     }
 
     @Override

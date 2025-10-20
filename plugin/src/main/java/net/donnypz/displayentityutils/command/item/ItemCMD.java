@@ -40,7 +40,7 @@ public final class ItemCMD extends ConsoleUsableSubCommand {
         CMDUtils.sendCMD(sender,"/mdis item help", "Get help for item displays");
         CMDUtils.sendCMD(sender, "/mdis item set <\"-held\" | item-id> [-all]", "Change the item of a item display part");
         CMDUtils.sendCMD(sender, "/mdis item transform <transform-type> [-all]", "Change the item display transform of a item display part");
-        CMDUtils.sendCMD(sender,"/mdis item toggleglint [-all]", "Toggle the enchantment glint of an item display's item");
+        CMDUtils.sendCMD(sender,"/mdis item toggleglint [-all <on | off>]", "Toggle the enchantment glint of an item display's item");
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>--------------------------"));
     }
 }

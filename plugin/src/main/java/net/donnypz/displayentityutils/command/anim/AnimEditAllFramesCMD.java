@@ -16,6 +16,8 @@ import java.util.List;
 class AnimEditAllFramesCMD extends PlayerSubCommand {
     AnimEditAllFramesCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("editallframes", parentSubCommand, Permission.ANIM_EDIT_FRAME);
+        setTabComplete(2, "<tick-delay>");
+        setTabComplete(3, "<tick-duration>");
     }
 
     @Override

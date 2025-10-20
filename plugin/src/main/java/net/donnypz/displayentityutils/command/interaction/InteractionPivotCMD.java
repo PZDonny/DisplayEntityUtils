@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 class InteractionPivotCMD extends PlayerSubCommand {
     InteractionPivotCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("pivot", parentSubCommand, Permission.INTERACTION_PIVOT);
+        setTabComplete(2, "<angle>");
     }
 
     @Override

@@ -15,9 +15,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 class AnimRemoveSoundCMD extends PlayerSubCommand {
     AnimRemoveSoundCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("removesound", parentSubCommand, Permission.ANIM_REMOVE_SOUND);
+        setTabComplete(2, List.of("<sound>", "-all"));
     }
 
     @Override
@@ -28,7 +31,7 @@ class AnimRemoveSoundCMD extends PlayerSubCommand {
             return;
         }
 
-        RelativePointSelector rp = RelativePointUtils.getRelativePointSelector(player);
+        RelativePointSelector<?> rp = RelativePointUtils.getRelativePointSelector(player);
         if (!(rp instanceof FramePointSelector display)){
             AnimCMD.noFramePointSelection(player);
             return;

@@ -16,14 +16,8 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
         super(commandName, parentSubCommand, permission);
         this.minimumArgs = minimumArgs;
         this.allArgumentIndex = allArgumentIndex;
+        setTabComplete(allArgumentIndex, "-all");
         this.requireGroupSelection = false;
-    }
-
-    public PartsSubCommand(@NotNull String commandName, @NotNull DEUSubCommand parentSubCommand, @NotNull Permission permission, int minimumArgs, int allArgumentIndex, boolean requireGroupSelection) {
-        super(commandName, parentSubCommand, permission);
-        this.minimumArgs = minimumArgs;
-        this.allArgumentIndex = allArgumentIndex;
-        this.requireGroupSelection = requireGroupSelection;
     }
 
     @Override

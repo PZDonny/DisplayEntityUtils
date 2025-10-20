@@ -18,9 +18,13 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 class PartsCycleCMD extends PlayerSubCommand {
     PartsCycleCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("cycle", parentSubCommand, Permission.PARTS_CYCLE);
+        setTabComplete(2, List.of("first", "prev", "next", "last"));
+        setTabComplete(3, "[jump]");
     }
 
     @Override

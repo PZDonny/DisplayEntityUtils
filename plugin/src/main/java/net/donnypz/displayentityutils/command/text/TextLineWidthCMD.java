@@ -13,7 +13,8 @@ import org.jetbrains.annotations.Nullable;
 
 class TextLineWidthCMD extends PartsSubCommand {
     TextLineWidthCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("linewidth", parentSubCommand, Permission.TEXT_SET_LINE_WIDTH, 3, 4);
+        super("linewidth", parentSubCommand, Permission.TEXT_SET_LINE_WIDTH, 3, 3);
+        setTabComplete(2, "<width>");
     }
 
     @Override

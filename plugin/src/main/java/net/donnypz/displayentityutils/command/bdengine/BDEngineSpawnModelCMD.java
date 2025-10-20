@@ -20,6 +20,7 @@ public class BDEngineSpawnModelCMD extends PlayerSubCommand {
 
     BDEngineSpawnModelCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("spawnmodel", parentSubCommand, Permission.BDENGINE_SPAWN_MODEL);
+        setTabComplete(2, "<file-name>");
     }
 
     @Override

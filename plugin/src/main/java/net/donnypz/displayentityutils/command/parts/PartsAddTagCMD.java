@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 class PartsAddTagCMD extends PartsSubCommand {
     PartsAddTagCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("addtag", parentSubCommand, Permission.PARTS_TAG, 3, 3);
+        setTabComplete(2,"<part-tag>");
     }
 
     @Override

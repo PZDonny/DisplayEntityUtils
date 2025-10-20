@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 class InteractionHeightCMD extends PlayerSubCommand {
     InteractionHeightCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("height", parentSubCommand, Permission.INTERACTION_DIMENSION);
+        setTabComplete(2, "<height>");
     }
 
     @Override

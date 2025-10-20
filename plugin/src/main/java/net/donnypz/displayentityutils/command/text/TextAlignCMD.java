@@ -12,9 +12,12 @@ import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 class TextAlignCMD extends PartsSubCommand {
     TextAlignCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("align", parentSubCommand, Permission.TEXT_SET_ALIGNMENT, 3, 4);
+        super("align", parentSubCommand, Permission.TEXT_SET_ALIGNMENT, 3, 3);
+        setTabComplete(2, TabSuggestion.TEXT_DISPLAY_ALIGN);
     }
 
 

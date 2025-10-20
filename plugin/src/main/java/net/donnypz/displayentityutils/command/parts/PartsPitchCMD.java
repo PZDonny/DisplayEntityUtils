@@ -17,6 +17,7 @@ class PartsPitchCMD extends PlayerSubCommand {
 
     PartsPitchCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("pitch", parentSubCommand, Permission.PARTS_TRANSFORM);
+        setTabComplete(2, "<pitch>");
     }
 
     @Override

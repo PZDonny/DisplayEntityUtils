@@ -23,6 +23,9 @@ import org.jetbrains.annotations.NotNull;
 public class GroupSpawnCMD extends PlayerSubCommand {
     GroupSpawnCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("spawn", parentSubCommand, Permission.GROUP_SPAWN);
+        setTabComplete(2, "<group-tag>");
+        setTabComplete(3, TabSuggestion.STORAGES);
+        setTabComplete(4, "-packet");
     }
 
     @Override

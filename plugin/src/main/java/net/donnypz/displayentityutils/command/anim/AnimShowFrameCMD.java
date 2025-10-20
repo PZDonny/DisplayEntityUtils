@@ -23,6 +23,7 @@ import java.util.List;
 class AnimShowFrameCMD extends GroupSubCommand {
     AnimShowFrameCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("showframe", parentSubCommand, Permission.ANIM_SHOW_FRAME, 3, true);
+        setTabComplete(2, "<frame-id>");
     }
 
     @Override

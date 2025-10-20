@@ -16,9 +16,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 class AnimPlayCMD extends PlayerSubCommand {
     AnimPlayCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("play", parentSubCommand, Permission.ANIM_PLAY);
+        setTabComplete(2, List.of("-loop", "-packet"));
+        setTabComplete(3, List.of("-loop", "-packet"));
     }
 
     @Override

@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 class GroupShowPersistentPacketGroupsCMD extends PlayerSubCommand {
     GroupShowPersistentPacketGroupsCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("showpacketgroups", parentSubCommand, Permission.GROUP_CHUNK_PACKET_GROUP_VISIBILITY);
+        setTabComplete(2, "-self");
     }
 
     @Override

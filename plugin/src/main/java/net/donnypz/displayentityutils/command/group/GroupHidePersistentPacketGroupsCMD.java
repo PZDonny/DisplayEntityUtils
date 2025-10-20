@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 class GroupHidePersistentPacketGroupsCMD extends PlayerSubCommand {
     GroupHidePersistentPacketGroupsCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("hidepacketgroups", parentSubCommand, Permission.GROUP_CHUNK_PACKET_GROUP_VISIBILITY);
+        setTabComplete(2, "-self");
     }
 
     @Override

@@ -23,6 +23,7 @@ class PartsFilterItemsCMD extends PlayerSubCommand {
 
     PartsFilterItemsCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("filteritems", parentSubCommand, Permission.PARTS_SELECT);
+        setTabComplete(2, "<item-ids>");
     }
 
     @Override

@@ -12,9 +12,14 @@ import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 class InteractionAddCMD extends PlayerSubCommand {
     InteractionAddCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("addcmd", parentSubCommand, Permission.INTERACTION_ADD_CMD);
+        setTabComplete(2, List.of("player", "console"));
+        setTabComplete(3, List.of("left", "right", "both"));
+        setTabComplete(4, "<command>");
     }
 
     @Override

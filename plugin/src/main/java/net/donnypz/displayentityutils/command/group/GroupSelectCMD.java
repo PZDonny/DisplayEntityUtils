@@ -32,6 +32,7 @@ class GroupSelectCMD extends PlayerSubCommand {
             .build();
     GroupSelectCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("select", parentSubCommand, Permission.GROUP_SELECT);
+        setTabComplete(2, "<distance>");
     }
 
     @Override

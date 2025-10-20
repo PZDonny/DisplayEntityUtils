@@ -21,6 +21,7 @@ import java.util.List;
 class AnimPreviewFrameCMD extends PlayerSubCommand {
     AnimPreviewFrameCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("previewframe", parentSubCommand, Permission.ANIM_PREVIEW);
+        setTabComplete(2, "<frame-id>");
     }
 
     @Override

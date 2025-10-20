@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 class GroupViewRangeCMD extends GroupSubCommand {
     GroupViewRangeCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("viewrange", parentSubCommand, Permission.GROUP_VIEWRANGE, 3, true);
+        setTabComplete(2, "<view-range-multiplier>");
     }
 
     @Override

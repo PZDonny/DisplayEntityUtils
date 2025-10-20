@@ -12,13 +12,18 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 class TextSeeThroughCMD extends PartsSubCommand {
     TextSeeThroughCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("seethrough", parentSubCommand, Permission.TEXT_TOGGLE_SEE_THROUGH, 0, 2);
+        setTabComplete(3, List.of("on", "off"));
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {}
+    protected void sendIncorrectUsage(@NotNull Player player) {
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /mdis text seethrough -all <on | off>", NamedTextColor.RED)));
+    }
 
     @Override
     protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {

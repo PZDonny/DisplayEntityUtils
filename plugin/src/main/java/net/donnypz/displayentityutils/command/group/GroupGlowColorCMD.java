@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 class GroupGlowColorCMD extends GroupSubCommand {
     GroupGlowColorCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("glowcolor", parentSubCommand, Permission.GROUP_GLOW_COLOR, 3, true);
+        setTabComplete(2, TabSuggestion.COLORS);
     }
 
     @Override

@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 class GroupToPacketCMD extends PlayerSubCommand {
     GroupToPacketCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("topacket", parentSubCommand, Permission.GROUP_TO_PACKET);
+        setTabComplete(3, "-keep");
     }
 
     @Override

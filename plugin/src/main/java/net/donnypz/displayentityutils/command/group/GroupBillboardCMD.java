@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 class GroupBillboardCMD extends GroupSubCommand {
     GroupBillboardCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("billboard", parentSubCommand, Permission.GROUP_BILLBOARD, 3, true);
+        setTabComplete(2, TabSuggestion.BILLBOARDS);
     }
 
     @Override

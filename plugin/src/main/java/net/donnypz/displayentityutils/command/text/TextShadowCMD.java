@@ -12,9 +12,12 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 class TextShadowCMD extends PartsSubCommand {
     TextShadowCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("shadow", parentSubCommand, Permission.TEXT_TOGGLE_SHADOW, 0, 2);
+        setTabComplete(3, List.of("on", "off"));
     }
 
     @Override

@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 class PartsBillboardCMD extends PartsSubCommand {
     PartsBillboardCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("billboard", parentSubCommand, Permission.PARTS_BILLBOARD, 3, 3);
+        setTabComplete(2, TabSuggestion.BILLBOARDS);
     }
 
     @Override

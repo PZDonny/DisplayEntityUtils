@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 class AnimUseFilterCMD extends PlayerSubCommand {
     AnimUseFilterCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("usefilter", parentSubCommand, Permission.ANIM_USE_FILTER);
+        setTabComplete(2, "-trim");
     }
 
     @Override

@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 class GroupSetTagCMD extends GroupSubCommand {
     GroupSetTagCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("settag", parentSubCommand, Permission.GROUP_SETTAG, 3, true);
+        setTabComplete(2, "<group-tag>");
     }
 
     @Override

@@ -20,6 +20,8 @@ import java.util.List;
 class AnimSetFrameTagCMD extends PlayerSubCommand {
     AnimSetFrameTagCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("setframetag", parentSubCommand, Permission.ANIM_SET_FRAME_TAG);
+        setTabComplete(2, "<frame-ids>");
+        setTabComplete(3, "<frame-tag>");
     }
 
     @Override

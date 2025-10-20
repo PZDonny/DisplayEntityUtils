@@ -15,7 +15,8 @@ import org.jetbrains.annotations.Nullable;
 class TextFontCMD extends PartsSubCommand {
 
     public TextFontCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("font", parentSubCommand, Permission.TEXT_SET_FONT, 3, 4);
+        super("font", parentSubCommand, Permission.TEXT_SET_FONT, 3, 3);
+        setTabComplete(2, TabSuggestion.TEXT_DISPLAY_FONTS);
     }
 
     @Override

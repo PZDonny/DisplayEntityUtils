@@ -13,9 +13,12 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 class ItemSetCMD extends PartsSubCommand {
     ItemSetCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("set", parentSubCommand, Permission.ITEM_SET,3, 3);
+        setTabComplete(2, List.of("-held", "<item-id>"));
     }
 
     @Override

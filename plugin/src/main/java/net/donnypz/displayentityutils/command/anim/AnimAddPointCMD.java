@@ -20,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 class AnimAddPointCMD extends PlayerSubCommand {
     AnimAddPointCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("addpoint", parentSubCommand, Permission.ANIM_ADD_FRAME_POINT);
+        setTabComplete(2, "<frame-id>");
+        setTabComplete(3, "<point-tag>");
     }
 
     @Override

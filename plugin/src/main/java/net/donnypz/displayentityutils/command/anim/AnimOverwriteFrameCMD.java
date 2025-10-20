@@ -19,6 +19,9 @@ import org.jetbrains.annotations.NotNull;
 class AnimOverwriteFrameCMD extends PlayerSubCommand {
     AnimOverwriteFrameCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("overwriteframe", parentSubCommand, Permission.ANIM_OVERWRITE_FRAME);
+        setTabComplete(2, "<frame-id>");
+        setTabComplete(3, "<tick-delay>");
+        setTabComplete(4, "<tick-duration>");
     }
 
     @Override

@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 class ItemTransformCMD extends PartsSubCommand {
     ItemTransformCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("transform", parentSubCommand, Permission.ITEM_TRANSFORM, 3, 3);
+        setTabComplete(2, TabSuggestion.ITEM_DISPLAY_TRANSFORMS);
     }
 
     @Override

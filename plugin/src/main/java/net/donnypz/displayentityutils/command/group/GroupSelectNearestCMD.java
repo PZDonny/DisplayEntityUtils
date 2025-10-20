@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 class GroupSelectNearestCMD extends PlayerSubCommand {
     GroupSelectNearestCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("selectnearest", parentSubCommand, Permission.GROUP_SELECT);
+        setTabComplete(2, "<distance>");
     }
 
     @Override

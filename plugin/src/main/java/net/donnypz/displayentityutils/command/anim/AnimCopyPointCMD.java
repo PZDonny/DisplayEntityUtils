@@ -18,10 +18,12 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.List;
 
 class AnimCopyPointCMD extends PlayerSubCommand {
     AnimCopyPointCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("copypoint", parentSubCommand, Permission.ANIM_COPY_FRAME_POINT);
+        setTabComplete(2, List.of("<frame-ids>", "<frame-tag>"));
     }
 
     @Override
@@ -32,7 +34,7 @@ class AnimCopyPointCMD extends PlayerSubCommand {
             return;
         }
 
-        RelativePointSelector rp = RelativePointUtils.getRelativePointSelector(player);
+        RelativePointSelector<?> rp = RelativePointUtils.getRelativePointSelector(player);
         if (!(rp instanceof FramePointSelector display)){
             AnimCMD.noFramePointSelection(player);
             return;
@@ -41,7 +43,7 @@ class AnimCopyPointCMD extends PlayerSubCommand {
 
         if (args.length < 3) {
             player.sendMessage(Component.text("Incorrect Usage! /mdis anim copypoint <frame-ids | frame-tag>", NamedTextColor.RED));
-            player.sendMessage(Component.text("| Enter a frame-tag, a single frame-id, or multiple commas separated ids.", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Enter a frame-tag, a single frame-id, or multiple comma separated ids.", NamedTextColor.GRAY));
             return;
         }
 

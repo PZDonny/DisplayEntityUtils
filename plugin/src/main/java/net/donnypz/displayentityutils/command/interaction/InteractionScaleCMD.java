@@ -14,6 +14,10 @@ import org.jetbrains.annotations.NotNull;
 class InteractionScaleCMD extends PlayerSubCommand {
     InteractionScaleCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("scale", parentSubCommand, Permission.INTERACTION_DIMENSION);
+        setTabComplete(2, "<height>");
+        setTabComplete(3, "<width>");
+        setTabComplete(3, "<tick-duration>");
+        setTabComplete(4, "<tick-delay>");
     }
 
     @Override

@@ -14,6 +14,9 @@ import org.jetbrains.annotations.Nullable;
 class GroupMoveCMD extends GroupSubCommand {
     GroupMoveCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("move", parentSubCommand, Permission.GROUP_TRANSFORM, 5, false);
+        setTabComplete(2, TabSuggestion.DIRECTIONS);
+        setTabComplete(3, "<distance>");
+        setTabComplete(4, "<tick-duration>");
     }
 
 

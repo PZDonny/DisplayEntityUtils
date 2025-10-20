@@ -17,6 +17,8 @@ import org.jetbrains.annotations.Nullable;
 class InteractionSpawnCMD extends GroupSubCommand {
     InteractionSpawnCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("spawn", parentSubCommand, Permission.INTERACTION_SPAWN, 4, true);
+        setTabComplete(2, "<height>");
+        setTabComplete(3, "<width>");
     }
 
 

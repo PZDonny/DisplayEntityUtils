@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 class PartsViewRangeCMD extends PartsSubCommand {
     PartsViewRangeCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("viewrange", parentSubCommand, Permission.PARTS_VIEWRANGE, 3, 3);
+        setTabComplete(2, "<view-range-multiplier>");
     }
 
     @Override

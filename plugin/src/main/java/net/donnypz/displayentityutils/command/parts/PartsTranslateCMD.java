@@ -18,6 +18,9 @@ import org.jetbrains.annotations.Nullable;
 class PartsTranslateCMD extends PartsSubCommand {
     PartsTranslateCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("translate", parentSubCommand, Permission.PARTS_TRANSLATE, 5, 5);
+        setTabComplete(2, TabSuggestion.DIRECTIONS);
+        setTabComplete(3, "<distance>");
+        setTabComplete(4, "<tick-duration>");
     }
 
     @Override

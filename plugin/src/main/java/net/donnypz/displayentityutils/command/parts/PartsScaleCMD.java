@@ -11,10 +11,14 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 class PartsScaleCMD extends PartsSubCommand {
 
     PartsScaleCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("scale", parentSubCommand, Permission.PARTS_TRANSFORM, 4, 4);
+        setTabComplete(2, List.of("x", "y", "z", "-all"));
+        setTabComplete(3, "<scale>");
     }
 
     @Override

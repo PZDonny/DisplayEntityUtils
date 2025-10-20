@@ -22,6 +22,8 @@ class PartsMoveCMD extends PlayerSubCommand {
 
     PartsMoveCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("move", parentSubCommand, Permission.PARTS_TRANSFORM);
+        setTabComplete(2, TabSuggestion.DIRECTIONS);
+        setTabComplete(3, "<distance>");
     }
 
     @Override

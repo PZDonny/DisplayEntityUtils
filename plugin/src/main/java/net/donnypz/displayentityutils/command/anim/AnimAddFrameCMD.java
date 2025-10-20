@@ -20,6 +20,8 @@ class AnimAddFrameCMD extends PlayerSubCommand {
 
     AnimAddFrameCMD(@NotNull DEUSubCommand parentSubCommand){
         super("addframe", parentSubCommand, Permission.ANIM_ADD_FRAME);
+        setTabComplete(2, "<tick-delay>");
+        setTabComplete(3, "<tick-duration>");
     }
 
     @Override

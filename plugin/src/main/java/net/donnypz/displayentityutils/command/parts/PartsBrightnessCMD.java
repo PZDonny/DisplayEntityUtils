@@ -15,6 +15,8 @@ import org.jetbrains.annotations.Nullable;
 class PartsBrightnessCMD extends PartsSubCommand {
     PartsBrightnessCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("brightness", parentSubCommand, Permission.PARTS_BRIGHTNESS, 4, 4);
+        setTabComplete(2, "<block>");
+        setTabComplete(3, "<sky>");
     }
 
     @Override

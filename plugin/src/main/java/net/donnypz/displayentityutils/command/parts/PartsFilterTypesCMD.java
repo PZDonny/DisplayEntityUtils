@@ -22,6 +22,7 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
 
     PartsFilterTypesCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("filtertypes", parentSubCommand, Permission.PARTS_SELECT);
+        setTabComplete(2, TabSuggestion.PART_TYPES);
     }
 
     @Override
