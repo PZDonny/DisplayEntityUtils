@@ -34,15 +34,16 @@ class AnimUseFilterCMD extends PlayerSubCommand {
         }
 
         ActivePartSelection<?> selection = DisplayGroupManager.getPartSelection(player);
-        if (PartsCMD.isUnwantedSingleSelection(player, selection)){
-            return;
-        }
         if (selection == null){
             PartsCMD.noPartSelection(player);
             return;
         }
 
-        boolean trim = args.length > 0 && args[0].equalsIgnoreCase("-trim");
+        if (PartsCMD.isUnwantedSingleSelection(player, selection)){
+            return;
+        }
+
+        boolean trim = args.length > 0 && args[2].equalsIgnoreCase("-trim");
         anim.setFilter((SpawnedPartSelection) selection, trim);
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your selected animation will use your part section's filter", NamedTextColor.GREEN)));
