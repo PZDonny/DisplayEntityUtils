@@ -19,7 +19,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Glow Color")
-@Description("Set the glow color of a active or packet-based group, part, or part selection. Or get the glow color of a active group")
+@Description("Set the glow color of a active or packet-based group, part, or part filter. Or get the glow color of a active group")
 @Examples({"set {_spawnedpart}'s deu glow color to red",
         "set {_color} to {_spawnedgroup}'s deu glow color",
         "",
@@ -55,7 +55,7 @@ public class ExprActiveGlowColor extends SimplePropertyExpression<Object, Color>
             return null;
         }
 
-        Skript.error("You can not get the glow color of a part selection", ErrorQuality.SEMANTIC_ERROR);
+        Skript.error("You can not get the glow color of a part filter", ErrorQuality.SEMANTIC_ERROR);
         return null;
     }
 

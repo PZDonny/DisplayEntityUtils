@@ -17,12 +17,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-@Name("Active Parts of Group / Part Selection")
-@Description("Get the active/packet parts of a group or part selection")
+@Name("Active Parts of Group / Part Filter")
+@Description("Get the active/packet parts of a group or part filter")
 @Examples({"set {_spawnedparts::*} to {_spawnedgroup}'s parts",
         "",
         "#3.0.0 and later",
-        "set {_packetparts::*} to {_packetpartselection}'s parts"})
+        "set {_packetparts::*} to {_packetpartfilter}'s parts"})
 @Since("2.6.2, 3.0.0 (Packet), 3.3.2 (Plural)")
 public class ExprActivePartsFromActive extends PropertyExpression<Object, ActivePart> {
 
