@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 class PartsRefreshFilterCMD extends PlayerSubCommand {
     PartsRefreshFilterCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("refresh", parentSubCommand, Permission.PARTS_SELECT);
+        super("refreshfilter", parentSubCommand, Permission.PARTS_SELECT);
     }
 
     @Override
