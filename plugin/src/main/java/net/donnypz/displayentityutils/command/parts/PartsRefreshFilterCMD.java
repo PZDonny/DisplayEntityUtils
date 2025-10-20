@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -29,9 +30,7 @@ class PartsRefreshFilterCMD extends PlayerSubCommand {
             return;
         }
 
-        SpawnedPartSelection partSelection = (SpawnedPartSelection) sel;
-
-        partSelection.refresh();
+        ((MultiPartSelection<?>) sel).refresh();
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Part Selection Filter Refreshed!", NamedTextColor.GREEN)));
     }
 }

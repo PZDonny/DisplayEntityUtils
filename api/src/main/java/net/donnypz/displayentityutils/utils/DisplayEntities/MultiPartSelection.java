@@ -1,7 +1,10 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.PacketUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Display;
@@ -430,6 +433,37 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
     public void glow(@NotNull Player player, long durationInTicks){
         for (T part : selectedParts){
             part.glow(player, durationInTicks);
+        }
+    }
+
+    /**
+     * Make this group's display entities glow, and interactions be outlined, for a player for a set period of time
+     * @param player the player
+     * @param durationInTicks how long the glowing should last. -1 to last forever
+     */
+    public void glowAndMarkInteractions(@NotNull Player player, long durationInTicks){
+        for (T part : selectedParts){
+            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                part.markInteraction(player, durationInTicks);
+            }
+            else {
+                if (part.isGlowing()){
+                    continue;
+                }
+                PacketUtils.setGlowing(player, part.getEntityId(), true);
+                if (durationInTicks > -1){
+                    Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+                        if (!part.isGlowing()){
+                            PacketUtils.setGlowing(player, part.getEntityId(), false);
+                        }
+                    }, durationInTicks);
+                }
+                else{
+                    if (!part.isGlowing()){
+                        PacketUtils.setGlowing(player, part.getEntityId(), false);
+                    }
+                }
+            }
         }
     }
 

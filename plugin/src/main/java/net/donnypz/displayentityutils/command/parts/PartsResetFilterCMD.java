@@ -27,7 +27,6 @@ class PartsResetFilterCMD extends PlayerSubCommand {
             return;
         }
 
-
         if (PartsCMD.isUnwantedSingleSelection(player, sel)){
             return;
         }

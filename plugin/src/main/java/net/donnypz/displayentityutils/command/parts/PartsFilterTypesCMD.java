@@ -33,7 +33,7 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
             return;
         }
 
-        SpawnedPartSelection partSelection = (SpawnedPartSelection) sel;
+        MultiPartSelection<?> partSelection = (MultiPartSelection<?>) sel;
         if (PartsCMD.isUnwantedSingleSelection(player, sel)){
             return;
         }
@@ -110,7 +110,7 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("| Your filter does not apply to any parts", NamedTextColor.GRAY, TextDecoration.ITALIC));
         }
         else{
-            partSelection.glow(player, 30);
+            partSelection.glowAndMarkInteractions(player, 30);
         }
     }
 

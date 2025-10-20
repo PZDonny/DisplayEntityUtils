@@ -15,7 +15,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.entity.Display;
-import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -59,8 +58,8 @@ class PartsInfoCMD extends PlayerSubCommand {
             if (PartsCMD.isUnwantedSingleSelection(player, selection)){
                 return;
             }
-            SpawnedPartSelection sel = (SpawnedPartSelection) selection;
-            SpawnedDisplayEntityGroup group = sel.getGroup();
+            MultiPartSelection<?> sel = (MultiPartSelection<?>) selection;
+            ActiveGroup<?> group = sel.getGroup();
             String groupTag = group.getTag();
 
             groupTag = groupTag == null ? "<red>NOT SET" : "<yellow>"+groupTag;
@@ -135,7 +134,7 @@ class PartsInfoCMD extends PlayerSubCommand {
         }
     }
 
-    private void sendFilterInfo(Player player, SpawnedPartSelection sel){
+    private void sendFilterInfo(Player player, MultiPartSelection<?> sel){
         PartFilter filter = sel.toFilter();
 
         //Included Part Tags
