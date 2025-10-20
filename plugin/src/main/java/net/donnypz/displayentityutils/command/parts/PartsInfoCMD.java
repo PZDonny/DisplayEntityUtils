@@ -19,11 +19,13 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 class PartsInfoCMD extends PlayerSubCommand {
     PartsInfoCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("info", parentSubCommand, Permission.PARTS_INFO);
+        setTabComplete(2, List.of("part", "selection", "filter"));
     }
 
     @Override
