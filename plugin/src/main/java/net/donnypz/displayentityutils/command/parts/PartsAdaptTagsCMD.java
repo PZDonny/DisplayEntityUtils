@@ -25,11 +25,11 @@ class PartsAdaptTagsCMD extends PlayerSubCommand {
         }
 
         boolean removeFromSB;
-        if (args.length < 2){
+        if (args.length < 3){
             removeFromSB = false;
         }
         else{
-            removeFromSB = args[1].equalsIgnoreCase("-remove");
+            removeFromSB = args[2].equalsIgnoreCase("-remove");
         }
 
         ActivePartSelection<?> selection = DisplayGroupManager.getPartSelection(player);
