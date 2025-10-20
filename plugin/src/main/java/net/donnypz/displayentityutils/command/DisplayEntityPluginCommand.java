@@ -65,11 +65,13 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         if (cmd == null) return List.of();
 
         String current = args[args.length-1];
-        DEUSubCommand.TabSuggestion suggestion = cmd.tabCompleteSuggestions.get(args.length-1);
-        List<String> tabCompletes = suggestion.suggestions;
+        DEUSubCommand.TabSuggestion indexSuggestions = cmd.tabCompleteSuggestions.get(args.length-1);
+        if (indexSuggestions == null) return List.of();
+
+        List<String> tabCompletes = indexSuggestions.suggestions;
         if (tabCompletes == null) return List.of();
 
-        if (!suggestion.suggestUsingCurrentString){
+        if (!indexSuggestions.suggestUsingCurrentString){
             return tabCompletes;
         }
         List<String> list = new ArrayList<>();
