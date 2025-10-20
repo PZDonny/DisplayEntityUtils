@@ -5,7 +5,6 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.command.group.GroupCMD;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
@@ -45,7 +44,7 @@ class AnimUseFilterCMD extends PlayerSubCommand {
         }
 
         boolean trim = args.length > 0 && args[2].equalsIgnoreCase("-trim");
-        anim.setFilter((SpawnedPartSelection) selection, trim);
+        anim.setFilter((MultiPartSelection<?>) selection, trim);
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your selected animation will use your part section's filter", NamedTextColor.GREEN)));
         if (trim){

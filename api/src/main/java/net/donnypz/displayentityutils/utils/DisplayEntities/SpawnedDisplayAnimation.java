@@ -63,24 +63,23 @@ public final class SpawnedDisplayAnimation{
      * @param trim <u>IRREVERSIBLY</u> remove the animation data of parts that the part filter doesn't apply to
      * @return this
      */
-    public SpawnedDisplayAnimation setFilter(@NotNull SpawnedDisplayEntityGroup group, @NotNull PartFilter filter, boolean trim){
-        SpawnedPartSelection sel = group.createPartSelection(filter);
+    public SpawnedDisplayAnimation setFilter(@NotNull ActiveGroup<?> group, @NotNull PartFilter filter, boolean trim){
+        MultiPartSelection<?> sel = group.createPartSelection(filter);
         return setFilter(sel, filter, trim);
     }
 
     /**
      * Set the filter this animation should use when animating
-     * @param spawnedPartSelection the selection with filtered parts
+     * @param selection the selection with filtered parts
      * @param trim <u>IRREVERSIBLY</u> remove the animation data of parts that the part filter doesn't apply to
      * @return this
      */
-    public SpawnedDisplayAnimation setFilter(@NotNull SpawnedPartSelection spawnedPartSelection, boolean trim){
-        PartFilter partFilter = spawnedPartSelection.toFilter();
-        return setFilter(spawnedPartSelection, partFilter, trim);
+    public SpawnedDisplayAnimation setFilter(@NotNull MultiPartSelection<?> selection, boolean trim){
+        PartFilter partFilter = selection.toFilter();
+        return setFilter(selection, partFilter, trim);
     }
 
-    private SpawnedDisplayAnimation setFilter(SpawnedPartSelection selection, PartFilter partFilter, boolean trim){
-
+    private SpawnedDisplayAnimation setFilter(MultiPartSelection<?> selection, PartFilter partFilter, boolean trim){
         this.filter = partFilter;
         if (!trim){
             return this;
