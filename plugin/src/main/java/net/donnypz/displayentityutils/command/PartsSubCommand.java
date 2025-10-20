@@ -56,7 +56,7 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
             executeAllPartsAction(player, group, (MultiPartSelection<?>) selection, args);
         }
         else{
-            executeSinglePartAction(player, (SpawnedDisplayEntityGroup) group, selection, (SpawnedDisplayEntityPart) selection.getSelectedPart(), args);
+            executeSinglePartAction(player, group, selection, selection.getSelectedPart(), args);
         }
     }
 
@@ -64,7 +64,7 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
 
     protected abstract void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args);
 
-    protected abstract void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ActivePartSelection<?> selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args);
+    protected abstract void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args);
 
 
 

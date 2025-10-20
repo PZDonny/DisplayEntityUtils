@@ -30,7 +30,7 @@ class PartsRemoveTagCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ActivePartSelection<?> selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         String tag  = args[2];
         selection.getSelectedPart().removeTag(tag);
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Removing part tag from selected part! <white>(Removed Tag: "+tag+")")));

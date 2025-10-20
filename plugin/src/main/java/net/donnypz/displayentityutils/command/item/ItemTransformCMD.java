@@ -33,7 +33,7 @@ class ItemTransformCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ActivePartSelection<?> selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         ItemDisplay.ItemDisplayTransform transform = getTransform(player, args[2]);
         if (transform == null) return;
         if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {

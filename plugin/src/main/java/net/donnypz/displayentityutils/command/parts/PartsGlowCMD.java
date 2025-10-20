@@ -26,7 +26,7 @@ class PartsGlowCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ActivePartSelection selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Glowing applied to your selected part!", NamedTextColor.GREEN)));
         selectedPart.glow();
     }

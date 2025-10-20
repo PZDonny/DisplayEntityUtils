@@ -34,7 +34,7 @@ class PartsGlowColorCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ActivePartSelection<?> selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         Color color = getColor(player, args[2]);
         if (color == null) return;
         if (selectedPart.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {

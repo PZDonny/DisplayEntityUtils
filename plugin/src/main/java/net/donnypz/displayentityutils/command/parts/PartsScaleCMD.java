@@ -35,7 +35,7 @@ class PartsScaleCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ActivePartSelection<?> selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (selectedPart.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
             player.sendMessage(Component.text("You cannot do this with an interaction part entity!", NamedTextColor.RED));
             player.sendMessage(Component.text("| Use \"/mdis interaction scale\" instead", NamedTextColor.GRAY));

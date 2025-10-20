@@ -37,7 +37,7 @@ class PartsSetBlockCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ActivePartSelection<?> selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         BlockData blockData = DEUCommandUtils.getBlockFromText(args[2], player);
         if (blockData == null) return;
         if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY) {

@@ -5,7 +5,6 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -39,12 +38,17 @@ class PartsRemoveCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ActivePartSelection<?> selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (selectedPart.isMaster() && !selection.isSinglePartSelection()){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot despawn the master/parent part!", NamedTextColor.RED)));
             return;
         }
-        selectedPart.remove(true);
+        if (selectedPart instanceof SpawnedDisplayEntityPart sp){
+            sp.remove(true);
+        }
+        else if (selectedPart instanceof PacketDisplayEntityPart pp){
+            pp.remove();
+        }
         player.sendMessage(Component.text("Successfully despawned your selected part!", NamedTextColor.GREEN));
         removePartSelectionIfEmpty(player, selection);
         removeGroupIfEmpty(player, group);
