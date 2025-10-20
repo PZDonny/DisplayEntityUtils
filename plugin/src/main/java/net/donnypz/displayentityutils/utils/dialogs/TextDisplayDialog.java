@@ -9,11 +9,10 @@ import io.papermc.paper.registry.data.dialog.input.SingleOptionDialogInput;
 import io.papermc.paper.registry.data.dialog.input.TextDialogInput;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
@@ -283,6 +282,10 @@ public final class TextDisplayDialog{
             part.setTextDisplayDefaultBackground(view.getBoolean(DEFAULT_BACKGROUND));
             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Text Display Updated!", NamedTextColor.GREEN)));
             if (!backgroundColorSuccess) p.sendMessage(Component.text("| Failed to set background color. Invalid color input.", NamedTextColor.YELLOW));
+            ActiveGroup<?> selected = DEUUser.getOrCreateUser(p).getSelectedGroup();
+            if (selected instanceof PacketDisplayEntityGroup pdeg && pdeg.isPersistent()){
+                DisplayGroupManager.updatePersistentPacketGroup(pdeg);
+            }
 
         }, ClickCallback.Options.builder().uses(ClickCallback.UNLIMITED_USES).build());
     }

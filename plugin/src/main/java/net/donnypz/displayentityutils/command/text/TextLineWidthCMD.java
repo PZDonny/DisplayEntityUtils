@@ -2,62 +2,62 @@ package net.donnypz.displayentityutils.command.text;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
+import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.command.parts.PartsCMD;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-class TextLineWidthCMD extends PlayerSubCommand {
+class TextLineWidthCMD extends PartsSubCommand {
     TextLineWidthCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("linewidth", parentSubCommand, Permission.TEXT_SET_LINE_WIDTH);
+        super("linewidth", parentSubCommand, Permission.TEXT_SET_LINE_WIDTH, 3, 4);
     }
 
     @Override
-    public void execute(Player player, String[] args) {
-        if (args.length < 3){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis text linewidth <width>", NamedTextColor.RED)));
-            return;
+    protected void sendIncorrectUsage(@NotNull Player player) {
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis text linewidth <width> [-all]", NamedTextColor.RED)));
+    }
+
+    @Override
+    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+        int width = getLineWidth(args, player);
+        if (width == -1) return;
+        for (ActivePart part : selection.getSelectedParts()){
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
+                part.setTextDisplayLineWidth(width);
+            }
         }
+        player.sendMessage(Component.text("Successfully set text display's line width to "+width+" for ALL selected text displays", NamedTextColor.GREEN));
+    }
 
-
-        ActivePartSelection<?> partSelection = DisplayGroupManager.getPartSelection(player);
-        if (partSelection == null){
-            DisplayEntityPluginCommand.noPartSelection(player);
-            return;
-        }
-
-        if (!partSelection.hasSelectedPart()){
-            PartsCMD.invalidPartSelection(player);
-        }
-
-        ActivePart selected = partSelection.getSelectedPart();
-        if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
+    @Override
+    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        int width = getLineWidth(args, player);
+        if (width == -1) return;
+        if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
             return;
         }
+        selectedPart.setTextDisplayLineWidth(width);
+        player.sendMessage(Component.text("Successfully set text display's line width to "+width, NamedTextColor.GREEN));
+    }
 
-
+    private int getLineWidth(String[] args, Player player){
         try{
             int change = Integer.parseInt(args[2]);
             if (change <= 0){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid width, enter a whole positive number!", NamedTextColor.RED)));
-                return;
+                return -1;
             }
 
-            selected.setTextDisplayLineWidth(change);
-            player.sendMessage(Component.text("Successfully set text display's line width to "+change, NamedTextColor.GREEN));
+            return change;
         }
         catch(NumberFormatException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid width, enter a positive whole number!", NamedTextColor.RED)));
+            return -1;
         }
     }
 }
