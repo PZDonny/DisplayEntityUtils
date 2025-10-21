@@ -205,6 +205,9 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         groupParts.put(part.partUUID, part);
         part.group = this;
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) interactionCount++;
+        if (this.autoShow){
+            part.showToPlayers(getTrackingPlayers(), GroupSpawnedEvent.SpawnReason.INTERNAL);
+        }
     }
 
     /**
@@ -487,9 +490,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
     @Override
     public void pivot(float angleInDegrees) {
-        iterateInteractionParts(part -> {
-            part.pivot(angleInDegrees);
-        });
+        for (PacketDisplayEntityPart part : groupParts.values()){
+            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                part.pivot(angleInDegrees);
+            }
+        }
     }
 
     /**
@@ -590,35 +595,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             }
             else{
                 updateChunkAndWorld(newLoc);
-            }
-        }
-    }
-
-
-    public @NotNull Collection<PacketDisplayEntityPart> getInteractionParts(){
-        int i = 0;
-        Set<PacketDisplayEntityPart> parts = new HashSet<>();
-        for (PacketDisplayEntityPart part : groupParts.sequencedValues().reversed()){
-            if (i == interactionCount){
-                return parts;
-            }
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                parts.add(part);
-                i++;
-            }
-        }
-        return parts;
-    }
-
-    private void iterateInteractionParts(Consumer<PacketDisplayEntityPart> consumer){
-        int i = 0;
-        for (PacketDisplayEntityPart part : groupParts.sequencedValues().reversed()){
-            if (i == interactionCount){
-                return;
-            }
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                consumer.accept(part);
-                i++;
             }
         }
     }
