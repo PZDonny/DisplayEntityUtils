@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 @DocumentationId("EffSpawnedGroupPersistence")
 public class EffActiveGroupPersistence extends Effect {
     static {
-        Skript.registerEffect(EffActiveGroupPersistence.class,"(make|set) %spawnedgroups% [to] [:not] persistent");
+        Skript.registerEffect(EffActiveGroupPersistence.class,"(make|set) %activegroups% [to] [:not] persistent");
     }
 
     Expression<ActiveGroup<?>> object;
