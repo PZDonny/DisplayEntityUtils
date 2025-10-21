@@ -175,6 +175,9 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         else if (particle() == Particle.ENTITY_EFFECT){
             animParticle = new EntityEffectAnimationParticle(this, data());
         }
+        else if (particle() == Particle.FLASH){
+            animParticle = new FlashAnimationParticle(this, data());
+        }
         else{
             animParticle = new GeneralAnimationParticle(this, particle());
         }

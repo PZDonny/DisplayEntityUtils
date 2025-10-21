@@ -18,6 +18,7 @@ public final class VersionUtils {
     public static boolean IS_1_21_2 = Bukkit.getUnsafe().getProtocolVersion() >= 768;
     public static boolean IS_1_21_6 = Bukkit.getUnsafe().getProtocolVersion() >= 771;
     public static boolean IS_1_21_7 = Bukkit.getUnsafe().getProtocolVersion() >= 772;
+    public static boolean IS_1_21_9 = Bukkit.getUnsafe().getProtocolVersion() >= 773;
 
     public static boolean canViewDialogs(Player player, boolean sendErrorMessage){
         if (!serverHasDialogs()){

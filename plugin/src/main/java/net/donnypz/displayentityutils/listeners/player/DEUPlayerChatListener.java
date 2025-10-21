@@ -65,6 +65,9 @@ public final class DEUPlayerChatListener implements Listener {
                             builder.advanceStep(AnimationParticleBuilder.Step.OFFSETS);
                         }
                     }
+                    else if (builder.particle() == Particle.FLASH){
+                        builder.advanceStep(AnimationParticleBuilder.Step.COLOR_ONLY);
+                    }
                     else{
                         builder.advanceStep(AnimationParticleBuilder.Step.EXTRA);
                     }
