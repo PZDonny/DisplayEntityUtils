@@ -23,6 +23,6 @@ class InteractionSpawnHereCMD extends PlayerSubCommand {
             return;
         }
 
-        InteractionSpawnCMD.spawnInteraction(player, player.getLocation(), args);
+        InteractionAddToGroupCMD.spawnInteraction(player, player.getLocation(), args);
     }
 }

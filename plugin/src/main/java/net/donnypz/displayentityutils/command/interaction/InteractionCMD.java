@@ -30,7 +30,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
         new InteractionPivotCMD(this);
         new InteractionPivotSelectionCMD(this);
         new InteractionResponsiveCMD(this);
-        new InteractionSpawnCMD(this);
+        new InteractionAddToGroupCMD(this);
         new InteractionSpawnHereCMD(this);
         new InteractionInfoCMD(this);
     }
@@ -57,7 +57,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
             sender.sendMessage(Component.text("Where applicable, these commands prioritize the interaction entity you're looking at over the one you may have selected", NamedTextColor.AQUA));
             CMDUtils.sendCMD(sender, "/mdis interaction help", "Get help for interactions");
             CMDUtils.sendCMD(sender, "/mdis interaction info", "Get info about an interaction entity, targeted or selected");
-            CMDUtils.sendCMD(sender, "/mdis interaction spawn <height> <width>", "Create an interaction entity part for a group, at the group's location");
+            CMDUtils.sendCMD(sender, "/mdis interaction addtogroup <height> <width> [-here]", "Create an interaction entity part for a group, at the group's location. Use \"-here\" to spawn it at your location");
             CMDUtils.sendCMD(sender, "/mdis interaction spawnhere <height> <width>", "Create an interaction entity at your location");
             CMDUtils.sendCMD(sender, "/mdis interaction height <height>", "Set the height of an interaction");
             CMDUtils.sendCMD(sender, "/mdis interaction width <width>", "Set the width of an interaction");

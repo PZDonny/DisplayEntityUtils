@@ -14,28 +14,36 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-class InteractionSpawnCMD extends GroupSubCommand {
-    InteractionSpawnCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("spawn", parentSubCommand, Permission.INTERACTION_SPAWN, 4, true);
+class InteractionAddToGroupCMD extends GroupSubCommand {
+    InteractionAddToGroupCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("addtogroup", parentSubCommand, Permission.INTERACTION_SPAWN, 4, true);
         setTabComplete(2, "<height>");
         setTabComplete(3, "<width>");
+        setTabComplete(4, "-here");
     }
 
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis interaction spawn <height> <width>", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis interaction addtogroup <height> <width> [-here]", NamedTextColor.RED)));
     }
 
     @Override
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
+        Location spawn;
+        if (args.length >= 5){
+            spawn = args[4].equalsIgnoreCase("-here") ? player.getLocation() : group.getLocation();
+        }
+        else{
+            spawn = group.getLocation();
+        }
         if (group instanceof SpawnedDisplayEntityGroup sg){
-            Interaction i = spawnInteraction(player, group.getLocation(), args);
+            Interaction i = spawnInteraction(player, spawn, args);
             if (i == null) return;
             sg.addInteractionEntity(i);
         }
         else if (group instanceof PacketDisplayEntityGroup pg){
-            spawnInteraction(pg, player, group.getLocation(), args);
+            spawnInteraction(pg, player, spawn, args);
         }
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("| The interaction has been added to your group!", NamedTextColor.YELLOW)));
