@@ -52,14 +52,14 @@ public final class DEUPlayerChatListener implements Listener {
                     int amount = Integer.parseInt(msg);
                     builder.count(amount);
                     if (builder.isDustOptionParticle()){
-                        builder.advanceStep(AnimationParticleBuilder.Step.COLOR);
+                        builder.advanceStep(AnimationParticleBuilder.Step.COLOR_AND_SIZE);
                     }
                     else if (builder.isDustTransitionParticle()){
                         builder.advanceStep(AnimationParticleBuilder.Step.COLOR_TRANSITION);
                     }
                     else if (builder.particle() == VersionUtils.getEntityEffectParticle()){
                         if (VersionUtils.IS_1_20_5){
-                            builder.advanceStep(AnimationParticleBuilder.Step.COLOR_ENTITY_EFFECT);
+                            builder.advanceStep(AnimationParticleBuilder.Step.COLOR_ONLY);
                         }
                         else{
                             builder.advanceStep(AnimationParticleBuilder.Step.OFFSETS);
@@ -116,7 +116,7 @@ public final class DEUPlayerChatListener implements Listener {
                     p.sendMessage(Component.text("Invalid Extra Value! Enter a whole number greater than 0.", NamedTextColor.RED));
                 }
             }
-            case COLOR -> {
+            case COLOR_AND_SIZE -> {
                 try{
                     String[] args = msg.split(" ");
                     if (args.length != 2){
@@ -135,7 +135,7 @@ public final class DEUPlayerChatListener implements Listener {
                     p.sendMessage(Component.text("color size", NamedTextColor.GRAY, TextDecoration.ITALIC));
                 }
             }
-            case COLOR_ENTITY_EFFECT -> {
+            case COLOR_ONLY -> {
                 try{
                     Color color = ConversionUtils.getColorFromText(msg);
 
