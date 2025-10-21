@@ -27,10 +27,10 @@ class ItemSetCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         String item = args[2];
         ItemStack itemStack = DEUCommandUtils.getItemFromText(item, player);
-        if (itemStack == null) return;
+        if (itemStack == null) return false;
 
         for (ActivePart part : selection.getSelectedParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
@@ -38,22 +38,21 @@ class ItemSetCMD extends PartsSubCommand {
             }
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set item of ALL selected item displays!", NamedTextColor.GREEN)));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         String item = args[2];
         ItemStack itemStack = DEUCommandUtils.getItemFromText(item, player);
-        if (itemStack == null) return;
+        if (itemStack == null) return false;
 
         if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with item display entities", NamedTextColor.RED)));
-            return;
+            return false;
         }
         selectedPart.setItemDisplayItem(itemStack);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set item of selected item display!", NamedTextColor.GREEN)));
+        return true;
     }
-
-
-
 }

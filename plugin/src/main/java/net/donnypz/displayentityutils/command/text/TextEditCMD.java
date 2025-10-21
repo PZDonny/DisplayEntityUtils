@@ -23,18 +23,21 @@ class TextEditCMD extends PartsSubCommand {
     protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {}
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+        return false;
+    }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
-            return;
+            return false;
         }
 
         boolean legacy = args.length >= 3 && args[2].equals("-&");
         if (VersionUtils.canViewDialogs(player, true)){
             TextDisplayDialog.sendDialog(player, selectedPart, !legacy);
         }
+        return false;
     }
 }

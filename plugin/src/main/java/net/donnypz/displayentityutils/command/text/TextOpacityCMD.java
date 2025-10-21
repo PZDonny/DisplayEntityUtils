@@ -23,9 +23,9 @@ class TextOpacityCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         Byte opacity = getOpacity(args, player);
-        if (opacity == null) return;
+        if (opacity == null) return false;
         for (ActivePart part : selection.getSelectedParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
                 part.setTextDisplayTextOpacity(opacity);
@@ -33,19 +33,21 @@ class TextOpacityCMD extends PartsSubCommand {
         }
         player.sendMessage(DisplayAPI.pluginPrefix
                 .append(Component.text("Successfully set text display's opacity to "+opacity+" for ALL selected text displays", NamedTextColor.GREEN)));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         Byte opacity = getOpacity(args, player);
-        if (opacity == null) return;
+        if (opacity == null) return false;
         if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
-            return;
+            return false;
         }
         selectedPart.setTextDisplayTextOpacity(opacity);
         player.sendMessage(DisplayAPI.pluginPrefix
                 .append(Component.text("Successfully set text display's opacity to "+opacity, NamedTextColor.GREEN)));
+        return true;
     }
 
     private Byte getOpacity(String[] args, Player player){

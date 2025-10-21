@@ -27,11 +27,11 @@ class PartsBrightnessCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         BrightnessResult result = buildBrightness(player, args[2], args[3]);
         if (!result.correctNumbers()){
             sendIncorrectUsage(player);
-            return;
+            return false;
         }
         Display.Brightness brightness = result.brightness;
         if (brightness == null){
@@ -41,14 +41,15 @@ class PartsBrightnessCMD extends PartsSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Brightness set for your part selection!", NamedTextColor.GREEN)));
         }
         selection.setBrightness(brightness);
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         BrightnessResult result = buildBrightness(player, args[2], args[3]);
         if (!result.correctNumbers()){
             sendIncorrectUsage(player);
-            return;
+            return false;
         }
         Display.Brightness brightness = result.brightness;
         if (brightness == null){
@@ -58,6 +59,7 @@ class PartsBrightnessCMD extends PartsSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Brightness set for your selected part!", NamedTextColor.GREEN)));
         }
         selectedPart.setBrightness(brightness);
+        return true;
     }
 
     private BrightnessResult buildBrightness(Player player, String arg1, String arg2){

@@ -12,8 +12,6 @@ import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 class TextAlignCMD extends PartsSubCommand {
     TextAlignCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("align", parentSubCommand, Permission.TEXT_SET_ALIGNMENT, 3, 3);
@@ -27,27 +25,29 @@ class TextAlignCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         TextDisplay.TextAlignment alignment = getAlignment(args[2], player);
-        if (alignment == null) return;
+        if (alignment == null) return false;
         for (ActivePart part : selection.getSelectedParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
                 part.setTextDisplayAlignment(alignment);
             }
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Text alignment successfully set to "+args[2]+" for ALL selected text displays", NamedTextColor.GREEN)));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
-            return;
+            return false;
         }
         TextDisplay.TextAlignment alignment = getAlignment(args[2], player);
-        if (alignment == null) return;
+        if (alignment == null) return false;
         selectedPart.setTextDisplayAlignment(alignment);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Text alignment successfully set to "+args[2], NamedTextColor.GREEN)));
+        return true;
     }
 
     private TextDisplay.TextAlignment getAlignment(String alignment, Player player){

@@ -43,23 +43,25 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
             return;
         }
 
+        boolean updatePacket;
         if (args.length >= allArgumentIndex +1 && args[allArgumentIndex].equalsIgnoreCase("-all")){
             if (PartsCMD.isUnwantedSingleSelectionAll(player, selection)){
                 return;
             }
-            executeAllPartsAction(player, group, (MultiPartSelection<?>) selection, args);
+            updatePacket = executeAllPartsAction(player, group, (MultiPartSelection<?>) selection, args);
         }
         else{
-            executeSinglePartAction(player, group, selection, selection.getSelectedPart(), args);
+            updatePacket = executeSinglePartAction(player, group, selection, selection.getSelectedPart(), args);
+        }
+
+        if (updatePacket && group instanceof PacketDisplayEntityGroup pg && pg.getMasterPart() != null){
+            pg.refresh();
         }
     }
 
     protected abstract void sendIncorrectUsage(@NotNull Player player);
 
-    protected abstract void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args);
+    protected abstract boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args);
 
-    protected abstract void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args);
-
-
-
+    protected abstract boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args);
 }

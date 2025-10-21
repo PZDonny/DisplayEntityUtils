@@ -25,27 +25,29 @@ class TextFontCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         Key font = getFont(args, player);
-        if (font == null) return;
+        if (font == null) return false;
         for (ActivePart part : selection.getSelectedParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
                 part.setTextDisplayText(part.getTextDisplayText().font(font));
             }
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Font successfully set to "+args[2]+" for ALL selected text displays", NamedTextColor.GREEN)));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
-            return;
+            return false;
         }
         Key font = getFont(args, player);
-        if (font == null) return;
+        if (font == null) return false;
         selectedPart.setTextDisplayText(selectedPart.getTextDisplayText().font(font));
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Font successfully set to "+args[2], NamedTextColor.GREEN)));
+        return true;
     }
 
     private Key getFont(String[] args, Player player){

@@ -24,25 +24,27 @@ class ItemTransformCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         ItemDisplay.ItemDisplayTransform transform = getTransform(player, args[2]);
-        if (transform == null) return;
+        if (transform == null) return false;
         for (ActivePart part : selection.getSelectedParts()){
             part.setItemDisplayTransform(transform);
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set item transform of ALL selected item displays!", NamedTextColor.GREEN)));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         ItemDisplay.ItemDisplayTransform transform = getTransform(player, args[2]);
-        if (transform == null) return;
+        if (transform == null) return false;
         if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with item display entities", NamedTextColor.RED)));
-            return;
+            return false;
         }
         selectedPart.setItemDisplayTransform(transform);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set item transform of selected item display!", NamedTextColor.GREEN)));
+        return true;
     }
 
 

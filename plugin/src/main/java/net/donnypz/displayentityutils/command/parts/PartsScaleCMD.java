@@ -22,7 +22,7 @@ class PartsScaleCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         for (ActivePart selectedPart : selection.getSelectedParts()){
             if (selectedPart.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 continue;
@@ -33,24 +33,30 @@ class PartsScaleCMD extends PartsSubCommand {
                 }
             } catch (NumberFormatException e) {
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the scale!", NamedTextColor.RED)));
-                return;
+                return false;
             }
         }
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (selectedPart.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
             player.sendMessage(Component.text("You cannot do this with an interaction part entity!", NamedTextColor.RED));
             player.sendMessage(Component.text("| Use \"/mdis interaction scale\" instead", NamedTextColor.GRAY));
-            return;
+            return false;
         }
         try {
             if (applyScaleChange(getDimension(args), getScale(args), selectedPart, player)) {
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Scale Updated!", NamedTextColor.GREEN)));
+                return true;
+            }
+            else{
+                return false;
             }
         } catch (NumberFormatException e) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the scale!", NamedTextColor.RED)));
+            return false;
         }
     }
 

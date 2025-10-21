@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
+import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
@@ -21,7 +22,7 @@ class PartsRemoveCMD extends PartsSubCommand {
     protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         for (ActivePart part : selection.getSelectedParts()){
             if (part.isMaster()){
                 continue;
@@ -35,13 +36,14 @@ class PartsRemoveCMD extends PartsSubCommand {
         }
         player.sendMessage(Component.text("Successfully despawned all selected parts!", NamedTextColor.GREEN));
         removeGroupIfEmpty(player, group);
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (selectedPart.isMaster() && !selection.isSinglePartSelection()){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot despawn the master/parent part!", NamedTextColor.RED)));
-            return;
+            return false;
         }
         if (selectedPart instanceof SpawnedDisplayEntityPart sp){
             sp.remove(true);
@@ -52,6 +54,7 @@ class PartsRemoveCMD extends PartsSubCommand {
         player.sendMessage(Component.text("Successfully despawned your selected part!", NamedTextColor.GREEN));
         removePartSelectionIfEmpty(player, selection);
         removeGroupIfEmpty(player, group);
+        return true;
     }
 
     private void removePartSelectionIfEmpty(Player player, ActivePartSelection<?> selection){
@@ -72,7 +75,13 @@ class PartsRemoveCMD extends PartsSubCommand {
                 g.unregister(true, true);
             }
             else if (group instanceof PacketDisplayEntityGroup pg){
-                pg.unregister();
+                if (pg.isPersistent()){
+                    DisplayGroupManager.removePersistentPacketGroup(pg, false);
+                    pg.unregister();
+                }
+                else{
+                    pg.unregister();
+                }
             }
         }
     }

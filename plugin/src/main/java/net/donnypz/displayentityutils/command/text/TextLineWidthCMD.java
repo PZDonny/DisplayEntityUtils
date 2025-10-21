@@ -23,27 +23,29 @@ class TextLineWidthCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         int width = getLineWidth(args, player);
-        if (width == -1) return;
+        if (width == -1) return false;
         for (ActivePart part : selection.getSelectedParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
                 part.setTextDisplayLineWidth(width);
             }
         }
         player.sendMessage(Component.text("Successfully set text display's line width to "+width+" for ALL selected text displays", NamedTextColor.GREEN));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         int width = getLineWidth(args, player);
-        if (width == -1) return;
+        if (width == -1) return false;
         if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
-            return;
+            return false;
         }
         selectedPart.setTextDisplayLineWidth(width);
         player.sendMessage(Component.text("Successfully set text display's line width to "+width, NamedTextColor.GREEN));
+        return true;
     }
 
     private int getLineWidth(String[] args, Player player){

@@ -38,20 +38,22 @@ class PartsTranslateCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         Object[] objects = getArgs(player, args);
-        if (objects == null) return;
+        if (objects == null) return false;
 
         selection.translate((Direction) objects[0], (float) objects[1], (int) objects[2], -1);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Translating all selected parts!", NamedTextColor.GREEN)));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         Object[] objects = getArgs(player, args);
-        if (objects == null) return;
+        if (objects == null) return false;
         selectedPart.translate((Direction) objects[0], (float) objects[1], (int) objects[2], -1);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Translating your selected part!", NamedTextColor.GREEN)));
+        return true;
     }
 
     private Object[] getArgs(Player player, String[] args){

@@ -2,7 +2,6 @@ package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -23,13 +22,15 @@ class PartsAdaptTagsCMD extends PartsSubCommand {
     protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {}
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+        return false;
+    }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (selection instanceof PacketPartSelection){
             DisplayEntityPluginCommand.disallowPacketGroup(player);
-            return;
+            return false;
         }
 
         boolean removeFromSB;
@@ -42,16 +43,17 @@ class PartsAdaptTagsCMD extends PartsSubCommand {
 
         if (!selection.isValid()){ //Adapt for all parts
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid part selection! Please try again!", NamedTextColor.RED)));
-            return;
+            return false;
         }
         if (PartsCMD.isUnwantedSingleSelection(player, selection)){
-            return;
+            return false;
         }
 
         for (SpawnedDisplayEntityPart part : ((SpawnedPartSelection) selection).getSelectedParts()){
             part.adaptScoreboardTags(removeFromSB);
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Adapted all scoreboard tags in your part selection!", NamedTextColor.GREEN)));
+        return true;
     }
 
 }

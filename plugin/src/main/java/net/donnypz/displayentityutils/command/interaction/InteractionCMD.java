@@ -2,7 +2,6 @@ package net.donnypz.displayentityutils.command.interaction;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
-import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -116,6 +115,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
             }
             else{
                 interactionPart.setInteractionHeight(height);
+                updatePacketGroup();
             }
         }
 
@@ -125,6 +125,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
             }
             else{
                 interactionPart.setInteractionWidth(width);
+                updatePacketGroup();
             }
         }
 
@@ -137,8 +138,8 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
                     DisplayUtils.scaleInteraction((Interaction) sp.getEntity(), height, width, duration, delay);
                 }
                 else if (interactionPart instanceof PacketDisplayEntityPart pp){
-
                     PacketUtils.scaleInteraction(pp, height, width, duration, delay);
+                    updatePacketGroup();
                 }
             }
         }
@@ -149,6 +150,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
             }
             else{
                 interactionPart.setInteractionResponsive(responsive);
+                updatePacketGroup();
             }
         }
 
@@ -158,6 +160,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
             }
             else{
                 interactionPart.pivot((float) angle);
+                updatePacketGroup();
             }
         }
 
@@ -189,6 +192,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
             }
             else{
                 interactionPart.addInteractionCommand(command, left, console);
+                updatePacketGroup();
             }
         }
 
@@ -198,6 +202,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
             }
             else{
                 interactionPart.removeInteractionCommand(command);
+                updatePacketGroup();
             }
         }
 
@@ -216,6 +221,12 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
             }
             else{
                 return interactionPart.getInteractionCommandsWithData();
+            }
+        }
+
+        private void updatePacketGroup(){
+            if (interactionPart instanceof PacketDisplayEntityPart part){
+                part.getGroup().refresh();
             }
         }
     }

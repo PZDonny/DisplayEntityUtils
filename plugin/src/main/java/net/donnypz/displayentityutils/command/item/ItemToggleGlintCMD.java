@@ -27,10 +27,10 @@ class ItemToggleGlintCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         if (args.length < 4){
             sendIncorrectUsage(player);
-            return;
+            return false;
         }
 
         boolean status;
@@ -47,7 +47,7 @@ class ItemToggleGlintCMD extends PartsSubCommand {
         }
         else{
             sendIncorrectUsage(player);
-            return;
+            return false;
         }
 
         for (ActivePart part : selection.getSelectedParts()){
@@ -56,17 +56,19 @@ class ItemToggleGlintCMD extends PartsSubCommand {
             }
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully toggled glint of ALL selected item displays!", NamedTextColor.GREEN)));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with item display entities", NamedTextColor.RED)));
-            return;
+            return false;
         }
         ItemStack item = selectedPart.getItemDisplayItem();
-        if (item == null) return;
+        if (item == null) return false;
         selectedPart.setItemDisplayItemGlint(!item.getItemMeta().getEnchantmentGlintOverride());
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully toggled glint of selected item display!", NamedTextColor.GREEN)));
+        return true;
     }
 }

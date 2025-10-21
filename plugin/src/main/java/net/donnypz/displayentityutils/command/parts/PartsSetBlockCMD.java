@@ -27,9 +27,9 @@ class PartsSetBlockCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         BlockData blockData = DEUCommandUtils.getBlockFromText(args[2], player);
-        if (blockData == null) return;
+        if (blockData == null) return false;
         for (ActivePart part : selection.getSelectedParts()){
             if (part.isMaster()) continue;
             if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY) {
@@ -37,19 +37,21 @@ class PartsSetBlockCMD extends PartsSubCommand {
             }
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set block of ALL selected block displays!", NamedTextColor.GREEN)));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         BlockData blockData = DEUCommandUtils.getBlockFromText(args[2], player);
-        if (blockData == null) return;
+        if (blockData == null) return false;
         if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with block display entities", NamedTextColor.RED)));
-            return;
+            return false;
         }
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set block of selected block display!", NamedTextColor.GREEN)));
         setBlock(selectedPart, blockData);
+        return true;
     }
 
     private void setBlock(ActivePart part, BlockData blockData){

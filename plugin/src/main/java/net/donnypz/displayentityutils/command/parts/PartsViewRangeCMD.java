@@ -23,21 +23,23 @@ class PartsViewRangeCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         Float viewRange = getViewRange(player, args[2]);
-        if (viewRange == null) return;
+        if (viewRange == null) return false;
         selection.setViewRange(viewRange);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("View range multiplier updated for all selected parts!", NamedTextColor.GREEN)));
         player.sendMessage(Component.text("New View Range: "+viewRange, NamedTextColor.GRAY));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         Float viewRange = getViewRange(player, args[2]);
-        if (viewRange == null) return;
+        if (viewRange == null) return false;
         selectedPart.setViewRange(viewRange);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("View range multiplier updated for your selected part!", NamedTextColor.GREEN)));
         player.sendMessage(Component.text("New View Range: "+viewRange, NamedTextColor.GRAY));
+        return true;
     }
 
     private Float getViewRange(Player player, String arg){

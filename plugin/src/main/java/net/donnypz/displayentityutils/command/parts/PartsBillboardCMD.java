@@ -25,24 +25,26 @@ class PartsBillboardCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         Display.Billboard billboard = getBillboard(player, args[2]);
-        if (billboard == null) return;
+        if (billboard == null) return false;
         selection.setBillboard(billboard);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Billboard successfully set for selected display entity part(s) in your selection!", NamedTextColor.GREEN)));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (selectedPart.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Interaction entities cannot have a billboard applied!", NamedTextColor.RED)));
         }
         else{
             Display.Billboard billboard = getBillboard(player, args[2]);
-            if (billboard == null) return;
+            if (billboard == null) return false;
             selectedPart.setBillboard(billboard);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Billboard successfully set for your selected part!", NamedTextColor.GREEN)));
         }
+        return true;
     }
 
     private Display.Billboard getBillboard(Player player, String arg){

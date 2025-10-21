@@ -26,10 +26,10 @@ class TextShadowCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         if (args.length < 4){
             sendIncorrectUsage(player);
-            return;
+            return false;
         }
 
         boolean status;
@@ -46,7 +46,7 @@ class TextShadowCMD extends PartsSubCommand {
         }
         else{
             sendIncorrectUsage(player);
-            return;
+            return false;
         }
 
         for (ActivePart part : selection.getSelectedParts()){
@@ -55,15 +55,17 @@ class TextShadowCMD extends PartsSubCommand {
             }
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully toggled shadowed for ALL selected text displays!", NamedTextColor.GREEN)));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
-            return;
+            return false;
         }
         selectedPart.setTextDisplayShadowed(!selectedPart.isTextDisplayShadowed());
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully toggled shadow for text display!", NamedTextColor.GREEN)));
+        return true;
     }
 }
