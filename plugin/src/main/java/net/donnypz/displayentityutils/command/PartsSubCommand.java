@@ -55,7 +55,7 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
         }
 
         if (updatePacket && group instanceof PacketDisplayEntityGroup pg && pg.getMasterPart() != null){
-            pg.refresh();
+            pg.update();
         }
     }
 

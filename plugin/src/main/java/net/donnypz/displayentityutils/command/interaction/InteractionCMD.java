@@ -226,7 +226,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
 
         private void updatePacketGroup(){
             if (interactionPart instanceof PacketDisplayEntityPart part){
-                part.getGroup().refresh();
+                part.getGroup().update();
             }
         }
     }

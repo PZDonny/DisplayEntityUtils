@@ -43,7 +43,7 @@ class InteractionPivotSelectionCMD extends PlayerSubCommand {
             sel.pivot(angle);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Pivoting all Interaction Entities in part selection around group!", NamedTextColor.GREEN)));
             if (group instanceof PacketDisplayEntityGroup pg){
-                pg.refresh();
+                pg.update();
             }
         }
         catch(NumberFormatException e){

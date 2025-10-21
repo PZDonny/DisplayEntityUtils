@@ -547,7 +547,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 else{
                     masterPart.teleportUnsetPassengers(tpLocation);
                 }
-                PacketDisplayEntityGroup.this.refresh();
+                PacketDisplayEntityGroup.this.update();
             }
         }.runTaskTimerAsynchronously(DisplayAPI.getPlugin(), 0, 1);
     }
@@ -572,7 +572,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 part.setRotation(tpLocation.getPitch(), tpLocation.getYaw(), false);
             }
         }
-        this.refresh();
+        this.update();
     }
 
     private void attemptLocationUpdate(Location oldLoc, Location newLoc, boolean allowHide){
@@ -675,9 +675,9 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * Refresh this {@link PacketDisplayEntityGroup}'s saved data after any changes are made to it. <br>
      * This only applies to persistent groups that need any changes done to apply to the next server session.
      */
-    public void refresh(){
+    public void update(){
         if (isPersistent()){
-            DisplayGroupManager.refreshPersistentPacketGroup(this);
+            DisplayGroupManager.updatePersistentPacketGroup(this);
         }
     }
 
@@ -737,7 +737,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         boolean oldAutoshow = this.autoShow;
         this.autoShow = autoShow;
         if (oldAutoshow != autoShow){
-            this.refresh();
+            this.update();
             if (autoShow){
                 Location loc = getLocation();
                 if (loc != null){

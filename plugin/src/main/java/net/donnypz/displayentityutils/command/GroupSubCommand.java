@@ -35,7 +35,7 @@ public abstract class GroupSubCommand extends PlayerSubCommand{
         execute(player, group, args);
         if (refreshIfPersistentPacket){
             if (group instanceof PacketDisplayEntityGroup pg && pg.isPersistent()){
-                pg.refresh();
+                pg.update();
             }
         }
     }
