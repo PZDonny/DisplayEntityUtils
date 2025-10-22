@@ -9,7 +9,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityG
 import org.jetbrains.annotations.Nullable;
 
 @Name("Persistent Packet Group Id")
-@Description("Get the id of a persistent packet group.")
+@Description("Get the id of a persistent packet group, which can be used to get the group at the later time, even in different sessions.")
 @Examples({"set {id} to {_packetgroup}'s persistent id"})
 @Since("3.3.4")
 public class ExprPersistentPacketGroupId extends SimplePropertyExpression<PacketDisplayEntityGroup, String> {
