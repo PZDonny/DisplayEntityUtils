@@ -14,6 +14,6 @@ class GroupMarkPacketGroupsCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        RelativePointUtils.spawnPersistentPacketGroupPoints(player.getChunk(), player);
+        RelativePointUtils.spawnPacketGroupPoints(player.getChunk(), player);
     }
 }

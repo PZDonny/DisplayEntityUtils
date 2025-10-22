@@ -1,6 +1,5 @@
 package net.donnypz.displayentityutils.utils.relativepoints;
 
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -40,24 +39,24 @@ public class RelativePointUtils {
 
 
     @ApiStatus.Internal
-    public static void spawnPersistentPacketGroupPoints(Chunk chunk, Player player){
+    public static void spawnPacketGroupPoints(Chunk chunk, Player player){
         if (stopIfViewing(player)){
-            return;
-        }
-
-        List<DisplayGroupManager.ChunkPacketGroupInfo> infos = DisplayGroupManager.getPersistentPacketGroupInfo(chunk);
-        if (infos.isEmpty()){
-            player.sendMessage(Component.text("Failed to view points! The chunk does not have any persistent packet based groups!", NamedTextColor.RED));
             return;
         }
 
         Set<RelativePointSelector<?>> displays = new HashSet<>();
         for (PacketDisplayEntityGroup group : PacketDisplayEntityGroup.getGroups(chunk)){
-            PersistentPacketGroupSelector display = new PersistentPacketGroupSelector(player, group);
+            PacketGroupSelector display = new PacketGroupSelector(player, group);
             displays.add(display);
         }
-        setDisplays(player, displays);
-        player.sendMessage(Component.text("| Right click a point to select its packet-based group", NamedTextColor.AQUA));
+        if (displays.isEmpty()){
+            player.sendMessage(Component.text("Failed to view points! The chunk does not have any persistent packet based groups!", NamedTextColor.RED));
+        }
+        else{
+            setDisplays(player, displays);
+            player.sendMessage(Component.text("| Right click a point to select its packet-based group", NamedTextColor.AQUA));
+        }
+
     }
 
     @ApiStatus.Internal

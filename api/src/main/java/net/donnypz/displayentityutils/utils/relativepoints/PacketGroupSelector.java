@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
-public class PersistentPacketGroupSelector extends RelativePointSelector<RelativePoint> {
+public class PacketGroupSelector extends RelativePointSelector<RelativePoint> {
 
     int id;
     String globalId;
@@ -23,17 +23,7 @@ public class PersistentPacketGroupSelector extends RelativePointSelector<Relativ
     String worldName;
     String groupTag;
 
-
-//    PersistentPacketGroupSelector(Player player, DisplayGroupManager.ChunkPacketGroupInfo info) {
-//        super(player, getPitchCorrectedLocation(info.location()), null, Material.ORANGE_CONCRETE);
-//        this.id = info.id();
-//        this.globalId = PacketDisplayEntityGroup.buildPersistentGlobalId(info.location().getChunk(), this.id);
-//        this.chunkKey = info.location().getChunk().getChunkKey();
-//        this.worldName = info.location().getWorld().getName();
-//        this.groupTag = info.groupTag();
-//    }
-
-    PersistentPacketGroupSelector(Player player, PacketDisplayEntityGroup group) {
+    PacketGroupSelector(Player player, PacketDisplayEntityGroup group) {
         super(player, getPitchCorrectedLocation(group.getLocation()), null, Material.ORANGE_CONCRETE);
         this.id = group.getPersistentLocalId();
         this.globalId = group.getPersistentGlobalId();
