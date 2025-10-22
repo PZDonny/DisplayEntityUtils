@@ -29,19 +29,19 @@ public class CondSpawnedGroupIsSpawned extends Condition {
     public boolean check(Event event) {
         SpawnedDisplayEntityGroup g = group.getSingle(event);
         if (g == null) return isNegated();
-        return g.isSpawned() == isNegated();
+        return g.isSpawned() != isNegated();
     }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "Group spawned: "+group.toString(event, debug);
+        return "Is group spawned: "+group.toString(event, debug);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         this.group = (Expression<SpawnedDisplayEntityGroup>) expressions[0];
-        setNegated(parseResult.mark == 1);
+        setNegated(parseResult.mark == 2);
         return true;
     }
 }

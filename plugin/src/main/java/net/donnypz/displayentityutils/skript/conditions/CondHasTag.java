@@ -33,13 +33,13 @@ public class CondHasTag extends Condition {
     public boolean check(Event event) {
         Object obj = object.getSingle(event);
         if (obj instanceof ActiveGroup<?> g){
-            return (g.getTag() != null) == isNegated();
+            return g.hasTag() != isNegated();
         }
         else if (obj instanceof DisplayEntityGroup g){
-            return (g.getTag() != null) == isNegated();
+            return (g.getTag() == null) == isNegated();
         }
         else if (obj instanceof SpawnedDisplayAnimation a){
-            return (a.getAnimationTag() != null) == isNegated();
+            return (a.getAnimationTag() == null) == isNegated();
         }
         return isNegated();
 
@@ -54,7 +54,7 @@ public class CondHasTag extends Condition {
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         object = expressions[0];
-        setNegated(parseResult.mark == 1);
+        setNegated(parseResult.mark == 2);
         return true;
     }
 }

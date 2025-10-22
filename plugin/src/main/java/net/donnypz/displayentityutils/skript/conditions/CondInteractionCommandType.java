@@ -24,13 +24,13 @@ public class CondInteractionCommandType extends Condition {
     }
 
     Expression<InteractionCommand> command;
-    boolean checkingPlayer;
+    boolean isPlayer;
 
     @Override
     public boolean check(Event event) {
         InteractionCommand cmd = command.getSingle(event);
         if (cmd == null) return isNegated();
-        return (cmd.isConsoleCommand() != checkingPlayer) == isNegated();
+        return (cmd.isConsoleCommand() == isPlayer) == isNegated();
     }
 
     @Override
@@ -42,8 +42,8 @@ public class CondInteractionCommandType extends Condition {
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         this.command = (Expression<InteractionCommand>) expressions[0];
-        setNegated(parseResult.mark == 1);
-        checkingPlayer = parseResult.hasTag("player");
+        setNegated(parseResult.mark == 2);
+        isPlayer = parseResult.hasTag("player");
         return true;
     }
 }

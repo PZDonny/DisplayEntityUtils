@@ -29,7 +29,7 @@ public class CondSpawnedGroupAllowsPersistenceOverride extends Condition {
     public boolean check(Event event) {
         SpawnedDisplayEntityGroup g = group.getSingle(event);
         if (g == null) return isNegated();
-        return g.allowsPersistenceOverriding() == isNegated();
+        return g.allowsPersistenceOverriding() != isNegated();
     }
 
     @Override
@@ -41,7 +41,7 @@ public class CondSpawnedGroupAllowsPersistenceOverride extends Condition {
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         this.group = (Expression<SpawnedDisplayEntityGroup>) expressions[0];
-        setNegated(parseResult.mark == 1);
+        setNegated(parseResult.mark == 2);
         return true;
     }
 }

@@ -28,7 +28,7 @@ public class CondActiveGroupIsPersistent extends Condition {
     @Override
     public boolean check(Event event) {
         ActiveGroup<?> g = group.getSingle(event);
-        if (g == null) return false;
+        if (g == null) return isNegated();
         return g.isPersistent() != isNegated();
     }
 

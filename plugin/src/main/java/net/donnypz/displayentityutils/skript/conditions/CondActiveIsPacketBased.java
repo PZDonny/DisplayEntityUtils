@@ -34,7 +34,7 @@ public class CondActiveIsPacketBased extends Condition {
     public boolean check(Event event) {
         Active g = active.getSingle(event);
         if (g == null) return isNegated();
-        return g instanceof PacketDisplayEntityGroup == isNegated();
+        return g instanceof PacketDisplayEntityGroup != isNegated();
     }
 
     @Override
@@ -46,7 +46,7 @@ public class CondActiveIsPacketBased extends Condition {
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         this.active = (Expression<Active>) expressions[0];
-        setNegated(parseResult.mark == 1);
+        setNegated(parseResult.mark == 2);
         return true;
     }
 }

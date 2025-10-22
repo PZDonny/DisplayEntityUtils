@@ -29,7 +29,7 @@ public class CondActiveGroupIsAnimating extends Condition {
     public boolean check(Event event) {
         ActiveGroup g = group.getSingle(event);
         if (g == null) return isNegated();
-        return g.isAnimating() == isNegated();
+        return g.isAnimating() != isNegated();
     }
 
     @Override
@@ -41,7 +41,7 @@ public class CondActiveGroupIsAnimating extends Condition {
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         this.group = (Expression<ActiveGroup>) expressions[0];
-        setNegated(parseResult.mark == 1);
+        setNegated(parseResult.mark == 2);
         return true;
     }
 }
