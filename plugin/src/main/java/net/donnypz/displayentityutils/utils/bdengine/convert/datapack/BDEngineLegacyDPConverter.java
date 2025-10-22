@@ -7,7 +7,6 @@ import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -81,7 +80,7 @@ public class BDEngineLegacyDPConverter {
         SpawnedDisplayEntityGroup createdGroup = DatapackEntitySpawned.getTimestampGroup(timeStamp);
         if (createdGroup == null){
             player.sendMessage(Component.text("Failed to find model/group created from datapack!", NamedTextColor.RED));
-            player.sendMessage(Component.text("| The datapack may be a modern one (v1.13+ of BDEngine). Try using /mdis bdengine convertanimleg"));
+            player.sendMessage(Component.text("| The datapack may be a modern one (v1.13+ of BDEngine). Try using /mdis bdengine convertdp"));
             return;
         }
 
@@ -195,12 +194,7 @@ public class BDEngineLegacyDPConverter {
 
                 if (zipEntry.getName().contains("summon")){
                     String projectName = zipEntry.getName();
-                    if (VersionUtils.IS_1_21){
-                        projectName = projectName.replace("function/summon.mcfunction", "");
-                    }
-                    else{
-                        projectName = projectName.replace("functions/summon.mcfunction", "");
-                    }
+                    projectName = projectName.replace(BDEngineDPConverter.functionFolderName+"/summon.mcfunction", "");
 
                     String[] splitDir = projectName.split("/");
                     projectName = splitDir[splitDir.length-1];

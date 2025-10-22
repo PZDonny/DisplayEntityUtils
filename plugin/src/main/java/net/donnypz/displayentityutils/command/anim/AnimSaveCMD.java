@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 class AnimSaveCMD extends PlayerSubCommand {
     AnimSaveCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("save", parentSubCommand, Permission.ANIM_SAVE);
+        setTabComplete(2, TabSuggestion.STORAGES);
     }
 
     @Override
@@ -29,7 +30,7 @@ class AnimSaveCMD extends PlayerSubCommand {
         }
 
         if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage /mdis anim save <storage-location>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage /mdis anim save <storage>", NamedTextColor.RED));
             return;
         }
 

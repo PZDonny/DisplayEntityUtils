@@ -2,61 +2,65 @@ package net.donnypz.displayentityutils.command.text;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
+import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.command.parts.PartsCMD;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-class TextFontCMD extends PlayerSubCommand {
+class TextFontCMD extends PartsSubCommand {
 
     public TextFontCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("font", parentSubCommand, Permission.TEXT_SET_FONT);
+        super("font", parentSubCommand, Permission.TEXT_SET_FONT, 3, 3);
+        setTabComplete(2, TabSuggestion.TEXT_DISPLAY_FONTS);
     }
 
     @Override
-    public void execute(Player player, String[] args) {
-        ServerSideSelection partSelection = DisplayGroupManager.getPartSelection(player);
-        if (partSelection == null){
-            DisplayEntityPluginCommand.noPartSelection(player);
-            return;
-        }
+    protected void sendIncorrectUsage(@NotNull Player player) {
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis text font <default | alt | uniform | illageralt> [-all]", NamedTextColor.RED)));
+    }
 
-        if (!partSelection.hasSelectedPart()){
-            PartsCMD.invalidPartSelection(player);
+    @Override
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+        Key font = getFont(args, player);
+        if (font == null) return false;
+        for (ActivePart part : selection.getSelectedParts()){
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
+                part.setTextDisplayText(part.getTextDisplayText().font(font));
+            }
         }
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Font successfully set to "+args[2]+" for ALL selected text displays", NamedTextColor.GREEN)));
+        return true;
+    }
 
-        SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
-        if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
+    @Override
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
-            return;
+            return false;
         }
+        Key font = getFont(args, player);
+        if (font == null) return false;
+        selectedPart.setTextDisplayText(selectedPart.getTextDisplayText().font(font));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Font successfully set to "+args[2], NamedTextColor.GREEN)));
+        return true;
+    }
 
-        if (args.length < 3){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis text font <default | alt | uniform | illageralt>", NamedTextColor.RED)));
-            return;
-        }
-
-        TextDisplay display = (TextDisplay) selected.getEntity();
+    private Key getFont(String[] args, Player player){
         String font = args[2];
         switch(font){
             case "default", "alt", "uniform", "illageralt" -> {
-                display.text(display.text().font(Key.key("minecraft:"+font)));
+                return Key.key("minecraft:"+font);
             }
             default -> {
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid Font!", NamedTextColor.RED)));
                 player.sendMessage(Component.text("Valid fonts are \"default\", \"alt\", \"uniform\" and \"illageralt\"", NamedTextColor.GRAY));
-                return;
+                return null;
             }
         }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Font successfully set to "+args[2], NamedTextColor.GREEN)));
     }
 }

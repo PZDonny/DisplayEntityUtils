@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.GroupRegisteredEvent;
 import net.donnypz.displayentityutils.events.GroupUnregisteredEvent;
+import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.GroupResult;
@@ -45,34 +46,33 @@ public final class DisplayGroupManager {
     }
 
     /**
-     * Set the selected SpawnedDisplayEntityGroup of a player to the specified group
-     *
-     * @param player Player to set the selection to
-     * @param spawnedDisplayEntityGroup SpawnedDisplayEntityGroup to be set to the player
+     * Set the selected {@link ActiveGroup} that a player is selecting
+     * @param player the player selecting the group
+     * @param activeGroup the group to select
      * @return false if {@link DisplayConfig#limitGroupSelections()} is true and a player already has the group selected
      */
-    public static boolean setSelectedSpawnedGroup(@NotNull Player player, @NotNull SpawnedDisplayEntityGroup spawnedDisplayEntityGroup) {
-        return DEUUser.getOrCreateUser(player).setSelectedSpawnedGroup(spawnedDisplayEntityGroup);
+    public static boolean setSelectedGroup(@NotNull Player player, @NotNull ActiveGroup<?> activeGroup) {
+        return DEUUser.getOrCreateUser(player).setSelectedGroup(activeGroup);
     }
 
     /**
-     * Gets the SpawnedDisplayEntityGroup a player has selected
+     * Get the {@link ActiveGroup} a player has selected
      * @param player Player to get the group of
-     * @return The SpawnedDisplayEntityGroup that the player has selected. Null if player does not have a selection.
+     * @return an {@link ActiveGroup}. Null if player does not have a selection.
      */
-    public static @Nullable SpawnedDisplayEntityGroup getSelectedSpawnedGroup(@NotNull Player player) {
+    public static @Nullable ActiveGroup<?> getSelectedGroup(@NotNull Player player) {
         DEUUser user = DEUUser.getUser(player);
         if (user != null) return user.getSelectedGroup();
         return null;
     }
 
     /**
-     * Remove a player's SpawnedDisplayEntityGroup selection
+     * Make the player deselect their currently selected {@link ActiveGroup}
      * @param player Player to remove selection from
      */
-    public static void deselectSpawnedGroup(@NotNull Player player) {
+    public static void deselectGroup(@NotNull Player player) {
         DEUUser user = DEUUser.getUser(player);
-        if (user != null) user.deselectSpawnedGroup();
+        if (user != null) user.deselectGroup();
     }
 
     /**
@@ -82,22 +82,21 @@ public final class DisplayGroupManager {
      * @param selection The SpawnedPartSelection for the player to have selected
      * @param setGroup Whether to set the player's selected group to the selection's group
      */
-    public static void setPartSelection(@NotNull Player player, @NotNull ServerSideSelection selection, boolean setGroup) {
+    public static void setPartSelection(@NotNull Player player, @NotNull ActivePartSelection<?> selection, boolean setGroup) {
         DEUUser.getOrCreateUser(player).setSelectedPartSelection(selection, setGroup);
     }
 
     /**
-     * Gets the SpawnedPartSelection a player has selected
-     *
+     * Gets the {@link ActivePartSelection} a player has selected
      * @param player Player to get the selection of
-     * @return a {@link ServerSideSelection} or null if the player does not have an active selection
+     * @return a {@link ActivePartSelection} or null if the player does not have an active selection
      */
-    public static ServerSideSelection getPartSelection(@NotNull Player player) {
+    public static @Nullable ActivePartSelection<?> getPartSelection(@NotNull Player player) {
         DEUUser user = DEUUser.getUser(player);
         if (user == null){
             return null;
         }
-        ServerSideSelection sel = user.getSelectedPartSelection();
+        ActivePartSelection<?> sel = user.getSelectedPartSelection();
         if (sel != null && sel.isValid()) return sel;
         return null;
     }
@@ -317,9 +316,8 @@ public final class DisplayGroupManager {
      * If a group is created as a result of this, {@link GroupRegisteredEvent} will be called
      *
      * @param displayEntity The display entity within a group
-     * @param getter The player searching for a group (For commands, otherwise null)
      */
-    public static @Nullable GroupResult getSpawnedGroup(@NotNull Display displayEntity, @Nullable Player getter) {
+    public static @Nullable GroupResult getSpawnedGroup(@NotNull Display displayEntity) {
         //Check for already registered group
         SpawnedDisplayEntityPart existingPart = SpawnedDisplayEntityPart.getPart(displayEntity);
         if (existingPart != null){
@@ -332,10 +330,6 @@ public final class DisplayGroupManager {
             displayEntity = vehicle;
         }
         else if (displayEntity.getPassengers().isEmpty()) {
-            if (getter != null) {
-                getter.sendMessage(DisplayAPI.pluginPrefix
-                        .append(Component.text("The found display entity is not grouped", NamedTextColor.RED)));
-            }
             return null;
         }
 
@@ -382,27 +376,25 @@ public final class DisplayGroupManager {
         //Check if Interaction is part of group
         part = SpawnedDisplayEntityPart.getPart(interaction);
         return part == null ? null : part.getGroup();
-
     }
 
 
     /**
-     * Gets the nearest Spawned Display Entity Group near a location
+     * Gets the nearest {@link SpawnedDisplayEntityGroup} near a location
      * @param location Center of the search location
      * @param radius The radius to check for a spawned display entity group
      * @return A {@link GroupResult}. Null if not found.
      */
     public static @Nullable GroupResult getSpawnedGroupNearLocation(@NotNull Location location, double radius) {
-        /*Display master = getNearestPotentialMasterDisplay(location, radius, null);
-        if (master == null) {
-            return null;
+        Display master = getNearestPotentialMasterDisplay(location, radius, null);
+        if (master != null){
+            return getSpawnedGroup(master);
         }
-        return getSpawnedGroup(master, null);*/
-        return getSpawnedGroupNearLocation(location, radius, null);
+        return null;
     }
 
     /**
-     * Gets the nearest Spawned Display Entity Group near a location
+     * Gets the nearest {@link SpawnedDisplayEntityGroup} near a location
      *
      * @param location Center of the search location
      * @param radius The radius to check for a spawned display entity group
@@ -420,32 +412,11 @@ public final class DisplayGroupManager {
             }
             return null;
         }
-        return getSpawnedGroup(master, getter);
+        return getSpawnedGroup(master);
     }
 
     /**
-     * Gets the nearest Spawned Display Entity Group near a location
-     *
-     * @param location Center of the search location
-     * @param radius The radius to check for a spawned display entity group
-     * @param getter Player who is getting the spawned group
-     * @return A {@link GroupResult}. Null if not found.
-     */
-    public static @Nullable GroupResult getSpawnedGroupNearLocation(@NotNull Location location, double radius, @Nullable Player getter) {
-        Display master = getNearestPotentialMasterDisplay(location, radius, null);
-        if (master != null){
-            return getSpawnedGroup(master, getter);
-        }
-
-        if (getter != null) {
-            getter.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You are not near any spawned display entity groups!", NamedTextColor.RED)));
-        }
-        return null;
-
-    }
-
-    /**
-     * Gets all the Spawned Display Entity Groups near a location
+     * Gets all the {@link SpawnedDisplayEntityGroup}s near a location
      *
      * @param location Center of the search location
      * @param radius The radius to check for {@link SpawnedDisplayEntityGroup}s
@@ -456,7 +427,7 @@ public final class DisplayGroupManager {
     }
 
     /**
-     * Gets all the Spawned Display Entity Groups near a location
+     * Gets all the {@link SpawnedDisplayEntityGroup}s near a location
      *
      * @param location Center of the search location
      * @param radius The radius to check for {@link SpawnedDisplayEntityGroup}s
@@ -466,7 +437,7 @@ public final class DisplayGroupManager {
         List<GroupResult> results = new ArrayList<>();
         for (BlockDisplay display : location.getNearbyEntitiesByType(BlockDisplay.class, radius)) {
             //Check if found display is a part of a group
-            GroupResult result = getSpawnedGroup(display, null);
+            GroupResult result = getSpawnedGroup(display);
             if (result == null || results.stream().anyMatch(r -> r.group().equals(result.group()))) {
                 continue;
             }
@@ -479,11 +450,11 @@ public final class DisplayGroupManager {
     }
 
     /**
-     * Get the list of all the SpawnedDisplayEntityGroups that have been registered during this play session by world name.
+     * Get the list of all the {@link SpawnedDisplayEntityGroup} that have been registered during this play session by world name.
      *
-     * @return List of all the SpawnedDisplayEntityGroups spawned during this play session by world name.
+     * @return a list
      */
-    public static List<SpawnedDisplayEntityGroup> getSpawnedGroups(@NotNull String worldName) {
+    public static @NotNull List<SpawnedDisplayEntityGroup> getSpawnedGroups(@NotNull String worldName) {
         ArrayList<SpawnedDisplayEntityGroup> groups = new ArrayList<>();
         for (SpawnedDisplayEntityGroup group : allSpawnedGroups.values()) {
             if (group.getWorldName().equals(worldName)) {
@@ -495,7 +466,7 @@ public final class DisplayGroupManager {
 
     /**
      * Get the list of all the {@link SpawnedDisplayEntityGroup}s that have been registered during this play session.
-     * @return List of all registered SpawnedDisplayEntityGroups
+     * @return a list
      */
     public static List<SpawnedDisplayEntityGroup> getAllSpawnedGroups() {
         return new ArrayList<>(allSpawnedGroups.values());
@@ -530,7 +501,13 @@ public final class DisplayGroupManager {
         return DisplayAPI.getStorage(loadMethod).getGroupTags();
     }
 
-    public static PacketDisplayEntityGroup addChunkPacketGroup(@NotNull Location location, @NotNull DisplayEntityGroup displayEntityGroup){
+    @ApiStatus.Internal
+    public static void addPersistentPacketGroup(@NotNull PacketDisplayEntityGroup group, @NotNull Location location){
+        if (group.isPersistent()) return;
+        addPersistentPacketGroupSilent(group, location, group.toDisplayEntityGroup());
+    }
+
+    static void addPersistentPacketGroupSilent(@NotNull PacketDisplayEntityGroup group, @NotNull Location location, @NotNull DisplayEntityGroup displayEntityGroup){
         Chunk c = location.getChunk();
         PersistentDataContainer pdc = c.getPersistentDataContainer();
         Gson gson = new Gson();
@@ -540,38 +517,115 @@ public final class DisplayGroupManager {
             id = 1;
         }
         else{
-            id = gson.fromJson(list.getLast(), ChunkPacketGroup.class).id+1;
+            id = gson.fromJson(list.getLast(), PersistentPacketGroup.class).id+1;
         }
-        ChunkPacketGroup cpg = ChunkPacketGroup.create(id, location, displayEntityGroup);
+        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, group.isAutoShow());
+        if (cpg == null) return;
+
+        String json = gson.toJson(cpg);
+        list.add(json);
+        pdc.set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
+        group.setPersistentIds(id, c);
+    }
+
+    @ApiStatus.Internal
+    public static PacketDisplayEntityGroup addPersistentPacketGroup(@NotNull Location location, @NotNull DisplayEntityGroup displayEntityGroup, boolean autoShow){
+        Chunk c = location.getChunk();
+        PersistentDataContainer pdc = c.getPersistentDataContainer();
+        Gson gson = new Gson();
+        List<String> list = getChunkList(pdc);
+        int id;
+        if (list.isEmpty()){
+            id = 1;
+        }
+        else{
+            id = gson.fromJson(list.getLast(), PersistentPacketGroup.class).id+1;
+        }
+        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, autoShow);
         if (cpg == null) return null;
 
         String json = gson.toJson(cpg);
         list.add(json);
         pdc.set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
-        PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, true, true);
-        pdeg.setChunkPacketGroupId(id);
+        PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, true, autoShow);
+        pdeg.setPersistentIds(id, c);
         return pdeg;
     }
 
-    public static boolean removeChunkPacketGroup(@NotNull PacketDisplayEntityGroup packetDisplayEntityGroup){
-        Location location = packetDisplayEntityGroup.getLocation();
-        if (location == null) return false;
-        return removeChunkPacketGroup(location.getChunk(), packetDisplayEntityGroup.getChunkPacketGroupId(), packetDisplayEntityGroup.getTag());
+    @ApiStatus.Internal
+    public static void updatePersistentPacketGroup(@NotNull PacketDisplayEntityGroup packetDisplayEntityGroup){
+        if (!packetDisplayEntityGroup.isPersistent()) return;
+        String persistentGlobalId = packetDisplayEntityGroup.getPersistentGlobalId();
+        String[] split = persistentGlobalId.split("\\|");
+        long chunkKey = Long.parseLong(split[1]);
+        int localId = Integer.parseInt(split[2]);
+        updatePersistentPacketGroup(packetDisplayEntityGroup, Bukkit.getWorld(split[0]), chunkKey, localId);
+
     }
 
-    public static boolean removeChunkPacketGroup(@NotNull Chunk chunk, int id, String groupTag){
+    @ApiStatus.Internal
+    public static void updatePersistentPacketGroup(@NotNull String persistentGlobalId){
+        try{
+            PacketDisplayEntityGroup g = PacketDisplayEntityGroup.getGroup(persistentGlobalId);
+            if (g == null || !g.isPersistent()) return;
+            String[] split = persistentGlobalId.split("\\|");
+            long chunkKey = Long.parseLong(split[1]);
+            int localId = Integer.parseInt(split[2]);
+            updatePersistentPacketGroup(g, Bukkit.getWorld(split[0]), chunkKey, localId);
+        }
+        catch(IndexOutOfBoundsException | NumberFormatException e){}
+    }
+
+    private static void updatePersistentPacketGroup(PacketDisplayEntityGroup group, World world, long chunkKey, int localId){
+        Chunk storedChunk = world.getChunkAt(chunkKey);
+        PersistentDataContainer pdc = storedChunk.getPersistentDataContainer();
+        List<String> list = getChunkList(pdc);
+        Gson gson = new Gson();
+        for (int i = 0; i < list.size(); i++){
+            String json = list.get(i);
+            PersistentPacketGroup cpg = gson.fromJson(json, PersistentPacketGroup.class);
+            if (cpg == null || cpg.id != localId) continue;
+
+            Location currentLoc = group.getLocation();
+            if (storedChunk.getChunkKey() != ConversionUtils.getChunkKey(currentLoc)){ //Group in new location
+                //Remove and add to new chunk
+                list.remove(i);
+                addPersistentPacketGroupSilent(group, currentLoc, group.toDisplayEntityGroup());
+            }
+            else{
+                cpg.autoShow = group.isAutoShow();
+                cpg.setLocation(currentLoc);
+                cpg.setGroup(group.toDisplayEntityGroup());
+                list.set(i, new Gson().toJson(cpg));
+            }
+            pdc.set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
+            return;
+        }
+    }
+
+    @ApiStatus.Internal
+    public static boolean removePersistentPacketGroup(@NotNull PacketDisplayEntityGroup packetDisplayEntityGroup, boolean unregister){
+        Location location = packetDisplayEntityGroup.getLocation();
+        if (location == null) return false;
+        return removePersistentPacketGroup(location.getChunk(), packetDisplayEntityGroup.getPersistentLocalId(), unregister);
+    }
+
+    @ApiStatus.Internal
+    public static boolean removePersistentPacketGroup(@NotNull Chunk chunk, int id, boolean unregister){
         List<String> list = getChunkList(chunk.getPersistentDataContainer());
         Gson gson = new Gson();
         for (int i = 0; i < list.size(); i++){
             String json = list.get(i);
-            ChunkPacketGroup cpg = gson.fromJson(json, ChunkPacketGroup.class);
+            PersistentPacketGroup cpg = gson.fromJson(json, PersistentPacketGroup.class);
             if (cpg == null) continue;
-            if (cpg.id == id && Objects.equals(cpg.groupTag, groupTag)){
+            if (cpg.id == id){
                 list.remove(json);
                 chunk.getPersistentDataContainer().set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
+                if (!unregister) return true;
+
                 Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
                    for (PacketDisplayEntityGroup g : PacketDisplayEntityGroup.getGroups(chunk)){
-                       if (g.getChunkPacketGroupId() == id){
+                       if (g.getPersistentLocalId() == id){
                            g.unregister();
                            return;
                        }
@@ -583,17 +637,18 @@ public final class DisplayGroupManager {
         return false;
     }
 
-    public static void removeChunkPacketGroups(@NotNull Chunk chunk){
+    @ApiStatus.Internal
+    public static void removePersistentPacketGroups(@NotNull Chunk chunk){
         chunk.getPersistentDataContainer().remove(DisplayAPI.getChunkPacketGroupsKey());
     }
 
     @ApiStatus.Internal
-    public static void spawnChunkPacketGroups(@NotNull Chunk chunk){
+    public static void spawnPersistentPacketGroups(@NotNull Chunk chunk){
         List<String> list = getChunkList(chunk.getPersistentDataContainer());
         Gson gson = new Gson();
         for (String json : list){
-            ChunkPacketGroup cpg = gson.fromJson(json, ChunkPacketGroup.class);
-            cpg.spawn(chunk).setChunkPacketGroupId(cpg.id);
+            PersistentPacketGroup cpg = gson.fromJson(json, PersistentPacketGroup.class);
+            cpg.spawn(chunk).setPersistentIds(cpg.id, chunk);
         }
     }
 
@@ -603,11 +658,11 @@ public final class DisplayGroupManager {
     }
 
     @ApiStatus.Internal
-    public static List<ChunkPacketGroupInfo> getChunkPacketGroupInfo(Chunk chunk){
+    public static List<ChunkPacketGroupInfo> getPersistentPacketGroupInfo(Chunk chunk){
         Gson gson = new Gson();
         List<ChunkPacketGroupInfo> info = new ArrayList<>();
         for (String json : getChunkList(chunk.getPersistentDataContainer())){
-            ChunkPacketGroup cpg = gson.fromJson(json, ChunkPacketGroup.class);
+            PersistentPacketGroup cpg = gson.fromJson(json, PersistentPacketGroup.class);
             if (cpg == null) continue;
             info.add(new ChunkPacketGroupInfo(cpg.getLocation(chunk), cpg.groupTag, cpg.id));
         }
@@ -617,7 +672,7 @@ public final class DisplayGroupManager {
     public record ChunkPacketGroupInfo(Location location, String groupTag, int id){}
 
 
-    static class ChunkPacketGroup{
+    static class PersistentPacketGroup {
         int id;
         double x;
         double y;
@@ -626,11 +681,12 @@ public final class DisplayGroupManager {
         float pitch;
         String groupBase64;
         String groupTag;
+        boolean autoShow = true; //Don't change
 
-        private ChunkPacketGroup(){}
+        private PersistentPacketGroup(){}
 
-        static ChunkPacketGroup create(int id, Location location, DisplayEntityGroup group){
-            ChunkPacketGroup cpg = new ChunkPacketGroup();
+        static PersistentPacketGroup create(int id, Location location, DisplayEntityGroup group, boolean autoShow){
+            PersistentPacketGroup cpg = new PersistentPacketGroup();
             cpg.id = id;
             cpg.x = location.x();
             cpg.y = location.y();
@@ -638,6 +694,12 @@ public final class DisplayGroupManager {
             cpg.yaw = location.getYaw();
             cpg.pitch = location.getPitch();
             cpg.groupTag = group.getTag();
+            cpg.autoShow = autoShow;
+            cpg.setGroup(group);
+            return (cpg.groupBase64 == null) ? null : cpg;
+        }
+
+        void setGroup(DisplayEntityGroup group){
             try{
                 ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
                 GZIPOutputStream gzipOut = new GZIPOutputStream(byteOut);
@@ -647,16 +709,20 @@ public final class DisplayGroupManager {
                 gzipOut.close();
                 objOut.close();
 
-                cpg.groupBase64 = Base64.getEncoder().encodeToString(byteOut.toByteArray());
+                this.groupBase64 = Base64.getEncoder().encodeToString(byteOut.toByteArray());
 
                 byteOut.close();
             }
-            catch(IOException e){
-                return null;
-            }
-            return cpg;
+            catch(IOException e){}
         }
 
+        void setLocation(Location location){
+            this.x = location.x();
+            this.y = location.y();
+            this.z = location.z();
+            this.yaw = location.getYaw();
+            this.pitch = location.getPitch();
+        }
 
         Location getLocation(Chunk chunk){
             World w = chunk.getWorld();
@@ -677,7 +743,7 @@ public final class DisplayGroupManager {
             Location spawnLoc = getLocation(chunk);
             DisplayEntityGroup g = getGroup();
             if (spawnLoc == null || g == null) return null;
-            return g.createPacketGroup(spawnLoc, true, true);
+            return g.createPacketGroup(spawnLoc, true, autoShow);
         }
     }
 }

@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -20,11 +21,12 @@ import java.util.List;
 class AnimPreviewFrameCMD extends PlayerSubCommand {
     AnimPreviewFrameCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("previewframe", parentSubCommand, Permission.ANIM_PREVIEW);
+        setTabComplete(2, "<frame-id>");
     }
 
     @Override
     public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
+        ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(player);
         if (group == null) {
             player.sendMessage(Component.text("You must have a group selected to do this animation command!", NamedTextColor.RED));
             return;

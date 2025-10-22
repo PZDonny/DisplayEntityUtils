@@ -8,7 +8,7 @@ import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDisplayEntityPart> implements ServerSideSelection{
+public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDisplayEntityPart> implements Spawned {
 
     SpawnedPartSelection(@NotNull SpawnedDisplayEntityGroup group, @NotNull PartFilter filter){
         super(group, filter);
@@ -25,33 +25,6 @@ public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDispla
     Material getItemType(SpawnedDisplayEntityPart part) {
         ItemDisplay display = (ItemDisplay) part.getEntity();
         return display.getItemStack().getType();
-    }
-
-    /**
-     * Adds a part tag to the parts in this selection. The tag will not be added if it starts with an "!" or is blank
-     * @param partTag The part tag to give the parts in this selection
-     * @return true if the tag was successfully added
-     */
-    public boolean addTag(@NotNull String partTag){
-        if (!DisplayUtils.isValidTag(partTag)){
-            return false;
-        }
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            part.addTag(partTag);
-        }
-        return true;
-    }
-
-    /**
-     * Removes a part tag from the parts in this selection
-     * @param partTag The part tag to remove from the parts in this selection
-     * @return this
-     */
-    public SpawnedPartSelection removeTag(@NotNull String partTag){
-        for (SpawnedDisplayEntityPart part : selectedParts){
-            part.removeTag(partTag);
-        }
-        return this;
     }
 
     /**

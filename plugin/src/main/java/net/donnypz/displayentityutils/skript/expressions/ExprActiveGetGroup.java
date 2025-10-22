@@ -15,20 +15,20 @@ import org.bukkit.entity.Display;
 import org.bukkit.entity.Interaction;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Active Group From Part/PartSelection/Entity")
-@Description("Get the active group of a active part or part selection or an Display/Interaction entity")
+@Name("Active Group From Active Part/Part Filter/Entity")
+@Description("Get the active group of a active part, part filter, or a Display/Interaction entity")
 @Examples({"set {_spawnedgroup} to {_spawnedpart}'s spawned group",
             "",
             "#3.0.0 and later",
             "set {_packetgroup} to {_packetpart}'s packet group",
             "set {_activegroup} to {_part}'s active group",
-            "3.3.2 and later",
-            "set {_spawnedgroup} to {_display}'s spawned group"})
+            "#3.3.2 and later",
+            "set {_spawnedgroup} to {_displayentity}'s spawned group"})
 @Since("2.6.2, 3.0.0 (Packet), 3.3.2 (Plural)")
 public class ExprActiveGetGroup extends SimplePropertyExpression<Object, ActiveGroup> {
 
     static {
-        register(ExprActiveGetGroup.class, ActiveGroup.class, "(active|spawned|packet)[ |-]group", "activeparts/multipartselections/entities");
+        register(ExprActiveGetGroup.class, ActiveGroup.class, "(active|spawned|packet)[ |-]group", "activeparts/multipartfilters/entities");
     }
 
     @Override
@@ -46,7 +46,7 @@ public class ExprActiveGetGroup extends SimplePropertyExpression<Object, ActiveG
             return sel.getGroup();
         }
         else if (obj instanceof Display display){
-            GroupResult result = DisplayGroupManager.getSpawnedGroup(display, null);
+            GroupResult result = DisplayGroupManager.getSpawnedGroup(display);
             if (result == null) return null;
             return result.group();
         }

@@ -16,7 +16,7 @@ import java.util.List;
 
 class ListGroupsCMD extends ConsoleUsableSubCommand {
     ListGroupsCMD() {
-        super(Permission.LIST_GROUPS, false);
+        super(Permission.LIST_GROUPS);
     }
 
     @Override

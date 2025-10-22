@@ -18,11 +18,11 @@ import org.jetbrains.annotations.Nullable;
 @Name("Translate Active Group/Parts/Selection")
 @Description("Change the translation of an active group's parts, an active part selection's parts, or an active spawned part")
 @Examples({"add {_vector} to {_spawnedgroup}'s translation",
-        "add {_vector} to {_partselection}'s translation over 20 ticks"})
+        "add {_vector} to {_partfilter}'s translation over 20 ticks"})
 @Since("2.7.3, 3.0.0 (Packet)")
 public class EffActiveTranslate extends Effect {
     static {
-        Skript.registerEffect(EffActiveTranslate.class,"add %vector% to %activegroups/activeparts/multipartselections%['s] translation [time:(for|over|with) [duration] %-timespan%]");
+        Skript.registerEffect(EffActiveTranslate.class,"add %vector% to %activegroups/activeparts/multipartfilters%['s] translation [time:(for|over|with) [duration] %-timespan%]");
     }
 
     Expression<Vector> vector;

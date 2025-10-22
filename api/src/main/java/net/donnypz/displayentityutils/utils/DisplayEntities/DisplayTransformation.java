@@ -33,19 +33,19 @@ class DisplayTransformation extends Transformation{
         super(translation, leftRotation, scale, rightRotation);
     }
 
-    static DisplayTransformation get(Display display){
-        DisplayTransformation dTransform = new DisplayTransformation(display.getTransformation());
-        if (display instanceof BlockDisplay blockDisplay){
+    static DisplayTransformation get(ActivePart part){
+        DisplayTransformation dTransform = new DisplayTransformation(part.getDisplayTransformation());
+        if (part.type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY){
             dTransform.type = SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY;
-            dTransform.data = blockDisplay.getBlock();
+            dTransform.data = part.getBlockDisplayBlock();
         }
-        else if (display instanceof ItemDisplay itemDisplay){
+        else if (part.type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
             dTransform.type = SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY;
-            dTransform.data = itemDisplay.getItemStack();
+            dTransform.data = part.getItemDisplayItem();
         }
         else{
             dTransform.type = SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY;
-            dTransform.data = ((TextDisplay) display).text();
+            dTransform.data = part.getTextDisplayText();
         }
         return dTransform;
     }

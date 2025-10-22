@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.InteractionCommand;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
@@ -14,9 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
@@ -90,7 +89,11 @@ public abstract class ActivePart implements Active{
         return players;
     }
 
-
+    /**
+     * Check if this part is the master/parent of its group
+     * @return a boolean
+     */
+    public abstract boolean isMaster();
 
     /** Get this part's UUID used for animations and uniquely identifying parts
      * @return a {@link UUID}
@@ -113,13 +116,20 @@ public abstract class ActivePart implements Active{
         partsById.put(newEntityId, this);
     }
 
+
     /**
-     * Gets the part tags of this part
-     * @return This part's part tags.
+     * Add a tag to this part. The tag will not be added if it starts with an "!" or is blank
+     * @param partTag The part tag to add to this part
+     * @return true if the tag was added successfully
      */
-    public @NotNull HashSet<String> getTags(){
-        return new HashSet<>(partTags);
-    }
+    public abstract boolean addTag(@NotNull String partTag);
+
+    /**
+     * Remove a tag from this part
+     * @param partTag the tag to remove from this part
+     * @return this
+     */
+    public abstract ActivePart removeTag(@NotNull String partTag);
 
     /**
      * Check if this part has a tag
@@ -129,6 +139,15 @@ public abstract class ActivePart implements Active{
     public boolean hasTag(@NotNull String tag){
         return partTags.contains(tag);
     }
+
+    /**
+     * Gets the part tags of this part
+     * @return This part's part tags.
+     */
+    public @NotNull HashSet<String> getTags(){
+        return new HashSet<>(partTags);
+    }
+
 
     public abstract ActiveGroup<?> getGroup();
 
@@ -208,6 +227,8 @@ public abstract class ActivePart implements Active{
             }
         }
     }
+
+    public abstract boolean isGlowing();
 
     /**
      * Mark an interaction entity with a packet-based block display, shown for the given duration. The block used is determined by {@link DisplayConfig#interactionPreviewBlock()}
@@ -289,10 +310,82 @@ public abstract class ActivePart implements Active{
     public abstract void setTransformationMatrix(@NotNull Matrix4f matrix);
 
     /**
+     * Change the X scale of this part
+     * @param scale The X scale to set for this part
+     * @return false if this part is an Interaction
+     */
+    public abstract boolean setXScale(float scale);
+
+    /**
+     * Change the Y scale of this part
+     * @param scale The Y scale to set for this part
+     * @return false if this part is an Interaction
+     */
+    public abstract boolean setYScale(float scale);
+
+    /**
+     * Change the Z scale of this part
+     * @param scale The Z scale to set for this part
+     * @return false if this part is an Interaction
+     */
+    public abstract boolean setZScale(float scale);
+
+    /**
+     * Change the scale of this part
+     * @param x The X scale to set for this part
+     * @param y The Y scale to set for this part
+     * @param z The Z scale to set for this part
+     * @return false if this part is an Interaction
+     */
+    public abstract boolean setScale(float x, float y, float z);
+
+    /**
      * Set the text of this part if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
      * @param text the text
      */
     public abstract void setTextDisplayText(@NotNull Component text);
+
+    /**
+     * Set the text line width of this part if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
+     * @param lineWidth the line width
+     */
+    public abstract void setTextDisplayLineWidth(int lineWidth);
+
+    /**
+     * Set the background color of this part if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
+     * @param color the color
+     */
+    public abstract void setTextDisplayBackgroundColor(@Nullable Color color);
+
+    /**
+     * Set the text opacity of this part if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
+     * @param opacity the opacity
+     */
+    public abstract void setTextDisplayTextOpacity(byte opacity);
+
+    /**
+     * Set whether text of this part should be shadowed, if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
+     * @param shadowed whether text should be shadowed
+     */
+    public abstract void setTextDisplayShadowed(boolean shadowed);
+
+    /**
+     * Set whether text display should be seen through walls, if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
+     * @param seeThrough whether the text display should be seen through walls
+     */
+    public abstract void setTextDisplaySeeThrough(boolean seeThrough);
+
+    /**
+     * Set whether text display should use its default background, if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
+     * @param defaultBackground whether the text display should use its default background
+     */
+    public abstract void setTextDisplayDefaultBackground(boolean defaultBackground);
+
+    /**
+     * Set the {@link TextDisplay.TextAlignment} of this part if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
+     * @param alignment the alignment
+     */
+    public abstract void setTextDisplayAlignment(@NotNull TextDisplay.TextAlignment alignment);
 
     /**
      * Set the block data of this part if its type is {@link SpawnedDisplayEntityPart.PartType#BLOCK_DISPLAY}.
@@ -307,10 +400,34 @@ public abstract class ActivePart implements Active{
     public abstract void setItemDisplayItem(@NotNull ItemStack itemStack);
 
     /**
+     * Set the item of this part if its type is {@link SpawnedDisplayEntityPart.PartType#ITEM_DISPLAY}.
+     * @param transform the transform
+     */
+    public abstract void setItemDisplayTransform(@NotNull ItemDisplay.ItemDisplayTransform transform);
+
+    /**
      * Set the item glint of this part if its type is {@link SpawnedDisplayEntityPart.PartType#ITEM_DISPLAY}.
      * @param hasGlint whether the item display should have an item glint
      */
     public abstract void setItemDisplayItemGlint(boolean hasGlint);
+
+    public abstract @Nullable Component getTextDisplayText();
+
+    public abstract int getTextDisplayLineWidth();
+
+    public abstract @Nullable Color getTextDisplayBackgroundColor();
+
+    public abstract byte getTextDisplayTextOpacity();
+
+    public abstract boolean isTextDisplayShadowed();
+
+    public abstract boolean isTextDisplaySeeThrough();
+
+    public abstract boolean isTextDisplayDefaultBackground();
+
+    public abstract @Nullable TextDisplay.TextAlignment getTextDisplayAlignment();
+
+    public abstract @Nullable BlockData getBlockDisplayBlock();
 
     /**
      * Get the {@link ItemStack} of this part if its type is {@link SpawnedDisplayEntityPart.PartType#ITEM_DISPLAY}.
@@ -331,18 +448,43 @@ public abstract class ActivePart implements Active{
      */
     public abstract void setAttributes(@NotNull DisplayAttributeMap attributeMap);
 
-    /**
-     * Get the interaction translation of this part, relative to its group's location
-     * group's location <bold><u>only</u></bold> if the part's type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.
-     * @return a vector or null if the part is not an interaction or the part is ungrouped
-     */
-    public abstract @Nullable Vector getInteractionTranslation();
 
     /**
-     * Get the transformation of this part if its type of not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * Get the {@link Transformation} of this part if its type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
      * @return a {@link Transformation} or null if the part is an interaction
      */
     public abstract @Nullable Transformation getDisplayTransformation();
+
+    /**
+     * Get the {@link Display.Brightness} of this part if its type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * @return a {@link Display.Brightness} or null if brightness is not set or if the part is an interaction
+     */
+    public abstract @Nullable Display.Brightness getDisplayBrightness();
+
+    /**
+     * Get the view range of this part, if its type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * @return a float, -1 if the part is an interaction
+     */
+    public abstract float getDisplayViewRange();
+
+    /**
+     * Get the teleport duration of this part if its type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.
+     * @return the teleport duration or -1 is the part is an interaction
+     */
+    public abstract int getDisplayTeleportDuration();
+
+    /**
+     * Get the interaction translation of this part, relative to its group's location
+     * group's location <bold><u>only</u></bold> if the part's type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.
+     * @return a {@link Vector} or null if the part is not an Interaction, or if the part is ungrouped
+     */
+    public abstract @Nullable Vector getInteractionTranslation();
+
+    public abstract void setInteractionHeight(float height);
+
+    public abstract void setInteractionWidth(float width);
+
+    public abstract void setInteractionResponsive(boolean responsive);
 
     /**
      * Get the interaction height of this if its type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.
@@ -357,10 +499,28 @@ public abstract class ActivePart implements Active{
     public abstract float getInteractionWidth();
 
     /**
-     * Get the teleport duration of this part if its type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.
-     * @return the teleport duration or -1 is the part is an interaction
+     * Get whether this interaction part is responsive, if its type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * @return a boolean
      */
-    public abstract int getTeleportDuration();
+    public abstract boolean isInteractionResponsive();
+
+    /**
+     * Adds a command to this part to execute when clicked, if its type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * @param command The command to assign
+     * @param isLeftClick whether the command is executed on left click
+     * @param isConsole whether the command should be executed by console or the clicker
+     */
+    public abstract void addInteractionCommand(@NotNull String command, boolean isLeftClick, boolean isConsole);
+
+    /**
+     * Remove a command from this part, if its type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * @param command The command to remove
+     */
+    public abstract void removeInteractionCommand(@NotNull InteractionCommand command);
+
+    public abstract @NotNull List<String> getInteractionCommands();
+
+    public abstract @NotNull List<InteractionCommand> getInteractionCommandsWithData();
 
     static class PartData {
 

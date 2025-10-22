@@ -52,12 +52,12 @@ class DustOptionAnimationParticle extends AnimationParticle implements Serializa
 
     @Override
     protected Component getUniqueInfo() {
-        return getEditMSG("| Color and Size: "+color.asRGB()+", "+size, AnimationParticleBuilder.Step.COLOR);
+        return getEditMSG("| Color and Size: "+color.asRGB()+", "+size, AnimationParticleBuilder.Step.COLOR_AND_SIZE);
     }
 
     @Override
     protected boolean editUniqueParticle(AnimationParticleBuilder builder, AnimationParticleBuilder.Step step) {
-        if (step == AnimationParticleBuilder.Step.COLOR){
+        if (step == AnimationParticleBuilder.Step.COLOR_AND_SIZE){
             updateColor(builder.data());
             return true;
         }

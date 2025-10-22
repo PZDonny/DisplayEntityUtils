@@ -4,10 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -17,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 class PartsViewRangeCMD extends PartsSubCommand {
     PartsViewRangeCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("viewrange", parentSubCommand, Permission.PARTS_VIEWRANGE, 3, 3);
+        setTabComplete(2, "<view-range-multiplier>");
     }
 
     @Override
@@ -25,21 +23,23 @@ class PartsViewRangeCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull SpawnedPartSelection selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         Float viewRange = getViewRange(player, args[2]);
-        if (viewRange == null) return;
+        if (viewRange == null) return false;
         selection.setViewRange(viewRange);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("View range multiplier updated for all selected parts!", NamedTextColor.GREEN)));
         player.sendMessage(Component.text("New View Range: "+viewRange, NamedTextColor.GRAY));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ServerSideSelection selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         Float viewRange = getViewRange(player, args[2]);
-        if (viewRange == null) return;
+        if (viewRange == null) return false;
         selectedPart.setViewRange(viewRange);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("View range multiplier updated for your selected part!", NamedTextColor.GREEN)));
         player.sendMessage(Component.text("New View Range: "+viewRange, NamedTextColor.GRAY));
+        return true;
     }
 
     private Float getViewRange(Player player, String arg){

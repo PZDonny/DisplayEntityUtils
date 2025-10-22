@@ -19,8 +19,8 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         new GroupSaveCMD(this);
         new GroupToPacketCMD(this);
         new GroupMarkPacketGroupsCMD(this);
-        new GroupHideChunkPacketGroupsCMD(this);
-        new GroupShowChunkPacketGroupsCMD(this);
+        new GroupHidePersistentPacketGroupsCMD(this);
+        new GroupShowPersistentPacketGroupsCMD(this);
         new GroupDeleteCMD(this);
         new GroupSpawnCMD(this);
         new GroupDespawnCMD(this);
@@ -41,7 +41,6 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         new GroupGlowCMD(this);
         new GroupUnglowCMD(this);
         new GroupGlowColorCMD(this);
-        new GroupCopyPoseCMD(this);
         new GroupSetSpawnAnimationCMD(this);
         new GroupUnsetSpawnAnimationCMD(this);
         new GroupPersistCMD(this);
@@ -86,17 +85,17 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group selectnearest <distance>", "Select the nearest group within the given distance");
             CMDUtils.sendCMD(sender, "/mdis group deselect", "Clear your group selection");
             CMDUtils.sendCMD(sender, "/mdis group info", "List information about your selected group");
-            CMDUtils.sendCMD(sender, "/mdis group spawn <group-tag> <storage>", "Spawn a saved DisplayEntityGroup from a storage location");
+            CMDUtils.sendCMD(sender, "/mdis group spawn <group-tag> <storage> [-packet]", "Spawn a saved display entity group/model from a storage location. \"-packet\" will spawn the group/model using packets");
             CMDUtils.sendCMD(sender, "/mdis group despawn", "Despawn your selected group");
         }
         else if (page == 2){
-            CMDUtils.sendCMD(sender, "/mdis group save <storage-location>", "Save your selected group");
-            CMDUtils.sendCMD(sender, "/mdis group delete <group-tag> <storage-location>", "Delete a saved group from a storage location");
+            CMDUtils.sendCMD(sender, "/mdis group save <storage>", "Save your selected group");
+            CMDUtils.sendCMD(sender, "/mdis group delete <group-tag> <storage>", "Delete a saved group from a storage location");
             CMDUtils.sendCMD(sender, "/mdis group topacket [-confirm] [-keep]", "Make your selected group packet-based, making it unselectable. \"-confirm\" confirms the action."+
                     " \"-keep\" keeps the non-packet based version of your group spawned.");
             CMDUtils.sendCMD(sender, "/mdis group markpacketgroups", "Create markers for all packet groups stored in your current chunk");
-            CMDUtils.sendCMD(sender, "/mdis group showpacketgroups", "Show all chunk-based, packet-based groups in your current chunk");
-            CMDUtils.sendCMD(sender, "/mdis group hidepacketgroups", "Hide all chunk-based, packet-based groups in your current chunk");
+            CMDUtils.sendCMD(sender, "/mdis group showpacketgroups [-self]", "Show all persistent packet-based groups in your current chunk. \n\"-self\" shows the group only for you");
+            CMDUtils.sendCMD(sender, "/mdis group hidepacketgroups [-self]", "Hide all persistent packet-based groups in your current chunk. \n\"-self\" hides the group only for you");
             CMDUtils.sendCMD(sender, "/mdis group addtarget", "Add a targeted interaction entity to your group");
         }
         else if (page == 3){
@@ -114,13 +113,12 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group translate <direction> <distance> <tick-duration>","Changes your selected group's translation, use \"move\" instead if this group uses animations");
             CMDUtils.sendCMD(sender, "/mdis group movehere", "Change your selected group's actual location to your location");
             CMDUtils.sendCMD(sender, "/mdis group merge <distance>","Merge groups near your selected group");
-            CMDUtils.sendCMD(sender, "/mdis group copypose", "Copies the transformations of the group you're closest to, to your selected group");
             CMDUtils.sendCMD(sender, "/mdis group billboard <fixed | vertical | horizontal | center>", "Set the billboard of all parts in this group");
+            CMDUtils.sendCMD(sender, "/mdis group glowcolor <color | hex-code>", "Set the glow color for all parts in this group");
         }
         else if (page == 5){
             CMDUtils.sendCMD(sender, "/mdis group glow", "Make all parts in this group glow");
             CMDUtils.sendCMD(sender, "/mdis group unglow", "Remove the glowing effect from all parts in this group");
-            CMDUtils.sendCMD(sender, "/mdis group glowcolor <color | hex-code>", "Set the glow color for all parts in this group");
             CMDUtils.sendCMD(sender, "/mdis group ride <-target | player-name | entity-uuid> [group-tag] [storage] [controller-id]", "Make a group ride an entity. Values in brackets [] are optional");
             CMDUtils.sendCMD(sender, "/mdis group safedismount <-target | -selected | player-name | entity-uuid>", "Safely dismount a group from an entity");
             CMDUtils.sendCMD(sender, "/mdis group dismount <-target | -selected | player-name | entity-uuid> [-despawn]", "Dismount a group from an entity, with optional despawning");
@@ -134,7 +132,7 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group togglepersist", "Toggle if your group should persist after a server shutdown");
             CMDUtils.sendCMD(sender, "/mdis group togglepersistoverride", "Toggle if your group's persistence can be overriden when loaded by a chunk, " +
                     "only if \"persistenceOverride\" is enabled in the config");
-            CMDUtils.sendCMD(sender, "/mdis group wetogroup [-remove]", "Convert your WorldEdit selection to a display group, with its origin at the lowest center block of the selection (Requires WorldEdit). \nUse \"-remove\" to set all selected blocks to air");
+            CMDUtils.sendCMD(sender, "/mdis group wetogroup [-removeblocks]", "Convert your WorldEdit selection to a display group, with its origin at the lowest center block of the selection (Requires WorldEdit). \nUse \"-removeblocks\" to set all selected blocks to air");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }

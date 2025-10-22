@@ -8,6 +8,7 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.GroupResult;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
+import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 class GroupSelectNearestCMD extends PlayerSubCommand {
     GroupSelectNearestCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("selectnearest", parentSubCommand, Permission.GROUP_SELECT);
+        setTabComplete(2, "<distance>");
     }
 
     @Override
@@ -33,13 +35,15 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
         try {
             double searchDistance = Double.parseDouble(args[2]);
             if (searchDistance <= 0 ) throw new NumberFormatException();
-            GroupResult result = DisplayGroupManager.getSpawnedGroupNearLocation(player.getLocation(), searchDistance, player);
+            GroupResult result = DisplayGroupManager.getSpawnedGroupNearLocation(player.getLocation(), searchDistance);
             if (result == null || result.group() == null){
+                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You are not near any spawned display entity groups!", NamedTextColor.RED)));
+                player.sendMessage(Component.text("| Use \"/mdis group markpacketgroups\" to mark packet-based groups in your current chunk.", NamedTextColor.GRAY, TextDecoration.ITALIC));
                 return;
             }
             SpawnedDisplayEntityGroup group = result.group();
 
-            boolean selectResult = DisplayGroupManager.setSelectedSpawnedGroup(player, group);
+            boolean selectResult = DisplayGroupManager.setSelectedGroup(player, group);
             if (selectResult){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Selected the nearest group!", NamedTextColor.GREEN)));
             }
@@ -50,9 +54,9 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
 
             group.addMissingInteractionEntities(searchDistance);
             int selectDuration = 50;
-            group.glowAndOutline(player, selectDuration);
+            group.glowAndMarkInteractions(player, selectDuration);
             new BukkitRunnable(){
-                int maxIterations = selectDuration/2;
+                final int maxIterations = selectDuration/2;
                 int iteration = 0;
                 @Override
                 public void run() {
@@ -71,7 +75,7 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
                 }
             }.runTaskTimer(DisplayAPI.getPlugin(), 0, 2);
 
-            if (DEUCommandUtils.removeRelativePoints(player)){
+            if (RelativePointUtils.removeRelativePoints(player)){
                 player.sendMessage(Component.text("Your previewed points have been despawned since you have changed your selected group", NamedTextColor.GRAY, TextDecoration.ITALIC));
             }
             GroupCMD.groupToPacketInfo(player);

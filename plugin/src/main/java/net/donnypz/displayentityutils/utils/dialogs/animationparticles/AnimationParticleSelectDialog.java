@@ -46,6 +46,7 @@ public class AnimationParticleSelectDialog {
                 getDustOptionAction(),
                 getDustTransitionAction(),
                 getEntityEffectAction(),
+                getFlashAction(),
                 getGeneralAction()
         );
     }
@@ -96,6 +97,16 @@ public class AnimationParticleSelectDialog {
                 .tooltip(Component.text("Create an Entity Effect Animation Particle", NamedTextColor.YELLOW))
                 .action(DialogAction.customClick((view, audience) -> {
                     AnimationParticleDialogs.ENTITY_EFFECT.sendDialog((Player) audience);
+                }, CALLBACK_OPTIONS))
+                .build();
+    }
+
+    private static ActionButton getFlashAction(){
+        return ActionButton
+                .builder(Component.text("Flash"))
+                .tooltip(Component.text("Create an Flash Animation Particle", NamedTextColor.YELLOW))
+                .action(DialogAction.customClick((view, audience) -> {
+                    AnimationParticleDialogs.FLASH.sendDialog((Player) audience);
                 }, CALLBACK_OPTIONS))
                 .build();
     }

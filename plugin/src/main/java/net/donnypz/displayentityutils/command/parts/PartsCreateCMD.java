@@ -24,12 +24,14 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
 
 class PartsCreateCMD extends PlayerSubCommand {
 
     PartsCreateCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("create", parentSubCommand, Permission.PARTS_CREATE);
+        setTabComplete(2, TabSuggestion.PART_TYPES);
     }
 
     @Override

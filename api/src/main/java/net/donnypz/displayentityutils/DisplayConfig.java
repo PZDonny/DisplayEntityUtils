@@ -16,7 +16,6 @@ public final class DisplayConfig {
     static boolean overrideByDefault;
     static double maximumInteractionSearchRange;
     static boolean readSameChunks = true;
-    static boolean autoPivotInteractions;
     static boolean overwriteExistingSaves;
     static boolean unregisterOnUnload;
     static boolean isUnregisterOnUnloadBlacklist;
@@ -128,14 +127,6 @@ public final class DisplayConfig {
      */
     public static boolean overwritexistingSaves() {
         return overwriteExistingSaves;
-    }
-
-    /**
-     * Gets the value of "autoPivotInteractionsOnSpawn" in the config
-     * @return the boolean value set in config
-     */
-    public static boolean autoPivotInteractions(){
-        return autoPivotInteractions;
     }
 
 

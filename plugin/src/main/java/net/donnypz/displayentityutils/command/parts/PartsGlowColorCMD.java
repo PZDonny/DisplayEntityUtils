@@ -5,10 +5,7 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
@@ -19,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 class PartsGlowColorCMD extends PartsSubCommand {
     PartsGlowColorCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("glowcolor", parentSubCommand, Permission.PARTS_GLOW_COLOR, 3, 3);
+        setTabComplete(2, TabSuggestion.COLORS);
     }
 
     @Override
@@ -28,25 +26,28 @@ class PartsGlowColorCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull SpawnedPartSelection selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         Color color = getColor(player, args[2]);
-        if (color == null) return;
+        if (color == null) return false;
         selection.setGlowColor(color);
         selection.glow(player, 60);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Glow color successfully set for selected display entity part(s) in your selection!", NamedTextColor.GREEN)));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ServerSideSelection selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         Color color = getColor(player, args[2]);
-        if (color == null) return;
+        if (color == null) return false;
         if (selectedPart.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Interaction entities cannot have a glow color applied!", NamedTextColor.RED)));
+            return false;
         }
         else{
             selectedPart.setGlowColor(color);
             selectedPart.glow(player, 60);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Glow color successfully set for your selected part!", NamedTextColor.GREEN)));
+            return true;
         }
     }
 

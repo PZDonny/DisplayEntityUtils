@@ -35,13 +35,13 @@ public class CondActiveIsVisible extends Condition {
         Object o = active.getSingle(event);
         if (p == null || o == null) return isNegated();
         if (o instanceof ActiveGroup ag){
-            return ag.isTrackedBy(p) == isNegated();
+            return ag.isTrackedBy(p) != isNegated();
         }
         else if (o instanceof SpawnedDisplayEntityPart sp){
-            return p.canSee(sp.getEntity()) == isNegated();
+            return p.canSee(sp.getEntity()) != isNegated();
         }
         else if (o instanceof PacketDisplayEntityPart pp){
-            return pp.isTrackedBy(p) == isNegated();
+            return pp.isTrackedBy(p) != isNegated();
         }
         return false;
     }
@@ -55,8 +55,8 @@ public class CondActiveIsVisible extends Condition {
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         this.player = (Expression<Player>) expressions[0];
-        this.active = (Expression<ActiveGroup>) expressions[1];
-        setNegated(parseResult.mark == 1);
+        this.active = expressions[1];
+        setNegated(parseResult.mark == 2);
         return true;
     }
 }

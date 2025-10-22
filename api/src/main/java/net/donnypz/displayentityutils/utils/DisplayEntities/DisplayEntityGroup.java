@@ -250,11 +250,10 @@ public final class DisplayEntityGroup implements Serializable{
                 part.adaptScoreboardTags(true);
             }
 
-            if (DisplayConfig.autoPivotInteractions()){
-                float yaw = location.getYaw();
-                interaction.setRotation(yaw, location.getPitch());
-                DisplayUtils.pivot(interaction, location, yaw);
-            }
+            //Interaction Pivot
+            float yaw = location.getYaw();
+            interaction.setRotation(yaw, location.getPitch());
+            DisplayUtils.pivot(interaction, location, yaw);
         }
 
         group.setPersistenceOverride(settings.persistenceOverride);

@@ -4,10 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Display;
@@ -18,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 class PartsBillboardCMD extends PartsSubCommand {
     PartsBillboardCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("billboard", parentSubCommand, Permission.PARTS_BILLBOARD, 3, 3);
+        setTabComplete(2, TabSuggestion.BILLBOARDS);
     }
 
     @Override
@@ -27,24 +25,26 @@ class PartsBillboardCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull SpawnedPartSelection selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         Display.Billboard billboard = getBillboard(player, args[2]);
-        if (billboard == null) return;
+        if (billboard == null) return false;
         selection.setBillboard(billboard);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Billboard successfully set for selected display entity part(s) in your selection!", NamedTextColor.GREEN)));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ServerSideSelection selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (selectedPart.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Interaction entities cannot have a billboard applied!", NamedTextColor.RED)));
         }
         else{
             Display.Billboard billboard = getBillboard(player, args[2]);
-            if (billboard == null) return;
+            if (billboard == null) return false;
             selectedPart.setBillboard(billboard);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Billboard successfully set for your selected part!", NamedTextColor.GREEN)));
         }
+        return true;
     }
 
     private Display.Billboard getBillboard(Player player, String arg){

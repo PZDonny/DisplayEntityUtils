@@ -4,10 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,9 +13,12 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 class ItemSetCMD extends PartsSubCommand {
     ItemSetCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("set", parentSubCommand, Permission.ITEM_SET,3, 3);
+        setTabComplete(2, List.of("-held", "<item-id>"));
     }
 
     @Override
@@ -27,33 +27,32 @@ class ItemSetCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull SpawnedPartSelection selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         String item = args[2];
         ItemStack itemStack = DEUCommandUtils.getItemFromText(item, player);
-        if (itemStack == null) return;
+        if (itemStack == null) return false;
 
-        for (SpawnedDisplayEntityPart part : selection.getSelectedParts()){
+        for (ActivePart part : selection.getSelectedParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
                 part.setItemDisplayItem(itemStack);
             }
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set item of ALL selected item displays!", NamedTextColor.GREEN)));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ServerSideSelection selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         String item = args[2];
         ItemStack itemStack = DEUCommandUtils.getItemFromText(item, player);
-        if (itemStack == null) return;
+        if (itemStack == null) return false;
 
         if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with item display entities", NamedTextColor.RED)));
-            return;
+            return false;
         }
         selectedPart.setItemDisplayItem(itemStack);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set item of selected item display!", NamedTextColor.GREEN)));
+        return true;
     }
-
-
-
 }

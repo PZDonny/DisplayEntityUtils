@@ -2,74 +2,77 @@ package net.donnypz.displayentityutils.command.text;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
+import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.command.parts.PartsCMD;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-class TextBackgroundCMD extends PlayerSubCommand {
+class TextBackgroundCMD extends PartsSubCommand {
     TextBackgroundCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("background", parentSubCommand, Permission.TEXT_BACKGROUND);
+        super("background", parentSubCommand, Permission.TEXT_BACKGROUND, 4, 4);
+        setTabComplete(2, TabSuggestion.COLORS);
+        setTabComplete(3, "<0-1>");
     }
 
     @Override
-    public void execute(Player player, String[] args) {
-        if (args.length < 4){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis text background <color | hex-code> <0-1>", NamedTextColor.RED)));
-            return;
+    protected void sendIncorrectUsage(@NotNull Player player) {
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis text background <color | hex-code> <0-1> [-all]", NamedTextColor.RED)));
+    }
+
+    @Override
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+        Color color = getColor(args, player);
+        if (color == null) return false;
+        for (ActivePart part : selection.getSelectedParts()){
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
+                part.setTextDisplayBackgroundColor(color);
+            }
         }
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set background color for ALL selected text displays", NamedTextColor.GREEN)));
+        return true;
+    }
 
-
-        ServerSideSelection partSelection = DisplayGroupManager.getPartSelection(player);
-        if (partSelection == null){
-            DisplayEntityPluginCommand.noPartSelection(player);
-            return;
+    @Override
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        Color color = getColor(args, player);
+        if (color == null) return false;
+        if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
+            return false;
         }
+        selectedPart.setTextDisplayBackgroundColor(color);
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set text display's background color", NamedTextColor.GREEN)));
+        return true;
+    }
 
-        if (!partSelection.hasSelectedPart()){
-            PartsCMD.invalidPartSelection(player);
-        }
-
+    private Color getColor(String[] args, Player player){
         Color c = ConversionUtils.getColorFromText(args[2]);
         if (c == null){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid color!", NamedTextColor.RED)));
             player.sendMessage(Component.text("/mdis text background <color | hex-code> <0-1>", NamedTextColor.GRAY));
-            return;
+            return null;
         }
-
-        SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
-        if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
-            return;
-        }
-
-        TextDisplay display = (TextDisplay) selected.getEntity();
         try{
             double change = Double.parseDouble(args[3]);
             if (change < 0 || change > 1){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid opacity, enter a value between 0 and 1!", NamedTextColor.RED)));
-                return;
+                return null;
             }
             double multiplied = 255*change;
             if (multiplied >= 25.5 && multiplied < 26){//0.1 input range
                 multiplied = 26;
             }
-
-            display.setBackgroundColor(c.setAlpha((int) multiplied));
-            player.sendMessage(Component.text("Successfully set text display's background color", NamedTextColor.GREEN));
+            return c.setAlpha((int) multiplied);
         }
         catch(NumberFormatException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid opacity, enter a value between 0 and 1!", NamedTextColor.RED)));
+            return null;
         }
     }
 }

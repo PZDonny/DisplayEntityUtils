@@ -4,6 +4,7 @@ import com.destroystokyo.paper.event.entity.EntityJumpEvent;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.Disguise;
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.listeners.ListenerUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -93,7 +94,7 @@ public final class DEUEntityListener implements Listener {
 
         ActiveGroup<?> controllerGroup = DisplayControllerManager.getControllerGroup(entity.getUniqueId());
         if (controllerGroup instanceof PacketDisplayEntityGroup pg){
-            pg.updateChunkAndWorld(e.getTo());
+            pg.teleport(e.getTo(), true);
         }
     }
 
@@ -119,10 +120,8 @@ public final class DEUEntityListener implements Listener {
                 }
             }
         }
+        ListenerUtils.removeEntity(entity.getEntityId());
     }
-
-
-
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onRemoval(EntityRemoveEvent e){ //Non-Persistent Entities
@@ -137,6 +136,21 @@ public final class DEUEntityListener implements Listener {
                 pdeg.dismount();
             }
             DisplayControllerManager.unregisterEntity(entity);
+        }
+        ListenerUtils.removeEntity(entity.getEntityId());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onRide(EntityMountEvent e){ //Happens before packet
+        Entity vehicle = e.getMount();
+        ListenerUtils.setEntity(vehicle.getEntityId(), vehicle.getUniqueId());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onDismount(EntityDismountEvent e){
+        Entity vehicle = e.getDismounted();
+        if (vehicle.getPassengers().size() == 1){
+            ListenerUtils.removeEntity(vehicle.getEntityId());
         }
     }
 

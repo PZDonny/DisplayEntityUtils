@@ -4,25 +4,26 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 class PartsScaleCMD extends PartsSubCommand {
 
     PartsScaleCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("scale", parentSubCommand, Permission.PARTS_TRANSFORM, 4, 4);
+        setTabComplete(2, List.of("x", "y", "z", "-all"));
+        setTabComplete(3, "<scale>");
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull SpawnedPartSelection selection, @NotNull String[] args) {
-        for (SpawnedDisplayEntityPart selectedPart : selection.getSelectedParts()){
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+        for (ActivePart selectedPart : selection.getSelectedParts()){
             if (selectedPart.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 continue;
             }
@@ -32,24 +33,30 @@ class PartsScaleCMD extends PartsSubCommand {
                 }
             } catch (NumberFormatException e) {
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the scale!", NamedTextColor.RED)));
-                return;
+                return false;
             }
         }
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ServerSideSelection selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (selectedPart.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
             player.sendMessage(Component.text("You cannot do this with an interaction part entity!", NamedTextColor.RED));
             player.sendMessage(Component.text("| Use \"/mdis interaction scale\" instead", NamedTextColor.GRAY));
-            return;
+            return false;
         }
         try {
             if (applyScaleChange(getDimension(args), getScale(args), selectedPart, player)) {
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Scale Updated!", NamedTextColor.GREEN)));
+                return true;
+            }
+            else{
+                return false;
             }
         } catch (NumberFormatException e) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the scale!", NamedTextColor.RED)));
+            return false;
         }
     }
 
@@ -66,7 +73,7 @@ class PartsScaleCMD extends PartsSubCommand {
         return Float.parseFloat(args[3]);
     }
 
-    private boolean applyScaleChange(String dim, float scale, SpawnedDisplayEntityPart part, Player player){
+    private boolean applyScaleChange(String dim, float scale, ActivePart part, Player player){
         switch (dim){
             case "x" -> {
                 part.setXScale(scale);

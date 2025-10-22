@@ -6,10 +6,7 @@ import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.utils.Direction;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -21,6 +18,9 @@ import org.jetbrains.annotations.Nullable;
 class PartsTranslateCMD extends PartsSubCommand {
     PartsTranslateCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("translate", parentSubCommand, Permission.PARTS_TRANSLATE, 5, 5);
+        setTabComplete(2, TabSuggestion.DIRECTIONS);
+        setTabComplete(3, "<distance>");
+        setTabComplete(4, "<tick-duration>");
     }
 
     @Override
@@ -38,20 +38,22 @@ class PartsTranslateCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull SpawnedPartSelection selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         Object[] objects = getArgs(player, args);
-        if (objects == null) return;
+        if (objects == null) return false;
 
         selection.translate((Direction) objects[0], (float) objects[1], (int) objects[2], -1);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Translating all selected parts!", NamedTextColor.GREEN)));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ServerSideSelection selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         Object[] objects = getArgs(player, args);
-        if (objects == null) return;
+        if (objects == null) return false;
         selectedPart.translate((Direction) objects[0], (float) objects[1], (int) objects[2], -1);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Translating your selected part!", NamedTextColor.GREEN)));
+        return true;
     }
 
     private Object[] getArgs(Player player, String[] args){

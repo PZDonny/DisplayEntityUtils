@@ -1,6 +1,10 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.PacketUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Display;
@@ -190,6 +194,32 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
 
     abstract Material getItemType(T part);
 
+    /**
+     * Adds a part tag to the parts in this selection. The tag will not be added if it starts with an "!" or is blank
+     * @param partTag The part tag to give the parts in this selection
+     * @return true if the tag was successfully added
+     */
+    public boolean addTag(@NotNull String partTag){
+        if (!DisplayUtils.isValidTag(partTag)){
+            return false;
+        }
+        for (T part : selectedParts){
+            part.addTag(partTag);
+        }
+        return true;
+    }
+
+    /**
+     * Removes a part tag from the parts in this selection
+     * @param partTag The part tag to remove from the parts in this selection
+     * @return this
+     */
+    public MultiPartSelection<T> removeTag(@NotNull String partTag){
+        for (T part : selectedParts){
+            part.removeTag(partTag);
+        }
+        return this;
+    }
 
     /**
      * Check if this selection has any filters applied to it
@@ -202,6 +232,14 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
                         && excludedTags.isEmpty()
                         && itemTypes.isEmpty()
                         && blockTypes.isEmpty());
+    }
+
+    /**
+     * Get whether this selection has parts that are included in this selection's filter
+     * @return a boolean
+     */
+    public boolean hasSelectedParts(){
+        return !selectedParts.isEmpty();
     }
 
     /**
@@ -395,6 +433,37 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
     public void glow(@NotNull Player player, long durationInTicks){
         for (T part : selectedParts){
             part.glow(player, durationInTicks);
+        }
+    }
+
+    /**
+     * Make this group's display entities glow, and interactions be outlined, for a player for a set period of time
+     * @param player the player
+     * @param durationInTicks how long the glowing should last. -1 to last forever
+     */
+    public void glowAndMarkInteractions(@NotNull Player player, long durationInTicks){
+        for (T part : selectedParts){
+            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                part.markInteraction(player, durationInTicks);
+            }
+            else {
+                if (part.isGlowing()){
+                    continue;
+                }
+                PacketUtils.setGlowing(player, part.getEntityId(), true);
+                if (durationInTicks > -1){
+                    Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+                        if (!part.isGlowing()){
+                            PacketUtils.setGlowing(player, part.getEntityId(), false);
+                        }
+                    }, durationInTicks);
+                }
+                else{
+                    if (!part.isGlowing()){
+                        PacketUtils.setGlowing(player, part.getEntityId(), false);
+                    }
+                }
+            }
         }
     }
 

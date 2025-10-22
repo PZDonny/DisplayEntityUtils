@@ -27,8 +27,8 @@ public abstract class RelativePointSelector<T extends RelativePoint> {
     private static final HashMap<PacketDisplayEntityPart, RelativePointSelector> interactionParts = new HashMap<>();
 
     private UUID playerUUID;
-    private PacketDisplayEntityPart selectPart;
-    private PacketDisplayEntityPart displayPart;
+    protected PacketDisplayEntityPart selectPart;
+    protected PacketDisplayEntityPart displayPart;
 
     T relativePoint;
     Location spawnLocation;
@@ -72,7 +72,7 @@ public abstract class RelativePointSelector<T extends RelativePoint> {
         displayPart.setGlowColor(Color.BLACK);
     }
 
-    public void setLocation(@NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
+    public void setLocation(@NotNull ActiveGroup<?> group, @NotNull Location location){
         if (!isValid){
             return;
         }
@@ -93,7 +93,7 @@ public abstract class RelativePointSelector<T extends RelativePoint> {
     }
 
     public T getRelativePoint(){
-        return (T) relativePoint;
+        return relativePoint;
     }
 
     public abstract void sendInfo(Player player);

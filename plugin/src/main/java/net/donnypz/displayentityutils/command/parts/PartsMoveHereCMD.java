@@ -6,7 +6,8 @@ import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -22,7 +23,7 @@ class PartsMoveHereCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        ServerSideSelection selection = DisplayGroupManager.getPartSelection(player);
+        ActivePartSelection<?> selection = DisplayGroupManager.getPartSelection(player);
         if (selection == null){
             DisplayEntityPluginCommand.noPartSelection(player);
             return;
@@ -36,7 +37,7 @@ class PartsMoveHereCMD extends PlayerSubCommand {
             PartsCMD.invalidPartSelection(player);
             return;
         }
-        Entity e = selection.getSelectedPart().getEntity();
+        Entity e = ((SpawnedDisplayEntityPart) selection.getSelectedPart()).getEntity();
         Location loc = player.getLocation();
         loc.setYaw(e.getYaw());
         loc.setPitch(e.getPitch());

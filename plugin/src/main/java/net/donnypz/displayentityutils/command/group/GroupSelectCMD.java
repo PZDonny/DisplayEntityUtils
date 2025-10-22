@@ -9,6 +9,7 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.GroupResult;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
+import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -31,6 +32,7 @@ class GroupSelectCMD extends PlayerSubCommand {
             .build();
     GroupSelectCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("select", parentSubCommand, Permission.GROUP_SELECT);
+        setTabComplete(2, "<distance>");
     }
 
     @Override
@@ -60,6 +62,7 @@ class GroupSelectCMD extends PlayerSubCommand {
         if (groups.isEmpty()){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("No nearby groups found!", NamedTextColor.RED)));
             player.sendMessage(Component.text("| Move to a different location or increase your search distance.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+            player.sendMessage(Component.text("| Use \"/mdis group markpacketgroups\" to mark packet-based groups in your current chunk.", NamedTextColor.GRAY, TextDecoration.ITALIC));
             return;
         }
 
@@ -82,7 +85,7 @@ class GroupSelectCMD extends PlayerSubCommand {
                             audience.sendMessage(Component.text("Group no longer spawned or is invalid.", NamedTextColor.RED));
                             return;
                         }
-                        g.glowAndOutline((Player) audience, 60);
+                        g.glowAndMarkInteractions((Player) audience, 60);
                     }, clickOptions));
             Component select = Component.text("[SELECT]", NamedTextColor.GREEN)
                     .clickEvent(ClickEvent.callback(audience -> {
@@ -91,11 +94,11 @@ class GroupSelectCMD extends PlayerSubCommand {
                             audience.sendMessage(Component.text("Group no longer spawned or is invalid.", NamedTextColor.RED));
                             return;
                         }
-                        boolean selectResult = DisplayGroupManager.setSelectedSpawnedGroup(p, g);
+                        boolean selectResult = DisplayGroupManager.setSelectedGroup(p, g);
                         if (selectResult){
                             g.addMissingInteractionEntities(distance);
                             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully selected group!", NamedTextColor.GREEN)));
-                            if (DEUCommandUtils.removeRelativePoints(p)){
+                            if (RelativePointUtils.removeRelativePoints(p)){
                                 p.sendMessage(Component.text("Your previewed points have been despawned since you have changed your selected group", NamedTextColor.GRAY, TextDecoration.ITALIC));
                             }
                         }
@@ -104,7 +107,7 @@ class GroupSelectCMD extends PlayerSubCommand {
                             return;
                         }
                         int selectDuration = 50;
-                        g.glowAndOutline(p, selectDuration);
+                        g.glowAndMarkInteractions(p, selectDuration);
                         new BukkitRunnable(){
                             int maxIterations = selectDuration/2;
                             int iteration = 0;

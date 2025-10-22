@@ -3,20 +3,23 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
+import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
+import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.FollowType;
+import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.Vector;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,12 +43,36 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     protected float verticalOffset = 0;
     int lastAnimatedTick = -1;
 
+
+    /**
+     * Make a player select this group
+     * @param player The player to give the selection to
+     * @return this
+     */
+    @ApiStatus.Internal
+    public ActiveGroup<T> addPlayerSelection(Player player){
+        DisplayGroupManager.setSelectedGroup(player, this);
+        return this;
+    }
+
+    /**
+     * Add a part to this group. If the part was not previously part of this group AND it represents a display entity.
+     * @param part the part to add
+     */
+    public abstract void addPart(T part);
+
+
     /**
      * Get this group's tag
      * @return This group's tag. Null if it is unset
      */
     public @Nullable String getTag() {
         return tag;
+    }
+
+    public ActiveGroup<?> setTag(@Nullable String tag){
+        this.tag = tag;
+        return this;
     }
 
     /**
@@ -112,6 +139,23 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      */
     public abstract boolean teleport(@NotNull Location location, boolean respectGroupDirection);
 
+    /**
+     * Move the model through smooth teleportation of both interaction and display entities. Doing this multiple times in a short amount of time may bring unexpected results.
+     * @param direction The direction to translate the group
+     * @param distance How far the group should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     */
+    public void teleportMove(@NotNull Direction direction, double distance, int durationInTicks){
+        teleportMove(direction.getVector(masterPart, false), distance, durationInTicks);
+    }
+
+    /**
+     * Move the model through smooth teleportation of both interaction and display entities. Doing this multiple times in a short amount of time may bring unexpected results.
+     * @param direction The direction to translate the group
+     * @param distance How far the group should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     */
+    public abstract void teleportMove(Vector direction, double distance, int durationInTicks);
 
     /**
      * Set the teleportation duration of all parts in this group
@@ -265,6 +309,38 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
+     * Make this group's display entities glow, and interactions be outlined, for a player for a set period of time
+     * @param player the player
+     * @param durationInTicks how long the glowing should last. -1 to last forever
+     * @return this
+     */
+    public void glowAndMarkInteractions(@NotNull Player player, long durationInTicks){
+        for (ActivePart p : groupParts.values()){
+            if (p.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                p.markInteraction(player, durationInTicks);
+            }
+            else {
+                if (p.isGlowing()){
+                    continue;
+                }
+                PacketUtils.setGlowing(player, p.getEntityId(), true);
+                if (durationInTicks > -1){
+                    Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+                        if (!p.isGlowing()){
+                            PacketUtils.setGlowing(player, p.getEntityId(), false);
+                        }
+                    }, durationInTicks);
+                }
+                else{
+                    if (!p.isGlowing()){
+                        PacketUtils.setGlowing(player, p.getEntityId(), false);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Removes the glow effect from all the display parts in this group
      */
     @Override
@@ -406,6 +482,18 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         return masterPart;
     }
 
+    /**
+     * Set whether this group should persist after a server restart. If false, the group will be removed after a restart.
+     * @param persistent if this group should persist
+     */
+    public abstract void setPersistent(boolean persistent);
+
+    /**
+     * Get whether this group will persist after a server restart
+     * @return a boolean
+     */
+    public abstract boolean isPersistent();
+
     public abstract Location getLocation();
 
     public abstract String getWorldName();
@@ -423,7 +511,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @return the group's teleport duration value
      */
     public int getTeleportDuration(){
-        return masterPart.getTeleportDuration();
+        return masterPart.getDisplayTeleportDuration();
     }
 
     /**
@@ -433,6 +521,12 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     public boolean hasTrackingPlayers() {
         return !getTrackingPlayers().isEmpty();
     }
+
+    /**
+     * Remove all Interaction {@link ActivePart}s that are in this group
+     */
+    public abstract void removeInteractions();
+
 
     void addActiveAnimator(DisplayAnimator animator){
         synchronized(animatorLock){
@@ -712,10 +806,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
             if (spawnAnimationType == null){
                 return;
             }
-            switch(spawnAnimationType){
-                case LINEAR -> this.animate(anim);
-                case LOOP -> this.animateLooping(anim);
-            }
+            new DisplayAnimator(anim, spawnAnimationType).playUsingPackets(this, 0);
         }
     }
 
@@ -778,11 +869,22 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         return verticalOffset;
     }
 
-
-    void setSpawnAnimation(String animationTag, LoadMethod loadMethod, DisplayAnimator.AnimationType animationType){
+    /**
+     * Set the animation that a group should play when it is spawned/loaded.
+     * @param animationTag tag of animation to apply whenever this group is spawned/loaded
+     * @param animationType type of animation to be applied
+     * @param loadMethod where the animation should be retrieved from
+     */
+    public void setSpawnAnimation(@NotNull String animationTag, @NotNull DisplayAnimator.AnimationType animationType, @NotNull LoadMethod loadMethod){
         this.spawnAnimationTag = animationTag;
         this.spawnAnimationLoadMethod = loadMethod;
         this.spawnAnimationType = animationType;
+    }
+
+    public void unsetSpawnAnimation(){
+        this.spawnAnimationTag = null;
+        this.spawnAnimationLoadMethod = null;
+        this.spawnAnimationType = null;
     }
 
     void setSpawnAnimation(PersistentDataContainer pdc){

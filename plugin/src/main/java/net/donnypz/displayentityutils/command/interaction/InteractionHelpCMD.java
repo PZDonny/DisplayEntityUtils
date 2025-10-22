@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 class InteractionHelpCMD extends ConsoleUsableSubCommand {
 
     InteractionHelpCMD() {
-        super(Permission.HELP, false);
+        super(Permission.HELP);
     }
 
     @Override

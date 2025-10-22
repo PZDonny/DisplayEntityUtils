@@ -2,10 +2,7 @@ package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,24 +16,18 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
         super(commandName, parentSubCommand, permission);
         this.minimumArgs = minimumArgs;
         this.allArgumentIndex = allArgumentIndex;
+        setTabComplete(allArgumentIndex, "-all");
         this.requireGroupSelection = false;
-    }
-
-    public PartsSubCommand(@NotNull String commandName, @NotNull DEUSubCommand parentSubCommand, @NotNull Permission permission, int minimumArgs, int allArgumentIndex, boolean requireGroupSelection) {
-        super(commandName, parentSubCommand, permission);
-        this.minimumArgs = minimumArgs;
-        this.allArgumentIndex = allArgumentIndex;
-        this.requireGroupSelection = requireGroupSelection;
     }
 
     @Override
     public void execute(Player player, String[] args){
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
+        ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(player);
         if (requireGroupSelection && group == null){
             DisplayEntityPluginCommand.noGroupSelection(player);
             return;
         }
-        ServerSideSelection selection = DisplayGroupManager.getPartSelection(player);
+        ActivePartSelection<?> selection = DisplayGroupManager.getPartSelection(player);
         if (selection == null){
             DisplayEntityPluginCommand.noPartSelection(player);
             return;
@@ -52,23 +43,25 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
             return;
         }
 
+        boolean updatePacket;
         if (args.length >= allArgumentIndex +1 && args[allArgumentIndex].equalsIgnoreCase("-all")){
             if (PartsCMD.isUnwantedSingleSelectionAll(player, selection)){
                 return;
             }
-            executeAllPartsAction(player, group, (SpawnedPartSelection) selection, args);
+            updatePacket = executeAllPartsAction(player, group, (MultiPartSelection<?>) selection, args);
         }
         else{
-            executeSinglePartAction(player, group, selection, selection.getSelectedPart(), args);
+            updatePacket = executeSinglePartAction(player, group, selection, selection.getSelectedPart(), args);
+        }
+
+        if (updatePacket && group instanceof PacketDisplayEntityGroup pg && pg.getMasterPart() != null){
+            pg.update();
         }
     }
 
     protected abstract void sendIncorrectUsage(@NotNull Player player);
 
-    protected abstract void executeAllPartsAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull SpawnedPartSelection selection, @NotNull String[] args);
+    protected abstract boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args);
 
-    protected abstract void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ServerSideSelection selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args);
-
-
-
+    protected abstract boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args);
 }

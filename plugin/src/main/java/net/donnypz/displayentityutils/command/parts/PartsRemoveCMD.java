@@ -4,11 +4,9 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
+import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -24,44 +22,67 @@ class PartsRemoveCMD extends PartsSubCommand {
     protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull SpawnedPartSelection selection, @NotNull String[] args) {
-        for (SpawnedDisplayEntityPart part : selection.getSelectedParts()){
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+        for (ActivePart part : selection.getSelectedParts()){
             if (part.isMaster()){
                 continue;
             }
-            part.remove(true);
+            if (part instanceof PacketDisplayEntityPart p){
+                p.remove();
+            }
+            else if (part instanceof SpawnedDisplayEntityPart p){
+                p.remove(true);
+            }
         }
         player.sendMessage(Component.text("Successfully despawned all selected parts!", NamedTextColor.GREEN));
         removeGroupIfEmpty(player, group);
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ServerSideSelection selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (selectedPart.isMaster() && !selection.isSinglePartSelection()){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot despawn the master/parent part!", NamedTextColor.RED)));
-            return;
+            return false;
         }
-        selectedPart.remove(true);
+        if (selectedPart instanceof SpawnedDisplayEntityPart sp){
+            sp.remove(true);
+        }
+        else if (selectedPart instanceof PacketDisplayEntityPart pp){
+            pp.remove();
+        }
         player.sendMessage(Component.text("Successfully despawned your selected part!", NamedTextColor.GREEN));
         removePartSelectionIfEmpty(player, selection);
         removeGroupIfEmpty(player, group);
+        return true;
     }
 
-    private void removePartSelectionIfEmpty(Player player, ServerSideSelection selection){
+    private void removePartSelectionIfEmpty(Player player, ActivePartSelection<?> selection){
         if (selection instanceof SpawnedPartSelection s && s.getSize() != 0) return;
 
         selection.remove();
-        if (!selection.isSinglePartSelection()){
+        if (!(selection instanceof SinglePartSelection)){
             player.sendMessage(Component.text("Part selection reset! (No parts remaining)", NamedTextColor.RED));
         }
     }
 
-    private void removeGroupIfEmpty(Player player, SpawnedDisplayEntityGroup group){
+    private void removeGroupIfEmpty(Player player, ActiveGroup<?> group){
         if (group == null) return;
         if (group.getParts().size() <= 1){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Despawning your group, not enough parts remain", NamedTextColor.YELLOW)));
-            DEUCommandUtils.removeRelativePoints(player);
-            group.unregister(true, true);
+            RelativePointUtils.removeRelativePoints(player);
+            if (group instanceof SpawnedDisplayEntityGroup g){
+                g.unregister(true, true);
+            }
+            else if (group instanceof PacketDisplayEntityGroup pg){
+                if (pg.isPersistent()){
+                    DisplayGroupManager.removePersistentPacketGroup(pg, false);
+                    pg.unregister();
+                }
+                else{
+                    pg.unregister();
+                }
+            }
         }
     }
 }

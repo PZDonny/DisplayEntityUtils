@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 
 class ListAnimationsCMD extends ConsoleUsableSubCommand {
     ListAnimationsCMD() {
-        super(Permission.LIST_ANIMATIONS, false);
+        super(Permission.LIST_ANIMATIONS);
     }
 
     @Override

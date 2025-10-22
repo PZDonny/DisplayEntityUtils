@@ -1,9 +1,7 @@
 package net.donnypz.displayentityutils.utils.relativepoints;
 
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Chunk;
@@ -20,7 +18,7 @@ public class RelativePointUtils {
     public static final HashMap<UUID, RelativePointSelector<?>> selectedSelector = new HashMap<>();
 
     @ApiStatus.Internal
-    public static void spawnFramePointDisplays(SpawnedDisplayEntityGroup group, Player player, SpawnedDisplayAnimationFrame frame){
+    public static void spawnFramePointDisplays(ActiveGroup<?> group, Player player, SpawnedDisplayAnimationFrame frame){
         if (stopIfViewing(player)){
             return;
         }
@@ -42,23 +40,37 @@ public class RelativePointUtils {
 
 
     @ApiStatus.Internal
-    public static void spawnChunkPacketGroupPoints(Chunk chunk, Player player){
+    public static void spawnPersistentPacketGroupPoints(Chunk chunk, Player player){
         if (stopIfViewing(player)){
             return;
         }
 
-        List<DisplayGroupManager.ChunkPacketGroupInfo> infos = DisplayGroupManager.getChunkPacketGroupInfo(chunk);
+        List<DisplayGroupManager.ChunkPacketGroupInfo> infos = DisplayGroupManager.getPersistentPacketGroupInfo(chunk);
         if (infos.isEmpty()){
-            player.sendMessage(Component.text("Failed to view points! The chunk does not have any stored packet based groups!", NamedTextColor.RED));
+            player.sendMessage(Component.text("Failed to view points! The chunk does not have any persistent packet based groups!", NamedTextColor.RED));
             return;
         }
 
         Set<RelativePointSelector<?>> displays = new HashSet<>();
-        for (DisplayGroupManager.ChunkPacketGroupInfo info : infos){
-            ChunkPacketGroupSelector display = new ChunkPacketGroupSelector(player, info);
+        for (PacketDisplayEntityGroup group : PacketDisplayEntityGroup.getGroups(chunk)){
+            PersistentPacketGroupSelector display = new PersistentPacketGroupSelector(player, group);
             displays.add(display);
         }
         setDisplays(player, displays);
+        player.sendMessage(Component.text("| Right click a point to select its packet-based group", NamedTextColor.AQUA));
+    }
+
+    @ApiStatus.Internal
+    public static boolean removeRelativePoints(Player player){
+        if (player == null) return false;
+        Set<RelativePointSelector<?>> selectors = RelativePointUtils.relativePointSelectors.remove(player.getUniqueId());
+        if (selectors != null){
+            for (RelativePointSelector<?> d : selectors){
+                d.despawn();
+            }
+        }
+        RelativePointUtils.deselectRelativePoint(player);
+        return selectors != null;
     }
 
     private static boolean stopIfViewing(Player player){
@@ -72,7 +84,7 @@ public class RelativePointUtils {
 
     private static void setDisplays(Player player, Set<RelativePointSelector<?>> selectors){
         relativePointSelectors.put(player.getUniqueId(), selectors);
-        player.sendMessage(Component.text("Left click a point to select it", NamedTextColor.YELLOW));
+        player.sendMessage(Component.text("Left click a point to select it", NamedTextColor.GREEN));
         player.sendMessage(Component.text("| Run \"/mdis hidepoints\" to stop viewing points", NamedTextColor.GRAY));
     }
 

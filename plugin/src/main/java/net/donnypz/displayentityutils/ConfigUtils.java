@@ -101,7 +101,6 @@ public final class ConfigUtils {
         DisplayConfig.cacheAnimationExpiration = cacheExpiration;
         DisplayAnimationManager.createExpirationMap(cacheExpiration);
 
-        DisplayConfig.autoPivotInteractions = config.getBoolean("autoPivotInteractionsOnSpawn");
         DisplayConfig.overwriteExistingSaves = config.getBoolean("overwriteExistingSaves");
         DisplayConfig.autoSelectGroups = config.getBoolean("autoSelectGroups");
         DisplayConfig.limitGroupSelections = config.getBoolean("limitGroupSelections");

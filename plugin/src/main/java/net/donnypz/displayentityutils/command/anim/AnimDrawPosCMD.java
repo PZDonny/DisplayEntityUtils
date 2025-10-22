@@ -17,10 +17,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.List;
 
 class AnimDrawPosCMD extends PlayerSubCommand {
     AnimDrawPosCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("drawpos", parentSubCommand, Permission.ANIM_DRAW_FRAME_POINTS);
+        setTabComplete(2, List.of("1", "2", "3", "show"));
     }
 
     @Override

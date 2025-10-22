@@ -4,8 +4,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class PlayerSubCommand extends DEUSubCommand {
-    public PlayerSubCommand(@NotNull Permission permission, boolean hasHelpCommand) {
-        super(permission, hasHelpCommand);
+    public PlayerSubCommand(@NotNull Permission permission) {
+        super(permission);
     }
 
     public PlayerSubCommand(@NotNull Permission permission, @NotNull DEUSubCommand helpSubCommand) {

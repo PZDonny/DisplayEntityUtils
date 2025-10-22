@@ -51,12 +51,12 @@ class EntityEffectAnimationParticle extends AnimationParticle {
     @Override
     protected Component getUniqueInfo() {
         if (!VersionUtils.IS_1_20_5) return null;
-        return getEditMSG("| Color: "+(color == null ? "Unset": color.asRGB()), AnimationParticleBuilder.Step.COLOR_ENTITY_EFFECT);
+        return getEditMSG("| Color: "+(color == null ? "Unset": color.asRGB()), AnimationParticleBuilder.Step.COLOR_ONLY);
     }
 
     @Override
     protected boolean editUniqueParticle(AnimationParticleBuilder builder, AnimationParticleBuilder.Step step) {
-        if (step == AnimationParticleBuilder.Step.COLOR_ENTITY_EFFECT){
+        if (step == AnimationParticleBuilder.Step.COLOR_ONLY){
             updateColor(builder.data());
             return true;
         }

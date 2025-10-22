@@ -56,7 +56,7 @@ public class ExprTag extends SimplePropertyExpression<Object, String> {
 
     @Override
     protected String getPropertyName() {
-        return "neu tag";
+        return "deu tag";
     }
 
     @Override

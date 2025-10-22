@@ -2,9 +2,8 @@ package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SinglePartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -26,8 +25,8 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         new PartsFilterTypesCMD(this);
         new PartsFilterBlocksCMD(this);
         new PartsFilterItemsCMD(this);
-        new PartsRefreshCMD(this);
-        new PartsResetCMD(this);
+        new PartsRefreshFilterCMD(this);
+        new PartsResetFilterCMD(this);
         new PartsAdaptTagsCMD(this);
         new PartsAddTagCMD(this);
         new PartsRemoveTagCMD(this);
@@ -88,8 +87,8 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         else if (page == 3){
             CMDUtils.sendCMD(sender, "/mdis parts filterblocks <block-ids>", "Filter blocks of BLOCK parts. Exclude ALL filtered blocks by prefixing with \"!\"");
             CMDUtils.sendCMD(sender, "/mdis parts filteritems <item-ids>", "Filter items of ITEM parts. Exclude ALL filtered items by prefixing with \"!\"");
-            CMDUtils.sendCMD(sender, "/mdis parts refresh", "Refresh your part selection after making some type of change");
-            CMDUtils.sendCMD(sender, "/mdis parts reset", "Reset your part selection and any filters");
+            CMDUtils.sendCMD(sender, "/mdis parts refreshfilter", "Refresh your part selection after making some type of change");
+            CMDUtils.sendCMD(sender, "/mdis parts resetfilter", "Reset your part selection and any filters");
             CMDUtils.sendCMD(sender, "/mdis parts remove [-all]", "Despawn and remove your selected part from a group");
             CMDUtils.sendCMD(sender, "/mdis parts glow [-all]", "Make your selected part glow");
             CMDUtils.sendCMD(sender, "/mdis parts unglow [-all]", "Remove the glow from your selected part");
@@ -121,7 +120,7 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your part selection is invalid!", NamedTextColor.RED)));
     }
 
-    public static boolean isUnwantedMultiSelection(Player player, ServerSideSelection selection){
+    public static boolean isUnwantedMultiSelection(Player player, ActivePartSelection<?> selection){
         if (selection instanceof MultiPartSelection){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot do this with a grouped part!", NamedTextColor.RED)));
             return true;
@@ -129,16 +128,16 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         return false;
     }
 
-    public static boolean isUnwantedSingleSelection(Player player, ServerSideSelection selection){
-        if (selection instanceof SinglePartSelection){
+    public static boolean isUnwantedSingleSelection(Player player, ActivePartSelection<?> selection){
+        if (selection.isSinglePartSelection()){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot do this with an ungrouped selected part entity!", NamedTextColor.RED)));
             return true;
         }
         return false;
     }
 
-    public static boolean isUnwantedSingleSelectionAll(Player player, ServerSideSelection selection){
-        if (selection instanceof SinglePartSelection){
+    public static boolean isUnwantedSingleSelectionAll(Player player, ActivePartSelection<?> selection){
+        if (selection.isSinglePartSelection()){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot use \"-all\" with an ungrouped selected part entity!", NamedTextColor.RED)));
             return true;
         }

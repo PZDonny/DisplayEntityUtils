@@ -229,19 +229,19 @@ public class SkriptTypes {
                     @Override
                     public String toVariableNameString(PacketDisplayEntityPart o) {
                         String groupTag = o.getGroup() != null ? o.getGroup().getTag() : "GROUPLESS";
-                        return "packetedpart w/ partUUID: " + o.getPartUUID()+" | (GROUP TAG:"+groupTag+")";
+                        return "packetpart w/ partUUID: " + o.getPartUUID()+" | (GROUP TAG:"+groupTag+")";
                     }
                 })
         );
 
-        Classes.registerClass(new ClassInfo<>(MultiPartSelection.class, "multipartselection")
-                .user("(multi( |-)?)?part( |-)?selections?")
-                .name("Multi Part Selection")
-                .description("Represents a selection of spawned parts from a spawned Display Entity Group/Model.",
-                            "This can be either a Spawned Part Selection or a Packet Part Selection")
+        Classes.registerClass(new ClassInfo<>(MultiPartSelection.class, "multipartfilter")
+                .user("(multi( |-)?)?part( |-)?filters?")
+                .name("Multi Part Filter/Selection")
+                .description("Represents a selection of filtered parts in a Display Entity Group/Model.",
+                            "This can be either a Spawned Part Filter or a Packet Part Filter")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(MultiPartSelection.class))
-                .since("3.1.1")
+                .since("3.1.1 (multipartselection), 3.3.4 (multipartfilter)")
                 .parser(new Parser<>() {
 
                     @Override
@@ -256,18 +256,18 @@ public class SkriptTypes {
 
                     @Override
                     public String toVariableNameString(MultiPartSelection o) {
-                        return "multipartselection w/ size: " + o.getSize();
+                        return "multipartfilter w/ size: " + o.getSize();
                     }
                 })
         );
 
-        Classes.registerClass(new ClassInfo<>(SpawnedPartSelection.class, "partselection")
-                .user("(spawned( |-)?)?part( |-)?selection")
-                .name("Spawned Part Selection")
-                .description("Represents a selection of spawned parts from a spawned Display Entity Group/Model.")
+        Classes.registerClass(new ClassInfo<>(SpawnedPartSelection.class, "partfilter")
+                .user("(spawned( |-)?)?part( |-)?filter")
+                .name("Spawned Part Filter/Selection")
+                .description("Represents a selection of filtered parts from a non-packet based Display Entity Group/Model.")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(SpawnedPartSelection.class))
-                .since("2.6.2")
+                .since("2.6.2 (partselection), 3.3.4 (partfilter)")
                 .parser(new Parser<>() {
 
                     @Override
@@ -282,18 +282,18 @@ public class SkriptTypes {
 
                     @Override
                     public String toVariableNameString(SpawnedPartSelection o) {
-                        return "partselection w/ size: " + o.getSize();
+                        return "partfilter w/ size: " + o.getSize();
                     }
                 })
         );
 
-        Classes.registerClass(new ClassInfo<>(PacketPartSelection.class, "packetpartselection")
-                .user("packet( |-)?part( |-)?selection")
-                .name("Packet Part Selection")
-                .description("Represents a selection of packet-based parts from a packet-based Display Entity Group/Model.")
+        Classes.registerClass(new ClassInfo<>(PacketPartSelection.class, "packetpartfilter")
+                .user("packet( |-)?part( |-)?filter")
+                .name("Packet Part Filter/Selection")
+                .description("Represents a selection of filtered parts from a packet-based Display Entity Group/Model.")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(PacketPartSelection.class))
-                .since("3.0.0")
+                .since("3.0.0 (packetpartselection), 3.3.4 (packetpartfilter)")
                 .parser(new Parser<>() {
 
                     @Override
@@ -308,7 +308,7 @@ public class SkriptTypes {
 
                     @Override
                     public String toVariableNameString(PacketPartSelection o) {
-                        return "packetpartselection w/ size: " + o.getSize();
+                        return "packetpartfilter w/ size: " + o.getSize();
                     }
                 })
         );

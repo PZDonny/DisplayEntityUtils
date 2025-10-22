@@ -18,14 +18,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@Name("Part Selection Filter Set Part Types")
+@Name("Part Filter/Selection Set Part Types")
 @Description("Set the part types that should be filtered in a part selection")
 @Examples({"set part type filter of {_selection} to parttype_text_display",
         "set type filter of {_selection} to exclude parttype_block_display and parttype_item_display"})
 @Since("2.6.2")
 public class EffPartSelectionFilterPartTypes extends Effect {
     static {
-        Skript.registerEffect(EffPartSelectionFilterPartTypes.class,"set [part] type[s] filter (for|of) %multipartselection% (with[:out]|to [out:exclude]) %parttypes%");
+        Skript.registerEffect(EffPartSelectionFilterPartTypes.class,"set [part] type[s] filter (for|of) %multipartfilter% (with[:out]|to [out:exclude]) %parttypes%");
     }
 
     Expression<MultiPartSelection> selection;

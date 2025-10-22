@@ -84,11 +84,6 @@ automaticGroupDetection:
   #If false, groups in the listed worlds will be unregistered
     blacklist: true
 
-
-#Automatically Pivot Interaction Entity when a DisplayEntityGroup is spawned
-#in order to match the group's yaw
-autoPivotInteractionsOnSpawn: true
-
 #Enable this to allow overwriting of existing saved DisplayEntityGroups and Animations
 overwriteExistingSaves: true
 

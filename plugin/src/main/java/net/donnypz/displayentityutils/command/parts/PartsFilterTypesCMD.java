@@ -5,10 +5,7 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.PartFilter;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -25,17 +22,18 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
 
     PartsFilterTypesCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("filtertypes", parentSubCommand, Permission.PARTS_SELECT);
+        setTabComplete(2, TabSuggestion.PART_TYPES);
     }
 
     @Override
     public void execute(Player player, String[] args) {
-        ServerSideSelection sel = DisplayGroupManager.getPartSelection(player);
+        ActivePartSelection<?> sel = DisplayGroupManager.getPartSelection(player);
         if (sel == null){
             PartsCMD.noPartSelection(player);
             return;
         }
 
-        SpawnedPartSelection partSelection = (SpawnedPartSelection) sel;
+        MultiPartSelection<?> partSelection = (MultiPartSelection<?>) sel;
         if (PartsCMD.isUnwantedSingleSelection(player, sel)){
             return;
         }
@@ -108,7 +106,12 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
         }
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Part Type Filters Applied!")));
-        partSelection.glow(player, 30);
+        if (!partSelection.hasSelectedParts()){
+            player.sendMessage(Component.text("| Your filter does not apply to any parts", NamedTextColor.GRAY, TextDecoration.ITALIC));
+        }
+        else{
+            partSelection.glowAndMarkInteractions(player, 30);
+        }
     }
 
 }

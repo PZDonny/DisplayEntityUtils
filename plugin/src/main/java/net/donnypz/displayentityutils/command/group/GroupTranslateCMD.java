@@ -1,12 +1,10 @@
 package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.*;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
@@ -14,30 +12,27 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-class GroupTranslateCMD extends PlayerSubCommand {
+class GroupTranslateCMD extends GroupSubCommand {
     GroupTranslateCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("translate", parentSubCommand, Permission.GROUP_TRANSFORM);
+        super("translate", parentSubCommand, Permission.GROUP_TRANSFORM, 5, true);
+        setTabComplete(2, TabSuggestion.DIRECTIONS);
+        setTabComplete(3, "<distance>");
+        setTabComplete(4, "<tick-duration>");
     }
 
     @Override
-    public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
-        if (group == null) {
-            DisplayEntityPluginCommand.noGroupSelection(player);
-            return;
-        }
+    protected void sendIncorrectUsage(@NotNull Player player) {
+        player.sendMessage(Component.text("/mdis group translate <direction> <distance> <tick-duration>", NamedTextColor.RED));
+    }
 
+    @Override
+    protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
         if (RelativePointUtils.isViewingRelativePoints(player)){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot play do that while viewing points!", NamedTextColor.RED)));
             return;
         }
-
-        if (args.length < 5){
-            player.sendMessage(Component.text("/mdis group translate <direction> <distance> <tick-duration>", NamedTextColor.RED));
-            return;
-        }
-
         try{
             Direction direction = Direction.valueOf(args[2].toUpperCase());
             double distance = Double.parseDouble(args[3]);
@@ -50,7 +45,7 @@ class GroupTranslateCMD extends PlayerSubCommand {
                 duration = 0;
             }
             group.translate(direction, (float) distance, duration, -1);
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Translating spawned display entity group!", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Translating your selected group!", NamedTextColor.GREEN)));
         }
         catch(IllegalArgumentException e){
             if (e instanceof NumberFormatException){

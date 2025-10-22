@@ -98,6 +98,12 @@ public class ConversionUtils {
         return ((long) z << 32) | (x & 0xFFFFFFFFL); //Order is inverted
     }
 
+    public static long getChunkKey(@NotNull Location location){
+        int chunkX = location.blockX() >> 4;
+        int chunkZ = location.blockZ() >> 4;
+        return getChunkKey(chunkX, chunkZ);
+    }
+
     /**
      * Get a chunk's x and z coordinates from a chunk's key
      * @param chunkKey chunk's key

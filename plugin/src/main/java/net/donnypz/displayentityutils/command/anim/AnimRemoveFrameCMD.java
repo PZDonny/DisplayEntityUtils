@@ -16,6 +16,7 @@ import java.util.List;
 class AnimRemoveFrameCMD extends PlayerSubCommand {
     AnimRemoveFrameCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("removeframe", parentSubCommand, Permission.ANIM_REMOVE_FRAME);
+        setTabComplete(2, "<frame-id>");
     }
 
     @Override

@@ -2,18 +2,21 @@ package net.donnypz.displayentityutils.command.interaction;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
-import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.InteractionCommand;
+import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
+
+import java.util.List;
 
 public final class InteractionCMD extends ConsoleUsableSubCommand {
 
@@ -27,7 +30,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
         new InteractionPivotCMD(this);
         new InteractionPivotSelectionCMD(this);
         new InteractionResponsiveCMD(this);
-        new InteractionSpawnCMD(this);
+        new InteractionAddToGroupCMD(this);
         new InteractionSpawnHereCMD(this);
         new InteractionInfoCMD(this);
     }
@@ -54,7 +57,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
             sender.sendMessage(Component.text("Where applicable, these commands prioritize the interaction entity you're looking at over the one you may have selected", NamedTextColor.AQUA));
             CMDUtils.sendCMD(sender, "/mdis interaction help", "Get help for interactions");
             CMDUtils.sendCMD(sender, "/mdis interaction info", "Get info about an interaction entity, targeted or selected");
-            CMDUtils.sendCMD(sender, "/mdis interaction spawn <height> <width>", "Create an interaction entity part for a group, at the group's location");
+            CMDUtils.sendCMD(sender, "/mdis interaction addtogroup <height> <width> [-here]", "Create an interaction entity part for a group, at the group's location. Use \"-here\" to spawn it at your location");
             CMDUtils.sendCMD(sender, "/mdis interaction spawnhere <height> <width>", "Create an interaction entity at your location");
             CMDUtils.sendCMD(sender, "/mdis interaction height <height>", "Set the height of an interaction");
             CMDUtils.sendCMD(sender, "/mdis interaction width <width>", "Set the width of an interaction");
@@ -70,31 +73,22 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }
 
-    static Interaction getInteraction(Player player, boolean checkTargeted){
+    static SelectedInteraction getInteraction(Player player, boolean checkTargeted){
         Entity entity = player.getTargetEntity(5);
         if (entity instanceof Interaction i && checkTargeted){
-            return i;
+            return new SelectedInteraction(i);
         }
         else{
-            ServerSideSelection selection = DisplayGroupManager.getPartSelection(player);
-            SpawnedPartSelection partSelection = (SpawnedPartSelection) selection;
-            if (partSelection == null){
-                noPartSelectionInteraction(player);
+            ActivePartSelection<?> selection = DisplayGroupManager.getPartSelection(player);
+            if (selection == null){
                 return null;
             }
-            else{
-                if (partSelection.getSelectedParts().isEmpty()){
-                    PartsCMD.invalidPartSelection(player);
-                    return null;
-                }
-
-                SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
-                if (selected.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION) {
-                    player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with interaction entities", NamedTextColor.RED)));
-                    return null;
-                }
-                return (Interaction) selected.getEntity();
+            ActivePart part = selection.getSelectedPart();
+            if (part == null || part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
+                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with interaction entities", NamedTextColor.RED)));
+                return null;
             }
+            return new SelectedInteraction(part);
         }
     }
 
@@ -103,4 +97,137 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
         player.sendMessage(Component.text("/mdis parts cycle <first | prev | next | last>", NamedTextColor.GRAY));
     }
 
+    static class SelectedInteraction {
+
+        Interaction interaction;
+        ActivePart interactionPart;
+        SelectedInteraction(Interaction i){
+            this.interaction = i;
+        }
+
+        SelectedInteraction(ActivePart part){
+            this.interactionPart = part;
+        }
+
+        void setHeight(float height){
+            if (interaction != null){
+                interaction.setInteractionHeight(height);
+            }
+            else{
+                interactionPart.setInteractionHeight(height);
+                updatePacketGroup();
+            }
+        }
+
+        void setWidth(float width){
+            if (interaction != null){
+                interaction.setInteractionWidth(width);
+            }
+            else{
+                interactionPart.setInteractionWidth(width);
+                updatePacketGroup();
+            }
+        }
+
+        void scale(float height, float width, int duration, int delay){
+            if (interaction != null){
+                DisplayUtils.scaleInteraction(interaction, height, width, duration, delay);
+            }
+            else{
+                if (interactionPart instanceof SpawnedDisplayEntityPart sp){
+                    DisplayUtils.scaleInteraction((Interaction) sp.getEntity(), height, width, duration, delay);
+                }
+                else if (interactionPart instanceof PacketDisplayEntityPart pp){
+                    PacketUtils.scaleInteraction(pp, height, width, duration, delay);
+                    updatePacketGroup();
+                }
+            }
+        }
+
+        void setResponsive(boolean responsive){
+            if (interaction != null){
+                interaction.setResponsive(responsive);
+            }
+            else{
+                interactionPart.setInteractionResponsive(responsive);
+                updatePacketGroup();
+            }
+        }
+
+        void pivot(Location pivotLoc, double angle){
+            if (interaction != null){
+                DisplayUtils.pivot(interaction, pivotLoc, angle);
+            }
+            else{
+                interactionPart.pivot((float) angle);
+                updatePacketGroup();
+            }
+        }
+
+        float getHeight(){
+            return interaction == null ? interactionPart.getInteractionHeight() : interaction.getInteractionHeight();
+        }
+
+        float getWidth(){
+            return interaction == null ? interactionPart.getInteractionWidth() : interaction.getInteractionWidth();
+        }
+
+        boolean isResponsive(){
+            return interaction == null ? interactionPart.isInteractionResponsive() : interaction.isResponsive();
+        }
+
+        String getGroupTag(){
+            if (interaction != null){
+                return DisplayUtils.getGroupTag(interaction);
+            }
+            else{
+                ActiveGroup<?> group = interactionPart.getGroup();
+                return group == null ? null : group.getTag();
+            }
+        }
+
+        void addInteractionCommand(String command, boolean left, boolean console){
+            if (interaction != null){
+                DisplayUtils.addInteractionCommand(interaction, command, left, console);
+            }
+            else{
+                interactionPart.addInteractionCommand(command, left, console);
+                updatePacketGroup();
+            }
+        }
+
+        void removeInteractionCommand(InteractionCommand command){
+            if (interaction != null){
+                DisplayUtils.removeInteractionCommand(interaction, command);
+            }
+            else{
+                interactionPart.removeInteractionCommand(command);
+                updatePacketGroup();
+            }
+        }
+
+        List<String> getInteractionCommands(){
+            if (interaction != null){
+                return DisplayUtils.getInteractionCommands(interaction);
+            }
+            else{
+                return interactionPart.getInteractionCommands();
+            }
+        }
+
+        List<InteractionCommand> getInteractionCommandsWithData(){
+            if (interaction != null){
+                return DisplayUtils.getInteractionCommandsWithData(interaction);
+            }
+            else{
+                return interactionPart.getInteractionCommandsWithData();
+            }
+        }
+
+        private void updatePacketGroup(){
+            if (interactionPart instanceof PacketDisplayEntityPart part){
+                part.getGroup().update();
+            }
+        }
+    }
 }

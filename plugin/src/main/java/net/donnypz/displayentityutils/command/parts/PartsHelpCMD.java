@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 class PartsHelpCMD extends ConsoleUsableSubCommand {
 
     PartsHelpCMD() {
-        super(Permission.HELP, false);
+        super(Permission.HELP);
     }
 
     @Override

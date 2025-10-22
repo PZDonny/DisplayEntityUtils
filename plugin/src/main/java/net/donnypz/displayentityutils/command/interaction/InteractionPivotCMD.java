@@ -7,9 +7,7 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -20,17 +18,18 @@ import org.jetbrains.annotations.NotNull;
 class InteractionPivotCMD extends PlayerSubCommand {
     InteractionPivotCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("pivot", parentSubCommand, Permission.INTERACTION_PIVOT);
+        setTabComplete(2, "<angle>");
     }
 
     @Override
     public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
+        ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(player);
         if (group == null){
             DisplayEntityPluginCommand.noGroupSelection(player);
             return;
         }
 
-        ServerSideSelection sel = DisplayGroupManager.getPartSelection(player);
+        ActivePartSelection<?> sel = DisplayGroupManager.getPartSelection(player);
         if (sel == null){
             DisplayEntityPluginCommand.noPartSelection(player);
             return;
@@ -39,22 +38,23 @@ class InteractionPivotCMD extends PlayerSubCommand {
         if (PartsCMD.isUnwantedSingleSelection(player, sel)){
             return;
         }
-        SpawnedPartSelection selection = (SpawnedPartSelection) sel;
+
+        MultiPartSelection<?> selection = (MultiPartSelection<?>) sel;
         if (args.length < 3){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis interaction pivot <angle>", NamedTextColor.RED)));
             return;
         }
-        Interaction interaction = InteractionCMD.getInteraction(player, false);
+        InteractionCMD.SelectedInteraction interaction = InteractionCMD.getInteraction(player, false);
         if (interaction == null){
             return;
         }
+
         try{
-            DisplayUtils.pivot(interaction, selection.getGroup().getLocation(), Double.parseDouble(args[2]));
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Pivoting Interaction Entity around group", NamedTextColor.GREEN)));
+            interaction.pivot(selection.getGroup().getLocation(), Double.parseDouble(args[2]));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Pivoting Interaction around group", NamedTextColor.GREEN)));
         }
         catch(NumberFormatException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the angle!", NamedTextColor.RED)));
-            return;
         }
     }
 }

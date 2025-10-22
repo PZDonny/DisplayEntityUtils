@@ -23,6 +23,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3f;
 
 import java.util.Collection;
 import java.util.List;
@@ -278,6 +279,52 @@ public final class PacketUtils {
 
 
     /**
+     * Change the translation of a {@link PacketDisplayEntityPart} if it's not an {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.<br><br>
+     * If it is an interaction, {@link  #translateInteraction(PacketDisplayEntityPart, Direction, double, int, int)} will be called instead.
+     * @param part the part to translate
+     * @param direction the direction to translate the display entity
+     * @param distance translation distance
+     * @param durationInTicks translation duration
+     * @param delayInTicks delay before translation should begin
+     */
+    public static void translate(@NotNull PacketDisplayEntityPart part, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
+        if (distance == 0) return;
+        if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            translateInteraction(part, direction, distance, durationInTicks, delayInTicks);
+            return;
+        }
+        translate(part, direction.getVector(part, true), distance, durationInTicks, delayInTicks);
+    }
+
+    /**
+     * Change the translation of a {@link PacketDisplayEntityPart} if it's not an {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.<br><br>
+     * If it is an interaction, {@link  #translateInteraction(PacketDisplayEntityPart, Vector, double, int, int)} will be called instead.
+     * @param part the part to translate
+     * @param direction the direction to translate the display entity
+     * @param distance translation distance
+     * @param durationInTicks translation duration
+     * @param delayInTicks delay before translation should begin
+     */
+    public static void translate(@NotNull PacketDisplayEntityPart part, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
+        if (distance == 0) return;
+        if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            translateInteraction(part, direction, distance, durationInTicks, delayInTicks);
+            return;
+        }
+        if (delayInTicks < 0){
+            delayInTicks = -1;
+        }
+
+        Vector3f translation = part.getDisplayTransformation().getTranslation();
+        translation.add(direction.toVector3f().normalize().mul((float) distance));
+        part.setAttributes(new DisplayAttributeMap()
+                .add(DisplayAttributes.Transform.TRANSLATION, translation)
+                .add(DisplayAttributes.Interpolation.DURATION, durationInTicks)
+                .add(DisplayAttributes.Interpolation.DELAY, delayInTicks));
+    }
+
+
+    /**
      * Attempts to change the translation of a packet-based interaction entity similar
      * to a Display Entity, through smooth teleportation.
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results
@@ -288,7 +335,7 @@ public final class PacketUtils {
      * @param delayInTicks How long before the translation should begin
      */
     public static void translateInteraction(@NotNull PacketDisplayEntityPart part, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
-        translateInteraction(part, direction.getVector(part), distance, durationInTicks, delayInTicks);
+        translateInteraction(part, direction.getVector(part, true), distance, durationInTicks, delayInTicks);
     }
 
 
@@ -353,7 +400,7 @@ public final class PacketUtils {
      * @param delayInTicks How long before the translation should begin
      */
     public static void translateInteraction(@NotNull Player player, @NotNull Interaction interaction, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
-        translateInteraction(player, interaction, direction.getVector(interaction), distance, durationInTicks, delayInTicks);
+        translateInteraction(player, interaction, direction.getVector(interaction, true), distance, durationInTicks, delayInTicks);
     }
 
     /**
@@ -383,7 +430,7 @@ public final class PacketUtils {
      * @param delayInTicks How long before the translation should begin
      */
     public static void translateInteraction(@NotNull Player player, @NotNull ActivePart part, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
-        translateInteraction(player, part, direction.getVector(getLocation(part)), distance, durationInTicks, delayInTicks);
+        translateInteraction(player, part, direction.getVector(part, true), distance, durationInTicks, delayInTicks);
     }
 
     /**
@@ -413,7 +460,7 @@ public final class PacketUtils {
      * @param delayInTicks How long before the translation should begin
      */
     public static void translateInteraction(@NotNull Collection<Player> players, @NotNull Interaction interaction, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
-        translateInteraction(players, interaction, direction.getVector(interaction), distance, durationInTicks, delayInTicks);
+        translateInteraction(players, interaction, direction.getVector(interaction, true), distance, durationInTicks, delayInTicks);
     }
 
     /**
@@ -444,7 +491,7 @@ public final class PacketUtils {
      * @param delayInTicks How long before the translation should begin
      */
     public static void translateInteraction(@NotNull Collection<Player> players, @NotNull ActivePart part, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
-        translateInteraction(players, part, direction.getVector(getLocation(part)), distance, durationInTicks, delayInTicks);
+        translateInteraction(players, part, direction.getVector(part, true), distance, durationInTicks, delayInTicks);
     }
 
     /**
@@ -460,7 +507,7 @@ public final class PacketUtils {
      */
     public static void translateInteraction(@NotNull Collection<Player> players, @NotNull ActivePart part, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
         if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION) return;
-        Location l = getLocation(part);
+        Location l = part.getLocation();
         if (l == null) return;
         translateInteraction(players, part.getEntityId(), l, l.getYaw(), direction, distance, durationInTicks, delayInTicks);
     }
@@ -509,16 +556,6 @@ public final class PacketUtils {
                     SpigotConversionUtil.fromBukkitLocation(location),
                     false));
         }
-    }
-
-    private static Location getLocation(ActivePart part){
-        if (part instanceof SpawnedDisplayEntityPart sp){
-            return sp.getLocation();
-        }
-        else if (part instanceof PacketDisplayEntityPart pp){
-            return pp.getLocation();
-        }
-        return null;
     }
 
     /**

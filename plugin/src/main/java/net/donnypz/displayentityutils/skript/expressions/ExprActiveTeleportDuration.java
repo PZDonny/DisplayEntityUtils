@@ -14,8 +14,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Active Group/Part/Part Selection Teleportation Duration")
-@Description("Set the teleportation duration of an active group, part or part selection. Get the duration on an active group or active part object.")
+@Name("Active Group/Part/Part Filter Teleportation Duration")
+@Description("Set the teleportation duration of an active group, part or parts in a part filter. Get the duration on an active group or active part object.")
 @Examples({"set {_spawnedgroup}'s deu teleportation duration to 5 ticks",
         "reset {_spawnedgroup}'s deu teleport duration",
         "",
@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprActiveTeleportDuration extends SimplePropertyExpression<Active, Number> {
 
     static {
-        register(ExprActiveTeleportDuration.class, Number.class, "[deu] teleport[ation][ |-]duration", "activegroups/activeparts/multipartselections");
+        register(ExprActiveTeleportDuration.class, Number.class, "[deu] teleport[ation][ |-]duration", "activegroups/activeparts/multipartfilters");
     }
 
     @Override
@@ -43,7 +43,7 @@ public class ExprActiveTeleportDuration extends SimplePropertyExpression<Active,
             return ag.getTeleportDuration();
         }
         if (active instanceof ActivePart ap){
-            return ap.getTeleportDuration();
+            return ap.getDisplayTeleportDuration();
         }
 
         return null;

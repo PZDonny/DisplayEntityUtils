@@ -15,19 +15,22 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Create Spawned Part Selection")
-@Description("Create a spawned or packet part selection containing the parts of a active group")
+@Name("Create Part Filter/Selection")
+@Description("Create a selection, containing the parts of a active group, which can later be filtered")
 @Examples({"#2.7.7 and earlier",
         "set {_selection} to a new spawned part selection from {_spawnedgroup}",
         "",
         "#3.0.0 and later",
         "set {_selection} to a new part selection using {_packetgroup}",
-        "set {_selection} to a new part selection of {_spawnedgroup}"})
-@Since("2.6.2")
+        "set {_selection} to a new part selection of {_spawnedgroup}",
+        "",
+        "#3.3.4 and later",
+        "set {_selection} to a new part filter from {_packetgroup}"})
+@Since("2.6.2, 3.3.4 (Filter Syntax)")
 public class ExprActiveGroupCreateSelection extends SimpleExpression<MultiPartSelection> {
 
     static{
-        Skript.registerExpression(ExprActiveGroupCreateSelection.class, MultiPartSelection.class, ExpressionType.SIMPLE, "[a] [new] part[ |-]selection [from|using|of] %activegroup%");
+        Skript.registerExpression(ExprActiveGroupCreateSelection.class, MultiPartSelection.class, ExpressionType.SIMPLE, "[a] [new] part[ |-](filter|selection) [from|using|of] %activegroup%");
     }
 
     private Expression<ActiveGroup> group;
@@ -54,7 +57,7 @@ public class ExprActiveGroupCreateSelection extends SimpleExpression<MultiPartSe
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "active part selection: "+group.toString(event, debug);
+        return "create part filter: "+group.toString(event, debug);
     }
 
     @Override

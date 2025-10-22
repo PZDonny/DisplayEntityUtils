@@ -27,4 +27,8 @@ public abstract class ActivePartSelection<T extends ActivePart> implements Activ
      * @return a boolean
      */
     public abstract boolean isValid();
+
+    public boolean isSinglePartSelection(){
+        return (this instanceof SinglePartSelection);
+    }
 }

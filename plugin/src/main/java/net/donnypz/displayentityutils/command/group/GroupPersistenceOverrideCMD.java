@@ -7,6 +7,8 @@ import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -20,11 +22,17 @@ class GroupPersistenceOverrideCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
-        if (group == null) {
+        ActiveGroup<?> ag = DisplayGroupManager.getSelectedGroup(player);
+        if (ag == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);
             return;
         }
+        if (ag instanceof PacketDisplayEntityGroup){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot do this with packet-based groups!", NamedTextColor.RED)));
+            return;
+        }
+
+        SpawnedDisplayEntityGroup group = (SpawnedDisplayEntityGroup) ag;
         boolean oldPersist = group.allowsPersistenceOverriding();
         group.setPersistenceOverride(!oldPersist);
         Component persist;

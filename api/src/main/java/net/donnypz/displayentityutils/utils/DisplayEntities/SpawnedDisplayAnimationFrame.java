@@ -4,8 +4,6 @@ import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -106,19 +104,22 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param group the group to get transformation data from
      * @return this
      */
-    public SpawnedDisplayAnimationFrame setTransformation(@NotNull SpawnedDisplayEntityGroup group){
+    public SpawnedDisplayAnimationFrame setTransformation(@NotNull ActiveGroup<?> group){
         Location gLoc = group.getLocation();
         for (ActivePart p : group.groupParts.values()){
-            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) p;
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                Interaction i = (Interaction) part.getEntity();
+            if (p.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
 
-                InteractionTransformation transform = new InteractionTransformation(DisplayUtils.getInteractionTranslation(i).toVector3f(), gLoc.getYaw(), gLoc.getPitch(), i.getInteractionHeight(), i.getInteractionWidth());
-                setInteractionTransformation(part, transform);
+                InteractionTransformation transform = new InteractionTransformation(
+                        p.getInteractionTranslation().toVector3f(),
+                        gLoc.getYaw(),
+                        gLoc.getPitch(),
+                        p.getInteractionHeight(),
+                        p.getInteractionWidth());
+                setInteractionTransformation(p, transform);
             }
             else{
-                DisplayTransformation transform = DisplayTransformation.get((Display) part.getEntity());
-                setDisplayEntityTransformation(part, transform);
+                DisplayTransformation transform = DisplayTransformation.get(p);
+                setDisplayEntityTransformation(p, transform);
             }
         }
         return this;
@@ -132,24 +133,26 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param partTag the part tag that is required for a part's transformation to be contained in this frame
      * @return this
      */
-    public SpawnedDisplayAnimationFrame setTransformation(@NotNull SpawnedDisplayEntityGroup group, @NotNull String partTag){
+    public SpawnedDisplayAnimationFrame setTransformation(@NotNull ActiveGroup<?> group, @NotNull String partTag){
         displayTransformations.clear();
         interactionTransformations.clear();
         Location gLoc = group.getLocation();
-        for (SpawnedDisplayEntityPart p : group.groupParts.values()){
-            //Ignore if part does not have specified tag
-            if (!p.hasTag(partTag)){
-                continue;
-            }
+        for (ActivePart p : group.groupParts.values()){
+            if (!p.hasTag(partTag)) continue;
 
             if (p.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                Interaction i = (Interaction) p.getEntity();
 
-                InteractionTransformation transform = new InteractionTransformation(DisplayUtils.getInteractionTranslation(i).toVector3f(), gLoc.getYaw(), gLoc.getPitch(), i.getInteractionHeight(), i.getInteractionWidth());
+                InteractionTransformation transform = new InteractionTransformation(
+                        p.getInteractionTranslation().toVector3f(),
+                        gLoc.getYaw(),
+                        gLoc.getPitch(),
+                        p.getInteractionHeight(),
+                        p.getInteractionWidth());
+                setInteractionTransformation(p, transform);
                 setInteractionTransformation(p, transform);
             }
             else{
-                DisplayTransformation transform = DisplayTransformation.get((Display) p.getEntity());
+                DisplayTransformation transform = DisplayTransformation.get(p);
                 setDisplayEntityTransformation(p, transform);
             }
         }
@@ -172,7 +175,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param location the relative location that the frame point represents
      * @return true if a point with the given tag doesn't already exist. false if it exists or the tag is invalid
      */
-    public boolean addFramePoint(@NotNull String pointTag, @NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
+    public boolean addFramePoint(@NotNull String pointTag, @NotNull ActiveGroup<?> group, @NotNull Location location){
         if (!DisplayUtils.isValidTag(pointTag)) {
             return false;
         }
@@ -299,7 +302,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a location relative to a {@link ActiveGroup}
      * @param group the relative group
      */
-    public void playSounds(@NotNull ActiveGroup group){
+    public void playSounds(@NotNull ActiveGroup<?> group){
         playSounds(group, null, true);
     }
 
@@ -309,7 +312,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param animator the animator attempting to play the sounds
      * @param limited whether the effects should only be played to players who can see the group
      */
-    public void playSounds(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
+    public void playSounds(@NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, boolean limited){
         for (FramePoint framePoint : framePoints.values()){
             framePoint.playSounds(group, animator, limited);
         }
@@ -320,7 +323,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param player the player
      * @param group the relative group
      */
-    public void playSounds(@NotNull Player player, @NotNull ActiveGroup group){
+    public void playSounds(@NotNull Player player, @NotNull ActiveGroup<?> group){
         for (FramePoint framePoint : framePoints.values()){
             framePoint.playSounds(group, player);
         }
@@ -352,7 +355,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * Show the particles that will be displayed at the start of this frame
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
      */
-    public void showParticles(@NotNull ActiveGroup group){
+    public void showParticles(@NotNull ActiveGroup<?> group){
         showParticles(group, null, true);
     }
 
@@ -363,7 +366,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param animator the animator attempting to show the particles
      * @param limited whether the effects should only be played to players who can see the group
      */
-    public void showParticles(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
+    public void showParticles(@NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, boolean limited){
         for (FramePoint framePoint : framePoints.values()){
             framePoint.showParticles(group, animator, limited);
         }
@@ -374,7 +377,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param player
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
      */
-    public void showParticles(@NotNull Player player, @NotNull ActiveGroup group){
+    public void showParticles(@NotNull Player player, @NotNull ActiveGroup<?> group){
         for (FramePoint framePoint : framePoints.values()){
             framePoint.showParticles(group, player);
         }
@@ -385,7 +388,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param players
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
      */
-    public void showParticles(@NotNull Collection<Player> players, @NotNull ActiveGroup group){
+    public void showParticles(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group){
         for (FramePoint framePoint : framePoints.values()){
             framePoint.showParticles(group, players);
         }
@@ -426,13 +429,10 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param animator the animator attempting to play the effects
      * @param limited whether the effects should only be played to players who can see the group
      */
-    public void playEffects(@NotNull ActiveGroup group, @Nullable DisplayAnimator animator, boolean limited){
-        Location groupLoc = group.getLocation();
-        if (groupLoc != null){
-            executeStartCommands(groupLoc);
+    public void playEffects(@NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, boolean limited){
+        for (FramePoint point : framePoints.values()){
+            point.playEffects(group, animator, limited);
         }
-        playSounds(group, animator, limited);
-        showParticles(group, animator, limited);
     }
 
     /**
@@ -441,9 +441,10 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param player the player to show the effects to
      * @param group the group to play these effects for
      */
-    public void playEffects(@NotNull Player player, @NotNull ActiveGroup group){
-        playSounds(player, group);
-        showParticles(player, group);
+    public void playEffects(@NotNull Player player, @NotNull ActiveGroup<?> group){
+        for (FramePoint point : framePoints.values()){
+            point.playEffects(group, player);
+        }
     }
     /**
      * Play all effects that are contained within every {@link FramePoint}
@@ -451,12 +452,13 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param players the players to show the effects to
      * @param group the group to play these effects for
      */
-    public void playEffects(@NotNull Collection<Player> players, @NotNull ActiveGroup group){
-        playSounds(players, group);
-        showParticles(players, group);
+    public void playEffects(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group){
+        for (FramePoint point : framePoints.values()){
+            point.playEffects(group, players);
+        }
     }
 
-    void setDisplayEntityTransformation(SpawnedDisplayEntityPart part, DisplayTransformation transformation){
+    void setDisplayEntityTransformation(ActivePart part, DisplayTransformation transformation){
         this.setDisplayEntityTransformation(part.getPartUUID(), transformation);
     }
 
@@ -465,7 +467,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     }
 
 
-    boolean setInteractionTransformation(SpawnedDisplayEntityPart part, Vector3f transformation){
+    boolean setInteractionTransformation(ActivePart part, Vector3f transformation){
         setInteractionTransformation(part.getPartUUID(), transformation);
         return true;
     }

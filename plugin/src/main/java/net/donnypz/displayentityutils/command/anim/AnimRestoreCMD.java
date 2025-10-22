@@ -4,11 +4,13 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,14 +21,19 @@ class AnimRestoreCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
+        ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(player);
         if (group == null) {
             player.sendMessage(Component.text("You must have a group selected to do this animation command!", NamedTextColor.RED));
             return;
         }
 
         group.hideFromPlayer(player);
-        group.showToPlayer(player);
+        if (group instanceof PacketDisplayEntityGroup pdeg){
+            pdeg.showToPlayer(player, GroupSpawnedEvent.SpawnReason.COMMAND);
+        }
+        else if (group instanceof SpawnedDisplayEntityGroup sdeg){
+            sdeg.showToPlayer(player);
+        }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Restored group transformations, removing animation preview changes", NamedTextColor.GREEN)));
     }
 }

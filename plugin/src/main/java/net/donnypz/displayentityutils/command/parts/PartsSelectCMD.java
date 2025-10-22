@@ -29,6 +29,7 @@ class PartsSelectCMD extends PlayerSubCommand {
 
     PartsSelectCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("select", parentSubCommand, Permission.PARTS_SELECT);
+        setTabComplete(2, List.of("<distance>", "-target"));
     }
 
     @Override

@@ -2,52 +2,60 @@ package net.donnypz.displayentityutils.command.text;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
+import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.command.parts.PartsCMD;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-class TextOpacityCMD extends PlayerSubCommand {
+class TextOpacityCMD extends PartsSubCommand {
     TextOpacityCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("opacity", parentSubCommand, Permission.TEXT_OPACITY);
+        super("opacity", parentSubCommand, Permission.TEXT_OPACITY, 3, 3);
+        setTabComplete(2, "<0-1>");
     }
 
     @Override
-    public void execute(Player player, String[] args) {
-        if (args.length < 3){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis text opacity <0-1>", NamedTextColor.RED)));
-            return;
-        }
+    protected void sendIncorrectUsage(@NotNull Player player) {
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis text opacity <0-1> [-all]", NamedTextColor.RED)));
+    }
 
-
-        ServerSideSelection partSelection = DisplayGroupManager.getPartSelection(player);
-        if (partSelection == null){
-            DisplayEntityPluginCommand.noPartSelection(player);
-            return;
+    @Override
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+        Byte opacity = getOpacity(args, player);
+        if (opacity == null) return false;
+        for (ActivePart part : selection.getSelectedParts()){
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
+                part.setTextDisplayTextOpacity(opacity);
+            }
         }
-        if (!partSelection.hasSelectedPart()){
-            PartsCMD.invalidPartSelection(player);
-        }
+        player.sendMessage(DisplayAPI.pluginPrefix
+                .append(Component.text("Successfully set text display's opacity to "+opacity+" for ALL selected text displays", NamedTextColor.GREEN)));
+        return true;
+    }
 
-        SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
-        if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
+    @Override
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        Byte opacity = getOpacity(args, player);
+        if (opacity == null) return false;
+        if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
-            return;
+            return false;
         }
-        TextDisplay display = (TextDisplay) selected.getEntity();
+        selectedPart.setTextDisplayTextOpacity(opacity);
+        player.sendMessage(DisplayAPI.pluginPrefix
+                .append(Component.text("Successfully set text display's opacity to "+opacity, NamedTextColor.GREEN)));
+        return true;
+    }
+
+    private Byte getOpacity(String[] args, Player player){
         try{
             double change = Double.parseDouble(args[2]);
             if (change < 0 || change > 1){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid opacity, enter a value between 0 and 1!", NamedTextColor.RED)));
-                return;
+                return null;
             }
             double percentage = 255*change;
             if (percentage >= 25.5 && percentage < 26){//0.1 input range
@@ -57,12 +65,11 @@ class TextOpacityCMD extends PlayerSubCommand {
             if (opacity > -1 && opacity < 26){ //Adjusted for Minecraft Shader Values (Outside of 0.1 range)
                 opacity = 25;
             }
-
-            display.setTextOpacity(opacity);
-            player.sendMessage(Component.text("Successfully set text display's opacity to "+change, NamedTextColor.GREEN));
+            return opacity;
         }
         catch(NumberFormatException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid opacity, enter a value between 0 and 1!", NamedTextColor.RED)));
+            return null;
         }
     }
 }

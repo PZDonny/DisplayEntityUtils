@@ -10,6 +10,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -34,13 +35,13 @@ import java.util.zip.ZipFile;
 public class BDEngineDPConverter {
 
     static final CommandSender silentSender = Bukkit.createCommandSender(feedback -> {});
+    static final String functionFolderName = VersionUtils.IS_1_21 ? "function" : "functions";
     private static final String createModelPath = "/create.mcfunction";
 
     private String projectName = null;
     private final String groupSaveTag;
     private final String animationSavePrefix;
     private final LinkedHashMap<String, ArrayList<ZipEntry>> animations = new LinkedHashMap<>();
-    private final String functionFolderName = VersionUtils.IS_1_21 ? "function" : "functions";
 
     public BDEngineDPConverter(@NotNull Player player, @NotNull String datapackName, @NotNull String groupSaveTag, @NotNull String animationSavePrefix){
         this.groupSaveTag = groupSaveTag;
@@ -117,7 +118,8 @@ public class BDEngineDPConverter {
         SpawnedDisplayEntityGroup createdGroup = DatapackEntitySpawned.getProjectGroup(projectName);
         if (createdGroup == null){
             player.sendMessage(Component.text("Failed to find model/group created from datapack!", NamedTextColor.RED));
-            player.sendMessage(Component.text("| The datapack may be a legacy one (before v1.13 of BDEngine). Try using /mdis bdengine convertanimleg", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| The datapack may be a legacy one (Before BDEngine v1.13). Try using /mdis bdengine convertdpleg", NamedTextColor.GRAY, TextDecoration.ITALIC));
+            player.sendMessage(Component.text("| The datapack may have been generated for a different game version", NamedTextColor.GRAY, TextDecoration.ITALIC));
             return;
         }
 

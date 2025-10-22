@@ -7,6 +7,7 @@ import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.relativepoints.MultiFramePointHelper;
@@ -17,14 +18,25 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 class AnimDrawPointsCMD extends PlayerSubCommand {
     AnimDrawPointsCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("drawpoints", parentSubCommand, Permission.ANIM_DRAW_FRAME_POINTS);
+        setTabComplete(2, List.of("straight", "arc"));
+        setTabComplete(3, "<point-tag>");
+        setTabComplete(4, "<start-frame>");
+        setTabComplete(5, "<end-frame>");
+        setTabComplete(6, "[points-per-frame]");
+    }
+
+    private void incorrectUsage(Player player){
+        player.sendMessage(Component.text("Incorrect Usage! /mdis anim drawpoints <straight | arc> <point-tag> <start-frame> <end-frame> [points-per-frame]", NamedTextColor.RED));
     }
 
     @Override
     public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
+        ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(player);
         if (group == null) {
             player.sendMessage(Component.text("You must have a group selected to do this animation command!", NamedTextColor.RED));
             return;
@@ -132,10 +144,6 @@ class AnimDrawPointsCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("| Start Frame ID cannot be < 0", NamedTextColor.RED));
             player.sendMessage(Component.text("| End Frame ID cannot be >= # of frames in animation", NamedTextColor.RED));
         }
-    }
-
-    private void incorrectUsage(Player player){
-        player.sendMessage(Component.text("Incorrect Usage! /mdis anim drawpoints <straight | arc> <point-tag> <start-frame> <end-frame> [points-per-frame]", NamedTextColor.RED));
     }
 
     private void invalidPos(Player player){

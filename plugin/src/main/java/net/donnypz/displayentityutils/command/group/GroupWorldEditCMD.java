@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 class GroupWorldEditCMD extends PlayerSubCommand {
     GroupWorldEditCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("wetogroup", parentSubCommand, Permission.GROUP_WORLD_EDIT);
+        setTabComplete(2, "-removeblocks");
     }
 
     @Override
@@ -25,7 +26,7 @@ class GroupWorldEditCMD extends PlayerSubCommand {
             return;
         }
 
-        boolean removeBlocks = args.length >= 3 && args[2].equals("-remove");
+        boolean removeBlocks = args.length >= 3 && args[2].equals("-removeblocks");
         SpawnedDisplayEntityGroup g = WorldEditUtils.createGroupFromSelection(player, removeBlocks);
         if (g == null){
             player.sendMessage(Component.text("Failed to convert WorldEdit selection to a spawned group! Ensure that:", NamedTextColor.RED));
@@ -38,7 +39,7 @@ class GroupWorldEditCMD extends PlayerSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Converted your WorldEdit selection to a spawned group!", NamedTextColor.GREEN)));
         player.sendMessage(Component.text("| Your group selection has been changed to the newly created group", NamedTextColor.GRAY, TextDecoration.ITALIC));
 
-        DisplayGroupManager.setSelectedSpawnedGroup(player, g);
+        DisplayGroupManager.setSelectedGroup(player, g);
         g.glow(player, 60);
         if (removeBlocks) player.sendMessage(Component.text("| Selected blocks have been removed!", NamedTextColor.YELLOW, TextDecoration.ITALIC));
     }

@@ -14,7 +14,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.PartFilter;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Part Selection Filter Part Tags")
+@Name("Part Filter/Selection Part Tags")
 @Description("Filter part tags in a part selection")
 @Examples({"#Filter parts with the tag \"head\" but exclude if they have \"eye\"",
         "add filter to {_selection} with tag \"head\" and without tag \"eye\"",
@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class EffPartSelectionFilterTags extends Effect {
     static {
-        Skript.registerEffect(EffPartSelectionFilterTags.class,"add filter to %multipartselection% [in:with [part( |-)?]tag[s] %strings%] [ex:[and ]without [part( |-)?]tag[s] %strings%]");
+        Skript.registerEffect(EffPartSelectionFilterTags.class,"add filter to %multipartfilter% [in:with [part( |-)?]tag[s] %-strings%] [ex:[and ]without [part( |-)?]tag[s] %-strings%]");
     }
 
     Expression<MultiPartSelection> selection;

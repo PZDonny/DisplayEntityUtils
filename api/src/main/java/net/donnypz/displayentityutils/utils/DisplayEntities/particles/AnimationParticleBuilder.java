@@ -96,11 +96,11 @@ public class AnimationParticleBuilder extends ParticleBuilder{
             case COUNT -> {
                 player.sendMessage(amountMSG);
             }
-            case COLOR -> {
+            case COLOR_AND_SIZE -> {
                 player.sendMessage(colorAndSizeMSG);
                 player.sendMessage(separatedMSG);
             }
-            case COLOR_ENTITY_EFFECT -> {
+            case COLOR_ONLY -> {
                 player.sendMessage(colorMSG);
             }
             case COLOR_TRANSITION -> {
@@ -175,6 +175,9 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         else if (particle() == Particle.ENTITY_EFFECT){
             animParticle = new EntityEffectAnimationParticle(this, data());
         }
+        else if (particle() == Particle.FLASH){
+            animParticle = new FlashAnimationParticle(this, data());
+        }
         else{
             animParticle = new GeneralAnimationParticle(this, particle());
         }
@@ -195,8 +198,8 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     public enum Step{
         PARTICLE,
         COUNT,
-        COLOR,
-        COLOR_ENTITY_EFFECT,
+        COLOR_AND_SIZE,
+        COLOR_ONLY,
         COLOR_TRANSITION,
         EXTRA,
         ITEM,

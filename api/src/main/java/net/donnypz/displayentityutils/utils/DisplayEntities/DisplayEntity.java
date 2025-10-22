@@ -150,7 +150,9 @@ final class DisplayEntity implements Serializable {
             String animationTag = getSpawnAnimationTag(pdc);
             LoadMethod loadMethod = getSpawnAnimationLoadMethod(pdc);
             DisplayAnimator.AnimationType type = getSpawnAnimationType(pdc);
-            group.setSpawnAnimation(animationTag, loadMethod, type);
+            if (animationTag != null){
+                group.setSpawnAnimation(pdc, animationTag, type, loadMethod);
+            }
         }
         return d;
     }
@@ -175,7 +177,7 @@ final class DisplayEntity implements Serializable {
                 String animationTag = getSpawnAnimationTag(pdc);
                 LoadMethod loadMethod = getSpawnAnimationLoadMethod(pdc);
                 DisplayAnimator.AnimationType type = getSpawnAnimationType(pdc);
-                group.setSpawnAnimation(animationTag, loadMethod, type);
+                group.setSpawnAnimation(animationTag, type, loadMethod);
             }
         }
 

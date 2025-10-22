@@ -32,7 +32,7 @@ public class CondActiveGroupAnimatorIsActive extends Condition {
         ActiveGroup<?> g = group.getSingle(event);
         DisplayAnimator a = animator.getSingle(event);
         if (g == null || a == null) return isNegated();
-        return g.isActiveAnimator(a) == isNegated();
+        return g.isActiveAnimator(a) != isNegated();
     }
 
 
@@ -47,7 +47,7 @@ public class CondActiveGroupAnimatorIsActive extends Condition {
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         this.animator = (Expression<DisplayAnimator>) expressions[0];
         this.group = (Expression<ActiveGroup<?>>) expressions[1];
-        setNegated(parseResult.mark == 1);
+        setNegated(parseResult.mark == 2);
         return true;
     }
 }

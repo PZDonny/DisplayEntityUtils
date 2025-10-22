@@ -14,6 +14,10 @@ import org.jetbrains.annotations.NotNull;
 class InteractionScaleCMD extends PlayerSubCommand {
     InteractionScaleCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("scale", parentSubCommand, Permission.INTERACTION_DIMENSION);
+        setTabComplete(2, "<height>");
+        setTabComplete(3, "<width>");
+        setTabComplete(3, "<tick-duration>");
+        setTabComplete(4, "<tick-delay>");
     }
 
     @Override
@@ -23,7 +27,7 @@ class InteractionScaleCMD extends PlayerSubCommand {
             return;
         }
 
-        Interaction interaction = InteractionCMD.getInteraction(player, true);
+        InteractionCMD.SelectedInteraction interaction = InteractionCMD.getInteraction(player, true);
         if (interaction == null){
             return;
         }
@@ -35,7 +39,7 @@ class InteractionScaleCMD extends PlayerSubCommand {
             if (duration < 0 || delay < 0){
                 throw new NumberFormatException();
             }
-            DisplayUtils.scaleInteraction(interaction, height, width, duration, delay);
+            interaction.scale(height, width, duration, delay);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Scaling Interaction Entity over "+duration+" ticks!", NamedTextColor.GREEN)));
             player.sendMessage(Component.text("| Height: "+height, NamedTextColor.GRAY));
             player.sendMessage(Component.text("| Width: "+width, NamedTextColor.GRAY));

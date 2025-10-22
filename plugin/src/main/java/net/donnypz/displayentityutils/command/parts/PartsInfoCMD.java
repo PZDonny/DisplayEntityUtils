@@ -15,21 +15,22 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.entity.Display;
-import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 class PartsInfoCMD extends PlayerSubCommand {
     PartsInfoCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("info", parentSubCommand, Permission.PARTS_INFO);
+        setTabComplete(2, List.of("part", "selection", "filter"));
     }
 
     @Override
     public void execute(Player player, String[] args) {
-        ServerSideSelection selection = DisplayGroupManager.getPartSelection(player);
+        ActivePartSelection<?> selection = DisplayGroupManager.getPartSelection(player);
         if (selection == null){
             DisplayEntityPluginCommand.noPartSelection(player);
             return;
@@ -59,8 +60,8 @@ class PartsInfoCMD extends PlayerSubCommand {
             if (PartsCMD.isUnwantedSingleSelection(player, selection)){
                 return;
             }
-            SpawnedPartSelection sel = (SpawnedPartSelection) selection;
-            SpawnedDisplayEntityGroup group = sel.getGroup();
+            MultiPartSelection<?> sel = (MultiPartSelection<?>) selection;
+            ActiveGroup<?> group = sel.getGroup();
             String groupTag = group.getTag();
 
             groupTag = groupTag == null ? "<red>NOT SET" : "<yellow>"+groupTag;
@@ -71,13 +72,18 @@ class PartsInfoCMD extends PlayerSubCommand {
         }
 
         //Single Part
-        SpawnedDisplayEntityPart part = selection.getSelectedPart();
+        ActivePart part = selection.getSelectedPart();
         player.sendMessage(MiniMessage.miniMessage().deserialize("Part Type: <yellow>"+part.getType()));
 
-        UUID entityUUID = part.getEntity().getUniqueId();
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Entity UUID: <yellow>"+entityUUID)
-                .hoverEvent(HoverEvent.showText(Component.text("Click to copy", NamedTextColor.GREEN)))
-                .clickEvent(ClickEvent.copyToClipboard(entityUUID.toString())));
+
+        if (part instanceof SpawnedDisplayEntityPart sp){
+            UUID entityUUID = sp.getEntity().getUniqueId();
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Entity UUID: <yellow>"+entityUUID)
+                    .hoverEvent(HoverEvent.showText(Component.text("Click to copy", NamedTextColor.GREEN)))
+                    .clickEvent(ClickEvent.copyToClipboard(entityUUID.toString())));
+        }
+
+
 
         if (!selection.isSinglePartSelection()){
             UUID partUUID = part.getPartUUID();
@@ -90,19 +96,18 @@ class PartsInfoCMD extends PlayerSubCommand {
             player.sendMessage(MiniMessage.miniMessage().deserialize("Is Master Part: "+(part.isMaster() ? "<green>TRUE" : "<red>FALSE")));
             player.sendMessage(Component.empty());
             if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getViewRange()));
+                player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getDisplayViewRange()));
                 sendBrightness(player, part);
                 DEUCommandUtils.sendGlowColor(player, part.getGlowColor());
             }
             else{
-                Interaction interaction = (Interaction) part.getEntity();
-                player.sendMessage(MiniMessage.miniMessage().deserialize("Height: <yellow>"+interaction.getInteractionHeight()));
-                player.sendMessage(MiniMessage.miniMessage().deserialize("Width: <yellow>"+interaction.getInteractionWidth()));
-                player.sendMessage(MiniMessage.miniMessage().deserialize("Responsive: "+(interaction.isResponsive() ? "<green>ENABLED" : "<red>DISABLED")));
+                player.sendMessage(MiniMessage.miniMessage().deserialize("Height: <yellow>"+part.getInteractionHeight()));
+                player.sendMessage(MiniMessage.miniMessage().deserialize("Width: <yellow>"+part.getInteractionWidth()));
+                player.sendMessage(MiniMessage.miniMessage().deserialize("Responsive: "+(part.isInteractionResponsive() ? "<green>ENABLED" : "<red>DISABLED")));
             }
         }
         else{
-            player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getViewRange()));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getDisplayViewRange()));
             sendBrightness(player, part);
             DEUCommandUtils.sendGlowColor(player, part.getGlowColor());
         }
@@ -116,11 +121,11 @@ class PartsInfoCMD extends PlayerSubCommand {
         player.sendMessage(Component.text("Incorrect Usage! /mdis parts info <part | selection>", NamedTextColor.RED));
     }
 
-    private void sendBrightness(Player player, SpawnedDisplayEntityPart part){
+    private void sendBrightness(Player player, ActivePart part){
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
             return;
         }
-        Display.Brightness brightness = part.getBrightness();
+        Display.Brightness brightness = part.getDisplayBrightness();
         if (brightness == null){
             player.sendMessage(MiniMessage.miniMessage().deserialize("Brightness: <red>NOT SET"));
         }
@@ -131,7 +136,7 @@ class PartsInfoCMD extends PlayerSubCommand {
         }
     }
 
-    private void sendFilterInfo(Player player, SpawnedPartSelection sel){
+    private void sendFilterInfo(Player player, MultiPartSelection<?> sel){
         PartFilter filter = sel.toFilter();
 
         //Included Part Tags

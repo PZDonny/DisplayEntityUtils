@@ -9,7 +9,7 @@ public class InteractionCommand {
     boolean isConsoleCommand;
     NamespacedKey key;
 
-    InteractionCommand(String command, boolean isLeftClick, boolean isConsoleCommand, NamespacedKey key){
+    public InteractionCommand(String command, boolean isLeftClick, boolean isConsoleCommand, NamespacedKey key){
         this.command = command;
         this.isLeftClick = isLeftClick;
         this.isConsoleCommand = isConsoleCommand;

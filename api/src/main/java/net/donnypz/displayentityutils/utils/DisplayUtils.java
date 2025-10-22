@@ -97,25 +97,37 @@ public final class DisplayUtils {
                 .rotate(transformation.getRightRotation());
     }
 
-    public static Vector3f pivotPitchAndYaw(@NotNull Vector3f translation, float pitch, float yaw){
+    /**
+     * Pivot a vector with a given pitch and yaw change
+     * @param vector the vector
+     * @param pitchChange the pitch change
+     * @param yawChange the yaw change
+     * @return a new vector with the pivot applied
+     */
+    public static Vector3f pivotPitchAndYaw(@NotNull Vector3f vector, float pitchChange, float yawChange){
         //Apply Pitch
-        double pitchAsRad = Math.toRadians(pitch);
+        double pitchAsRad = Math.toRadians(pitchChange);
         double sin = Math.sin(pitchAsRad);
         double cos = Math.cos(pitchAsRad);
-        float translationY = translation.y;
-        float translationZ = translation.z;
 
-        translation.y = (float) (translationY * cos - translationZ * sin);
-        translation.z = (float) (translationY * sin + translationZ * cos);
+        float y = (float) (vector.y * cos - vector.z * sin);
+        float z = (float) (vector.y * sin + vector.z * cos);
 
         //Apply Yaw
         return new Quaternionf()
-                .rotateY((float) Math.toRadians(-yaw))
-                .transform(translation);
+                .rotateY((float) Math.toRadians(-yawChange))
+                .transform(new Vector3f(vector.x, y, z));
     }
 
-    public static Vector pivotPitchAndYaw(@NotNull Vector vector, float pitch, float yaw){
-        return Vector.fromJOML(pivotPitchAndYaw(vector.toVector3f(), pitch, yaw));
+    /**
+     * Pivot a vector with a given pitch and yaw change
+     * @param vector the vector
+     * @param pitchChange the pitch change
+     * @param yawChange the yaw change
+     * @return a new vector with the pivot applied
+     */
+    public static Vector pivotPitchAndYaw(@NotNull Vector vector, float pitchChange, float yawChange){
+        return Vector.fromJOML(pivotPitchAndYaw(vector.toVector3f(), pitchChange, yawChange));
     }
 
     /**
@@ -150,9 +162,8 @@ public final class DisplayUtils {
             translationVector.add(centeringVec);
         }
 
-        pivotPitchAndYaw(translationVector, display.getPitch(), display.getYaw());
-
-        translationLoc.add(Vector.fromJOML(translationVector));
+        Vector3f pivotedVector = pivotPitchAndYaw(translationVector, display.getPitch(), display.getYaw());
+        translationLoc.add(Vector.fromJOML(pivotedVector));
         return translationLoc;
     }
 
@@ -181,7 +192,7 @@ public final class DisplayUtils {
      * @param part The entity to get the location from
      * @return the location where the part is translated at. Null if the part is an interaction entity
      */
-    public static @Nullable Location getModelLocation(@NotNull PacketDisplayEntityPart part){
+    public static @Nullable Location getModelLocation(@NotNull ActivePart part){
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
             return null;
         }
@@ -201,9 +212,8 @@ public final class DisplayUtils {
             translationVector.add(centerVec);
         }
 
-        pivotPitchAndYaw(translationVector, pitch, yaw);
-
-        translationLoc.add(Vector.fromJOML(translationVector));
+        Vector3f pivotedVector = pivotPitchAndYaw(translationVector, pitch, yaw);
+        translationLoc.add(Vector.fromJOML(pivotedVector));
         return translationLoc;
     }
 
@@ -365,7 +375,7 @@ public final class DisplayUtils {
         List<SpawnedDisplayEntityGroup> groups = new ArrayList<>();
         for (Entity e : vehicleEntity.getPassengers()){
             if (e instanceof Display display){
-                GroupResult result = DisplayGroupManager.getSpawnedGroup(display, null);
+                GroupResult result = DisplayGroupManager.getSpawnedGroup(display);
                 if (result == null || result.group() == null){
                     continue;
                 }
@@ -389,7 +399,7 @@ public final class DisplayUtils {
         List<SpawnedDisplayEntityGroup> groups = new ArrayList<>();
         for (Entity e : vehicleEntity.getPassengers()){
             if (e instanceof Display display){
-                GroupResult result = DisplayGroupManager.getSpawnedGroup(display, null);
+                GroupResult result = DisplayGroupManager.getSpawnedGroup(display);
                 if (result == null || result.group() == null){
                     continue;
                 }
@@ -424,6 +434,7 @@ public final class DisplayUtils {
      * @param delayInTicks How long before the translation should begin
      */
     public static void translate(@NotNull Display display, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
+        if (distance == 0) return;
         if (delayInTicks < 0){
             delayInTicks = -1;
         }
@@ -455,13 +466,8 @@ public final class DisplayUtils {
      * @param delayInTicks How long before the translation should begin
      */
     public static void translate(@NotNull Display display, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
-        Vector v = direction.getVector(display);
-        if (direction != Direction.UP && direction != Direction.DOWN){
-            v.rotateAroundY(Math.toRadians(display.getYaw()));
-            v.setY(0);
-        }
-
-        translate(display, v, distance, durationInTicks, delayInTicks);
+        if (distance == 0) return;
+        translate(display, direction.getVector(display, true), distance, durationInTicks, delayInTicks);
     }
 
     /**
@@ -475,6 +481,7 @@ public final class DisplayUtils {
      * @param delayInTicks How long before the translation should begin
      */
     public static void translate(@NotNull Interaction interaction, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
+        if (distance == 0) return;
         Location destination = interaction.getLocation().clone().add(direction.clone().normalize().multiply(distance));
         if (!new PartTranslateEvent(interaction, destination, null,null).callEvent()){
             return;
@@ -527,7 +534,7 @@ public final class DisplayUtils {
      * @param delayInTicks How long before the translation should begin
      */
     public static void translate(@NotNull Interaction interaction, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
-        translate(interaction, direction.getVector(interaction), distance, durationInTicks, delayInTicks);
+        translate(interaction, direction.getVector(interaction, true), distance, durationInTicks, delayInTicks);
     }
 
     /**
@@ -561,7 +568,7 @@ public final class DisplayUtils {
     public static void translate(@NotNull SpawnedDisplayEntityPart part, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
             Interaction interaction = (Interaction) part.getEntity();
-            translate(interaction, direction.getVector(interaction), distance, durationInTicks, delayInTicks);
+            translate(interaction, direction.getVector(interaction, true), distance, durationInTicks, delayInTicks);
             return;
         }
         Display display = (Display) part.getEntity();
@@ -776,12 +783,10 @@ public final class DisplayUtils {
      * @param interaction The entity to assign the command to
      * @param command The command to remove
      */
-    @ApiStatus.Internal
-    public static void removeInteractionCommand(@NotNull Interaction interaction, @NotNull String command, NamespacedKey key){
-        if (command.isBlank()){
-            return;
-        }
-        removeFromPDCList(interaction, command, key);
+    public static void removeInteractionCommand(@NotNull Interaction interaction, @NotNull InteractionCommand command){
+        String cmd = command.command;
+        NamespacedKey key = command.key;
+        removeFromPDCList(interaction, cmd, key);
     }
 
     /**

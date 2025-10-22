@@ -17,9 +17,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Active Group/Part/Selection Visibility")
+@Name("Active Group/Part/PartFilter Visibility")
 @Description("Show or hide a DisplayEntityUtils object to/from a player")
-@Examples({"deu hide {_partselection} from player",
+@Examples({"deu hide {_partfilter} from player",
         "deu show {_spawnedpart} to player",
         "",
         "#3.0.0 or later",
@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2, 3.0.0 (Packet)")
 public class EffActivePlayerVisibility extends Effect {
     static {
-        Skript.registerEffect(EffActivePlayerVisibility.class,"deu (1¦(show|reveal)|2¦hide) %activegroups/activeparts/multipartselections% (to|from) %players%");
+        Skript.registerEffect(EffActivePlayerVisibility.class,"deu (1¦(show|reveal)|2¦hide) %activegroups/activeparts/multipartfilters% (to|from) %players%");
     }
 
     Expression<?> object;

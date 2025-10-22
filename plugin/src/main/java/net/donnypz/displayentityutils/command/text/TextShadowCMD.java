@@ -2,43 +2,70 @@ package net.donnypz.displayentityutils.command.text;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
+import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.command.parts.PartsCMD;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-class TextShadowCMD extends PlayerSubCommand {
+import java.util.List;
+
+class TextShadowCMD extends PartsSubCommand {
     TextShadowCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("shadow", parentSubCommand, Permission.TEXT_TOGGLE_SHADOW);
+        super("shadow", parentSubCommand, Permission.TEXT_TOGGLE_SHADOW, 0, 2);
+        setTabComplete(3, List.of("on", "off"));
     }
 
     @Override
-    public void execute(Player player, String[] args) {
-        ServerSideSelection partSelection = DisplayGroupManager.getPartSelection(player);
-        if (partSelection == null){
-            DisplayEntityPluginCommand.noPartSelection(player);
-            return;
+    protected void sendIncorrectUsage(@NotNull Player player) {
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /mdis text shadow -all <on | off>", NamedTextColor.RED)));
+    }
+
+    @Override
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+        if (args.length < 4){
+            sendIncorrectUsage(player);
+            return false;
         }
 
-        if (!partSelection.hasSelectedPart()){
-            PartsCMD.invalidPartSelection(player);
+        boolean status;
+        String s = args[3];
+        if (s.equalsIgnoreCase("on")){
+            status = true;
+            player.sendMessage(DisplayAPI.pluginPrefix
+                    .append(MiniMessage.miniMessage().deserialize("<green>Successfully toggled shadowed for ALL selected text displays ON")));
+        }
+        else if (s.equalsIgnoreCase("off")){
+            status = false;
+            player.sendMessage(DisplayAPI.pluginPrefix
+                    .append(MiniMessage.miniMessage().deserialize("<green>Successfully toggled shadowed for ALL selected text displays <red>OFF")));
+        }
+        else{
+            sendIncorrectUsage(player);
+            return false;
         }
 
-        SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
-        if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
+        for (ActivePart part : selection.getSelectedParts()){
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
+                part.setTextDisplayShadowed(status);
+            }
+        }
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully toggled shadowed for ALL selected text displays!", NamedTextColor.GREEN)));
+        return true;
+    }
+
+    @Override
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
-            return;
+            return false;
         }
-        TextDisplay display = (TextDisplay) partSelection.getSelectedPart().getEntity();
-        display.setShadowed(!display.isShadowed());
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully toggled shadow on text display!", NamedTextColor.GREEN)));
+        selectedPart.setTextDisplayShadowed(!selectedPart.isTextDisplayShadowed());
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully toggled shadow for text display!", NamedTextColor.GREEN)));
+        return true;
     }
 }

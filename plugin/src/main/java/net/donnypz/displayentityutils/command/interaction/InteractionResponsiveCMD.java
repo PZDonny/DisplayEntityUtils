@@ -18,7 +18,7 @@ class InteractionResponsiveCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         Component result;
-        Interaction interaction = InteractionCMD.getInteraction(player, true);
+        InteractionCMD.SelectedInteraction interaction = InteractionCMD.getInteraction(player, true);
         if (interaction == null){
             return;
         }

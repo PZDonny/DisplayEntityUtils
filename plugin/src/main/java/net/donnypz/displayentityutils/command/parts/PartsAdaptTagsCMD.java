@@ -1,54 +1,59 @@
 package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.command.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-class PartsAdaptTagsCMD extends PlayerSubCommand {
+class PartsAdaptTagsCMD extends PartsSubCommand {
     PartsAdaptTagsCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("adapttags", parentSubCommand, Permission.PARTS_TAG);
+        super("adapttags", parentSubCommand, Permission.PARTS_TAG, 2, 0);
+        setTabComplete(2, "-remove");
     }
 
     @Override
-    public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
-        if (group == null){
-            DisplayEntityPluginCommand.noGroupSelection(player);
-            return;
+    public void execute(Player player, String[] args) {}
+
+    @Override
+    protected void sendIncorrectUsage(@NotNull Player player) {}
+
+    @Override
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+        return false;
+    }
+
+    @Override
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        if (selection instanceof PacketPartSelection){
+            DisplayEntityPluginCommand.disallowPacketGroup(player);
+            return false;
         }
 
         boolean removeFromSB;
-        if (args.length < 2){
+        if (args.length < 3){
             removeFromSB = false;
         }
         else{
-            removeFromSB = args[1].equalsIgnoreCase("-remove");
+            removeFromSB = args[2].equalsIgnoreCase("-remove");
         }
 
-        ServerSideSelection selection = DisplayGroupManager.getPartSelection(player);
-        if (selection == null || !selection.isValid()){ //Adapt for all parts
+        if (!selection.isValid()){ //Adapt for all parts
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid part selection! Please try again!", NamedTextColor.RED)));
-            return;
+            return false;
         }
         if (PartsCMD.isUnwantedSingleSelection(player, selection)){
-            return;
+            return false;
         }
 
         for (SpawnedDisplayEntityPart part : ((SpawnedPartSelection) selection).getSelectedParts()){
             part.adaptScoreboardTags(removeFromSB);
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Adapted all scoreboard tags in your part selection!", NamedTextColor.GREEN)));
+        return true;
     }
 
 }

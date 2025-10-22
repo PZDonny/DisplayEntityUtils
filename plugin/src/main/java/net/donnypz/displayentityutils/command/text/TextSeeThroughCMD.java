@@ -2,43 +2,69 @@ package net.donnypz.displayentityutils.command.text;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
+import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.command.parts.PartsCMD;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-class TextSeeThroughCMD extends PlayerSubCommand {
+import java.util.List;
+
+class TextSeeThroughCMD extends PartsSubCommand {
     TextSeeThroughCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("seethrough", parentSubCommand, Permission.TEXT_TOGGLE_SEE_THROUGH);
+        super("seethrough", parentSubCommand, Permission.TEXT_TOGGLE_SEE_THROUGH, 0, 2);
+        setTabComplete(3, List.of("on", "off"));
     }
 
     @Override
-    public void execute(Player player, String[] args) {
-        ServerSideSelection partSelection = DisplayGroupManager.getPartSelection(player);
-        if (partSelection == null){
-            DisplayEntityPluginCommand.noPartSelection(player);
-            return;
-        }
-        if (!partSelection.hasSelectedPart()){
-            PartsCMD.invalidPartSelection(player);
+    protected void sendIncorrectUsage(@NotNull Player player) {
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /mdis text seethrough -all <on | off>", NamedTextColor.RED)));
+    }
+
+    @Override
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+        if (args.length < 4){
+            sendIncorrectUsage(player);
+            return false;
         }
 
-        SpawnedDisplayEntityPart selected = partSelection.getSelectedPart();
-        if (selected.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
+        boolean status;
+        String s = args[3];
+        if (s.equalsIgnoreCase("on")){
+            status = true;
+            player.sendMessage(DisplayAPI.pluginPrefix
+                    .append(MiniMessage.miniMessage().deserialize("<green>Successfully toggled see through for ALL selected text displays ON")));
+        }
+        else if (s.equalsIgnoreCase("off")){
+            status = false;
+            player.sendMessage(DisplayAPI.pluginPrefix
+                    .append(MiniMessage.miniMessage().deserialize("<green>Successfully toggled see through for ALL selected text displays <red>OFF")));
+        }
+        else{
+            sendIncorrectUsage(player);
+            return false;
+        }
+
+        for (ActivePart part : selection.getSelectedParts()){
+            if (part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
+                part.setTextDisplaySeeThrough(status);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
-            return;
+            return false;
         }
-
-        TextDisplay display = (TextDisplay) selected.getEntity();
-        display.setSeeThrough(!display.isSeeThrough());
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully toggled see through of text display!", NamedTextColor.GREEN)));
+        selectedPart.setTextDisplaySeeThrough(!selectedPart.isTextDisplaySeeThrough());
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully toggled see through for text display!", NamedTextColor.GREEN)));
+        return true;
     }
 }

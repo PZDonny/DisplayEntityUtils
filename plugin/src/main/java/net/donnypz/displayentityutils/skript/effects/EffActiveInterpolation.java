@@ -21,8 +21,8 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2, 3.0.0 (Packet)")
 public class EffActiveInterpolation extends Effect {
     static {
-        Skript.registerEffect(EffActiveInterpolation.class,"[deu ]set interpolation (:duration|delay) of %activegroups/multipartselections/activeparts% to %timespan%",
-                "[deu] set %activegroups/multipartselections/activeparts%'s interpolation (:duration|delay) to %timespan%");
+        Skript.registerEffect(EffActiveInterpolation.class,"[deu ]set interpolation (:duration|delay) of %activegroups/multipartfilters/activeparts% to %timespan%",
+                "[deu] set %activegroups/multipartfilters/activeparts%'s interpolation (:duration|delay) to %timespan%");
     }
 
     Expression<?> object;

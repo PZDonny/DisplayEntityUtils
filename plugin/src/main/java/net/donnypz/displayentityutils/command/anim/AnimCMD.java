@@ -75,7 +75,7 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
             sender.sendMessage(Component.text("Commands allowing multiple <frame-ids> are comma separated", NamedTextColor.GRAY));
             CMDUtils.sendCMD(sender,"/mdis anim help <page-number>", "Get help for animations");
             CMDUtils.sendCMD(sender,"/mdis anim new", "Manually create a new animation");
-            CMDUtils.sendCMD(sender, "/mdis anim select <anim-tag> <storage-location>", "Select a saved animation");
+            CMDUtils.sendCMD(sender, "/mdis anim select <anim-tag> <storage>", "Select a saved animation");
             CMDUtils.sendCMD(sender,"/mdis anim info", "List information about your selected animation");
             CMDUtils.sendCMD(sender, "/mdis anim frameinfo <frame-id>", "List information about a frame in your animation");
             CMDUtils.sendCMD(sender, "/mdis anim settag", "Set the tag to identify this animation");
@@ -109,12 +109,12 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
         }
         else{
             CMDUtils.sendCMD(sender, "/mdis anim previewframe <frame-id>", "Preview a frame on your selected group, without changing group entity data");
-            CMDUtils.sendCMD(sender, "/mdis anim play [-loop]", "Play your selected animation on your selected group. Include \"-loop\" to loop the animation");
+            CMDUtils.sendCMD(sender, "/mdis anim play [-loop] [-packet]", "Play your selected animation on your selected group. \n\"-loop\" will make the animation loop. \n\"-packet\" will play the animation using packets.");
             CMDUtils.sendCMD(sender, "/mdis anim previewplay", "Preview your selected animation on your selected group, without changing group entity data.");
             CMDUtils.sendCMD(sender, "/mdis anim restore", "Restore your selected group to its previous state before previewing frames/animations");
             CMDUtils.sendCMD(sender, "/mdis anim stop", "Stop an animation playing on a group");
-            CMDUtils.sendCMD(sender, "/mdis anim save <storage-location>", "Save your selected animation and any changes made");
-            CMDUtils.sendCMD(sender, "/mdis anim delete <anim-tag> <storage-location>", "Delete a saved animation");
+            CMDUtils.sendCMD(sender, "/mdis anim save <storage>", "Save your selected animation and any changes made");
+            CMDUtils.sendCMD(sender, "/mdis anim delete <anim-tag> <storage>", "Delete a saved animation");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }

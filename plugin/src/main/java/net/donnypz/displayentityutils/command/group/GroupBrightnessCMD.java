@@ -1,38 +1,33 @@
 package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.*;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-class GroupBrightnessCMD extends PlayerSubCommand {
+class GroupBrightnessCMD extends GroupSubCommand {
     GroupBrightnessCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("brightness", parentSubCommand, Permission.GROUP_BRIGHTNESS);
+        super("brightness", parentSubCommand, Permission.GROUP_BRIGHTNESS, 4, true);
+        setTabComplete(2, "<block>");
+        setTabComplete(2, "<sky>");
     }
 
     @Override
-    public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
-        if (group == null) {
-            DisplayEntityPluginCommand.noGroupSelection(player);
-            return;
-        }
+    protected void sendIncorrectUsage(@NotNull Player player) {
+        player.sendMessage(Component.text("/mdis group brightness <block> <sky>", NamedTextColor.RED));
+        player.sendMessage(Component.text("| Brightness can any number between 0 and 15", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("| Set both \"block\" and \"sky\" to -1 to reset brightness", NamedTextColor.GRAY));
+    }
 
-        if (args.length < 4) {
-            player.sendMessage(Component.text("/mdis group brightness <block> <sky>", NamedTextColor.RED));
-            player.sendMessage(Component.text("| Brightness can any number between 0 and 15", NamedTextColor.GRAY));
-            player.sendMessage(Component.text("| Set both \"block\" and \"sky\" to -1 to reset brightness", NamedTextColor.GRAY));
-            return;
-        }
-
+    @Override
+    protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
         try{
             int block = Integer.parseInt(args[2]);
             int sky = Integer.parseInt(args[3]);

@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
@@ -18,9 +19,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 class GroupSafeDismountCMD extends ConsoleUsableSubCommand {
     GroupSafeDismountCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("safedismount", parentSubCommand, Permission.GROUP_DISMOUNT);
+        setTabComplete(2, List.of("-target", "-selected", "player-name", "entity-uuid"));
     }
 
     @Override
@@ -44,7 +48,7 @@ class GroupSafeDismountCMD extends ConsoleUsableSubCommand {
                 return;
             }
 
-            SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(p);
+            ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(p);
             if (group == null) {
                 DisplayEntityPluginCommand.noGroupSelection(p);
                 return;

@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -20,11 +21,14 @@ import java.util.List;
 class AnimAddFrameAfterCMD extends PlayerSubCommand {
     AnimAddFrameAfterCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("addframeafter", parentSubCommand, Permission.ANIM_ADD_FRAME);
+        setTabComplete(2, "<frame-id>");
+        setTabComplete(3, "<tick-delay>");
+        setTabComplete(4, "<tick-duration>");
     }
 
     @Override
     public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
+        ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(player);
         if (group == null) {
             DisplayEntityPluginCommand.noGroupSelection(player);
             return;
@@ -66,7 +70,8 @@ class AnimAddFrameAfterCMD extends PlayerSubCommand {
 
             player.sendMessage(Component.text(  "Frame successfully added after frame-id " + id + "!", NamedTextColor.GREEN));
             player.playSound(player, Sound.ENTITY_SHEEP_SHEAR, 1, 0.75f);
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid value entered! Enter whole numbers >= 0", NamedTextColor.RED));
         }
     }

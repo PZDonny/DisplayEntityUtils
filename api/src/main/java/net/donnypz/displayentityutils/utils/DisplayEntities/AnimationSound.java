@@ -48,7 +48,7 @@ public class AnimationSound implements Externalizable, Cloneable {
         this.existsInGameVersion = sound.existsInGameVersion;
     }
 
-    public void playSound(@NotNull Location location, @NotNull ActiveGroup group, @Nullable DisplayAnimator animator){
+    public void playSound(@NotNull Location location, @NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator){
         if (delay == 0){
             playSound(location);
         }
@@ -67,7 +67,7 @@ public class AnimationSound implements Externalizable, Cloneable {
         }
     }
 
-    public void playSound(@NotNull Location location, @NotNull ActiveGroup group, @Nullable DisplayAnimator animator, @NotNull Player player){
+    public void playSound(@NotNull Location location, @NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, @NotNull Player player){
         if (delay == 0){
             playSound(location, player);
         }
@@ -86,7 +86,7 @@ public class AnimationSound implements Externalizable, Cloneable {
         }
     }
 
-    public void playSound(@NotNull Location location, @NotNull ActiveGroup group, @Nullable DisplayAnimator animator, @NotNull Collection<Player> players){
+    public void playSound(@NotNull Location location, @NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, @NotNull Collection<Player> players){
         if (delay == 0){
             playSound(location, players);
         }

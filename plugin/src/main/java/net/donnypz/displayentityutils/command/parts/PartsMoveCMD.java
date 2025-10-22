@@ -7,7 +7,8 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.Direction;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -21,11 +22,13 @@ class PartsMoveCMD extends PlayerSubCommand {
 
     PartsMoveCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("move", parentSubCommand, Permission.PARTS_TRANSFORM);
+        setTabComplete(2, TabSuggestion.DIRECTIONS);
+        setTabComplete(3, "<distance>");
     }
 
     @Override
     public void execute(Player player, String[] args) {
-        ServerSideSelection selection = DisplayGroupManager.getPartSelection(player);
+        ActivePartSelection<?> selection = DisplayGroupManager.getPartSelection(player);
         if (selection == null){
             DisplayEntityPluginCommand.noPartSelection(player);
             return;
@@ -52,13 +55,11 @@ class PartsMoveCMD extends PlayerSubCommand {
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number greater than 0 for the distance!", NamedTextColor.RED)));
                 return;
             }
-            Entity e = selection.getSelectedPart().getEntity();
-            Location loc = e.getLocation();
-            Vector v = direction.getVector(loc).normalize().multiply(distance);
+            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) selection.getSelectedPart();
+            Location loc = part.getLocation();
+            Vector v = direction.getVector(selection.getSelectedPart(), false).normalize().multiply(distance);
             loc.add(v);
-            loc.setYaw(e.getYaw());
-            loc.setPitch(e.getPitch());
-            e.teleport(loc);
+            part.getEntity().teleport(loc);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Moved your selected part!", NamedTextColor.GREEN)));
         }
         catch(NumberFormatException e){

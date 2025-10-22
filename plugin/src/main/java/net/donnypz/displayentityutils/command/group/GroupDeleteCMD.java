@@ -16,12 +16,14 @@ import org.jetbrains.annotations.NotNull;
 class GroupDeleteCMD extends PlayerSubCommand {
     GroupDeleteCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("delete", parentSubCommand, Permission.GROUP_DELETE);
+        setTabComplete(2, "<anim-tag>");
+        setTabComplete(3, TabSuggestion.STORAGES);
     }
 
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 4) {
-            player.sendMessage(Component.text("/mdis group delete <anim-tag> <storage-location>", NamedTextColor.RED));
+            player.sendMessage(Component.text("/mdis group delete <anim-tag> <storage>", NamedTextColor.RED));
             return;
         }
 

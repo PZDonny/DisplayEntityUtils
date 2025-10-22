@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
@@ -20,13 +21,13 @@ class GroupDeselectCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
+        ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(player);
         if (group == null) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your group selection is already cleared!", NamedTextColor.RED)));
             return;
         }
 
-        DEUUser.getOrCreateUser(player).deselectSpawnedGroup();
+        DEUUser.getOrCreateUser(player).deselectGroup();
         RelativePointUtils.deselectRelativePoint(player);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Group selection cleared!", NamedTextColor.GREEN)));
     }

@@ -10,7 +10,6 @@ import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.FollowType;
-import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -114,16 +113,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return DisplayUtils.isInLoadedChunk(masterPart);
     }
 
-
-    /**
-     * Add a {@link SpawnedDisplayEntityPart} to this group. If the part was not previously part of this group AND it is a display entity, it will be mounted on top of
-     * the master entity of this group.
-     * @param part the part to add
-     * @return this
-     */
-    public SpawnedDisplayEntityGroup addSpawnedDisplayEntityPart(SpawnedDisplayEntityPart part){
+    @Override
+    public void addPart(@NotNull SpawnedDisplayEntityPart part){
         part.setGroup(this);
-        return this;
     }
 
 
@@ -147,8 +139,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 masterEntity.addPassenger(displayEntity);
             }
             else if (!groupParts.isEmpty()){
-                for (ActivePart spawnedPart : groupParts.values()){
-                    Entity spEntity = ((SpawnedDisplayEntityPart) spawnedPart).getEntity();
+                for (SpawnedDisplayEntityPart spawnedPart : groupParts.values()){
+                    Entity spEntity = spawnedPart.getEntity();
                     if (!spEntity.equals(part.getEntity())){
                         getMasterEntity().addPassenger(spEntity);
                     }
@@ -348,12 +340,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return interactions;
     }
 
-    /**
-     * Remove all Interaction Entities that are part of this SpawnedDisplayEntityGroup
-     * @return List of removed Interactions
-     */
-    public List<Interaction> removeInteractionEntities(){
-        List<Interaction> interactions = new ArrayList<>();
+
+    public void removeInteractions(){
         HashSet<Chunk> loadedChunks = new HashSet<>();
         for (SpawnedDisplayEntityPart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
             Chunk chunk = part.getEntity().getChunk();
@@ -364,7 +352,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         for (Chunk c : loadedChunks){
             c.removePluginChunkTicket(DisplayAPI.getPlugin());
         }
-        return interactions;
     }
 
     /**
@@ -423,37 +410,18 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
 
-    /**
-     * Make a player select this SpawnedDisplayEntityGroup
-     * @param player The player to give the selection to
-     * @return this
-     */
-    @ApiStatus.Internal
-    public SpawnedDisplayEntityGroup addPlayerSelection(Player player){
-        DisplayGroupManager.setSelectedSpawnedGroup(player, this);
-        return this;
-    }
-
-
-    /**
-     * Return whether this group will stay spawned after a server restart
-     * @return true if this group is persistent
-     */
+    @Override
     public boolean isPersistent(){
         return isPersistent;
     }
 
-    /**
-     * Set whether this group should persist after a server restart. If false, the group's entities will be despawned after a restart.
-     * @param persistent if this group should persist
-     * @return this
-     */
-    public SpawnedDisplayEntityGroup setPersistent(boolean persistent){
-        for (ActivePart p : groupParts.values()){
-            ((SpawnedDisplayEntityPart) p).getEntity().setPersistent(persistent);
+
+    @Override
+    public void setPersistent(boolean persistent){
+        for (SpawnedDisplayEntityPart p : groupParts.values()){
+            p.getEntity().setPersistent(persistent);
         }
         this.isPersistent = persistent;
-        return this;
     }
 
     /**
@@ -631,16 +599,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }.runTaskTimer(DisplayAPI.getPlugin(), delayInTicks, 1);
     }
 
-    /**
-     * Move the actual location of all the SpawnedDisplayEntityParts in this group through smooth teleportation.
-     * Doing this multiple times in a short amount of time may bring unexpected results.
-     * @param direction The direction to translate the group
-     * @param distance How far the group should be translated
-     * @param durationInTicks How long it should take for the translation to complete
-     */
-    public void teleportMove(Vector direction, double distance, int durationInTicks){
-        Entity master = getMasterEntity();
-        Location destination = master.getLocation().clone().add(direction.clone().normalize().multiply(distance));
+    @Override
+    public void teleportMove(@NotNull Vector direction, double distance, int durationInTicks){
+        Entity masterEntity = getMasterEntity();
+        Location destination = masterEntity.getLocation().clone().add(direction.clone().normalize().multiply(distance));
         if (!new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent()){
             return;
         }
@@ -651,50 +613,34 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 .normalize()
                 .multiply(movementIncrement);
 
-        for (ActivePart p : groupParts.values()){
-            SpawnedDisplayEntityPart part = (SpawnedDisplayEntityPart) p;
+        for (SpawnedDisplayEntityPart part : groupParts.values()){
             if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 translateInteractionEventless((Interaction) part.getEntity(), direction, distance, durationInTicks, 0);
             }
-            else{
-                new BukkitRunnable(){
-                    double currentDistance = 0;
-                    @Override
-                    public void run() {
-                        if (!isSpawned()){
-                            cancel();
-                            return;
-                        }
-                        currentDistance+=Math.abs(movementIncrement);
-                        Location tpLoc = master.getLocation().clone().add(incrementVector);
-
-                        part.getEntity().setRotation(tpLoc.getYaw(), tpLoc.getPitch());
-                        if (currentDistance >= distance){
-                            if (part.isMaster()){
-                                master.teleport(destination, TeleportFlag.EntityState.RETAIN_PASSENGERS);
-                            }
-                            new GroupTeleportMoveEndEvent(SpawnedDisplayEntityGroup.this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent();
-                            cancel();
-                        }
-                        else if (part.isMaster()){
-                            master.teleport(tpLoc, TeleportFlag.EntityState.RETAIN_PASSENGERS);
-                        }
-
-                    }
-                }.runTaskTimer(DisplayAPI.getPlugin(), 0, 1);
-            }
         }
-    }
+        new BukkitRunnable(){
+            double currentDistance = 0;
+            @Override
+            public void run() {
+                if (!isSpawned()){
+                    cancel();
+                    return;
+                }
+                currentDistance+=Math.abs(movementIncrement);
+                Location tpLoc = masterEntity.getLocation().clone().add(incrementVector);
 
-    /**
-     * Move the actual location of all the SpawnedDisplayEntityParts in this group through smooth teleportation.
-     * Doing this multiple times in a short amount of time may bring unexpected results.
-     * @param direction The direction to translate the group
-     * @param distance How far the group should be translated
-     * @param durationInTicks How long it should take for the translation to complete
-     */
-    public void teleportMove(@NotNull Direction direction, double distance, int durationInTicks){
-        teleportMove(direction.getVector(masterPart), distance, durationInTicks);
+                masterEntity.setRotation(tpLoc.getYaw(), tpLoc.getPitch());
+                if (currentDistance >= distance){
+                    masterEntity.teleport(destination, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                    new GroupTeleportMoveEndEvent(SpawnedDisplayEntityGroup.this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent();
+                    cancel();
+                }
+                else{
+                    masterEntity.teleport(tpLoc, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                }
+
+            }
+        }.runTaskTimer(DisplayAPI.getPlugin(), 0, 1);
     }
 
     /**
@@ -764,6 +710,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (!isInLoadedChunk()){
             return false;
         }
+
+        if (distance == 0) return true;
         Location destination = getMasterEntity().getLocation().clone().add(direction.clone().normalize().multiply(distance));
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.VANILLATRANSLATE, destination);
         Bukkit.getPluginManager().callEvent(event);
@@ -793,7 +741,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
         if (distance == 0) return true;
         Entity masterEntity = getMasterEntity();
-        Location destination = getLocation().clone().add(direction.getVector(masterEntity).normalize().multiply(distance));
+        Location destination = getLocation().clone().add(direction.getVector(masterEntity, true).normalize().multiply(distance));
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.VANILLATRANSLATE, destination);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()){
@@ -811,8 +759,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * @param tag What to set this group's tag to. Null to remove the group tag
      * @return this
      */
-    public SpawnedDisplayEntityGroup setTag(String tag){
-        this.tag = tag;
+    @Override
+    public SpawnedDisplayEntityGroup setTag(@Nullable String tag){
+        super.setTag(tag);
         for (SpawnedDisplayEntityPart part : groupParts.values()){
             part.setGroupPDC();
         }
@@ -866,42 +815,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * @return Whether the display is the master part
      */
     public boolean isMasterPart(@NotNull Display display){
-        return display.getPersistentDataContainer().has(new NamespacedKey(DisplayAPI.getPlugin(), "ismaster"), PersistentDataType.BOOLEAN);
-    }
-
-    /**
-     * Make this group's display entities glow, and interactions be outlined, for a player for a set period of time
-     * @param player the player
-     * @param durationInTicks how long the glowing should last. -1 to last forever
-     * @return this
-     */
-    public SpawnedDisplayEntityGroup glowAndOutline(@NotNull Player player, long durationInTicks){
-        for (SpawnedDisplayEntityPart p : groupParts.values()){
-            if (p.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                p.markInteraction(player, durationInTicks);
-            }
-            else {
-                Display display = (Display) p.getEntity();
-                if (display.isGlowing()){
-                    continue;
-                }
-                PacketUtils.setGlowing(player, display.getEntityId(), true);
-                if (durationInTicks > -1){
-                    Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
-                        if (!display.isGlowing()){
-                            PacketUtils.setGlowing(player, display.getEntityId(), false);
-                        }
-                    }, durationInTicks);
-                }
-                else{
-                    if (!display.isGlowing()){
-                        PacketUtils.setGlowing(player, display.getEntityId(), false);
-                    }
-                }
-
-            }
-        }
-        return this;
+        return DisplayUtils.isMaster(display);
     }
 
     /**
@@ -1103,26 +1017,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             float heightCullingAdder = DisplayConfig.heightCullingAdder();
             autoCull(widthCullingAdder, heightCullingAdder);
         }
-        return this;
-    }
-
-
-    /**
-     * Attempt to copy the transformations of one group to another.
-     * Both groups must have the same parts (or same amount of display entity parts)
-     * @param copyGroup the group to copy from
-     */
-    public void copyTransformation(SpawnedDisplayEntityGroup copyGroup){
-        List<SpawnedDisplayEntityPart> displayParts = getDisplayParts();
-        List<SpawnedDisplayEntityPart> copyParts = copyGroup.getDisplayParts();
-        for (int i = 0; i < displayParts.size(); i++){
-            if (copyParts.size() < i+1){
-                return;
-            }
-            SpawnedDisplayEntityPart part = displayParts.get(i);
-            SpawnedDisplayEntityPart copyPart = copyParts.get(i);
-            part.setTransformation(copyPart.getDisplayTransformation());
+        for (SpawnedPartSelection sel : partSelections){
+            sel.refresh();
         }
+        return this;
     }
 
     /**
@@ -1132,20 +1030,28 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * @param animationType type of animation to be applied
      * @param loadMethod where the animation should be retrieved from
      */
-    public void setSpawnAnimationTag(@Nullable String animationTag, @NotNull DisplayAnimator.AnimationType animationType, @NotNull LoadMethod loadMethod){
+    @Override
+    public void setSpawnAnimation(@NotNull String animationTag, @NotNull DisplayAnimator.AnimationType animationType, @NotNull LoadMethod loadMethod){
         PersistentDataContainer c = getMasterEntity().getPersistentDataContainer();
-        if (animationTag == null){
-            setSpawnAnimation(null, null, null);
-            c.remove(DisplayAPI.getSpawnAnimationKey());
-            c.remove(DisplayAPI.getSpawnAnimationTypeKey());
-            c.remove(DisplayAPI.getSpawnAnimationLoadMethodKey());
-        }
-        else{
-            c.set(DisplayAPI.getSpawnAnimationKey(), PersistentDataType.STRING, animationTag);
-            c.set(DisplayAPI.getSpawnAnimationTypeKey(), PersistentDataType.STRING, animationType.name());
-            c.set(DisplayAPI.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING, loadMethod.name());
-            setSpawnAnimation(animationTag, loadMethod, animationType);
-        }
+        c.set(DisplayAPI.getSpawnAnimationKey(), PersistentDataType.STRING, animationTag);
+        c.set(DisplayAPI.getSpawnAnimationTypeKey(), PersistentDataType.STRING, animationType.name());
+        c.set(DisplayAPI.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING, loadMethod.name());
+        super.setSpawnAnimation(animationTag, animationType, loadMethod);
+    }
+
+    void setSpawnAnimation(PersistentDataContainer pdc, String animationTag, DisplayAnimator.AnimationType animationType, LoadMethod loadMethod){
+        pdc.set(DisplayAPI.getSpawnAnimationKey(), PersistentDataType.STRING, animationTag);
+        pdc.set(DisplayAPI.getSpawnAnimationTypeKey(), PersistentDataType.STRING, animationType.name());
+        pdc.set(DisplayAPI.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING, loadMethod.name());
+        super.setSpawnAnimation(animationTag, animationType, loadMethod);
+    }
+
+    public void unsetSpawnAnimation(){
+        PersistentDataContainer c = getMasterEntity().getPersistentDataContainer();
+        c.remove(DisplayAPI.getSpawnAnimationKey());
+        c.remove(DisplayAPI.getSpawnAnimationTypeKey());
+        c.remove(DisplayAPI.getSpawnAnimationLoadMethodKey());
+        super.unsetSpawnAnimation();
     }
 
 
@@ -1250,59 +1156,53 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * @return a cloned {@link SpawnedDisplayEntityGroup}
      */
     public SpawnedDisplayEntityGroup clone(@NotNull Location location, @NotNull GroupSpawnSettings settings){
-        if (DisplayConfig.autoPivotInteractions()){
-            HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
-            for (SpawnedDisplayEntityPart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
-                float oldYaw = part.getYaw();
-                oldYaws.put(part,  oldYaw);
-                part.pivot(-oldYaw);
-            }
-
-            DisplayEntityGroup group = toDisplayEntityGroup();
-            SpawnedDisplayEntityGroup cloned = group.spawn(location, GroupSpawnedEvent.SpawnReason.CLONE, settings);
-
-            for (Map.Entry<SpawnedDisplayEntityPart, Float> entry : oldYaws.entrySet()){
-                SpawnedDisplayEntityPart part = entry.getKey();
-                float oldYaw = entry.getValue();
-                part.pivot(oldYaw);
-            }
-            oldYaws.clear();
-            return cloned;
+        //Reset Interaction pivot to 0 yaw
+        HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
+        for (SpawnedDisplayEntityPart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
+            float oldYaw = part.getYaw();
+            oldYaws.put(part,  oldYaw);
+            part.pivot(-oldYaw);
         }
-        else{
-            return toDisplayEntityGroup().spawn(location, GroupSpawnedEvent.SpawnReason.CLONE);
+
+        DisplayEntityGroup group = toDisplayEntityGroup();
+        SpawnedDisplayEntityGroup cloned = group.spawn(location, GroupSpawnedEvent.SpawnReason.CLONE, settings);
+
+        //Restore Interaction Pivot
+        for (Map.Entry<SpawnedDisplayEntityPart, Float> entry : oldYaws.entrySet()){
+            SpawnedDisplayEntityPart part = entry.getKey();
+            float oldYaw = entry.getValue();
+            part.pivot(oldYaw);
         }
+        return cloned;
     }
 
-    public PacketDisplayEntityGroup toPacket(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow, boolean addToChunk){
-        if (DisplayConfig.autoPivotInteractions()){
-            HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
-            for (SpawnedDisplayEntityPart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
-                float oldYaw = part.getEntity().getYaw();
-                oldYaws.put(part, oldYaw);
-                part.pivot(-oldYaw);
-            }
+    public PacketDisplayEntityGroup toPacket(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow, boolean persistent){
 
-            DisplayEntityGroup group = toDisplayEntityGroup();
-            PacketDisplayEntityGroup packetGroup;
-            if (addToChunk){
-                packetGroup = DisplayGroupManager.addChunkPacketGroup(location, group);
-            }
-            else{
-                packetGroup = group.createPacketGroup(location, playSpawnAnimation, autoShow);
-            }
+        //Reset Interaction pivot to 0 yaw
+        HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
+        for (SpawnedDisplayEntityPart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
+            float oldYaw = part.getEntity().getYaw();
+            oldYaws.put(part, oldYaw);
+            part.pivot(-oldYaw);
+        }
 
-            for (Map.Entry<SpawnedDisplayEntityPart, Float> entry : oldYaws.entrySet()){
-                SpawnedDisplayEntityPart part = entry.getKey();
-                float oldYaw = entry.getValue();
-                part.pivot(oldYaw);
-            }
-            oldYaws.clear();
-            return packetGroup;
+        DisplayEntityGroup savedGroup = toDisplayEntityGroup();
+        PacketDisplayEntityGroup packetGroup;
+
+        if (persistent){
+            packetGroup = DisplayGroupManager.addPersistentPacketGroup(location, savedGroup, autoShow);
         }
         else{
-            return toDisplayEntityGroup().createPacketGroup(location, playSpawnAnimation, autoShow);
+            packetGroup = savedGroup.createPacketGroup(location, playSpawnAnimation, autoShow);
         }
+
+        //Restore Interaction Pivot
+        for (Map.Entry<SpawnedDisplayEntityPart, Float> entry : oldYaws.entrySet()){
+            SpawnedDisplayEntityPart part = entry.getKey();
+            float oldYaw = entry.getValue();
+            part.pivot(oldYaw);
+        }
+        return packetGroup;
     }
 
     @Override

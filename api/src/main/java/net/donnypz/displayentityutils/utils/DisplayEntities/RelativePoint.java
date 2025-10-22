@@ -23,11 +23,11 @@ public abstract class RelativePoint implements Serializable {
     float groupPitchAtCreation;
 
     /**
-     * Create a point that is relative to the origin of a {@link SpawnedDisplayEntityGroup}
+     * Create a point that is relative to the origin of a {@link ActiveGroup}
      * @param group the group that the point relative to
      * @param location the relative location that the point represents
      */
-    public RelativePoint(@NotNull String pointTag, @NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
+    RelativePoint(@NotNull String pointTag, @NotNull ActiveGroup<?> group, @NotNull Location location){
         this(pointTag, location.toVector().subtract(group.getLocation().toVector()), group.getLocation().getYaw(), group.getLocation().getPitch());
     }
 
@@ -83,7 +83,7 @@ public abstract class RelativePoint implements Serializable {
     }
 
     /**
-     * Get the location that this point represents, relative to a {@link SpawnedDisplayEntityGroup}
+     * Get the location that this point represents, relative to an {@link ActiveGroup}
      * @param group
      * @return a location
      */
@@ -94,9 +94,9 @@ public abstract class RelativePoint implements Serializable {
 
         double pitchDiff = groupLoc.getPitch() - groupPitchAtCreation;
         double yawDiff = groupLoc.getYaw() - groupYawAtCreation;
-        DisplayUtils.pivotPitchAndYaw(v, (float) pitchDiff, (float) -yawDiff);
 
-        groupLoc.add(v);
+        Vector pivotVec = DisplayUtils.pivotPitchAndYaw(v, (float) pitchDiff, (float) yawDiff);
+        groupLoc.add(pivotVec);
         return groupLoc;
     }
 
@@ -107,21 +107,18 @@ public abstract class RelativePoint implements Serializable {
      */
     public @NotNull Location getLocation(@NotNull Location fromLocation){
         fromLocation = fromLocation.clone();
-        Vector v = vectorFromOrigin.clone();
-
-        DisplayUtils.pivotPitchAndYaw(v, fromLocation.getPitch(), fromLocation.getYaw());
-
-        fromLocation.add(v);
+        Vector pivotVec = DisplayUtils.pivotPitchAndYaw(vectorFromOrigin.clone(), fromLocation.getPitch(), fromLocation.getYaw());
+        fromLocation.add(pivotVec);
         return fromLocation;
     }
 
     /**
-     * Set the vector offset of this point, based on a {@link SpawnedDisplayEntityGroup}'s origin and a relative location
-     * @param group
-     * @param location
+     * Set the vector offset of this point, based on a {@link ActiveGroup}'s origin and a relative location
+     * @param group the group
+     * @param location the relative location
      * @return this
      */
-    public @NotNull RelativePoint setLocation(@NotNull SpawnedDisplayEntityGroup group, @NotNull Location location){
+    public @NotNull RelativePoint setLocation(@NotNull ActiveGroup<?> group, @NotNull Location location){
         Location groupLoc = group.getLocation();
         groupPitchAtCreation = groupLoc.getPitch();
         groupYawAtCreation = groupLoc.getYaw();

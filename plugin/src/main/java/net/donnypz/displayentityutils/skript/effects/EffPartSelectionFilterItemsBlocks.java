@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
-@Name("Part Selection Filter Set Items/Blocks")
+@Name("Part Filter/Selection Set Items/Blocks")
 @Description("Set the items/blocks that should be filtered in a part selection")
 @Examples({"#Filter Stone",
             "set block filter of {_selection} with stone",
@@ -31,7 +31,7 @@ import java.util.Set;
 @Since("2.6.2")
 public class EffPartSelectionFilterItemsBlocks extends Effect {
     static {
-        Skript.registerEffect(EffPartSelectionFilterItemsBlocks.class,"set (:block|item)[s] filter (for|of) %multipartselection% with[:out] %itemtypes%");
+        Skript.registerEffect(EffPartSelectionFilterItemsBlocks.class,"set (:block|item)[s] filter (for|of) %multipartfilter% with[:out] %itemtypes%");
     }
 
     Expression<MultiPartSelection<?>> selection;

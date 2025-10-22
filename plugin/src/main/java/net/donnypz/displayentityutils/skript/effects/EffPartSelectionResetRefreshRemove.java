@@ -13,7 +13,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Part Selection Reset/Refresh/Remove")
+@Name("Part Filter/Selection Reset/Refresh/Remove")
 @Description("Reset, refresh, or remove a part selection")
 @Examples({"#Ensure selected parts are up to date with the applied filters", "refresh {_selection}",
         "",
@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class EffPartSelectionResetRefreshRemove extends Effect {
     static {
-        Skript.registerEffect(EffPartSelectionResetRefreshRemove.class,"(1¦refresh|2¦reset|3¦remove) %multipartselections%");
+        Skript.registerEffect(EffPartSelectionResetRefreshRemove.class,"(1¦refresh|2¦reset|3¦remove) %multipartfilters%");
     }
 
     Expression<MultiPartSelection<?>> selections;
@@ -56,6 +56,6 @@ public class EffPartSelectionResetRefreshRemove extends Effect {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "refresh/reset/remove part selection: "+selections.toString(event, debug);
+        return "refresh/reset/remove part filter: "+selections.toString(event, debug);
     }
 }

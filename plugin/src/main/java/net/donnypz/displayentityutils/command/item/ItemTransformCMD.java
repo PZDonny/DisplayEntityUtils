@@ -4,10 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ServerSideSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.ItemDisplay;
@@ -18,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 class ItemTransformCMD extends PartsSubCommand {
     ItemTransformCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("transform", parentSubCommand, Permission.ITEM_TRANSFORM, 3, 3);
+        setTabComplete(2, TabSuggestion.ITEM_DISPLAY_TRANSFORMS);
     }
 
     @Override
@@ -26,33 +24,29 @@ class ItemTransformCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void executeAllPartsAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull SpawnedPartSelection selection, @NotNull String[] args) {
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         ItemDisplay.ItemDisplayTransform transform = getTransform(player, args[2]);
-        if (transform == null) return;
-        for (SpawnedDisplayEntityPart part : selection.getSelectedParts()){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
-                setTransform(part, transform);
-            }
+        if (transform == null) return false;
+        for (ActivePart part : selection.getSelectedParts()){
+            part.setItemDisplayTransform(transform);
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set item transform of ALL selected item displays!", NamedTextColor.GREEN)));
+        return true;
     }
 
     @Override
-    protected void executeSinglePartAction(@NotNull Player player, @Nullable SpawnedDisplayEntityGroup group, @NotNull ServerSideSelection selection, @NotNull SpawnedDisplayEntityPart selectedPart, @NotNull String[] args) {
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         ItemDisplay.ItemDisplayTransform transform = getTransform(player, args[2]);
-        if (transform == null) return;
+        if (transform == null) return false;
         if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with item display entities", NamedTextColor.RED)));
-            return;
+            return false;
         }
-        setTransform(selectedPart, transform);
+        selectedPart.setItemDisplayTransform(transform);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set item transform of selected item display!", NamedTextColor.GREEN)));
+        return true;
     }
 
-    private void setTransform(SpawnedDisplayEntityPart part, ItemDisplay.ItemDisplayTransform transform){
-        ItemDisplay display = (ItemDisplay) part.getEntity();
-        display.setItemDisplayTransform(transform);
-    }
 
     private ItemDisplay.ItemDisplayTransform getTransform(Player player, String transform){
         try{

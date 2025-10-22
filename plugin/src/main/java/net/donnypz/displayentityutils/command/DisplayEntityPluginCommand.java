@@ -12,6 +12,7 @@ import net.donnypz.displayentityutils.utils.Direction;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -47,7 +48,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
 
     }
 
-    public List<String> getTabComplete(String current){
+    public List<String> getFirstArgTabComplete(String current){
         List<String> list = new ArrayList<>();
         for (String s : subCommands.keySet()){
             if (s.startsWith(current.toLowerCase())){
@@ -57,7 +58,33 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         return list;
     }
 
-    private List<String> getTabCompleteCommands(String subcommand, String current){
+    private List<String> getTabComplete(String commandType, String subCommand, String[] args){
+        DEUSubCommand cmd = subCommands.get(commandType);
+        if (cmd == null) return List.of();
+        cmd = cmd.subCommands.get(subCommand);
+        if (cmd == null) return List.of();
+
+        String current = args[args.length-1];
+        DEUSubCommand.TabSuggestion indexSuggestions = cmd.tabCompleteSuggestions.get(args.length-1);
+        if (indexSuggestions == null) return List.of();
+
+        List<String> tabCompletes = indexSuggestions.suggestions;
+        if (tabCompletes == null) return List.of();
+
+        if (!indexSuggestions.suggestUsingCurrentString){
+            return tabCompletes;
+        }
+        List<String> list = new ArrayList<>();
+        for (String s : tabCompletes){
+            if (s.toLowerCase().startsWith(current.toLowerCase())){
+                list.add(s);
+            }
+        }
+
+        return list.isEmpty() ? tabCompletes : list;
+    }
+
+    private List<String> getTabComplete(String subcommand, String current){
         DEUSubCommand cmd = subCommands.get(subcommand);
         List<String> list = new ArrayList<>();
         for (String s : cmd.subCommands.keySet()){
@@ -77,8 +104,12 @@ public class DisplayEntityPluginCommand implements TabExecutor {
     }
 
     public static void noGroupSelection(Player player){
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You have not selected a spawned display entity group!", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You must have selected a display entity group to run this command!", NamedTextColor.RED)));
         player.sendMessage(Component.text("/mdis group selectnearest <distance>", NamedTextColor.GRAY));
+    }
+
+    public static void disallowPacketGroup(Player player){
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot do this with a packet-based group!", NamedTextColor.RED)));
     }
 
     public static void noPartSelection(Player player){
@@ -152,7 +183,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         CMDUtils.sendCMD(sender, "/mdis interaction", "Commands related to manipulating Interaction entities");
         CMDUtils.sendCMD(sender, "/mdis listgroups <storage> [page-number]", "List all saved Display Entity Models/Groups");
         CMDUtils.sendCMD(sender, "/mdis listanims <storage> [page-number]", "List all saved Animations");
-        CMDUtils.sendCMD(sender, "/mdis hidepoints", "Hide any visible points (frame points, chunk packet group points, etc.)");
+        CMDUtils.sendCMD(sender, "/mdis hidepoints", "Hide any visible points (frame points, persistent packet group points, etc.)");
         CMDUtils.sendCMD(sender, "/mdis bdengine", "Import/Convert models from BDEngine");
         CMDUtils.sendCMD(sender, "/mdis reload <config | controllers>", "Reload the plugin's config or Display Controllers." +
                 " To reload Local, MySQL or MongoDB config save options, the server must be restarted");
@@ -164,7 +195,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
             return empty;
         }
         if (args.length == 1) {
-            return getTabComplete(args[0]);
+            return getFirstArgTabComplete(args[0]);
         }
 
         List<String> suggestions = new ArrayList<>();
@@ -173,203 +204,18 @@ public class DisplayEntityPluginCommand implements TabExecutor {
             String current = args[1];
             switch (subcmd) {
                 case "interaction", "anim", "group", "parts", "bdengine", "text", "item" -> {
-                    return getTabCompleteCommands(subcmd, current);
+                    return getTabComplete(subcmd, current);
                 }
-                case "listgroups", "listanims" -> addStorages(suggestions);
+                case "listgroups", "listanims" -> suggestions.addAll(DEUSubCommand.TabSuggestion.STORAGES.suggestions);
                 case "reload" -> {
                     suggestions.add("config");
                     suggestions.add("controllers");
                 }
             }
         }
-        else if (args.length == 3){
-            switch (args[0].toLowerCase()){
-                case "group" -> {
-                    switch (args[1].toLowerCase()){
-                        case "selectnearest" -> {
-                            suggestions.add("<distance>");
-                        }
-                        case "glowcolor" -> {
-                            addColors(suggestions);
-                        }
-                        case "move", "translate" -> {
-                            addDirections(suggestions);
-                        }
-                        case "save" -> {
-                            addStorages(suggestions);
-                        }
-                        case "billboard" -> {
-                            addBillboard(suggestions);
-                        }
-                        case "ride", "dismount" -> {
-                            return null;
-                        }
-                        case "topacket" -> {
-                            suggestions.add("-confirm");
-                        }
-                        case "wetogroup" -> {
-                            suggestions.add("-remove");
-                        }
-                    }
-                }
-                case "anim" -> {
-                    if (args[1].equalsIgnoreCase("save")) {
-                        addStorages(suggestions);
-                    }
-                }
-                case "parts" -> {
-                    switch (args[1].toLowerCase()){
-                        case "select" -> {
-                            suggestions.add("-target");
-                            suggestions.add("<distance>");
-                        }
-                        case "glowcolor" -> {
-                            addColors(suggestions);
-                        }
-                        case "move", "translate" -> {
-                            addDirections(suggestions);
-                        }
-                        case "scale" -> {
-                            suggestions.add("x");
-                            suggestions.add("y");
-                            suggestions.add("z");
-                            suggestions.add("-all");
-                        }
-                        case "filtertypes", "create" -> {
-                            suggestions.add("block");
-                            suggestions.add("item");
-                            suggestions.add("text");
-                            suggestions.add("interaction");
-                        }
-                        case "cycle" -> {
-                            suggestions.add("first");
-                            suggestions.add("prev");
-                            suggestions.add("next");
-                            suggestions.add("last");
-                        }
-                        case "setblock" -> {
-                            suggestions.add("-target");
-                            suggestions.add("-held");
-                            suggestions.add("block-id");
-                        }
-                        case "info" -> {
-                            suggestions.add("part");
-                            suggestions.add("selection");
-                        }
-                        case "billboard" -> {
-                            addBillboard(suggestions);
-                        }
-                    }
-                }
-                case "item" -> {
-                    switch (args[1].toLowerCase()){
-                        case "set" -> {
-                            suggestions.add("-held");
-                            suggestions.add("item-id");
-                        }
-                        case "transform" -> {
-                            for (ItemDisplay.ItemDisplayTransform transform : ItemDisplay.ItemDisplayTransform.values()){
-                                suggestions.add(transform.name());
-                            }
-                        }
-                    }
-                }
-                case "interaction" -> {
-                    if (args[1].equalsIgnoreCase("addcmd")){
-                        suggestions.add("player");
-                        suggestions.add("console");
-                    }
-                }
-                case "text" -> {
-                    if (args[1].equalsIgnoreCase("background")){
-                        addColors(suggestions);
-                    }
-                    else if (args[1].equalsIgnoreCase("font")){
-                        suggestions.add("default");
-                        suggestions.add("uniform");
-                        suggestions.add("alt");
-                        suggestions.add("illageralt");
-                    }
-                }
-            }
-        }
-        else if (args.length == 4) {
-            if (args[0].equalsIgnoreCase("group")){
-                if (args[1].equalsIgnoreCase("spawn") ||args[1].equalsIgnoreCase("delete") || args[1].equalsIgnoreCase("setspawnanim")){
-                    addStorages(suggestions);
-                }
-                else if (args[1].equalsIgnoreCase("dismount")){
-                    return null;
-                }
-                else if (args[1].equalsIgnoreCase("topacket")){
-                    suggestions.add("-keep");
-                }
-                else if (args[1].equalsIgnoreCase("yaw")){
-                    suggestions.add("-pivot");
-                }
-            }
-            else if (args[0].equalsIgnoreCase("anim")){
-                if (args[1].equalsIgnoreCase("delete") || args[1].equalsIgnoreCase("select")){
-                    addStorages(suggestions);
-                }
-            }
-
-            else if (args[0].equalsIgnoreCase("interaction")){
-                if (args[1].equalsIgnoreCase("addcmd")){
-                    suggestions.add("left");
-                    suggestions.add("right");
-                    suggestions.add("both");
-                }
-            }
-        }
-        else if (args.length == 5){
-            if (args[0].equalsIgnoreCase("group")){
-                if (args[1].equalsIgnoreCase("setspawnanim")){
-                    suggestions.add("linear");
-                    suggestions.add("loop");
-                }
-            }
+        else{
+            return getTabComplete(args[0], args[1], args);
         }
         return suggestions;
-    }
-
-    private void addDirections(List<String> suggestions){
-        for (Direction dir : Direction.values()){
-            suggestions.add(dir.name().toLowerCase());
-        }
-    }
-
-    private void addBillboard(List<String> suggestions){
-        for (Display.Billboard billboard : Display.Billboard.values()){
-            suggestions.add(billboard.name());
-        }
-    }
-
-    private void addStorages(List<String> suggestions){
-        suggestions.add("all");
-        suggestions.add("local");
-        suggestions.add("mysql");
-        suggestions.add("mongodb");
-    }
-
-    private void addColors(List<String> suggestions){
-        suggestions.add("<hex-color>");
-        suggestions.add("white");
-        suggestions.add("silver");
-        suggestions.add("gray");
-        suggestions.add("black");
-        suggestions.add("red");
-        suggestions.add("maroon");
-        suggestions.add("yellow");
-        suggestions.add("olive");
-        suggestions.add("lime");
-        suggestions.add("green");
-        suggestions.add("aqua");
-        suggestions.add("teal");
-        suggestions.add("blue");
-        suggestions.add("navy");
-        suggestions.add("fuchsia");
-        suggestions.add("purple");
-        suggestions.add("orange");
     }
 }

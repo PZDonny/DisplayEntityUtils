@@ -1,37 +1,30 @@
 package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.command.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-class GroupSetTagCMD extends PlayerSubCommand {
+class GroupSetTagCMD extends GroupSubCommand {
     GroupSetTagCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("settag", parentSubCommand, Permission.GROUP_SETTAG);
+        super("settag", parentSubCommand, Permission.GROUP_SETTAG, 3, true);
+        setTabComplete(2, "<group-tag>");
     }
 
     @Override
-    public void execute(Player player, String[] args) {
-        SpawnedDisplayEntityGroup group = DisplayGroupManager.getSelectedSpawnedGroup(player);
-        if (group == null) {
-            DisplayEntityPluginCommand.noGroupSelection(player);
-            return;
-        }
+    protected void sendIncorrectUsage(@NotNull Player player) {
+        player.sendMessage(Component.text("Incorrect Usage! /mdis group settag <group-tag>", NamedTextColor.RED));
+    }
 
-        if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis group settag <group-tag>", NamedTextColor.RED));
-            return;
-        }
+    @Override
+    protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
         String tag = args[2];
         group.setTag(tag);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully tagged spawned display entity group! <white>(Tagged: "+tag+")")));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully tagged your selected group! <white>(Tagged: "+tag+")")));
     }
 }

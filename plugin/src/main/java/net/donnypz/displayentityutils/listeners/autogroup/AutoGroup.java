@@ -57,7 +57,7 @@ final class AutoGroup {
             chunks.add(chunk.getChunkKey());
         }
 
-        DisplayGroupManager.spawnChunkPacketGroups(chunk);
+        DisplayGroupManager.spawnPersistentPacketGroups(chunk);
 
 
         if (entities.isEmpty()) return;
@@ -73,7 +73,7 @@ final class AutoGroup {
                     continue;
                 }
 
-                GroupResult result = DisplayGroupManager.getSpawnedGroup(display, null);
+                GroupResult result = DisplayGroupManager.getSpawnedGroup(display);
                 if (result == null || foundGroups.contains(result.group())){
                     continue;
                 }

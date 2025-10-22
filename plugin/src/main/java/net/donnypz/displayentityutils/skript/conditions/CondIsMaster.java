@@ -9,8 +9,7 @@ import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.entity.Display;
 import org.bukkit.event.Event;
@@ -33,21 +32,15 @@ public class CondIsMaster extends Condition {
         Object obj = object.getSingle(event);
         Display entity;
         switch (obj) {
-            case PacketDisplayEntityPart p -> {
-                return p.isMaster() == isNegated();
-            }
-            case SpawnedDisplayEntityPart p -> {
-                if (!(p.getEntity() instanceof Display display)) {
-                    return isNegated();
-                }
-                entity = display;
+            case ActivePart p -> {
+                return p.isMaster() != isNegated();
             }
             case Display display -> entity = display;
             case null, default -> {
                 return isNegated();
             }
         }
-        return DisplayUtils.isMaster(entity) == isNegated();
+        return DisplayUtils.isMaster(entity) != isNegated();
     }
 
     @Override
@@ -59,7 +52,7 @@ public class CondIsMaster extends Condition {
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         this.object = expressions[0];
-        setNegated(parseResult.mark == 1);
+        setNegated(parseResult.mark == 2);
         return true;
     }
 }
