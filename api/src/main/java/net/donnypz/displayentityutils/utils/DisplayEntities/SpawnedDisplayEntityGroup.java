@@ -1265,12 +1265,4 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     public boolean isSpawned(){
         return masterPart != null && masterPart.isValid();
     }
-
-    /**
-     * Check if a group has been registered within the plugin. This will return true even in unloaded chunks.
-     * @return false if this group has been unregistered with {@link SpawnedDisplayEntityGroup#unregister(boolean, boolean)} or a world unload (if enabled in config).
-     */
-    public boolean isRegistered(){
-        return DisplayGroupManager.isGroupRegistered(this);
-    }
 }

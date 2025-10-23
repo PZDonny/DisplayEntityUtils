@@ -933,4 +933,11 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @return {@link DisplayEntityGroup} representing this
      */
     public abstract @NotNull DisplayEntityGroup toDisplayEntityGroup();
+
+    /**
+     * Check if a group is currently registered and usable.
+     */
+    public boolean isRegistered(){
+        return masterPart != null;
+    }
 }
