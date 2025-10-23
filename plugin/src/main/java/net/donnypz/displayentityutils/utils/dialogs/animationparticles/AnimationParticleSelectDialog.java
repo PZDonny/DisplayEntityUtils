@@ -109,6 +109,16 @@ public class AnimationParticleSelectDialog {
                 .build();
     }
 
+    private static ActionButton getTintedLeavesAction(){
+        return ActionButton
+                .builder(Component.text("Tinted Leaves"))
+                .tooltip(Component.text("Create a Tinted Leaves Animation Particle", NamedTextColor.YELLOW))
+                .action(DialogAction.customClick((view, audience) -> {
+                    AnimationParticleDialogs.TINTED_LEAVES.sendDialog((Player) audience);
+                }, CALLBACK_OPTIONS))
+                .build();
+    }
+
     private static ActionButton getFlashAction(){
         return ActionButton
                 .builder(Component.text("Flash"))
