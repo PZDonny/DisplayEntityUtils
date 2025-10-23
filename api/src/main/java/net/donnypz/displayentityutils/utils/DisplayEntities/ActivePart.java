@@ -125,6 +125,12 @@ public abstract class ActivePart implements Active{
     public abstract boolean addTag(@NotNull String partTag);
 
     /**
+     * Add multiple tag to this part. The tag will not be added if it starts with an "!" or is blank
+     * @param partTag The part tags to add to this part
+     */
+    public abstract void addTags(@NotNull List<String> partTag);
+
+    /**
      * Remove a tag from this part
      * @param partTag the tag to remove from this part
      * @return this

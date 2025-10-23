@@ -114,6 +114,15 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
+    public void addTags(@NotNull List<String> tags){
+        for (String tag : tags){
+            if (DisplayUtils.isValidTag(tag)){
+                partTags.add(tag);
+            }
+        }
+    }
+
+    @Override
     public PacketDisplayEntityPart removeTag(@NotNull String partTag) {
         partTags.remove(partTag);
         return this;

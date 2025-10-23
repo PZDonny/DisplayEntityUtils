@@ -318,6 +318,16 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return false;
     }
 
+    @Override
+    public void addTags(@NotNull List<String> tags){
+        DisplayUtils.addTags(getEntity(), tags);
+        for (String tag : tags){
+            if (DisplayUtils.isValidTag(tag)){
+                partTags.add(tag);
+            }
+        }
+    }
+
 
     @Override
     public SpawnedDisplayEntityPart removeTag(@NotNull String partTag){
