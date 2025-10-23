@@ -1017,7 +1017,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public void removeFromGroup(boolean unregister){
         if (!hasGroup()) return;
         group.groupParts.remove(partUUID);
-        group.updatePartCount(this, false);
+        if (!isMaster){
+            group.updatePartCount(this, false);
+        }
         group = null;
         if (unregister){
             remove();

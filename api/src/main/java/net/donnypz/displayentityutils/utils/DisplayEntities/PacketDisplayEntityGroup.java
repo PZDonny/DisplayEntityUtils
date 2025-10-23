@@ -193,22 +193,27 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
     }
 
+    @Override
     public void addPart(@NotNull PacketDisplayEntityPart part){
-        if (groupParts.get(part.partUUID) == part) return;
-
-        if (part.partUUID == null){
-            do{
-                part.partUUID = UUID.randomUUID(); //for parts in old models that do not contain pdc data / part uuids AND new ungrouped parts
-            } while(groupParts.containsKey(part.partUUID));
-        }
-
-        if (part.isMaster) masterPart = part;
-        groupParts.put(part.partUUID, part);
-        part.group = this;
+        addPartSilent(part);
         updatePartCount(part, true);
-        if (this.autoShow){
-            part.showToPlayers(getTrackingPlayers(), GroupSpawnedEvent.SpawnReason.INTERNAL);
-        }
+    }
+
+     void addPartSilent(PacketDisplayEntityPart part){
+         if (groupParts.get(part.partUUID) == part) return;
+
+         if (part.partUUID == null){
+             do{
+                 part.partUUID = UUID.randomUUID(); //for parts in old models that do not contain pdc data / part uuids AND new ungrouped parts
+             } while(groupParts.containsKey(part.partUUID));
+         }
+
+         if (part.isMaster) masterPart = part;
+         groupParts.put(part.partUUID, part);
+         part.group = this;
+         if (this.autoShow){
+             part.showToPlayers(getTrackingPlayers(), GroupSpawnedEvent.SpawnReason.INTERNAL);
+         }
     }
 
     void updatePartCount(PacketDisplayEntityPart part, boolean add){
@@ -237,6 +242,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             ids[passengerIds.length] = passengerId;
         }
         else{
+            int newLength = passengerIds.length-1;
+            if (newLength <= 0){
+                passengerIds = new int[0];
+                return;
+            }
             ids = new int[passengerIds.length-1];
             for (int i = 0; i < ids.length; i++){
                 int id = passengerIds[i];
@@ -484,11 +494,13 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
     @Override
     public boolean isTrackedBy(@NotNull Player player) {
+        if (masterPart == null) return false;
         return masterPart.isTrackedBy(player.getUniqueId());
     }
 
     @Override
     public Collection<Player> getTrackingPlayers() {
+        if (masterPart == null) return Collections.emptySet();
         return masterPart.getTrackingPlayers();
     }
 
