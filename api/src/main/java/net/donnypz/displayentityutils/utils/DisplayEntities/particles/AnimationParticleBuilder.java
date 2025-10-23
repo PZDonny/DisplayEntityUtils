@@ -8,6 +8,7 @@ import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
@@ -129,6 +130,9 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         }
     }
 
+    public boolean isColorOnlyParticle(){
+        return this.particle().getDataType().isAssignableFrom(Color.class);
+    }
 
     public boolean isBlockDataParticle(){
         return this.particle().getDataType().isAssignableFrom(BlockData.class);
@@ -172,7 +176,7 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         else if (isDustTransitionParticle()){
             animParticle = new DustTransitionAnimationParticle(this, data());
         }
-        else if (particle() == Particle.ENTITY_EFFECT){
+        else if (particle() == VersionUtils.getEntityEffectParticle()){
             animParticle = new EntityEffectAnimationParticle(this, data());
         }
         else if (particle() == Particle.FLASH){

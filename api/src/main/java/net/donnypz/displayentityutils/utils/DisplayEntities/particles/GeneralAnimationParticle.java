@@ -26,7 +26,7 @@ class GeneralAnimationParticle extends AnimationParticle implements Serializable
     static{
         defaultData.put(Color.class, Color.WHITE);
         defaultData.put(Particle.DustOptions.class, new Particle.DustOptions(Color.WHITE, 1));
-        defaultData.put(ItemStack.class, ItemStack.of(Material.STICK));
+        defaultData.put(ItemStack.class, new ItemStack(Material.STICK));
         defaultData.put(BlockData.class, Material.STONE.createBlockData());
         defaultData.put(Float.class, 0f);
         defaultData.put(Integer.class, 0f);

@@ -42,15 +42,6 @@ public class AnimationParticleSelectDialog {
 
 
     private static List<ActionButton> getActionButtons(){
-        return List.of(
-                getBlockParticleAction(),
-                getItemstackAction(),
-                getDustOptionAction(),
-                getDustTransitionAction(),
-                getEntityEffectAction(),
-                getFlashAction(),
-                getGeneralAction()
-        );
         List<ActionButton> buttons = new ArrayList<>();
         buttons.add(getBlockParticleAction());
         buttons.add(getItemstackAction());
@@ -60,6 +51,7 @@ public class AnimationParticleSelectDialog {
         //V_1_21_5 Particles
         //Not checked for v1_20_5 since dialogs aren't even viewable on versions that low
         buttons.add(getEntityEffectAction());
+        buttons.add(getTintedLeavesAction());
 
         if (VersionUtils.IS_1_21_9) buttons.add(getFlashAction());
 

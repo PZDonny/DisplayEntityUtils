@@ -128,14 +128,13 @@ public class AnimationSound implements Externalizable, Cloneable {
     }
 
     @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException { //fixes 1.20.4 issues w/ anim sounds
         soundName = (String) in.readObject();
-        try{
-            sound = Registry.SOUNDS.getOrThrow(NamespacedKey.minecraft(soundName.replace(".", "_")));
-        }
-        catch(Exception e){
+        sound = Registry.SOUNDS.get(NamespacedKey.minecraft(soundName.replace(".", "_")));
+        if (sound == null){
             existsInGameVersion = false;
         }
+
         volume = in.readFloat();
         pitch = in.readFloat();
         try{
