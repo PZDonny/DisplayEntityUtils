@@ -1006,32 +1006,36 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     private static abstract class GroupHolder<T>{
-        Map<T, Set<PacketDisplayEntityGroup>> groupMap = new HashMap<>();
+        final Map<T, Set<PacketDisplayEntityGroup>> groupMap = new ConcurrentHashMap<>();
+        final Object groupMapLock = new Object();
 
 
         Set<PacketDisplayEntityGroup> getGroups(){
             Set<PacketDisplayEntityGroup> groups = new HashSet<>();
-            for (Set<PacketDisplayEntityGroup> g : groupMap.values()){
-                groups.addAll(g);
+            synchronized (groupMapLock){
+                for (Set<PacketDisplayEntityGroup> g : groupMap.values()){
+                    groups.addAll(g);
+                }
             }
+
             return groups;
         }
 
         Set<PacketDisplayEntityGroup> getGroups(T key){
-            Set<PacketDisplayEntityGroup> groups = groupMap.get(key);
-            return groups == null ? Collections.emptySet() : new HashSet<>(groups);
+            synchronized (groupMapLock){
+                Set<PacketDisplayEntityGroup> groups = groupMap.get(key);
+                if (groups == null) return Collections.emptySet();
+                return new HashSet<>(groups);
+            }
         }
 
         void addGroup(T key, PacketDisplayEntityGroup group){
-            groupMap
-                    .computeIfAbsent(key, k -> Collections.newSetFromMap(new ConcurrentHashMap<>()))
-                    .add(group);
+            groupMap.computeIfAbsent(key, k -> ConcurrentHashMap.newKeySet()).add(group);
         }
 
         void removeGroup(T key, PacketDisplayEntityGroup group){
             Set<PacketDisplayEntityGroup> groups = groupMap.get(key);
-            if (groups == null) return;
-            synchronized (groups){
+            if (groups != null) {
                 groups.remove(group);
                 if (groups.isEmpty()) groupMap.remove(key);
             }
@@ -1040,7 +1044,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         boolean isEmpty(){
             return groupMap.isEmpty();
         }
-
     }
 
     static class WorldData extends GroupHolder<Long>{
@@ -1049,16 +1052,17 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
 
         PacketDisplayEntityGroup getGroup(long chunkKey, int localId){
-            Set<PacketDisplayEntityGroup> groups = groupMap.get(chunkKey);
-            if (groups == null) return null;
-            for (PacketDisplayEntityGroup pdeg : groups){
-                if (localId == pdeg.persistentLocalId){
-                    return pdeg;
+            synchronized (groupMapLock){
+                Set<PacketDisplayEntityGroup> groups = groupMap.get(chunkKey);
+                if (groups == null) return null;
+                for (PacketDisplayEntityGroup pdeg : groups){
+                    if (localId == pdeg.persistentLocalId){
+                        return pdeg;
+                    }
                 }
+                return null;
             }
-            return null;
         }
-
     }
 
     static class PassengerGroupData extends GroupHolder<UUID>{
