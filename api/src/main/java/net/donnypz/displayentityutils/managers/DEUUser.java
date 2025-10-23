@@ -243,7 +243,9 @@ public class DEUUser {
             if (condition != null && !condition.test(player)) continue;
 
             Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
-                pg.showToPlayer(player, GroupSpawnedEvent.SpawnReason.PLAYER_SENT_CHUNK);
+                if (pg.isRegistered()){
+                    pg.showToPlayer(player, GroupSpawnedEvent.SpawnReason.PLAYER_SENT_CHUNK);
+                }
             });
         }
     }
