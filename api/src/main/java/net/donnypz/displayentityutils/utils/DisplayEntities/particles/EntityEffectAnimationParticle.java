@@ -33,12 +33,22 @@ class EntityEffectAnimationParticle extends AnimationParticle {
 
     @Override
     public void spawn(Location location) {
-        location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, color == null ? Color.WHITE : color);
+        if (VersionUtils.IS_1_20_5){
+            location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, color == null ? Color.WHITE : color);
+        }
+        else{
+            location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra);
+        }
     }
 
     @Override
     public void spawn(Location location, @NotNull Player player) {
-        player.spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, color == null ? Color.WHITE : color);
+        if (VersionUtils.IS_1_20_5){
+            player.spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, color == null ? Color.WHITE : color);
+        }
+        else{
+            player.spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra);
+        }
     }
 
     @Override
