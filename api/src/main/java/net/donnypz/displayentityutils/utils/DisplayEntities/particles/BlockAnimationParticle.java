@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities.particles;
 
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -44,7 +45,7 @@ class BlockAnimationParticle extends AnimationParticle implements Serializable {
 
     @Override
     protected void initalize() {
-        blockData = Bukkit.getServer().createBlockData(blockDataAsString);
+        blockData = VersionUtils.createBlockData(blockDataAsString);
     }
 
     @Override

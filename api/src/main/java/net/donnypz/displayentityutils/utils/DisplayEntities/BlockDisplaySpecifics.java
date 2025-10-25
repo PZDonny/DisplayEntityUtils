@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.BlockDisplay;
 
@@ -30,6 +31,6 @@ final class BlockDisplaySpecifics extends DisplayEntitySpecifics implements Seri
 
     @Override
     protected void applyToAttributeContainer(PacketAttributeContainer attributeContainer) {
-        attributeContainer.setAttribute(DisplayAttributes.BlockDisplay.BLOCK_STATE, Bukkit.createBlockData(blockData));
+        attributeContainer.setAttribute(DisplayAttributes.BlockDisplay.BLOCK_STATE, VersionUtils.createBlockData(blockData));
     }
 }

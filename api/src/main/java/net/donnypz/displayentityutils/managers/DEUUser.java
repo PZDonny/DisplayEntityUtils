@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 public class DEUUser {
+    static final Object userLock = new Object();
     static final HashMap<UUID, DEUUser> users = new HashMap<>();
 
     private final UUID userUUID;
@@ -37,7 +38,9 @@ public class DEUUser {
 
     private DEUUser(UUID userUUID){
         this.userUUID = userUUID;
-        users.put(userUUID, this);
+        synchronized (userLock){
+            users.put(userUUID, this);
+        }
     }
 
 
@@ -55,7 +58,9 @@ public class DEUUser {
     }
 
     public static @Nullable DEUUser getUser(@NotNull UUID uuid){
-        return users.get(uuid);
+        synchronized (userLock){
+            return users.get(uuid);
+        }
     }
 
     @ApiStatus.Internal
@@ -81,9 +86,11 @@ public class DEUUser {
      * @return false if {@link DisplayConfig#limitGroupSelections()} is true and another player already has the group selected
      */
     public boolean setSelectedGroup(@NotNull ActiveGroup<?> activeGroup) {
-        for (DEUUser user : DEUUser.users.values()){
-            if (user.getSelectedGroup() == activeGroup){
-                return user.userUUID == userUUID;
+        synchronized (userLock){
+            for (DEUUser user : DEUUser.users.values()){
+                if (user.getSelectedGroup() == activeGroup){
+                    return user.userUUID == userUUID;
+                }
             }
         }
         setSelectedPartSelection(activeGroup.createPartSelection(),true);
@@ -324,6 +331,7 @@ public class DEUUser {
         selectedGroup = null;
         if (selectedPartSelection != null) selectedPartSelection.remove();
         if (particleBuilder != null) particleBuilder.remove();
+        selectedAnimation = null;
 
         Player player = Bukkit.getPlayer(userUUID);
 
@@ -334,6 +342,9 @@ public class DEUUser {
                 part.hideFromPlayer(player);
             }
             iter.remove();
+        }
+        synchronized (userLock){
+            users.remove(userUUID);
         }
     }
 }

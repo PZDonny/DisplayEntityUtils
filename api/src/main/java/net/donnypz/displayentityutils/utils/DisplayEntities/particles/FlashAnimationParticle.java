@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities.particles;
 
-import net.donnypz.displayentityutils.utils.VersionUtils;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Location;

@@ -6,7 +6,7 @@ import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
-import net.donnypz.displayentityutils.utils.VersionUtils;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.donnypz.displayentityutils.utils.dialogs.animationparticles.AnimationParticleSelectDialog;
 import net.donnypz.displayentityutils.utils.relativepoints.FramePointSelector;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointSelector;

@@ -3,9 +3,9 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
@@ -122,7 +122,7 @@ class DisplayTransformation extends Transformation{
             this.data = MiniMessage.miniMessage().deserialize(serialized);
         }
         else if (type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY){
-            this.data = Bukkit.createBlockData((String) data);
+            this.data = VersionUtils.createBlockData((String) data);
         }
         else{
             this.data = ItemStack.deserializeBytes((byte[]) data);
