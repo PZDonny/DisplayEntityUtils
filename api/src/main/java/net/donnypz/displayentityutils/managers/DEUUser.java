@@ -250,7 +250,7 @@ public class DEUUser {
             if (condition != null && !condition.test(player)) continue;
 
             Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
-                if (pg.isRegistered()){
+                if (pg.isRegistered() && player.getWorld().getName().equals(pg.getWorldName())){
                     pg.showToPlayer(player, GroupSpawnedEvent.SpawnReason.PLAYER_SENT_CHUNK);
                 }
             });

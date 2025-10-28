@@ -760,7 +760,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * Set whether this group should automatically handle revealing itself to players after they switch worlds
      * @param autoShow whether the group should autoShow
      */
-    public PacketDisplayEntityGroup setAutoShow(boolean autoShow){
+    public synchronized PacketDisplayEntityGroup setAutoShow(boolean autoShow){
         boolean oldAutoshow = this.autoShow;
         this.autoShow = autoShow;
         if (oldAutoshow != autoShow){
@@ -769,21 +769,17 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 Location loc = getLocation();
                 if (loc != null){
                     Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> {
-                        Chunk chunk = loc.getChunk();
-                        Collection<Player> players;
-                        if (VersionUtils.IS_1_20_4 || VersionUtils.IS_1_20_5){
-                            players = new ArrayList<>();
-                            for (Player p : Bukkit.getOnlinePlayers()){
-                                if (p.isChunkSent(chunk)){
-                                    players.add(p);
-                                }
+                        long chunkKey = ConversionUtils.getChunkKey(loc);
+                        Collection<Player> players = new ArrayList<>();
+                        for (Player p : loc.getWorld().getPlayers()){
+                            if (p.isChunkSent(chunkKey)){
+                                players.add(p);
                             }
                         }
-                        else{
-                            players = new ArrayList<>(chunk.getPlayersSeeingChunk());
-                        }
                         Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
-                            if (this.autoShow) showToPlayers(players, GroupSpawnedEvent.SpawnReason.INTERNAL);
+                            if (this.autoShow) {
+                                showToPlayers(players, GroupSpawnedEvent.SpawnReason.INTERNAL);
+                            }
                         });
                     });
                 }
@@ -802,7 +798,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * @param playerCondition the condition checked for every player.
      *
      */
-    public void setAutoShow(boolean autoShow, @Nullable Predicate<Player> playerCondition){
+    public synchronized void setAutoShow(boolean autoShow, @Nullable Predicate<Player> playerCondition){
         setAutoShow(autoShow);
         this.autoShowCondition = playerCondition;
     }
@@ -811,7 +807,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * Get whether this group should automatically handle revealing itself to player after a world switch
      * @return a boolean
      */
-    public boolean isAutoShow(){
+    public synchronized boolean isAutoShow(){
         return autoShow;
     }
 
