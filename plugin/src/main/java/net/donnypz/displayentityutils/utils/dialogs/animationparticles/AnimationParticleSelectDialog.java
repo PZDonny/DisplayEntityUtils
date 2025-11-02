@@ -5,6 +5,7 @@ import io.papermc.paper.registry.data.dialog.ActionButton;
 import io.papermc.paper.registry.data.dialog.DialogBase;
 import io.papermc.paper.registry.data.dialog.action.DialogAction;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @ApiStatus.Internal
@@ -40,15 +42,21 @@ public class AnimationParticleSelectDialog {
 
 
     private static List<ActionButton> getActionButtons(){
-        return List.of(
-                getBlockParticleAction(),
-                getItemstackAction(),
-                getDustOptionAction(),
-                getDustTransitionAction(),
-                getEntityEffectAction(),
-                getFlashAction(),
-                getGeneralAction()
-        );
+        List<ActionButton> buttons = new ArrayList<>();
+        buttons.add(getBlockParticleAction());
+        buttons.add(getItemstackAction());
+        buttons.add(getDustOptionAction());
+        buttons.add(getDustTransitionAction());
+
+        //V_1_21_5 Particles
+        //Not checked for v1_20_5 since dialogs aren't even viewable on versions that low
+        buttons.add(getEntityEffectAction());
+        buttons.add(getTintedLeavesAction());
+
+        if (VersionUtils.IS_1_21_9) buttons.add(getFlashAction());
+
+        buttons.add(getGeneralAction());
+        return buttons;
     }
 
     private static ActionButton getBlockParticleAction(){
@@ -101,10 +109,20 @@ public class AnimationParticleSelectDialog {
                 .build();
     }
 
+    private static ActionButton getTintedLeavesAction(){
+        return ActionButton
+                .builder(Component.text("Tinted Leaves"))
+                .tooltip(Component.text("Create a Tinted Leaves Animation Particle", NamedTextColor.YELLOW))
+                .action(DialogAction.customClick((view, audience) -> {
+                    AnimationParticleDialogs.TINTED_LEAVES.sendDialog((Player) audience);
+                }, CALLBACK_OPTIONS))
+                .build();
+    }
+
     private static ActionButton getFlashAction(){
         return ActionButton
                 .builder(Component.text("Flash"))
-                .tooltip(Component.text("Create an Flash Animation Particle", NamedTextColor.YELLOW))
+                .tooltip(Component.text("Create a Flash Animation Particle", NamedTextColor.YELLOW))
                 .action(DialogAction.customClick((view, audience) -> {
                     AnimationParticleDialogs.FLASH.sendDialog((Player) audience);
                 }, CALLBACK_OPTIONS))

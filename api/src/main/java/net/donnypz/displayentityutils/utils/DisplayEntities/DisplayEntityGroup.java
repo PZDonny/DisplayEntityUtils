@@ -301,7 +301,7 @@ public final class DisplayEntityGroup implements Serializable{
         packetGroup.updateChunkAndWorld(spawnLocation);
         PacketDisplayEntityPart masterPart = masterEntity.createPacketPart(packetGroup, spawnLocation);
         masterPart.isMaster = true; //for parts in old models that do not contain pdc data / part uuids
-        packetGroup.addPart(masterPart);
+        packetGroup.addPartSilent(masterPart);
 
         int passengerSize = displayEntities.size()-1;
         int[] passengerIds = new int[passengerSize];
@@ -310,7 +310,7 @@ public final class DisplayEntityGroup implements Serializable{
         for (DisplayEntity entity : displayEntities){
             if (entity.isMaster()) continue;
             PacketDisplayEntityPart part = entity.createPacketPart(packetGroup, spawnLocation);
-            packetGroup.addPart(part);
+            packetGroup.addPartSilent(part);
             passengerIds[i] = part.getEntityId();
             i++;
         }
@@ -318,7 +318,7 @@ public final class DisplayEntityGroup implements Serializable{
 
         for (InteractionEntity entity : interactionEntities){
             PacketDisplayEntityPart part = entity.createPacketPart(spawnLocation);
-            packetGroup.addPart(part);
+            packetGroup.addPartSilent(part);
         }
 
         if (playSpawnAnimation){

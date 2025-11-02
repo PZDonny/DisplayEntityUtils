@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils;
 import net.donnypz.displayentityutils.managers.DisplayStorage;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationPlayer;
+import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -39,6 +40,7 @@ public final class DisplayAPI {
     static DisplayStorage MYSQL_STORAGE;
     static DisplayStorage MONGODB_STORAGE;
     static AnimationPlayer.AnimationPlayerProvider ANIMATION_PLAYER_SERVICE;
+    static Scheduler SCHEDULER;
 
     private DisplayAPI(){}
 
@@ -146,5 +148,9 @@ public final class DisplayAPI {
                 return null;
             }
         }
+    }
+
+    public static Scheduler getScheduler(){
+        return SCHEDULER;
     }
 }

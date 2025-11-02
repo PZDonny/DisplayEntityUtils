@@ -11,7 +11,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
-import org.bukkit.Bukkit;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
@@ -28,8 +27,9 @@ public final class DEUEntityListener implements Listener {
     //============Mythic====================
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntitySpawn(EntitySpawnEvent e){
-        Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> {
-            if (e.getEntity().isValid()) applyState(e.getEntity(), MachineState.StateType.SPAWN);
+        Entity entity = e.getEntity();
+        DisplayAPI.getScheduler().entityRun(entity, () -> {
+            if (entity.isValid()) applyState(entity, MachineState.StateType.SPAWN);
         });
     }
 
@@ -71,7 +71,7 @@ public final class DEUEntityListener implements Listener {
             if (e.getEntity() instanceof LivingEntity victim){
                 e.setCancelled(true);
                 Entity finalDamager = damager;
-                Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+                DisplayAPI.getScheduler().runLater(() -> {
                     if (finalDamager.getLocation().distanceSquared(victim.getLocation()) <= state.getMaxRange()*state.getMaxRange()){
                         victim.damage(e.getDamage(), DamageSource.builder(DamageType.GENERIC)
                                 .withDirectEntity(finalDamager)

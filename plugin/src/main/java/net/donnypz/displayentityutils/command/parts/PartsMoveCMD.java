@@ -9,11 +9,11 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -59,7 +59,7 @@ class PartsMoveCMD extends PlayerSubCommand {
             Location loc = part.getLocation();
             Vector v = direction.getVector(selection.getSelectedPart(), false).normalize().multiply(distance);
             loc.add(v);
-            part.getEntity().teleport(loc);
+            FoliaUtils.teleport(part.getEntity(), loc);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Moved your selected part!", NamedTextColor.GREEN)));
         }
         catch(NumberFormatException e){

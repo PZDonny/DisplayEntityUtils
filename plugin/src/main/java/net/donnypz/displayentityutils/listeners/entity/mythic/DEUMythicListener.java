@@ -36,14 +36,11 @@ public final class DEUMythicListener implements Listener {
         if (machine == null) return;
 
         if (disg != null && !disg.isBlank()){
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().runLater(() -> {
                if (machine == group.getDisplayStateMachine()){
                    machine.setStateIfPresent(MachineState.StateType.SPAWN, group);
                }
             }, 2);
-        }
-        else{
-
         }
     }
 

@@ -114,7 +114,16 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public ActivePart removeTag(@NotNull String partTag) {
+    public void addTags(@NotNull List<String> tags){
+        for (String tag : tags){
+            if (DisplayUtils.isValidTag(tag)){
+                partTags.add(tag);
+            }
+        }
+    }
+
+    @Override
+    public PacketDisplayEntityPart removeTag(@NotNull String partTag) {
         partTags.remove(partTag);
         return this;
     }
@@ -856,7 +865,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             if (player == null) continue;
             if (isMaster && group != null){
                 group.unsetPassengers(player);
-                Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
+                DisplayAPI.getScheduler().runAsync(() -> {
                     PacketUtils.teleport(player, getEntityId(), location);
                     group.setPassengers(player);
                 });
@@ -1017,6 +1026,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public void removeFromGroup(boolean unregister){
         if (!hasGroup()) return;
         group.groupParts.remove(partUUID);
+        if (!isMaster){
+            group.updatePartCount(this, false);
+        }
         group = null;
         if (unregister){
             remove();

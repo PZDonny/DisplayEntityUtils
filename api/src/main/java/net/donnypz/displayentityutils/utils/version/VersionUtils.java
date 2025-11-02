@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.utils;
+package net.donnypz.displayentityutils.utils.version;
 
 import io.github.retrooper.packetevents.util.viaversion.ViaVersionUtil;
 import net.donnypz.displayentityutils.DisplayAPI;
@@ -6,6 +6,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.BlockType;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemType;
 import org.jetbrains.annotations.NotNull;
@@ -16,6 +17,7 @@ public final class VersionUtils {
     public static boolean IS_1_20_5 = Bukkit.getUnsafe().getProtocolVersion() >= 766;
     public static boolean IS_1_21 = Bukkit.getUnsafe().getProtocolVersion() >= 767;
     public static boolean IS_1_21_2 = Bukkit.getUnsafe().getProtocolVersion() >= 768;
+    public static boolean IS_1_21_5 = Bukkit.getUnsafe().getProtocolVersion() >= 770;
     public static boolean IS_1_21_6 = Bukkit.getUnsafe().getProtocolVersion() >= 771;
     public static boolean IS_1_21_7 = Bukkit.getUnsafe().getProtocolVersion() >= 772;
     public static boolean IS_1_21_9 = Bukkit.getUnsafe().getProtocolVersion() >= 773;
@@ -81,5 +83,14 @@ public final class VersionUtils {
 
     public static boolean serverHasDialogs(){ //Dialog API came to Paper in 1.21.7, Dialog System came to MC in 1.21.6
         return IS_1_21_7;
+    }
+
+    public static BlockData createBlockData(@NotNull String data){
+        try{
+            return Bukkit.createBlockData(data);
+        }
+        catch(IllegalArgumentException e){
+            return Bukkit.createBlockData(BlockDataMapper.updateBlockData(data));
+        }
     }
 }

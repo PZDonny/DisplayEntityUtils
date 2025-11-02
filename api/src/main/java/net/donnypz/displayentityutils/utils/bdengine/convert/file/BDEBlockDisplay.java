@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.bdengine.convert.file;
 
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.BlockDisplay;
@@ -16,7 +17,7 @@ class BDEBlockDisplay extends BDEDisplay<BlockDisplay>{
             name = split[0];
             String data = "["+split[1];
             try{
-                blockdata = Bukkit.createBlockData(data);
+                blockdata = VersionUtils.createBlockData(data);
             }
             catch(IllegalArgumentException e){}
         }

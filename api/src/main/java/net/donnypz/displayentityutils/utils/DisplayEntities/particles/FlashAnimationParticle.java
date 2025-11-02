@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities.particles;
 
-import net.donnypz.displayentityutils.utils.VersionUtils;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -34,12 +34,22 @@ class FlashAnimationParticle extends AnimationParticle {
 
     @Override
     public void spawn(Location location) {
-        location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, color == null ? Color.WHITE : color);
+        if (VersionUtils.IS_1_21_9){
+            location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, color == null ? Color.WHITE : color);
+        }
+        else{
+            location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra);
+        }
     }
 
     @Override
     public void spawn(Location location, @NotNull Player player) {
-        player.spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, color == null ? Color.WHITE : color);
+        if (VersionUtils.IS_1_21_9){
+            player.spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, color == null ? Color.WHITE : color);
+        }
+        else{
+            player.spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra);
+        }
     }
 
     @Override

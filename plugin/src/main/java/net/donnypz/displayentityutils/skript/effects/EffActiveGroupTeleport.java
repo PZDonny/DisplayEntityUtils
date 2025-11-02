@@ -10,17 +10,18 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Teleport Active Group")
-@Description("Teleport an Active group to a location")
-@Examples({"deu teleport {_spawnedgroup} to player", "deu move {_spawnedgroup} to {_location} and respect group facing"})
-@Since("2.6.2, 3.0.0 (Packet)")
+@Description("Teleport an Active Group to a location")
+@Examples({"deu teleport {_spawnedgroup} to player", "deu move {_spawnedgroup} to {_location} and respect group direction"})
+@Since("2.6.2, 3.0.0 (Packet), 3.3.5 (Plural)")
 public class EffActiveGroupTeleport extends Effect {
     static {
-        Skript.registerEffect(EffActiveGroupTeleport.class,"deu (move|teleport) %activegroup% to %location% [r:[and] (keep|respect) group (facing|direction|orientation)]");
+        Skript.registerEffect(EffActiveGroupTeleport.class,"deu (move|teleport) %activegroups% to %location% [r:[and] (keep|respect) group (facing|direction|orientation)]");
     }
 
     Expression<ActiveGroup<?>> group;
@@ -37,16 +38,19 @@ public class EffActiveGroupTeleport extends Effect {
 
     @Override
     protected void execute(Event event) {
-        ActiveGroup<?> g = group.getSingle(event);
+
+        ActiveGroup<?>[] groups = group.getArray(event);
         Location loc = location.getSingle(event);
-        if (g == null || loc == null){
-            return;
+        if (groups == null || loc == null) return;
+        for (ActiveGroup<?> g : groups){
+            if (g != null){
+                g.teleport(loc, respect);
+            }
         }
-        g.teleport(loc, respect);
     }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "teleport spawned group: "+group.toString(event, debug);
+        return "teleport active group: "+group.toString(event, debug);
     }
 }

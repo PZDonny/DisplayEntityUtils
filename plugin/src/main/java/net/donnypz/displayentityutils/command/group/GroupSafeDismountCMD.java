@@ -12,7 +12,6 @@ import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -67,7 +66,7 @@ class GroupSafeDismountCMD extends ConsoleUsableSubCommand {
                     hadAI = false;
                 }
                 vehicle.setRotation(vehicle.getYaw(), 0);
-                Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+                DisplayAPI.getScheduler().runLater(() -> {
                     GroupDismountCMD.dismount(group, false);
                     sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Safely dismounted your selected group!", NamedTextColor.GREEN)));
                     if (hadAI){
@@ -90,7 +89,7 @@ class GroupSafeDismountCMD extends ConsoleUsableSubCommand {
             hadAI = false;
         }
 
-        Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runLater(() -> {
             for (SpawnedDisplayEntityGroup g : DisplayUtils.getGroupPassengers(vehicle)){
                 GroupDismountCMD.dismount(g, false);
             }

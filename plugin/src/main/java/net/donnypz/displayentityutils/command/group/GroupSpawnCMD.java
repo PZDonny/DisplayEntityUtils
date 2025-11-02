@@ -110,7 +110,7 @@ public class GroupSpawnCMD extends PlayerSubCommand {
             }
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runAsync(() -> {
             if (isGroup) {
                 DisplayEntityGroup group = DisplayGroupManager.getGroup(storage, tag);
                 if (group == null){
@@ -124,7 +124,7 @@ public class GroupSpawnCMD extends PlayerSubCommand {
                 p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully spawned display entity group at your location! <white>(Tagged: "+tag+")")));
                 Location spawnLoc = p.getLocation();
 
-                Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> {
+                DisplayAPI.getScheduler().run(() -> {
                     if (!spawnLoc.isChunkLoaded()){
                         Bukkit.getConsoleSender().sendMessage(Component.text("Failed to spawn group in unloaded chunk", NamedTextColor.RED));
                         return;

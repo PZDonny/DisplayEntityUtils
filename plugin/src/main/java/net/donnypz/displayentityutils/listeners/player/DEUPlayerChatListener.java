@@ -4,7 +4,6 @@ import io.papermc.paper.event.player.AsyncChatEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
-import net.donnypz.displayentityutils.utils.VersionUtils;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -39,7 +38,7 @@ public final class DEUPlayerChatListener implements Listener {
         switch (step){
             case PARTICLE -> {
                 try{
-                    Particle particle = Particle.valueOf(msg);
+                    Particle particle = Particle.valueOf(msg.toUpperCase());
                     builder.particle(particle);
                     builder.advanceStep(AnimationParticleBuilder.Step.COUNT);
                 }
@@ -51,21 +50,20 @@ public final class DEUPlayerChatListener implements Listener {
                 try{
                     int amount = Integer.parseInt(msg);
                     builder.count(amount);
+
                     if (builder.isDustOptionParticle()){
                         builder.advanceStep(AnimationParticleBuilder.Step.COLOR_AND_SIZE);
                     }
                     else if (builder.isDustTransitionParticle()){
                         builder.advanceStep(AnimationParticleBuilder.Step.COLOR_TRANSITION);
                     }
-                    else if (builder.particle() == VersionUtils.getEntityEffectParticle()){
-                        if (VersionUtils.IS_1_20_5){
-                            builder.advanceStep(AnimationParticleBuilder.Step.COLOR_ONLY);
-                        }
-                        else{
-                            builder.advanceStep(AnimationParticleBuilder.Step.OFFSETS);
-                        }
+                    else if (builder.isBlockDataParticle()){
+                        builder.advanceStep(AnimationParticleBuilder.Step.BLOCK);
                     }
-                    else if (builder.particle() == Particle.FLASH){
+                    else if (builder.isItemParticle()){
+                        builder.advanceStep(AnimationParticleBuilder.Step.ITEM);
+                    }
+                    else if (builder.isColorOnlyParticle()){ //Entity Effect, Flash, Tinted Leaves
                         builder.advanceStep(AnimationParticleBuilder.Step.COLOR_ONLY);
                     }
                     else{
@@ -74,6 +72,32 @@ public final class DEUPlayerChatListener implements Listener {
                 }
                 catch(IllegalArgumentException ex){
                     p.sendMessage(Component.text("Invalid Particle Count! Enter a whole number greater than 0.", NamedTextColor.RED));
+                }
+            }
+            case BLOCK -> {
+                BlockData blockData = DEUCommandUtils.getBlockFromText(msg, p);
+                if (blockData == null){
+                    return;
+                }
+                builder.data(blockData);
+                builder.advanceStep(AnimationParticleBuilder.Step.EXTRA);
+            }
+            case ITEM -> {
+                ItemStack item = DEUCommandUtils.getItemFromText(msg, p);
+                if (item == null){
+                    return;
+                }
+                builder.data(item);
+                builder.advanceStep(AnimationParticleBuilder.Step.EXTRA);
+            }
+            case EXTRA -> {
+                try{
+                    double amount = Double.parseDouble(msg);
+                    builder.extra(amount);
+                    builder.advanceStep(AnimationParticleBuilder.Step.OFFSETS);
+                }
+                catch(NumberFormatException ex){
+                    p.sendMessage(Component.text("Invalid Extra Value! Enter a whole number greater than 0.", NamedTextColor.RED));
                 }
             }
             case OFFSETS -> {
@@ -101,24 +125,7 @@ public final class DEUPlayerChatListener implements Listener {
                     p.sendMessage(Component.text("Invalid Delay Value! Enter a non-negative whole number.", NamedTextColor.RED));
                 }
             }
-            case EXTRA -> {
-                try{
-                    double amount = Double.parseDouble(msg);
-                    builder.extra(amount);
-                    if (builder.isBlockDataParticle()){
-                        builder.advanceStep(AnimationParticleBuilder.Step.BLOCK);
-                    }
-                    else if (builder.isItemParticle()){
-                        builder.advanceStep(AnimationParticleBuilder.Step.ITEM);
-                    }
-                    else{
-                        builder.advanceStep(AnimationParticleBuilder.Step.OFFSETS);
-                    }
-                }
-                catch(NumberFormatException ex){
-                    p.sendMessage(Component.text("Invalid Extra Value! Enter a whole number greater than 0.", NamedTextColor.RED));
-                }
-            }
+
             case COLOR_AND_SIZE -> {
                 try{
                     String[] args = msg.split(" ");
@@ -171,22 +178,6 @@ public final class DEUPlayerChatListener implements Listener {
                     p.sendMessage(Component.text("Invalid Color Values! Enter two colors and a particle size.", NamedTextColor.RED));
                     p.sendMessage(Component.text("color color size", NamedTextColor.GRAY, TextDecoration.ITALIC));
                 }
-            }
-            case BLOCK -> {
-                BlockData blockData = DEUCommandUtils.getBlockFromText(msg, p);
-                if (blockData == null){
-                    return;
-                }
-                builder.data(blockData);
-                builder.advanceStep(AnimationParticleBuilder.Step.OFFSETS);
-            }
-            case ITEM -> {
-                ItemStack item = DEUCommandUtils.getItemFromText(msg, p);
-                if (item == null){
-                    return;
-                }
-                builder.data(item);
-                builder.advanceStep(AnimationParticleBuilder.Step.OFFSETS);
             }
         }
     }

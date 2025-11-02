@@ -3,7 +3,6 @@ package net.donnypz.displayentityutils.listeners.player;
 import io.papermc.paper.event.packet.PlayerChunkUnloadEvent;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.managers.DEUUser;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,7 +17,7 @@ public class DEUPlayerWorldListener implements Listener {
     public void onPlayerChangeWorld(PlayerChangedWorldEvent e){
         Player player = e.getPlayer();
 
-        Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runAsync(() -> {
             DEUUser user = DEUUser.getOrCreateUser(player);
             user.resetTrackedPacketParts();
         });
@@ -31,7 +30,7 @@ public class DEUPlayerWorldListener implements Listener {
         DEUUser deuUser = DEUUser.getOrCreateUser(p);
         //Ran async after this event is processed to check for world equality
         //No real negative impact if the worlds are expected to be different, but are somehow similar
-        Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runLaterAsync(() -> {
             deuUser.hideTrackedChunkGroups(c);
         }, 1);
     }

@@ -11,13 +11,11 @@ import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -125,6 +123,12 @@ public abstract class ActivePart implements Active{
     public abstract boolean addTag(@NotNull String partTag);
 
     /**
+     * Add multiple tag to this part. The tag will not be added if it starts with an "!" or is blank
+     * @param partTag The part tags to add to this part
+     */
+    public abstract void addTags(@NotNull List<String> partTag);
+
+    /**
      * Remove a tag from this part
      * @param partTag the tag to remove from this part
      * @return this
@@ -167,7 +171,7 @@ public abstract class ActivePart implements Active{
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
         Transformation transformation = getDisplayTransformation();
         if (transformation == null) return;
-        Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().partRunAsync(this, () -> {
             float[] values = DisplayUtils.getAutoCullValues(type, transformation.getTranslation(), transformation.getScale(), transformation.getLeftRotation(), widthAdder, heightAdder);
             float width = values[0];
             float height = values[1];
@@ -201,12 +205,7 @@ public abstract class ActivePart implements Active{
         if (type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
             glow();
 
-            new BukkitRunnable(){
-                @Override
-                public void run() {
-                    unglow();
-                }
-            }.runTaskLater(DisplayAPI.getPlugin(), durationInTicks);
+            DisplayAPI.getScheduler().partRunLater(this, this::unglow, durationInTicks);
         }
     }
 
@@ -254,7 +253,7 @@ public abstract class ActivePart implements Active{
         part.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
 
         if (durationInTicks > -1) {
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().runLaterAsync(() -> {
                 if (player.isConnected()){
                     part.hideFromPlayer(player);
                 }

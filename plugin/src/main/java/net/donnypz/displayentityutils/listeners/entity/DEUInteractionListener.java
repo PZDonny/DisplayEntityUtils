@@ -103,7 +103,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
             return;
         }
 
-        Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().run(() -> {
             //Execute Commands
             if (clickType == InteractionClickEvent.ClickType.LEFT){
                 for (String cmd : part.getLeftConsoleInteractionCommands()){

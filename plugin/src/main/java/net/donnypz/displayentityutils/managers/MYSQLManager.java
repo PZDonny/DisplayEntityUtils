@@ -46,7 +46,7 @@ public final class MYSQLManager implements DisplayStorage{
         if (connected){
             return;
         }
-        Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runAsync(() -> {
             try {
                 //Set Data Source
                 dataSource = new HikariDataSource();

@@ -11,11 +11,12 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayState
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.FollowType;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
+import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
+import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
@@ -546,7 +547,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             location.setYaw(oldMasterLoc.getYaw());
         }
 
-        master.teleport(location, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+        FoliaUtils.teleport(master, location, TeleportFlag.EntityState.RETAIN_PASSENGERS);
         World w = location.getWorld();
 
 
@@ -558,7 +559,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 Interaction interaction = (Interaction) part.getEntity();
                 Vector vector = oldMasterLoc.toVector().subtract(interaction.getLocation().toVector());
                 Location tpLocation = location.clone().subtract(vector);
-                part.getEntity().teleport(tpLocation, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                FoliaUtils.teleport(part.getEntity(), tpLocation, TeleportFlag.EntityState.RETAIN_PASSENGERS);
             }
 
             if (w != null && part.getEntity().getWorld() != w){ //Keep world name consistent within part's data
@@ -575,7 +576,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 .normalize()
                 .multiply(movementIncrement);
 
-        new BukkitRunnable(){
+        DisplayAPI.getScheduler().entityRunTimer(interaction, new Scheduler.SchedulerRunnable(){
             double currentDistance = 0;
             float lastYaw = interaction.getYaw();
             @Override
@@ -589,14 +590,15 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 Location tpLoc = interaction.getLocation().clone().add(incrementVector);
 
                 if (currentDistance >= distance){
-                    interaction.teleport(destination);
+                    FoliaUtils.teleport(interaction, destination);
                     cancel();
                 }
                 else{
-                    interaction.teleport(tpLoc);
+                    FoliaUtils.teleport(interaction, tpLoc);
                 }
             }
-        }.runTaskTimer(DisplayAPI.getPlugin(), delayInTicks, 1);
+        }, delayInTicks, 1);
+
     }
 
     @Override
@@ -618,7 +620,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 translateInteractionEventless((Interaction) part.getEntity(), direction, distance, durationInTicks, 0);
             }
         }
-        new BukkitRunnable(){
+
+        DisplayAPI.getScheduler().entityRunTimer(masterEntity, new Scheduler.SchedulerRunnable() {
             double currentDistance = 0;
             @Override
             public void run() {
@@ -631,16 +634,15 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
                 masterEntity.setRotation(tpLoc.getYaw(), tpLoc.getPitch());
                 if (currentDistance >= distance){
-                    masterEntity.teleport(destination, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                    FoliaUtils.teleport(masterEntity, destination, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                     new GroupTeleportMoveEndEvent(SpawnedDisplayEntityGroup.this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent();
                     cancel();
                 }
                 else{
-                    masterEntity.teleport(tpLoc, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                    FoliaUtils.teleport(masterEntity, tpLoc, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                 }
-
             }
-        }.runTaskTimer(DisplayAPI.getPlugin(), 0, 1);
+        }, 0, 1);
     }
 
     /**
@@ -870,8 +872,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     private void alignInteractionWithMountedGroup(SpawnedDisplayEntityPart part, Entity vehicle){
-        new BukkitRunnable() {
-            final Interaction interaction = (Interaction) part.getEntity();
+        final Interaction interaction = (Interaction) part.getEntity();
+        DisplayAPI.getScheduler().entityRunTimer(interaction, new Scheduler.SchedulerRunnable() {
             Location lastLoc = getLocation();
             @Override
             public void run() {
@@ -888,14 +890,14 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                     Vector adjustVec = lastLoc.toVector().subtract(newLoc.toVector());
                     tpLoc.subtract(adjustVec);
                     lastLoc = newLoc;
-                    interaction.teleport(tpLoc);
+                    FoliaUtils.teleport(interaction, tpLoc);
                 }
 
                 if (getVehicle() != vehicle){
                     cancel();
                 }
             }
-        }.runTaskTimer(DisplayAPI.getPlugin(), 0, 1);
+        }, 0, 1);
     }
 
     /**
@@ -1264,13 +1266,5 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     public boolean isSpawned(){
         return masterPart != null && masterPart.isValid();
-    }
-
-    /**
-     * Check if a group has been registered within the plugin. This will return true even in unloaded chunks.
-     * @return false if this group has been unregistered with {@link SpawnedDisplayEntityGroup#unregister(boolean, boolean)} or a world unload (if enabled in config).
-     */
-    public boolean isRegistered(){
-        return DisplayGroupManager.isGroupRegistered(this);
     }
 }

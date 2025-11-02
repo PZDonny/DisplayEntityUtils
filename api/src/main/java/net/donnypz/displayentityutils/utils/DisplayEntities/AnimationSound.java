@@ -53,7 +53,7 @@ public class AnimationSound implements Externalizable, Cloneable {
             playSound(location);
         }
         else{
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().runLater(() -> {
                 if (group.getMasterPart() == null){
                     return;
                 }
@@ -72,7 +72,7 @@ public class AnimationSound implements Externalizable, Cloneable {
             playSound(location, player);
         }
         else{
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().runLater(() -> {
                 if (group.getMasterPart() == null){
                     return;
                 }
@@ -91,7 +91,7 @@ public class AnimationSound implements Externalizable, Cloneable {
             playSound(location, players);
         }
         else{
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().runLater(() -> {
                 if (group.getMasterPart() == null){
                     return;
                 }
@@ -128,14 +128,13 @@ public class AnimationSound implements Externalizable, Cloneable {
     }
 
     @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException { //fixes 1.20.4 issues w/ anim sounds
         soundName = (String) in.readObject();
-        try{
-            sound = Registry.SOUNDS.getOrThrow(NamespacedKey.minecraft(soundName.replace(".", "_")));
-        }
-        catch(Exception e){
+        sound = Registry.SOUNDS.get(NamespacedKey.minecraft(soundName.replace(".", "_")));
+        if (sound == null){
             existsInGameVersion = false;
         }
+
         volume = in.readFloat();
         pitch = in.readFloat();
         try{

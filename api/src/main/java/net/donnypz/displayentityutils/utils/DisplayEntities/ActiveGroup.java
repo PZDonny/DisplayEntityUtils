@@ -12,7 +12,6 @@ import net.donnypz.displayentityutils.utils.FollowType;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
@@ -312,7 +311,6 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * Make this group's display entities glow, and interactions be outlined, for a player for a set period of time
      * @param player the player
      * @param durationInTicks how long the glowing should last. -1 to last forever
-     * @return this
      */
     public void glowAndMarkInteractions(@NotNull Player player, long durationInTicks){
         for (ActivePart p : groupParts.values()){
@@ -323,9 +321,10 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
                 if (p.isGlowing()){
                     continue;
                 }
+
                 PacketUtils.setGlowing(player, p.getEntityId(), true);
                 if (durationInTicks > -1){
-                    Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+                    DisplayAPI.getScheduler().partRunLater(p, () -> {
                         if (!p.isGlowing()){
                             PacketUtils.setGlowing(player, p.getEntityId(), false);
                         }
@@ -933,4 +932,11 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @return {@link DisplayEntityGroup} representing this
      */
     public abstract @NotNull DisplayEntityGroup toDisplayEntityGroup();
+
+    /**
+     * Check if a group is currently registered and usable.
+     */
+    public boolean isRegistered(){
+        return masterPart != null;
+    }
 }

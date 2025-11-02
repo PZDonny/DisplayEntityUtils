@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.BlockDisplay;
@@ -251,7 +252,7 @@ final class DisplayEntity implements Serializable {
 
     private Display spawnBlockDisplay(Location location, GroupSpawnSettings settings){
         BlockDisplaySpecifics spec = (BlockDisplaySpecifics) specifics;
-        BlockData data = Bukkit.createBlockData(spec.getBlockData());
+        BlockData data = VersionUtils.createBlockData(spec.getBlockData());
         return location.getWorld().spawn(location, BlockDisplay.class, display -> {
             display.setBlock(data);
             specifics.apply(this, display);

@@ -12,13 +12,13 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayState
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
@@ -193,20 +193,69 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
     }
 
+    @Override
     public void addPart(@NotNull PacketDisplayEntityPart part){
-        if (part.partUUID == null){
-            do{
-                part.partUUID = UUID.randomUUID(); //for parts in old models that do not contain pdc data / part uuids AND new ungrouped parts
-            } while(groupParts.containsKey(part.partUUID));
-        }
+        addPartSilent(part);
+        updatePartCount(part, true);
+    }
 
-        if (part.isMaster) masterPart = part;
-        groupParts.put(part.partUUID, part);
-        part.group = this;
-        if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) interactionCount++;
-        if (this.autoShow){
-            part.showToPlayers(getTrackingPlayers(), GroupSpawnedEvent.SpawnReason.INTERNAL);
+     void addPartSilent(PacketDisplayEntityPart part){
+         if (groupParts.get(part.partUUID) == part) return;
+
+         if (part.partUUID == null){
+             do{
+                 part.partUUID = UUID.randomUUID(); //for parts in old models that do not contain pdc data / part uuids AND new ungrouped parts
+             } while(groupParts.containsKey(part.partUUID));
+         }
+
+         if (part.isMaster) masterPart = part;
+         groupParts.put(part.partUUID, part);
+         part.group = this;
+         if (this.autoShow){
+             part.showToPlayers(getTrackingPlayers(), GroupSpawnedEvent.SpawnReason.INTERNAL);
+         }
+    }
+
+    void updatePartCount(PacketDisplayEntityPart part, boolean add){
+        if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (add){
+                interactionCount++;
+            }
+            else{
+                interactionCount--;
+            }
         }
+        else{
+            updatePassengerIds(part.getEntityId(), add);
+        }
+    }
+
+    private void updatePassengerIds(int passengerId, boolean add){
+        int[] ids;
+        if (add){
+            ids = new int[passengerIds.length+1];
+            for (int i = 0; i < ids.length; i++){
+                int id = passengerIds[i];
+                if (id == passengerId) return;
+                ids[i] = id;
+            }
+            ids[passengerIds.length] = passengerId;
+        }
+        else{
+            int newLength = passengerIds.length-1;
+            if (newLength <= 0){
+                passengerIds = new int[0];
+                return;
+            }
+            ids = new int[passengerIds.length-1];
+            for (int i = 0; i < ids.length; i++){
+                int id = passengerIds[i];
+                if (id != passengerId){
+                    ids[i] = id;
+                }
+            }
+        }
+        passengerIds = ids;
     }
 
     /**
@@ -344,10 +393,9 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             translate(Direction.UP, verticalOffset, -1, -1);
         }
 
-
         if (runLocationUpdater){
             final UUID finalUUID = vehicle.getUniqueId();
-            new BukkitRunnable(){
+            DisplayAPI.getScheduler().entityRunTimer(vehicle, new Scheduler.SchedulerRunnable() {
                 @Override
                 public void run() {
                     if (masterPart == null){
@@ -372,7 +420,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                     }
                     updateChunkAndWorld(entity.getLocation());
                 }
-            }.runTaskTimer(DisplayAPI.getPlugin(), 0, 30);
+            }, 0, 30);
         }
         return true;
     }
@@ -445,11 +493,13 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
     @Override
     public boolean isTrackedBy(@NotNull Player player) {
+        if (masterPart == null) return false;
         return masterPart.isTrackedBy(player.getUniqueId());
     }
 
     @Override
     public Collection<Player> getTrackingPlayers() {
+        if (masterPart == null) return Collections.emptySet();
         return masterPart.getTrackingPlayers();
     }
 
@@ -532,7 +582,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 PacketUtils.translateInteraction(part, direction, distance, durationInTicks, 0);
             }
         }
-        new BukkitRunnable(){
+        DisplayAPI.getScheduler().partRunTimerAsync(masterPart, new Scheduler.SchedulerRunnable() {
             double currentDistance = 0;
             @Override
             public void run() {
@@ -553,7 +603,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 }
                 PacketDisplayEntityGroup.this.update();
             }
-        }.runTaskTimerAsynchronously(DisplayAPI.getPlugin(), 0, 1);
+        }, 0, 1);
     }
 
     private void teleport(Location tpLocation, boolean respectGroupDirection, boolean hide){
@@ -708,7 +758,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * Set whether this group should automatically handle revealing itself to players after they switch worlds
      * @param autoShow whether the group should autoShow
      */
-    public PacketDisplayEntityGroup setAutoShow(boolean autoShow){
+    public synchronized PacketDisplayEntityGroup setAutoShow(boolean autoShow){
         boolean oldAutoshow = this.autoShow;
         this.autoShow = autoShow;
         if (oldAutoshow != autoShow){
@@ -716,22 +766,18 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             if (autoShow){
                 Location loc = getLocation();
                 if (loc != null){
-                    Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> {
-                        Chunk chunk = loc.getChunk();
-                        Collection<Player> players;
-                        if (VersionUtils.IS_1_20_4 || VersionUtils.IS_1_20_5){
-                            players = new ArrayList<>();
-                            for (Player p : Bukkit.getOnlinePlayers()){
-                                if (p.isChunkSent(chunk)){
-                                    players.add(p);
-                                }
+                    DisplayAPI.getScheduler().run(() -> {
+                        long chunkKey = ConversionUtils.getChunkKey(loc);
+                        Collection<Player> players = new ArrayList<>();
+                        for (Player p : loc.getWorld().getPlayers()){
+                            if (p.isChunkSent(chunkKey)){
+                                players.add(p);
                             }
                         }
-                        else{
-                            players = new ArrayList<>(chunk.getPlayersSeeingChunk());
-                        }
-                        Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
-                            if (this.autoShow) showToPlayers(players, GroupSpawnedEvent.SpawnReason.INTERNAL);
+                        DisplayAPI.getScheduler().runAsync(() -> {
+                            if (this.autoShow) {
+                                showToPlayers(players, GroupSpawnedEvent.SpawnReason.INTERNAL);
+                            }
                         });
                     });
                 }
@@ -750,7 +796,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * @param playerCondition the condition checked for every player.
      *
      */
-    public void setAutoShow(boolean autoShow, @Nullable Predicate<Player> playerCondition){
+    public synchronized void setAutoShow(boolean autoShow, @Nullable Predicate<Player> playerCondition){
         setAutoShow(autoShow);
         this.autoShowCondition = playerCondition;
     }
@@ -759,7 +805,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * Get whether this group should automatically handle revealing itself to player after a world switch
      * @return a boolean
      */
-    public boolean isAutoShow(){
+    public synchronized boolean isAutoShow(){
         return autoShow;
     }
 
@@ -852,7 +898,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     void refreshVehicle(@NotNull Player player){
-        Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runLater(() -> {
             Entity vehicle = getVehicle();
             if (vehicle != null){
                 WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, true));
@@ -967,32 +1013,36 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     private static abstract class GroupHolder<T>{
-        Map<T, Set<PacketDisplayEntityGroup>> groupMap = new HashMap<>();
+        final Map<T, Set<PacketDisplayEntityGroup>> groupMap = new ConcurrentHashMap<>();
+        final Object groupMapLock = new Object();
 
 
         Set<PacketDisplayEntityGroup> getGroups(){
             Set<PacketDisplayEntityGroup> groups = new HashSet<>();
-            for (Set<PacketDisplayEntityGroup> g : groupMap.values()){
-                groups.addAll(g);
+            synchronized (groupMapLock){
+                for (Set<PacketDisplayEntityGroup> g : groupMap.values()){
+                    groups.addAll(g);
+                }
             }
+
             return groups;
         }
 
         Set<PacketDisplayEntityGroup> getGroups(T key){
-            Set<PacketDisplayEntityGroup> groups = groupMap.get(key);
-            return groups == null ? Collections.emptySet() : new HashSet<>(groups);
+            synchronized (groupMapLock){
+                Set<PacketDisplayEntityGroup> groups = groupMap.get(key);
+                if (groups == null) return Collections.emptySet();
+                return new HashSet<>(groups);
+            }
         }
 
         void addGroup(T key, PacketDisplayEntityGroup group){
-            groupMap
-                    .computeIfAbsent(key, k -> Collections.newSetFromMap(new ConcurrentHashMap<>()))
-                    .add(group);
+            groupMap.computeIfAbsent(key, k -> ConcurrentHashMap.newKeySet()).add(group);
         }
 
         void removeGroup(T key, PacketDisplayEntityGroup group){
             Set<PacketDisplayEntityGroup> groups = groupMap.get(key);
-            if (groups == null) return;
-            synchronized (groups){
+            if (groups != null) {
                 groups.remove(group);
                 if (groups.isEmpty()) groupMap.remove(key);
             }
@@ -1001,7 +1051,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         boolean isEmpty(){
             return groupMap.isEmpty();
         }
-
     }
 
     static class WorldData extends GroupHolder<Long>{
@@ -1010,16 +1059,17 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
 
         PacketDisplayEntityGroup getGroup(long chunkKey, int localId){
-            Set<PacketDisplayEntityGroup> groups = groupMap.get(chunkKey);
-            if (groups == null) return null;
-            for (PacketDisplayEntityGroup pdeg : groups){
-                if (localId == pdeg.persistentLocalId){
-                    return pdeg;
+            synchronized (groupMapLock){
+                Set<PacketDisplayEntityGroup> groups = groupMap.get(chunkKey);
+                if (groups == null) return null;
+                for (PacketDisplayEntityGroup pdeg : groups){
+                    if (localId == pdeg.persistentLocalId){
+                        return pdeg;
+                    }
                 }
+                return null;
             }
-            return null;
         }
-
     }
 
     static class PassengerGroupData extends GroupHolder<UUID>{

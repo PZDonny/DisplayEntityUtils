@@ -18,7 +18,6 @@ import org.bson.conversions.Bson;
 import org.bson.types.Binary;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -92,23 +91,20 @@ public final class MongoManager implements DisplayStorage{
 
     public void deleteDisplayEntityGroup(@NotNull String tag, @Nullable Player deleter){
         if (!isConnected()) return;
-        new BukkitRunnable(){
-            @Override
-            public void run() {
-                Document doc = getGroupDocument(tag);
-                if (doc != null){
-                    groupCollection.deleteOne(doc);
-                    if (deleter != null){
-
-                        deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted group from MongoDB!"));
-                        return;
-                    }
-                }
+        DisplayAPI.getScheduler().runAsync(() -> {
+            Document doc = getGroupDocument(tag);
+            if (doc != null){
+                groupCollection.deleteOne(doc);
                 if (deleter != null){
-                    deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved display entity group does not exist in MongoDB database!"));
+
+                    deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted group from MongoDB!"));
+                    return;
                 }
             }
-        }.runTaskAsynchronously(DisplayAPI.getPlugin());
+            if (deleter != null){
+                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved display entity group does not exist in MongoDB database!"));
+            }
+        });
     }
 
     public @Nullable DisplayEntityGroup getDisplayEntityGroup(@NotNull String tag){
@@ -176,22 +172,19 @@ public final class MongoManager implements DisplayStorage{
 
     public void deleteDisplayAnimation(@NotNull String tag, @Nullable Player deleter){
         if (!isConnected()) return;
-        new BukkitRunnable(){
-            @Override
-            public void run() {
-                Document doc = getAnimationDocument(tag);
-                if (doc != null){
-                    animationCollection.deleteOne(doc);
-                    if (deleter != null){
-                        deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted animation from MongoDB database!"));
-                        return;
-                    }
-                }
+        DisplayAPI.getScheduler().runAsync(() -> {
+            Document doc = getAnimationDocument(tag);
+            if (doc != null){
+                animationCollection.deleteOne(doc);
                 if (deleter != null){
-                    deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved animation does not exist in MongoDB database!"));
+                    deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted animation from MongoDB database!"));
+                    return;
                 }
             }
-        }.runTaskAsynchronously(DisplayAPI.getPlugin());
+            if (deleter != null){
+                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved animation does not exist in MongoDB database!"));
+            }
+        });
     }
 
     public @Nullable DisplayAnimation getDisplayAnimation(@NotNull String tag){
@@ -236,36 +229,35 @@ public final class MongoManager implements DisplayStorage{
             isConnected = false;
             return;
         }
-        new BukkitRunnable(){
-            @Override
-            public void run() {
-                try{
-                    ConnectionString cString = new ConnectionString(connectionString);
-                    MongoClientSettings settings = MongoClientSettings.builder()
-                            .applyConnectionString(cString)
-                            .serverApi(ServerApi.builder()
-                                    .version(ServerApiVersion.V1)
-                                    .build())
-                            .build();
 
-                    client = MongoClients.create(settings);
-                    database = client.getDatabase(databaseName);
+        DisplayAPI.getScheduler().runAsync(() -> {
+            try{
+                ConnectionString cString = new ConnectionString(connectionString);
+                MongoClientSettings settings = MongoClientSettings.builder()
+                        .applyConnectionString(cString)
+                        .serverApi(ServerApi.builder()
+                                .version(ServerApiVersion.V1)
+                                .build())
+                        .build();
 
-                    createIfNotExisting(groupColl);
-                    createIfNotExisting(animColl);
+                client = MongoClients.create(settings);
+                database = client.getDatabase(databaseName);
 
-                    groupCollection = database.getCollection(groupColl);
-                    animationCollection = database.getCollection(animColl);
+                createIfNotExisting(groupColl);
+                createIfNotExisting(animColl);
 
-                    Bukkit.getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <green>MongoDB!")));
-                    isConnected = true;
-                }catch (IllegalArgumentException | MongoException e){
-                    isConnected = false;
-                    Bukkit.getConsoleSender().sendMessage(Component.text("There was an error connecting to the MongoDB Database!", NamedTextColor.RED));
-                    e.printStackTrace();
-                }
+                groupCollection = database.getCollection(groupColl);
+                animationCollection = database.getCollection(animColl);
+
+                Bukkit.getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <green>MongoDB!")));
+                isConnected = true;
             }
-        }.runTaskAsynchronously(DisplayAPI.getPlugin());
+            catch (IllegalArgumentException | MongoException e){
+                isConnected = false;
+                Bukkit.getConsoleSender().sendMessage(Component.text("There was an error connecting to the MongoDB Database!", NamedTextColor.RED));
+                e.printStackTrace();
+            }
+        });
     }
 
     private static void createIfNotExisting(String collectionName){

@@ -4,11 +4,10 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -182,14 +181,13 @@ public class MultiFramePointHelper {
                 }
 
                 if (player != null) pointParticle(loc, player);
-
                 loc.add(v);
             }
         }
     }
 
     private static void pointParticle(Location location, Player player){
-        new BukkitRunnable(){
+        DisplayAPI.getScheduler().entityRunTimerAsync(player, new Scheduler.SchedulerRunnable() {
             int i = 0;
             @Override
             public void run() {
@@ -200,6 +198,6 @@ public class MultiFramePointHelper {
                 player.spawnParticle(Particle.END_ROD, location, 1, 0,0,0,0);
                 i++;
             }
-        }.runTaskTimer(DisplayAPI.getPlugin(), 0, 2);
+        }, 0, 2);
     }
 }

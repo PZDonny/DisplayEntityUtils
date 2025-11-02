@@ -9,11 +9,9 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -47,7 +45,7 @@ class AnimPreviewPlayCMD extends PlayerSubCommand {
         }
 
         DisplayAnimator.play(player, group, anim, DisplayAnimator.AnimationType.LINEAR);
-        Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runLaterAsync(() -> {
             if (player.isConnected()){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Animation test complete!", NamedTextColor.GREEN)));
                 player.sendMessage(Component.text("| Use \"/mdis anim restore\" to restore your group's original state", NamedTextColor.GRAY));

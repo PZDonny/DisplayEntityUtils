@@ -7,7 +7,6 @@ import net.donnypz.displayentityutils.managers.DEUUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,7 +34,7 @@ public final class DEUPlayerConnectionListener implements Listener {
 
         //Version Check
         if (!player.hasPermission("deu.help")) return;
-        Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runAsync(() -> {
             String currentVersion = DisplayAPI.getPlugin().getPluginMeta().getVersion();
             String latestVersion;
             try{

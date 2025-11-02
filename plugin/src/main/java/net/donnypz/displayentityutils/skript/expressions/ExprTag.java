@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
             "set {_animation}'s deu tag to \"newTag\"",
             "",
             "#3.0.0 and later",
-            "set {_packetgrouptag} to {_packetgroup}'s deu tag"})
+            "set \"mynewgrouptag\" to {_packetgroup}'s deu tag"})
 @Since("2.6.2, 3.0.0 (Packet), 3.2.1 (Frame Point), 3.3.2 (Plural)")
 public class ExprTag extends SimplePropertyExpression<Object, String> {
     static {
@@ -36,7 +36,7 @@ public class ExprTag extends SimplePropertyExpression<Object, String> {
     @Override
     @Nullable
     public String convert(Object obj) {
-        if (obj instanceof ActiveGroup g){
+        if (obj instanceof ActiveGroup<?> g){
             return g.getTag();
         }
         else if (obj instanceof DisplayEntityGroup g){
@@ -68,7 +68,7 @@ public class ExprTag extends SimplePropertyExpression<Object, String> {
     public void change(Event event, Object[] delta, Changer.ChangeMode mode){
         Object o = getExpr().getSingle(event);
 
-        if (o instanceof SpawnedDisplayEntityGroup g){
+        if (o instanceof ActiveGroup<?> g){
             switch (mode) {
                 case SET -> {
                     if (delta == null){
@@ -96,8 +96,9 @@ public class ExprTag extends SimplePropertyExpression<Object, String> {
                 }
             }
         }
-        Skript.error("You can only set the tag of a spawned group or animation", ErrorQuality.SEMANTIC_ERROR);
-
+        else{
+            Skript.error("You can only set the tag of a active group or animation", ErrorQuality.SEMANTIC_ERROR);
+        }
     }
 
     @Override

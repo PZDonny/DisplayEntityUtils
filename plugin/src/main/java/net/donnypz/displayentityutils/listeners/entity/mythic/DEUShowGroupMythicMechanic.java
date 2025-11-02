@@ -10,7 +10,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -34,7 +33,7 @@ class DEUShowGroupMythicMechanic implements ITargetedEntitySkill {
         Player p = (Player) target.getBukkitEntity();
 
         if (group != null && p != null){
-            Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().run(() -> {
                 if (group instanceof PacketDisplayEntityGroup pdg){
                     pdg.showToPlayer(p, GroupSpawnedEvent.SpawnReason.DISPLAY_CONTROLLER);
                 }
