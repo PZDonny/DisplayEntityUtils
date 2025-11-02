@@ -24,6 +24,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationPlayerProvi
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerUtils;
+import net.donnypz.displayentityutils.utils.version.folia.SchedulerImpl;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bstats.bukkit.Metrics;
@@ -59,6 +60,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         DisplayAPI.MONGODB_STORAGE = new MongoManager();
         DisplayAPI.MYSQL_STORAGE = new MYSQLManager();
         DisplayAPI.ANIMATION_PLAYER_SERVICE = new AnimationPlayerProviderImpl();
+        DisplayAPI.SCHEDULER = new SchedulerImpl();
 
         getConfig().options().copyDefaults(true);
         reloadPlugin(true);

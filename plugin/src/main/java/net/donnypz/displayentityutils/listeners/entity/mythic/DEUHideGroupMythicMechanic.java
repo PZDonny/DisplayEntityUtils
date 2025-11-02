@@ -7,7 +7,6 @@ import io.lumine.mythic.api.skills.SkillResult;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -32,7 +31,7 @@ class DEUHideGroupMythicMechanic implements ITargetedEntitySkill {
         Player p = (Player) target.getBukkitEntity();
 
         if (group != null && p != null){
-            Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().run(() -> {
                 group.hideFromPlayer(p);
             });
         }

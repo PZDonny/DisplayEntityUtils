@@ -8,6 +8,7 @@ import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -41,7 +42,7 @@ class PartsMoveHereCMD extends PlayerSubCommand {
         Location loc = player.getLocation();
         loc.setYaw(e.getYaw());
         loc.setPitch(e.getPitch());
-        e.teleport(loc);
+        FoliaUtils.teleport(e, loc);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Moved your selected part to your location!", NamedTextColor.GREEN)));
     }
 }

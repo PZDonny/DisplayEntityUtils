@@ -865,7 +865,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             if (player == null) continue;
             if (isMaster && group != null){
                 group.unsetPassengers(player);
-                Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
+                DisplayAPI.getScheduler().runAsync(() -> {
                     PacketUtils.teleport(player, getEntityId(), location);
                     group.setPassengers(player);
                 });

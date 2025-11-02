@@ -506,12 +506,9 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
         entity.setGlowing(true);
 
-        new BukkitRunnable(){
-            @Override
-            public void run() {
-                entity.setGlowing(false);
-            }
-        }.runTaskLater(DisplayAPI.getPlugin(), durationInTicks);
+        DisplayAPI.getScheduler().entityRunLater(entity, () -> {
+            entity.setGlowing(false);
+        }, durationInTicks);
     }
 
     @Override
@@ -544,35 +541,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public Collection<Player> getTrackingPlayers() {
         return new HashSet<>(getEntity().getTrackedBy());
-    }
-
-    private void temporaryParticles(Entity entity, long durationInTicks, Particle particle){
-        entity.setGlowing(true);
-
-        new BukkitRunnable(){
-            Location loc;
-            long i = 0;
-            @Override
-            public void run() {
-                if (!entity.isGlowing() || !entity.isValid() || (durationInTicks != -1 && i >= durationInTicks) || group == null || !group.isSpawned() || group.groupParts.isEmpty()){
-                    cancel();
-                    return;
-                }
-
-
-                if (entity instanceof Display d){
-                    loc = DisplayUtils.getModelLocation(d);
-                }
-                else{
-                    loc = entity.getLocation();
-                }
-
-                loc.getWorld().spawnParticle(particle, loc, 1, 0, 0,0 , 0);
-                if (durationInTicks != -1){
-                    i+=2;
-                }
-            }
-        }.runTaskTimer(DisplayAPI.getPlugin(), 0, 2);
     }
 
     /**

@@ -9,7 +9,6 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -49,7 +48,7 @@ class ListGroupsCMD extends ConsoleUsableSubCommand {
     }
 
     static void list(CommandSender sender, LoadMethod method, String[] args, boolean isListingGroups){
-        Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runAsync(() -> {
             List<String> tags;
             if (isListingGroups){
                 tags = DisplayGroupManager.getSavedDisplayEntityGroups(method);

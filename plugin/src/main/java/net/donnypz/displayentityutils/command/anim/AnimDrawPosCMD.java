@@ -6,6 +6,8 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DEUUser;
+import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
+import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -13,7 +15,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -76,14 +77,14 @@ class AnimDrawPosCMD extends PlayerSubCommand {
             Location finalL = l;
             player.sendMessage(Component.text("| Pos "+i+": "+particle.name(), NamedTextColor.YELLOW)
                     .clickEvent(ClickEvent.callback(clicker -> {
-                        player.teleport(finalL, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                        FoliaUtils.teleport(player, finalL, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                     }, ClickCallback.Options
                             .builder()
                             .uses(ClickCallback.UNLIMITED_USES)
                             .lifetime(Duration.ofSeconds(60*60))
                             .build())));
 
-            new BukkitRunnable(){
+            DisplayAPI.getScheduler().entityRunTimerAsync(player, new Scheduler.SchedulerRunnable() {
                 int timesShown;
                 @Override
                 public void run() {
@@ -94,7 +95,7 @@ class AnimDrawPosCMD extends PlayerSubCommand {
                     player.spawnParticle(particle, finalL,1 ,0 ,0 ,0, 0);
                     timesShown++;
                 }
-            }.runTaskTimer(DisplayAPI.getPlugin(), 0, 2);
+            }, 0, 2);
         }
     }
 }

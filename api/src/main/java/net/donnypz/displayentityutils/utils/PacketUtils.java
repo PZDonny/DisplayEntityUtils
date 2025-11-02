@@ -15,11 +15,11 @@ import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -168,7 +168,7 @@ public final class PacketUtils {
 
         float heightChange = (part.getInteractionHeight()-newHeight)/durationInTicks;
         float widthChange = (part.getInteractionWidth()-newWidth)/durationInTicks;
-        new BukkitRunnable(){
+        DisplayAPI.getScheduler().partRunTimerAsync(part, new Scheduler.SchedulerRunnable() {
             int timeRan = 0;
             @Override
             public void run() {
@@ -180,9 +180,8 @@ public final class PacketUtils {
                 sendInteractionPacket(part, part.getInteractionHeight()-heightChange, part.getInteractionWidth()-widthChange);
                 timeRan++;
             }
-        }.runTaskTimerAsynchronously(DisplayAPI.getPlugin(), delayInTicks, 1);
+        }, delayInTicks, 1);
     }
-
 
     /**
      * Scale an interaction entity over time, displayed only for the given player
@@ -249,7 +248,7 @@ public final class PacketUtils {
 
         float heightChange = (height-newHeight)/durationInTicks;
         float widthChange = (width-newWidth)/durationInTicks;
-        new BukkitRunnable(){
+        DisplayAPI.getScheduler().runTimerAsync(new Scheduler.SchedulerRunnable() {
             int timeRan = 0;
             @Override
             public void run() {
@@ -261,7 +260,7 @@ public final class PacketUtils {
                 sendInteractionPacket(entityId, height-heightChange, width-widthChange, players);
                 timeRan++;
             }
-        }.runTaskTimerAsynchronously(DisplayAPI.getPlugin(), delayInTicks, 1);
+        }, delayInTicks, 1);
     }
 
     private static void sendInteractionPacket(PacketDisplayEntityPart part, float newHeight, float newWidth){
@@ -364,7 +363,7 @@ public final class PacketUtils {
                 .normalize()
                 .multiply(movementIncrement);
 
-        new BukkitRunnable(){
+        DisplayAPI.getScheduler().partRunTimerAsync(part, new Scheduler.SchedulerRunnable() {
             double currentDistance = 0;
             float lastYaw = part.getYaw();
             @Override
@@ -385,7 +384,7 @@ public final class PacketUtils {
                     part.teleport(tpLoc);
                 }
             }
-        }.runTaskTimerAsynchronously(DisplayAPI.getPlugin(), delayInTicks, 1);
+        }, delayInTicks, 1);
     }
 
     /**
@@ -525,7 +524,7 @@ public final class PacketUtils {
                 .normalize()
                 .multiply(movementIncrement);
 
-        new BukkitRunnable(){
+        DisplayAPI.getScheduler().runTimerAsync(new Scheduler.SchedulerRunnable() {
             double currentDistance = 0;
             float finalLastYaw = lastYaw;
             Location tpLoc = location.clone();
@@ -547,7 +546,7 @@ public final class PacketUtils {
                     sendInteractionTeleportPacket(entityId, tpLoc, players);
                 }
             }
-        }.runTaskTimerAsynchronously(DisplayAPI.getPlugin(), delayInTicks, 1);
+        }, delayInTicks, 1);
     }
 
     private static void sendInteractionTeleportPacket(int entityId, Location location, Collection<Player> players){
@@ -619,7 +618,7 @@ public final class PacketUtils {
      */
     public static void setGlowing(@NotNull Player player, int entityId, long durationInTicks){
         setGlowing(player, entityId, true);
-        Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runLaterAsync(() -> {
             setGlowing(player, entityId, false);
         }, durationInTicks);
     }

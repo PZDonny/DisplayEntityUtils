@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -72,17 +73,16 @@ public class DisplayStateMachine {
 
         group.unsetMachineState();
         groupMachines.put(group, this);
-
-            new BukkitRunnable(){
-                @Override
-                public void run() {
-                    if (!group.isSpawned() || groupMachines.get(group) != DisplayStateMachine.this){
-                        cancel();
-                        return;
-                    }
-                    updateWithEntity(group);
+        DisplayAPI.getScheduler().partRunTimer(group.getMasterPart(), new Scheduler.SchedulerRunnable() {
+            @Override
+            public void run() {
+                if (!group.isSpawned() || groupMachines.get(group) != DisplayStateMachine.this){
+                    cancel();
+                    return;
                 }
-            }.runTaskTimer(DisplayAPI.getPlugin(), 1, 1);
+                updateWithEntity(group);
+            }
+        }, 1, 1);
         return true;
     }
 
@@ -105,7 +105,7 @@ public class DisplayStateMachine {
         group.unsetMachineState();
         groupMachines.put(group, this);
 
-        new BukkitRunnable(){
+        DisplayAPI.getScheduler().partRunTimer(group.getMasterPart(), new Scheduler.SchedulerRunnable() {
             @Override
             public void run() {
                 if (groupMachines.get(group) != DisplayStateMachine.this){
@@ -114,7 +114,8 @@ public class DisplayStateMachine {
                 }
                 updateWithEntity(group);
             }
-        }.runTaskTimer(DisplayAPI.getPlugin(), 0, 1);
+        }, 0, 1);
+
         return true;
     }
 

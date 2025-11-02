@@ -623,7 +623,7 @@ public final class DisplayGroupManager {
                 chunk.getPersistentDataContainer().set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
                 if (!unregister) return true;
 
-                Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
+                DisplayAPI.getScheduler().runAsync(() -> {
                    for (PacketDisplayEntityGroup g : PacketDisplayEntityGroup.getGroups(chunk)){
                        if (g.getPersistentLocalId() == id){
                            g.unregister();

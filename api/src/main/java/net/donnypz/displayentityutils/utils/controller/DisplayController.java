@@ -343,7 +343,7 @@ public class DisplayController {
             if (!activeGroup.rideEntity(entity)){
                 return false;
             }
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().runLater(() -> {
                 startFollowersAndMachine(entity, activeGroup);
             }, 2);
         }

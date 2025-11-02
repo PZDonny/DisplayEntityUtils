@@ -4,7 +4,6 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Display;
@@ -452,7 +451,7 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
                 }
                 PacketUtils.setGlowing(player, part.getEntityId(), true);
                 if (durationInTicks > -1){
-                    Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+                    DisplayAPI.getScheduler().runLater(() -> {
                         if (!part.isGlowing()){
                             PacketUtils.setGlowing(player, part.getEntityId(), false);
                         }

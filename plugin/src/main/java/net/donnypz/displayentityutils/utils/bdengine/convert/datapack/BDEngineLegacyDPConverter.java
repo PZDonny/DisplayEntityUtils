@@ -7,13 +7,13 @@ import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -66,7 +66,7 @@ public class BDEngineLegacyDPConverter {
             if (!frames.isEmpty() && timestamp > 0 && totalGroups > 0){
                 int finalTotalGroups = totalGroups;
                 long finalTimestamp = timestamp;
-                Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+                DisplayAPI.getScheduler().runLater(() -> {
                     readAnimationFiles(finalTimestamp, finalTotalGroups, zipFile, frames, finalDatapackName, player, groupSaveTag, animationSaveTag);
                 }, 30);
             }
@@ -88,7 +88,8 @@ public class BDEngineLegacyDPConverter {
         createdGroup.seedPartUUIDs(SpawnedDisplayEntityGroup.defaultPartUUIDSeed);
         final SpawnedDisplayAnimation anim = new SpawnedDisplayAnimation();
 
-        new BukkitRunnable(){
+
+        DisplayAPI.getScheduler().partRunTimer(createdGroup.getMasterPart(), new Scheduler.SchedulerRunnable() {
             int i = 0;
             @Override
             public void run() {
@@ -100,7 +101,7 @@ public class BDEngineLegacyDPConverter {
 
 
                     //Save with first frame applied to group
-                    Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+                    DisplayAPI.getScheduler().runLater(() -> {
                         if (animationSaveTag.isBlank()){
                             anim.setAnimationTag(datapackName.replace(".zip", "_autoconvert"));
                         }
@@ -177,7 +178,7 @@ public class BDEngineLegacyDPConverter {
                     anim.addFrame(frame);
                 }
             }
-        }.runTaskTimer(DisplayAPI.getPlugin(), 2, 2);
+        }, 2, 2);
     }
 
 

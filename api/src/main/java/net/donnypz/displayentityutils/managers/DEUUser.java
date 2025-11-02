@@ -71,7 +71,7 @@ public class DEUUser {
     @ApiStatus.Internal
     public boolean unsuppressIfEqual(int entityId, @NotNull Vector3f vector3f) {
         if (vector3f.equals(suppressedVectors.get(entityId))){
-            Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().runLaterAsync(() -> {
                 suppressedVectors.remove(entityId);
             }, 1);
 
@@ -249,7 +249,7 @@ public class DEUUser {
             Predicate<Player> condition = pg.getAutoShowCondition();
             if (condition != null && !condition.test(player)) continue;
 
-            Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().runAsync(() -> {
                 if (pg.isRegistered() && player.getWorld().getName().equals(pg.getWorldName())){
                     pg.showToPlayer(player, GroupSpawnedEvent.SpawnReason.PLAYER_SENT_CHUNK);
                 }

@@ -12,14 +12,13 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayState
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
-import net.donnypz.displayentityutils.utils.version.VersionUtils;
+import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
@@ -394,10 +393,9 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             translate(Direction.UP, verticalOffset, -1, -1);
         }
 
-
         if (runLocationUpdater){
             final UUID finalUUID = vehicle.getUniqueId();
-            new BukkitRunnable(){
+            DisplayAPI.getScheduler().entityRunTimer(vehicle, new Scheduler.SchedulerRunnable() {
                 @Override
                 public void run() {
                     if (masterPart == null){
@@ -422,7 +420,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                     }
                     updateChunkAndWorld(entity.getLocation());
                 }
-            }.runTaskTimer(DisplayAPI.getPlugin(), 0, 30);
+            }, 0, 30);
         }
         return true;
     }
@@ -584,7 +582,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 PacketUtils.translateInteraction(part, direction, distance, durationInTicks, 0);
             }
         }
-        new BukkitRunnable(){
+        DisplayAPI.getScheduler().partRunTimerAsync(masterPart, new Scheduler.SchedulerRunnable() {
             double currentDistance = 0;
             @Override
             public void run() {
@@ -605,7 +603,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 }
                 PacketDisplayEntityGroup.this.update();
             }
-        }.runTaskTimerAsynchronously(DisplayAPI.getPlugin(), 0, 1);
+        }, 0, 1);
     }
 
     private void teleport(Location tpLocation, boolean respectGroupDirection, boolean hide){
@@ -768,7 +766,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             if (autoShow){
                 Location loc = getLocation();
                 if (loc != null){
-                    Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> {
+                    DisplayAPI.getScheduler().run(() -> {
                         long chunkKey = ConversionUtils.getChunkKey(loc);
                         Collection<Player> players = new ArrayList<>();
                         for (Player p : loc.getWorld().getPlayers()){
@@ -776,7 +774,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                                 players.add(p);
                             }
                         }
-                        Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
+                        DisplayAPI.getScheduler().runAsync(() -> {
                             if (this.autoShow) {
                                 showToPlayers(players, GroupSpawnedEvent.SpawnReason.INTERNAL);
                             }
@@ -900,7 +898,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     void refreshVehicle(@NotNull Player player){
-        Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runLater(() -> {
             Entity vehicle = getVehicle();
             if (vehicle != null){
                 WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, true));

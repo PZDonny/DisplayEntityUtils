@@ -8,6 +8,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.version.VersionUtils;
+import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -18,7 +19,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -109,9 +109,7 @@ public class BDEngineDPConverter {
         }
 
         //Save Model and Animations
-        Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () ->{
-            playAndSave(player, datapackName, zipFile);
-        }, 30);
+        DisplayAPI.getScheduler().runLater(() -> playAndSave(player, datapackName, zipFile), 30);
     }
 
     private void playAndSave(Player player, String datapackName, ZipFile zipFile){
@@ -133,7 +131,7 @@ public class BDEngineDPConverter {
         int delay = 0;
         for (String animName : animations.sequencedKeySet()){
             List<ZipEntry> frames = animations.get(animName);
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().runLater(() -> {
                 player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Converting Animation: <yellow>"+animName));
                 processAnimation(createdGroup, zipFile, frames, datapackName, animName, player);
             }, delay);
@@ -141,7 +139,7 @@ public class BDEngineDPConverter {
         }
 
         //Despawn group after animation conversions
-        Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runLater(() -> {
             player.sendMessage(Component.empty());
             if (save){
                 DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.LOCAL, createdGroup.toDisplayEntityGroup(), player);
@@ -151,13 +149,13 @@ public class BDEngineDPConverter {
                 player.sendMessage(Component.text("The group will not be saved due to setting the group tag to \"-\"", NamedTextColor.GRAY));
             }
 
-            Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> createdGroup.unregister(true, true));
+            DisplayAPI.getScheduler().run(() -> createdGroup.unregister(true, true));
         }, delay+5);
     }
 
 
     private void processAnimation(SpawnedDisplayEntityGroup createdGroup, ZipFile zipFile, List<ZipEntry> frames, String datapackName, String animName, Player player){
-        new BukkitRunnable(){
+        DisplayAPI.getScheduler().partRunTimer(createdGroup.getMasterPart(), new Scheduler.SchedulerRunnable() {
             final SpawnedDisplayAnimation anim = new SpawnedDisplayAnimation();
             final int frameCount = frames.size();
             int i = 0;
@@ -170,7 +168,7 @@ public class BDEngineDPConverter {
                     catch(IndexOutOfBoundsException ignored){}
 
                     //Save
-                    Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+                    DisplayAPI.getScheduler().runLater(() -> {
                         if (animationSavePrefix.isBlank()){
                             anim.setAnimationTag(datapackName.replace(".zip", "_auto_"+animName));
                         }
@@ -203,7 +201,7 @@ public class BDEngineDPConverter {
                 anim.addFrame(frame);
                 i++;
             }
-        }.runTaskTimer(DisplayAPI.getPlugin(), 0, 2); //BDEngine Animation Frame Duration is 2 ticks
+        }, 0, 2); //BDEngine Animation Frame Duration is 2 ticks
     }
 
 

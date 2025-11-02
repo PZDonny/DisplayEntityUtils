@@ -82,7 +82,7 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
             spawn(location);
         }
         else{
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().runLater(() -> {
                 if (group.getMasterPart() == null){
                     return;
                 }
@@ -101,7 +101,7 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
             spawn(location, player);
         }
         else{
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().runLater(() -> {
                 if (group.getMasterPart() == null){
                     return;
                 }
@@ -120,7 +120,7 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
             spawn(location, players);
         }
         else{
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().runLater(() -> {
                 if (group.getMasterPart() == null){
                     return;
                 }

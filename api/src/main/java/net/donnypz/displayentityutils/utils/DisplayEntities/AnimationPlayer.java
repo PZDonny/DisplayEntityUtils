@@ -6,7 +6,6 @@ import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Interaction;
@@ -56,10 +55,9 @@ public abstract class AnimationPlayer {
         group.addActiveAnimator(animator);
         MultiPartSelection<?> selection = animation.hasFilter() ? group.createPartSelection(animation.filter) : group.createPartSelection();
         if (packetAnimationPlayer){
-            Bukkit
+            DisplayAPI
                     .getScheduler()
-                    .runTaskLaterAsynchronously(DisplayAPI.getPlugin(),
-                            () -> executeAnimation(null, animation, group, selection, frame, frameId, playSingleFrame),
+                    .partRunLaterAsync(group.getMasterPart(), () -> executeAnimation(null, animation, group, selection, frame, frameId, playSingleFrame),
                             Math.max(delay, 0));
         }
         else{
@@ -67,7 +65,7 @@ public abstract class AnimationPlayer {
                 executeAnimation(null, animation, group, selection, frame, frameId, playSingleFrame);
             }
             else{
-                Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> executeAnimation(null, animation, group, selection, frame, frameId, playSingleFrame), delay);
+                DisplayAPI.getScheduler().runLater(() -> executeAnimation(null, animation, group, selection, frame, frameId, playSingleFrame), delay);
             }
         }
     }
@@ -308,7 +306,7 @@ public abstract class AnimationPlayer {
     private void playEndCommands(Collection<Player> players, ActiveGroup<?> group, SpawnedDisplayAnimationFrame frame, Location location){
         if (players == null || group.getMasterPart() == null || location == null) return;
         if (packetAnimationPlayer){
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().runLater(() -> {
                 frame.executeEndCommands(location);
             }, Math.max(frame.duration, 0));
         }
@@ -317,7 +315,7 @@ public abstract class AnimationPlayer {
                 frame.executeEndCommands(location);
             }
             else{
-                Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+                DisplayAPI.getScheduler().runLater(() -> {
                    frame.executeEndCommands(location);
                 }, frame.duration);
             }
@@ -326,12 +324,12 @@ public abstract class AnimationPlayer {
 
     private void useScheduler(Runnable runnable, int delay){
         if (packetAnimationPlayer){
-            Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().partRunLaterAsync(group.getMasterPart(), () -> {
                 runnable.run();
             }, delay);
         }
         else{
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().partRunLater(group.getMasterPart(), () -> {
                 runnable.run();
             }, delay);
         }

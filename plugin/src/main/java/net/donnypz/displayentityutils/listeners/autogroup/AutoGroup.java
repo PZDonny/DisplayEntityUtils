@@ -11,7 +11,6 @@ import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.GroupResult;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Display;
@@ -21,16 +20,17 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 final class AutoGroup {
 
     private AutoGroup(){}
 
-    static final HashMap<String, HashSet<Long>> readChunks = new HashMap<>();
+    static final ConcurrentHashMap<String, Set<Long>> readChunks = new ConcurrentHashMap<>();
 
     private static void refreshGroupPartEntities(List<Entity> entities){
         if (entities.isEmpty()) return;
-        Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runAsync(() -> {
             for (Entity e : entities){
                 SpawnedDisplayEntityPart p = SpawnedDisplayEntityPart.getPart(e);
                 if (p != null) p.refreshEntity(e);
@@ -46,7 +46,8 @@ final class AutoGroup {
 
         World world = chunk.getWorld();
         String worldName = world.getName();
-        HashSet<Long> chunks = readChunks.computeIfAbsent(worldName, name -> new HashSet<>());
+        Set<Long> chunks = readChunks
+                .computeIfAbsent(worldName, name -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
 
         //Bukkit.broadcastMessage(chunk.getX()+" X | "+chunk.getZ()+" Z | TICK="+Bukkit.getCurrentTick());
         if (chunks.contains(chunk.getChunkKey())){
@@ -62,9 +63,9 @@ final class AutoGroup {
 
         if (entities.isEmpty()) return;
 
-        HashSet<SpawnedDisplayEntityGroup> foundGroups = new HashSet<>();
-        HashMap<SpawnedDisplayEntityGroup, Collection<Interaction>> addedInteractionsForEvent = new HashMap<>();
-        HashSet<Interaction> interactions = new HashSet<>();
+        Set<SpawnedDisplayEntityGroup> foundGroups = new HashSet<>();
+        HashMap<SpawnedDisplayEntityGroup, Set<Interaction>> addedInteractionsForEvent = new HashMap<>();
+        Set<Interaction> interactions = new HashSet<>();
         HashMap<SpawnedDisplayEntityGroup, ChunkRegisterGroupEvent> events = new HashMap<>();
 
         for (Entity entity : entities){
@@ -157,7 +158,7 @@ final class AutoGroup {
             event.callEvent();
         }
 
-        for (Map.Entry<SpawnedDisplayEntityGroup, Collection<Interaction>> entry : addedInteractionsForEvent.entrySet()){
+        for (Map.Entry<SpawnedDisplayEntityGroup, Set<Interaction>> entry : addedInteractionsForEvent.entrySet()){
             SpawnedDisplayEntityGroup g = entry.getKey();
             if (!g.isSpawned()){
                 continue;

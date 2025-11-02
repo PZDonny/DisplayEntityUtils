@@ -71,7 +71,7 @@ public class DEUPlayerPacketListener implements PacketListener {
         Column column = packet.getColumn();
         UUID uuid = user.getUUID();
         DEUUser deuUser = DEUUser.getOrCreateUser(uuid);
-        Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runLater(() -> {
             deuUser.revealPacketGroupsFromSentChunk(column.getX(), column.getZ());
         }, 2);
     }

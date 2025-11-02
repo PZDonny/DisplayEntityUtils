@@ -6,11 +6,11 @@ import net.donnypz.displayentityutils.utils.FollowType;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.joml.Vector3f;
 
@@ -69,7 +69,7 @@ class GroupEntityFollower {
             group.setTeleportDuration(teleportationDuration);
         }
 
-        new BukkitRunnable(){
+        DisplayAPI.getScheduler().partRunTimer(group.masterPart, new Scheduler.SchedulerRunnable() {
             @Override
             public void run() {
                 synchronized (group.followerLock){
@@ -87,7 +87,7 @@ class GroupEntityFollower {
 
                 if (entity.isDead()) {
                     if (properties.unregisterDelay() > -1) {
-                        Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+                        DisplayAPI.getScheduler().runLater(() -> {
                             if (group instanceof SpawnedDisplayEntityGroup sg){
                                 sg.unregister(true, true);
                             }
@@ -135,7 +135,7 @@ class GroupEntityFollower {
                 }
                 apply(entity, selection, yaw, pitch, finalFollowType, followType);
             }
-        }.runTaskTimer(DisplayAPI.getPlugin(), 1, teleportationDuration);
+        }, 1, teleportationDuration);
     }
 
     private void apply(Entity entity, MultiPartSelection<?> selection, float newYaw, float newPitch, FollowType finalFollowType, FollowType trueFollowType){

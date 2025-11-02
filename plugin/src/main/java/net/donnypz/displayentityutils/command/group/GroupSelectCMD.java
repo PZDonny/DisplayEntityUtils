@@ -8,8 +8,9 @@ import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.GroupResult;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
+import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
+import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -19,7 +20,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -77,7 +77,7 @@ class GroupSelectCMD extends PlayerSubCommand {
                             audience.sendMessage(Component.text("Group no longer spawned or is invalid.", NamedTextColor.RED));
                             return;
                         }
-                        ((Player) audience).teleport(groupLoc, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                        FoliaUtils.teleport((Player) audience, groupLoc, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                     }, clickOptions));
             Component glow = Component.text("[GLOW]", NamedTextColor.YELLOW)
                     .clickEvent(ClickEvent.callback(audience -> {
@@ -85,7 +85,7 @@ class GroupSelectCMD extends PlayerSubCommand {
                             audience.sendMessage(Component.text("Group no longer spawned or is invalid.", NamedTextColor.RED));
                             return;
                         }
-                        g.glowAndMarkInteractions((Player) audience, 60);
+                        g.glowAndMarkInteractions((Player) audience, 40);
                     }, clickOptions));
             Component select = Component.text("[SELECT]", NamedTextColor.GREEN)
                     .clickEvent(ClickEvent.callback(audience -> {
@@ -108,7 +108,7 @@ class GroupSelectCMD extends PlayerSubCommand {
                         }
                         int selectDuration = 50;
                         g.glowAndMarkInteractions(p, selectDuration);
-                        new BukkitRunnable(){
+                        DisplayAPI.getScheduler().partRunTimer(g.getMasterPart(), new Scheduler.SchedulerRunnable() {
                             int maxIterations = selectDuration/2;
                             int iteration = 0;
                             @Override
@@ -126,8 +126,7 @@ class GroupSelectCMD extends PlayerSubCommand {
                                     cancel();
                                 }
                             }
-                        }.runTaskTimer(DisplayAPI.getPlugin(), 0, 2);
-
+                        }, 0, 2);
                     }, clickOptions));
             Component groupMessage = groupTag
                     .appendSpace()

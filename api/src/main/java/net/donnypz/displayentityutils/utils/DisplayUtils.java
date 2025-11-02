@@ -8,6 +8,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
+import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.BlockDisplay;
@@ -17,7 +19,6 @@ import org.bukkit.entity.Interaction;
 import org.bukkit.persistence.ListPersistentDataType;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
@@ -488,7 +489,7 @@ public final class DisplayUtils {
         }
 
         if (durationInTicks <= 0 && delayInTicks <= 0){
-            interaction.teleport(destination);
+            FoliaUtils.teleport(interaction, destination);
             return;
         }
 
@@ -498,7 +499,7 @@ public final class DisplayUtils {
                 .normalize()
                 .multiply(movementIncrement);
 
-        new BukkitRunnable(){
+        DisplayAPI.getScheduler().entityRunTimer(interaction, new Scheduler.SchedulerRunnable() {
             double currentDistance = 0;
             float lastYaw = interaction.getYaw();
             @Override
@@ -512,14 +513,14 @@ public final class DisplayUtils {
                 Location tpLoc = interaction.getLocation().clone().add(incrementVector);
 
                 if (currentDistance >= distance){
-                    interaction.teleport(destination);
+                    FoliaUtils.teleport(interaction, destination);
                     cancel();
                 }
                 else{
-                    interaction.teleport(tpLoc);
+                    FoliaUtils.teleport(interaction, tpLoc);
                 }
             }
-        }.runTaskTimer(DisplayAPI.getPlugin(), delayInTicks, 1);
+        }, delayInTicks, 1);
     }
 
 
@@ -588,7 +589,7 @@ public final class DisplayUtils {
                 .rotateY((float) Math.toRadians(angleInDegrees*-1))
                 .transform(translationVector);
         Location newLoc = center.clone().subtract(Vector.fromJOML(translationVector));
-        interaction.teleport(newLoc);
+        FoliaUtils.teleport(interaction, newLoc);
     }
 
     /**
@@ -634,7 +635,7 @@ public final class DisplayUtils {
         }
         float heightChange = (interaction.getInteractionHeight()-newHeight)/durationInTicks;
         float widthChange = (interaction.getInteractionWidth()-newWidth)/durationInTicks;
-        new BukkitRunnable(){
+        DisplayAPI.getScheduler().entityRunTimer(interaction, new Scheduler.SchedulerRunnable() {
             int timeRan = 0;
             @Override
             public void run() {
@@ -648,7 +649,7 @@ public final class DisplayUtils {
                 interaction.setInteractionHeight(interaction.getInteractionHeight()-heightChange);
                 timeRan++;
             }
-        }.runTaskTimer(DisplayAPI.getPlugin(), delayInTicks, 1);
+        }, delayInTicks, 1);
     }
 
     /**

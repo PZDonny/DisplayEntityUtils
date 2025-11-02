@@ -9,7 +9,6 @@ import net.donnypz.displayentityutils.utils.bdengine.BDEngineUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +31,7 @@ class BDEngineImportModelCMD extends PlayerSubCommand {
             return;
         }
         Location spawnLoc = player.getLocation();
-        Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runAsync(() -> {
             try{
                 int modelID = Integer.parseInt(args[2]);
                 player.sendMessage(Component.text("Retrieving Model...", NamedTextColor.GRAY));
@@ -41,7 +40,7 @@ class BDEngineImportModelCMD extends PlayerSubCommand {
                     throw new InterruptedException("Null Result");
                 }
 
-                Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> {
+                DisplayAPI.getScheduler().run(() -> {
                     if (!result.spawn(spawnLoc)){
                         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to spawn model! The spawn location's chunk is not loaded or the model was uploaded as a BDEngine file on the website (Spawning Commands not found), and that format is not supported!", NamedTextColor.RED)));
                         return;

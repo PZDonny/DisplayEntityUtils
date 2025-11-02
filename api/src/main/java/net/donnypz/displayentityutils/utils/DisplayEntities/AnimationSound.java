@@ -53,7 +53,7 @@ public class AnimationSound implements Externalizable, Cloneable {
             playSound(location);
         }
         else{
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().runLater(() -> {
                 if (group.getMasterPart() == null){
                     return;
                 }
@@ -72,7 +72,7 @@ public class AnimationSound implements Externalizable, Cloneable {
             playSound(location, player);
         }
         else{
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().runLater(() -> {
                 if (group.getMasterPart() == null){
                     return;
                 }
@@ -91,7 +91,7 @@ public class AnimationSound implements Externalizable, Cloneable {
             playSound(location, players);
         }
         else{
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), () -> {
+            DisplayAPI.getScheduler().runLater(() -> {
                 if (group.getMasterPart() == null){
                     return;
                 }

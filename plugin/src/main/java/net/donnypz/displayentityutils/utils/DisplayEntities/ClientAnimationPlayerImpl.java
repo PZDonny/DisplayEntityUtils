@@ -1,7 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,11 +26,11 @@ final class ClientAnimationPlayerImpl extends ClientAnimationPlayer{
         group.addActiveAnimator(animator);
         MultiPartSelection<?> selection = animation.hasFilter() ? group.createPartSelection(animation.filter) : group.createPartSelection();
         selection.addPlayerAnimationPlayer(this);
-        Bukkit
+        DisplayAPI
                 .getScheduler()
-                .runTaskLaterAsynchronously(DisplayAPI.getPlugin(),
-                        () -> executeAnimation(players, animation, group, selection, frame, frameId, playSingleFrame),
-                        Math.max(delay, 0));
+                .runLaterAsync(() -> {
+                    executeAnimation(players, animation, group, selection, frame, frameId, playSingleFrame);
+                }, Math.max(delay, 0));
     }
 
     @Override

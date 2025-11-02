@@ -9,11 +9,9 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +41,7 @@ class GroupSaveCMD extends PlayerSubCommand {
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<gray>Attempting to save your selected group <white>(Tagged: "+group.getTag()+")")));
         DisplayEntityGroup displayGroup = group.toDisplayEntityGroup();
-        Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runAsync(() -> {
             switch (args[2].toLowerCase()) {
                 case "all" -> {
                     DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.LOCAL, displayGroup, player);

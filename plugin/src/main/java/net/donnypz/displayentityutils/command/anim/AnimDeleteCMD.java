@@ -9,7 +9,6 @@ import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +29,7 @@ class AnimDeleteCMD extends PlayerSubCommand {
         String tag = args[2];
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<gray>Attempting to delete display animation <white>(Tagged: "+tag+")")));
-        Bukkit.getScheduler().runTaskAsynchronously(DisplayAPI.getPlugin(), () -> {
+        DisplayAPI.getScheduler().runAsync(() -> {
             switch(args[3].toLowerCase()){
                 case "all" ->{
                     DisplayAnimationManager.deleteDisplayAnimation(LoadMethod.LOCAL, tag, player);
