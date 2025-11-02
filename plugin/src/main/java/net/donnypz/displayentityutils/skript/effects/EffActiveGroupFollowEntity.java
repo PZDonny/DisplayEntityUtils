@@ -19,15 +19,15 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Active Group Follow Entity Direction")
 @Description("Make an active group respect an entity's looking direction. " +
-        "VERSIONS BELOW 3.3.5 USE \"ft_body\", \"ft_pitch\", \"ft_yaw\", and \"ft_pitch_and_yaw\"!")
+        "IN VERSIONS BELOW v3.3.5, EACH TYPE IS PREFIXED WITH \"ft\": \"ft_body\", \"ft_pitch\", \"ft_yaw\", and \"ft_pitch_and_yaw\"!")
 @Examples({
-        "make {_activegroup} follow {_entity} with ft_body",
-        "make {_activegroup} follow {_entity} with ft_pitch and flip group",
-        "make {_activegroup} follow {_entity} with ft_yaw and with teleport duration of 2",
-        "make {_activegroup} follow {_entity} with ft_pitch_and_yaw and after death despawn after 2 seconds",
+        "make {_activegroup} follow {_entity} using body yaw",
+        "make {_activegroup} follow {_entity} using pitch and flip group",
+        "make {_activegroup} follow {_entity} using yaw and with teleport duration of 2",
+        "make {_activegroup} follow {_entity} using pitch_and_yaw and after death despawn after 2 seconds",
         "",
         "#Combined",
-        "make {_activegroup} follow {_entity} with ft_body and flip group and using smoothness of 2 and despawn after 1 second"})
+        "make {_activegroup} follow {_entity} using yaw and flip group and with smoothness of 2 and despawn after 1 second"})
 @Since({"3.2.1", "3.3.5 (No \"ft\" prefix)"})
 public class EffActiveGroupFollowEntity extends Effect {
 
