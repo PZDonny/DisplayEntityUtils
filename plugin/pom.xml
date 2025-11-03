@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.donnypz.displayentityutils</groupId>
         <artifactId>deu</artifactId>
-        <version>3.3.5</version>
+        <version>3.3.6-PRE-1</version>
     </parent>
 
     <artifactId>plugin</artifactId>
