@@ -447,6 +447,7 @@ public class SkriptTypes {
 
 
         EnumWrapper<SpawnedDisplayEntityPart.PartType> partTypeWrapper = new EnumWrapper<>(SpawnedDisplayEntityPart.PartType.class, null, null);
+        partTypeWrapper.replace("interaction", "deu_interaction");
         Classes.registerClass(partTypeWrapper.getClassInfo("parttype")
                 .user("(part( | -)?)?type")
                 .name("Part Type")
