@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Active Part's Type")
 @Description("Get the active part's type")
-@Examples({"set {_type} to {_spawnedpart}'s part type", "if {_type} is parttype_interaction:", "\tThis part represents an interaction entity!"})
+@Examples({"set {_type} to {_spawnedpart}'s part type", "if {_type} is block_display:", "\tThis part represents a block display entity!"})
 @Since("2.6.2, 3.0.0 (Packet), 3.3.2 (Plural)")
 public class ExprActivePartType extends SimplePropertyExpression<ActivePart, SpawnedDisplayEntityPart.PartType> {
 

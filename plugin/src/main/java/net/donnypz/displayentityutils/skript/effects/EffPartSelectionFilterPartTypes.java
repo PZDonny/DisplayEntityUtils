@@ -20,8 +20,8 @@ import java.util.Arrays;
 
 @Name("Part Filter/Selection Set Part Types")
 @Description("Set the part types that should be filtered in a part selection")
-@Examples({"set part type filter of {_selection} to parttype_text_display",
-        "set type filter of {_selection} to exclude parttype_block_display and parttype_item_display"})
+@Examples({"set part type filter of {_selection} to text_display",
+        "set type filter of {_selection} to exclude block_display and item_display"})
 @Since("2.6.2")
 public class EffPartSelectionFilterPartTypes extends Effect {
     static {

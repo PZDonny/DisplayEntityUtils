@@ -446,12 +446,12 @@ public class SkriptTypes {
 
 
 
-        EnumWrapper<SpawnedDisplayEntityPart.PartType> partTypeWrapper = new EnumWrapper<>(SpawnedDisplayEntityPart.PartType.class, "parttype", null);
+        EnumWrapper<SpawnedDisplayEntityPart.PartType> partTypeWrapper = new EnumWrapper<>(SpawnedDisplayEntityPart.PartType.class, null, null);
         Classes.registerClass(partTypeWrapper.getClassInfo("parttype")
                 .user("(part( | -)?)?type")
                 .name("Part Type")
                 .description("Represents a part type being BLOCK_DISPLAY, ITEM_DISPLAY, TEXT_DISPLAY, or INTERACTION")
-                .since("2.6.2"));
+                .since("2.6.2, 3.3.6 (Removed \"parttype_\" prefix)"));
 
         EnumWrapper<InteractionClickEvent.ClickType> clickTypeWrapper = new EnumWrapper<>(InteractionClickEvent.ClickType.class, "iClickType", null);
         Classes.registerClass(clickTypeWrapper.getClassInfo("interactionclicktype")
@@ -460,19 +460,18 @@ public class SkriptTypes {
                 .description("Represents a interaction click type of LEFT or RIGHT")
                 .since("2.6.2"));
 
-        EnumWrapper<DisplayAnimator.AnimationType> animationTypeWrapper = new EnumWrapper<>(DisplayAnimator.AnimationType.class, "animtype", null);
+        EnumWrapper<DisplayAnimator.AnimationType> animationTypeWrapper = new EnumWrapper<>(DisplayAnimator.AnimationType.class, null, null);
         Classes.registerClass(animationTypeWrapper.getClassInfo("animationtype")
                 .user("(anim(ation)?( | -)?)?type")
                 .name("Animation Type")
                 .description("Represents an animation type, being LINEAR or LOOP")
-                .since("2.6.2"));
+                .since("2.6.2, 3.3.6 (Removed \"animtype_\" prefix)"));
 
         EnumWrapper<GroupSpawnedEvent.SpawnReason> spawnReasonWrapper = new EnumWrapper<>(GroupSpawnedEvent.SpawnReason.class, "gsr", null);
         Classes.registerClass(spawnReasonWrapper.getClassInfo("groupspawnreason")
                 .user("(group( |-)?spawn( |-)?)?reason")
                 .name("Group Spawn Reason")
-                .description("Represents a spawn reason when a saved Group/Model is spawned.",
-                            "\"INTERNAL\" spawn reason added in version 3.0.0")
-                .since("2.6.2"));
+                .description("Represents a spawn reason when a saved Group/Model is spawned.")
+                .since("2.6.2, 3.0.0 (INTERNAL)"));
     }
 }
