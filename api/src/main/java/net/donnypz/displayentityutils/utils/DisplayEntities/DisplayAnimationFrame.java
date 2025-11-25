@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticle;
 import net.donnypz.displayentityutils.utils.DisplayEntities.saved.OldSound;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -193,10 +194,11 @@ public final class DisplayAnimationFrame implements Serializable {
             float volume = values[0];
             float pitch = values[1];
             String soundName = sound.getKey().getKey();
-            try {
-                Sound foundSound = Sound.valueOf(soundName.toUpperCase().replace(".", "_"));
+            Sound foundSound = VersionUtils.getSound(soundName);
+            if (foundSound != null){
                 convertedMap.put(foundSound.getKey().getKey(), new AnimationSound(foundSound, volume, pitch, delayInTicks));
-            } catch (IllegalArgumentException ignored) {
+            }
+            else{
                 convertedMap.put(soundName, new AnimationSound(soundName, volume, pitch, delayInTicks));
             }
         }
