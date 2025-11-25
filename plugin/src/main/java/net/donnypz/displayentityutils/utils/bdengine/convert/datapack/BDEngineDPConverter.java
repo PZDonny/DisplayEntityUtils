@@ -197,7 +197,6 @@ public class BDEngineDPConverter {
 
                 //Create Frame
                 SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(0, 2).setTransformation(createdGroup);
-                frame.setStartCommands(commands);
                 anim.addFrame(frame);
                 i++;
             }

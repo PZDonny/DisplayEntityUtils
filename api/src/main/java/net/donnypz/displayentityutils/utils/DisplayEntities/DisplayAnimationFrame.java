@@ -15,6 +15,9 @@ import java.io.Serializable;
 import java.util.*;
 
 public final class DisplayAnimationFrame implements Serializable {
+    private static final String OLD_SOUNDS_TAG = "deu_old_sounds";
+    private static final String OLD_ANIM_PARTICLE = "deu_anim_particle_";
+
     HashMap<UUID, SerialTransformation> displayTransformations = new HashMap<>();
     HashMap<UUID, Vector3f> interactionTranslations = new HashMap<>();
     int delay;
@@ -26,13 +29,11 @@ public final class DisplayAnimationFrame implements Serializable {
     HashMap<String, AnimationSound> startSounds;
     HashMap<String, AnimationSound> endSounds;
 
-    Set<AnimationParticle> frameStartParticles;
-    Set<AnimationParticle> frameEndParticles;
+    transient Set<AnimationParticle> frameStartParticles;
+    transient Set<AnimationParticle> frameEndParticles;
 
     Map<String, FramePoint> framePoints;
 
-    List<String> startCommands;
-    List<String> endCommands;
 
     String frameTag;
 
@@ -42,14 +43,10 @@ public final class DisplayAnimationFrame implements Serializable {
     DisplayAnimationFrame(
             int delay, int duration,
             Map<String, FramePoint> framePoints,
-            List<String> startCommands,
-            List<String> endCommands,
             String frameTag){
         this.delay = delay;
         this.duration = duration;
         this.framePoints = new HashMap<>(framePoints);
-        this.startCommands = new ArrayList<>(startCommands);
-        this.endCommands = new ArrayList<>(endCommands);
         this.frameTag = frameTag;
     }
 
@@ -69,8 +66,7 @@ public final class DisplayAnimationFrame implements Serializable {
 
         //Old Sound Maps
         if (startSounds != null || endSounds != null){
-            String oldSoundTag = "deu_old_sounds";
-            FramePoint point = new FramePoint(oldSoundTag, new Vector(0,0,0), 0,0);
+            FramePoint point = new FramePoint(OLD_SOUNDS_TAG, new Vector(0,0,0), 0,0);
 
             //Start Sounds
             if (startSounds != null){
@@ -93,7 +89,7 @@ public final class DisplayAnimationFrame implements Serializable {
             }
 
             if (!point.sounds.isEmpty()){
-                frame.framePoints.put(oldSoundTag, point);
+                frame.framePoints.put(OLD_SOUNDS_TAG, point);
             }
         }
 
@@ -101,7 +97,7 @@ public final class DisplayAnimationFrame implements Serializable {
         int animationParticle = 0;
         if (frameStartParticles != null){
             for (AnimationParticle particle : frameStartParticles){
-                String pointTag = "deu_anim_particle_"+animationParticle;
+                String pointTag = OLD_ANIM_PARTICLE+animationParticle;
                 FramePoint point = new FramePoint(pointTag, particle.getVector(), particle.getGroupYawAtCreation(), particle.getGroupPitchAtCreation());
                 particle.setDelayInTicks(0);
                 point.particles.add(particle);
@@ -113,7 +109,7 @@ public final class DisplayAnimationFrame implements Serializable {
         //Old End Particles
         if (frameEndParticles != null){
             for (AnimationParticle particle : frameEndParticles){
-                String pointTag = "deu_anim_particle_"+animationParticle;
+                String pointTag = OLD_ANIM_PARTICLE+animationParticle;
                 FramePoint point = new FramePoint(pointTag, particle.getVector(), particle.getGroupYawAtCreation(), particle.getGroupPitchAtCreation());
                 particle.setDelayInTicks(duration);
                 point.particles.add(particle);
@@ -121,12 +117,6 @@ public final class DisplayAnimationFrame implements Serializable {
                 animationParticle++;
             }
         }
-
-        //Start Commands
-        if (startCommands != null) frame.setStartCommands(startCommands);
-
-        //End Commands
-        if (endCommands != null) frame.setEndCommands(endCommands);
 
         //Frame Points
         if (framePoints != null){

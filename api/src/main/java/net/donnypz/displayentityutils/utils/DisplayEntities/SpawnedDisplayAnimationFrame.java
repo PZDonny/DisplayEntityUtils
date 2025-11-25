@@ -20,8 +20,6 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     int duration;
     String tag;
     Map<String, FramePoint> framePoints = new HashMap<>();
-    List<String> startCommands = new ArrayList<>();
-    List<String> endCommands = new ArrayList<>();
 
 
     @ApiStatus.Internal
@@ -94,8 +92,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     public boolean isEmptyFrame(){
         return displayTransformations.isEmpty()
                 && interactionTransformations.isEmpty()
-                && framePoints.isEmpty()
-                && startCommands.isEmpty();
+                && framePoints.isEmpty();
     }
 
 
@@ -206,61 +203,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     }
 
 
-    /**
-     * Set the commands that will be executed when this frame starts
-     * @param commands the commands
-     * @return this
-     */
-    public SpawnedDisplayAnimationFrame setStartCommands(List<String> commands){
-        startCommands = new ArrayList<>(commands);
-        return this;
-    }
 
-    /**
-     * Add a command that will be executed when this frame starts
-     * @param command the command to add
-     * @return this
-     */
-    public SpawnedDisplayAnimationFrame addStartCommand(String command){
-        startCommands.add(command);
-        return this;
-    }
-
-    /**
-     * Set the commands that will be executed when this frame ends
-     * @param commands the commands
-     * @return this
-     */
-    public SpawnedDisplayAnimationFrame setEndCommands(List<String> commands){
-        endCommands = new ArrayList<>(commands);
-        return this;
-    }
-
-    /**
-     * Add a command that will be executed when this frame ends
-     * @param command the command to add
-     * @return this
-     */
-    public SpawnedDisplayAnimationFrame addEndCommand(String command){
-        endCommands.add(command);
-        return this;
-    }
-
-    /**
-     * Get the commands that will be executed when this frame starts
-     * @return a string list of commands
-     */
-    public List<String> getStartCommands() {
-        return new ArrayList<>(startCommands);
-    }
-
-    /**
-     * Get the commands that will be executed when this frame ends
-     * @return a string list of commands
-     */
-    public List<String> getEndCommands() {
-        return new ArrayList<>(endCommands);
-    }
 
     /**
      * Get a {@link FramePoint} by its tag
@@ -395,22 +338,6 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     }
 
 
-    /**
-     * Execute the commands that are expected to run at the start of this frame from a specified location
-     * @param location
-     */
-    public void executeStartCommands(@NotNull Location location){
-        executeCommands(location, startCommands);
-    }
-
-    /**
-     * Execute the commands that are expected to run at the end of this frame from a specified location
-     * @param location
-     */
-    public void executeEndCommands(@NotNull Location location){
-        executeCommands(location, endCommands);
-    }
-
     private void executeCommands(Location location, List<String> commands){
         if (location == null || !location.isChunkLoaded() || commands.isEmpty()) {
             return;
@@ -479,7 +406,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
 
     @ApiStatus.Internal
     public DisplayAnimationFrame toDisplayAnimationFrame(){
-        DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, framePoints, startCommands, endCommands, tag);
+        DisplayAnimationFrame frame = new DisplayAnimationFrame(delay, duration, framePoints, tag);
         for (Map.Entry<UUID, DisplayTransformation> entry : displayTransformations.entrySet()){
             UUID uuid = entry.getKey();
             DisplayTransformation transformation = entry.getValue();
@@ -504,8 +431,6 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
             cloned.displayTransformations = new HashMap<>(this.displayTransformations);
             cloned.interactionTransformations = new HashMap<>(this.interactionTransformations);
             cloned.framePoints = new HashMap<>(this.framePoints);
-            cloned.startCommands = new ArrayList<>(this.startCommands);
-            cloned.endCommands = new ArrayList<>(this.endCommands);
 
             return cloned;
         } catch (CloneNotSupportedException e) {
@@ -523,13 +448,11 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
                 Objects.equals(tag, other.tag) &&
                 Objects.equals(displayTransformations, other.displayTransformations) &&
                 Objects.equals(interactionTransformations, other.interactionTransformations) &&
-                Objects.equals(framePoints, other.framePoints) &&
-                Objects.equals(startCommands, other.startCommands) &&
-                Objects.equals(endCommands, other.endCommands);
+                Objects.equals(framePoints, other.framePoints);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(delay, duration, tag, displayTransformations, interactionTransformations, framePoints, startCommands, endCommands);
+        return Objects.hash(delay, duration, tag, displayTransformations, interactionTransformations, framePoints);
     }
 }
