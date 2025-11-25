@@ -34,8 +34,9 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
     double xOffset;
     double yOffset;
     double zOffset;
+
     transient Vector vectorFromOrigin;
-    Vector3f vector = null;
+    transient Vector3f vector = null; //Transient so saving to JSON doesn't include in output
 
     float groupYawAtCreation;
     float groupPitchAtCreation;
