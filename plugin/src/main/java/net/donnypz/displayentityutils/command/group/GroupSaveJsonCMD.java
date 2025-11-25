@@ -6,7 +6,6 @@ import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.kyori.adventure.text.Component;
@@ -17,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 class GroupSaveJsonCMD extends PlayerSubCommand {
     GroupSaveJsonCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("save", parentSubCommand, Permission.GROUP_SAVE);
+        super("savejson", parentSubCommand, Permission.GROUP_SAVE);
         setTabComplete(2, TabSuggestion.STORAGES);
     }
 

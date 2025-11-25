@@ -17,6 +17,7 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         new GroupSelectNearestCMD(this);
         new GroupDeselectCMD(this);
         new GroupSaveCMD(this);
+        new GroupSaveJsonCMD(this);
         new GroupToPacketCMD(this);
         new GroupMarkPacketGroupsCMD(this);
         new GroupHidePersistentPacketGroupsCMD(this);
