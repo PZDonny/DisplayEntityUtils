@@ -26,57 +26,16 @@ import java.util.UUID;
 
 final class DisplayEntity implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 99L;
-    public enum Type{
-        TEXT,
-        BLOCK,
-        ITEM;
-
-        SpawnedDisplayEntityPart.PartType toPartType(){
-            switch (this){
-                case ITEM -> {
-                    return SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY;
-                }
-                case TEXT -> {
-                    return SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY;
-                }
-                case BLOCK -> {
-                    return SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY;
-                }
-                default -> {
-                    return null;
-                }
-            }
-        }
-
-        static Type fromPartType(SpawnedDisplayEntityPart.PartType type){
-            switch (type){
-                case ITEM_DISPLAY -> {
-                    return ITEM;
-                }
-                case TEXT_DISPLAY -> {
-                    return TEXT;
-                }
-                case BLOCK_DISPLAY -> {
-                    return BLOCK;
-                }
-                default -> {
-                    return null;
-                }
-            }
-        }
-    }
-
-    private final DisplayEntityGroup group;
     private DisplayEntitySpecifics specifics;
     private final Type type;
     private boolean isMaster;
     byte[] persistentDataContainer = null;
 
+    @Serial
+    private static final long serialVersionUID = 99L;
+
     DisplayEntity(Display entity, Type type, DisplayEntityGroup group){
         this.type = type;
-        this.group = group;
         if (type == Type.BLOCK) {
             specifics = new BlockDisplaySpecifics((BlockDisplay) entity);
         }
@@ -96,7 +55,6 @@ final class DisplayEntity implements Serializable {
 
     DisplayEntity(PacketDisplayEntityPart part, Type type, DisplayEntityGroup group){
         this.type = type;
-        this.group = group;
         if (type == Type.BLOCK) {
             specifics = new BlockDisplaySpecifics(part);
         }
@@ -297,14 +255,6 @@ final class DisplayEntity implements Serializable {
     }
 
     /**
-     * Get the DisplayEntityGroup that this DisplayEntity belongs to
-     * @return The DisplayEntityGroup this DisplayEntity belongs to
-     */
-    public DisplayEntityGroup getGroup() {
-        return group;
-    }
-
-    /**
      * Get whether this is the master entity
      * @return A boolean representing if this is the master entity
      */
@@ -314,5 +264,45 @@ final class DisplayEntity implements Serializable {
 
     List<String> getLegacyPartTags(){
         return specifics.getLegacyPartTags();
+    }
+
+    public enum Type{
+        TEXT,
+        BLOCK,
+        ITEM;
+
+        SpawnedDisplayEntityPart.PartType toPartType(){
+            switch (this){
+                case ITEM -> {
+                    return SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY;
+                }
+                case TEXT -> {
+                    return SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY;
+                }
+                case BLOCK -> {
+                    return SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY;
+                }
+                default -> {
+                    return null;
+                }
+            }
+        }
+
+        static Type fromPartType(SpawnedDisplayEntityPart.PartType type){
+            switch (type){
+                case ITEM_DISPLAY -> {
+                    return ITEM;
+                }
+                case TEXT_DISPLAY -> {
+                    return TEXT;
+                }
+                case BLOCK_DISPLAY -> {
+                    return BLOCK;
+                }
+                default -> {
+                    return null;
+                }
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.managers;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.GroupRegisteredEvent;
@@ -11,6 +12,8 @@ import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.GroupResult;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -31,10 +34,10 @@ import java.util.zip.ZipException;
 
 public final class DisplayGroupManager {
 
-    private DisplayGroupManager() {}
-
+    private static final Gson gson = new Gson();
     private static final Map<SpawnedDisplayEntityPart, SpawnedDisplayEntityGroup> allSpawnedGroups = new HashMap<>();
 
+    private DisplayGroupManager() {}
 
     /**
      * This will NEVER have to be called since it is already done automatically when a SpawnedDisplayEntityGroup is created.
@@ -168,11 +171,10 @@ public final class DisplayGroupManager {
 
 
     /**
-     * Save a Display Entity Group to a Data Location
-     *
-     * @param loadMethod         Storage where to save the Display Entity Group
-     * @param displayEntityGroup The group to be saved
-     * @param saver              Player who is saving the group (Nullable)
+     * Save a {@link DisplayEntityGroup} to a specified storage location
+     * @param loadMethod where to save the group
+     * @param displayEntityGroup the group to be saved
+     * @param saver player who is saving the group
      * @return boolean whether the save was successful
      */
     public static boolean saveDisplayEntityGroup(@NotNull LoadMethod loadMethod, @NotNull DisplayEntityGroup displayEntityGroup, @Nullable Player saver) {
@@ -183,18 +185,54 @@ public final class DisplayGroupManager {
     }
 
     /**
-     * Delete a Display Entity Group from a Data Location
-     *
-     * @param loadMethod Storage where the Display Entity Group is located
-     * @param tag Tag of the group to be deleted
-     * @param deleter Player who is deleting the group (Nullable)
+     * Save a {@link DisplayEntityGroup} to a local storage as a json file
+     * @param displayEntityGroup the animation to be saved
+     * @param saver player who is saving the animation
+     * @return boolean whether the save was successful
      */
-    public static void deleteDisplayEntityGroup(@NotNull LoadMethod loadMethod, @NotNull String tag, @Nullable Player deleter) {
-        if (!loadMethod.isEnabled()) return;
-
-        DisplayAPI.getStorage(loadMethod).deleteDisplayEntityGroup(tag, deleter);
+    public static boolean saveDisplayEntityGroupJson(@NotNull DisplayEntityGroup displayEntityGroup, @Nullable Player saver){
+        try{
+            File saveFile = new File(PluginFolders.groupSaveFolder, "/"+displayEntityGroup.getTag()+".json");
+            if (saveFile.exists()){
+                if (!DisplayConfig.overwritexistingSaves()){
+                    if (saver != null){
+                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display entity group <light_purple>JSON <red>locally!"));
+                        saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                    }
+                    return false;
+                }
+                saveFile.delete();
+            }
+            saveFile.createNewFile();
+            String json = gson.toJson(displayEntityGroup);
+            FileWriter fileWriter = new FileWriter(saveFile);
+            fileWriter.write(json);
+            fileWriter.close();
+            if (saver != null) {
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved display entity group <light_purple>JSON <green>locally!"));
+            }
+            return true;
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
+            if (saver != null) {
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display entity group <light_purple>JSON <red>locally!"));
+            }
+            return false;
+        }
     }
 
+    /**
+     * Delete a {@link DisplayEntityGroup} from a storage location
+     * @param loadMethod Storage where the Display Entity Group is located
+     * @param tag tag of the group to be deleted
+     * @param deleter player who is deleting the group
+     */
+    public static void deleteDisplayEntityGroup(@NotNull LoadMethod loadMethod, @NotNull String tag, @Nullable Player deleter) {
+        if (loadMethod.isEnabled()) {
+            DisplayAPI.getStorage(loadMethod).deleteDisplayEntityGroup(tag, deleter);
+        }
+    }
 
     /**
      * Attempt to get a {@link DisplayEntityGroup} from all storage locations.

@@ -2,10 +2,18 @@ package net.donnypz.displayentityutils.managers;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticle;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
@@ -21,8 +29,10 @@ import java.util.zip.ZipException;
 
 public final class DisplayAnimationManager {
 
-    private DisplayAnimationManager(){}
     private static Cache<String, SpawnedDisplayAnimation> cachedAnimations;
+    private static final Gson gson = new Gson();
+
+    private DisplayAnimationManager(){}
 
     @ApiStatus.Internal
     public static void createExpirationMap(int expireTime){
@@ -62,12 +72,11 @@ public final class DisplayAnimationManager {
         if (user != null) user.deselectSpawnedAnimation();
     }
 
-
     /**
-     * Save a DisplayAnimation to a Data Location
-     * @param loadMethod Storage where to save the DisplayAnimation
-     * @param displayAnimation The group to be saved
-     * @param saver Player who is saving the animation
+     * Save a {@link DisplayAnimation} to a specified storage location
+     * @param loadMethod where to save the animation
+     * @param displayAnimation the animation to be saved
+     * @param saver player who is saving the animation
      * @return boolean whether the save was successful
      */
     public static boolean saveDisplayAnimation(@NotNull LoadMethod loadMethod, @NotNull DisplayAnimation displayAnimation, @Nullable Player saver){
@@ -82,17 +91,59 @@ public final class DisplayAnimationManager {
     }
 
     /**
-     * Delete a DisplayAnimation from a Data Location
-     * @param loadMethod Storage where the DisplayAnimation is located
-     * @param tag Tag of the animation to be deleted
-     * @param deleter Player who is deleting the animation (Nullable)
+     * Save a {@link DisplayAnimation} to a local storage as a json file
+     * @param displayAnimation the animation to be saved
+     * @param saver player who is saving the animation
+     * @return boolean whether the save was successful
      */
-    public static void deleteDisplayAnimation(@NotNull LoadMethod loadMethod, @NotNull String tag, @Nullable Player deleter) {
-        if (!loadMethod.isEnabled()) return;
-        DisplayAPI.getStorage(loadMethod).deleteDisplayAnimation(tag, deleter);
+    public static boolean saveDisplayAnimationJson(@NotNull DisplayAnimation displayAnimation, @Nullable Player saver){
+        try{
+            File saveFile = new File(PluginFolders.animSaveFolder, "/"+displayAnimation.getAnimationTag()+".json");
+            if (saveFile.exists()){
+                if (!DisplayConfig.overwritexistingSaves()){
+                    if (saver != null){
+                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save animation <light_purple>JSON <red>locally!"));
+                        saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                    }
+                    return false;
+                }
+                saveFile.delete();
+            }
+            saveFile.createNewFile();
+
+            FileWriter fileWriter = new FileWriter(saveFile);
+
+            JsonElement jsonEl = gson.toJsonTree(displayAnimation);
+            JsonObject jsonObj = jsonEl.getAsJsonObject();
+            jsonObj.addProperty("pluginVersion", DisplayAPI.getVersion());
+
+            fileWriter.write(gson.toJson(jsonObj));
+            fileWriter.close();
+            if (saver != null) {
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved animation <light_purple>JSON <green>locally!"));
+            }
+            return true;
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
+            if (saver != null) {
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save animation <light_purple>JSON <red>locally!"));
+            }
+            return false;
+        }
     }
 
-
+    /**
+     * Delete a {@link DisplayAnimation} from a storage location
+     * @param loadMethod where the DisplayAnimation is located
+     * @param tag tag of the animation to be deleted
+     * @param deleter player who is deleting the animation
+     */
+    public static void deleteDisplayAnimation(@NotNull LoadMethod loadMethod, @NotNull String tag, @Nullable Player deleter) {
+        if (loadMethod.isEnabled()){
+            DisplayAPI.getStorage(loadMethod).deleteDisplayAnimation(tag, deleter);
+        }
+    }
 
     /**
      * Get a cached {@link SpawnedDisplayAnimation}
