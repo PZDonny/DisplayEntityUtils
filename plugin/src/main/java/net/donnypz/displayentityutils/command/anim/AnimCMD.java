@@ -117,7 +117,7 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis anim save <storage>", "Save your selected animation and any changes made");
         }
         else{
-            CMDUtils.sendUnsafeCMD(sender, "/mdis anim savejson <storage>", "Save your selected animation and any changes made as a json file");
+            CMDUtils.sendUnsafeCMD(sender, "/mdis anim savejson", "Save your selected animation and any changes made as a json file");
             CMDUtils.sendCMD(sender, "/mdis anim delete <anim-tag> <storage>", "Delete a saved animation");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));

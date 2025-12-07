@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 class GroupSaveJsonCMD extends PlayerSubCommand {
     GroupSaveJsonCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("savejson", parentSubCommand, Permission.GROUP_SAVE);
-        setTabComplete(2, TabSuggestion.STORAGES);
     }
 
     @Override
