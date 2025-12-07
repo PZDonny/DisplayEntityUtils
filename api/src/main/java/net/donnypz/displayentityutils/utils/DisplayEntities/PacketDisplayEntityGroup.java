@@ -591,6 +591,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      */
     @Override
     public boolean teleport(@NotNull Location tpLocation, boolean respectGroupDirection){
+        if (isRiding()) return false;
         Location oldMasterLoc = getLocation();
         attemptLocationUpdate(oldMasterLoc, tpLocation);
 
@@ -820,8 +821,20 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * @param player the player
      * @param spawnReason the spawn reason
      */
+    @Override
     public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
         showToPlayer(player, spawnReason, new GroupSpawnSettings());
+    }
+
+    /**
+     * Show the group's packet-based entities to a player. Calls the {@link PacketGroupSendEvent}
+     * @param player the player
+     * @param spawnReason the spawn reason
+     * @param location where to spawn the group for the player
+     */
+    @Override
+    public void showToPlayer(@NotNull Player player, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull Location location) {
+        showToPlayer(player, spawnReason, new GroupSpawnSettings(), location);
     }
 
     /**
@@ -832,10 +845,22 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      */
     @Override
     public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
+        showToPlayer(player, spawnReason, groupSpawnSettings, getLocation());
+    }
+
+    /**
+     * Show the group's packet-based entities to a player. Calls the {@link PacketGroupSendEvent}
+     * @param player the player
+     * @param spawnReason the spawn reason
+     * @param groupSpawnSettings the group spawn settings to use
+     * @param location where to spawn the group for the player
+     */
+    @Override
+    public void showToPlayer(@NotNull Player player, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings, @NotNull Location location) {
         if (!sendShowEvent(List.of(player), spawnReason)) return;
         if (!masterPart.isTrackedBy(player)){
             for (PacketDisplayEntityPart part : groupParts.values()){
-                part.showToPlayer(player, spawnReason);
+                part.showToPlayer(player, spawnReason, groupSpawnSettings, location);
             }
             setPassengers(player);
         }
@@ -859,11 +884,34 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      */
     @Override
     public void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
+        showToPlayers(players, spawnReason, groupSpawnSettings, getLocation());
+    }
+
+    /**
+     * Show the group's packet-based entities to players. Calls the {@link PacketGroupSendEvent}
+     * @param players the players
+     * @param spawnReason the spawn reason
+     * @param location where to spawn the group for the players
+     */
+    @Override
+    public void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull Location location) {
+        showToPlayers(players, spawnReason, new GroupSpawnSettings(), location);
+    }
+
+    /**
+     * Show the group's packet-based entities to players. Calls the {@link PacketGroupSendEvent}
+     * @param players the players
+     * @param spawnReason the spawn reason
+     * @param groupSpawnSettings the group spawn settings to use
+     * @param location where to spawn the group for the players
+     */
+    @Override
+    public void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings, @NotNull Location location) {
         if (!sendShowEvent(players, spawnReason)) return;
         for (Player player : players){
             if (!masterPart.isTrackedBy(player)){
                 for (PacketDisplayEntityPart part : groupParts.sequencedValues()){
-                    part.showToPlayer(player, spawnReason, groupSpawnSettings);
+                    part.showToPlayer(player, spawnReason, groupSpawnSettings, location);
                 }
                 setPassengers(player);
             }
