@@ -546,27 +546,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
     }
 
-    /**
-     * Change the true location of this group. If the teleport changes worlds, the group will automatically be hidden from players in the old world.<br>
-     * It is not recommended to use this multiple times in the same tick, as unexpected results may occur.
-     * @param location The location to teleport this group
-     * @param respectGroupDirection Whether to respect this group's pitch and yaw or the location's pitch and yaw
-
-     */
-    public void teleportSafe(@NotNull Location location, boolean respectGroupDirection){
-        teleport(location, respectGroupDirection, true);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <br>It is not recommended to use this multiple times in the same tick, unexpected results may occur.
-     */
-    @Override
-    public boolean teleport(@NotNull Location location, boolean respectGroupDirection){
-        teleport(location, respectGroupDirection, false);
-        return true;
-    }
-
     @Override
     public void teleportMove(Vector direction, double distance, int durationInTicks) {
         Location destination = getLocation().add(direction.clone().normalize().multiply(distance));
@@ -593,7 +572,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 currentDistance+=Math.abs(movementIncrement);
                 Location tpLocation = getLocation().add(incrementVector);
 
-                attemptLocationUpdate(getLocation(), tpLocation, false);
+                attemptLocationUpdate(getLocation(), tpLocation);
                 if (currentDistance >= distance){
                     masterPart.teleportUnsetPassengers(destination);
                     cancel();
@@ -606,9 +585,14 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }, 0, 1);
     }
 
-    private void teleport(Location tpLocation, boolean respectGroupDirection, boolean hide){
+    /**
+     * {@inheritDoc}
+     * <br>It is not recommended to use this multiple times in the same tick, unexpected results may occur.
+     */
+    @Override
+    public boolean teleport(@NotNull Location tpLocation, boolean respectGroupDirection){
         Location oldMasterLoc = getLocation();
-        attemptLocationUpdate(oldMasterLoc, tpLocation, hide);
+        attemptLocationUpdate(oldMasterLoc, tpLocation);
 
         tpLocation = tpLocation.clone();
         if (respectGroupDirection){
@@ -627,9 +611,10 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             }
         }
         this.update();
+        return true;
     }
 
-    private void attemptLocationUpdate(Location oldLoc, Location newLoc, boolean allowHide){
+    private void attemptLocationUpdate(Location oldLoc, Location newLoc){
         if (oldLoc == null) {
             updateChunkAndWorld(newLoc);
         }
@@ -637,10 +622,9 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             World w1 = oldLoc.getWorld();
             World w2 = newLoc.getWorld();
             if (!w1.equals(w2)){
-                if (allowHide){
-                    hide();
-                }
+                hide();
                 updateChunkAndWorld(newLoc);
+                if (isAutoShow()) show();
             }
             else{
                 updateChunkAndWorld(newLoc);
@@ -764,26 +748,29 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         if (oldAutoshow != autoShow){
             this.update();
             if (autoShow){
-                Location loc = getLocation();
-                if (loc != null){
-                    DisplayAPI.getScheduler().run(() -> {
-                        long chunkKey = ConversionUtils.getChunkKey(loc);
-                        Collection<Player> players = new ArrayList<>();
-                        for (Player p : loc.getWorld().getPlayers()){
-                            if (p.isChunkSent(chunkKey)){
-                                players.add(p);
-                            }
-                        }
-                        DisplayAPI.getScheduler().runAsync(() -> {
-                            if (this.autoShow) {
-                                showToPlayers(players, GroupSpawnedEvent.SpawnReason.INTERNAL);
-                            }
-                        });
-                    });
-                }
+                show();
             }
         }
         return this;
+    }
+
+    private synchronized void show(){
+        Location loc = getLocation();
+        if (loc == null) return;
+        long chunkKey = ConversionUtils.getChunkKey(loc);
+        Collection<Player> players = new ArrayList<>();
+        DisplayAPI.getScheduler().run(() -> {
+            for (Player p : loc.getWorld().getPlayers()){
+                if (p.isChunkSent(chunkKey)){
+                    players.add(p);
+                }
+            }
+            DisplayAPI.getScheduler().runAsync(() -> {
+                if (this.autoShow) {
+                    showToPlayers(players, GroupSpawnedEvent.SpawnReason.INTERNAL);
+                }
+            });
+        });
     }
 
     /**
