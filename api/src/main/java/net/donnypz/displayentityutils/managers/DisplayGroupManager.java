@@ -1,7 +1,9 @@
 package net.donnypz.displayentityutils.managers;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.GroupRegisteredEvent;
@@ -19,6 +21,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,6 +39,7 @@ public final class DisplayGroupManager {
 
     private static final Gson gson = new Gson();
     private static final Map<SpawnedDisplayEntityPart, SpawnedDisplayEntityGroup> allSpawnedGroups = new HashMap<>();
+    private static final String[] ITEM_STACK_FIELDS = new String[]{"itemStack", "itemStackAsBytes"};
 
     private DisplayGroupManager() {}
 
@@ -204,9 +208,15 @@ public final class DisplayGroupManager {
                 saveFile.delete();
             }
             saveFile.createNewFile();
-            String json = gson.toJson(displayEntityGroup);
+
             FileWriter fileWriter = new FileWriter(saveFile);
-            fileWriter.write(json);
+
+            JsonElement jsonEl = gson.toJsonTree(displayEntityGroup);
+            JsonObject jsonObj = jsonEl.getAsJsonObject();
+            replaceItemStacks(jsonObj);
+            jsonObj.addProperty("pluginVersion", DisplayAPI.getVersion());
+
+            fileWriter.write(gson.toJson(jsonObj));
             fileWriter.close();
             if (saver != null) {
                 saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved display entity group <light_purple>JSON <green>locally!"));
@@ -219,6 +229,40 @@ public final class DisplayGroupManager {
                 saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display entity group <light_purple>JSON <red>locally!"));
             }
             return false;
+        }
+    }
+
+    static void replaceItemStacks(JsonElement el) {
+        if (el == null || el.isJsonNull()) return;
+
+        if (el.isJsonObject()) {
+            JsonObject obj = el.getAsJsonObject();
+
+            for (String field : ITEM_STACK_FIELDS){
+                if (obj.has(field)) {
+                    JsonArray arr = obj.getAsJsonArray(field);
+                    byte[] bytes = new byte[arr.size()];
+
+                    for (int i = 0; i < arr.size(); i++) {
+                        bytes[i] = arr.get(i).getAsByte();
+                    }
+
+                    Map<String, Object> itemStackMap = ItemStack.deserializeBytes(bytes).serialize();
+                    JsonElement jsonElement = gson.toJsonTree(itemStackMap);
+                    obj.add(field, jsonElement);
+                }
+            }
+
+
+            for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
+                replaceItemStacks(entry.getValue());
+            }
+        }
+        else if (el.isJsonArray()) {
+            JsonArray arr = el.getAsJsonArray();
+            for (JsonElement child : arr) {
+                replaceItemStacks(child);
+            }
         }
     }
 

@@ -5,7 +5,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
@@ -115,6 +114,7 @@ public final class DisplayAnimationManager {
 
             JsonElement jsonEl = gson.toJsonTree(displayAnimation);
             JsonObject jsonObj = jsonEl.getAsJsonObject();
+            DisplayGroupManager.replaceItemStacks(jsonObj);
             jsonObj.addProperty("pluginVersion", DisplayAPI.getVersion());
 
             fileWriter.write(gson.toJson(jsonObj));
