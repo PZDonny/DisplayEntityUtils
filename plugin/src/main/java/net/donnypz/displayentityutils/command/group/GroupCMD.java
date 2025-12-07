@@ -24,6 +24,7 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         new GroupShowPersistentPacketGroupsCMD(this);
         new GroupDeleteCMD(this);
         new GroupSpawnCMD(this);
+        new GroupSpawnJSONCMD(this);
         new GroupDespawnCMD(this);
         new GroupInfoCMD(this);
         new GroupSetTagCMD(this);
@@ -87,11 +88,12 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis group deselect", "Clear your group selection");
             CMDUtils.sendCMD(sender, "/mdis group info", "List information about your selected group");
             CMDUtils.sendCMD(sender, "/mdis group spawn <group-tag> <storage> [-packet]", "Spawn a saved display entity group/model from a storage location. \"-packet\" will spawn the group/model using packets");
+            CMDUtils.sendCMD(sender, "/mdis group spawnjson <group-tag> [-packet]", "Spawn a JSON saved display entity group/model from a local storage. \"-packet\" will spawn the group/model using packets");
             CMDUtils.sendCMD(sender, "/mdis group despawn", "Despawn your selected group");
         }
         else if (page == 2) {
             CMDUtils.sendCMD(sender, "/mdis group save <storage>", "Save your selected group");
-            CMDUtils.sendUnsafeCMD(sender, "/mdis group savejson", "Save your selected group as a json file");
+            CMDUtils.sendUnsafeCMD(sender, "/mdis group savejson", "Save your selected group as a JSON file. Spawning groups from JSON files will always be slower");
             CMDUtils.sendCMD(sender, "/mdis group delete <group-tag> <storage>", "Delete a saved group from a storage location");
             CMDUtils.sendCMD(sender, "/mdis group topacket [-confirm] [-keep]", "Make your selected group packet-based, making it unselectable. \"-confirm\" confirms the action." +
                     " \"-keep\" keeps the non-packet based version of your group spawned.");

@@ -232,8 +232,7 @@ public final class DisplayEntityGroup implements Serializable{
             Display passenger = entity.createEntity(group, location, settings);
 
             SpawnedDisplayEntityPart part = group.addDisplayEntity(passenger);
-            List<String> legacyPartTags = entity.getLegacyPartTags();
-            if (legacyPartTags != null && !entity.getLegacyPartTags().isEmpty()){
+            if (entity.hasLegacyPartTags()){
                 part.adaptScoreboardTags(true);
             }
             //}
@@ -246,7 +245,7 @@ public final class DisplayEntityGroup implements Serializable{
             Interaction interaction = entity.createEntity(spawnLocation, settings);
 
             SpawnedDisplayEntityPart part = group.addInteractionEntity(interaction);
-            if (!entity.getLegacyPartTags().isEmpty()){
+            if (entity.hasLegacyPartTags()){
                 part.adaptScoreboardTags(true);
             }
 

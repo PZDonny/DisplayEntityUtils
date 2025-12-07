@@ -36,7 +36,9 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
     double zOffset;
 
     transient Vector vectorFromOrigin;
-    transient Vector3f vector = null; //Transient so saving to JSON doesn't include in output
+    //Vector is kept since old versions did not have frame points. A new FP is created, using this vector in newer versions.
+    //Transient so saving to JSON doesn't include in output
+    transient Vector3f vector = null;
 
     float groupYawAtCreation;
     float groupPitchAtCreation;

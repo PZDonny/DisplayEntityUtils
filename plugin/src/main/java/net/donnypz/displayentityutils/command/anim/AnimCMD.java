@@ -46,6 +46,7 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
         new AnimStopCMD(this);
         new AnimRestoreCMD(this);
         new AnimSelectCMD(this);
+        new AnimSelectJSONCMD(this);
     }
 
     @Override
@@ -77,6 +78,7 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender,"/mdis anim help <page-number>", "Get help for animations");
             CMDUtils.sendCMD(sender,"/mdis anim new", "Manually create a new animation");
             CMDUtils.sendCMD(sender, "/mdis anim select <anim-tag> <storage>", "Select a saved animation");
+            CMDUtils.sendCMD(sender, "/mdis anim selectjson <file-name>", "Select a JSON saved animation");
             CMDUtils.sendCMD(sender,"/mdis anim info", "List information about your selected animation");
             CMDUtils.sendCMD(sender, "/mdis anim frameinfo <frame-id>", "List information about a frame in your animation");
         }
@@ -117,7 +119,7 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/mdis anim save <storage>", "Save your selected animation and any changes made");
         }
         else{
-            CMDUtils.sendUnsafeCMD(sender, "/mdis anim savejson", "Save your selected animation and any changes made as a json file");
+            CMDUtils.sendUnsafeCMD(sender, "/mdis anim savejson", "Save your selected animation and any changes made as a JSON file. Selection animations from JSON files will always be slower");
             CMDUtils.sendCMD(sender, "/mdis anim delete <anim-tag> <storage>", "Delete a saved animation");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));

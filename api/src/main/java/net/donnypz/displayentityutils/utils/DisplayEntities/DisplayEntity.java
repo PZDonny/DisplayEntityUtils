@@ -26,13 +26,15 @@ import java.util.UUID;
 
 final class DisplayEntity implements Serializable {
 
-    private DisplayEntitySpecifics specifics;
-    private final Type type;
-    private boolean isMaster;
+    DisplayEntitySpecifics specifics;
+    Type type;
+    boolean isMaster;
     byte[] persistentDataContainer = null;
 
     @Serial
     private static final long serialVersionUID = 99L;
+
+    DisplayEntity(){}
 
     DisplayEntity(Display entity, Type type, DisplayEntityGroup group){
         this.type = type;
@@ -66,8 +68,7 @@ final class DisplayEntity implements Serializable {
         }
 
         try{
-            ItemStack i = new ItemStack(Material.STICK);
-            PersistentDataContainer pdc = i.getItemMeta().getPersistentDataContainer();
+            PersistentDataContainer pdc = new ItemStack(Material.STICK).getItemMeta().getPersistentDataContainer();
             pdc.set(DisplayAPI.getPartPDCTagKey(), PersistentDataType.LIST.strings(), new ArrayList<>(part.getTags()));
             persistentDataContainer = pdc.serializeToBytes();
         }
@@ -260,6 +261,10 @@ final class DisplayEntity implements Serializable {
      */
     public boolean isMaster() {
         return isMaster;
+    }
+
+    boolean hasLegacyPartTags(){
+        return specifics.hasLegacyPartTags();
     }
 
     List<String> getLegacyPartTags(){

@@ -1,9 +1,7 @@
 package net.donnypz.displayentityutils.managers;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.GroupRegisteredEvent;
@@ -16,10 +14,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -30,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -40,6 +36,7 @@ public final class DisplayGroupManager {
     private static final Gson gson = new Gson();
     private static final Map<SpawnedDisplayEntityPart, SpawnedDisplayEntityGroup> allSpawnedGroups = new HashMap<>();
     private static final String[] ITEM_STACK_FIELDS = new String[]{"itemStack", "itemStackAsBytes"};
+    static final String PLUGIN_VERSION_FIELD = "pluginVersion";
 
     private DisplayGroupManager() {}
 
@@ -210,11 +207,12 @@ public final class DisplayGroupManager {
             saveFile.createNewFile();
 
             FileWriter fileWriter = new FileWriter(saveFile);
+            Gson gson = DEGJSONAdapter.GSON;
 
             JsonElement jsonEl = gson.toJsonTree(displayEntityGroup);
             JsonObject jsonObj = jsonEl.getAsJsonObject();
-            replaceItemStacks(jsonObj);
-            jsonObj.addProperty("pluginVersion", DisplayAPI.getVersion());
+            serializeJsonElement(jsonObj);
+            jsonObj.addProperty(PLUGIN_VERSION_FIELD, DisplayAPI.getVersion());
 
             fileWriter.write(gson.toJson(jsonObj));
             fileWriter.close();
@@ -232,7 +230,7 @@ public final class DisplayGroupManager {
         }
     }
 
-    static void replaceItemStacks(JsonElement el) {
+    static void serializeJsonElement(JsonElement el) {
         if (el == null || el.isJsonNull()) return;
 
         if (el.isJsonObject()) {
@@ -253,15 +251,60 @@ public final class DisplayGroupManager {
                 }
             }
 
+//            if (obj.has(PART_TAG_FIELD)){
+//                JsonArray arr = obj.getAsJsonArray(PDC_FIELD);
+//                if (arr != null){
+//                    byte[] bytes = new byte[arr.size()];
+//                    ItemStack stick = new ItemStack(Material.STICK);
+//                    PersistentDataContainer pdc = stick.getItemMeta().getPersistentDataContainer();
+//                    try{
+//                        pdc.readFromBytes(bytes);
+//                        List<String> tags = pdc.get(DisplayAPI.getPartPDCTagKey(), PersistentDataType.LIST.strings());
+//                        obj.add(PART_TAG_FIELD, gson.toJsonTree(tags));
+//                    }
+//                    catch(IOException e){}
+//                }
+//            }
+
 
             for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
-                replaceItemStacks(entry.getValue());
+                serializeJsonElement(entry.getValue());
             }
         }
         else if (el.isJsonArray()) {
             JsonArray arr = el.getAsJsonArray();
             for (JsonElement child : arr) {
-                replaceItemStacks(child);
+                serializeJsonElement(child);
+            }
+        }
+    }
+
+    static void deserializeJsonElement(JsonElement el) {
+        if (el == null || el.isJsonNull()) return;
+
+        if (el.isJsonObject()) {
+            JsonObject obj = el.getAsJsonObject();
+
+            for (String field : ITEM_STACK_FIELDS){
+                if (obj.has(field)) {
+                    JsonObject mapObj = obj.getAsJsonObject(field);
+
+                    Map<String, Object> itemStackMap = gson.fromJson(mapObj, new TypeToken<Map<String, Object>>() {}.getType());
+                    byte[] itemStackBytes = ItemStack.deserialize(itemStackMap).serializeAsBytes();
+                    JsonElement jsonElement = gson.toJsonTree(itemStackBytes);
+                    obj.add(field, jsonElement);
+                }
+            }
+
+
+            for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
+                deserializeJsonElement(entry.getValue());
+            }
+        }
+        else if (el.isJsonArray()) {
+            JsonArray arr = el.getAsJsonArray();
+            for (JsonElement child : arr) {
+                deserializeJsonElement(child);
             }
         }
     }
@@ -380,6 +423,73 @@ public final class DisplayGroupManager {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * Get a {@link DisplayEntityGroup} from a JSON string
+     * @param json JSON of a saved {@link DisplayEntityGroup}
+     * @return The represented {@link DisplayEntityGroup} or null.
+     */
+    public static @Nullable DisplayEntityGroup getGroupFromJSON(@NotNull String json){
+        return getGroupFromJSON(JsonParser.parseString(json).getAsJsonObject());
+    }
+
+    /**
+     * Get a {@link DisplayEntityGroup} from a saved file, containing JSON data
+     * @param jsonFile JSON file of a saved {@link DisplayEntityGroup}
+     * @return The found {@link DisplayEntityGroup}. Null if not found.
+     */
+    public static @Nullable DisplayEntityGroup getGroupFromJSON(@NotNull File jsonFile){
+        try{
+            String json = Files.readString(jsonFile.toPath());
+            return getGroupFromJSON(JsonParser.parseString(json).getAsJsonObject());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Get a {@link DisplayEntityGroup} from a saved file, containing JSON data
+     * @param inputStream stream of {@link DisplayEntityGroup} saved as JSON
+     * @return The found {@link DisplayEntityGroup} or null.
+     */
+    public static @Nullable DisplayEntityGroup getGroupFromJSON(@NotNull InputStream inputStream){
+        try{
+            return getGroupFromJSON(JsonParser
+                    .parseString(new String(inputStream.readAllBytes()))
+                    .getAsJsonObject());
+        }
+        catch(IOException ex){
+            return null;
+        }
+    }
+
+    /**
+     * Get a {@link DisplayEntityGroup} from a plugin's resources, which is stored as a JSON file
+     *
+     * @param plugin The plugin to get the group from
+     * @param resourcePath The path of the group
+     * @return The found {@link DisplayEntityGroup} or null
+     */
+    public static @Nullable DisplayEntityGroup getGroupFromJSON(@NotNull JavaPlugin plugin, @NotNull String resourcePath) {
+        try(InputStream stream = plugin.getResource(resourcePath)){
+            if (stream == null) return null;
+            return getGroupFromJSON(stream);
+        }
+        catch(IOException e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static DisplayEntityGroup getGroupFromJSON(JsonObject jsonObject){
+        deserializeJsonElement(jsonObject);
+        jsonObject.remove(PLUGIN_VERSION_FIELD);
+
+        return DEGJSONAdapter
+                .GSON
+                .fromJson(jsonObject, DisplayEntityGroup.class);
     }
 
     public static @Nullable SpawnedDisplayEntityGroup getExistingSpawnedGroup(Display displayEntity) {
@@ -592,7 +702,6 @@ public final class DisplayGroupManager {
     static void addPersistentPacketGroupSilent(@NotNull PacketDisplayEntityGroup group, @NotNull Location location, @NotNull DisplayEntityGroup displayEntityGroup){
         Chunk c = location.getChunk();
         PersistentDataContainer pdc = c.getPersistentDataContainer();
-        Gson gson = new Gson();
         List<String> list = getChunkList(pdc);
         int id;
         if (list.isEmpty()){
@@ -614,7 +723,6 @@ public final class DisplayGroupManager {
     public static PacketDisplayEntityGroup addPersistentPacketGroup(@NotNull Location location, @NotNull DisplayEntityGroup displayEntityGroup, boolean autoShow){
         Chunk c = location.getChunk();
         PersistentDataContainer pdc = c.getPersistentDataContainer();
-        Gson gson = new Gson();
         List<String> list = getChunkList(pdc);
         int id;
         if (list.isEmpty()){
@@ -662,7 +770,6 @@ public final class DisplayGroupManager {
         Chunk storedChunk = world.getChunkAt(chunkKey);
         PersistentDataContainer pdc = storedChunk.getPersistentDataContainer();
         List<String> list = getChunkList(pdc);
-        Gson gson = new Gson();
         for (int i = 0; i < list.size(); i++){
             String json = list.get(i);
             PersistentPacketGroup cpg = gson.fromJson(json, PersistentPacketGroup.class);
@@ -678,7 +785,7 @@ public final class DisplayGroupManager {
                 cpg.autoShow = group.isAutoShow();
                 cpg.setLocation(currentLoc);
                 cpg.setGroup(group.toDisplayEntityGroup());
-                list.set(i, new Gson().toJson(cpg));
+                list.set(i, gson.toJson(cpg));
             }
             pdc.set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
             return;
@@ -695,7 +802,6 @@ public final class DisplayGroupManager {
     @ApiStatus.Internal
     public static boolean removePersistentPacketGroup(@NotNull Chunk chunk, int id, boolean unregister){
         List<String> list = getChunkList(chunk.getPersistentDataContainer());
-        Gson gson = new Gson();
         for (int i = 0; i < list.size(); i++){
             String json = list.get(i);
             PersistentPacketGroup cpg = gson.fromJson(json, PersistentPacketGroup.class);
@@ -727,7 +833,6 @@ public final class DisplayGroupManager {
     @ApiStatus.Internal
     public static void spawnPersistentPacketGroups(@NotNull Chunk chunk){
         List<String> list = getChunkList(chunk.getPersistentDataContainer());
-        Gson gson = new Gson();
         for (String json : list){
             PersistentPacketGroup cpg = gson.fromJson(json, PersistentPacketGroup.class);
             cpg.spawn(chunk).setPersistentIds(cpg.id, chunk);
@@ -741,7 +846,6 @@ public final class DisplayGroupManager {
 
     @ApiStatus.Internal
     public static List<ChunkPacketGroupInfo> getPersistentPacketGroupInfo(Chunk chunk){
-        Gson gson = new Gson();
         List<ChunkPacketGroupInfo> info = new ArrayList<>();
         for (String json : getChunkList(chunk.getPersistentDataContainer())){
             PersistentPacketGroup cpg = gson.fromJson(json, PersistentPacketGroup.class);

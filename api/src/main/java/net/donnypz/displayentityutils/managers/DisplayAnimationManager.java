@@ -5,6 +5,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
@@ -114,8 +116,8 @@ public final class DisplayAnimationManager {
 
             JsonElement jsonEl = gson.toJsonTree(displayAnimation);
             JsonObject jsonObj = jsonEl.getAsJsonObject();
-            DisplayGroupManager.replaceItemStacks(jsonObj);
-            jsonObj.addProperty("pluginVersion", DisplayAPI.getVersion());
+            DisplayGroupManager.serializeJsonElement(jsonObj);
+            jsonObj.addProperty(DisplayGroupManager.PLUGIN_VERSION_FIELD, DisplayAPI.getVersion());
 
             fileWriter.write(gson.toJson(jsonObj));
             fileWriter.close();
@@ -318,5 +320,72 @@ public final class DisplayAnimationManager {
     public static @NotNull List<String> getSavedDisplayAnimations(@NotNull LoadMethod loadMethod){
         if (!loadMethod.isEnabled()) return Collections.emptyList();
         return DisplayAPI.getStorage(loadMethod).getAnimationTags();
+    }
+
+    /**
+     * Get a {@link DisplayAnimation} from a JSON string
+     * @param json JSON of a saved {@link DisplayAnimation}
+     * @return The represented {@link DisplayAnimation} or null.
+     */
+    public static @Nullable DisplayAnimation getAnimationFromJSON(@NotNull String json){
+        return getAnimationFromJSON(JsonParser.parseString(json).getAsJsonObject());
+    }
+
+
+    /**
+     * Get a {@link DisplayAnimation} from a saved file, containing JSON data
+     * @param jsonFile JSON file of a saved {@link DisplayAnimation}
+     * @return The found {@link DisplayAnimation}. Null if not found.
+     */
+    public static @Nullable DisplayAnimation getAnimationFromJSON(@NotNull File jsonFile){
+        try{
+            String json = Files.readString(jsonFile.toPath());
+            return getAnimationFromJSON(JsonParser.parseString(json).getAsJsonObject());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Get a {@link DisplayAnimation} from an input stream, containing JSON data
+     * @param inputStream InputStream containing a saved {@link DisplayAnimation}.
+     * @return The found {@link DisplayAnimation} or null.
+     */
+    public static @Nullable DisplayAnimation getAnimationFromJSON(@NotNull InputStream inputStream){
+        try{
+            return getAnimationFromJSON(JsonParser
+                    .parseString(new String(inputStream.readAllBytes()))
+                    .getAsJsonObject());
+        }
+        catch(IOException ex){
+            return null;
+        }
+    }
+
+    /**
+     * Get a {@link DisplayAnimation} from a plugin's resources, which is stored as a JSON file
+     * @param plugin The plugin to get the animation from
+     * @param resourcePath The path of the animation
+     * @return The found {@link DisplayAnimation}. Null if not found.
+     */
+    public static @Nullable DisplayAnimation getAnimationFromJSON(@NotNull JavaPlugin plugin, @NotNull String resourcePath){
+        try(InputStream stream = plugin.getResource(resourcePath)){
+            if (stream == null) return null;
+            return getAnimationFromJSON(stream);
+        }
+        catch(IOException e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static DisplayAnimation getAnimationFromJSON(JsonObject jsonObject){
+        DisplayGroupManager.deserializeJsonElement(jsonObject);
+        jsonObject.remove(DisplayGroupManager.PLUGIN_VERSION_FIELD);
+
+        return DEGJSONAdapter
+                .GSON
+                .fromJson(jsonObject, DisplayAnimation.class);
     }
 }

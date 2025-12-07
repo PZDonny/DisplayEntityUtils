@@ -74,6 +74,10 @@ abstract class DisplayEntitySpecifics implements Serializable {
         }
     }
 
+    boolean hasLegacyPartTags(){
+        return partTags != null && !partTags.isEmpty();
+    }
+
     List<String> getLegacyPartTags() {
         return partTags;
     }
@@ -161,7 +165,6 @@ abstract class DisplayEntitySpecifics implements Serializable {
                 display.addScoreboardTag(partTag);
             }
         }
-
 
         if (displayEntity.persistentDataContainer != null){
             try{
