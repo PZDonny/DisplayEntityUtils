@@ -560,7 +560,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public Transformation getDisplayTransformation(){
+    public Transformation getTransformation(){
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
             return null;
         }
@@ -573,7 +573,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public int getDisplayTeleportDuration() {
+    public int getTeleportDuration() {
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
             return -1;
         }
@@ -581,12 +581,12 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public @Nullable Display.Brightness getDisplayBrightness(){
+    public @Nullable Display.Brightness getBrightness(){
         return attributeContainer.getAttribute(DisplayAttributes.BRIGHTNESS);
     }
 
     @Override
-    public float getDisplayViewRange(){
+    public float getViewRange(){
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
             return -1;
         }

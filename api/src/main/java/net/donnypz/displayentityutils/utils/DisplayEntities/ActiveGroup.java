@@ -510,7 +510,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @return the group's teleport duration value
      */
     public int getTeleportDuration(){
-        return masterPart.getDisplayTeleportDuration();
+        return masterPart.getTeleportDuration();
     }
 
     /**

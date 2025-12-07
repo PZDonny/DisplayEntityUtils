@@ -179,7 +179,7 @@ public final class DisplayUtils {
             return null;
         }
 
-        Transformation transformation = part.getDisplayTransformation();
+        Transformation transformation = part.getTransformation();
         Location translationLoc = part.getLocation();
         if (translationLoc == null || transformation == null) return null;
 
@@ -198,7 +198,7 @@ public final class DisplayUtils {
             return null;
         }
 
-        Transformation transformation = part.getDisplayTransformation();
+        Transformation transformation = part.getTransformation();
         Location translationLoc = part.getLocation();
         Vector3f translationVector = transformation.getTranslation();
         float pitch = translationLoc.getPitch();
@@ -257,7 +257,7 @@ public final class DisplayUtils {
      * @return a float array containing the width and height, respectively
      */
     public static float[] getAutoCullValues(@NotNull ActivePart part, float widthAdder, float heightAdder){
-        Transformation t = part.getDisplayTransformation();
+        Transformation t = part.getTransformation();
         return getAutoCullValues(part.getType(), t.getTranslation(), t.getScale(), t.getLeftRotation(), widthAdder, heightAdder);
     }
 

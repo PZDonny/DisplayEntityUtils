@@ -290,7 +290,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             //Displays
             if (p.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
                 DisplayAttributeMap attributeMap = new DisplayAttributeMap();
-                Transformation transformation = p.getDisplayTransformation();
+                Transformation transformation = p.getTransformation();
                 //Reset Scale then multiply by newScaleMultiplier
                 Vector3f scale = transformation.getScale();
                 scale.x = (scale.x/scaleMultiplier)*newScaleMultiplier;
@@ -303,7 +303,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 translationVector.y = (translationVector.y/scaleMultiplier)*newScaleMultiplier;
                 translationVector.z = (translationVector.z/scaleMultiplier)*newScaleMultiplier;
 
-                if (!transformation.equals(p.getDisplayTransformation())){
+                if (!transformation.equals(p.getTransformation())){
                     attributeMap.add(DisplayAttributes.Interpolation.DURATION, durationInTicks)
                         .add(DisplayAttributes.Interpolation.DELAY, -1)
                         .addTransformation(transformation);

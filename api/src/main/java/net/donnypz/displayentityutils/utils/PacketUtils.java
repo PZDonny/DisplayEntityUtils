@@ -314,7 +314,7 @@ public final class PacketUtils {
             delayInTicks = -1;
         }
 
-        Vector3f translation = part.getDisplayTransformation().getTranslation();
+        Vector3f translation = part.getTransformation().getTranslation();
         translation.add(direction.toVector3f().normalize().mul((float) distance));
         part.setAttributes(new DisplayAttributeMap()
                 .add(DisplayAttributes.Transform.TRANSLATION, translation)

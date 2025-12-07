@@ -285,7 +285,7 @@ public abstract class AnimationPlayer {
         //Prevents jittering in some cases
         boolean applyDataOnly;
         if (!packetAnimationPlayer){
-            applyDataOnly = transformation.isSimilar(part.getDisplayTransformation());
+            applyDataOnly = transformation.isSimilar(part.getTransformation());
             applyDisplayTransformation(part, frame, animation, group, transformation, applyDataOnly);
         }
         else{

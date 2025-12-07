@@ -34,7 +34,7 @@ class DisplayTransformation extends Transformation{
     }
 
     static DisplayTransformation get(ActivePart part){
-        DisplayTransformation dTransform = new DisplayTransformation(part.getDisplayTransformation());
+        DisplayTransformation dTransform = new DisplayTransformation(part.getTransformation());
         if (part.type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY){
             dTransform.type = SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY;
             dTransform.data = part.getBlockDisplayBlock();
@@ -173,7 +173,7 @@ class DisplayTransformation extends Transformation{
 
     boolean isSimilar(ActivePart part){
         if (part instanceof PacketDisplayEntityPart p){
-            return isSimilar(p.getDisplayTransformation());
+            return isSimilar(p.getTransformation());
         }
         return isSimilar(((Display) ((SpawnedDisplayEntityPart) part).getEntity()).getTransformation());
     }

@@ -58,7 +58,7 @@ abstract class DisplayEntitySpecifics implements Serializable {
     DisplayEntitySpecifics(PacketDisplayEntityPart part){
         //this.partTags = DisplayUtils.getPartTags(displayEntity);
         this.partUUID = part.partUUID;
-        this.serialTransformation = new SerialTransformation(part.getDisplayTransformation());
+        this.serialTransformation = new SerialTransformation(part.getTransformation());
         PacketAttributeContainer c = part.attributeContainer;
         this.billboard = c.getAttributeOrDefault(DisplayAttributes.BILLBOARD, Display.Billboard.FIXED);
         this.viewRange = c.getAttributeOrDefault(DisplayAttributes.VIEW_RANGE, 1f);

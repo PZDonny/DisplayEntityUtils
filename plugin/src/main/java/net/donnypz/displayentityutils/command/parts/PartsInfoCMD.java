@@ -96,7 +96,7 @@ class PartsInfoCMD extends PlayerSubCommand {
             player.sendMessage(MiniMessage.miniMessage().deserialize("Is Master Part: "+(part.isMaster() ? "<green>TRUE" : "<red>FALSE")));
             player.sendMessage(Component.empty());
             if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getDisplayViewRange()));
+                player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getViewRange()));
                 sendBrightness(player, part);
                 DEUCommandUtils.sendGlowColor(player, part.getGlowColor());
             }
@@ -107,7 +107,7 @@ class PartsInfoCMD extends PlayerSubCommand {
             }
         }
         else{
-            player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getDisplayViewRange()));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getViewRange()));
             sendBrightness(player, part);
             DEUCommandUtils.sendGlowColor(player, part.getGlowColor());
         }
@@ -125,7 +125,7 @@ class PartsInfoCMD extends PlayerSubCommand {
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
             return;
         }
-        Display.Brightness brightness = part.getDisplayBrightness();
+        Display.Brightness brightness = part.getBrightness();
         if (brightness == null){
             player.sendMessage(MiniMessage.miniMessage().deserialize("Brightness: <red>NOT SET"));
         }

@@ -43,7 +43,7 @@ public class ExprActiveTeleportDuration extends SimplePropertyExpression<Active,
             return ag.getTeleportDuration();
         }
         if (active instanceof ActivePart ap){
-            return ap.getDisplayTeleportDuration();
+            return ap.getTeleportDuration();
         }
 
         return null;
