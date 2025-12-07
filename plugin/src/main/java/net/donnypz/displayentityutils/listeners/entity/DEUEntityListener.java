@@ -11,6 +11,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
+import org.bukkit.Location;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
@@ -92,9 +93,18 @@ public final class DEUEntityListener implements Listener {
         Entity entity = e.getEntity();
         applyState(e.getEntity(), MachineState.StateType.TELEPORT);
 
+        Location fromLoc = e.getFrom();
+        Location toLoc = e.getTo();
+
         ActiveGroup<?> controllerGroup = DisplayControllerManager.getControllerGroup(entity.getUniqueId());
         if (controllerGroup instanceof PacketDisplayEntityGroup pg){
-            pg.teleport(e.getTo(), true);
+            pg.teleport(toLoc, true);
+        }
+
+        if (!fromLoc.getWorld().equals(toLoc.getWorld())){
+            for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getPassengerGroups(entity)){
+                pg.hide(); //Hide for players in prev world
+            }
         }
     }
 

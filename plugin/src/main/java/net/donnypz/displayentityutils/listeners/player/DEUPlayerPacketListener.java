@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.world.chunk.Column;
+import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
@@ -18,6 +19,8 @@ import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.util.Set;
 import java.util.UUID;
@@ -40,9 +43,15 @@ public class DEUPlayerPacketListener implements PacketListener {
     private void spawnEntity(User user, PacketSendEvent event){
         WrapperPlayServerSpawnEntity packet = new WrapperPlayServerSpawnEntity(event);
         packet.getUUID().ifPresent(uuid -> {
+            Player player = event.getPlayer();
+            Vector3d pos = packet.getPosition();
+            Location spawnLoc = new Location(player.getWorld(), pos.x, pos.y, pos.z);
+
             if (!PacketDisplayEntityGroup.hasPassengerGroups(uuid)) return;
             for (PacketDisplayEntityGroup g : PacketDisplayEntityGroup.getPassengerGroups(uuid)){
-                g.showToPlayer(event.getPlayer(), GroupSpawnedEvent.SpawnReason.PLAYER_SENT_CHUNK);
+                if (g.isAutoShow()){
+                    g.showToPlayer(event.getPlayer(), GroupSpawnedEvent.SpawnReason.PLAYER_SENT_PASSENGER_GROUP, spawnLoc);
+                }
             }
         });
     }
