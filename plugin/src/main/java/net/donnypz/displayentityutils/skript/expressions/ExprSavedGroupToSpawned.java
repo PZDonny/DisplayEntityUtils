@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 @Name("Saved Group to Spawned Group")
 @Description("Spawn a saved group at a location")
 @Examples({"set {_spawnedgroup} to {_savedgroup} spawned at {_location}",
-"set {_spawnedgroup} to {_savedgroup} spawned at {_location} with {_groupspawnsettings}"})
+            "set {_spawnedgroup} to {_savedgroup} spawned at {_location} with {_groupspawnsettings}"})
 @Since("2.6.2")
 public class ExprSavedGroupToSpawned extends SimpleExpression<SpawnedDisplayEntityGroup> {
 

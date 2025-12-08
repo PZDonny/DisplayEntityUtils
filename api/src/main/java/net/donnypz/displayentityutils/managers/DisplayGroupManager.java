@@ -744,6 +744,31 @@ public final class DisplayGroupManager {
     }
 
     @ApiStatus.Internal
+    public static PacketDisplayEntityGroup addPersistentPacketGroup(@NotNull Location location, @NotNull DisplayEntityGroup displayEntityGroup, GroupSpawnSettings settings){
+        Chunk c = location.getChunk();
+        PersistentDataContainer pdc = c.getPersistentDataContainer();
+        List<String> list = getChunkList(pdc);
+        int id;
+        if (list.isEmpty()){
+            id = 1;
+        }
+        else{
+            id = gson.fromJson(list.getLast(), PersistentPacketGroup.class).id+1;
+        }
+
+        PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.INTERNAL, true, settings);
+        displayEntityGroup = pdeg.toDisplayEntityGroup();
+        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, pdeg.isAutoShow());
+        if (cpg != null){
+            String json = gson.toJson(cpg);
+            list.add(json);
+            pdc.set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
+            pdeg.setPersistentIds(id, c);
+        }
+        return pdeg;
+    }
+
+    @ApiStatus.Internal
     public static void updatePersistentPacketGroup(@NotNull PacketDisplayEntityGroup packetDisplayEntityGroup){
         if (!packetDisplayEntityGroup.isPersistent()) return;
         String persistentGlobalId = packetDisplayEntityGroup.getPersistentGlobalId();
@@ -751,7 +776,6 @@ public final class DisplayGroupManager {
         long chunkKey = Long.parseLong(split[1]);
         int localId = Integer.parseInt(split[2]);
         updatePersistentPacketGroup(packetDisplayEntityGroup, Bukkit.getWorld(split[0]), chunkKey, localId);
-
     }
 
     @ApiStatus.Internal
@@ -885,6 +909,7 @@ public final class DisplayGroupManager {
             cpg.setGroup(group);
             return (cpg.groupBase64 == null) ? null : cpg;
         }
+
 
         void setGroup(DisplayEntityGroup group){
             try{

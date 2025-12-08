@@ -13,6 +13,7 @@ import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import org.bukkit.Location;
 import org.bukkit.event.Event;
@@ -23,17 +24,21 @@ import org.jetbrains.annotations.Nullable;
 @Examples({"set {_packetgroup} to packet based {_savedgroup} spawned at {_location}",
         "",
         "#(3.3.4+) Spawn packet based group that will persist after restarts",
-        "set {_packetgroup} to persistent packet based {_savedgroup} spawned at {_location}"})
-@Since("3.0.0, 3.3.4 (Persistent)")
+        "set {_packetgroup} to persistent packet based {_savedgroup} spawned at {_location}",
+        "",
+        "#(3.3.6+) Spawn packet based group with spawn settings, changing its properties",
+        "set {_packetgroup} to packet based {_savedgroup} spawned at {_location} with {_groupspawnsettings}"})
+@Since("3.0.0, 3.3.4 (Persistent), 3.3.6 (GroupSpawnSettings)")
 public class ExprSavedGroupToPacket extends SimpleExpression<PacketDisplayEntityGroup> {
 
     static{
-        Skript.registerExpression(ExprSavedGroupToPacket.class, PacketDisplayEntityGroup.class, ExpressionType.COMBINED, "[:persistent] packet [based] %savedgroup% spawned at %location%");
+        Skript.registerExpression(ExprSavedGroupToPacket.class, PacketDisplayEntityGroup.class, ExpressionType.COMBINED, "[:persistent] packet [based] %savedgroup% spawned at %location% [w:with %-groupspawnsetting%]");
     }
 
     private Expression<DisplayEntityGroup> savedGroup;
     private Expression<Location> location;
     boolean persistent;
+    private Expression<GroupSpawnSettings> groupSpawnSettings = null;
 
     @Override
     protected PacketDisplayEntityGroup @Nullable [] get(Event event) {
@@ -41,11 +46,21 @@ public class ExprSavedGroupToPacket extends SimpleExpression<PacketDisplayEntity
         if (saved == null) return new PacketDisplayEntityGroup[0];
         Location loc = location.getSingle(event);
         if (loc == null) return new PacketDisplayEntityGroup[0];
-        if (persistent){
-            return new PacketDisplayEntityGroup[]{DisplayGroupManager.addPersistentPacketGroup(loc, saved, false)};
+        GroupSpawnSettings settings;
+        if (groupSpawnSettings != null){
+            settings = groupSpawnSettings.getSingle(event);
+            if (settings == null){
+                settings = new GroupSpawnSettings().visibleByDefault(false, null);
+            }
         }
         else{
-            return new PacketDisplayEntityGroup[]{saved.createPacketGroup(loc, GroupSpawnedEvent.SpawnReason.SKRIPT, true)};
+            settings = new GroupSpawnSettings().visibleByDefault(false, null);
+        }
+        if (persistent){
+            return new PacketDisplayEntityGroup[]{DisplayGroupManager.addPersistentPacketGroup(loc, saved, settings)};
+        }
+        else{
+            return new PacketDisplayEntityGroup[]{saved.createPacketGroup(loc, GroupSpawnedEvent.SpawnReason.SKRIPT, true, settings)};
         }
     }
 
@@ -69,6 +84,9 @@ public class ExprSavedGroupToPacket extends SimpleExpression<PacketDisplayEntity
         savedGroup = (Expression<DisplayEntityGroup>) expressions[0];
         location = (Expression<Location>) expressions[1];
         persistent = parseResult.hasTag("persistent");
+        if (parseResult.hasTag("w")){
+            groupSpawnSettings = (Expression<GroupSpawnSettings>) expressions[2];
+        }
         return true;
     }
 }
