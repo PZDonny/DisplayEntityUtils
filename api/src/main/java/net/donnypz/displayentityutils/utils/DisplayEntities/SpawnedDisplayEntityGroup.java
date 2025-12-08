@@ -1192,7 +1192,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         PacketDisplayEntityGroup packetGroup;
 
         if (persistent){
-            packetGroup = DisplayGroupManager.addPersistentPacketGroup(location, savedGroup, autoShow);
+            packetGroup = DisplayGroupManager.addPersistentPacketGroup(location, savedGroup, autoShow, GroupSpawnedEvent.SpawnReason.INTERNAL);
         }
         else{
             packetGroup = savedGroup.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.INTERNAL, playSpawnAnimation, autoShow);

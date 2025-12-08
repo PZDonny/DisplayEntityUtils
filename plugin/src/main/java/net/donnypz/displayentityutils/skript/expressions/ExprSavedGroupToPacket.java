@@ -57,7 +57,7 @@ public class ExprSavedGroupToPacket extends SimpleExpression<PacketDisplayEntity
             settings = new GroupSpawnSettings().visibleByDefault(false, null);
         }
         if (persistent){
-            return new PacketDisplayEntityGroup[]{DisplayGroupManager.addPersistentPacketGroup(loc, saved, settings)};
+            return new PacketDisplayEntityGroup[]{DisplayGroupManager.addPersistentPacketGroup(loc, saved, settings, GroupSpawnedEvent.SpawnReason.SKRIPT)};
         }
         else{
             return new PacketDisplayEntityGroup[]{saved.createPacketGroup(loc, GroupSpawnedEvent.SpawnReason.SKRIPT, true, settings)};

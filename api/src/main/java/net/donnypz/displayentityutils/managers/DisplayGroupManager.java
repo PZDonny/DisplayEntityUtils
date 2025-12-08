@@ -721,7 +721,10 @@ public final class DisplayGroupManager {
     }
 
     @ApiStatus.Internal
-    public static PacketDisplayEntityGroup addPersistentPacketGroup(@NotNull Location location, @NotNull DisplayEntityGroup displayEntityGroup, boolean autoShow){
+    public static PacketDisplayEntityGroup addPersistentPacketGroup(@NotNull Location location,
+                                                                    @NotNull DisplayEntityGroup displayEntityGroup,
+                                                                    boolean autoShow,
+                                                                    @NotNull GroupSpawnedEvent.SpawnReason spawnReason){
         Chunk c = location.getChunk();
         PersistentDataContainer pdc = c.getPersistentDataContainer();
         List<String> list = getChunkList(pdc);
@@ -738,13 +741,16 @@ public final class DisplayGroupManager {
         String json = gson.toJson(cpg);
         list.add(json);
         pdc.set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
-        PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.INTERNAL, true, autoShow);
+        PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, spawnReason, true, autoShow);
         pdeg.setPersistentIds(id, c);
         return pdeg;
     }
 
     @ApiStatus.Internal
-    public static PacketDisplayEntityGroup addPersistentPacketGroup(@NotNull Location location, @NotNull DisplayEntityGroup displayEntityGroup, GroupSpawnSettings settings){
+    public static PacketDisplayEntityGroup addPersistentPacketGroup(@NotNull Location location,
+                                                                    @NotNull DisplayEntityGroup displayEntityGroup,
+                                                                    @NotNull GroupSpawnSettings settings,
+                                                                    @NotNull GroupSpawnedEvent.SpawnReason spawnReason){
         Chunk c = location.getChunk();
         PersistentDataContainer pdc = c.getPersistentDataContainer();
         List<String> list = getChunkList(pdc);
@@ -756,7 +762,7 @@ public final class DisplayGroupManager {
             id = gson.fromJson(list.getLast(), PersistentPacketGroup.class).id+1;
         }
 
-        PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.INTERNAL, true, settings);
+        PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, spawnReason, true, settings);
         displayEntityGroup = pdeg.toDisplayEntityGroup();
         PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, pdeg.isAutoShow());
         if (cpg != null){
