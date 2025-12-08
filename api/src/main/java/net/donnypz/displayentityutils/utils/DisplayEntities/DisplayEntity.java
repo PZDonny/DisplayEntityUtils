@@ -117,7 +117,7 @@ final class DisplayEntity implements Serializable {
         return d;
     }
 
-    PacketDisplayEntityPart createPacketPart(PacketDisplayEntityGroup group, Location spawnLocation){
+    PacketDisplayEntityPart createPacketPart(PacketDisplayEntityGroup group, Location spawnLocation, GroupSpawnSettings settings){
         PacketAttributeContainer attributeContainer = specifics.getAttributeContainer();
         PacketDisplayEntityPart part = attributeContainer.createPart(type.toPartType(), spawnLocation);
         if (persistentDataContainer != null){
@@ -140,6 +140,7 @@ final class DisplayEntity implements Serializable {
                 group.setSpawnAnimation(animationTag, type, loadMethod);
             }
         }
+        settings.applyAttributes(part);
 
         return part;
     }

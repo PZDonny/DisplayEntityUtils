@@ -136,23 +136,12 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
-        showToPlayer(player, spawnReason, new GroupSpawnSettings());
-    }
-
-    /**
-     * Show this part to a player as a packet-based entity
-     * @param player the player
-     * @param spawnReason the spawn reason
-     * @param groupSpawnSettings the spawn settings to apply
-     * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#teleport(Location)}, or if when created for a group, the group's location was null.
-     */
-    @Override
-    public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
         if (packetLocation == null){
             throw new RuntimeException("Location must be set for packet-based part before showing it to players.");
         }
-        showToPlayer(player, spawnReason, new GroupSpawnSettings(), getLocation());
+        showToPlayer(player, spawnReason, getLocation());
     }
+
 
     /**
      * Show this part to a player as a packet-based entity
@@ -162,18 +151,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void showToPlayer(@NotNull Player player, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull Location location) {
-        showToPlayer(player, spawnReason, new GroupSpawnSettings(), location);
-    }
-
-    /**
-     * Show this part to a player as a packet-based entity
-     * @param player the player
-     * @param spawnReason the spawn reason
-     * @param groupSpawnSettings the spawn settings to apply
-     * @param location where to spawn the packet-based entity for the player
-     */
-    @Override
-    public void showToPlayer(@NotNull Player player, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings, @NotNull Location location) {
         if (!viewers.add(player.getUniqueId())){  //Already viewing
             return;
         }
@@ -181,28 +158,27 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         attributeContainer.sendEntity(type, getEntityId(), player, location);
     }
 
+    public void showToPlayer(@NotNull Player player, @NotNull Location location, GroupSpawnSettings settings) {
+        if (!viewers.add(player.getUniqueId())){  //Already viewing
+            return;
+        }
+        if (settings.applyVisibility(this, player)){
+            DEUUser.getOrCreateUser(player).trackPacketEntity(this);
+            attributeContainer.sendEntity(type, getEntityId(), player, location);
+        }
+    }
+
+
     /**
      * Show this part to players as a packet-based entity.
      * @param players the players
      * @param spawnReason the spawn reason
      */
     public void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
-        showToPlayers(players, spawnReason, new GroupSpawnSettings());
+        showToPlayers(players, spawnReason, getLocation());
     }
 
-    /**
-     * Show this part to players as a packet-based entity.
-     * @param players the players
-     * @param spawnReason the spawn reason
-     * @param groupSpawnSettings the spawn settings to apply
-     * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#teleport(Location)}, or if when created for a group, the group's location was null.
-     */
-    public void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
-        if (packetLocation == null){
-            throw new RuntimeException("Location must be set for packet-based part before showing it to players.");
-        }
-        showToPlayers(players, spawnReason, groupSpawnSettings, getLocation());
-    }
+
 
     /**
      * Show this part to players as a packet-based entity.
@@ -212,18 +188,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull Location location) {
-        showToPlayers(players, spawnReason, new GroupSpawnSettings(), location);
-    }
-
-    /**
-     * Show this part to players as a packet-based entity.
-     * @param players the players
-     * @param spawnReason the spawn reason
-     * @param groupSpawnSettings the spawn settings to apply
-     * @param location where to spawn the packet-based entity for the players
-     */
-    @Override
-    public void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings, @NotNull Location location) {
         Collection<Player> plrs = new HashSet<>(players);
         for (Player player : players){
             if (!viewers.add(player.getUniqueId())){ //Already viewing

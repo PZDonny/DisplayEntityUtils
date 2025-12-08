@@ -1195,7 +1195,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             packetGroup = DisplayGroupManager.addPersistentPacketGroup(location, savedGroup, autoShow);
         }
         else{
-            packetGroup = savedGroup.createPacketGroup(location, playSpawnAnimation, autoShow);
+            packetGroup = savedGroup.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.INTERNAL, playSpawnAnimation, autoShow);
         }
 
         //Restore Interaction Pivot

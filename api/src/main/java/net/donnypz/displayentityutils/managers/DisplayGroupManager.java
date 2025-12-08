@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.GroupRegisteredEvent;
+import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.events.GroupUnregisteredEvent;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
@@ -737,7 +738,7 @@ public final class DisplayGroupManager {
         String json = gson.toJson(cpg);
         list.add(json);
         pdc.set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
-        PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, true, autoShow);
+        PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.INTERNAL, true, autoShow);
         pdeg.setPersistentIds(id, c);
         return pdeg;
     }
@@ -929,7 +930,7 @@ public final class DisplayGroupManager {
             Location spawnLoc = getLocation(chunk);
             DisplayEntityGroup g = getGroup();
             if (spawnLoc == null || g == null) return null;
-            return g.createPacketGroup(spawnLoc, true, autoShow);
+            return g.createPacketGroup(spawnLoc, GroupSpawnedEvent.SpawnReason.INTERNAL, true, autoShow);
         }
     }
 }

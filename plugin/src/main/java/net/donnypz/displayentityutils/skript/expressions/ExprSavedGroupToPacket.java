@@ -10,6 +10,7 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
+import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
@@ -44,7 +45,7 @@ public class ExprSavedGroupToPacket extends SimpleExpression<PacketDisplayEntity
             return new PacketDisplayEntityGroup[]{DisplayGroupManager.addPersistentPacketGroup(loc, saved, false)};
         }
         else{
-            return new PacketDisplayEntityGroup[]{saved.createPacketGroup(loc, true)};
+            return new PacketDisplayEntityGroup[]{saved.createPacketGroup(loc, GroupSpawnedEvent.SpawnReason.SKRIPT, true)};
         }
     }
 

@@ -95,7 +95,7 @@ final class InteractionEntity implements Serializable {
         });
     }
 
-    PacketDisplayEntityPart createPacketPart(Location spawnLocation){
+    PacketDisplayEntityPart createPacketPart(Location spawnLocation, GroupSpawnSettings settings){
         PacketAttributeContainer attributeContainer = new PacketAttributeContainer()
                 .setAttribute(DisplayAttributes.Interaction.WIDTH, width)
                 .setAttribute(DisplayAttributes.Interaction.HEIGHT, height)
@@ -118,6 +118,7 @@ final class InteractionEntity implements Serializable {
             part.partUUID = DisplayEntity.getPDCPartUUID(pdc);
             part.interactionCommands = getInteractionCommands(pdc);
         }
+        settings.applyAttributes(part);
 
         return part;
     }
