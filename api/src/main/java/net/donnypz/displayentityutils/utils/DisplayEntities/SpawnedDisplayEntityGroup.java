@@ -1076,7 +1076,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * @return the {@link DisplayAnimator} that will control the playing of the given animation
      */
     public @NotNull DisplayAnimator animateUsingPackets(@NotNull SpawnedDisplayAnimation animation){
-        return DisplayAnimator.playUsingPackets(this, animation);
+        return DisplayAnimator.playUsingPackets(this, animation, DisplayAnimator.AnimationType.LINEAR);
     }
 
     /**
@@ -1085,9 +1085,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * @return the {@link DisplayAnimator} that will control the playing of the given animation
      */
     public @NotNull DisplayAnimator animateLoopingUsingPackets(@NotNull SpawnedDisplayAnimation animation){
-        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
-        animator.playUsingPackets(this, 0);
-        return animator;
+        return DisplayAnimator.playUsingPackets(this, animation, DisplayAnimator.AnimationType.LOOP);
     }
 
     /**

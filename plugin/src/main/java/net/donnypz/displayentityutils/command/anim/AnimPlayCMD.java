@@ -48,13 +48,13 @@ class AnimPlayCMD extends PlayerSubCommand {
             AnimCMD.hasNoFrames(player);
             return;
         }
-        boolean loop = false;
+        DisplayAnimator.AnimationType animationType = DisplayAnimator.AnimationType.LINEAR;
         boolean packet = false;
         Component optionResult = Component.empty();
         for (int i = 2; i < args.length; i++){
             String arg = args[i];
-            if (arg.equalsIgnoreCase("-loop") && !loop){
-                loop = true;
+            if (arg.equalsIgnoreCase("-loop") && animationType != DisplayAnimator.AnimationType.LOOP){
+                animationType = DisplayAnimator.AnimationType.LOOP;
                 optionResult = optionResult.append(Component.text(" (LOOPING)", NamedTextColor.YELLOW));
             }
             else if (arg.equalsIgnoreCase("-packet") && !packet){
@@ -63,10 +63,9 @@ class AnimPlayCMD extends PlayerSubCommand {
             }
         }
 
-        if (loop){
+        if (animationType == DisplayAnimator.AnimationType.LOOP){
             if (packet){
-                new DisplayAnimator(anim, DisplayAnimator.AnimationType.LOOP)
-                        .playUsingPackets(group, 0);
+                DisplayAnimator.playUsingPackets(group, anim, DisplayAnimator.AnimationType.LOOP);
             }
             else{
                 group.animateLooping(anim);
@@ -74,7 +73,7 @@ class AnimPlayCMD extends PlayerSubCommand {
         }
         else{
             if (packet){
-                DisplayAnimator.playUsingPackets(group, anim);
+                DisplayAnimator.playUsingPackets(group, anim, DisplayAnimator.AnimationType.LINEAR);
             }
             else{
                 group.animate(anim);

@@ -28,7 +28,7 @@ public class DisplayAnimator {
     }
 
     /**
-     * Plays an animation once for a {@link ActiveGroup}.
+     * Plays an animation once for a {@link SpawnedDisplayEntityGroup}.
      * @param group The group to play the animation
      * @param animation The animation to play
      * @param animationType the animation type
@@ -73,8 +73,8 @@ public class DisplayAnimator {
      * @param animation The animation to play
      * @return the {@link DisplayAnimator} used to play the animation
      */
-    public static DisplayAnimator playUsingPackets(@NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation){
-        DisplayAnimator animator = new DisplayAnimator(animation, AnimationType.LINEAR);
+    public static DisplayAnimator playUsingPackets(@NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
+        DisplayAnimator animator = new DisplayAnimator(animation, animationType);
         animator.playUsingPackets(group, 0);
         return animator;
     }
