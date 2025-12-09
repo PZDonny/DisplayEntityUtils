@@ -95,6 +95,14 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     }
 
     /**
+     * Get the {@link AnimationCamera} for this frame
+     * @return an {@link AnimationCamera} or null
+     */
+    public @Nullable AnimationCamera getCamera() {
+        return camera;
+    }
+
+    /**
      * Get whether this frame has transformation data stored
      * @return a boolean
      */

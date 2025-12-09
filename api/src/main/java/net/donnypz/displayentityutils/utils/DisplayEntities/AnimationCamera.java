@@ -43,6 +43,20 @@ public class AnimationCamera implements Serializable {
         return DisplayUtils.pivotPitchAndYaw(v, groupLoc.getPitch(), groupLoc.getYaw());
     }
 
+    /**
+     * Teleport an entity to the camera's represented position
+     */
+    public void teleport(@NotNull ActiveGroup<?> group, @NotNull PacketDisplayEntityPart part){
+        Vector v = getVector(group);
+        Location cameraLoc = group.getLocation();
+        //float pitch = this.pitch+cameraLoc.getPitch();
+        float yaw = this.yaw+cameraLoc.getYaw();
+        cameraLoc.add(v);
+        cameraLoc.setPitch(this.pitch);
+        cameraLoc.setYaw(yaw);
+        part.teleport(cameraLoc);
+    }
+
     public float getYaw() {
         return yaw;
     }

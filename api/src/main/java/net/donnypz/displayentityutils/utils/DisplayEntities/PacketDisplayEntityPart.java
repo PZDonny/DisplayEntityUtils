@@ -189,12 +189,14 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     @Override
     public void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull Location location) {
         Collection<Player> plrs = new HashSet<>(players);
-        for (Player player : players){
-            if (!viewers.add(player.getUniqueId())){ //Already viewing
-                plrs.remove(player);
-                continue;
+        synchronized (viewers){
+            for (Player player : players){
+                if (!viewers.add(player.getUniqueId())){ //Already viewing
+                    plrs.remove(player);
+                    continue;
+                }
+                DEUUser.getOrCreateUser(player).trackPacketEntity(this);
             }
-            DEUUser.getOrCreateUser(player).trackPacketEntity(this);
         }
         attributeContainer.sendEntityUsingPlayers(type, getEntityId(), plrs, location);
     }
@@ -203,14 +205,16 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * Hide the packet-based entity from all players tracking this part
      */
     public void hide(){
-        if (viewers.isEmpty()) return;
-        for (UUID uuid : getViewers()){
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null && player.isConnected()){
-                PacketUtils.hideEntity(player, getEntityId());
+        synchronized (viewers){
+            if (viewers.isEmpty()) return;
+            for (UUID uuid : getViewers()){
+                Player player = Bukkit.getPlayer(uuid);
+                if (player != null && player.isConnected()){
+                    PacketUtils.hideEntity(player, getEntityId());
+                }
             }
+            viewers.clear();
         }
-        viewers.clear();
     }
 
     /**
@@ -219,16 +223,26 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void hideFromPlayer(@NotNull Player player) {
-        if (viewers.remove(player.getUniqueId())){ //Was present and removed
-            PacketUtils.hideEntity(player, getEntityId());
-            DEUUser.getOrCreateUser(player).untrackPacketEntity(this);
+        synchronized (viewers){
+            if (viewers.remove(player.getUniqueId())){ //Was present and removed
+                PacketUtils.hideEntity(player, getEntityId());
+                DEUUser.getOrCreateUser(player).untrackPacketEntity(this);
+            }
         }
+    }
 
+    @ApiStatus.Internal
+    public void removeViewer(@NotNull UUID uuid){
+        synchronized (viewers){
+            viewers.remove(uuid);
+        }
     }
 
     @ApiStatus.Internal
     public void worldSwitchHide(@NotNull Player player, DEUUser user) {
-        viewers.remove(player.getUniqueId());
+        synchronized (viewers){
+            viewers.remove(player.getUniqueId());
+        }
         user.untrackPacketEntity(this);
         DEUUser.getOrCreateUser(player).untrackPacketEntity(this);
     }
@@ -239,10 +253,12 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void hideFromPlayers(@NotNull Collection<Player> players) {
-        for (Player p : players){
-            if (viewers.remove(p.getUniqueId())){ //Was present and removed
-                PacketUtils.hideEntity(p, getEntityId());
-                DEUUser.getOrCreateUser(p).untrackPacketEntity(this);
+        synchronized (viewers){
+            for (Player p : players){
+                if (viewers.remove(p.getUniqueId())){ //Was present and removed
+                    PacketUtils.hideEntity(p, getEntityId());
+                    DEUUser.getOrCreateUser(p).untrackPacketEntity(this);
+                }
             }
         }
     }
@@ -252,7 +268,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * @return a set of uuids
      */
     public @NotNull Collection<UUID> getViewers(){
-        return new HashSet<>(viewers);
+        synchronized (viewers){
+            return new HashSet<>(viewers);
+        }
     }
 
     @Override

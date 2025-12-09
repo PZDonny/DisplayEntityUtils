@@ -690,12 +690,18 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     /**
      * Manually stop all animations playing on this group
      * @param removeFromStateMachine removes this animation from its state machine if true
+     * @return a collection of the stopped {@link DisplayAnimator}s
      */
-    public void stopAnimations(boolean removeFromStateMachine){
-        clearActiveAnimators();
-        if (removeFromStateMachine){
-            DisplayStateMachine.unregisterFromStateMachine(this, true);
+    public @NotNull Collection<DisplayAnimator> stopAnimations(boolean removeFromStateMachine){
+        synchronized (animatorLock){
+            Set<DisplayAnimator> animators = new HashSet<>(activeAnimators);
+            activeAnimators.clear();
+            if (removeFromStateMachine){
+                DisplayStateMachine.unregisterFromStateMachine(this, true);
+            }
+            return animators;
         }
+
     }
 
     /**

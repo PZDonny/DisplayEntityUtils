@@ -1,15 +1,18 @@
 package net.donnypz.displayentityutils.managers;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCamera;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChangeGameState;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +26,7 @@ import java.util.function.Predicate;
 public class DEUUser {
     static final Object userLock = new Object();
     static final HashMap<UUID, DEUUser> users = new HashMap<>();
+    private static final ConcurrentHashMap<Integer, Vector3f> suppressedVectors = new ConcurrentHashMap<>();
 
     private final UUID userUUID;
     private boolean isValid = true;
@@ -32,7 +36,11 @@ public class DEUUser {
     private AnimationParticleBuilder particleBuilder;
     private final Location[] pointPositions = new Location[3];
     private final Set<PacketDisplayEntityPart> trackedPacketEntities = Collections.newSetFromMap(new ConcurrentHashMap<>());
-    private static final ConcurrentHashMap<Integer, Vector3f> suppressedVectors = new ConcurrentHashMap<>();
+
+    private PreAnimationCameraData preAnimationCameraData;
+    private final Object animationCameraLock = new Object();
+    private UUID cameraPlayerUUID;
+
 
 
 
@@ -257,6 +265,36 @@ public class DEUUser {
         }
     }
 
+    @ApiStatus.Internal
+    public void setPreAnimationCameraData(Player player, int cameraEntityId, UUID cameraPlayerUUID){
+        synchronized (animationCameraLock){
+            preAnimationCameraData = new PreAnimationCameraData(player.getLocation(), player.isOnGround(), player.getGameMode());
+            this.cameraPlayerUUID = cameraPlayerUUID;
+            WrapperPlayServerChangeGameState gameModePacket = new WrapperPlayServerChangeGameState(WrapperPlayServerChangeGameState.Reason.CHANGE_GAME_MODE, GameMode.SPECTATOR.getValue()); //Set gamemode to spectator
+            PacketEvents.getAPI().getPlayerManager().sendPacket(player, gameModePacket);
+
+            WrapperPlayServerCamera spectatePacket = new WrapperPlayServerCamera(cameraEntityId);
+            PacketEvents.getAPI().getPlayerManager().sendPacket(player, spectatePacket);
+        }
+    }
+
+    @ApiStatus.Internal
+    public void unsetPreAnimationCameraData(Player player, int cameraEntityId){
+        synchronized (animationCameraLock){
+            if (preAnimationCameraData != null && player.isConnected()){
+                preAnimationCameraData.halt(player, cameraEntityId);
+            }
+            preAnimationCameraData = null;
+            cameraPlayerUUID = null;
+        }
+    }
+
+    public UUID getAnimationCameraPlayer(){
+        synchronized (animationCameraLock){
+            return cameraPlayerUUID;
+        }
+    }
+
     /**
      * Check if this user is tracking a {@link PacketDisplayEntityPart}
      * @param part the {@link PacketDisplayEntityPart}
@@ -339,12 +377,38 @@ public class DEUUser {
         while (iter.hasNext()) {
             PacketDisplayEntityPart part = iter.next();
             if (part != null){
-                part.hideFromPlayer(player);
+                part.removeViewer(player.getUniqueId());
             }
             iter.remove();
         }
+        if (player.isConnected()) unsetPreAnimationCameraData(player, -1);
         synchronized (userLock){
             users.remove(userUUID);
+        }
+    }
+
+    record PreAnimationCameraData(Location prevLocation, boolean onGround, GameMode prevGameMode) {
+
+        void halt(Player player, int cameraEntityId){
+
+            //Stop Spectating
+            WrapperPlayServerCamera spectateStopPacket = new WrapperPlayServerCamera(player.getEntityId());
+            PacketEvents.getAPI().getPlayerManager().sendPacket(player, spectateStopPacket);
+
+            //Previous Gamemode
+            WrapperPlayServerChangeGameState packet = new WrapperPlayServerChangeGameState(WrapperPlayServerChangeGameState.Reason.CHANGE_GAME_MODE, prevGameMode.getValue());
+            PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
+
+            //Kill Camera Entity
+            WrapperPlayServerDestroyEntities destroyEntityPacket = new WrapperPlayServerDestroyEntities(cameraEntityId);
+            PacketEvents.getAPI().getPlayerManager().sendPacket(player, destroyEntityPacket);
+
+            //TP To Prev Location
+            org.joml.Vector3d jomlVec = prevLocation.toVector().toVector3d();
+            WrapperPlayServerEntityTeleport tpPacket = new WrapperPlayServerEntityTeleport(player.getEntityId(),
+                    new com.github.retrooper.packetevents.protocol.world.Location(new Vector3d(jomlVec.x, jomlVec.y, jomlVec.z), prevLocation.getYaw(), prevLocation.getPitch()),
+                    onGround);
+            PacketEvents.getAPI().getPlayerManager().sendPacket(player, tpPacket);
         }
     }
 }

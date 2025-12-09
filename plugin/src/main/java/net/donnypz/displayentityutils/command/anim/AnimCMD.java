@@ -112,8 +112,12 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
         else if (page == 5){
             CMDUtils.sendCMD(sender, "/deu anim showframe <frame-id>", "Displays a frame on your selected group");
             CMDUtils.sendCMD(sender, "/deu anim previewframe <frame-id>", "Preview a frame on your selected group, without changing group entity data");
-            CMDUtils.sendCMD(sender, "/deu anim play [-loop] [-packet]", "Play your selected animation on your selected group. \n\"-loop\" will make the animation loop. \n\"-packet\" will play the animation using packets.");
-            CMDUtils.sendCMD(sender, "/deu anim previewplay", "Preview your selected animation on your selected group, without changing group entity data.");
+            CMDUtils.sendCMD(sender, "/deu anim play [-loop] [-packet] [-camera]", "Play your selected animation on your selected group." +
+                    " \n\"-loop\" will make the animation loop." +
+                    " \n\"-packet\" will play the animation using packets." +
+                    " \n\"-camera\" will set your view to the animation's camera, if present");
+            CMDUtils.sendCMD(sender, "/deu anim previewplay [-camera]", "Preview your selected animation on your selected group, without changing group entity data." +
+                    " \n\"-camera\" will set your view to the animation's camera, if present");
             CMDUtils.sendCMD(sender, "/deu anim restore", "Restore your selected group to its previous state before previewing frames/animations");
             CMDUtils.sendCMD(sender, "/deu anim stop", "Stop an animation playing on a group");
             CMDUtils.sendCMD(sender, "/deu anim save <storage>", "Save your selected animation and any changes made");
