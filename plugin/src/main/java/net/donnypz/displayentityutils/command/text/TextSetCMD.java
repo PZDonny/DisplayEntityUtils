@@ -25,7 +25,7 @@ class TextSetCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /mdis text set <text>", NamedTextColor.RED));
+        player.sendMessage(Component.text("Incorrect Usage! /deu text set <text>", NamedTextColor.RED));
     }
 
     @Override

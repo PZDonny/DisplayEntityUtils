@@ -39,7 +39,7 @@ class GroupSelectCMD extends PlayerSubCommand {
     public void execute(Player player, String[] args) {
         if (args.length < 3) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number for the distance to search for groups", NamedTextColor.RED)));
-            player.sendMessage(Component.text("/mdis group select <distance>", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("/deu group select <distance>", NamedTextColor.GRAY));
             return;
         }
 
@@ -62,7 +62,7 @@ class GroupSelectCMD extends PlayerSubCommand {
         if (groups.isEmpty()){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("No nearby groups found!", NamedTextColor.RED)));
             player.sendMessage(Component.text("| Move to a different location or increase your search distance.", NamedTextColor.GRAY, TextDecoration.ITALIC));
-            player.sendMessage(Component.text("| Use \"/mdis group markpacketgroups\" to mark packet-based groups in your current chunk.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+            player.sendMessage(Component.text("| Use \"/deu group markpacketgroups\" to mark packet-based groups in your current chunk.", NamedTextColor.GRAY, TextDecoration.ITALIC));
             return;
         }
 

@@ -48,7 +48,7 @@ class AnimPreviewPlayCMD extends PlayerSubCommand {
         DisplayAPI.getScheduler().runLaterAsync(() -> {
             if (player.isConnected()){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Animation test complete!", NamedTextColor.GREEN)));
-                player.sendMessage(Component.text("| Use \"/mdis anim restore\" to restore your group's original state", NamedTextColor.GRAY));
+                player.sendMessage(Component.text("| Use \"/deu anim restore\" to restore your group's original state", NamedTextColor.GRAY));
             }
         }, anim.getDuration());
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Test playing animation!", NamedTextColor.AQUA)));

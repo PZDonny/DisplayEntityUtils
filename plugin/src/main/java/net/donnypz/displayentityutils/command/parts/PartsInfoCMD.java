@@ -113,12 +113,12 @@ class PartsInfoCMD extends PlayerSubCommand {
         }
         player.sendMessage(Component.empty());
         player.sendMessage(Component.text("| Click to view Part Tags", NamedTextColor.GOLD)
-                .clickEvent(ClickEvent.suggestCommand("/mdis parts listtags")));
+                .clickEvent(ClickEvent.suggestCommand("/deu parts listtags")));
 
     }
 
     private void incorrectUsage(Player player){
-        player.sendMessage(Component.text("Incorrect Usage! /mdis parts info <part | selection>", NamedTextColor.RED));
+        player.sendMessage(Component.text("Incorrect Usage! /deu parts info <part | selection>", NamedTextColor.RED));
     }
 
     private void sendBrightness(Player player, ActivePart part){

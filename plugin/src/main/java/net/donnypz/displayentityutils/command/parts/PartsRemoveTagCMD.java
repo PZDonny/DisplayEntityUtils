@@ -20,7 +20,7 @@ class PartsRemoveTagCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Provide a part tag! /mdis parts removetag <part-tag> [-all]", NamedTextColor.RED));
+        player.sendMessage(Component.text("Provide a part tag! /deu parts removetag <part-tag> [-all]", NamedTextColor.RED));
     }
 
     @Override

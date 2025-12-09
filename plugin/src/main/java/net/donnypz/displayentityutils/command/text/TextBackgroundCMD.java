@@ -22,7 +22,7 @@ class TextBackgroundCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis text background <color | hex-code> <0-1> [-all]", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu text background <color | hex-code> <0-1> [-all]", NamedTextColor.RED)));
     }
 
     @Override
@@ -55,7 +55,7 @@ class TextBackgroundCMD extends PartsSubCommand {
         Color c = ConversionUtils.getColorFromText(args[2]);
         if (c == null){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid color!", NamedTextColor.RED)));
-            player.sendMessage(Component.text("/mdis text background <color | hex-code> <0-1>", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("/deu text background <color | hex-code> <0-1>", NamedTextColor.GRAY));
             return null;
         }
         try{

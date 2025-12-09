@@ -39,7 +39,7 @@ class PartsMoveCMD extends PlayerSubCommand {
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /mdis parts move <direction> <distance>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /deu parts move <direction> <distance>", NamedTextColor.RED));
             return;
         }
 

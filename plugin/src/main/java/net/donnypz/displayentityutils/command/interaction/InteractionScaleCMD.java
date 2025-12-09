@@ -23,7 +23,7 @@ class InteractionScaleCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 6){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis interaction scale <height> <width> <tick-duration> <tick-delay>", NamedTextColor.RED)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu interaction scale <height> <width> <tick-duration> <tick-delay>", NamedTextColor.RED)));
             return;
         }
 

@@ -34,7 +34,7 @@ class PartsYawCMD extends PlayerSubCommand {
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /mdis parts yaw <yaw>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /deu parts yaw <yaw>", NamedTextColor.RED));
             return;
         }
 

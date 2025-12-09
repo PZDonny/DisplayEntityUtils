@@ -22,7 +22,7 @@ class TextSeeThroughCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /mdis text seethrough -all <on | off>", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /deu text seethrough -all <on | off>", NamedTextColor.RED)));
     }
 
     @Override

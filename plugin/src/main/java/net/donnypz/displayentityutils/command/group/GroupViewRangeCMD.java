@@ -19,7 +19,7 @@ class GroupViewRangeCMD extends GroupSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis group viewrange <view-range-multiplier>", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu group viewrange <view-range-multiplier>", NamedTextColor.RED)));
     }
 
     @Override

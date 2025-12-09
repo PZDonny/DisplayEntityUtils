@@ -23,7 +23,7 @@ class ItemSetCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /mdis parts setitem <\"-held\" | item-id> [-all]", NamedTextColor.RED));
+        player.sendMessage(Component.text("Incorrect Usage! /deu parts setitem <\"-held\" | item-id> [-all]", NamedTextColor.RED));
     }
 
     @Override

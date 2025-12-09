@@ -40,12 +40,12 @@ class AnimAddPointCMD extends PlayerSubCommand {
 
         if (RelativePointUtils.isViewingRelativePoints(player)){
             player.sendMessage(Component.text("You cannot add a point while already viewing points!", NamedTextColor.RED));
-            player.sendMessage(Component.text("| Run \"/mdis hidepoints\" to stop viewing points", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Run \"/deu hidepoints\" to stop viewing points", NamedTextColor.GRAY));
             return;
         }
 
         if (args.length < 4) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis anim addpoint <frame-id> <point-tag>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /deu anim addpoint <frame-id> <point-tag>", NamedTextColor.RED));
             player.sendMessage(Component.text("| \"point-tag\" is the tag you want to represent the new point", NamedTextColor.GRAY));
             return;
         }

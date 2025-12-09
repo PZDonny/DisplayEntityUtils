@@ -22,7 +22,7 @@ class TextShadowCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /mdis text shadow -all <on | off>", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /deu text shadow -all <on | off>", NamedTextColor.RED)));
     }
 
     @Override

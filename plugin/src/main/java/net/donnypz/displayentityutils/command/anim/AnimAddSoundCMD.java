@@ -43,7 +43,7 @@ class AnimAddSoundCMD extends PlayerSubCommand {
         }
 
         if (args.length < 6) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis anim addsound <sound> <volume> <pitch> <delay-in-ticks>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /deu anim addsound <sound> <volume> <pitch> <delay-in-ticks>", NamedTextColor.RED));
             return;
         }
         try {

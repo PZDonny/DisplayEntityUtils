@@ -14,7 +14,7 @@ softdepend:
 depend:
   - packetevents
 commands:
-  managedisplays:
-    aliases: [mdis]
+  deu:
+    aliases: [mdis, managedisplays]
     description:
     usage:

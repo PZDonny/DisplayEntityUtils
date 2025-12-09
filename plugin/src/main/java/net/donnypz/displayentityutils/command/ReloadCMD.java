@@ -18,7 +18,7 @@ class ReloadCMD extends ConsoleUsableSubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length < 2){
-            sender.sendMessage(Component.text("Incorrect Usage! /mdis reload <config | controllers>", NamedTextColor.RED));
+            sender.sendMessage(Component.text("Incorrect Usage! /deu reload <config | controllers>", NamedTextColor.RED));
             return;
         }
         if (args[1].equals("controllers")){
@@ -33,7 +33,7 @@ class ReloadCMD extends ConsoleUsableSubCommand {
             sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Plugin Config Reloaded!", NamedTextColor.YELLOW)));
         }
         else{
-            sender.sendMessage(Component.text("Incorrect Usage! /mdis reload <config | controllers>", NamedTextColor.RED));
+            sender.sendMessage(Component.text("Incorrect Usage! /deu reload <config | controllers>", NamedTextColor.RED));
         }
 
     }

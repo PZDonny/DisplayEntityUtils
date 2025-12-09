@@ -51,7 +51,7 @@ class AnimDrawPosCMD extends PlayerSubCommand {
     }
 
     private void incorrectUsage(Player player){
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis anim drawpos <1 | 2 | 3 | show>", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu anim drawpos <1 | 2 | 3 | show>", NamedTextColor.RED)));
     }
 
     private void showPointPos(DEUUser user, Player player){

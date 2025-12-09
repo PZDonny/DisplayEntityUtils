@@ -26,7 +26,7 @@ class AnimSelectCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 4) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis anim select <anim-tag> <storage>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /deu anim select <anim-tag> <storage>", NamedTextColor.RED));
             return;
         }
         String tag = args[2];

@@ -30,7 +30,7 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
     public void execute(Player player, String[] args) {
         if (args.length < 3) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number for the distance to search for the nearest group", NamedTextColor.RED)));
-            player.sendMessage(Component.text("/mdis group selectnearest <distance>", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("/deu group selectnearest <distance>", NamedTextColor.GRAY));
             return;
         }
 
@@ -40,7 +40,7 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
             GroupResult result = DisplayGroupManager.getSpawnedGroupNearLocation(player.getLocation(), searchDistance);
             if (result == null || result.group() == null){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You are not near any spawned display entity groups!", NamedTextColor.RED)));
-                player.sendMessage(Component.text("| Use \"/mdis group markpacketgroups\" to mark packet-based groups in your current chunk.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                player.sendMessage(Component.text("| Use \"/deu group markpacketgroups\" to mark packet-based groups in your current chunk.", NamedTextColor.GRAY, TextDecoration.ITALIC));
                 return;
             }
             SpawnedDisplayEntityGroup group = result.group();

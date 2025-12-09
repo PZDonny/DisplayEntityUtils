@@ -19,7 +19,7 @@ class TextLineWidthCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis text linewidth <width> [-all]", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu text linewidth <width> [-all]", NamedTextColor.RED)));
     }
 
     @Override

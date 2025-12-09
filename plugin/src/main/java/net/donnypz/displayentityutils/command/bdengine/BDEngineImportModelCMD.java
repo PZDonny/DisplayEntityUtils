@@ -27,7 +27,7 @@ class BDEngineImportModelCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 3) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis bdengine importmodel <model-id>", NamedTextColor.RED)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu bdengine importmodel <model-id>", NamedTextColor.RED)));
             return;
         }
         Location spawnLoc = player.getLocation();
@@ -49,7 +49,7 @@ class BDEngineImportModelCMD extends PlayerSubCommand {
 
                     if (result.getCommandCount() > 1){
                         player.sendMessage(Component.text("! The model resulted in creating multiple groups!", NamedTextColor.RED));
-                        player.sendMessage(Component.text("Select the group then use \"/mdis group merge\" to merge the produced group", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                        player.sendMessage(Component.text("Select the group then use \"/deu group merge\" to merge the produced group", NamedTextColor.GRAY, TextDecoration.ITALIC));
                         player.sendMessage(Component.text("It is not recommended to import groups that use animations this way!", NamedTextColor.RED, TextDecoration.ITALIC));
                     }
 

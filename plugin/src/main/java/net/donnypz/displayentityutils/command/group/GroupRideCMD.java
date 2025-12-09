@@ -38,7 +38,7 @@ class GroupRideCMD extends ConsoleUsableSubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length == 2){
-            sender.sendMessage(Component.text("Incorrect Usage! /mdis group ride <-target | player-name | entity-uuid> [group-tag] [storage] [controller-id]", NamedTextColor.RED));
+            sender.sendMessage(Component.text("Incorrect Usage! /deu group ride <-target | player-name | entity-uuid> [group-tag] [storage] [controller-id]", NamedTextColor.RED));
             return;
         }
 
@@ -51,7 +51,7 @@ class GroupRideCMD extends ConsoleUsableSubCommand {
         //Use Selected Group
         if (args.length < 5) {
             if (!(sender instanceof Player player)){
-                sender.sendMessage(Component.text("Incorrect Console Usage! /mdis group ride <-target | player-name | entity-uuid> [group-tag] [storage] [controller-id]", NamedTextColor.RED));
+                sender.sendMessage(Component.text("Incorrect Console Usage! /deu group ride <-target | player-name | entity-uuid> [group-tag] [storage] [controller-id]", NamedTextColor.RED));
                 return;
             }
 

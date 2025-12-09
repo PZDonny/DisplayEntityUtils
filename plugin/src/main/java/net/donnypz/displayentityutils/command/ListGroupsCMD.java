@@ -21,7 +21,7 @@ class ListGroupsCMD extends ConsoleUsableSubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length == 1){
-            sender.sendMessage(Component.text("Incorrect Usage! /mdis listgroups <storage> [page-number]", NamedTextColor.RED));
+            sender.sendMessage(Component.text("Incorrect Usage! /deu listgroups <storage> [page-number]", NamedTextColor.RED));
             return;
         }
         LoadMethod method;
@@ -35,9 +35,9 @@ class ListGroupsCMD extends ConsoleUsableSubCommand {
             }
             sender.sendMessage(DisplayAPI.pluginPrefixLong);
             sender.sendMessage(Component.text("Invalid Storage Location!", NamedTextColor.RED));
-            sender.sendMessage(Component.text("/mdis listgroups local", NamedTextColor.GRAY));
-            sender.sendMessage(Component.text("/mdis listgroups mongodb", NamedTextColor.GRAY));
-            sender.sendMessage(Component.text("/mdis listgroups mysql", NamedTextColor.GRAY));
+            sender.sendMessage(Component.text("/deu listgroups local", NamedTextColor.GRAY));
+            sender.sendMessage(Component.text("/deu listgroups mongodb", NamedTextColor.GRAY));
+            sender.sendMessage(Component.text("/deu listgroups mysql", NamedTextColor.GRAY));
             return;
         }
 
@@ -96,12 +96,12 @@ class ListGroupsCMD extends ConsoleUsableSubCommand {
     private static Component spawnGroup(String tag, LoadMethod loadMethod){
         return MiniMessage.miniMessage().deserialize("- <yellow>"+tag)
                 .hoverEvent(HoverEvent.showText(Component.text("Click to spawn", NamedTextColor.AQUA)))
-                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/mdis group spawn "+tag+" "+loadMethod.name()));
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/deu group spawn "+tag+" "+loadMethod.name()));
     }
 
     private static Component selectAnimation(String tag, LoadMethod loadMethod){
         return MiniMessage.miniMessage().deserialize("- <yellow>"+tag)
                 .hoverEvent(HoverEvent.showText(Component.text("Click to select", NamedTextColor.AQUA)))
-                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/mdis anim select "+tag+" "+loadMethod.name()));
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/deu anim select "+tag+" "+loadMethod.name()));
     }
 }

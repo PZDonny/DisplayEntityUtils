@@ -84,7 +84,7 @@ class PartsCreateCMD extends PlayerSubCommand {
     }
 
     private void incorrectUsage(Player player){
-        player.sendMessage(Component.text("Incorrect Usage! /mdis parts create <block | item | text | interaction>", NamedTextColor.RED));
+        player.sendMessage(Component.text("Incorrect Usage! /deu parts create <block | item | text | interaction>", NamedTextColor.RED));
     }
 
     private void selectEntity(Player player, UUID entityUUID, String displayName){

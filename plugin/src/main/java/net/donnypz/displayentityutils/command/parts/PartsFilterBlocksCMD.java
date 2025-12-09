@@ -40,7 +40,7 @@ class PartsFilterBlocksCMD extends PlayerSubCommand {
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("/mdis parts filterblocks <block-ids>", NamedTextColor.RED));
+            player.sendMessage(Component.text("/deu parts filterblocks <block-ids>", NamedTextColor.RED));
             return;
         }
 

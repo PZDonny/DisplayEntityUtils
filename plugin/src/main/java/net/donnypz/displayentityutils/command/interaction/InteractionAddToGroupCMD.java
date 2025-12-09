@@ -25,7 +25,7 @@ class InteractionAddToGroupCMD extends GroupSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis interaction addtogroup <height> <width> [-here]", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu interaction addtogroup <height> <width> [-here]", NamedTextColor.RED)));
     }
 
     @Override

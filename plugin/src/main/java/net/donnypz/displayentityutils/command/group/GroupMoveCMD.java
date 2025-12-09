@@ -22,7 +22,7 @@ class GroupMoveCMD extends GroupSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("/mdis group move <direction> <distance> <tick-duration>", NamedTextColor.RED));
+        player.sendMessage(Component.text("/deu group move <direction> <distance> <tick-duration>", NamedTextColor.RED));
     }
 
     @Override

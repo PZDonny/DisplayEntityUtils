@@ -20,7 +20,7 @@ class ItemTransformCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /mdis item transform <transform-type> [-all]", NamedTextColor.RED));
+        player.sendMessage(Component.text("Incorrect Usage! /deu item transform <transform-type> [-all]", NamedTextColor.RED));
     }
 
     @Override

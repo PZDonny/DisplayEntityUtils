@@ -31,7 +31,7 @@ class GroupSetSpawnAnimationCMD extends GroupSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /mdis group setspawnanim <animation-tag> <storage> <linear | loop>", NamedTextColor.RED));
+        player.sendMessage(Component.text("Incorrect Usage! /deu group setspawnanim <animation-tag> <storage> <linear | loop>", NamedTextColor.RED));
         player.sendMessage(Component.text("Valid storage methods are local, mongodb, or mysql", NamedTextColor.GRAY));
         sendAnimationTypes(player);
     }

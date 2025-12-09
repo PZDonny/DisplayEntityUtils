@@ -29,7 +29,7 @@ class GroupSaveJsonCMD extends PlayerSubCommand {
 
         if (group.getTag() == null){
             player.sendMessage(Component.text("Failed to save display entity group, no tag provided!", NamedTextColor.RED));
-            player.sendMessage(Component.text("| Use \"/mdis group settag <tag>\"", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Use \"/deu group settag <tag>\"", NamedTextColor.GRAY));
             return;
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<gray>Attempting to save your selected group as <light_purple>JSON <white>(Tagged: "+group.getTag()+")")));

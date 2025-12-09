@@ -28,7 +28,7 @@ class AnimShowFrameCMD extends GroupSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("/mdis anim showframe <frame-id>", NamedTextColor.RED));
+        player.sendMessage(Component.text("/deu anim showframe <frame-id>", NamedTextColor.RED));
         player.sendMessage(Component.text("First frame is 0, Second frame is 1, and so on...", NamedTextColor.GRAY));
     }
 

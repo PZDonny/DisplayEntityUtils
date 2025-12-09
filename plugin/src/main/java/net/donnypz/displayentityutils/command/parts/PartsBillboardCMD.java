@@ -21,7 +21,7 @@ class PartsBillboardCMD extends PartsSubCommand {
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid billboard type!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/mdis parts billboard <fixed | vertical | horizontal | center> [-all]", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("/deu parts billboard <fixed | vertical | horizontal | center> [-all]", NamedTextColor.GRAY));
     }
 
     @Override

@@ -29,7 +29,7 @@ class AnimSaveJsonCMD extends PlayerSubCommand {
 
         if (animation.getAnimationTag() == null){
             player.sendMessage(Component.text("Failed to save animation, no tag provided!", NamedTextColor.RED));
-            player.sendMessage(Component.text("| Use \"/mdis anim settag <tag>\"", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Use \"/deu anim settag <tag>\"", NamedTextColor.GRAY));
             return;
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow> Attempting to save animation as <light_purple>JSON <white>(Tagged:"+animation.getAnimationTag()+")")));

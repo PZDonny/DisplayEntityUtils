@@ -26,7 +26,7 @@ public class BDEngineSpawnModelCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 3) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis bdengine spawnmodel <file-name>", NamedTextColor.RED)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu bdengine spawnmodel <file-name>", NamedTextColor.RED)));
             return;
         }
         String fileName = args[2];

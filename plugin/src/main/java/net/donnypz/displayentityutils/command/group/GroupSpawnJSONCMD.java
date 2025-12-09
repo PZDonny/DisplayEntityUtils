@@ -27,7 +27,7 @@ public class GroupSpawnJSONCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis group spawnjson <file-name> [-packet]", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /deu group spawnjson <file-name> [-packet]", NamedTextColor.RED));
             return;
         }
         String tag = args[2];

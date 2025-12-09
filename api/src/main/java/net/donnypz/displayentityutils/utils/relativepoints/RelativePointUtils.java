@@ -75,7 +75,7 @@ public class RelativePointUtils {
     private static boolean stopIfViewing(Player player){
         if (isViewingRelativePoints(player)) {
             player.sendMessage(Component.text("You are already viewing points!", NamedTextColor.RED));
-            player.sendMessage(Component.text("| Run \"/mdis hidepoints\" to stop viewing points", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Run \"/deu hidepoints\" to stop viewing points", NamedTextColor.GRAY));
             return true;
         }
         return false;
@@ -84,7 +84,7 @@ public class RelativePointUtils {
     private static void setDisplays(Player player, Set<RelativePointSelector<?>> selectors){
         relativePointSelectors.put(player.getUniqueId(), selectors);
         player.sendMessage(Component.text("Left click a point to select it", NamedTextColor.GREEN));
-        player.sendMessage(Component.text("| Run \"/mdis hidepoints\" to stop viewing points", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("| Run \"/deu hidepoints\" to stop viewing points", NamedTextColor.GRAY));
     }
 
     public static boolean isViewingRelativePoints(Player player){

@@ -29,7 +29,7 @@ class AnimReverseCMD extends PlayerSubCommand {
         List<SpawnedDisplayAnimationFrame> frames = anim.getFrames();
         if (frames.isEmpty()) {
             player.sendMessage(Component.text("Your currently selected animation has no frames!", NamedTextColor.RED));
-            player.sendMessage(Component.text("Use \"/mdis anim addframe\" instead", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("Use \"/deu anim addframe\" instead", NamedTextColor.GRAY));
             return;
         }
         anim.reverse();

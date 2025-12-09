@@ -24,7 +24,7 @@ class GroupSaveCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage /mdis group save <storage>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage /deu group save <storage>", NamedTextColor.RED));
             return;
         }
 
@@ -36,7 +36,7 @@ class GroupSaveCMD extends PlayerSubCommand {
 
         if (group.getTag() == null){
             player.sendMessage(Component.text("Failed to save display entity group, no tag provided!", NamedTextColor.RED));
-            player.sendMessage(Component.text("| Use \"/mdis group settag <tag>\"", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Use \"/deu group settag <tag>\"", NamedTextColor.GRAY));
             return;
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<gray>Attempting to save your selected group <white>(Tagged: "+group.getTag()+")")));
