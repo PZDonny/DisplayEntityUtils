@@ -80,7 +80,7 @@ public class BDEngineLegacyDPConverter {
         SpawnedDisplayEntityGroup createdGroup = DatapackEntitySpawned.getTimestampGroup(timeStamp);
         if (createdGroup == null){
             player.sendMessage(Component.text("Failed to find model/group created from datapack!", NamedTextColor.RED));
-            player.sendMessage(Component.text("| The datapack may be a modern one (v1.13+ of BDEngine). Try using /mdis bdengine convertdp"));
+            player.sendMessage(Component.text("| The datapack may be a modern one (v1.13+ of BDEngine). Try using /deu bdengine convertdp"));
             return;
         }
 
@@ -195,7 +195,7 @@ public class BDEngineLegacyDPConverter {
 
                 if (zipEntry.getName().contains("summon")){
                     String projectName = zipEntry.getName();
-                    projectName = projectName.replace(BDEngineDPConverter.functionFolderName+"/summon.mcfunction", "");
+                    projectName = projectName.replace(BDEngineDPConverter.FUNCTION_FOLDER +"/summon.mcfunction", "");
 
                     String[] splitDir = projectName.split("/");
                     projectName = splitDir[splitDir.length-1];

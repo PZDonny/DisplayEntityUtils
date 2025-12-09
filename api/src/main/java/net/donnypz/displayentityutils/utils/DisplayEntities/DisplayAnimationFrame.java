@@ -21,6 +21,7 @@ public final class DisplayAnimationFrame implements Serializable {
 
     HashMap<UUID, SerialTransformation> displayTransformations = new HashMap<>();
     HashMap<UUID, Vector3f> interactionTranslations = new HashMap<>();
+    AnimationCamera camera;
     int delay;
     int duration;
 
@@ -59,11 +60,18 @@ public final class DisplayAnimationFrame implements Serializable {
         interactionTranslations.put(uuid, transformation);
     }
 
+    void setCamera(AnimationCamera camera){
+        this.camera = camera;
+    }
+
     public SpawnedDisplayAnimationFrame toSpawnedDisplayAnimationFrame(){
         SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame();
         frame.delay = delay;
         frame.duration = duration;
         frame.tag = frameTag;
+        if (camera != null){
+            frame.camera = new AnimationCamera(camera);
+        }
 
         //Old Sound Maps
         if (startSounds != null || endSounds != null){

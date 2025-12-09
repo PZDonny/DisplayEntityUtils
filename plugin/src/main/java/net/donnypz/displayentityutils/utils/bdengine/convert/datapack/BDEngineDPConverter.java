@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.listeners.bdengine.DatapackEntitySpawned;
 import net.donnypz.displayentityutils.managers.*;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
+import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationCamera;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -13,10 +14,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -35,17 +33,21 @@ import java.util.zip.ZipFile;
 public class BDEngineDPConverter {
 
     static final CommandSender silentSender = Bukkit.createCommandSender(feedback -> {});
-    static final String functionFolderName = VersionUtils.IS_1_21 ? "function" : "functions";
-    private static final String createModelPath = "/create.mcfunction";
+    static final String FUNCTION_FOLDER = VersionUtils.IS_1_21 ? "function" : "functions";
+    private static final String CREATE_MODEL_PATH = "/create.mcfunction";
 
     private String projectName = null;
     private final String groupSaveTag;
     private final String animationSavePrefix;
     private final LinkedHashMap<String, ArrayList<ZipEntry>> animations = new LinkedHashMap<>();
+    Location spawnLoc;
 
     public BDEngineDPConverter(@NotNull Player player, @NotNull String datapackName, @NotNull String groupSaveTag, @NotNull String animationSavePrefix){
         this.groupSaveTag = groupSaveTag;
         this.animationSavePrefix = animationSavePrefix;
+        spawnLoc = player.getLocation();
+        spawnLoc.setPitch(0);
+        spawnLoc.setYaw(0);
         if (!datapackName.endsWith(".zip")){
             datapackName = datapackName+".zip";
         }
@@ -60,27 +62,27 @@ public class BDEngineDPConverter {
     }
 
     private boolean isAnimationEntry(String entryName){
-        return !entryName.endsWith(".mcfunction") && (entryName.contains("/"+ functionFolderName +"/a/") && !entryName.endsWith("/"+ functionFolderName +"/a/"));
+        return !entryName.endsWith(".mcfunction") && (entryName.contains("/"+ FUNCTION_FOLDER +"/a/") && !entryName.endsWith("/"+ FUNCTION_FOLDER +"/a/"));
     }
 
     private boolean isSoundPath(String entryName){
-        return entryName.contains("/"+ functionFolderName +"/k_s");
+        return entryName.contains("/"+ FUNCTION_FOLDER +"/k_s");
     }
 
     private String getAnimationName(String entryName, String folder){
-        String animName = entryName.split(functionFolderName +"/"+folder+"/")[1];
+        String animName = entryName.split(FUNCTION_FOLDER +"/"+folder+"/")[1];
         return animName.endsWith(".mcfunction") ? animName.split("/")[0] : animName.substring(0, animName.length()-1);
     }
 
     private void getProjectName(String entryName){
         if (projectName == null){
-            this.projectName = entryName.split("/"+functionFolderName+"/")[0].substring(5);
+            this.projectName = entryName.split("/"+ FUNCTION_FOLDER +"/")[0].substring(5);
         }
     }
 
     private void spawnModel(Player player, ZipEntry createModelEntry, ZipFile zipFile){
         getProjectName(createModelEntry.getName());
-        executeCommands(createModelEntry, zipFile, player, player.getLocation());
+        executeCommands(createModelEntry, zipFile, player, null);
     }
 
     private void addFrame(ZipEntry entry){
@@ -95,7 +97,7 @@ public class BDEngineDPConverter {
             String entryName = entry.getName();
 
             //Summon model
-            if (entryName.endsWith(createModelPath)){
+            if (entryName.endsWith(CREATE_MODEL_PATH)){
                 spawnModel(player, entry, zipFile);
             }
             //Add Animation
@@ -116,7 +118,7 @@ public class BDEngineDPConverter {
         SpawnedDisplayEntityGroup createdGroup = DatapackEntitySpawned.getProjectGroup(projectName);
         if (createdGroup == null){
             player.sendMessage(Component.text("Failed to find model/group created from datapack!", NamedTextColor.RED));
-            player.sendMessage(Component.text("| The datapack may be a legacy one (Before BDEngine v1.13). Try using /mdis bdengine convertdpleg", NamedTextColor.GRAY, TextDecoration.ITALIC));
+            player.sendMessage(Component.text("| The datapack may be a legacy one (Before BDEngine v1.13). Try using /deu bdengine convertdpleg", NamedTextColor.GRAY, TextDecoration.ITALIC));
             player.sendMessage(Component.text("| The datapack may have been generated for a different game version", NamedTextColor.GRAY, TextDecoration.ITALIC));
             return;
         }
@@ -191,12 +193,14 @@ public class BDEngineDPConverter {
                     return;
                 }
 
+                SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(0, 2);
+
                 //Apply Transformations, Texture Values, etc.
                 ZipEntry entry = frames.get(i);
-                List<String> commands = executeCommands(entry, zipFile, player, createdGroup.getLocation());
+                executeCommands(entry, zipFile, player, frame);
 
                 //Create Frame
-                SpawnedDisplayAnimationFrame frame = new SpawnedDisplayAnimationFrame(0, 2).setTransformation(createdGroup);
+                frame.setTransformation(createdGroup);
                 anim.addFrame(frame);
                 i++;
             }
@@ -204,14 +208,10 @@ public class BDEngineDPConverter {
     }
 
 
-    private List<String> executeCommands(ZipEntry zipEntry, ZipFile zipFile, Player player, Location location){
-        List<String> commands;
-        if (zipEntry.getName().endsWith(createModelPath)) {
-            commands = null;
-        }
-        else{
-            commands = new ArrayList<>();
-        }
+    private void executeCommands(ZipEntry zipEntry,
+                                 ZipFile zipFile,
+                                 Player player,
+                                 SpawnedDisplayAnimationFrame frame){
         try{
             InputStream stream = zipFile.getInputStream(zipEntry);
             BufferedReader br = new BufferedReader(new InputStreamReader(stream));
@@ -226,12 +226,16 @@ public class BDEngineDPConverter {
                 }
 
                 //Summon Model from datapack
-                if (zipEntry.getName().endsWith(createModelPath)){
+                if (zipEntry.getName().endsWith(CREATE_MODEL_PATH)){
+                    //Camera
+                    if (line.startsWith("execute unless") || line.startsWith("data")) {
+                        continue;
+                    }
 
                     //Master Part
                     //if (line.contains("execute as @s")){
                     if (line.startsWith("summon block_display")){
-                        String coordinates = ConversionUtils.getCoordinateString(location);
+                        String coordinates = ConversionUtils.getCoordinateString(spawnLoc);
                         String replacement = "execute at "+player.getName()+" run summon block_display "+coordinates;
                         line = line.replace("summon block_display ~ ~ ~", replacement); //Before BDEngine 1.15.3
                         line = line.replace("summon block_display ~-0.5 ~-0.5 ~-0.5", replacement); //BDEngine 1.15.3 and Later
@@ -257,6 +261,7 @@ public class BDEngineDPConverter {
                         line = line.replace("@s", player.getName());
                         line = "execute"+line.split("nearest]")[1];
                     }
+
                     line = line.substring(0, line.length()-2)+",\""+LocalManager.datapackConvertDeleteSubParentTag+"\"]}";
                 }
 
@@ -264,14 +269,18 @@ public class BDEngineDPConverter {
                     continue;
                 }
 
-                String coordinates = ConversionUtils.getCoordinateString(location);
-                World w = location.getWorld();
+
+                if (line.startsWith("tp @e[type=minecraft:block_display,tag="+projectName+"_camera,limit=1,sort=nearest]")){
+                    if (frame != null){
+                        setCameraVectorAndDirection(frame, line);
+                    }
+                    continue;
+                }
+
+                String coordinates = ConversionUtils.getCoordinateString(spawnLoc);
+                World w = spawnLoc.getWorld();
                 String worldName = ConversionUtils.getExecuteCommandWorldName(w);
 
-
-                if (!line.startsWith("data merge entity @e[") && commands != null){ //Not an animation command
-                    commands.add(line);
-                }
                 Bukkit.dispatchCommand(silentSender, "execute positioned "+coordinates+" in "+worldName+" run "+line);
             }
             br.close();
@@ -284,6 +293,22 @@ public class BDEngineDPConverter {
             catch(IOException ignored){}
             throw new RuntimeException("Failed to execute command from ZipEntry: "+zipEntry.getName());
         }
-        return commands;
+    }
+
+    private void setCameraVectorAndDirection(SpawnedDisplayAnimationFrame frame, String line){
+        try{
+            String argsString = line.split("_camera,limit=1,sort=nearest] ")[1];
+            String[] args = argsString.split(" ");
+            double x = Double.parseDouble(args[0].substring(1));
+            double y = Double.parseDouble(args[1].substring(1));
+            double z = Double.parseDouble(args[2].substring(1));
+            double yaw = Double.parseDouble(args[3]);
+            double pitch = Double.parseDouble(args[4]);
+            frame.setAnimationCamera(new AnimationCamera(x, y, z, (float) yaw, (float) pitch));
+            Location cameraLoc = spawnLoc.clone().add(x, y, z);
+            cameraLoc.getWorld().spawnParticle(Particle.DRAGON_BREATH, cameraLoc, 1, 0,0,0,0);
+        } catch(IndexOutOfBoundsException e){}
+
+
     }
 }

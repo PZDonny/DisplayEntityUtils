@@ -15,6 +15,7 @@ import java.util.*;
 public final class SpawnedDisplayAnimationFrame implements Cloneable{
     HashMap<UUID, DisplayTransformation> displayTransformations = new HashMap<>(); //Part UUIDS
     HashMap<UUID, Vector3f>  interactionTransformations = new HashMap<>(); //Part UUIDS
+    AnimationCamera camera;
 
     int delay;
     int duration;
@@ -29,6 +30,14 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     }
 
     SpawnedDisplayAnimationFrame(){}
+
+    /**
+     * Set the {@link AnimationCamera}, with properties to be used for this frame
+     * @param camera the camera
+     */
+    public void setAnimationCamera(@Nullable AnimationCamera camera){
+        this.camera = camera;
+    }
 
     /**
      * Set the delay of this frame.
@@ -419,6 +428,9 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
             UUID uuid = entry.getKey();
             Vector3f vector = entry.getValue();
             frame.setInteractionTransformation(uuid, vector);
+        }
+        if (camera != null){
+            frame.setCamera(new AnimationCamera(camera));
         }
         return frame;
     }
