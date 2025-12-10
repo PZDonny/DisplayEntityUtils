@@ -303,7 +303,9 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
             if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
                 continue;
             }
-            part.glow(player, durationInTicks);
+            if (!part.isGlowing()){
+                part.glow(player, durationInTicks);
+            }
         }
     }
 
