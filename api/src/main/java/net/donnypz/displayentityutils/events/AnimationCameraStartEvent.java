@@ -26,14 +26,16 @@ public class AnimationCameraStartEvent extends Event implements Cancellable {
     DisplayAnimator animator;
     Collection<Player> players;
     UUID cameraUUID;
+    int startFrameId;
     private boolean isCancelled = false;
 
-    public AnimationCameraStartEvent(ActiveGroup<?> group, DisplayAnimator animator, SpawnedDisplayAnimation animation, Collection<Player> players, UUID cameraUUID){
+    public AnimationCameraStartEvent(ActiveGroup<?> group, DisplayAnimator animator, SpawnedDisplayAnimation animation, Collection<Player> players, int startFrameId, UUID cameraUUID){
         super(!Bukkit.isPrimaryThread());
         this.group = group;
         this.animation = animation;
         this.animator = animator;
         this.players = players;
+        this.startFrameId = startFrameId;
         this.cameraUUID = cameraUUID;
     }
 
@@ -67,6 +69,14 @@ public class AnimationCameraStartEvent extends Event implements Cancellable {
      */
     public @NotNull Collection<Player> getPlayers(){
         return new HashSet<>(players);
+    }
+
+    /**
+     * Get the frame that the camera will start at
+     * @return an int
+     */
+    public int getStartFrameId(){
+        return startFrameId;
     }
 
     /**

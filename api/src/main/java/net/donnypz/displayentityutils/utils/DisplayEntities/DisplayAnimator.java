@@ -104,7 +104,7 @@ public class DisplayAnimator {
      */
     public static boolean playCamera(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
         UUID uuid = UUID.randomUUID();
-        if (!new AnimationCameraStartEvent(group, null, animation, players, uuid).callEvent()){
+        if (!new AnimationCameraStartEvent(group, null, animation, players, 0, uuid).callEvent()){
             return false;
         }
         new AnimationCameraPlayer(players, animation, group, animationType, 0, DEFAULT_END_DELAY, uuid);
@@ -225,7 +225,7 @@ public class DisplayAnimator {
      */
     public boolean playCamera(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, int startFrameId, int endDelay){
         UUID uuid = UUID.randomUUID();
-        if (!new AnimationCameraStartEvent(group, this, animation, players, uuid).callEvent()){
+        if (!new AnimationCameraStartEvent(group, this, animation, players, startFrameId, uuid).callEvent()){
             return false;
         }
         new AnimationCameraPlayer(players, animation, group, getAnimationType(), startFrameId, endDelay, uuid);
