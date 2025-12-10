@@ -50,7 +50,7 @@ public class AnimationCameraPlayerRemovedEvent extends Event{
      * Get the player involved in this event
      * @return the player
      */
-    public @NotNull Player getPlayers(){
+    public @NotNull Player getPlayer(){
         return player;
     }
 
