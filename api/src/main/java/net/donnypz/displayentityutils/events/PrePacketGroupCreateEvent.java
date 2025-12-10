@@ -14,7 +14,7 @@ import org.bukkit.event.HandlerList;
  * <p>
  * Can be cancelled
  */
-public class PacketGroupCreateEvent extends Event implements Cancellable {
+public class PrePacketGroupCreateEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     DisplayEntityGroup displayEntityGroup;
     GroupSpawnSettings newSettings = null;
@@ -22,7 +22,7 @@ public class PacketGroupCreateEvent extends Event implements Cancellable {
 
     private boolean isCancelled = false;
 
-    public PacketGroupCreateEvent(DisplayEntityGroup group, GroupSpawnedEvent.SpawnReason spawnReason){
+    public PrePacketGroupCreateEvent(DisplayEntityGroup group, GroupSpawnedEvent.SpawnReason spawnReason){
         this.displayEntityGroup = group;
         this.spawnReason = spawnReason;
     }
@@ -52,7 +52,7 @@ public class PacketGroupCreateEvent extends Event implements Cancellable {
     }
 
     /**
-     * Get the settings set with {@link  PacketGroupCreateEvent#setGroupSpawnSettings(GroupSpawnSettings)}
+     * Get the settings set with {@link  PrePacketGroupCreateEvent#setGroupSpawnSettings(GroupSpawnSettings)}
      * @return {@link GroupSpawnSettings} or null
      */
     public GroupSpawnSettings getNewSettings() {
