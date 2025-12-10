@@ -17,6 +17,7 @@ public class DisplayAnimator {
     final AnimationType type;
     private final ConcurrentHashMap<UUID, Set<ClientAnimationPlayer>> clientPlayers = new ConcurrentHashMap<>();
     private final Object clientPlayerLock = new Object();
+    private static final int DEFAULT_START_DELAY = 0;
     private static final int DEFAULT_END_DELAY = 2;
 
     /**
@@ -107,7 +108,7 @@ public class DisplayAnimator {
         if (!new AnimationCameraStartEvent(group, null, animation, players, 0, uuid).callEvent()){
             return false;
         }
-        new AnimationCameraPlayer(players, animation, group, animationType, 0, DEFAULT_END_DELAY, uuid);
+        new AnimationCameraPlayer(players, animation, group, animationType, 0, DEFAULT_START_DELAY, DEFAULT_END_DELAY, uuid);
         return true;
     }
 
@@ -185,7 +186,7 @@ public class DisplayAnimator {
      * @param player the player
      * @param group the group
      * @param startFrameId the frame index the animation will start from
-     *   * @return false if the {@link AnimationCameraStartEvent} is cancelled
+     * @return false if the {@link AnimationCameraStartEvent} is cancelled
      */
     public boolean playCamera(@NotNull Player player, @NotNull ActiveGroup<?> group, int startFrameId){
         return playCamera(List.of(player), group, startFrameId);
@@ -196,10 +197,10 @@ public class DisplayAnimator {
      * @param players the players
      * @param group the group
      * @param startFrameId the frame index the animation will start from
-     *   * @return false if the {@link AnimationCameraStartEvent} is cancelled
+     *  @return false if the {@link AnimationCameraStartEvent} is cancelled
      */
     public boolean playCamera(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, int startFrameId){
-        return playCamera(players, group, startFrameId, DEFAULT_END_DELAY);
+        return playCamera(players, group, startFrameId, DEFAULT_START_DELAY, DEFAULT_END_DELAY);
     }
 
 
@@ -208,11 +209,12 @@ public class DisplayAnimator {
      * @param player the player
      * @param group the group
      * @param startFrameId the frame index the animation will start from
+     * @param startTransition how long it should take to transition from the player's current position to the first frame's position
      * @param endDelay how long after the animation the player should stay at the final position
      * @return false if the {@link AnimationCameraStartEvent} is cancelled
      */
-    public boolean playCamera(@NotNull Player player, @NotNull ActiveGroup<?> group, int startFrameId, int endDelay){
-        return playCamera(List.of(player), group, startFrameId, endDelay);
+    public boolean playCamera(@NotNull Player player, @NotNull ActiveGroup<?> group, int startFrameId, int startTransition, int endDelay){
+        return playCamera(List.of(player), group, startFrameId, startTransition, endDelay);
     }
 
     /**
@@ -220,15 +222,16 @@ public class DisplayAnimator {
      * @param players the players
      * @param group the group
      * @param startFrameId the frame index the animation will start from
+     * @param startTransition how long it should take to transition from the player's current position to the first frame's position
      * @param endDelay how long after the animation the players should stay at the final position
      * @return false if the {@link AnimationCameraStartEvent} is cancelled
      */
-    public boolean playCamera(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, int startFrameId, int endDelay){
+    public boolean playCamera(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, int startFrameId, int startTransition, int endDelay){
         UUID uuid = UUID.randomUUID();
         if (!new AnimationCameraStartEvent(group, this, animation, players, startFrameId, uuid).callEvent()){
             return false;
         }
-        new AnimationCameraPlayer(players, animation, group, getAnimationType(), startFrameId, endDelay, uuid);
+        new AnimationCameraPlayer(players, animation, group, getAnimationType(), startFrameId, startTransition, endDelay, uuid);
         return true;
     }
 

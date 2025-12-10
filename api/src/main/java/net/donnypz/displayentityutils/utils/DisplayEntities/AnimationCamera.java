@@ -47,6 +47,10 @@ public class AnimationCamera implements Serializable {
      * Teleport an entity to the camera's represented position
      */
     public void teleport(@NotNull ActiveGroup<?> group, @NotNull PacketDisplayEntityPart part){
+        part.teleport(getTeleportLocation(group));
+    }
+
+    public Location getTeleportLocation(@NotNull ActiveGroup<?> group){
         Vector v = getVector(group);
         Location cameraLoc = group.getLocation();
         //float pitch = this.pitch+cameraLoc.getPitch();
@@ -54,7 +58,7 @@ public class AnimationCamera implements Serializable {
         cameraLoc.add(v);
         cameraLoc.setPitch(this.pitch);
         cameraLoc.setYaw(yaw);
-        part.teleport(cameraLoc);
+        return cameraLoc;
     }
 
     public float getYaw() {

@@ -299,6 +299,13 @@ public class DEUUser {
         return getAnimationCameraPlayer() != null;
     }
 
+    @ApiStatus.Internal
+    public boolean isInAnimationCamera(@NotNull UUID cameraPlayerUUID){
+        synchronized (animationCameraLock){
+            return cameraPlayerUUID.equals(this.cameraPlayerUUID);
+        }
+    }
+
     /**
      * Check if this user is tracking a {@link PacketDisplayEntityPart}
      * @param part the {@link PacketDisplayEntityPart}
