@@ -85,7 +85,7 @@ public class DisplayAnimator {
     }
 
     public static DisplayAnimator playCamera(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
-        DisplayAnimator animator = new DisplayAnimator(animation, AnimationType.LINEAR);
+        DisplayAnimator animator = new DisplayAnimator(animation, animationType);
         animator.playCamera(players, group, 0, 2);
         return animator;
     }
