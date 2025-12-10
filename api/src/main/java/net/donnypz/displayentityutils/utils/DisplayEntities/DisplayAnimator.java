@@ -16,6 +16,7 @@ public class DisplayAnimator {
     final AnimationType type;
     private final ConcurrentHashMap<UUID, Set<ClientAnimationPlayer>> clientPlayers = new ConcurrentHashMap<>();
     private final Object clientPlayerLock = new Object();
+    private static final int DEFAULT_END_DELAY = 2;
 
     /**
      * Create a display animator that manages playing and stopping animations for {@link ActiveGroup}s.
@@ -86,7 +87,7 @@ public class DisplayAnimator {
 
     public static DisplayAnimator playCamera(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
         DisplayAnimator animator = new DisplayAnimator(animation, animationType);
-        animator.playCamera(players, group, 0, 2);
+        animator.playCamera(players, group, 0, DEFAULT_END_DELAY);
         return animator;
     }
 
@@ -158,6 +159,27 @@ public class DisplayAnimator {
         DisplayAPI.getAnimationPlayerService().playForClient(players, this, animation, group, frame, startFrameId, delay, false);
         return true;
     }
+
+    /**
+     * Set a player's perspective to the animation's camera and play the camera's movements to the player
+     * @param player the player
+     * @param group the group
+     * @param startFrameId the frame index the animation will start from
+     */
+    public void playCamera(@NotNull Player player, @NotNull ActiveGroup<?> group, int startFrameId){
+        playCamera(List.of(player), group, startFrameId);
+    }
+
+    /**
+     * Set the perspective of players to the animation's camera and play the camera's movements to the players
+     * @param players the players
+     * @param group the group
+     * @param startFrameId the frame index the animation will start from
+     */
+    public void playCamera(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, int startFrameId){
+        playCamera(players, group, startFrameId, DEFAULT_END_DELAY);
+    }
+
 
     /**
      * Set a player's perspective to the animation's camera and play the camera's movements to the player
