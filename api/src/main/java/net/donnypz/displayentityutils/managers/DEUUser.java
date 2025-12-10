@@ -295,6 +295,10 @@ public class DEUUser {
         }
     }
 
+    public boolean isInAnimationCamera(){
+        return getAnimationCameraPlayer() != null;
+    }
+
     /**
      * Check if this user is tracking a {@link PacketDisplayEntityPart}
      * @param part the {@link PacketDisplayEntityPart}
