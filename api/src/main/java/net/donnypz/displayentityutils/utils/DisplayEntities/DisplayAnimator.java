@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.events.AnimationCameraStartEvent;
 import net.donnypz.displayentityutils.events.AnimationStartEvent;
 import net.donnypz.displayentityutils.events.PacketAnimationStartEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
@@ -81,14 +82,33 @@ public class DisplayAnimator {
         return animator;
     }
 
-    public static DisplayAnimator playCamera(@NotNull Player player, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
+    /**
+     * Set the perspective of players to the animation's camera and play the camera's movements to the players.
+     * @param player the players
+     * @param group the group
+     * @param animation the animation
+     * @param animationType the animation type
+     * @return false if the {@link AnimationCameraStartEvent} is cancelled
+     */
+    public static boolean playCamera(@NotNull Player player, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
         return playCamera(List.of(player), group, animation, animationType);
     }
 
-    public static DisplayAnimator playCamera(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
-        DisplayAnimator animator = new DisplayAnimator(animation, animationType);
-        animator.playCamera(players, group, 0, DEFAULT_END_DELAY);
-        return animator;
+    /**
+     * Set the perspective of players to the animation's camera and play the camera's movements to the players.
+     * @param players the players
+     * @param group the group
+     * @param animation the animation
+     * @param animationType the animation type
+     * @return false if the {@link AnimationCameraStartEvent} is cancelled
+     */
+    public static boolean playCamera(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
+        UUID uuid = UUID.randomUUID();
+        if (!new AnimationCameraStartEvent(group, null, animation, players, uuid).callEvent()){
+            return false;
+        }
+        new AnimationCameraPlayer(players, animation, group, animationType, 0, DEFAULT_END_DELAY, uuid);
+        return true;
     }
 
     /**
@@ -165,9 +185,10 @@ public class DisplayAnimator {
      * @param player the player
      * @param group the group
      * @param startFrameId the frame index the animation will start from
+     *   * @return false if the {@link AnimationCameraStartEvent} is cancelled
      */
-    public void playCamera(@NotNull Player player, @NotNull ActiveGroup<?> group, int startFrameId){
-        playCamera(List.of(player), group, startFrameId);
+    public boolean playCamera(@NotNull Player player, @NotNull ActiveGroup<?> group, int startFrameId){
+        return playCamera(List.of(player), group, startFrameId);
     }
 
     /**
@@ -175,9 +196,10 @@ public class DisplayAnimator {
      * @param players the players
      * @param group the group
      * @param startFrameId the frame index the animation will start from
+     *   * @return false if the {@link AnimationCameraStartEvent} is cancelled
      */
-    public void playCamera(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, int startFrameId){
-        playCamera(players, group, startFrameId, DEFAULT_END_DELAY);
+    public boolean playCamera(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, int startFrameId){
+        return playCamera(players, group, startFrameId, DEFAULT_END_DELAY);
     }
 
 
@@ -187,9 +209,10 @@ public class DisplayAnimator {
      * @param group the group
      * @param startFrameId the frame index the animation will start from
      * @param endDelay how long after the animation the player should stay at the final position
+     * @return false if the {@link AnimationCameraStartEvent} is cancelled
      */
-    public void playCamera(@NotNull Player player, @NotNull ActiveGroup<?> group, int startFrameId, int endDelay){
-        playCamera(List.of(player), group, startFrameId, endDelay);
+    public boolean playCamera(@NotNull Player player, @NotNull ActiveGroup<?> group, int startFrameId, int endDelay){
+        return playCamera(List.of(player), group, startFrameId, endDelay);
     }
 
     /**
@@ -198,9 +221,15 @@ public class DisplayAnimator {
      * @param group the group
      * @param startFrameId the frame index the animation will start from
      * @param endDelay how long after the animation the players should stay at the final position
+     * @return false if the {@link AnimationCameraStartEvent} is cancelled
      */
-    public void playCamera(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, int startFrameId, int endDelay){
-        new AnimationCameraPlayer(players, animation, group, getAnimationType(), startFrameId, endDelay);
+    public boolean playCamera(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, int startFrameId, int endDelay){
+        UUID uuid = UUID.randomUUID();
+        if (!new AnimationCameraStartEvent(group, this, animation, players, uuid).callEvent()){
+            return false;
+        }
+        new AnimationCameraPlayer(players, animation, group, getAnimationType(), startFrameId, endDelay, uuid);
+        return true;
     }
 
     void addPlayers(Collection<Player> players, ClientAnimationPlayer animationPlayer){
@@ -287,27 +316,38 @@ public class DisplayAnimator {
     }
 
     /**
-     * Stop a player from viewing an animation camera from its perspective
+     * Stop a player from viewing an animation camera and return to their original position
      * @param player the player
      */
-    public void stopCamera(@NotNull Player player){
+    public static void stopCameraView(@NotNull Player player){
         DEUUser user = DEUUser.getUser(player);
         if (user != null) {
             UUID cameraPlayerUUID = user.getAnimationCameraPlayer();
             AnimationCameraPlayer cameraPlayer = AnimationCameraPlayer.getCameraPlayer(cameraPlayerUUID);
             if (cameraPlayer != null){
-                cameraPlayer.removePlayer(player);
+                cameraPlayer.removePlayer(player, user);
             }
         }
     }
 
     /**
-     * Stop players from viewing an animation from its perspective
+     * Stop players from viewing an animation camera and return to their original position
      * @param players the players
      */
-    public void stopCamera(@NotNull Collection<Player> players){
+    public static void stopCameraView(@NotNull Collection<Player> players){
         for (Player player : players){
-            stopCamera(player);
+            stopCameraView(player);
+        }
+    }
+
+    /**
+     * Stop an animation camera by its UUID
+     * @param cameraUUID the camera's uuid
+     */
+    public static void stopCamera(@NotNull UUID cameraUUID){
+        AnimationCameraPlayer cameraPlayer = AnimationCameraPlayer.getCameraPlayer(cameraUUID);
+        if (cameraPlayer != null){
+            cameraPlayer.stop();
         }
     }
 

@@ -1,6 +1,8 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.events.AnimationCameraPlayerRemovedEvent;
+import net.donnypz.displayentityutils.events.AnimationCameraStopEvent;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
@@ -16,11 +18,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 class AnimationCameraPlayer {
 
+    ActiveGroup<?> group;
     SpawnedDisplayAnimation animation;
     DisplayAnimator.AnimationType animType;
     PacketDisplayEntityPart camera;
     private final Object playerLock = new Object();
-    private final UUID cameraPlayerUUID = UUID.randomUUID();
+    private final UUID cameraPlayerUUID;
     private final Collection<Player> players;
     private final int endDelay;
     private static final ConcurrentHashMap<UUID, AnimationCameraPlayer> cameraPlayers = new ConcurrentHashMap<>();
@@ -30,8 +33,10 @@ class AnimationCameraPlayer {
                             @NotNull ActiveGroup<?> group,
                             @NotNull DisplayAnimator.AnimationType animType,
                             int startFrameId,
-                            int endDelay)
+                            int endDelay,
+                            UUID cameraPlayerUUID)
     {
+        this.group = group;
         this.animation = animation;
         this.animType = animType;
 
@@ -42,6 +47,7 @@ class AnimationCameraPlayer {
         this.endDelay = endDelay;
         this.players = new HashSet<>(players);
 
+        this.cameraPlayerUUID = cameraPlayerUUID;
         cameraPlayers.put(cameraPlayerUUID, this);
 
         SpawnedDisplayAnimationFrame frame = animation.getFrame(startFrameId);
@@ -63,7 +69,10 @@ class AnimationCameraPlayer {
         if (!updatePlayers()){
             return;
         }
-        camera.setAttribute(DisplayAttributes.TELEPORTATION_DURATION, 2);
+        int lastDuration = camera.getTeleportDuration();
+        if (lastDuration != frame.duration){
+            camera.setAttribute(DisplayAttributes.TELEPORTATION_DURATION, frame.duration);
+        }
         frame.getAnimationCamera().teleport(group, camera);
 
         int delay = frame.duration+frame.delay;
@@ -96,23 +105,32 @@ class AnimationCameraPlayer {
                 else if (user.getAnimationCameraPlayer() != cameraPlayerUUID){
                     iter.remove();
                 }
+                else{
+                    continue;
+                }
+                removePlayerEvent(p);
             }
             return !players.isEmpty();
         }
     }
 
-    void removePlayer(Player player){
+    void removePlayer(Player player, DEUUser user){
         synchronized (playerLock){
             players.remove(player);
-            DEUUser user = DEUUser.getUser(player);
-            if (user != null && user.getAnimationCameraPlayer() == cameraPlayerUUID){
+            if (user.getAnimationCameraPlayer() == cameraPlayerUUID) {
                 user.unsetPreAnimationCameraData(player, camera.getEntityId());
             }
+            removePlayerEvent(player);
         }
+    }
+
+    void removePlayerEvent(Player player){
+        new AnimationCameraPlayerRemovedEvent(player, group, animation, cameraPlayerUUID).callEvent();
     }
 
     void stop(){
         synchronized (playerLock){
+            new AnimationCameraStopEvent(group, animation, new HashSet<>(players), cameraPlayerUUID).callEvent();
             Iterator<Player> iter = players.iterator();
             while(iter.hasNext()){
                 Player p = iter.next();
