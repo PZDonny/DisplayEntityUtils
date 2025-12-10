@@ -64,7 +64,7 @@ class AnimationCameraPlayer {
             return;
         }
         camera.setAttribute(DisplayAttributes.TELEPORTATION_DURATION, 2);
-        frame.getCamera().teleport(group, camera);
+        frame.getAnimationCamera().teleport(group, camera);
 
         int delay = frame.duration+frame.delay;
         if (frame == animation.frames.getLast()){
