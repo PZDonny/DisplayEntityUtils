@@ -25,11 +25,14 @@ import java.util.Collection;
         "",
         "#3.0.0 or later",
         "start packet animation on {_packetgroup} with {_displayanimator} starting at frame 3",
-        "start packet animation on {_group} using {_displayanimator} for {_player}"})
-@Since("2.6.2, 3.0.0 (Packet)")
+        "start packet animation on {_activegroup} using {_displayanimator} for {_player}",
+        "",
+        "#3.3.6 or later",
+        "start packet animation on {_packetgroup} with {_displayanimator} for {_player} and use camera"})
+@Since("2.6.2, 3.0.0 (Packet), 3.3.6 (Animation Camera)")
 public class EffActiveGroupPlayAnimation extends Effect {
     static {
-        Skript.registerEffect(EffActiveGroupPlayAnimation.class,"(start|play) [p:packet] anim[ation] on %activegroup% (using|with) %displayanimator% [frame:[starting ](at|on) frame %-number%] [f:for %-players%]");
+        Skript.registerEffect(EffActiveGroupPlayAnimation.class,"(start|play) [p:packet] anim[ation] on %activegroup% (using|with) %displayanimator% [frame:[starting] (at|on) frame %-number%] [f:for %-players% [cam:and (with|us(e|ing)) cam[era]]]");
     }
 
     Expression<ActiveGroup> group;
@@ -37,6 +40,7 @@ public class EffActiveGroupPlayAnimation extends Effect {
     Expression<Number> frame;
     Expression<Player> players;
     boolean packet;
+    boolean camera;
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
@@ -49,6 +53,7 @@ public class EffActiveGroupPlayAnimation extends Effect {
         if (parseResult.hasTag("f")){
             players = (Expression<Player>) expressions[3];
         }
+        camera = parseResult.hasTag("cam");
         return true;
     }
 
@@ -74,12 +79,21 @@ public class EffActiveGroupPlayAnimation extends Effect {
             else{
                 a.playUsingPackets(g, frameNum);
             }
-
         }
         else{
             if (g instanceof SpawnedDisplayEntityGroup sg){
-                a.play(sg, frameNum);
+                if (playerColl != null){
+                    a.play(playerColl, sg, frameNum);
+                }
+                else{
+                    a.play(sg, frameNum);
+                }
             }
+        }
+
+        //Camera Enabled
+        if (camera){
+            a.playCamera(playerColl, g, frameNum);
         }
     }
 

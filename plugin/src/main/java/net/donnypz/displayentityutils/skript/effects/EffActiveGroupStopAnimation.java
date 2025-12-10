@@ -23,11 +23,14 @@ import java.util.Collection;
 @Examples({"stop animation on {_spawnedgroup} from {_displayanimator}",
             "",
             "#3.0.0 and later",
-            "stop packet animation on {_packetgroup} from {_displayanimator} for {_players::*}"})
-@Since("2.6.2, 3.0.0 (Packet)")
+            "stop packet animation on {_packetgroup} from {_displayanimator} for {_players::*}",
+            "",
+            "#3.3.6 and later",
+            "stop animation on {_activegroup} from {_displayanimator} for {_players::*} and stop camera"})
+@Since("2.6.2, 3.0.0 (Packet), 3.3.6 (Animation Camera)")
 public class EffActiveGroupStopAnimation extends Effect {
     static {
-        Skript.registerEffect(EffActiveGroupStopAnimation.class,"stop [packet] animation on %activegroup% from %displayanimator% [f:for %-players%]");
+        Skript.registerEffect(EffActiveGroupStopAnimation.class,"stop [packet] animation on %activegroup% from %displayanimator% [f:for %-players%] [cam:and (stop|end) cam[era]]");
     }
 
     Expression<ActiveGroup> group;

@@ -13,6 +13,8 @@ import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.UUID;
+
 @ApiStatus.Internal
 public class SimpleEvents extends SimpleEvent {
 
@@ -180,6 +182,36 @@ public class SimpleEvents extends SimpleEvent {
             EventValues.registerEventValue(PacketAnimationCompleteEvent.class, SpawnedDisplayAnimation.class, PacketAnimationCompleteEvent::getAnimation);
             EventValues.registerEventValue(PacketAnimationCompleteEvent.class, DisplayAnimator.class, PacketAnimationCompleteEvent::getAnimator);
             EventValues.registerEventValue(PacketAnimationCompleteEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
+
+
+            //Animation Camera Start
+            Skript.registerEvent("Animation Camera Start", SimpleEvents.class, AnimationCameraStartEvent.class, "[deu] animation camera start[ed]")
+                    .description("Called when an animation camera begins for players.")
+                    .since("3.3.6");
+            EventValues.registerEventValue(AnimationCameraStartEvent.class, ActiveGroup.class, AnimationCameraStartEvent::getGroup);
+            EventValues.registerEventValue(AnimationCameraStartEvent.class, SpawnedDisplayAnimation.class, AnimationCameraStartEvent::getAnimation);
+            EventValues.registerEventValue(AnimationCameraStartEvent.class, UUID.class, AnimationCameraStartEvent::getCameraUUID);
+            EventValues.registerEventValue(AnimationCameraStartEvent.class, DisplayAnimator.class, AnimationCameraStartEvent::getAnimator);
+            EventValues.registerEventValue(AnimationCameraStartEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
+
+            //Animation Camera Stop
+            Skript.registerEvent("Animation Camera Stop", SimpleEvents.class, AnimationCameraStopEvent.class, "[deu] animation camera (stop[ped]|complete[d]|end[ed])")
+                    .description("Called when an animation camera stops for all of its players.")
+                    .since("3.3.6");
+            EventValues.registerEventValue(AnimationCameraStopEvent.class, ActiveGroup.class, AnimationCameraStopEvent::getGroup);
+            EventValues.registerEventValue(AnimationCameraStopEvent.class, SpawnedDisplayAnimation.class, AnimationCameraStopEvent::getAnimation);
+            EventValues.registerEventValue(AnimationCameraStopEvent.class, UUID.class, AnimationCameraStopEvent::getCameraUUID);
+            EventValues.registerEventValue(AnimationCameraStopEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
+
+            //Animation Camera Remove Player
+            Skript.registerEvent("Animation Camera Remove Player", SimpleEvents.class, AnimationCameraStopEvent.class, "[deu] animation camera player remove[d]")
+                    .description("Called when an animation camera has a player removed from it.")
+                    .since("3.3.6");
+            EventValues.registerEventValue(AnimationCameraPlayerRemovedEvent.class, ActiveGroup.class, AnimationCameraPlayerRemovedEvent::getGroup);
+            EventValues.registerEventValue(AnimationCameraPlayerRemovedEvent.class, SpawnedDisplayAnimation.class, AnimationCameraPlayerRemovedEvent::getAnimation);
+            EventValues.registerEventValue(AnimationCameraPlayerRemovedEvent.class, UUID.class, AnimationCameraPlayerRemovedEvent::getCameraUUID);
+            EventValues.registerEventValue(AnimationCameraPlayerRemovedEvent.class, Player.class, AnimationCameraPlayerRemovedEvent::getPlayer);
+
 
             //Pre Interaction Click Event
             Skript.registerEvent("Pre Interaction Click", SimpleEvents.class, PreInteractionClickEvent.class, "pre interaction [entity] click[ed]")
