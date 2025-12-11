@@ -37,7 +37,7 @@ public class GroupSpawnJSONCMD extends PlayerSubCommand {
 
     private static void spawnGroup(Player p, String tag, boolean isPacket){
         String fileName = tag.endsWith(".json") ? tag : tag+".json";
-        DisplayEntityGroup group = DisplayGroupManager.getGroupFromJSON(new File(PluginFolders.groupSaveFolder, "/"+fileName));
+        DisplayEntityGroup group = DisplayGroupManager.getGroupFromJson(new File(PluginFolders.groupSaveFolder, "/"+fileName));
         if (group == null){
             p.sendMessage(MiniMessage.miniMessage().deserialize("<red>- Failed to find <light_purple>JSON <red>saved display entity group!"));
             return;

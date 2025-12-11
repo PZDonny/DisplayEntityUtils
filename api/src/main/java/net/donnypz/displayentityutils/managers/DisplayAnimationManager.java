@@ -327,8 +327,8 @@ public final class DisplayAnimationManager {
      * @param json JSON of a saved {@link DisplayAnimation}
      * @return The represented {@link DisplayAnimation} or null.
      */
-    public static @Nullable DisplayAnimation getAnimationFromJSON(@NotNull String json){
-        return getAnimationFromJSON(JsonParser.parseString(json).getAsJsonObject());
+    public static @Nullable DisplayAnimation getAnimationFromJson(@NotNull String json){
+        return getAnimationFromJson(JsonParser.parseString(json).getAsJsonObject());
     }
 
 
@@ -337,10 +337,10 @@ public final class DisplayAnimationManager {
      * @param jsonFile JSON file of a saved {@link DisplayAnimation}
      * @return The found {@link DisplayAnimation}. Null if not found.
      */
-    public static @Nullable DisplayAnimation getAnimationFromJSON(@NotNull File jsonFile){
+    public static @Nullable DisplayAnimation getAnimationFromJson(@NotNull File jsonFile){
         try{
             String json = Files.readString(jsonFile.toPath());
-            return getAnimationFromJSON(JsonParser.parseString(json).getAsJsonObject());
+            return getAnimationFromJson(JsonParser.parseString(json).getAsJsonObject());
         } catch (IOException ex) {
             ex.printStackTrace();
             return null;
@@ -352,9 +352,9 @@ public final class DisplayAnimationManager {
      * @param inputStream InputStream containing a saved {@link DisplayAnimation}.
      * @return The found {@link DisplayAnimation} or null.
      */
-    public static @Nullable DisplayAnimation getAnimationFromJSON(@NotNull InputStream inputStream){
+    public static @Nullable DisplayAnimation getAnimationFromJson(@NotNull InputStream inputStream){
         try{
-            return getAnimationFromJSON(JsonParser
+            return getAnimationFromJson(JsonParser
                     .parseString(new String(inputStream.readAllBytes()))
                     .getAsJsonObject());
         }
@@ -369,10 +369,10 @@ public final class DisplayAnimationManager {
      * @param resourcePath The path of the animation
      * @return The found {@link DisplayAnimation}. Null if not found.
      */
-    public static @Nullable DisplayAnimation getAnimationFromJSON(@NotNull JavaPlugin plugin, @NotNull String resourcePath){
+    public static @Nullable DisplayAnimation getAnimationFromJson(@NotNull JavaPlugin plugin, @NotNull String resourcePath){
         try(InputStream stream = plugin.getResource(resourcePath)){
             if (stream == null) return null;
-            return getAnimationFromJSON(stream);
+            return getAnimationFromJson(stream);
         }
         catch(IOException e){
             e.printStackTrace();
@@ -380,7 +380,7 @@ public final class DisplayAnimationManager {
         }
     }
 
-    private static DisplayAnimation getAnimationFromJSON(JsonObject jsonObject){
+    private static DisplayAnimation getAnimationFromJson(JsonObject jsonObject){
         DisplayGroupManager.deserializeJsonElement(jsonObject);
         jsonObject.remove(DisplayGroupManager.PLUGIN_VERSION_FIELD);
 

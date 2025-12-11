@@ -36,7 +36,7 @@ class AnimSelectJSONCMD extends PlayerSubCommand {
 
     static void getAnimation(Player p, String tag){
         String fileName = tag.endsWith(".json") ? tag : tag+".json";
-        DisplayAnimation jsonAnim = DisplayAnimationManager.getAnimationFromJSON(new File(PluginFolders.animSaveFolder, "/"+fileName));
+        DisplayAnimation jsonAnim = DisplayAnimationManager.getAnimationFromJson(new File(PluginFolders.animSaveFolder, "/"+fileName));
         if (jsonAnim == null){
             p.sendMessage(MiniMessage.miniMessage().deserialize("<red>- Failed to find <light_purple>JSON <red>saved animation!"));
             return;

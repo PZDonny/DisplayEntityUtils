@@ -431,8 +431,8 @@ public final class DisplayGroupManager {
      * @param json JSON of a saved {@link DisplayEntityGroup}
      * @return The represented {@link DisplayEntityGroup} or null.
      */
-    public static @Nullable DisplayEntityGroup getGroupFromJSON(@NotNull String json){
-        return getGroupFromJSON(JsonParser.parseString(json).getAsJsonObject());
+    public static @Nullable DisplayEntityGroup getGroupFromJson(@NotNull String json){
+        return getGroupFromJson(JsonParser.parseString(json).getAsJsonObject());
     }
 
     /**
@@ -440,10 +440,10 @@ public final class DisplayGroupManager {
      * @param jsonFile JSON file of a saved {@link DisplayEntityGroup}
      * @return The found {@link DisplayEntityGroup}. Null if not found.
      */
-    public static @Nullable DisplayEntityGroup getGroupFromJSON(@NotNull File jsonFile){
+    public static @Nullable DisplayEntityGroup getGroupFromJson(@NotNull File jsonFile){
         try{
             String json = Files.readString(jsonFile.toPath());
-            return getGroupFromJSON(JsonParser.parseString(json).getAsJsonObject());
+            return getGroupFromJson(JsonParser.parseString(json).getAsJsonObject());
         } catch (IOException ex) {
             ex.printStackTrace();
             return null;
@@ -455,9 +455,9 @@ public final class DisplayGroupManager {
      * @param inputStream stream of {@link DisplayEntityGroup} saved as JSON
      * @return The found {@link DisplayEntityGroup} or null.
      */
-    public static @Nullable DisplayEntityGroup getGroupFromJSON(@NotNull InputStream inputStream){
+    public static @Nullable DisplayEntityGroup getGroupFromJson(@NotNull InputStream inputStream){
         try{
-            return getGroupFromJSON(JsonParser
+            return getGroupFromJson(JsonParser
                     .parseString(new String(inputStream.readAllBytes()))
                     .getAsJsonObject());
         }
@@ -473,10 +473,10 @@ public final class DisplayGroupManager {
      * @param resourcePath The path of the group
      * @return The found {@link DisplayEntityGroup} or null
      */
-    public static @Nullable DisplayEntityGroup getGroupFromJSON(@NotNull JavaPlugin plugin, @NotNull String resourcePath) {
+    public static @Nullable DisplayEntityGroup getGroupFromJson(@NotNull JavaPlugin plugin, @NotNull String resourcePath) {
         try(InputStream stream = plugin.getResource(resourcePath)){
             if (stream == null) return null;
-            return getGroupFromJSON(stream);
+            return getGroupFromJson(stream);
         }
         catch(IOException e){
             e.printStackTrace();
@@ -484,7 +484,7 @@ public final class DisplayGroupManager {
         }
     }
 
-    private static DisplayEntityGroup getGroupFromJSON(JsonObject jsonObject){
+    private static DisplayEntityGroup getGroupFromJson(JsonObject jsonObject){
         deserializeJsonElement(jsonObject);
         jsonObject.remove(PLUGIN_VERSION_FIELD);
 
