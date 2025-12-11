@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 @Name("Active Part Data")
-@Description("Get the data of an active part based on its part type.")
+@Description("Get or change the data of an active part based on its part type.")
 @Examples({"#Get Data",
             "set {_height} to {_spawnedpart}'s deu interaction height",
             "set {_text} to {_packetpart}'s deu text",
