@@ -65,7 +65,7 @@ public class SimpleEvents extends SimpleEvent {
             EventValues.registerEventValue(PacketGroupSendEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
 
             //Pre Packet Group Create Event
-            Skript.registerEvent("Packet Group Created", SimpleEvents.class, PrePacketGroupCreateEvent.class, "packet [spawned] [display] group (destroy[ed]|remove[d]|hid(e|den))")
+            Skript.registerEvent("Pre Packet Group Created", SimpleEvents.class, PrePacketGroupCreateEvent.class, "pre packet [spawned] [display] group (created[ed]|spawn[ed])")
                     .description("Called before a packet-based group is created")
                     .since("3.3.6");
             EventValues.registerEventValue(PrePacketGroupCreateEvent.class, DisplayEntityGroup.class, PrePacketGroupCreateEvent::getGroup);
