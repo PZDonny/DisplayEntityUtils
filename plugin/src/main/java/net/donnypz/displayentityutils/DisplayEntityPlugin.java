@@ -170,7 +170,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         plugin.reloadConfig();
         ConfigUtils.read(plugin.getConfig());
         
-        PluginCommand command = plugin.getCommand("managedisplays");
+        PluginCommand command = plugin.getCommand("deu");
         if (command != null){
             if (DisplayConfig.registerPluginCommands && isOnEnable) {
                 DisplayEntityPluginCommand cmd = new DisplayEntityPluginCommand();

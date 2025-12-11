@@ -18,7 +18,7 @@ class GroupSetTagCMD extends GroupSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /mdis group settag <group-tag>", NamedTextColor.RED));
+        player.sendMessage(Component.text("Incorrect Usage! /deu group settag <group-tag>", NamedTextColor.RED));
     }
 
     @Override

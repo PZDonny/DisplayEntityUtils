@@ -33,7 +33,7 @@ class PartsPitchCMD extends PlayerSubCommand {
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /mdis parts pitch <pitch>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /deu parts pitch <pitch>", NamedTextColor.RED));
             return;
         }
 

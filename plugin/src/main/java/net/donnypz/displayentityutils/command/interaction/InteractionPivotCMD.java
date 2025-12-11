@@ -41,7 +41,7 @@ class InteractionPivotCMD extends PlayerSubCommand {
 
         MultiPartSelection<?> selection = (MultiPartSelection<?>) sel;
         if (args.length < 3){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis interaction pivot <angle>", NamedTextColor.RED)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu interaction pivot <angle>", NamedTextColor.RED)));
             return;
         }
         InteractionCMD.SelectedInteraction interaction = InteractionCMD.getInteraction(player, false);

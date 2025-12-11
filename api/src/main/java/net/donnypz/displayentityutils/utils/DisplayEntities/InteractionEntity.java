@@ -26,7 +26,7 @@ final class InteractionEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 99L;
 
-    private ArrayList<String> partTags = new ArrayList<>(); //Legacy Part Tags (Using scoreboard Only)
+    private ArrayList<String> partTags; //Legacy Part Tags (Using Scoreboard Only)
     Vector3f vector;
     UUID partUUID;
     float height;
@@ -35,8 +35,6 @@ final class InteractionEntity implements Serializable {
     boolean isResponsive;
 
     InteractionEntity(Interaction interaction){
-        //partTags = LegacyUtils.getLegacyPartTags(interaction);
-
         this.height = interaction.getInteractionHeight();
         this.width = interaction.getInteractionWidth();
         this.isResponsive = interaction.isResponsive();
@@ -52,7 +50,6 @@ final class InteractionEntity implements Serializable {
     }
 
     InteractionEntity(PacketDisplayEntityPart part){
-        //partTags = LegacyUtils.getLegacyPartTags(interaction);
 
         PacketAttributeContainer c = part.attributeContainer;
         this.height = c.getAttributeOrDefault(DisplayAttributes.Interaction.HEIGHT, 1f);
@@ -73,30 +70,32 @@ final class InteractionEntity implements Serializable {
     }
 
     Interaction createEntity(Location location, GroupSpawnSettings settings){
-        return location.getWorld().spawn(location, Interaction.class, spawn ->{
-            spawn.setInteractionHeight(height);
-            spawn.setInteractionWidth(width);
-            spawn.setResponsive(isResponsive);
-            for (String partTag : partTags){
-                spawn.addScoreboardTag(partTag);
+        return location.getWorld().spawn(location, Interaction.class, i ->{
+            i.setInteractionHeight(height);
+            i.setInteractionWidth(width);
+            i.setResponsive(isResponsive);
+            if (partTags != null){
+                for (String partTag : partTags){
+                    i.addScoreboardTag(partTag);
+                }
             }
 
             if (persistentDataContainer != null){
                 try{
-                    spawn.getPersistentDataContainer().readFromBytes(persistentDataContainer);
+                    i.getPersistentDataContainer().readFromBytes(persistentDataContainer);
                 }
                 catch(IOException ignore){}
             }
 
             if (partUUID != null){
-                spawn.getPersistentDataContainer().set(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
+                i.getPersistentDataContainer().set(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
             }
 
-            settings.apply(spawn);
+            settings.apply(i);
         });
     }
 
-    PacketDisplayEntityPart createPacketPart(Location spawnLocation){
+    PacketDisplayEntityPart createPacketPart(Location spawnLocation, GroupSpawnSettings settings){
         PacketAttributeContainer attributeContainer = new PacketAttributeContainer()
                 .setAttribute(DisplayAttributes.Interaction.WIDTH, width)
                 .setAttribute(DisplayAttributes.Interaction.HEIGHT, height)
@@ -119,6 +118,7 @@ final class InteractionEntity implements Serializable {
             part.partUUID = DisplayEntity.getPDCPartUUID(pdc);
             part.interactionCommands = getInteractionCommands(pdc);
         }
+        settings.applyAttributes(part);
 
         return part;
     }
@@ -134,6 +134,10 @@ final class InteractionEntity implements Serializable {
 
      Vector getVector(){
         return Vector.fromJOML(vector);
+    }
+
+    boolean hasLegacyPartTags(){
+        return partTags != null && !partTags.isEmpty();
     }
 
     ArrayList<String> getLegacyPartTags() {

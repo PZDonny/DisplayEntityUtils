@@ -132,71 +132,89 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * Show this part to a player as a packet-based entity
      * @param player the player
      * @param spawnReason the spawn reason
+     * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#teleport(Location)}, or if when created for a group, the group's location was null.
      */
     @Override
     public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
-        showToPlayer(player, spawnReason, new GroupSpawnSettings());
+        if (packetLocation == null){
+            throw new RuntimeException("Location must be set for packet-based part before showing it to players.");
+        }
+        showToPlayer(player, spawnReason, getLocation());
     }
+
 
     /**
      * Show this part to a player as a packet-based entity
      * @param player the player
      * @param spawnReason the spawn reason
-     * @param groupSpawnSettings the spawn settings to apply
+     * @param location where to spawn the packet-based entity for the player
      */
     @Override
-    public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
+    public void showToPlayer(@NotNull Player player, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull Location location) {
         if (!viewers.add(player.getUniqueId())){  //Already viewing
             return;
         }
         DEUUser.getOrCreateUser(player).trackPacketEntity(this);
-        attributeContainer.sendEntity(type, getEntityId(), player, getLocation());
+        attributeContainer.sendEntity(type, getEntityId(), player, location);
     }
+
+    public void showToPlayer(@NotNull Player player, @NotNull Location location, GroupSpawnSettings settings) {
+        if (!viewers.add(player.getUniqueId())){  //Already viewing
+            return;
+        }
+        if (settings.applyVisibility(this, player)){
+            DEUUser.getOrCreateUser(player).trackPacketEntity(this);
+            attributeContainer.sendEntity(type, getEntityId(), player, location);
+        }
+    }
+
 
     /**
      * Show this part to players as a packet-based entity.
      * @param players the players
      * @param spawnReason the spawn reason
-     * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#teleport(Location)}, or if when created for a group, the group's location was null.
      */
     public void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
-        showToPlayers(players, spawnReason, new GroupSpawnSettings());
+        showToPlayers(players, spawnReason, getLocation());
     }
+
+
 
     /**
      * Show this part to players as a packet-based entity.
      * @param players the players
      * @param spawnReason the spawn reason
-     * @param groupSpawnSettings the spawn settings to apply
-     * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#teleport(Location)}, or if when created for a group, the group's location was null.
+     * @param location where to spawn the packet-based entity for the players
      */
-    public void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
-        if (packetLocation == null){
-            throw new RuntimeException("Location must be set for packet-based part before showing it to players.");
-        }
+    @Override
+    public void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull Location location) {
         Collection<Player> plrs = new HashSet<>(players);
-        for (Player player : players){
-            if (!viewers.add(player.getUniqueId())){ //Already viewing
-                plrs.remove(player);
-                continue;
+        synchronized (viewers){
+            for (Player player : players){
+                if (!viewers.add(player.getUniqueId())){ //Already viewing
+                    plrs.remove(player);
+                    continue;
+                }
+                DEUUser.getOrCreateUser(player).trackPacketEntity(this);
             }
-            DEUUser.getOrCreateUser(player).trackPacketEntity(this);
         }
-        attributeContainer.sendEntityUsingPlayers(type, getEntityId(), plrs, getLocation());
+        attributeContainer.sendEntityUsingPlayers(type, getEntityId(), plrs, location);
     }
 
     /**
      * Hide the packet-based entity from all players tracking this part
      */
     public void hide(){
-        if (viewers.isEmpty()) return;
-        for (UUID uuid : getViewers()){
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null && player.isConnected()){
-                PacketUtils.hideEntity(player, getEntityId());
+        synchronized (viewers){
+            if (viewers.isEmpty()) return;
+            for (UUID uuid : getViewers()){
+                Player player = Bukkit.getPlayer(uuid);
+                if (player != null && player.isConnected()){
+                    PacketUtils.hideEntity(player, getEntityId());
+                }
             }
+            viewers.clear();
         }
-        viewers.clear();
     }
 
     /**
@@ -205,16 +223,26 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void hideFromPlayer(@NotNull Player player) {
-        if (viewers.remove(player.getUniqueId())){ //Was present and removed
-            PacketUtils.hideEntity(player, getEntityId());
-            DEUUser.getOrCreateUser(player).untrackPacketEntity(this);
+        synchronized (viewers){
+            if (viewers.remove(player.getUniqueId())){ //Was present and removed
+                PacketUtils.hideEntity(player, getEntityId());
+                DEUUser.getOrCreateUser(player).untrackPacketEntity(this);
+            }
         }
+    }
 
+    @ApiStatus.Internal
+    public void removeViewer(@NotNull UUID uuid){
+        synchronized (viewers){
+            viewers.remove(uuid);
+        }
     }
 
     @ApiStatus.Internal
     public void worldSwitchHide(@NotNull Player player, DEUUser user) {
-        viewers.remove(player.getUniqueId());
+        synchronized (viewers){
+            viewers.remove(player.getUniqueId());
+        }
         user.untrackPacketEntity(this);
         DEUUser.getOrCreateUser(player).untrackPacketEntity(this);
     }
@@ -225,10 +253,12 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void hideFromPlayers(@NotNull Collection<Player> players) {
-        for (Player p : players){
-            if (viewers.remove(p.getUniqueId())){ //Was present and removed
-                PacketUtils.hideEntity(p, getEntityId());
-                DEUUser.getOrCreateUser(p).untrackPacketEntity(this);
+        synchronized (viewers){
+            for (Player p : players){
+                if (viewers.remove(p.getUniqueId())){ //Was present and removed
+                    PacketUtils.hideEntity(p, getEntityId());
+                    DEUUser.getOrCreateUser(p).untrackPacketEntity(this);
+                }
             }
         }
     }
@@ -238,7 +268,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * @return a set of uuids
      */
     public @NotNull Collection<UUID> getViewers(){
-        return new HashSet<>(viewers);
+        synchronized (viewers){
+            return new HashSet<>(viewers);
+        }
     }
 
     @Override
@@ -510,7 +542,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public Transformation getDisplayTransformation(){
+    public Transformation getTransformation(){
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
             return null;
         }
@@ -523,7 +555,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public int getDisplayTeleportDuration() {
+    public int getTeleportDuration() {
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
             return -1;
         }
@@ -531,12 +563,12 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public @Nullable Display.Brightness getDisplayBrightness(){
+    public @Nullable Display.Brightness getBrightness(){
         return attributeContainer.getAttribute(DisplayAttributes.BRIGHTNESS);
     }
 
     @Override
-    public float getDisplayViewRange(){
+    public float getViewRange(){
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
             return -1;
         }

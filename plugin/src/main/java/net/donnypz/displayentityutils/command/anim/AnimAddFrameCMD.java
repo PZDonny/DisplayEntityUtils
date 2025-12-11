@@ -38,7 +38,7 @@ class AnimAddFrameCMD extends PlayerSubCommand {
             return;
         }
         if (args.length < 4) {
-            player.sendMessage(Component.text("/mdis anim addframe <tick-delay> <tick-duration>", NamedTextColor.RED));
+            player.sendMessage(Component.text("/deu anim addframe <tick-delay> <tick-duration>", NamedTextColor.RED));
             return;
         }
         try {

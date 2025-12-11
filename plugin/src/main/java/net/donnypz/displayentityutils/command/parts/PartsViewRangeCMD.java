@@ -19,7 +19,7 @@ class PartsViewRangeCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Provide a part tag! /mdis parts viewrange <view-range-multiplier> [-all]", NamedTextColor.RED));
+        player.sendMessage(Component.text("Provide a part tag! /deu parts viewrange <view-range-multiplier> [-all]", NamedTextColor.RED));
     }
 
     @Override

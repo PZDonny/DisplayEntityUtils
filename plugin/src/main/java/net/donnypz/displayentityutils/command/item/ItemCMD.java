@@ -37,10 +37,10 @@ public final class ItemCMD extends ConsoleUsableSubCommand {
         sender.sendMessage(Component.empty());
         sender.sendMessage(DisplayAPI.pluginPrefixLong);
         sender.sendMessage(Component.text("| Commands with \"-all\" will apply the command to all item displays within a part selection", NamedTextColor.GOLD));
-        CMDUtils.sendCMD(sender,"/mdis item help", "Get help for item displays");
-        CMDUtils.sendCMD(sender, "/mdis item set <\"-held\" | item-id> [-all]", "Change the item of a item display part");
-        CMDUtils.sendCMD(sender, "/mdis item transform <transform-type> [-all]", "Change the item display transform of a item display part");
-        CMDUtils.sendCMD(sender,"/mdis item toggleglint [-all <on | off>]", "Toggle the enchantment glint of an item display's item");
+        CMDUtils.sendCMD(sender,"/deu item help", "Get help for item displays");
+        CMDUtils.sendCMD(sender, "/deu item set <\"-held\" | item-id> [-all]", "Change the item of a item display part");
+        CMDUtils.sendCMD(sender, "/deu item transform <transform-type> [-all]", "Change the item display transform of a item display part");
+        CMDUtils.sendCMD(sender,"/deu item toggleglint [-all <on | off>]", "Toggle the enchantment glint of an item display's item");
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>--------------------------"));
     }
 }

@@ -28,7 +28,7 @@ class InteractionPivotSelectionCMD extends PlayerSubCommand {
         }
 
         if (args.length < 3){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis interaction pivotselection <angle>", NamedTextColor.RED)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu interaction pivotselection <angle>", NamedTextColor.RED)));
             return;
         }
 

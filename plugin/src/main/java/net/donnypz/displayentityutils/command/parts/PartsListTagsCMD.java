@@ -32,17 +32,15 @@ class PartsListTagsCMD extends PlayerSubCommand {
             return;
         }
 
-        Set<String> tags;
         player.sendMessage(Component.empty());
         player.sendMessage(Component.text("Part's Tags:", NamedTextColor.YELLOW));
-        tags = partSelection.getSelectedPart().getTags();
 
-
+        Set<String> tags = partSelection.getSelectedPart().getTags();
         if (tags.isEmpty()){
             player.sendMessage(Component.text("- No part tags", NamedTextColor.GRAY));
         }
         else{
-            for (String s : partSelection.getSelectedPart().getTags()){
+            for (String s : tags){
                 player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>- <yellow>"+s));
             }
         }

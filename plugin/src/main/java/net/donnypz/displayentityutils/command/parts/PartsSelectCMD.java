@@ -35,7 +35,7 @@ class PartsSelectCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 3){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis parts select <distance | -target>", NamedTextColor.RED)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu parts select <distance | -target>", NamedTextColor.RED)));
             return;
         }
         try{

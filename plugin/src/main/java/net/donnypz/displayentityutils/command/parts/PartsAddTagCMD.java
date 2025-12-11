@@ -21,7 +21,7 @@ class PartsAddTagCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Provide a part tag! /mdis parts addtag <part-tag> [-all]", NamedTextColor.RED));
+        player.sendMessage(Component.text("Provide a part tag! /deu parts addtag <part-tag> [-all]", NamedTextColor.RED));
     }
 
     @Override

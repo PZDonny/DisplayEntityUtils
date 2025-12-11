@@ -20,7 +20,7 @@ class GroupPitchCMD extends GroupSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis group pitch <pitch>", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu group pitch <pitch>", NamedTextColor.RED)));
     }
 
     @Override

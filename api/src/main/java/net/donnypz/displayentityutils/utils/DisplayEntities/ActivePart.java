@@ -169,7 +169,7 @@ public abstract class ActivePart implements Active{
      */
     public void autoCull(float widthAdder, float heightAdder){
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
-        Transformation transformation = getDisplayTransformation();
+        Transformation transformation = getTransformation();
         if (transformation == null) return;
         DisplayAPI.getScheduler().partRunAsync(this, () -> {
             float[] values = DisplayUtils.getAutoCullValues(type, transformation.getTranslation(), transformation.getScale(), transformation.getLeftRotation(), widthAdder, heightAdder);
@@ -452,25 +452,25 @@ public abstract class ActivePart implements Active{
      * Get the {@link Transformation} of this part if its type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
      * @return a {@link Transformation} or null if the part is an interaction
      */
-    public abstract @Nullable Transformation getDisplayTransformation();
+    public abstract @Nullable Transformation getTransformation();
 
     /**
      * Get the {@link Display.Brightness} of this part if its type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
      * @return a {@link Display.Brightness} or null if brightness is not set or if the part is an interaction
      */
-    public abstract @Nullable Display.Brightness getDisplayBrightness();
+    public abstract @Nullable Display.Brightness getBrightness();
 
     /**
-     * Get the view range of this part, if its type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
+     * Get the view range of this part if its type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
      * @return a float, -1 if the part is an interaction
      */
-    public abstract float getDisplayViewRange();
+    public abstract float getViewRange();
 
     /**
      * Get the teleport duration of this part if its type is not {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.
      * @return the teleport duration or -1 is the part is an interaction
      */
-    public abstract int getDisplayTeleportDuration();
+    public abstract int getTeleportDuration();
 
     /**
      * Get the interaction translation of this part, relative to its group's location

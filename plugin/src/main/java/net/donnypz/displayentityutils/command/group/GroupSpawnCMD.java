@@ -31,7 +31,7 @@ public class GroupSpawnCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 4) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis group spawn <group-tag> <storage> [-packet]", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /deu group spawn <group-tag> <storage> [-packet]", NamedTextColor.RED));
             return;
         }
         String tag = args[2];
@@ -68,7 +68,7 @@ public class GroupSpawnCMD extends PlayerSubCommand {
         }
         Location spawnLoc = p.getLocation();
         if (isPacket){
-            DisplayGroupManager.addPersistentPacketGroup(spawnLoc, group, true);
+            DisplayGroupManager.addPersistentPacketGroup(spawnLoc, group, true, GroupSpawnedEvent.SpawnReason.COMMAND);
             p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Spawned a <light_purple>packet-based <green>display entity group at your location! <white>(Tagged: "+tag+")")));
         }
         else{

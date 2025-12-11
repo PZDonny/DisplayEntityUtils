@@ -15,6 +15,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Constructor;
+
 @ApiStatus.Internal
 public class AnimationParticleBuilder extends ParticleBuilder{
     Player player;
@@ -150,6 +152,26 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         return this.particle() == Particle.DUST_COLOR_TRANSITION;
     }
 
+    public static boolean isColorOnlyParticle(@NotNull Particle particle){
+        return particle.getDataType().isAssignableFrom(Color.class);
+    }
+
+    public static boolean isBlockDataParticle(@NotNull Particle particle){
+        return particle.getDataType().isAssignableFrom(BlockData.class);
+    }
+
+    public static boolean isItemParticle(@NotNull Particle particle){
+        return particle == VersionUtils.getItemParticle();
+    }
+
+    public static boolean isDustOptionParticle(@NotNull Particle particle){
+        return particle.getDataType().isAssignableFrom(Particle.DustOptions.class);
+    }
+
+    public static boolean isDustTransitionParticle(@NotNull Particle particle){
+        return particle == Particle.DUST_COLOR_TRANSITION;
+    }
+
     public Step getStep() {
         return step;
     }
@@ -163,34 +185,53 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     }
 
     public AnimationParticle build(){
-        AnimationParticle animParticle;
-        if (isBlockDataParticle()){
-            animParticle = new BlockAnimationParticle(this, data());
-        }
-        else if (isItemParticle()){
-            animParticle = new ItemStackAnimationParticle(this, data());
-        }
-        else if (isDustOptionParticle()){
-            animParticle = new DustOptionAnimationParticle(this, data());
-        }
-        else if (isDustTransitionParticle()){
-            animParticle = new DustTransitionAnimationParticle(this, data());
-        }
-        else if (particle() == VersionUtils.getEntityEffectParticle()){
-            animParticle = new EntityEffectAnimationParticle(this, data());
-        }
-        else if (particle() == Particle.FLASH){
-            animParticle = new FlashAnimationParticle(this, data());
-        }
-        else{
-            animParticle = new GeneralAnimationParticle(this, particle());
-        }
+        Class<? extends AnimationParticle> clazz = getAnimationParticleClass(particle());
+        try {
+            Constructor<? extends AnimationParticle> constructor = clazz.getConstructor(AnimationParticleBuilder.class, Object.class);
 
-        animParticle.setDelayInTicks(delayInTicks);
-        framePoint.addParticle(animParticle);
+            AnimationParticle animParticle = constructor.newInstance(this, data());
+            animParticle.setDelayInTicks(delayInTicks);
+            framePoint.addParticle(animParticle);
+            return animParticle;
 
-        return animParticle;
+        } catch (Exception e) {
+            throw new RuntimeException("Could not create particle: " + clazz.getSimpleName(), e);
+        }
     }
+
+    public static Class<? extends AnimationParticle> getAnimationParticleClass(@NotNull String particleName){
+        try{
+            return getAnimationParticleClass(Particle.valueOf(particleName));
+        }
+        catch(IllegalArgumentException e){
+            return null;
+        }
+    }
+
+    public static Class<? extends AnimationParticle> getAnimationParticleClass(@NotNull Particle particle){
+        if (isBlockDataParticle(particle)){
+            return BlockAnimationParticle.class;
+        }
+        else if (isItemParticle(particle)){
+            return ItemStackAnimationParticle.class;
+        }
+        else if (isDustOptionParticle(particle)){
+            return DustOptionAnimationParticle.class;
+        }
+        else if (isDustTransitionParticle(particle)) {
+            return DustTransitionAnimationParticle.class;
+        }
+        else if (particle == VersionUtils.getEntityEffectParticle()) {
+            return EntityEffectAnimationParticle.class;
+        }
+        else if (particle == Particle.FLASH) {
+            return FlashAnimationParticle.class;
+        }
+        else {
+            return GeneralAnimationParticle.class;
+        }
+    }
+
 
     private boolean updateParticle(){
         boolean result = editParticle.editParticle(this);

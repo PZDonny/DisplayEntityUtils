@@ -36,7 +36,7 @@ class PartsCycleCMD extends PlayerSubCommand {
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("/mdis parts cycle <first | prev | next | last> [jump]", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("/deu parts cycle <first | prev | next | last> [jump]", NamedTextColor.GRAY));
             return;
         }
 
@@ -88,7 +88,7 @@ class PartsCycleCMD extends PlayerSubCommand {
                 displayPartInfo(player, partSelection.getSelectedPart(), partSelection);
             }
             default ->{
-                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid Option! /mdis parts cycle <first | prev | next | last>", NamedTextColor.RED)));
+                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid Option! /deu parts cycle <first | prev | next | last>", NamedTextColor.RED)));
             }
         }
     }

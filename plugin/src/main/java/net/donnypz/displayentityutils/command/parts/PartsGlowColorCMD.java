@@ -22,7 +22,7 @@ class PartsGlowColorCMD extends PartsSubCommand {
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid color!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/mdis parts glowcolor <color | hex-code> [-all]", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("/deu parts glowcolor <color | hex-code> [-all]", NamedTextColor.GRAY));
     }
 
     @Override
@@ -55,7 +55,7 @@ class PartsGlowColorCMD extends PartsSubCommand {
         Color c = ConversionUtils.getColorFromText(arg);
         if (c == null){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid color!", NamedTextColor.RED)));
-            player.sendMessage(Component.text("/mdis parts glowcolor <color | hex-code> [-all]", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("/deu parts glowcolor <color | hex-code> [-all]", NamedTextColor.GRAY));
         }
         return c;
     }

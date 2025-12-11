@@ -20,7 +20,7 @@ class AnimSetTagCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis anim settag <anim-tag>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /deu anim settag <anim-tag>", NamedTextColor.RED));
             return;
         }
 

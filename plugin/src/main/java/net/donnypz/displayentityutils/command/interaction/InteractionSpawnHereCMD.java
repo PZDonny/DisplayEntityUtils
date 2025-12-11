@@ -19,7 +19,7 @@ class InteractionSpawnHereCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 4){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis interaction spawnhere <height> <width>", NamedTextColor.RED)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu interaction spawnhere <height> <width>", NamedTextColor.RED)));
             return;
         }
 

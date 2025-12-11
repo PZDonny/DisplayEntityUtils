@@ -38,7 +38,7 @@ class AnimOverwriteFrameCMD extends PlayerSubCommand {
             return;
         }
         if (args.length < 5) {
-            player.sendMessage(Component.text("/mdis anim overwriteframe <frame-id> <tick-delay> <tick-duration>", NamedTextColor.RED));
+            player.sendMessage(Component.text("/deu anim overwriteframe <frame-id> <tick-delay> <tick-duration>", NamedTextColor.RED));
             return;
         }
         try {

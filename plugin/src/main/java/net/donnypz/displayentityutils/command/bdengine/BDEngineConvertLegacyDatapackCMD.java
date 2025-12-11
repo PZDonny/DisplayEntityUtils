@@ -21,7 +21,7 @@ class BDEngineConvertLegacyDatapackCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 5) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis bdengine convertdpleg <datapack-name> <group-tag-to-set> <anim-tag-to-set>", NamedTextColor.RED)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu bdengine convertdpleg <datapack-name> <group-tag-to-set> <anim-tag-to-set>", NamedTextColor.RED)));
             player.sendMessage(Component.text("Use \"-\" for the group tag if you do not want to save the group", NamedTextColor.GRAY));
             return;
         }
@@ -30,9 +30,9 @@ class BDEngineConvertLegacyDatapackCMD extends PlayerSubCommand {
         String groupTag = args[3];
         String animPrefix = args[4];
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Attempting to convert datapack...", NamedTextColor.AQUA)));
-        player.sendMessage(Component.text(" | DO NOT LEAVE THIS AREA UNTIL CONVERSION IS COMPLETED/FAILS", NamedTextColor.YELLOW));
+        player.sendMessage(Component.text(" | DO NOT LEAVE THIS AREA UNTIL COMPLETION!", NamedTextColor.YELLOW));
         player.sendMessage(Component.text(" | Conversion time may vary.", NamedTextColor.YELLOW));
-        player.sendMessage(Component.text(" | Entities may not be visible while converting", NamedTextColor.YELLOW));
+        player.sendMessage(Component.text(" | Entities may not be visible while converting.", NamedTextColor.YELLOW));
         BDEngineLegacyDPConverter.saveDatapackAnimation(player, datapackName, groupTag, animPrefix);
     }
 }

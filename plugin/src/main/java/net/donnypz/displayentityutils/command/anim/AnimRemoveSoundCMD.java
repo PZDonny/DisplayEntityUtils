@@ -38,7 +38,7 @@ class AnimRemoveSoundCMD extends PlayerSubCommand {
         }
 
         if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis anim removesound <sound | -all>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /deu anim removesound <sound | -all>", NamedTextColor.RED));
             return;
         }
         try {

@@ -299,7 +299,7 @@ public class DisplayController {
 
         Location spawnLoc = entity.getLocation();
         ActiveGroup<?> activeGroup = isPacketBased ?
-                group.createPacketGroup(spawnLoc, true)
+                group.createPacketGroup(spawnLoc, GroupSpawnedEvent.SpawnReason.DISPLAY_CONTROLLER, true)
                         .setAutoShow(groupVisibleByDefault)
                 :
                 group.spawn(spawnLoc, GroupSpawnedEvent.SpawnReason.DISPLAY_CONTROLLER, new GroupSpawnSettings()

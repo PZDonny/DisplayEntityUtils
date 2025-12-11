@@ -21,7 +21,7 @@ class GroupBrightnessCMD extends GroupSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("/mdis group brightness <block> <sky>", NamedTextColor.RED));
+        player.sendMessage(Component.text("/deu group brightness <block> <sky>", NamedTextColor.RED));
         player.sendMessage(Component.text("| Brightness can any number between 0 and 15", NamedTextColor.GRAY));
         player.sendMessage(Component.text("| Set both \"block\" and \"sky\" to -1 to reset brightness", NamedTextColor.GRAY));
     }

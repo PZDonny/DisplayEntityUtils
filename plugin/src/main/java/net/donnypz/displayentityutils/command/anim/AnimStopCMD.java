@@ -6,7 +6,7 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -27,6 +27,7 @@ class AnimStopCMD extends PlayerSubCommand {
 
 
         group.stopAnimations(true);
+        DisplayAnimator.stopCameraView(player);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Stopping all animations played on your selected group!", NamedTextColor.YELLOW)));
     }
 }

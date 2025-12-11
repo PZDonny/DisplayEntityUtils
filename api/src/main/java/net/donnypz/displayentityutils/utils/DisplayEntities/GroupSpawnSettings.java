@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
@@ -86,7 +87,7 @@ public class GroupSpawnSettings {
     }
 
     /**
-     * Determine if the {@link SpawnedDisplayEntityGroup} will be persistent by default when spawned
+     * Determine if an {@link ActiveGroup} will be persistent by default when spawned
      * @param persistentByDefault
      * @return
      */
@@ -96,7 +97,7 @@ public class GroupSpawnSettings {
     }
 
     /**
-     * Determine if the {@link SpawnedDisplayEntityGroup} can have its persistence overriden when loaded by a chunk, based on config values
+     * Determine if a {@link SpawnedDisplayEntityGroup} can have its persistence overriden when loaded by a chunk, based on config values
      * @param allowPersistenceOverride
      * @return
      */
@@ -106,7 +107,7 @@ public class GroupSpawnSettings {
     }
 
     /**
-     * Determine if the {@link SpawnedDisplayEntityGroup} will be visible by default when spawned
+     * Determine if a {@link SpawnedDisplayEntityGroup} will be visible by default when spawned
      * @param visible the visibility
      * @param visiblePlayers the players that can see the group even if visibility is false
      * @return this
@@ -131,6 +132,71 @@ public class GroupSpawnSettings {
         this.hideInteractions = hideInteractions;
         return this;
     }
+
+    boolean applyVisibility(PacketDisplayEntityPart part, Player player){
+        if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (hideInteractions) return false;
+        }
+
+        if (!visibleByDefault){
+            return visiblePlayers.contains(player.getUniqueId());
+        }
+        else{
+            for (Map.Entry<String, Set<UUID>> entry : hiddenPartTags.entrySet()){
+                String tag = entry.getKey();
+                Set<UUID> hideForPlayers = entry.getValue();
+                if (part.partTags.contains(tag) && hideForPlayers.contains(player.getUniqueId())) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    boolean applyAttributes(PacketDisplayEntityPart part){
+        if (part.type != SpawnedDisplayEntityPart.PartType.INTERACTION){
+            //Teleport Duration
+            part.attributeContainer.setAttribute(DisplayAttributes.TELEPORTATION_DURATION, teleportationDuration);
+
+            //Brightness
+            if (!brightness.isEmpty()){
+                Display.Brightness b = brightness.get(null);
+                if (b != null){
+                    part.attributeContainer.setAttribute(DisplayAttributes.BRIGHTNESS, b);
+                }
+
+                for (Map.Entry<String, Display.Brightness> entry : brightness.entrySet()){
+                    String tag = entry.getKey();
+                    if (tag == null) continue;
+                    Display.Brightness brightness = entry.getValue();
+                    if (part.partTags.contains(tag)){
+                        part.attributeContainer.setAttribute(DisplayAttributes.BRIGHTNESS, brightness);
+                        break;
+                    }
+                }
+            }
+
+            //Billboard
+            if (!billboard.isEmpty()){
+                Display.Billboard b = billboard.get(null);
+                if (b != null){
+                    part.attributeContainer.setAttribute(DisplayAttributes.BILLBOARD, b);
+                }
+
+                for (Map.Entry<String, Display.Billboard> entry : billboard.entrySet()){
+                    String tag = entry.getKey();
+                    if (tag == null) continue;
+                    Display.Billboard bb = entry.getValue();
+                    if (part.partTags.contains(tag)){
+                        part.attributeContainer.setAttribute(DisplayAttributes.BILLBOARD, bb);
+                        break;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
 
     void apply(Display display){
     //Determine Visibility

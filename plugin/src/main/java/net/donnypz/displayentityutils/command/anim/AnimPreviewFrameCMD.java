@@ -44,7 +44,7 @@ class AnimPreviewFrameCMD extends PlayerSubCommand {
         }
 
         if (args.length < 3) {
-            player.sendMessage(Component.text("/mdis anim previewframe <frame-id>", NamedTextColor.RED));
+            player.sendMessage(Component.text("/deu anim previewframe <frame-id>", NamedTextColor.RED));
             player.sendMessage(Component.text("First frame is 0, Second frame is 1, and so on...", NamedTextColor.GRAY));
             return;
         }
@@ -65,7 +65,7 @@ class AnimPreviewFrameCMD extends PlayerSubCommand {
             }
             group.setToFrame(player, anim, frames.get(id));
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Previewing your selected group as Frame #" + id, NamedTextColor.GREEN)));
-            player.sendMessage(Component.text("| Use \"/mdis anim restore\" to restore your group's original state", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Use \"/deu anim restore\" to restore your group's original state", NamedTextColor.GRAY));
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid ID! ID's must be >= 0", NamedTextColor.RED));
         }

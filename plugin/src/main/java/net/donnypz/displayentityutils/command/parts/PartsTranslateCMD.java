@@ -34,7 +34,7 @@ class PartsTranslateCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("/mdis parts translate <direction> <distance> <tick-duration> [-all]", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("/deu parts translate <direction> <distance> <tick-duration> [-all]", NamedTextColor.RED)));
     }
 
     @Override

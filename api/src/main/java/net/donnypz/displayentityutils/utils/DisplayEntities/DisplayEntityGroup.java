@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.events.PreGroupSpawnedEvent;
+import net.donnypz.displayentityutils.events.PrePacketGroupCreateEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Location;
@@ -189,7 +190,7 @@ public final class DisplayEntityGroup implements Serializable{
      * Spawns this {@link DisplayEntityGroup} at a specified location returning a {@link SpawnedDisplayEntityGroup} that represents this.
      * @param location The location to spawn the group
      * @param spawnReason The reason for this display entity group to spawn
-     * @return A {@link SpawnedDisplayEntityGroup} representative of this DisplayEntityGroup. Null if the {@link PreGroupSpawnedEvent} is cancelled
+     * @return A {@link SpawnedDisplayEntityGroup} representative of this. Null if the {@link PreGroupSpawnedEvent} is cancelled
      */
     public @Nullable SpawnedDisplayEntityGroup spawn(@NotNull Location location, @NotNull GroupSpawnedEvent.SpawnReason spawnReason){
         return spawn(location, spawnReason, new GroupSpawnSettings());
@@ -200,7 +201,7 @@ public final class DisplayEntityGroup implements Serializable{
      * @param location The location to spawn the group
      * @param spawnReason The reason for this display entity group to spawn
      * @param settings The settings to apply to every display  and interaction entity created from this. This may be overridden with the {@link PreGroupSpawnedEvent}.
-     * @return A {@link SpawnedDisplayEntityGroup} representative of this DisplayEntityGroup. Null if the {@link PreGroupSpawnedEvent} is cancelled
+     * @return A {@link SpawnedDisplayEntityGroup} representative of this. Null if the {@link PreGroupSpawnedEvent} is cancelled
      */
     public @Nullable SpawnedDisplayEntityGroup spawn(@NotNull Location location, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings settings){
         PreGroupSpawnedEvent event = new PreGroupSpawnedEvent(this, spawnReason);
@@ -208,9 +209,7 @@ public final class DisplayEntityGroup implements Serializable{
             return null;
         }
         GroupSpawnSettings newSettings = event.getNewSettings();
-        if (newSettings != null){
-            settings = newSettings;
-        }
+        if (newSettings != null) settings = newSettings;
 
         SpawnedDisplayEntityGroup group = new SpawnedDisplayEntityGroup(settings.visibleByDefault);
         Display masterDisplay = masterEntity.createEntity(group, location, settings);
@@ -232,8 +231,7 @@ public final class DisplayEntityGroup implements Serializable{
             Display passenger = entity.createEntity(group, location, settings);
 
             SpawnedDisplayEntityPart part = group.addDisplayEntity(passenger);
-            List<String> legacyPartTags = entity.getLegacyPartTags();
-            if (legacyPartTags != null && !entity.getLegacyPartTags().isEmpty()){
+            if (entity.hasLegacyPartTags()){
                 part.adaptScoreboardTags(true);
             }
             //}
@@ -246,7 +244,7 @@ public final class DisplayEntityGroup implements Serializable{
             Interaction interaction = entity.createEntity(spawnLocation, settings);
 
             SpawnedDisplayEntityPart part = group.addInteractionEntity(interaction);
-            if (!entity.getLegacyPartTags().isEmpty()){
+            if (entity.hasLegacyPartTags()){
                 part.adaptScoreboardTags(true);
             }
 
@@ -277,14 +275,26 @@ public final class DisplayEntityGroup implements Serializable{
 
 
 
+
     /**
      * Spawns this {@link DisplayEntityGroup} at a specified location returning a {@link PacketDisplayEntityGroup} that represents this.
      * @param spawnLocation The location where this group spawn be spawned for players
      * @param playSpawnAnimation whether this packet group should automatically play its spawn animation when created
-     * @return A {@link PacketDisplayEntityGroup} representative of this DisplayEntityGroup.
+     * @return A {@link PacketDisplayEntityGroup} representative of this. Null if the {@link PrePacketGroupCreateEvent} is cancelled
      */
-    public @NotNull PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation, boolean playSpawnAnimation){
-        return createPacketGroup(spawnLocation, playSpawnAnimation, false);
+    public @Nullable PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation, boolean playSpawnAnimation){
+        return createPacketGroup(spawnLocation, GroupSpawnedEvent.SpawnReason.CUSTOM, playSpawnAnimation);
+    }
+
+    /**
+     * Spawns this {@link DisplayEntityGroup} at a specified location returning a {@link PacketDisplayEntityGroup} that represents this.
+     * @param spawnLocation The location where this group spawn be spawned for players
+     * @param spawnReason The reason for this display entity group to spawn
+     * @param playSpawnAnimation whether this packet group should automatically play its spawn animation when created
+     * @return A {@link PacketDisplayEntityGroup} representative of this. Null if the {@link PrePacketGroupCreateEvent} is cancelled
+     */
+    public @Nullable PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, boolean playSpawnAnimation){
+        return createPacketGroup(spawnLocation, spawnReason, playSpawnAnimation, false);
     }
 
 
@@ -293,13 +303,45 @@ public final class DisplayEntityGroup implements Serializable{
      * @param spawnLocation The location where this group spawn be spawned for players
      * @param playSpawnAnimation whether this packet group should automatically play its spawn animation when created
      * @param autoShow whether this packet group should automatically handle revealing and hiding itself to players
-     * @return A {@link PacketDisplayEntityGroup} representative of this DisplayEntityGroup.
+     * @return A {@link PacketDisplayEntityGroup} representative of this. Null if the {@link PrePacketGroupCreateEvent} is cancelled
      */
-    public @NotNull PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation, boolean playSpawnAnimation, boolean autoShow){
+    public @Nullable PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation, boolean playSpawnAnimation, boolean autoShow){
+        return createPacketGroup(spawnLocation, GroupSpawnedEvent.SpawnReason.CUSTOM, playSpawnAnimation, new GroupSpawnSettings().visibleByDefault(autoShow, null));
+    }
+
+    /**
+     * Spawns this {@link DisplayEntityGroup} at a specified location returning a {@link PacketDisplayEntityGroup} that represents this.
+     * @param spawnLocation The location where this group spawn be spawned for players
+     * @param spawnReason The reason for this display entity group to spawn
+     * @param playSpawnAnimation whether this packet group should automatically play its spawn animation when created
+     * @param autoShow whether this packet group should automatically handle revealing and hiding itself to players
+     * @return A {@link PacketDisplayEntityGroup} representative of this. Null if the {@link PrePacketGroupCreateEvent} is cancelled
+     */
+    public @Nullable PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, boolean playSpawnAnimation, boolean autoShow){
+        return createPacketGroup(spawnLocation, spawnReason, playSpawnAnimation, new GroupSpawnSettings().visibleByDefault(autoShow, null));
+    }
+
+    /**
+     * Spawns this {@link DisplayEntityGroup} at a specified location returning a {@link PacketDisplayEntityGroup} that represents this.
+     * @param spawnLocation The location where this group spawn be spawned for players
+     * @param spawnReason The reason for this display entity group to spawn
+     * @param playSpawnAnimation whether this packet group should automatically play its spawn animation when created
+     * @param settings The settings to apply to every display and interaction entity created from this. This may be overridden with the {@link PrePacketGroupCreateEvent}. <br><b>The persistence of the settings is ignored for packet-based groups</b>
+     * @return A {@link PacketDisplayEntityGroup} representative of this. Null if the {@link PrePacketGroupCreateEvent} is cancelled
+     */
+    public @Nullable PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, boolean playSpawnAnimation, @NotNull GroupSpawnSettings settings){
+        PrePacketGroupCreateEvent event = new PrePacketGroupCreateEvent(this, spawnReason);
+        if (!event.callEvent()){
+            return null;
+        }
+
+        GroupSpawnSettings newSettings = event.getNewSettings();
+        if (newSettings != null) settings = newSettings;
+
         PacketDisplayEntityGroup packetGroup = new PacketDisplayEntityGroup(tag);
 
         packetGroup.updateChunkAndWorld(spawnLocation);
-        PacketDisplayEntityPart masterPart = masterEntity.createPacketPart(packetGroup, spawnLocation);
+        PacketDisplayEntityPart masterPart = masterEntity.createPacketPart(packetGroup, spawnLocation, settings);
         masterPart.isMaster = true; //for parts in old models that do not contain pdc data / part uuids
         packetGroup.addPartSilent(masterPart);
 
@@ -309,7 +351,7 @@ public final class DisplayEntityGroup implements Serializable{
 
         for (DisplayEntity entity : displayEntities){
             if (entity.isMaster()) continue;
-            PacketDisplayEntityPart part = entity.createPacketPart(packetGroup, spawnLocation);
+            PacketDisplayEntityPart part = entity.createPacketPart(packetGroup, spawnLocation, settings);
             packetGroup.addPartSilent(part);
             passengerIds[i] = part.getEntityId();
             i++;
@@ -317,14 +359,14 @@ public final class DisplayEntityGroup implements Serializable{
         packetGroup.passengerIds = passengerIds;
 
         for (InteractionEntity entity : interactionEntities){
-            PacketDisplayEntityPart part = entity.createPacketPart(spawnLocation);
+            PacketDisplayEntityPart part = entity.createPacketPart(spawnLocation, settings);
             packetGroup.addPartSilent(part);
         }
 
         if (playSpawnAnimation){
             packetGroup.playSpawnAnimation();
         }
-        packetGroup.setAutoShow(autoShow);
+        packetGroup.setAutoShow(settings);
 
 
         if (DisplayConfig.autoCulling()){

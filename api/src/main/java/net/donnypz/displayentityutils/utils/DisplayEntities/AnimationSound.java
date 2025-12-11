@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
@@ -25,21 +26,25 @@ public class AnimationSound implements Externalizable, Cloneable {
     @ApiStatus.Internal
     public AnimationSound(){}
 
-    public AnimationSound(String soundName, float volume, float pitch, int delayInTicks){
+    public AnimationSound(@NotNull String soundName, float volume, float pitch, int delayInTicks){
         this.soundName = soundName;
         this.volume = volume;
         this.pitch = pitch;
         this.delay = delayInTicks;
-        existsInGameVersion = false;
+        this.sound = VersionUtils.getSound(soundName);
+        existsInGameVersion = this.sound != null;
     }
 
-    public AnimationSound(Sound sound, float volume, float pitch, int delayInTicks){
-        this(sound.getKey().getKey(), volume, pitch, delayInTicks);
+    public AnimationSound(@NotNull Sound sound, float volume, float pitch, int delayInTicks){
         this.sound = sound;
-        existsInGameVersion = true;
+        this.soundName = sound.getKey().getKey();
+        this.volume = volume;
+        this.pitch = pitch;
+        this.delay = delayInTicks;
+        this.existsInGameVersion = true;
     }
 
-    public AnimationSound(AnimationSound sound){
+    public AnimationSound(@NotNull AnimationSound sound){
         this.sound = sound.sound;
         this.soundName = sound.soundName;
         this.volume = sound.volume;
@@ -130,7 +135,7 @@ public class AnimationSound implements Externalizable, Cloneable {
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException { //fixes 1.20.4 issues w/ anim sounds
         soundName = (String) in.readObject();
-        sound = Registry.SOUNDS.get(NamespacedKey.minecraft(soundName.replace(".", "_")));
+        sound = VersionUtils.getSound(soundName);
         if (sound == null){
             existsInGameVersion = false;
         }

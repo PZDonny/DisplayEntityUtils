@@ -126,13 +126,11 @@ public abstract class AnimationPlayer {
                 delay++;
             }
             if (frame.duration > 0){
-                playEndCommands(players, group, frame, groupLoc);
                 useScheduler(() -> {
                     callAnimationFrameEnd(players, group, animation, frame, frameId);
                 }, frame.duration);
             }
             else{
-                playEndCommands(players, group, frame, groupLoc);
                 callAnimationFrameEnd(players, group, animation, frame, frameId);
             }
 
@@ -147,13 +145,11 @@ public abstract class AnimationPlayer {
             if (animator.type != DisplayAnimator.AnimationType.LOOP) {
                 if (frame.duration > 0) {
                     useScheduler(() -> {
-                        playEndCommands(players, group, frame, groupLoc);
                         callAnimationComplete(players, group, animation);
                         handleAnimationComplete(group, selection);
                     }, frame.duration);
                 }
                 else {
-                    playEndCommands(players, group, frame, groupLoc);
                     callAnimationComplete(players, group, animation);
                     handleAnimationComplete(group, selection);
                 }
@@ -162,14 +158,12 @@ public abstract class AnimationPlayer {
             //Loop Animation
             else {
                 if (frame.duration > 0) {
-                    playEndCommands(players, group, frame, groupLoc);
                     SpawnedDisplayAnimationFrame firstFrame = animation.frames.getFirst();
                     useScheduler(() -> {
                         executeAnimation(players, animation, group, selection, firstFrame, 0, false);
                     }, frame.duration);
                 }
                 else {
-                    playEndCommands(players, group, frame, groupLoc);
                     executeAnimation(players, animation, group, selection, animation.frames.getFirst(), 0, false);
                 }
             }
@@ -291,7 +285,7 @@ public abstract class AnimationPlayer {
         //Prevents jittering in some cases
         boolean applyDataOnly;
         if (!packetAnimationPlayer){
-            applyDataOnly = transformation.isSimilar(part.getDisplayTransformation());
+            applyDataOnly = transformation.isSimilar(part.getTransformation());
             applyDisplayTransformation(part, frame, animation, group, transformation, applyDataOnly);
         }
         else{
@@ -302,25 +296,6 @@ public abstract class AnimationPlayer {
     }
 
 
-
-    private void playEndCommands(Collection<Player> players, ActiveGroup<?> group, SpawnedDisplayAnimationFrame frame, Location location){
-        if (players == null || group.getMasterPart() == null || location == null) return;
-        if (packetAnimationPlayer){
-            DisplayAPI.getScheduler().runLater(() -> {
-                frame.executeEndCommands(location);
-            }, Math.max(frame.duration, 0));
-        }
-        else{
-            if (frame.duration <= 0){
-                frame.executeEndCommands(location);
-            }
-            else{
-                DisplayAPI.getScheduler().runLater(() -> {
-                   frame.executeEndCommands(location);
-                }, frame.duration);
-            }
-        }
-    }
 
     private void useScheduler(Runnable runnable, int delay){
         if (packetAnimationPlayer){

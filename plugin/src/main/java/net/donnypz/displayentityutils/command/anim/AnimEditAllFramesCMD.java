@@ -29,7 +29,7 @@ class AnimEditAllFramesCMD extends PlayerSubCommand {
         }
 
         if (args.length < 4) {
-            player.sendMessage(Component.text("/mdis anim editallframes <tick-delay> <tick-duration>", NamedTextColor.RED));
+            player.sendMessage(Component.text("/deu anim editallframes <tick-delay> <tick-duration>", NamedTextColor.RED));
             return;
         }
 

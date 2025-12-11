@@ -10,11 +10,10 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import net.donnypz.displayentityutils.utils.relativepoints.FramePointSelector;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointSelector;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
-import net.kyori.adventure.key.Key;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -44,12 +43,11 @@ class AnimAddSoundCMD extends PlayerSubCommand {
         }
 
         if (args.length < 6) {
-            player.sendMessage(Component.text("Incorrect Usage! /mdis anim addsound <sound> <volume> <pitch> <delay-in-ticks>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /deu anim addsound <sound> <volume> <pitch> <delay-in-ticks>", NamedTextColor.RED));
             return;
         }
         try {
-            String soundString = args[2].replace(".", "_").toUpperCase();
-            Sound sound = Registry.SOUNDS.get(Key.key("minecraft", soundString));
+            Sound sound = VersionUtils.getSound(args[2]);
             if (sound == null){
                 player.sendMessage(Component.text("Invalid Sound Name!", NamedTextColor.RED));
                 return;

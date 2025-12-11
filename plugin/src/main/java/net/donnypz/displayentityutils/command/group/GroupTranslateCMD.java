@@ -24,7 +24,7 @@ class GroupTranslateCMD extends GroupSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("/mdis group translate <direction> <distance> <tick-duration>", NamedTextColor.RED));
+        player.sendMessage(Component.text("/deu group translate <direction> <distance> <tick-duration>", NamedTextColor.RED));
     }
 
     @Override

@@ -303,7 +303,9 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
             if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
                 continue;
             }
-            part.glow(player, durationInTicks);
+            if (!part.isGlowing()){
+                part.glow(player, durationInTicks);
+            }
         }
     }
 
@@ -510,7 +512,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @return the group's teleport duration value
      */
     public int getTeleportDuration(){
-        return masterPart.getDisplayTeleportDuration();
+        return masterPart.getTeleportDuration();
     }
 
     /**
@@ -690,12 +692,18 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     /**
      * Manually stop all animations playing on this group
      * @param removeFromStateMachine removes this animation from its state machine if true
+     * @return a collection of the stopped {@link DisplayAnimator}s
      */
-    public void stopAnimations(boolean removeFromStateMachine){
-        clearActiveAnimators();
-        if (removeFromStateMachine){
-            DisplayStateMachine.unregisterFromStateMachine(this, true);
+    public @NotNull Collection<DisplayAnimator> stopAnimations(boolean removeFromStateMachine){
+        synchronized (animatorLock){
+            Set<DisplayAnimator> animators = new HashSet<>(activeAnimators);
+            activeAnimators.clear();
+            if (removeFromStateMachine){
+                DisplayStateMachine.unregisterFromStateMachine(this, true);
+            }
+            return animators;
         }
+
     }
 
     /**

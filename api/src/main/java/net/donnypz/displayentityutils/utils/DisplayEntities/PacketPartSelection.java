@@ -110,30 +110,25 @@ public class PacketPartSelection extends MultiPartSelection<PacketDisplayEntityP
 
     @Override
     public void showToPlayer(@NotNull Player player, GroupSpawnedEvent.@NotNull SpawnReason spawnReason) {
-        for (PacketDisplayEntityPart part : selectedParts){
-            part.showToPlayer(player, spawnReason);
-        }
+        showToPlayer(player, spawnReason, getLocation());
     }
 
     @Override
-    public void showToPlayer(@NotNull Player player, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
+    public void showToPlayer(@NotNull Player player, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull Location location) {
         for (PacketDisplayEntityPart part : selectedParts){
-            part.showToPlayer(player, spawnReason, groupSpawnSettings);
+            part.showToPlayer(player, spawnReason, location);
         }
     }
 
     @Override
     public void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason) {
-        for (PacketDisplayEntityPart part : selectedParts){
-            part.showToPlayers(players, spawnReason);
-        }
+        showToPlayers(players, spawnReason, getLocation());
     }
 
     @Override
-    public void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
+    public void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull Location location) {
         for (PacketDisplayEntityPart part : selectedParts){
-            part.showToPlayers(players, spawnReason, groupSpawnSettings);
+            part.showToPlayers(players, spawnReason, location);
         }
     }
-
 }

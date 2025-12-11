@@ -176,7 +176,7 @@ class GroupEntityFollower {
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
             return;
         }
-        Transformation t = part.getDisplayTransformation();
+        Transformation t = part.getTransformation();
         Vector3f translation = t.getTranslation();
 
         /*if (part.isAnimatingForPlayers()){

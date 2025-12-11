@@ -21,7 +21,7 @@ class PartsBrightnessCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("/mdis parts brightness <block> <sky> [-all]", NamedTextColor.RED));
+        player.sendMessage(Component.text("/deu parts brightness <block> <sky> [-all]", NamedTextColor.RED));
         player.sendMessage(Component.text("| Brightness can be whole numbers between 0 and 15", NamedTextColor.GRAY));
         player.sendMessage(Component.text("| Set both \"block\" and \"sky\" to -1 to reset brightness", NamedTextColor.GRAY));
     }

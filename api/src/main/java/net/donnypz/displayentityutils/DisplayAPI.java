@@ -153,4 +153,9 @@ public final class DisplayAPI {
     public static Scheduler getScheduler(){
         return SCHEDULER;
     }
+
+    public static String getVersion(){
+        return plugin.getPluginMeta().getVersion();
+    }
+
 }

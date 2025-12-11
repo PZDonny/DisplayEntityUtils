@@ -105,7 +105,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
 
     public static void noGroupSelection(Player player){
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You must have selected a display entity group to run this command!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/mdis group selectnearest <distance>", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("/deu group selectnearest <distance>", NamedTextColor.GRAY));
     }
 
     public static void disallowPacketGroup(Player player){
@@ -114,7 +114,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
 
     public static void noPartSelection(Player player){
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You have not selected a part!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/mdis parts cycle <first | prev | next>", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("/deu parts cycle <first | prev | next>", NamedTextColor.GRAY));
     }
 
     public static void invalidTag(Player player, String tag){
@@ -174,18 +174,18 @@ public class DisplayEntityPluginCommand implements TabExecutor {
             return;
         }
         sender.sendMessage(DisplayAPI.pluginPrefixLong);
-        sender.sendMessage(Component.text("v"+DisplayAPI.getPlugin().getPluginMeta().getVersion(), NamedTextColor.GRAY));
-        CMDUtils.sendCMD(sender, "/mdis group", "Display Entity Models/Groups related commands");
-        CMDUtils.sendCMD(sender, "/mdis anim", "Animation related commands");
-        CMDUtils.sendCMD(sender, "/mdis parts", "Commands related to the parts (individual display entities) of a Display Entity Model/Group");
-        CMDUtils.sendCMD(sender, "/mdis item", "Commands related to the Item Display parts of a Display Entity Model/Group");
-        CMDUtils.sendCMD(sender, "/mdis text", "Commands related to the Text Display parts of a Display Entity Model/Group");
-        CMDUtils.sendCMD(sender, "/mdis interaction", "Commands related to manipulating Interaction entities");
-        CMDUtils.sendCMD(sender, "/mdis listgroups <storage> [page-number]", "List all saved Display Entity Models/Groups");
-        CMDUtils.sendCMD(sender, "/mdis listanims <storage> [page-number]", "List all saved Animations");
-        CMDUtils.sendCMD(sender, "/mdis hidepoints", "Hide any visible points (frame points, persistent packet group points, etc.)");
-        CMDUtils.sendCMD(sender, "/mdis bdengine", "Import/Convert models from BDEngine");
-        CMDUtils.sendCMD(sender, "/mdis reload <config | controllers>", "Reload the plugin's config or Display Controllers." +
+        sender.sendMessage(Component.text("v"+DisplayAPI.getVersion(), NamedTextColor.GRAY));
+        CMDUtils.sendCMD(sender, "/deu group", "Display Entity Models/Groups related commands");
+        CMDUtils.sendCMD(sender, "/deu anim", "Animation related commands");
+        CMDUtils.sendCMD(sender, "/deu parts", "Commands related to the parts (individual display entities) of a Display Entity Model/Group");
+        CMDUtils.sendCMD(sender, "/deu item", "Commands related to the Item Display parts of a Display Entity Model/Group");
+        CMDUtils.sendCMD(sender, "/deu text", "Commands related to the Text Display parts of a Display Entity Model/Group");
+        CMDUtils.sendCMD(sender, "/deu interaction", "Commands related to manipulating Interaction entities");
+        CMDUtils.sendCMD(sender, "/deu listgroups <storage> [page-number]", "List all saved Display Entity Models/Groups");
+        CMDUtils.sendCMD(sender, "/deu listanims <storage> [page-number]", "List all saved Animations");
+        CMDUtils.sendCMD(sender, "/deu hidepoints", "Hide any visible points (frame points, persistent packet group points, etc.)");
+        CMDUtils.sendCMD(sender, "/deu bdengine", "Import/Convert models from BDEngine");
+        CMDUtils.sendCMD(sender, "/deu reload <config | controllers>", "Reload the plugin's config or Display Controllers." +
                 " To reload Local, MySQL or MongoDB config save options, the server must be restarted");
     }
 

@@ -21,7 +21,7 @@ class GroupBillboardCMD extends GroupSubCommand {
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid billboard type!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/mdis group billboard <fixed | vertical | horizontal | center>", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("/deu group billboard <fixed | vertical | horizontal | center>", NamedTextColor.GRAY));
     }
 
     @Override
@@ -33,7 +33,7 @@ class GroupBillboardCMD extends GroupSubCommand {
         }
         catch(IllegalArgumentException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid billboard type!", NamedTextColor.RED)));
-            player.sendMessage(Component.text("/mdis group billboard <fixed | vertical | horizontal | center>\"", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("/deu group billboard <fixed | vertical | horizontal | center>\"", NamedTextColor.GRAY));
         }
     }
 

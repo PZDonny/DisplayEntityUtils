@@ -23,7 +23,7 @@ class PartsSetBlockCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /mdis parts setblock <\"-held\" | \"-target\" | block-id> [-all]", NamedTextColor.RED));
+        player.sendMessage(Component.text("Incorrect Usage! /deu parts setblock <\"-held\" | \"-target\" | block-id> [-all]", NamedTextColor.RED));
     }
 
     @Override

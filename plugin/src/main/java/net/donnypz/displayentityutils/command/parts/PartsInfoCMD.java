@@ -96,7 +96,7 @@ class PartsInfoCMD extends PlayerSubCommand {
             player.sendMessage(MiniMessage.miniMessage().deserialize("Is Master Part: "+(part.isMaster() ? "<green>TRUE" : "<red>FALSE")));
             player.sendMessage(Component.empty());
             if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getDisplayViewRange()));
+                player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getViewRange()));
                 sendBrightness(player, part);
                 DEUCommandUtils.sendGlowColor(player, part.getGlowColor());
             }
@@ -107,25 +107,25 @@ class PartsInfoCMD extends PlayerSubCommand {
             }
         }
         else{
-            player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getDisplayViewRange()));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getViewRange()));
             sendBrightness(player, part);
             DEUCommandUtils.sendGlowColor(player, part.getGlowColor());
         }
         player.sendMessage(Component.empty());
         player.sendMessage(Component.text("| Click to view Part Tags", NamedTextColor.GOLD)
-                .clickEvent(ClickEvent.suggestCommand("/mdis parts listtags")));
+                .clickEvent(ClickEvent.suggestCommand("/deu parts listtags")));
 
     }
 
     private void incorrectUsage(Player player){
-        player.sendMessage(Component.text("Incorrect Usage! /mdis parts info <part | selection>", NamedTextColor.RED));
+        player.sendMessage(Component.text("Incorrect Usage! /deu parts info <part | selection>", NamedTextColor.RED));
     }
 
     private void sendBrightness(Player player, ActivePart part){
         if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
             return;
         }
-        Display.Brightness brightness = part.getDisplayBrightness();
+        Display.Brightness brightness = part.getBrightness();
         if (brightness == null){
             player.sendMessage(MiniMessage.miniMessage().deserialize("Brightness: <red>NOT SET"));
         }

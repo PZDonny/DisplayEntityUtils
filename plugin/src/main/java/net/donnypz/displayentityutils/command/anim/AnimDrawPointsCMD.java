@@ -31,7 +31,7 @@ class AnimDrawPointsCMD extends PlayerSubCommand {
     }
 
     private void incorrectUsage(Player player){
-        player.sendMessage(Component.text("Incorrect Usage! /mdis anim drawpoints <straight | arc> <point-tag> <start-frame> <end-frame> [points-per-frame]", NamedTextColor.RED));
+        player.sendMessage(Component.text("Incorrect Usage! /deu anim drawpoints <straight | arc> <point-tag> <start-frame> <end-frame> [points-per-frame]", NamedTextColor.RED));
     }
 
     @Override
@@ -50,7 +50,7 @@ class AnimDrawPointsCMD extends PlayerSubCommand {
 
         if (RelativePointUtils.isViewingRelativePoints(player)){
             player.sendMessage(Component.text("You cannot draw points while already viewing points!", NamedTextColor.RED));
-            player.sendMessage(Component.text("| Run \"/mdis hidepoints\" to stop viewing points", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Run \"/deu hidepoints\" to stop viewing points", NamedTextColor.GRAY));
             return;
         }
 
@@ -148,7 +148,7 @@ class AnimDrawPointsCMD extends PlayerSubCommand {
 
     private void invalidPos(Player player){
         player.sendMessage(Component.text("You have not set the correct amount of positions to begin drawing frame points!", NamedTextColor.RED));
-        player.sendMessage(Component.text("| Use command \"/mdis anim drawpos\"", NamedTextColor.YELLOW));
+        player.sendMessage(Component.text("| Use command \"/deu anim drawpos\"", NamedTextColor.YELLOW));
         player.sendMessage(Component.text("| Straight: Requires Pos 1 and Pos 2 to be set", NamedTextColor.GRAY));
         player.sendMessage(Component.text("| Arc: Requires Pos 1, Pos 2, and Pos 3 to be set", NamedTextColor.GRAY));
     }

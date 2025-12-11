@@ -9,7 +9,6 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -21,8 +20,9 @@ import java.util.List;
 class AnimPlayCMD extends PlayerSubCommand {
     AnimPlayCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("play", parentSubCommand, Permission.ANIM_PLAY);
-        setTabComplete(2, List.of("-loop", "-packet"));
-        setTabComplete(3, List.of("-loop", "-packet"));
+        setTabComplete(2, List.of("-loop", "-packet", "-camera"));
+        setTabComplete(3, List.of("-loop", "-packet", "-camera"));
+        setTabComplete(4, List.of("-loop", "-packet", "-camera"));
     }
 
     @Override
@@ -48,25 +48,29 @@ class AnimPlayCMD extends PlayerSubCommand {
             AnimCMD.hasNoFrames(player);
             return;
         }
-        boolean loop = false;
+        DisplayAnimator.AnimationType animationType = DisplayAnimator.AnimationType.LINEAR;
         boolean packet = false;
+        boolean camera = false;
         Component optionResult = Component.empty();
         for (int i = 2; i < args.length; i++){
             String arg = args[i];
-            if (arg.equalsIgnoreCase("-loop") && !loop){
-                loop = true;
+            if (arg.equalsIgnoreCase("-loop") && animationType != DisplayAnimator.AnimationType.LOOP){
+                animationType = DisplayAnimator.AnimationType.LOOP;
                 optionResult = optionResult.append(Component.text(" (LOOPING)", NamedTextColor.YELLOW));
             }
             else if (arg.equalsIgnoreCase("-packet") && !packet){
                 packet = true;
                 optionResult = optionResult.append(Component.text(" (PACKET-BASED)", NamedTextColor.LIGHT_PURPLE));
             }
+            else if (arg.equalsIgnoreCase("-camera") && !camera){
+                camera = true;
+                optionResult.append(Component.text(" (CAMERA VIEW)", NamedTextColor.AQUA));
+            }
         }
 
-        if (loop){
+        if (animationType == DisplayAnimator.AnimationType.LOOP){
             if (packet){
-                new DisplayAnimator(anim, DisplayAnimator.AnimationType.LOOP)
-                        .playUsingPackets(group, 0);
+                DisplayAnimator.playUsingPackets(group, anim, DisplayAnimator.AnimationType.LOOP);
             }
             else{
                 group.animateLooping(anim);
@@ -74,11 +78,14 @@ class AnimPlayCMD extends PlayerSubCommand {
         }
         else{
             if (packet){
-                DisplayAnimator.playUsingPackets(group, anim);
+                DisplayAnimator.playUsingPackets(group, anim, DisplayAnimator.AnimationType.LINEAR);
             }
             else{
                 group.animate(anim);
             }
+        }
+        if (camera){
+            DisplayAnimator.playCamera(player, group, anim, animationType);
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Playing Animation!", NamedTextColor.GREEN))
                 .append(optionResult));

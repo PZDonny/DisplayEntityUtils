@@ -39,7 +39,7 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("/mdis parts filtertype <part-types>", NamedTextColor.RED));
+            player.sendMessage(Component.text("/deu parts filtertype <part-types>", NamedTextColor.RED));
             return;
         }
 

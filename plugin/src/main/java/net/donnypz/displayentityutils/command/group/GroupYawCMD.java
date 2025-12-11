@@ -21,7 +21,7 @@ class GroupYawCMD extends GroupSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /mdis group yaw <yaw> [-pivot]", NamedTextColor.RED));
+        player.sendMessage(Component.text("Incorrect Usage! /deu group yaw <yaw> [-pivot]", NamedTextColor.RED));
     }
 
     @Override

@@ -30,11 +30,11 @@ class GroupSafeDismountCMD extends ConsoleUsableSubCommand {
     public void execute(CommandSender sender, String[] args) {
         if (args.length < 3) {
             if (!(sender instanceof Player)){
-                sender.sendMessage(Component.text("Incorrect Console Usage! /mdis group safedismount <player-name | entity-uuid>", NamedTextColor.RED));
+                sender.sendMessage(Component.text("Incorrect Console Usage! /deu group safedismount <player-name | entity-uuid>", NamedTextColor.RED));
                 return;
             }
             else{
-                sender.sendMessage(Component.text("Incorrect Usage! /mdis group safedismount <-target | -selected | player-name | entity-uuid>", NamedTextColor.RED));
+                sender.sendMessage(Component.text("Incorrect Usage! /deu group safedismount <-target | -selected | player-name | entity-uuid>", NamedTextColor.RED));
             }
             return;
         }

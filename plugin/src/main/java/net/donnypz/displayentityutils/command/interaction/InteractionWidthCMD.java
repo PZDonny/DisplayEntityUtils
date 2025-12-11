@@ -17,7 +17,7 @@ class InteractionWidthCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /mdis interaction width <width>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /deu interaction width <width>", NamedTextColor.RED));
             return;
         }
         InteractionHeightCMD.setInteractionDimensions(player, args, "width");

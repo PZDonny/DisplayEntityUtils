@@ -290,7 +290,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             //Displays
             if (p.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
                 DisplayAttributeMap attributeMap = new DisplayAttributeMap();
-                Transformation transformation = p.getDisplayTransformation();
+                Transformation transformation = p.getTransformation();
                 //Reset Scale then multiply by newScaleMultiplier
                 Vector3f scale = transformation.getScale();
                 scale.x = (scale.x/scaleMultiplier)*newScaleMultiplier;
@@ -303,7 +303,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 translationVector.y = (translationVector.y/scaleMultiplier)*newScaleMultiplier;
                 translationVector.z = (translationVector.z/scaleMultiplier)*newScaleMultiplier;
 
-                if (!transformation.equals(p.getDisplayTransformation())){
+                if (!transformation.equals(p.getTransformation())){
                     attributeMap.add(DisplayAttributes.Interpolation.DURATION, durationInTicks)
                         .add(DisplayAttributes.Interpolation.DELAY, -1)
                         .addTransformation(transformation);
@@ -346,13 +346,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
 
     public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation){
-        return DisplayAnimator.playUsingPackets(this, animation);
+        return DisplayAnimator.playUsingPackets(this, animation, DisplayAnimator.AnimationType.LINEAR);
     }
 
     public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation){
-        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
-        animator.playUsingPackets(this, 0);
-        return animator;
+        return DisplayAnimator.playUsingPackets(this, animation, DisplayAnimator.AnimationType.LOOP);
     }
 
 
@@ -546,27 +544,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
     }
 
-    /**
-     * Change the true location of this group. If the teleport changes worlds, the group will automatically be hidden from players in the old world.<br>
-     * It is not recommended to use this multiple times in the same tick, as unexpected results may occur.
-     * @param location The location to teleport this group
-     * @param respectGroupDirection Whether to respect this group's pitch and yaw or the location's pitch and yaw
-
-     */
-    public void teleportSafe(@NotNull Location location, boolean respectGroupDirection){
-        teleport(location, respectGroupDirection, true);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <br>It is not recommended to use this multiple times in the same tick, unexpected results may occur.
-     */
-    @Override
-    public boolean teleport(@NotNull Location location, boolean respectGroupDirection){
-        teleport(location, respectGroupDirection, false);
-        return true;
-    }
-
     @Override
     public void teleportMove(Vector direction, double distance, int durationInTicks) {
         Location destination = getLocation().add(direction.clone().normalize().multiply(distance));
@@ -593,7 +570,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 currentDistance+=Math.abs(movementIncrement);
                 Location tpLocation = getLocation().add(incrementVector);
 
-                attemptLocationUpdate(getLocation(), tpLocation, false);
+                attemptLocationUpdate(getLocation(), tpLocation);
                 if (currentDistance >= distance){
                     masterPart.teleportUnsetPassengers(destination);
                     cancel();
@@ -606,9 +583,15 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }, 0, 1);
     }
 
-    private void teleport(Location tpLocation, boolean respectGroupDirection, boolean hide){
+    /**
+     * {@inheritDoc}
+     * <br>It is not recommended to use this multiple times in the same tick, unexpected results may occur.
+     */
+    @Override
+    public boolean teleport(@NotNull Location tpLocation, boolean respectGroupDirection){
+        if (isRiding()) return false;
         Location oldMasterLoc = getLocation();
-        attemptLocationUpdate(oldMasterLoc, tpLocation, hide);
+        attemptLocationUpdate(oldMasterLoc, tpLocation);
 
         tpLocation = tpLocation.clone();
         if (respectGroupDirection){
@@ -627,9 +610,10 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             }
         }
         this.update();
+        return true;
     }
 
-    private void attemptLocationUpdate(Location oldLoc, Location newLoc, boolean allowHide){
+    private void attemptLocationUpdate(Location oldLoc, Location newLoc){
         if (oldLoc == null) {
             updateChunkAndWorld(newLoc);
         }
@@ -637,10 +621,9 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             World w1 = oldLoc.getWorld();
             World w2 = newLoc.getWorld();
             if (!w1.equals(w2)){
-                if (allowHide){
-                    hide();
-                }
+                hide();
                 updateChunkAndWorld(newLoc);
+                if (isAutoShow()) show();
             }
             else{
                 updateChunkAndWorld(newLoc);
@@ -732,7 +715,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
 
         DisplayEntityGroup group = toDisplayEntityGroup();
-        PacketDisplayEntityGroup clone = group.createPacketGroup(location, playSpawnAnimation, autoShow);
+        PacketDisplayEntityGroup clone = group.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.CLONE, playSpawnAnimation, autoShow);
 
         //Restore Interaction Pivot
         for (Map.Entry<ActivePart, Float> entry : oldYaws.entrySet()){
@@ -764,26 +747,61 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         if (oldAutoshow != autoShow){
             this.update();
             if (autoShow){
-                Location loc = getLocation();
-                if (loc != null){
-                    DisplayAPI.getScheduler().run(() -> {
-                        long chunkKey = ConversionUtils.getChunkKey(loc);
-                        Collection<Player> players = new ArrayList<>();
-                        for (Player p : loc.getWorld().getPlayers()){
-                            if (p.isChunkSent(chunkKey)){
-                                players.add(p);
-                            }
-                        }
-                        DisplayAPI.getScheduler().runAsync(() -> {
-                            if (this.autoShow) {
-                                showToPlayers(players, GroupSpawnedEvent.SpawnReason.INTERNAL);
-                            }
-                        });
-                    });
-                }
+                show();
             }
         }
         return this;
+    }
+
+    private synchronized void show(){
+        Location loc = getLocation();
+        if (loc == null) return;
+        long chunkKey = ConversionUtils.getChunkKey(loc);
+        Collection<Player> players = new ArrayList<>();
+        DisplayAPI.getScheduler().run(() -> {
+            for (Player p : loc.getWorld().getPlayers()){
+                if (p.isChunkSent(chunkKey)){
+                    players.add(p);
+                }
+            }
+            DisplayAPI.getScheduler().runAsync(() -> {
+                if (this.autoShow) {
+                    showToPlayers(players, GroupSpawnedEvent.SpawnReason.INTERNAL);
+                }
+            });
+        });
+    }
+
+    synchronized PacketDisplayEntityGroup setAutoShow(GroupSpawnSettings settings){
+        boolean autoShow = settings.visibleByDefault;
+        boolean oldAutoshow = this.autoShow;
+        this.autoShow = autoShow;
+        if (oldAutoshow != autoShow){
+            this.update();
+            if (autoShow){
+                show(settings);
+            }
+        }
+        return this;
+    }
+
+    private synchronized void show(GroupSpawnSettings settings){
+        Location loc = getLocation();
+        if (loc == null) return;
+        long chunkKey = ConversionUtils.getChunkKey(loc);
+        Collection<Player> players = new ArrayList<>();
+        DisplayAPI.getScheduler().run(() -> {
+            for (Player p : loc.getWorld().getPlayers()){
+                if (p.isChunkSent(chunkKey)){
+                    players.add(p);
+                }
+            }
+            DisplayAPI.getScheduler().runAsync(() -> {
+                if (this.autoShow) {
+                    showToPlayers(players, GroupSpawnedEvent.SpawnReason.INTERNAL, getLocation(), settings);
+                }
+            });
+        });
     }
 
     /**
@@ -833,22 +851,23 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * @param player the player
      * @param spawnReason the spawn reason
      */
+    @Override
     public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
-        showToPlayer(player, spawnReason, new GroupSpawnSettings());
+        showToPlayer(player, spawnReason, getLocation());
     }
 
     /**
      * Show the group's packet-based entities to a player. Calls the {@link PacketGroupSendEvent}
      * @param player the player
      * @param spawnReason the spawn reason
-     * @param groupSpawnSettings the group spawn settings to use
+     * @param location where to spawn the group for the player
      */
     @Override
-    public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
+    public void showToPlayer(@NotNull Player player, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull Location location) {
         if (!sendShowEvent(List.of(player), spawnReason)) return;
         if (!masterPart.isTrackedBy(player)){
             for (PacketDisplayEntityPart part : groupParts.values()){
-                part.showToPlayer(player, spawnReason);
+                part.showToPlayer(player, spawnReason, location);
             }
             setPassengers(player);
         }
@@ -861,22 +880,36 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * @param spawnReason the spawn reason
      */
     public void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
-        showToPlayers(players, spawnReason, new GroupSpawnSettings());
+        showToPlayers(players, spawnReason, getLocation());
     }
+
 
     /**
      * Show the group's packet-based entities to players. Calls the {@link PacketGroupSendEvent}
      * @param players the players
      * @param spawnReason the spawn reason
-     * @param groupSpawnSettings the group spawn settings to use
+     * @param location where to spawn the group for the players
      */
     @Override
-    public void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings groupSpawnSettings) {
+    public void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull Location location) {
         if (!sendShowEvent(players, spawnReason)) return;
         for (Player player : players){
             if (!masterPart.isTrackedBy(player)){
                 for (PacketDisplayEntityPart part : groupParts.sequencedValues()){
-                    part.showToPlayer(player, spawnReason, groupSpawnSettings);
+                    part.showToPlayer(player, spawnReason, location);
+                }
+                setPassengers(player);
+            }
+            refreshVehicle(player);
+        }
+    }
+
+    void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull Location location, GroupSpawnSettings settings) {
+        if (!sendShowEvent(players, spawnReason)) return;
+        for (Player player : players){
+            if (!masterPart.isTrackedBy(player)){
+                for (PacketDisplayEntityPart part : groupParts.sequencedValues()){
+                    part.showToPlayer(player, location, settings);
                 }
                 setPassengers(player);
             }

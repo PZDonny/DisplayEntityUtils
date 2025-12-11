@@ -31,11 +31,11 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
     public void execute(CommandSender sender, String[] args) {
         if (args.length < 3) {
             if (!(sender instanceof Player)){
-                sender.sendMessage(Component.text("Incorrect Console Usage! /mdis group dismount <player-name | entity-uuid> [-despawn]", NamedTextColor.RED));
+                sender.sendMessage(Component.text("Incorrect Console Usage! /deu group dismount <player-name | entity-uuid> [-despawn]", NamedTextColor.RED));
                 return;
             }
             else{
-                sender.sendMessage(Component.text("Incorrect Usage! /mdis group dismount <-target | -selected | player-name | entity-uuid> [-despawn]", NamedTextColor.RED));
+                sender.sendMessage(Component.text("Incorrect Usage! /deu group dismount <-target | -selected | player-name | entity-uuid> [-despawn]", NamedTextColor.RED));
             }
             return;
         }

@@ -19,7 +19,7 @@ class TextOpacityCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /mdis text opacity <0-1> [-all]", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu text opacity <0-1> [-all]", NamedTextColor.RED)));
     }
 
     @Override

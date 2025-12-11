@@ -14,7 +14,7 @@ class ListAnimationsCMD extends ConsoleUsableSubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length == 1){
-            sender.sendMessage(Component.text("Incorrect Usage! /mdis listanims <storage> [page-number]", NamedTextColor.RED));
+            sender.sendMessage(Component.text("Incorrect Usage! /deu listanims <storage> [page-number]", NamedTextColor.RED));
             return;
         }
         LoadMethod method;
@@ -28,7 +28,7 @@ class ListAnimationsCMD extends ConsoleUsableSubCommand {
             }
             sender.sendMessage(DisplayAPI.pluginPrefixLong);
             sender.sendMessage(Component.text("Invalid Storage Location!", NamedTextColor.RED));
-            sender.sendMessage(Component.text("/mdis listanims <local | mongodb | mysql>", NamedTextColor.GRAY));
+            sender.sendMessage(Component.text("/deu listanims <local | mongodb | mysql>", NamedTextColor.GRAY));
             return;
         }
 

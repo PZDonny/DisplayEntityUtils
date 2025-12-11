@@ -23,7 +23,7 @@ class ItemToggleGlintCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /mdis item toggleglint -all <on | off>", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /deu item toggleglint -all <on | off>", NamedTextColor.RED)));
     }
 
     @Override

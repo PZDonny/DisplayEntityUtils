@@ -15,7 +15,6 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
@@ -572,7 +571,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (type == PartType.INTERACTION){
             return false;
         }
-        Transformation t = getDisplayTransformation();
+        Transformation t = getTransformation();
         Vector3f v = t.getScale();
         Transformation newT = new Transformation(t.getTranslation(), t.getLeftRotation(), new Vector3f(scale, v.y, v.z), t.getRightRotation());
         Display entity = (Display) getEntity();
@@ -583,7 +582,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public boolean setYScale(float scale){
         if (type == PartType.INTERACTION) return false;
-        Transformation t = getDisplayTransformation();
+        Transformation t = getTransformation();
         Vector3f v = t.getScale();
         Transformation newT = new Transformation(t.getTranslation(), t.getLeftRotation(), new Vector3f(v.x, scale, v.z), t.getRightRotation());
         Display entity = (Display) getEntity();
@@ -594,7 +593,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public boolean setZScale(float scale){
         if (type == PartType.INTERACTION) return false;
-        Transformation t = getDisplayTransformation();
+        Transformation t = getTransformation();
         Vector3f v = t.getScale();
         Transformation newT = new Transformation(t.getTranslation(), t.getLeftRotation(), new Vector3f(v.x, v.y, scale), t.getRightRotation());
         Display entity = (Display) getEntity();
@@ -605,7 +604,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public boolean setScale(float x, float y, float z){
         if (type == PartType.INTERACTION) return false;
-        Transformation t = getDisplayTransformation();
+        Transformation t = getTransformation();
         Transformation newT = new Transformation(t.getTranslation(), t.getLeftRotation(), new Vector3f(x, y, z), t.getRightRotation());
         Display entity = (Display) getEntity();
         entity.setTransformation(newT);
@@ -627,18 +626,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
         Display display = (Display) entity;
         display.setBrightness(brightness);
-    }
-
-    /**
-     * Get the brightness of this part
-     * @return a color, or null if not set or if this part's type is {@link PartType#INTERACTION}
-     */
-    public @Nullable Display.Brightness getBrightness(){
-        if (type == PartType.INTERACTION){
-            return null;
-        }
-        Entity entity = getEntity();
-        return ((Display) entity).getBrightness();
     }
 
     /**
@@ -703,18 +690,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
         Display display = (Display) entity;
         display.setViewRange(viewRangeMultiplier);
-    }
-
-    /**
-     * Get this part's view range multiplier
-     * @return a float. -1 if the part is an interaction
-     */
-    public float getViewRange(){
-        Entity entity = getEntity();
-        if (entity instanceof Interaction){
-            return -1;
-        }
-        return ((Display)entity).getViewRange();
     }
 
 
@@ -1069,7 +1044,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
 
     @Override
-    public @Nullable Transformation getDisplayTransformation() {
+    public @Nullable Transformation getTransformation() {
         if (type == PartType.INTERACTION) {
             return null;
         }
@@ -1077,7 +1052,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
-    public @Nullable Display.Brightness getDisplayBrightness() {
+    public @Nullable Display.Brightness getBrightness() {
         if (type == PartType.INTERACTION){
             return null;
         }
@@ -1085,7 +1060,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
-    public float getDisplayViewRange() {
+    public float getViewRange() {
         if (type == PartType.INTERACTION){
             return -1;
         }
@@ -1139,7 +1114,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
-    public int getDisplayTeleportDuration() {
+    public int getTeleportDuration() {
         if (type == PartType.INTERACTION){
             return -1;
         }

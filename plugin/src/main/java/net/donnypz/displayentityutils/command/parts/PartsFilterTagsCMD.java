@@ -36,7 +36,7 @@ class PartsFilterTagsCMD extends PlayerSubCommand {
         }
 
         if (args.length < 3){
-            player.sendMessage(Component.text("/mdis parts filtertags <part-tags>", NamedTextColor.RED));
+            player.sendMessage(Component.text("/deu parts filtertags <part-tags>", NamedTextColor.RED));
             return;
         }
 

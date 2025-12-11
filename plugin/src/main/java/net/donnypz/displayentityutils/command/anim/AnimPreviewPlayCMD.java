@@ -15,9 +15,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 class AnimPreviewPlayCMD extends PlayerSubCommand {
     AnimPreviewPlayCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("previewplay", parentSubCommand, Permission.ANIM_PREVIEW);
+        setTabComplete(2, List.of("-camera"));
     }
 
     @Override
@@ -44,13 +47,18 @@ class AnimPreviewPlayCMD extends PlayerSubCommand {
             return;
         }
 
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Previewing animation!", NamedTextColor.AQUA)));
+
         DisplayAnimator.play(player, group, anim, DisplayAnimator.AnimationType.LINEAR);
+        if (args.length >= 3 && args[2].equalsIgnoreCase("-camera")){
+            DisplayAnimator.playCamera(player, group, anim, DisplayAnimator.AnimationType.LINEAR);
+            player.sendMessage(Component.text("| Previewing with camera", NamedTextColor.GRAY));
+        }
         DisplayAPI.getScheduler().runLaterAsync(() -> {
             if (player.isConnected()){
-                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Animation test complete!", NamedTextColor.GREEN)));
-                player.sendMessage(Component.text("| Use \"/mdis anim restore\" to restore your group's original state", NamedTextColor.GRAY));
+                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Animation preview complete!", NamedTextColor.GREEN)));
+                player.sendMessage(Component.text("| Use \"/deu anim restore\" to restore your group's original state", NamedTextColor.GRAY));
             }
         }, anim.getDuration());
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Test playing animation!", NamedTextColor.AQUA)));
     }
 }

@@ -21,7 +21,7 @@ class GroupScaleCMD extends GroupSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("/mdis group scale <scale-multiplier> <tick-duration>", NamedTextColor.RED));
+        player.sendMessage(Component.text("/deu group scale <scale-multiplier> <tick-duration>", NamedTextColor.RED));
     }
 
     @Override
