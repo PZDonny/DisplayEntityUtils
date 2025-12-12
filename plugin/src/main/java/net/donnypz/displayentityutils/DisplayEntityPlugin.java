@@ -69,6 +69,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         registerListeners();
         initializeNamespacedKeys();
         initializeBStats();
+        DisplayAPI.checkFolia();
         getServer().getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
     }
 

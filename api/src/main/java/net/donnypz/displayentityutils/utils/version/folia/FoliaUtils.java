@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.version.folia;
 
 import io.papermc.paper.entity.TeleportFlag;
+import net.donnypz.displayentityutils.DisplayAPI;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -28,11 +29,6 @@ public final class FoliaUtils {
     }
 
     static boolean isFolia() {
-        try {
-            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
+        return DisplayAPI.isFolia();
     }
 }

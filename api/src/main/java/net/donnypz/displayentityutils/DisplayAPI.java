@@ -41,6 +41,7 @@ public final class DisplayAPI {
     static DisplayStorage MONGODB_STORAGE;
     static AnimationPlayer.AnimationPlayerProvider ANIMATION_PLAYER_SERVICE;
     static Scheduler SCHEDULER;
+    private static boolean isFolia;
 
     private DisplayAPI(){}
 
@@ -156,6 +157,19 @@ public final class DisplayAPI {
 
     public static String getVersion(){
         return plugin.getPluginMeta().getVersion();
+    }
+
+    public static boolean isFolia(){
+        return isFolia;
+    }
+
+    static void checkFolia(){
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            isFolia = true;
+        } catch (ClassNotFoundException e) {
+            isFolia = false;
+        }
     }
 
 }
