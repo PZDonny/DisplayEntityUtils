@@ -13,49 +13,45 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-class ListGroupsCMD extends ConsoleUsableSubCommand {
-    ListGroupsCMD() {
+public class ListCMD extends ConsoleUsableSubCommand {
+    Component incorrectUsageMessage;
+    int minLength, storageIndex, pageNumberIndex;
+    boolean listsGroups;
+    public ListCMD(Component incorrectUsageMessage, int minLength, boolean listsGroups) {
         super(Permission.LIST_GROUPS);
+        this.incorrectUsageMessage = incorrectUsageMessage;
+        this.minLength = minLength;
+        this.storageIndex = minLength-1;
+        this.pageNumberIndex = minLength;
+        this.listsGroups = listsGroups;
+        setTabComplete(storageIndex, TabSuggestion.STORAGES);
+        setTabComplete(pageNumberIndex, "[page-number]");
     }
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (args.length == 1){
-            sender.sendMessage(Component.text("Incorrect Usage! /deu listgroups <storage> [page-number]", NamedTextColor.RED));
+        if (args.length < minLength){
+            sender.sendMessage(incorrectUsageMessage);
             return;
         }
-        LoadMethod method;
-        try{
-            method = LoadMethod.valueOf(args[1].toUpperCase());
-        }
-        catch(IllegalArgumentException e){
-            if (args[1].equalsIgnoreCase("all")){
-                sender.sendMessage(Component.text("You cannot use \"all\" here!", NamedTextColor.RED));
-                return;
-            }
-            sender.sendMessage(DisplayAPI.pluginPrefixLong);
-            sender.sendMessage(Component.text("Invalid Storage Location!", NamedTextColor.RED));
-            sender.sendMessage(Component.text("/deu listgroups local", NamedTextColor.GRAY));
-            sender.sendMessage(Component.text("/deu listgroups mongodb", NamedTextColor.GRAY));
-            sender.sendMessage(Component.text("/deu listgroups mysql", NamedTextColor.GRAY));
-            return;
-        }
-
-        list(sender, method, args, true);
-
-
-
+        list(sender,storageIndex, pageNumberIndex, args);
     }
 
-    static void list(CommandSender sender, LoadMethod method, String[] args, boolean isListingGroups){
+    public void list(CommandSender sender, int storageIndex, int pageNumberIndex, String[] args){
         DisplayAPI.getScheduler().runAsync(() -> {
-            List<String> tags;
-            if (isListingGroups){
-                tags = DisplayGroupManager.getSavedDisplayEntityGroups(method);
+            LoadMethod method;
+            try{
+                method = LoadMethod.valueOf(args[storageIndex].toUpperCase());
             }
-            else{
-                tags = DisplayAnimationManager.getSavedDisplayAnimations(method);
+            catch(IllegalArgumentException e){
+                DisplayEntityPluginCommand.invalidStorage(sender);
+                return;
             }
+
+            List<String> tags = listsGroups ?
+                    DisplayGroupManager.getSavedDisplayEntityGroups(method)
+                    :
+                    DisplayAnimationManager.getSavedDisplayAnimations(method);
 
             sender.sendMessage(DisplayAPI.pluginPrefixLong);
             sender.sendMessage(MiniMessage.miniMessage().deserialize("Storage Location: <yellow>"+method.getDisplayName()));
@@ -65,13 +61,13 @@ class ListGroupsCMD extends ConsoleUsableSubCommand {
             }
 
             int pageNumber = 1;
-            if (args.length >= 3){
+            if (args.length > minLength){
                 try{
-                    pageNumber = Math.abs(Integer.parseInt(args[2]));
-                    if (pageNumber == 0) pageNumber = 1;
+                    pageNumber = Math.max(1, Integer.parseInt(args[pageNumberIndex]));
                 }
                 catch(NumberFormatException ignored){}
             }
+
             int end = pageNumber*7;
             int start = end-7;
             sender.sendMessage(Component.text("Page Number: "+pageNumber, NamedTextColor.AQUA));
@@ -81,7 +77,7 @@ class ListGroupsCMD extends ConsoleUsableSubCommand {
                 }
                 Component message;
                 String tag = tags.get(i);
-                if (isListingGroups){
+                if (listsGroups){
                     message = spawnGroup(tag, method);
                 }
                 else{

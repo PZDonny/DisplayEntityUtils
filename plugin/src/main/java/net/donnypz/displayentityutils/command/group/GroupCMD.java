@@ -13,6 +13,10 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
 
     public GroupCMD(){
         super(Permission.HELP, new GroupHelpCMD());
+        this.subCommands.put("list", new ListCMD(
+                Component.text("Incorrect Usage! /deu group list <storage> [page-number]", NamedTextColor.RED),
+                3,
+                true));
         new GroupSelectCMD(this);
         new GroupSelectNearestCMD(this);
         new GroupDeselectCMD(this);
