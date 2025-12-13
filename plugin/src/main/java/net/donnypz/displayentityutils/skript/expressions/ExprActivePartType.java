@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 public class ExprActivePartType extends SimplePropertyExpression<ActivePart, SpawnedDisplayEntityPart.PartType> {
 
     static {
-        register(ExprActivePartType.class, SpawnedDisplayEntityPart.PartType.class, "[active] part type", "activeparts");
+        register(ExprActivePartType.class, SpawnedDisplayEntityPart.PartType.class, "[active] part[- | ]type", "activeparts");
     }
 
     @Override

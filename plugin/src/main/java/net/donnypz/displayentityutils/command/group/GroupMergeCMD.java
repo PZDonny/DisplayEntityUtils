@@ -22,11 +22,6 @@ class GroupMergeCMD extends GroupSubCommand {
     }
 
     @Override
-    public void execute(Player player, String[] args) {
-
-    }
-
-    @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number for the distance from your group to attempt to merge other groups", NamedTextColor.RED)));
         player.sendMessage(Component.text("/deu group merge <distance>", NamedTextColor.GRAY));

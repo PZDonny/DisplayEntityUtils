@@ -2,11 +2,7 @@ package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -15,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupUnsetSpawnAnimationCMD extends GroupSubCommand {
     GroupUnsetSpawnAnimationCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("unsetspawnanim", parentSubCommand, Permission.GROUP_SET_SPAWN_ANIM, 0, false);
+        super("unsetspawnanim", parentSubCommand, Permission.GROUP_SET_SPAWN_ANIM, 0, true);
     }
 
     @Override

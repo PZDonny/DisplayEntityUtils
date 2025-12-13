@@ -12,12 +12,9 @@ import net.donnypz.displayentityutils.utils.Direction;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -33,10 +30,16 @@ public class DisplayEntityPluginCommand implements TabExecutor {
     private final List<String> empty = List.of();
 
     public DisplayEntityPluginCommand(){
-        subCommands.put("listgroups", new ListGroupsCMD());
-        subCommands.put("listanims", new ListAnimationsCMD());
-        subCommands.put("hidepoints", new HidePointsCMD());
+        subCommands.put("listgroups", new ListCMD(
+                Component.text("Incorrect Usage! /deu listgroups <storage> [page-number]", NamedTextColor.RED),
+                2,
+                true));
+        subCommands.put("listanims", new ListCMD(
+                Component.text("Incorrect Usage! /deu listanims <storage> [page-number]", NamedTextColor.RED),
+                2,
+                false));
 
+        subCommands.put("hidepoints", new HidePointsCMD());
         subCommands.put("group", new GroupCMD());
         subCommands.put("parts", new PartsCMD());
         subCommands.put("item", new ItemCMD());
@@ -127,6 +130,11 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         player.sendMessage(Component.text("| The tag may also already exist or be set", NamedTextColor.GRAY, TextDecoration.ITALIC));
     }
 
+    public static void invalidStorage(CommandSender sender){
+        sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid Storage!", NamedTextColor.RED)));
+        sender.sendMessage(Component.text("<gray>| Valid Storages: local, mysql, mongodb>", NamedTextColor.GRAY));
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
@@ -182,7 +190,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         CMDUtils.sendCMD(sender, "/deu text", "Commands related to the Text Display parts of a Display Entity Model/Group");
         CMDUtils.sendCMD(sender, "/deu interaction", "Commands related to manipulating Interaction entities");
         CMDUtils.sendCMD(sender, "/deu listgroups <storage> [page-number]", "List all saved Display Entity Models/Groups");
-        CMDUtils.sendCMD(sender, "/deu listanims <storage> [page-number]", "List all saved Animations");
+        CMDUtils.sendCMD(sender, "/deu listanims <storage> [page-number]", "List all saved animations");
         CMDUtils.sendCMD(sender, "/deu hidepoints", "Hide any visible points (frame points, persistent packet group points, etc.)");
         CMDUtils.sendCMD(sender, "/deu bdengine", "Import/Convert models from BDEngine");
         CMDUtils.sendCMD(sender, "/deu reload <config | controllers>", "Reload the plugin's config or Display Controllers." +

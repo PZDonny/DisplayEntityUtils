@@ -80,6 +80,7 @@ public enum Permission {
     ANIM_SAVE("deu.anim.save"),
     ANIM_DELETE("deu.anim.delete"),
     ANIM_INFO("deu.anim.info"),
+    ANIM_LIST_ACTIVE("deu.anim.listactive"),
     ANIM_FRAME_INFO("deu.anim.info"),
     ANIM_USE_FILTER("deu.anim.usefilter"),
     ANIM_UNFILTER("deu.anim.unfilter"),

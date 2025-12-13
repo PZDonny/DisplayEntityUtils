@@ -20,7 +20,7 @@ public abstract class GroupSubCommand extends PlayerSubCommand{
     }
 
     @Override
-    public void execute(Player player, String[] args) {
+    public final void execute(Player player, String[] args) {
         ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(player);
         if (requireGroupSelection && group == null){
             DisplayEntityPluginCommand.noGroupSelection(player);
