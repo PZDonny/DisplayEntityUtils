@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 class AnimListActiveCMD extends PlayerSubCommand {
     AnimListActiveCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("listactive", parentSubCommand, Permission.ANIM_INFO);
+        super("listactive", parentSubCommand, Permission.ANIM_LIST_ACTIVE);
     }
 
     @Override
