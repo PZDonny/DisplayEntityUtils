@@ -18,7 +18,7 @@ public class ListCMD extends ConsoleUsableSubCommand {
     int minLength, storageIndex, pageNumberIndex;
     boolean listsGroups;
     public ListCMD(Component incorrectUsageMessage, int minLength, boolean listsGroups) {
-        super(Permission.LIST_GROUPS);
+        super(listsGroups ? Permission.LIST_GROUPS : Permission.LIST_ANIMATIONS);
         this.incorrectUsageMessage = incorrectUsageMessage;
         this.minLength = minLength;
         this.storageIndex = minLength-1;
