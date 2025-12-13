@@ -22,6 +22,7 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
         new AnimDeleteCMD(this);
         new AnimInfoCMD(this);
         new AnimFrameInfoCMD(this);
+        new AnimListActiveCMD(this);
         new AnimUseFilterCMD(this);
         new AnimUnfilterCMD(this);
         new AnimAddFrameCMD(this);
@@ -80,7 +81,7 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
                     "\"/deu bdengine convertanim\""));
             sender.sendMessage(Component.text("Commands allowing multiple <frame-ids> are comma separated", NamedTextColor.GRAY));
             CMDUtils.sendCMD(sender,"/deu anim help <page-number>", "Get help for animations");
-            CMDUtils.sendCMD(sender, "/deu anim list <storage> [page-number]");
+            CMDUtils.sendCMD(sender, "/deu anim list <storage> [page-number]", "List all saved animations");
             CMDUtils.sendCMD(sender, "/deu anim select <anim-tag> <storage>", "Select a saved animation");
             CMDUtils.sendCMD(sender, "/deu anim selectjson <file-name>", "Select a JSON saved animation");
             CMDUtils.sendCMD(sender,"/deu anim info", "List information about your selected animation");
@@ -121,11 +122,13 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
                     " \n\"-loop\" will make the animation loop." +
                     " \n\"-packet\" will play the animation using packets." +
                     " \n\"-camera\" will set your view to the animation's camera, if present");
+            CMDUtils.sendCMD(sender, "/deu anim listanims", "List the animations actively playing for a group");
+
+        }
+        else{
             CMDUtils.sendCMD(sender, "/deu anim previewplay [-camera]", "Preview your selected animation on your selected group, without changing group entity data." +
                     " \n\"-camera\" will set your view to the animation's camera, if present");
             CMDUtils.sendCMD(sender, "/deu anim restore", "Restore your selected group to its previous state before previewing frames/animations");
-        }
-        else{
             CMDUtils.sendCMD(sender, "/deu anim stop", "Stop an animation playing on a group");
             CMDUtils.sendCMD(sender, "/deu anim save <storage>", "Save your selected animation and any changes made");
             CMDUtils.sendUnsafeCMD(sender, "/deu anim savejson", "Save your selected animation and any changes made as a JSON file. Selection animations from JSON files will always be slower");

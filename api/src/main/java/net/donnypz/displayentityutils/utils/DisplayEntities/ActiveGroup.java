@@ -632,13 +632,23 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
 
 
     /**
-     * Check if an animator is animating on this group
+     * Check if a {@link DisplayAnimator} is animating on this group
      * @param animator the animator
      * @return a boolean
      */
     public boolean isActiveAnimator(@NotNull DisplayAnimator animator){
         synchronized(animatorLock){
             return activeAnimators.contains(animator);
+        }
+    }
+
+    /**
+     * Get the {@link DisplayAnimator}s actively animating on this group
+     * @return a collection of {@link DisplayAnimator}s
+     */
+    public @NotNull Set<DisplayAnimator> getActiveAnimators(){
+        synchronized (animatorLock){
+            return new HashSet<>(activeAnimators);
         }
     }
 

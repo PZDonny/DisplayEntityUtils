@@ -190,7 +190,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         CMDUtils.sendCMD(sender, "/deu text", "Commands related to the Text Display parts of a Display Entity Model/Group");
         CMDUtils.sendCMD(sender, "/deu interaction", "Commands related to manipulating Interaction entities");
         CMDUtils.sendCMD(sender, "/deu listgroups <storage> [page-number]", "List all saved Display Entity Models/Groups");
-        CMDUtils.sendCMD(sender, "/deu listanims <storage> [page-number]", "List all saved Animations");
+        CMDUtils.sendCMD(sender, "/deu listanims <storage> [page-number]", "List all saved animations");
         CMDUtils.sendCMD(sender, "/deu hidepoints", "Hide any visible points (frame points, persistent packet group points, etc.)");
         CMDUtils.sendCMD(sender, "/deu bdengine", "Import/Convert models from BDEngine");
         CMDUtils.sendCMD(sender, "/deu reload <config | controllers>", "Reload the plugin's config or Display Controllers." +
