@@ -1,7 +1,6 @@
 package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.utils.Direction;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.TextDisplay;
@@ -44,9 +43,6 @@ public abstract class DEUSubCommand {
     protected void setTabComplete(int index, TabSuggestion suggestion){
         tabCompleteSuggestions.put(index, suggestion);
     }
-
-
-
 
     public Permission getPermission() {
         return permission;
