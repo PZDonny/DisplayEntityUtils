@@ -217,6 +217,6 @@ class AnimationCameraPlayer {
     }
 
     static AnimationCameraPlayer getCameraPlayer(UUID cameraPlayerUUID){
-        return cameraPlayers.get(cameraPlayerUUID);
+        return cameraPlayerUUID == null ? null : cameraPlayers.get(cameraPlayerUUID);
     }
 }
