@@ -110,7 +110,9 @@ public class PacketPartSelection extends MultiPartSelection<PacketDisplayEntityP
 
     @Override
     public void showToPlayer(@NotNull Player player, GroupSpawnedEvent.@NotNull SpawnReason spawnReason) {
-        showToPlayer(player, spawnReason, getLocation());
+        for (PacketDisplayEntityPart part : selectedParts){
+            part.showToPlayer(player, spawnReason, part.getLocation());
+        }
     }
 
     @Override
@@ -122,7 +124,9 @@ public class PacketPartSelection extends MultiPartSelection<PacketDisplayEntityP
 
     @Override
     public void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason) {
-        showToPlayers(players, spawnReason, getLocation());
+        for (PacketDisplayEntityPart part : selectedParts){
+            part.showToPlayers(players, spawnReason, part.getLocation());
+        }
     }
 
     @Override

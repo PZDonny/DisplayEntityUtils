@@ -69,8 +69,12 @@ final class InteractionEntity implements Serializable {
         }
     }
 
-    Interaction createEntity(Location location, GroupSpawnSettings settings){
-        return location.getWorld().spawn(location, Interaction.class, i ->{
+    Interaction createEntity(Location origin, GroupSpawnSettings settings){
+        Location spawnLoc = DisplayUtils.getPivotLocation(
+                vector,
+                origin,
+                origin.getYaw());
+        return spawnLoc.getWorld().spawn(spawnLoc, Interaction.class, i ->{
             i.setInteractionHeight(height);
             i.setInteractionWidth(width);
             i.setResponsive(isResponsive);
@@ -95,14 +99,18 @@ final class InteractionEntity implements Serializable {
         });
     }
 
-    PacketDisplayEntityPart createPacketPart(Location spawnLocation, GroupSpawnSettings settings){
+    PacketDisplayEntityPart createPacketPart(Location origin, GroupSpawnSettings settings){
         PacketAttributeContainer attributeContainer = new PacketAttributeContainer()
                 .setAttribute(DisplayAttributes.Interaction.WIDTH, width)
                 .setAttribute(DisplayAttributes.Interaction.HEIGHT, height)
                 .setAttribute(DisplayAttributes.Interaction.RESPONSIVE, isResponsive);
 
-        PacketDisplayEntityPart part = attributeContainer.createPart(SpawnedDisplayEntityPart.PartType.INTERACTION,
-                DisplayUtils.getPivotLocation(Vector.fromJOML(vector), spawnLocation, spawnLocation.getYaw()));
+        Location spawnLoc = DisplayUtils.getPivotLocation(
+                vector,
+                origin,
+                origin.getYaw());
+
+        PacketDisplayEntityPart part = attributeContainer.createPart(SpawnedDisplayEntityPart.PartType.INTERACTION, spawnLoc);
 
         if (persistentDataContainer != null){
             ItemStack i = new ItemStack(Material.STICK);

@@ -798,7 +798,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             }
             DisplayAPI.getScheduler().runAsync(() -> {
                 if (this.autoShow) {
-                    showToPlayers(players, GroupSpawnedEvent.SpawnReason.INTERNAL, getLocation(), settings);
+                    showToPlayers(players, GroupSpawnedEvent.SpawnReason.INTERNAL, settings);
                 }
             });
         });
@@ -879,8 +879,18 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * @param players the players
      * @param spawnReason the spawn reason
      */
-    public void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
-        showToPlayers(players, spawnReason, getLocation());
+    @Override
+    public void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason) {
+        if (!sendShowEvent(players, spawnReason)) return;
+        for (Player player : players){
+            if (!masterPart.isTrackedBy(player)){
+                for (PacketDisplayEntityPart part : groupParts.sequencedValues()){
+                    part.showToPlayer(player, spawnReason);
+                }
+                setPassengers(player);
+            }
+            refreshVehicle(player);
+        }
     }
 
 
@@ -904,12 +914,12 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
     }
 
-    void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull Location location, GroupSpawnSettings settings) {
+    void showToPlayers(@NotNull Collection<Player> players, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull GroupSpawnSettings settings) {
         if (!sendShowEvent(players, spawnReason)) return;
         for (Player player : players){
             if (!masterPart.isTrackedBy(player)){
                 for (PacketDisplayEntityPart part : groupParts.sequencedValues()){
-                    part.showToPlayer(player, location, settings);
+                    part.showToPlayer(player, part.getLocation(), settings);
                 }
                 setPassengers(player);
             }
