@@ -52,7 +52,8 @@ public class DEUInteractionListener implements Listener, PacketListener {
         InteractionClickEvent.ClickType clickType =
                     interact.getAction() == WrapperPlayClientInteractEntity.InteractAction.ATTACK
                         ?
-                            InteractionClickEvent.ClickType.LEFT :
+                            InteractionClickEvent.ClickType.LEFT
+                            :
                             InteractionClickEvent.ClickType.RIGHT;
 
         int entityId = interact.getEntityId();
@@ -103,25 +104,27 @@ public class DEUInteractionListener implements Listener, PacketListener {
             return;
         }
 
-        DisplayAPI.getScheduler().run(() -> {
-            //Execute Commands
-            if (clickType == InteractionClickEvent.ClickType.LEFT){
-                for (String cmd : part.getLeftConsoleInteractionCommands()){
-                    runConsoleCommand(cmd);
+        if (part.hasInteractionCommands()){
+            DisplayAPI.getScheduler().run(() -> {
+                //Execute Commands
+                if (clickType == InteractionClickEvent.ClickType.LEFT){
+                    for (String cmd : part.getLeftConsoleInteractionCommands()){
+                        runConsoleCommand(cmd);
+                    }
+                    for (String cmd : part.getLeftPlayerInteractionCommands()){
+                        runPlayerCommand(cmd, player);
+                    }
                 }
-                for (String cmd : part.getLeftPlayerInteractionCommands()){
-                    runPlayerCommand(cmd, player);
+                else{
+                    for (String cmd : part.getRightConsoleInteractionCommands()){
+                        runConsoleCommand(cmd);
+                    }
+                    for (String cmd : part.getRightPlayerInteractionCommands()){
+                        runPlayerCommand(cmd, player);
+                    }
                 }
-            }
-            else{
-                for (String cmd : part.getRightConsoleInteractionCommands()){
-                    runConsoleCommand(cmd);
-                }
-                for (String cmd : part.getRightPlayerInteractionCommands()){
-                    runPlayerCommand(cmd, player);
-                }
-            }
-        });
+            });
+        }
     }
 
     //Right Click
@@ -165,7 +168,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
     }
 
 
-    private Component buildPointRemovalComponent(RelativePointSelector point){
+    private Component buildPointRemovalComponent(RelativePointSelector<?> point){
         return Component.text("Click here to confirm point REMOVAL", NamedTextColor.DARK_RED, TextDecoration.UNDERLINED)
                 .clickEvent(ClickEvent.callback(a -> {
                     Player p = (Player) a;
