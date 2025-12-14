@@ -6,8 +6,9 @@ import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,7 +46,21 @@ class GroupSetSpawnAnimationCMD extends GroupSubCommand {
             DisplayAnimator.AnimationType type = DisplayAnimator.AnimationType.valueOf(args[4].toUpperCase());
             group.setSpawnAnimation(args[2], type, loadMethod);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Spawn/Load Animation Set!", NamedTextColor.GREEN)));
-            player.sendMessage(Component.text("If an animation with that tag does not exist, this group will not perform the animation when it is spawned", NamedTextColor.GRAY, TextDecoration.ITALIC));
+            player.sendMessage(Component.text("| [PLAY ANIMATION]", NamedTextColor.AQUA)
+                    .hoverEvent(HoverEvent.showText(Component.text("The given animation will only play if it exists!", NamedTextColor.GRAY)))
+                    .clickEvent(ClickEvent.callback(a -> {
+                        DisplayAPI.getScheduler().runAsync(() -> {
+                            if (!group.isRegistered()){
+                                a.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("That group is no longer valid!", NamedTextColor.RED)));
+                            }
+                            if (group.playSpawnAnimation()){
+                                a.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Playing animation!", NamedTextColor.GREEN)));
+                            }
+                            else{
+                                a.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to get animation. It may not exist", NamedTextColor.RED)));
+                            }
+                        });
+                    })));
         }
         catch(IllegalArgumentException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid Animation type!", NamedTextColor.RED)));
