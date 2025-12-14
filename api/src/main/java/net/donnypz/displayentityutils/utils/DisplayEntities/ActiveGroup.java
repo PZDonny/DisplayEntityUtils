@@ -819,11 +819,9 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         }
 
         SpawnedDisplayAnimation anim = DisplayAnimationManager.getSpawnedDisplayAnimation(spawnAnimationTag, spawnAnimationLoadMethod);
-        if (anim == null) return false;
-        if (spawnAnimationType == null) {
-            return false;
-        }
-        new DisplayAnimator(anim, spawnAnimationType).playUsingPackets(this, 0);
+        if (anim == null || spawnAnimationType == null) return false;
+        new DisplayAnimator(anim, spawnAnimationType)
+                .playUsingPackets(this, 0);
         return true;
     }
 
