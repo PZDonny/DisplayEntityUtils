@@ -853,7 +853,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      */
     @Override
     public void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
-        showToPlayer(player, spawnReason, getLocation());
+        showToPlayers(List.of(player), spawnReason);
     }
 
     /**
@@ -864,14 +864,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      */
     @Override
     public void showToPlayer(@NotNull Player player, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull Location location) {
-        if (!sendShowEvent(List.of(player), spawnReason)) return;
-        if (!masterPart.isTrackedBy(player)){
-            for (PacketDisplayEntityPart part : groupParts.values()){
-                part.showToPlayer(player, spawnReason, location);
-            }
-            setPassengers(player);
-        }
-        refreshVehicle(player);
+        showToPlayers(List.of(player), spawnReason, location);
     }
 
     /**

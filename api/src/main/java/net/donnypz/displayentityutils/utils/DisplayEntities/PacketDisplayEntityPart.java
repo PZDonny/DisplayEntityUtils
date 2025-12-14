@@ -159,6 +159,10 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             return;
         }
         DEUUser.getOrCreateUser(player).trackPacketEntity(this);
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION && hasGroup()){
+            Vector translation = getInteractionTranslation(group.getLocation());
+            location = location.clone().add(translation);
+        }
         attributeContainer.sendEntity(type, getEntityId(), player, location);
     }
 
@@ -203,6 +207,10 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
                 }
                 DEUUser.getOrCreateUser(player).trackPacketEntity(this);
             }
+        }
+        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION && hasGroup()){
+            Vector translation = getInteractionTranslation(group.getLocation());
+            location = location.clone().add(translation);
         }
         attributeContainer.sendEntityUsingPlayers(type, getEntityId(), plrs, location);
     }
