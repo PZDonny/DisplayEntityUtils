@@ -35,7 +35,6 @@ public final class DisplayEntityGroup implements Serializable{
         this.masterEntity = addDisplayEntity(spawnedMasterEntity).setMaster();
 
         for (SpawnedDisplayEntityPart part : spawnedGroup.getParts()){
-
             if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
                 Interaction i = (Interaction) part.getEntity();
                 addInteractionEntity(i);
@@ -208,18 +207,13 @@ public final class DisplayEntityGroup implements Serializable{
         if (!event.callEvent()){
             return null;
         }
+
         GroupSpawnSettings newSettings = event.getNewSettings();
         if (newSettings != null) settings = newSettings;
 
         SpawnedDisplayEntityGroup group = new SpawnedDisplayEntityGroup(settings.visibleByDefault);
         Display masterDisplay = masterEntity.createEntity(group, location, settings);
-        if (isPersistent == null){
-            group.setPersistent(true);
-        }
-        else{
-            group.setPersistent(isPersistent);
-        }
-
+        group.setPersistent(isPersistent == null || isPersistent);
 
         group.setTag(tag);
         group.addDisplayEntity(masterDisplay).setMaster();
@@ -238,20 +232,14 @@ public final class DisplayEntityGroup implements Serializable{
         }
 
         for (InteractionEntity entity : interactionEntities){ //Summon Interaction Entities
-            Vector v = entity.getVector();
-            Location spawnLocation = masterDisplay.getLocation().clone().subtract(v);
-
-            Interaction interaction = entity.createEntity(spawnLocation, settings);
+            Interaction interaction = entity.createEntity(
+                    masterDisplay.getLocation(),
+                    settings);
 
             SpawnedDisplayEntityPart part = group.addInteractionEntity(interaction);
             if (entity.hasLegacyPartTags()){
                 part.adaptScoreboardTags(true);
             }
-
-            //Interaction Pivot
-            float yaw = location.getYaw();
-            interaction.setRotation(yaw, location.getPitch());
-            DisplayUtils.pivot(interaction, location, yaw);
         }
 
         group.setPersistenceOverride(settings.persistenceOverride);

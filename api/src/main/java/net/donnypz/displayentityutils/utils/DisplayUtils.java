@@ -586,7 +586,7 @@ public final class DisplayUtils {
     public static void pivot(@NotNull Interaction interaction, @NotNull Location center, double angleInDegrees){
         Vector3f translationVector = DisplayUtils.getInteractionTranslation(interaction, center).toVector3f();
         new Quaternionf()
-                .rotateY((float) Math.toRadians(angleInDegrees*-1))
+                .rotateY((float) Math.toRadians(-angleInDegrees))
                 .transform(translationVector);
         Location newLoc = center.clone().subtract(Vector.fromJOML(translationVector));
         FoliaUtils.teleport(interaction, newLoc);
@@ -594,29 +594,38 @@ public final class DisplayUtils {
 
     /**
      * Get the location an interaction entity would be pivoted to after using {@link DisplayUtils#pivot(Interaction, Location, double)}
-     * @param interactionLocation the interaction entity's location
-     * @param center the location the interaction should pivot around
+     * @param offsetLocation the interaction entity's location
+     * @param origin the location the interaction should pivot around
      * @param angleInDegrees the pivot angle in degrees
      * @return a Location
      */
-    public static @NotNull Location getPivotLocation(@NotNull Location interactionLocation, @NotNull Location center, double angleInDegrees){
-        Vector translationVector = center.clone().subtract(interactionLocation).toVector();
-        return getPivotLocation(translationVector, center, angleInDegrees);
+    public static @NotNull Location getPivotLocation(@NotNull Location offsetLocation, @NotNull Location origin, double angleInDegrees){
+        Vector translationVector = origin.clone().subtract(offsetLocation).toVector();
+        return getPivotLocation(translationVector, origin, angleInDegrees);
     }
 
     /**
      * Get the location an interaction entity would be pivoted to after using {@link DisplayUtils#pivot(Interaction, Location, double)}
      * @param translationVector the translation offset for an interaction entity from a center location
-     * @param center the location the interaction should pivot around
+     * @param origin the location the interaction should pivot around
      * @param angleInDegrees the pivot angle in degrees
      * @return a Location
      */
-    public static @NotNull Location getPivotLocation(@NotNull Vector translationVector, @NotNull Location center, double angleInDegrees){
-        Vector3f v = translationVector.toVector3f();
-        new Quaternionf()
-                .rotateY((float) Math.toRadians(angleInDegrees*-1))
-                .transform(v);
-        return center.clone().subtract(Vector.fromJOML(v));
+    public static @NotNull Location getPivotLocation(@NotNull Vector translationVector, @NotNull Location origin, double angleInDegrees){
+        return getPivotLocation(translationVector.toVector3f(), origin, angleInDegrees);
+    }
+
+    /**
+     * Get the location an interaction entity would be pivoted to after using {@link DisplayUtils#pivot(Interaction, Location, double)}
+     * @param translationVector the translation offset for an interaction entity from a center location
+     * @param origin the location the interaction should pivot around
+     * @param angleInDegrees the pivot angle in degrees
+     * @return a Location
+     */
+    public static @NotNull Location getPivotLocation(@NotNull Vector3f translationVector, @NotNull Location origin, double angleInDegrees){
+        Vector3f v = new Vector3f(translationVector);
+        v.rotateY((float) Math.toRadians(-angleInDegrees));
+        return origin.clone().subtract(Vector.fromJOML(v));
     }
 
     /**

@@ -139,7 +139,11 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (packetLocation == null){
             throw new RuntimeException("Location must be set for packet-based part before showing it to players.");
         }
-        showToPlayer(player, spawnReason, getLocation());
+        if (!viewers.add(player.getUniqueId())){  //Already viewing
+            return;
+        }
+        DEUUser.getOrCreateUser(player).trackPacketEntity(this);
+        attributeContainer.sendEntity(type, getEntityId(), player, getLocation());
     }
 
 
@@ -173,12 +177,14 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * Show this part to players as a packet-based entity.
      * @param players the players
      * @param spawnReason the spawn reason
+     * @throws RuntimeException if the part's location was never set through {@link PacketDisplayEntityPart#teleport(Location)}, or if when created for a group, the group's location was null.
      */
     public void showToPlayers(@NotNull Collection<Player> players, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
+        if (packetLocation == null){
+            throw new RuntimeException("Location must be set for packet-based part before showing it to players.");
+        }
         showToPlayers(players, spawnReason, getLocation());
     }
-
-
 
     /**
      * Show this part to players as a packet-based entity.
