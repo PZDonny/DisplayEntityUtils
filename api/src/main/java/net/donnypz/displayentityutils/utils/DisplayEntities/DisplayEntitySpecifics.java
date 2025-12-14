@@ -122,6 +122,10 @@ abstract class DisplayEntitySpecifics implements Serializable {
         return glowColorOverride;
     }
 
+    public UUID getPartUUID() {
+        return partUUID;
+    }
+
     PacketAttributeContainer getAttributeContainer(){
         Transformation transformation = serialTransformation.toTransformation();
 
