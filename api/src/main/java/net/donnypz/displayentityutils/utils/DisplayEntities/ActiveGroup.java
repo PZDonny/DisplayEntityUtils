@@ -810,21 +810,21 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
-     * Start playing this group's looping spawn animation.
-     * This will do nothing if this group's spawn animation tag was never set.
+     * Play this group's set spawn/load animation after using {@link #setSpawnAnimation(String, DisplayAnimator.AnimationType, LoadMethod)} or commands.
+     * @return false if the spawn animation was never set or if the animation could not be found
      */
-    public void playSpawnAnimation() {
-        if (spawnAnimationTag == null){
-            return;
+    public boolean playSpawnAnimation() {
+        if (spawnAnimationTag == null || spawnAnimationLoadMethod == null){
+            return false;
         }
 
         SpawnedDisplayAnimation anim = DisplayAnimationManager.getSpawnedDisplayAnimation(spawnAnimationTag, spawnAnimationLoadMethod);
-        if (anim != null){
-            if (spawnAnimationType == null){
-                return;
-            }
-            new DisplayAnimator(anim, spawnAnimationType).playUsingPackets(this, 0);
+        if (anim == null) return false;
+        if (spawnAnimationType == null) {
+            return false;
         }
+        new DisplayAnimator(anim, spawnAnimationType).playUsingPackets(this, 0);
+        return true;
     }
 
 
