@@ -2,12 +2,12 @@ package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
+import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.GroupResult;
-import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -80,9 +80,7 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
                 }
             }, 0, 2);
 
-            if (RelativePointUtils.removeRelativePoints(player)){
-                player.sendMessage(Component.text("Your previewed points have been despawned since you have changed your selected group", NamedTextColor.GRAY, TextDecoration.ITALIC));
-            }
+            DisplayEntityPluginCommand.hideRelativePoints(player);
             GroupCMD.groupToPacketInfo(player);
         } catch (NumberFormatException e) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid distance! The distance must be a positive number.", NamedTextColor.RED)));

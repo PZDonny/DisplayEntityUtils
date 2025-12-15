@@ -36,7 +36,7 @@ final class DisplayEntity implements Serializable {
 
     DisplayEntity(){}
 
-    DisplayEntity(Display entity, Type type, DisplayEntityGroup group){
+    DisplayEntity(Display entity, Type type){
         this.type = type;
         if (type == Type.BLOCK) {
             specifics = new BlockDisplaySpecifics((BlockDisplay) entity);
@@ -55,7 +55,7 @@ final class DisplayEntity implements Serializable {
         }
     }
 
-    DisplayEntity(PacketDisplayEntityPart part, Type type, DisplayEntityGroup group){
+    DisplayEntity(PacketDisplayEntityPart part, Type type, PacketDisplayEntityGroup group){
         this.type = type;
         if (type == Type.BLOCK) {
             specifics = new BlockDisplaySpecifics(part);
@@ -70,6 +70,11 @@ final class DisplayEntity implements Serializable {
         try{
             PersistentDataContainer pdc = new ItemStack(Material.STICK).getItemMeta().getPersistentDataContainer();
             pdc.set(DisplayAPI.getPartPDCTagKey(), PersistentDataType.LIST.strings(), new ArrayList<>(part.getTags()));
+            if (part.isMaster && group.getSpawnAnimationTag() != null){
+                pdc.set(DisplayAPI.getSpawnAnimationKey(), PersistentDataType.STRING, group.spawnAnimationTag);
+                pdc.set(DisplayAPI.getSpawnAnimationTypeKey(), PersistentDataType.STRING, group.spawnAnimationType.name());
+                pdc.set(DisplayAPI.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING, group.spawnAnimationLoadMethod.name());
+            }
             persistentDataContainer = pdc.serializeToBytes();
         }
         catch(IOException e){
@@ -131,13 +136,10 @@ final class DisplayEntity implements Serializable {
             }
 
             part.partTags = getSetFromPDC(pdc, DisplayAPI.getPartPDCTagKey());
-            part.partUUID = getPDCPartUUID(pdc);
+            part.partUUID = specifics.getPartUUID();
             if (group.masterPart == null && isMaster){
                 part.isMaster = true;
-                String animationTag = getSpawnAnimationTag(pdc);
-                LoadMethod loadMethod = getSpawnAnimationLoadMethod(pdc);
-                DisplayAnimator.AnimationType type = getSpawnAnimationType(pdc);
-                group.setSpawnAnimation(animationTag, type, loadMethod);
+                group.setSpawnAnimation(pdc);
             }
         }
         settings.applyAttributes(part);

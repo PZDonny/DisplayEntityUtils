@@ -59,8 +59,7 @@ class GroupToPacketCMD extends PlayerSubCommand {
             return;
         }
 
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("! Doing this will result in your selected group becoming completely packet based!"
-                +" It will become only selectable through the API/Skript", NamedTextColor.RED)));
-        player.sendMessage(Component.text("| Execute \"/deu group topacket -confirm [-keep]\" to confirm this action", NamedTextColor.YELLOW));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("This action is irreversible and your group will remain packet-based!", NamedTextColor.RED)));
+        player.sendMessage(Component.text("| Do \"/deu group topacket -confirm [-keep]\" to proceed", NamedTextColor.YELLOW));
     }
 }

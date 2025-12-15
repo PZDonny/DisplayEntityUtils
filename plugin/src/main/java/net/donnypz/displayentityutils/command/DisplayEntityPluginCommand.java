@@ -9,6 +9,7 @@ import net.donnypz.displayentityutils.command.item.ItemCMD;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.command.text.TextCMD;
 import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -133,6 +134,12 @@ public class DisplayEntityPluginCommand implements TabExecutor {
     public static void invalidStorage(CommandSender sender){
         sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid Storage!", NamedTextColor.RED)));
         sender.sendMessage(Component.text("<gray>| Valid Storages: local, mysql, mongodb>", NamedTextColor.GRAY));
+    }
+
+    public static void hideRelativePoints(Player player){
+        if (RelativePointUtils.removeRelativePoints(player)){
+            player.sendMessage(Component.text("Your previewed points have been hidden.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+        }
     }
 
     @Override

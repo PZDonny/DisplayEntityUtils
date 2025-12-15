@@ -52,7 +52,7 @@ public final class DisplayEntityGroup implements Serializable{
     DisplayEntityGroup(PacketDisplayEntityGroup packetGroup){
         this.tag = packetGroup.getTag();
 
-        this.masterEntity = addDisplayEntity(packetGroup.masterPart).setMaster();
+        this.masterEntity = addDisplayEntity(packetGroup.masterPart, packetGroup).setMaster();
 
         for (PacketDisplayEntityPart part : packetGroup.getParts()){
 
@@ -61,7 +61,7 @@ public final class DisplayEntityGroup implements Serializable{
             }
             else{
                 if (!part.isMaster()){
-                    addDisplayEntity(part);
+                    addDisplayEntity(part, packetGroup);
                 }
             }
         }
@@ -71,31 +71,31 @@ public final class DisplayEntityGroup implements Serializable{
     private DisplayEntity addDisplayEntity(Display entity){
         DisplayEntity display = null;
         if (entity instanceof TextDisplay) {
-            display = new DisplayEntity(entity, DisplayEntity.Type.TEXT, this);
+            display = new DisplayEntity(entity, DisplayEntity.Type.TEXT);
             displayEntities.add(display);
         }
         else if (entity instanceof BlockDisplay){
-            display = new DisplayEntity(entity, DisplayEntity.Type.BLOCK, this);
+            display = new DisplayEntity(entity, DisplayEntity.Type.BLOCK);
             displayEntities.add(display);
         }
         else if (entity instanceof ItemDisplay){
-            display = new DisplayEntity(entity, DisplayEntity.Type.ITEM, this);
+            display = new DisplayEntity(entity, DisplayEntity.Type.ITEM);
             displayEntities.add(display);
         }
         return display;
     }
 
-    private DisplayEntity addDisplayEntity(PacketDisplayEntityPart part){
+    private DisplayEntity addDisplayEntity(PacketDisplayEntityPart part, PacketDisplayEntityGroup packetGroup){
         DisplayEntity display;
         switch (part.type){
             case TEXT_DISPLAY -> {
-                display = new DisplayEntity(part, DisplayEntity.Type.TEXT, this);
+                display = new DisplayEntity(part, DisplayEntity.Type.TEXT, packetGroup);
             }
             case BLOCK_DISPLAY -> {
-                display = new DisplayEntity(part, DisplayEntity.Type.BLOCK, this);
+                display = new DisplayEntity(part, DisplayEntity.Type.BLOCK, packetGroup);
             }
             case ITEM_DISPLAY -> {
-                display = new DisplayEntity(part, DisplayEntity.Type.ITEM, this);
+                display = new DisplayEntity(part, DisplayEntity.Type.ITEM, packetGroup);
             }
             default -> {
                 return null;

@@ -1036,19 +1036,31 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     public List<String> getLeftConsoleInteractionCommands(){
-        return interactionCommands.get(DisplayUtils.leftClickConsole);
+        if (interactionCommands != null){
+            return interactionCommands.get(DisplayUtils.leftClickConsole);
+        }
+        return List.of();
     }
 
     public List<String> getLeftPlayerInteractionCommands(){
-        return interactionCommands.get(DisplayUtils.leftClickPlayer);
+        if (interactionCommands != null){
+            return interactionCommands.get(DisplayUtils.leftClickPlayer);
+        }
+        return List.of();
     }
 
     public List<String> getRightConsoleInteractionCommands(){
-        return interactionCommands.get(DisplayUtils.rightClickConsole);
+        if (interactionCommands != null){
+            return interactionCommands.get(DisplayUtils.rightClickConsole);
+        }
+        return List.of();
     }
 
     public List<String> getRightPlayerInteractionCommands(){
-        return interactionCommands.get(DisplayUtils.rightClickPlayer);
+        if (interactionCommands != null){
+            return interactionCommands.get(DisplayUtils.rightClickPlayer);
+        }
+        return List.of();
     }
 
     /**

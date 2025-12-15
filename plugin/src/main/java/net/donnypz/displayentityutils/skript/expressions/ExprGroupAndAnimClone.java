@@ -58,7 +58,7 @@ public class ExprGroupAndAnimClone extends SimpleExpression<Object> {
         }
         else if (obj instanceof PacketDisplayEntityGroup g){
             Location l = location == null ? g.getLocation() : location.getSingle(event);
-            return new PacketDisplayEntityGroup[]{g.clone(l, false, g.isAutoShow())};
+            return new PacketDisplayEntityGroup[]{g.clone(l, true, g.isAutoShow())};
         }
         else if (obj instanceof SpawnedDisplayAnimation a){
             return new SpawnedDisplayAnimation[]{a.clone()};

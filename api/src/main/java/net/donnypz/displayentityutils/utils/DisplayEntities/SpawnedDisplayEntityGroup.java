@@ -1164,8 +1164,11 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             part.pivot(-oldYaw);
         }
 
-        DisplayEntityGroup group = toDisplayEntityGroup();
-        SpawnedDisplayEntityGroup cloned = group.spawn(location, GroupSpawnedEvent.SpawnReason.CLONE, settings);
+        DisplayEntityGroup savedGroup = toDisplayEntityGroup();
+        float newYaw = location.getYaw();
+        location = location.clone();
+        location.setYaw(0);
+        SpawnedDisplayEntityGroup cloned = savedGroup.spawn(location, GroupSpawnedEvent.SpawnReason.CLONE, settings);
 
         //Restore Interaction Pivot
         for (Map.Entry<SpawnedDisplayEntityPart, Float> entry : oldYaws.entrySet()){
@@ -1173,11 +1176,11 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             float oldYaw = entry.getValue();
             part.pivot(oldYaw);
         }
+        cloned.setYaw(newYaw, true);
         return cloned;
     }
 
     public PacketDisplayEntityGroup toPacket(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow, boolean persistent){
-
         //Reset Interaction pivot to 0 yaw
         HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
         for (SpawnedDisplayEntityPart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
@@ -1187,6 +1190,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
 
         DisplayEntityGroup savedGroup = toDisplayEntityGroup();
+        float newYaw = location.getYaw();
+        location = location.clone();
+        location.setYaw(0);
+
         PacketDisplayEntityGroup packetGroup;
 
         if (persistent){
@@ -1202,6 +1209,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             float oldYaw = entry.getValue();
             part.pivot(oldYaw);
         }
+        packetGroup.setYaw(newYaw, true);
         return packetGroup;
     }
 
