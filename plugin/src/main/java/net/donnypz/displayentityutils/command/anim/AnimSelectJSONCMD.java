@@ -2,16 +2,15 @@ package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
+import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.PluginFolders;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -47,8 +46,6 @@ class AnimSelectJSONCMD extends PlayerSubCommand {
 
         p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully selected animation! <white>(Tagged: "+anim.getAnimationTag()+")")));
 
-        if (RelativePointUtils.removeRelativePoints(p)){
-            p.sendMessage(Component.text("Your previewed points have been despawned since you have changed your selected animation", NamedTextColor.GRAY, TextDecoration.ITALIC));
-        }
+        DisplayEntityPluginCommand.hideRelativePoints(p);
     }
 }

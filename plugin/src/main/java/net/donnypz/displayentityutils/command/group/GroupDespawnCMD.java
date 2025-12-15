@@ -35,5 +35,6 @@ class GroupDespawnCMD extends GroupSubCommand {
                 pg.unregister();
             }
         }
+        DisplayEntityPluginCommand.hideRelativePoints(player);
     }
 }

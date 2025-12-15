@@ -3,12 +3,12 @@ package net.donnypz.displayentityutils.command.group;
 import io.papermc.paper.entity.TeleportFlag;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
+import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.GroupResult;
-import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import net.kyori.adventure.text.Component;
@@ -98,9 +98,7 @@ class GroupSelectCMD extends PlayerSubCommand {
                         if (selectResult){
                             g.addMissingInteractionEntities(distance);
                             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully selected group!", NamedTextColor.GREEN)));
-                            if (RelativePointUtils.removeRelativePoints(p)){
-                                p.sendMessage(Component.text("Your previewed points have been despawned since you have changed your selected group", NamedTextColor.GRAY, TextDecoration.ITALIC));
-                            }
+                            DisplayEntityPluginCommand.hideRelativePoints(player);
                         }
                         else{
                             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to select group! Another player already has that group selected!", NamedTextColor.RED)));
