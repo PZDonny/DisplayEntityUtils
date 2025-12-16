@@ -109,8 +109,8 @@ public abstract class RelativePointSelector<T extends RelativePoint> {
         relativePoint = null;
         Player player = Bukkit.getPlayer(playerUUID);
         if (player != null){
-            displayPart.hideFromPlayer(player);
-            selectPart.hideFromPlayer(player);
+            displayPart.remove();
+            selectPart.remove();
         }
         isValid = false;
     }
