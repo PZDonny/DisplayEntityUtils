@@ -118,9 +118,9 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/deu group brightness <block> <sky>", "Set your selected group's brightness. Enter values between 0-15. -1 resets");
             CMDUtils.sendCMD(sender, "/deu group clone", "Spawn a cloned group at your selected group's location");
             CMDUtils.sendCMD(sender, "/deu group clonehere", "Spawn a cloned group at your location");
-            CMDUtils.sendCMD(sender, "/deu group move <direction> <distance> <tick-duration>", "Change the actual location of your selected group");
-            CMDUtils.sendCMD(sender, "/deu group translate <direction> <distance> <tick-duration>","Changes your selected group's translation, use \"move\" instead if this group uses animations");
+            CMDUtils.sendCMD(sender, "/deu group move <direction> <distance> [tick-duration]", "Change the actual location of your selected group, with an optional duration");
             CMDUtils.sendCMD(sender, "/deu group movehere", "Change your selected group's actual location to your location");
+            CMDUtils.sendCMD(sender, "/deu group translate <direction> <distance> <tick-duration>","Changes your selected group's translation, use \"move\" instead if this group uses animations");
         }
         else if (page == 5){
             CMDUtils.sendCMD(sender, "/deu group merge <distance>","Merge groups near your selected group");
