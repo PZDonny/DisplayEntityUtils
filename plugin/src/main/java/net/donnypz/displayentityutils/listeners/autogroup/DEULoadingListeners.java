@@ -23,16 +23,7 @@ import java.util.Arrays;
 public final class DEULoadingListeners implements Listener {
     @EventHandler(priority =  EventPriority.HIGHEST)
     public void onEntityLoad(EntitiesLoadEvent e){
-        Chunk chunk = e.getChunk();
-        //if (chunk.isLoaded()){
-            AutoGroup.detectGroups(chunk, e.getEntities());
-        //}
-//        else{
-//            CompletableFuture<Chunk> futureChunk = e.getWorld().getChunkAtAsync(chunk.getX(), chunk.getZ());
-//            futureChunk.thenAccept(c -> {
-//                Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> AutoGroup.detectGroups(c, e.getEntities()));
-//            });
-//        }
+        AutoGroup.detectGroups(e.getChunk(), e.getEntities());
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

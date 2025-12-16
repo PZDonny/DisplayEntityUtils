@@ -46,10 +46,8 @@ final class AutoGroup {
 
         World world = chunk.getWorld();
         String worldName = world.getName();
-        Set<Long> chunks = readChunks
-                .computeIfAbsent(worldName, name -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
+        Set<Long> chunks = readChunks.computeIfAbsent(worldName, name -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
 
-        //Bukkit.broadcastMessage(chunk.getX()+" X | "+chunk.getZ()+" Z | TICK="+Bukkit.getCurrentTick());
         if (chunks.contains(chunk.getChunkKey())){
             refreshGroupPartEntities(entities);
             if (!DisplayConfig.readSameChunks()) return;
