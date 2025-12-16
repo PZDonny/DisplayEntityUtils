@@ -44,18 +44,19 @@ class PartsSelectCMD extends PlayerSubCommand {
                 Entity entity = player.getTargetEntity(10);
                 if (!(entity instanceof Interaction)) {
                     player.sendMessage(Component.text("Your targeted entity must be an interaction entity within 10 blocks of you", NamedTextColor.RED));
-                    return;
                 }
-                select(player, entity.getUniqueId());
+                else{
+                    select(player, entity.getUniqueId());
+                }
                 return;
             }
+
             double distance = Double.parseDouble(arg);
             if (distance <= 0){
                 throw new IllegalArgumentException();
             }
-
-                player.sendMessage(Component.text("Finding entities within "+distance+" blocks...", NamedTextColor.YELLOW));
-                getSelectableEntities(player, distance);
+            player.sendMessage(Component.text("Finding entities within "+distance+" blocks...", NamedTextColor.YELLOW));
+            getSelectableEntities(player, distance);
         }
         catch(IllegalArgumentException e){
             player.sendMessage(Component.text("Invalid input! Enter a positive number for the distance, or -target to select a targeted Interaction entity", NamedTextColor.RED));
@@ -95,7 +96,8 @@ class PartsSelectCMD extends PlayerSubCommand {
     private void select(Player player, UUID entityUUID){
         SpawnedDisplayEntityPart existing = SpawnedDisplayEntityPart.getPart(Bukkit.getEntity(entityUUID));
         if (existing != null){
-            player.sendMessage(Component.text("That part is already in a group! Select the group, then cycle through the group's parts!", NamedTextColor.RED));
+            player.sendMessage(Component.text("That part is already in a group!", NamedTextColor.RED));
+            player.sendMessage(Component.text("| Select the group, then cycle through the group's parts", NamedTextColor.GRAY));
             return;
         }
 

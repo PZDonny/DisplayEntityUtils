@@ -21,14 +21,12 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.RayTraceResult;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@ApiStatus.Internal
 public class DEUCommandUtils {
 
     public static void removeRelativePoint(Player player, RelativePointSelector<?> selector){

@@ -1,7 +1,6 @@
 package net.donnypz.displayentityutils.utils.relativepoints;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.GroupPoint;
-import net.donnypz.displayentityutils.utils.DisplayEntities.RelativePoint;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.Location;
 import org.bukkit.Material;

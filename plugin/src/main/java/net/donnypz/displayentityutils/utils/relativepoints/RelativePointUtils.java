@@ -7,7 +7,6 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
 
@@ -16,7 +15,6 @@ public class RelativePointUtils {
     public static final HashMap<UUID, Set<RelativePointSelector<?>>> relativePointSelectors = new HashMap<>();
     public static final HashMap<UUID, RelativePointSelector<?>> selectedSelector = new HashMap<>();
 
-    @ApiStatus.Internal
     public static void spawnFramePointDisplays(ActiveGroup<?> group, Player player, SpawnedDisplayAnimationFrame frame){
         if (stopIfViewing(player)){
             return;
@@ -38,7 +36,6 @@ public class RelativePointUtils {
     }
 
 
-    @ApiStatus.Internal
     public static void spawnPacketGroupPoints(Chunk chunk, Player player){
         if (stopIfViewing(player)){
             return;
@@ -56,10 +53,8 @@ public class RelativePointUtils {
             setDisplays(player, displays);
             player.sendMessage(Component.text("| Right click a point to select its packet-based group", NamedTextColor.AQUA));
         }
-
     }
 
-    @ApiStatus.Internal
     public static boolean removeRelativePoints(Player player){
         if (player == null) return false;
         Set<RelativePointSelector<?>> selectors = RelativePointUtils.relativePointSelectors.remove(player.getUniqueId());
