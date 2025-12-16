@@ -4,10 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -35,6 +32,10 @@ class TextAddLineCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
+            return false;
+        }
         Component currentText = selectedPart.getTextDisplayText();
         Key font = currentText.font();
         Component comp = currentText.appendNewline().append(LegacyComponentSerializer.legacyAmpersand().deserialize(TextSetCMD.getTextResult(args)));
