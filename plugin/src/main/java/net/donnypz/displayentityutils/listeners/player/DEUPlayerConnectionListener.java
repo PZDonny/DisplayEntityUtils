@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.managers.DEUUser;
+import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -67,6 +68,7 @@ public final class DEUPlayerConnectionListener implements Listener {
         if (user != null){
             user.remove();
         }
+        RelativePointUtils.removeRelativePoints(player);
     }
 
     private String getLatest() throws IOException, InterruptedException, URISyntaxException {
