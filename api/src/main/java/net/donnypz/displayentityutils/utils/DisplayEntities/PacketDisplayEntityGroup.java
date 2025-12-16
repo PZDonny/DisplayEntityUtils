@@ -545,7 +545,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     @Override
-    public void teleportMove(Vector direction, double distance, int durationInTicks) {
+    public void teleportMove(@NotNull Vector direction, double distance, int durationInTicks) {
         Location destination = getLocation().add(direction.clone().normalize().multiply(distance));
 
         double movementIncrement = distance/(double) Math.max(durationInTicks, 1);

@@ -138,6 +138,31 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      */
     public abstract boolean teleport(@NotNull Location location, boolean respectGroupDirection);
 
+
+    /**
+     * Teleport this group in the given direction.
+     * @param direction The direction to translate the group
+     * @param distance How far the group should be translated
+     * @return true if the teleport was successful
+     */
+    public boolean teleport(@NotNull Direction direction, double distance){
+        return teleport(direction.getVector(masterPart, false), distance);
+    }
+
+    /**
+     * Teleport this group in the given vector's direction.
+     * @param direction The direction to translate the group
+     * @param distance How far the group should be translated
+     * @return true if the teleport was successful
+     */
+    public boolean teleport(@NotNull Vector direction, double distance){
+        Location l = getLocation();
+        if (l == null) return false;
+        l.add(direction.clone().normalize().multiply(distance));
+        teleport(l, true);
+        return true;
+    }
+
     /**
      * Move the model through smooth teleportation of both interaction and display entities. Doing this multiple times in a short amount of time may bring unexpected results.
      * @param direction The direction to translate the group
@@ -154,7 +179,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param distance How far the group should be translated
      * @param durationInTicks How long it should take for the translation to complete
      */
-    public abstract void teleportMove(Vector direction, double distance, int durationInTicks);
+    public abstract void teleportMove(@NotNull Vector direction, double distance, int durationInTicks);
 
     /**
      * Set the teleportation duration of all parts in this group
