@@ -1,11 +1,14 @@
 package net.donnypz.displayentityutils.utils.relativepoints;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -52,6 +55,26 @@ public class RelativePointUtils {
         else{
             setDisplays(player, displays);
             player.sendMessage(Component.text("| Right click a point to select its packet-based group", NamedTextColor.AQUA));
+        }
+    }
+
+    public static void spawnDisplayEntityPoints(double distance, Player player){
+        removeRelativePoints(player);
+        Set<RelativePointSelector<?>> displays = new HashSet<>();
+        for (Entity e : player.getNearbyEntities(distance, distance, distance)){
+            if (DisplayUtils.isInGroup(e)) continue;
+            DisplayEntitySelector selector;
+            if (e instanceof Display d){
+                selector = new DisplayEntitySelector(player, d);
+                displays.add(selector);
+            }
+        }
+        if (displays.isEmpty()){
+            player.sendMessage(Component.text("Failed to find ungrouped Display entities within the given range!", NamedTextColor.RED));
+        }
+        else{
+            setDisplays(player, displays);
+            player.sendMessage(Component.text("| Right click a point to select an entity", NamedTextColor.AQUA));
         }
     }
 

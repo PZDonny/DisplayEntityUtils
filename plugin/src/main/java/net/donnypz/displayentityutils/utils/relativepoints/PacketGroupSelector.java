@@ -67,7 +67,6 @@ public class PacketGroupSelector extends RelativePointSelector<RelativePoint> {
         boolean selectResult = DisplayGroupManager.setSelectedGroup(player, group);
         if (selectResult){
             group.glowAndMarkInteractions(player, 40);
-            RelativePointUtils.deselectRelativePoint(player);
             RelativePointUtils.removeRelativePoints(player);
             player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Selected the clicked point's <light_purple>packet-based <green>group!")));
             player.playSound(spawnLocation, Sound.UI_STONECUTTER_TAKE_RESULT, 1, 2f);

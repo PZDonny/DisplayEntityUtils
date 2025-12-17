@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,6 +62,34 @@ public abstract class RelativePointSelector<T extends RelativePoint> {
         this.relativePoint = relativePoint;
     }
 
+    RelativePointSelector(Player player, Location spawnLocation, T relativePoint, Material itemType, Transformation transformation){
+        Vector3f scaleVector = transformation.getScale();
+        float xInteractionScale = scaleVector.x+0.075f;
+        float yInteractionScale = scaleVector.y+0.075f;
+        float zInteractionScale = scaleVector.z+0.075f;
+        this.playerUUID = player.getUniqueId();
+        ItemStack stack = new ItemStack(itemType);
+        displayPart = new PacketAttributeContainer()
+                .setAttribute(DisplayAttributes.Transform.LEFT_ROTATION, transformation.getLeftRotation())
+                .setAttribute(DisplayAttributes.Transform.SCALE, transformation.getScale().add(0.05f, 0.05f, 0.05f))
+                .setAttribute(DisplayAttributes.GLOW_COLOR_OVERRIDE, Color.BLACK)
+                .setAttribute(DisplayAttributes.GLOWING, true)
+                .setAttribute(DisplayAttributes.BRIGHTNESS, new Display.Brightness(15,15))
+                .setAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK, stack)
+                .createPart(SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY, spawnLocation, pointDisplayTag);
+        displayPart.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
+
+        selectPart = new PacketAttributeContainer()
+                .setAttribute(DisplayAttributes.Interaction.WIDTH, Math.max(xInteractionScale, zInteractionScale))
+                .setAttribute(DisplayAttributes.Interaction.HEIGHT, yInteractionScale)
+                .createPart(SpawnedDisplayEntityPart.PartType.INTERACTION, spawnLocation.clone().subtract(0, yInteractionScale/2, 0), pointDisplayTag);
+        selectPart.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL);
+
+        interactionParts.put(selectPart, this);
+
+        this.spawnLocation = spawnLocation;
+        this.relativePoint = relativePoint;
+    }
 
     public void select(){
         if (!isValid) return;

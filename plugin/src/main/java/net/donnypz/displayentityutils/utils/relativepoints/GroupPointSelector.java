@@ -5,11 +5,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-@ApiStatus.Internal
-@ApiStatus.Experimental
 public class GroupPointSelector extends RelativePointSelector<GroupPoint> {
     SpawnedDisplayEntityGroup group;
 

@@ -71,7 +71,7 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/deu parts help <page-number>", "Get help for parts");
             CMDUtils.sendCMD(sender, "/deu parts info", "Get information about your current part/selection");
             CMDUtils.sendCMD(sender, "/deu parts create <block | item | text | interaction>", "Spawn an entity at your location and automatically select it");
-            CMDUtils.sendCMD(sender, "/deu parts select <distance | -target>", "Select an ungrouped display/interaction entity near your location. Use \"-target\" to select your targeted Interaction");
+            CMDUtils.sendCMD(sender, "/deu parts select <distance | -target>", "Select a nearby, ungrouped, Display entity. Use \"-target\" to select your targeted Interaction");
         }
         else if (page == 2) {
             CMDUtils.sendCMD(sender, "/deu parts cycle <first | prev | next | last> [jump]", "Cycle through parts of your selected group");
