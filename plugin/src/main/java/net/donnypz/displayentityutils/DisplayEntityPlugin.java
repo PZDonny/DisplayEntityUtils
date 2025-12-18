@@ -11,10 +11,7 @@ import net.donnypz.displayentityutils.listeners.bdengine.DatapackEntitySpawned;
 import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUInteractionListener;
 import net.donnypz.displayentityutils.listeners.entity.mythic.DEUMythicListener;
-import net.donnypz.displayentityutils.listeners.player.DEUPlayerChatListener;
-import net.donnypz.displayentityutils.listeners.player.DEUPlayerConnectionListener;
-import net.donnypz.displayentityutils.listeners.player.DEUPlayerPacketListener;
-import net.donnypz.displayentityutils.listeners.player.DEUPlayerWorldListener;
+import net.donnypz.displayentityutils.listeners.player.*;
 import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
@@ -89,6 +86,11 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         DisplayAPI.spawnAnimationTypeKey = new NamespacedKey(this, "spawnanimationtype");
         DisplayAPI.spawnAnimationLoadMethodKey = new NamespacedKey(this, "spawnanimationloader");
         DisplayAPI.chunkPacketGroupsKey = new NamespacedKey(this, "chunkpacketgroups");
+        DisplayAPI.placeableGroupKey = new NamespacedKey(this, "placeablegroup");
+        DisplayAPI.placeableGroupPacketBasedKey = new NamespacedKey(this, "placeablegrouppacketbased");
+        DisplayAPI.placeableGroupPermissionKey = new NamespacedKey(this, "placeablegroupperm");
+        DisplayAPI.placeableGroupRespectFacingKey = new NamespacedKey(this, "placeblegroupfacing");
+
     }
 
     private void initializeDependencies(){
@@ -132,6 +134,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new DEUEntityListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
         Bukkit.getPluginManager().registerEvents(new DEUInteractionListener(), this);
+        Bukkit.getPluginManager().registerEvents(new DEUPlayerPlaceBlockListener(), this);
     }
 
     private void initializeBStats(){

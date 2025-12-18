@@ -34,6 +34,11 @@ public enum Permission {
     GROUP_CULLING("deu.group.culling"),
     GROUP_WORLD_EDIT("deu.group.worldedit"),
 
+    PLACE_SET_ITEM("deu.place.setitem"),
+    PLACE_TOGGLE_PACKET("deu.place.togglepacket"),
+    PLACE_TOGGLE_FACING("deu.place.togglefacing"),
+    PLACE_SET_PERMISSION("deu.place.setpermission"),
+
 
     PARTS_INFO("deu.parts.info"),
     PARTS_CREATE("deu.parts.create"),

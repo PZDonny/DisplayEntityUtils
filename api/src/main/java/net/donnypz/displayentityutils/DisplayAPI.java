@@ -27,6 +27,10 @@ public final class DisplayAPI {
     static NamespacedKey spawnAnimationTypeKey;
     static NamespacedKey spawnAnimationLoadMethodKey;
     static NamespacedKey chunkPacketGroupsKey;
+    static NamespacedKey placeableGroupKey;
+    static NamespacedKey placeableGroupPacketBasedKey;
+    static NamespacedKey placeableGroupPermissionKey;
+    static NamespacedKey placeableGroupRespectFacingKey;
 
     static boolean isMythicMobsInstalled;
     static boolean isLibsDisguisesInstalled;
@@ -85,10 +89,23 @@ public final class DisplayAPI {
         return chunkPacketGroupsKey;
     }
 
-    /**
-     * Used for older versions of DisplayEntityUtils Plugin
-     * This will NEVER have to be called manually
-     */
+    public static @NotNull NamespacedKey getPlaceableGroupKey(){
+        return placeableGroupKey;
+    }
+
+    public static @NotNull NamespacedKey getPlaceableGroupPacketBasedKey(){
+        return placeableGroupPacketBasedKey;
+    }
+
+    public static @NotNull NamespacedKey getPlaceableGroupPermissionKey(){
+        return placeableGroupPermissionKey;
+    }
+
+    public static @NotNull NamespacedKey getPlaceableGroupRespectFacing(){
+        return placeableGroupRespectFacingKey;
+    }
+
+
     @ApiStatus.Internal
     public static String getLegacyPartTagPrefix(){
         return legacyPartTagPrefix;

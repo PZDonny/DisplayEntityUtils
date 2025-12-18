@@ -54,6 +54,7 @@ public class GroupSpawnedEvent extends Event {
          */
         PLAYER_SENT_CHUNK,
         PLAYER_SENT_PASSENGER_GROUP,
+        ITEMSTACK,
         SKRIPT,
         INTERNAL;
     }

@@ -7,6 +7,7 @@ import net.donnypz.displayentityutils.command.group.GroupCMD;
 import net.donnypz.displayentityutils.command.interaction.InteractionCMD;
 import net.donnypz.displayentityutils.command.item.ItemCMD;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
+import net.donnypz.displayentityutils.command.place.PlaceCMD;
 import net.donnypz.displayentityutils.command.text.TextCMD;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
@@ -46,6 +47,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         subCommands.put("item", new ItemCMD());
         subCommands.put("text", new TextCMD());
         subCommands.put("interaction", new InteractionCMD());
+        subCommands.put("place", new PlaceCMD());
         subCommands.put("anim", new AnimCMD());
         subCommands.put("bdengine", new BDEngineCMD());
         subCommands.put("reload", new ReloadCMD());
@@ -191,11 +193,12 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         sender.sendMessage(DisplayAPI.pluginPrefixLong);
         sender.sendMessage(Component.text("v"+DisplayAPI.getVersion(), NamedTextColor.GRAY));
         CMDUtils.sendCMD(sender, "/deu group", "Display Entity Models/Groups related commands");
-        CMDUtils.sendCMD(sender, "/deu anim", "Animation related commands");
         CMDUtils.sendCMD(sender, "/deu parts", "Commands related to the parts (individual display entities) of a Display Entity Model/Group");
         CMDUtils.sendCMD(sender, "/deu item", "Commands related to the Item Display parts of a Display Entity Model/Group");
         CMDUtils.sendCMD(sender, "/deu text", "Commands related to the Text Display parts of a Display Entity Model/Group");
         CMDUtils.sendCMD(sender, "/deu interaction", "Commands related to manipulating Interaction entities");
+        CMDUtils.sendCMD(sender, "/deu place", "Assign a Display Entity Model/Group to an block that will spawn when placed");
+        CMDUtils.sendCMD(sender, "/deu anim", "Animation related commands");
         CMDUtils.sendCMD(sender, "/deu listgroups <storage> [page-number]", "List all saved Display Entity Models/Groups");
         CMDUtils.sendCMD(sender, "/deu listanims <storage> [page-number]", "List all saved animations");
         CMDUtils.sendCMD(sender, "/deu hidepoints", "Hide any visible points (frame points, persistent packet group points, etc.)");
@@ -218,7 +221,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
             String subcmd = args[0].toLowerCase();
             String current = args[1];
             switch (subcmd) {
-                case "interaction", "anim", "group", "parts", "bdengine", "text", "item" -> {
+                case "interaction", "anim", "group", "parts", "bdengine", "text", "item", "place" -> {
                     return getTabComplete(subcmd, current);
                 }
                 case "listgroups", "listanims" -> suggestions.addAll(DEUSubCommand.TabSuggestion.STORAGES.suggestions);
