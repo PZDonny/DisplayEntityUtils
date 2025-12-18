@@ -42,8 +42,6 @@ public class DEUUser {
     private UUID cameraPlayerUUID;
 
 
-
-
     private DEUUser(UUID userUUID){
         this.userUUID = userUUID;
         synchronized (userLock){

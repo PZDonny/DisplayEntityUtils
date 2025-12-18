@@ -121,7 +121,7 @@ public final class DisplayAPI {
 
     /**
      * Get whether LibsDisguises is installed on this server
-     * @return true if MythicMobs is present
+     * @return true if LibsDisguises is present
      */
     public static boolean isLibsDisguisesInstalled() {
         return isLibsDisguisesInstalled;
