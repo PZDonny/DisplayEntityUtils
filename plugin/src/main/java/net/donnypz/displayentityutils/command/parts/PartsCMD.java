@@ -111,11 +111,6 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }
 
-    public static void noPartSelection(Player player){
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You have not selected any part(s)!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/deu parts cycle <first | prev | next>", NamedTextColor.GRAY));
-    }
-
     public static void invalidPartSelection(CommandSender sender){
         sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your part selection is invalid!", NamedTextColor.RED)));
     }

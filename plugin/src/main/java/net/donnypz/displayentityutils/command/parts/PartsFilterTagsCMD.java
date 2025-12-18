@@ -2,13 +2,13 @@ package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
+import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PartFilter;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -26,7 +26,7 @@ class PartsFilterTagsCMD extends PlayerSubCommand {
     public void execute(Player player, String[] args) {
         ActivePartSelection<?> sel = DisplayGroupManager.getPartSelection(player);
         if (sel == null){
-            PartsCMD.noPartSelection(player);
+            DisplayEntityPluginCommand.noPartSelection(player);
             return;
         }
 
