@@ -208,7 +208,7 @@ public final class DisplayGroupManager {
             saveFile.createNewFile();
 
             FileWriter fileWriter = new FileWriter(saveFile);
-            Gson gson = DEGJSONAdapter.GSON;
+            Gson gson = DEUJSONAdapter.GSON;
 
             JsonElement jsonEl = gson.toJsonTree(displayEntityGroup);
             JsonObject jsonObj = jsonEl.getAsJsonObject();
@@ -488,7 +488,7 @@ public final class DisplayGroupManager {
         deserializeJsonElement(jsonObject);
         jsonObject.remove(PLUGIN_VERSION_FIELD);
 
-        return DEGJSONAdapter
+        return DEUJSONAdapter
                 .GSON
                 .fromJson(jsonObject, DisplayEntityGroup.class);
     }

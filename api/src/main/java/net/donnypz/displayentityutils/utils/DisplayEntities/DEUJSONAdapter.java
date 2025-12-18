@@ -3,7 +3,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public final class DEGJSONAdapter {
+public final class DEUJSONAdapter {
 
     public static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(DisplayEntity.class, new JSONAdapter_DisplayEntity())
@@ -11,5 +11,5 @@ public final class DEGJSONAdapter {
             .registerTypeHierarchyAdapter(FramePoint.class, new JSONAdapter_FramePoint())
             .create();
 
-    private DEGJSONAdapter(){}
+    private DEUJSONAdapter(){}
 }

@@ -384,7 +384,7 @@ public final class DisplayAnimationManager {
         DisplayGroupManager.deserializeJsonElement(jsonObject);
         jsonObject.remove(DisplayGroupManager.PLUGIN_VERSION_FIELD);
 
-        return DEGJSONAdapter
+        return DEUJSONAdapter
                 .GSON
                 .fromJson(jsonObject, DisplayAnimation.class);
     }
