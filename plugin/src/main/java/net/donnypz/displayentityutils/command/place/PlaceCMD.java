@@ -2,7 +2,6 @@ package net.donnypz.displayentityutils.command.place;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
-import net.donnypz.displayentityutils.command.item.ItemHelpCMD;
 import net.donnypz.displayentityutils.managers.PlaceableGroupManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -14,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class PlaceCMD extends ConsoleUsableSubCommand {
     public PlaceCMD() {
-        super(Permission.HELP, new ItemHelpCMD());
+        super(Permission.HELP, new PlaceHelpCMD());
         new PlaceSetCMD(this);
         new PlaceUnsetCMD(this);
         new PlaceSetPermissionCMD(this);
