@@ -12,7 +12,7 @@ import java.io.*;
 import java.util.Collection;
 
 @ApiStatus.Internal
-public class AnimationSound implements Externalizable, Cloneable {
+public class DEUSound implements Externalizable, Cloneable {
     transient Sound sound;
     String soundName;
     float volume;
@@ -24,27 +24,26 @@ public class AnimationSound implements Externalizable, Cloneable {
     private static final long serialVersionUID = 0;
 
     @ApiStatus.Internal
-    public AnimationSound(){}
+    public DEUSound(){}
 
-    public AnimationSound(@NotNull String soundName, float volume, float pitch, int delayInTicks){
+    public DEUSound(@NotNull String soundName, float volume, float pitch, int delayInTicks){
         this.soundName = soundName;
         this.volume = volume;
         this.pitch = pitch;
         this.delay = delayInTicks;
         this.sound = VersionUtils.getSound(soundName);
-        existsInGameVersion = this.sound != null;
+        this.existsInGameVersion = this.sound != null;
     }
 
-    public AnimationSound(@NotNull Sound sound, float volume, float pitch, int delayInTicks){
+    public DEUSound(@NotNull Sound sound, float volume, float pitch, int delayInTicks){
         this.sound = sound;
         this.soundName = sound.getKey().getKey();
         this.volume = volume;
         this.pitch = pitch;
         this.delay = delayInTicks;
-        this.existsInGameVersion = true;
     }
 
-    public AnimationSound(@NotNull AnimationSound sound){
+    public DEUSound(@NotNull DEUSound sound){
         this.sound = sound.sound;
         this.soundName = sound.soundName;
         this.volume = sound.volume;
@@ -175,9 +174,9 @@ public class AnimationSound implements Externalizable, Cloneable {
     }
 
     @Override
-    public AnimationSound clone() {
+    public DEUSound clone() {
         try {
-            return (AnimationSound) super.clone();
+            return (DEUSound) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }

@@ -7,7 +7,7 @@ import java.io.ObjectStreamClass;
 
 class DisplayObjectInputStream extends ObjectInputStream {
 
-    private static final String oldPackage = "com.pzdonny";
+    private static final String OLD_PACKAGE = "com.pzdonny";
     DisplayObjectInputStream(InputStream in) throws IOException {
         super(in);
     }
@@ -17,10 +17,9 @@ class DisplayObjectInputStream extends ObjectInputStream {
 
     //Convert Old Serialized Objects with new package name
         String name = desc.getName();
-        if (name.startsWith(oldPackage)) {
-            name = "net.donnypz" + name.substring(oldPackage.length());
+        if (name.startsWith(OLD_PACKAGE)) {
+            name = "net.donnypz" + name.substring(OLD_PACKAGE.length());
         }
-
         return Class.forName(name);
     }
 }
