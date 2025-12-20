@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.command.parts;
 
+import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
@@ -7,7 +8,6 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -122,48 +122,19 @@ class PartsCycleCMD extends PlayerSubCommand {
             case ITEM_DISPLAY -> {
                 ItemStack i = part.getItemDisplayItem();
                 if (i.getType() == Material.AIR){
-                    desc = Component.text("(Invisible Item Display | AIR, CAVE_AIR, or VOID_AIR)", NamedTextColor.GRAY);
+                    desc = Component.text("(Invisible Item Display | AIR)", NamedTextColor.GRAY);
                 }
                 else{
                     desc = Component.text("("+i.getType().key().value()+")", NamedTextColor.AQUA);
                 }
             }
+            case MANNEQUIN -> {
+                ResolvableProfile profile = part.getMannequinProfile();
+                String name = profile.name();
+                if (name == null) name = "Unnamed Mannequin";
+                desc = Component.text("("+name+")");
+            }
             default -> throw new IllegalStateException("Unexpected part type");
-        }
-        return desc;
-    }
-
-    static Component getPartInfo(@NotNull Entity entity){
-        Component desc;
-        switch(entity){
-            case Interaction i -> {
-                desc = MiniMessage.miniMessage().deserialize("<dark_aqua>(Interaction, H: "+i.getInteractionHeight()+" W:"+i.getInteractionWidth()+")");
-            }
-            case TextDisplay display -> {
-                desc = Component.text("(Text Display: \"", NamedTextColor.LIGHT_PURPLE)
-                        .append(display.text())
-                        .append(Component.text("\")", NamedTextColor.LIGHT_PURPLE));
-            }
-            case BlockDisplay display -> {
-                if (DisplayUtils.isMaster(display)){
-                    desc = Component.text("(Master Entity/Part)", NamedTextColor.GOLD);
-                }
-                else if (display.getBlock().getMaterial() == Material.AIR){
-                    desc = Component.text("(Invisible Block Display | AIR, CAVE_AIR, or VOID_AIR)", NamedTextColor.GRAY);
-                }
-                else{
-                    desc = Component.text("("+display.getBlock().getMaterial().key().value()+")", NamedTextColor.YELLOW);
-                }
-            }
-            case ItemDisplay display -> {
-                if (display.getItemStack().getType() == Material.AIR){
-                    desc = Component.text("(Invisible Item Display | AIR, CAVE_AIR, or VOID_AIR)", NamedTextColor.GRAY);
-                }
-                else{
-                    desc = Component.text("("+display.getItemStack().getType().key().value()+")", NamedTextColor.AQUA);
-                }
-            }
-            default -> throw new IllegalStateException("Unexpected value: " + entity);
         }
         return desc;
     }

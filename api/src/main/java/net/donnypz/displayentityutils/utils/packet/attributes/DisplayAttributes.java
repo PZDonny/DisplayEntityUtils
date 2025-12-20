@@ -5,7 +5,7 @@ import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import net.kyori.adventure.text.Component;
 
 /**
- * A class containing all {@link DisplayAttribute}s that apply to both Display and Interaction entities
+ * A class containing all {@link DisplayAttribute}s that apply to eligible part type entities
  */
 public final class DisplayAttributes {
 
@@ -74,6 +74,6 @@ public final class DisplayAttributes {
         public static final MainHandDisplayAttribute MAIN_HAND = new MainHandDisplayAttribute(15);
         public static final ResolvableProfileDisplayAttribute RESOLVABLE_PROFILE = new ResolvableProfileDisplayAttribute(17);
         public static final BasicDisplayAttribute<Boolean> IMMOVABLE = new BasicDisplayAttribute<>(18, Boolean.class, EntityDataTypes.BOOLEAN);
+        public static final OptionalComponentDisplayAttribute BELOW_NAME = new OptionalComponentDisplayAttribute(19);
     }
-
 }

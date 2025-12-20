@@ -1,5 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
+import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -1019,6 +1021,43 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
     }
 
+    @Override
+    public void setMannequinProfile(@NotNull PlayerProfile profile) {
+        setMannequinProfile(ResolvableProfile.resolvableProfile(profile));
+    }
+
+    @Override
+    public void setMannequinProfile(@NotNull ResolvableProfile profile) {
+        if (type != PartType.MANNEQUIN) return;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return;
+        mannequin.setProfile(profile);
+    }
+
+    @Override
+    public void setMannequinBelowName(@Nullable Component text) {
+        if (type != PartType.MANNEQUIN) return;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return;
+        mannequin.setDescription(text);
+    }
+
+    @Override
+    public ResolvableProfile getMannequinProfile() {
+        if (type != PartType.MANNEQUIN) return null;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return null;
+        return mannequin.getProfile();
+    }
+
+    @Override
+    public @Nullable Component getMannequinBelowName() {
+        if (type != PartType.MANNEQUIN) return null;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return null;
+        return mannequin.getDescription();
+    }
+
     /**
      * {@inheritDoc}
      * The applied changes do not reflect the entity data server-side
@@ -1117,6 +1156,8 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
         return ((Interaction) getEntity()).isResponsive();
     }
+
+
 
     @Override
     public void addInteractionCommand(@NotNull String command, boolean isLeftClick, boolean isConsole) {

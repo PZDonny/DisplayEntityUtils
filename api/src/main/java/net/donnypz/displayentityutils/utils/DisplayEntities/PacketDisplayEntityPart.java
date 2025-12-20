@@ -1,9 +1,11 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityRotation;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport;
+import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
@@ -592,6 +594,35 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public void setMannequinHandItem(@NotNull ItemStack itemStack, boolean mainHand) {
         if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
         //TODO
+    }
+
+    @Override
+    public void setMannequinProfile(@NotNull PlayerProfile profile) {
+        setMannequinProfile(ResolvableProfile.resolvableProfile(profile));
+    }
+
+    @Override
+    public void setMannequinProfile(@NotNull ResolvableProfile profile) {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
+        setAndSend(DisplayAttributes.Mannequin.RESOLVABLE_PROFILE, profile);
+    }
+
+    @Override
+    public void setMannequinBelowName(@Nullable Component text) {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
+        setAndSend(DisplayAttributes.Mannequin.BELOW_NAME, text);
+    }
+
+    @Override
+    public ResolvableProfile getMannequinProfile() {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return null;
+        return attributeContainer.getAttribute(DisplayAttributes.Mannequin.RESOLVABLE_PROFILE);
+    }
+
+    @Override
+    public @Nullable Component getMannequinBelowName() {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return null;
+        return attributeContainer.getAttribute(DisplayAttributes.Mannequin.BELOW_NAME);
     }
 
 

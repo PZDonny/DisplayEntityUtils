@@ -1,5 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
+import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
@@ -519,6 +521,12 @@ public abstract class ActivePart implements Active{
      */
     public abstract boolean isInteractionResponsive();
 
+    public abstract void setMannequinProfile(@NotNull PlayerProfile profile);
+
+    public abstract void setMannequinProfile(@NotNull ResolvableProfile profile);
+
+    public abstract void setMannequinBelowName(@Nullable Component text);
+
     public abstract void setMannequinPose(Pose pose);
 
     public abstract void setMannequinScale(double scale);
@@ -530,6 +538,10 @@ public abstract class ActivePart implements Active{
     public abstract void setMannequinMainHand(@NotNull MainHand mainHand);
 
     public abstract void setMannequinHandItem(@NotNull ItemStack itemStack, boolean mainHand);
+
+    public abstract ResolvableProfile getMannequinProfile();
+
+    public abstract @Nullable Component getMannequinBelowName();
 
     public abstract @Nullable Pose getMannequinPose();
 
