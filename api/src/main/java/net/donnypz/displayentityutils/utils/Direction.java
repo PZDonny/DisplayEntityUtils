@@ -1,10 +1,9 @@
 package net.donnypz.displayentityutils.utils;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import org.bukkit.Location;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Interaction;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -89,8 +88,8 @@ public enum Direction {
      * @return A vector
      */
     public Vector getVector(@NotNull Entity entity, boolean localSpace) {
-        boolean isInteraction = entity instanceof Interaction;
-        return getVector(entity.getLocation(), localSpace && !isInteraction);
+        boolean isDisplay = entity instanceof Display;
+        return getVector(entity.getLocation(), localSpace && isDisplay);
     }
 
     /**
@@ -99,8 +98,7 @@ public enum Direction {
      * @return A vector
      */
     public Vector getVector(@NotNull ActivePart part, boolean localSpace) {
-        boolean isInteraction = part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION;
-        return getVector(part.getLocation(), localSpace && !isInteraction);
+        return getVector(part.getLocation(), localSpace && part.isDisplay());
     }
 
     /**

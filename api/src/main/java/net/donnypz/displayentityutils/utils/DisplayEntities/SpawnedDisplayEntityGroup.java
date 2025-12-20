@@ -151,42 +151,27 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return part;
     }
 
-
     /**
-     * Add an interaction entity to this group. If this group already contains this interaction entity as a registered part it will return the existing
-     * {@link SpawnedDisplayEntityPart}. If it doesn't then it will return a new {@link SpawnedDisplayEntityPart}
-     * @param interactionEntity
-     * @return a {@link SpawnedDisplayEntityPart} representing the Interaction entity
+     * Add a valid part entity to this group, when you don't know the type of entity you're dealing with
+     * @param entity the part entity to add
+     * @return a corresponding {@link SpawnedDisplayEntityPart} or null if the entity is not an eligible part entity
      */
-    public SpawnedDisplayEntityPart addInteractionEntity(@NotNull Interaction interactionEntity){
-        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(interactionEntity);
+    public @Nullable SpawnedDisplayEntityPart addEntity(@NotNull Entity entity){
+        if (entity instanceof Display display){
+            return addDisplayEntity(display);
+        }
+
+        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
         if (part == null){
-            part =  new SpawnedDisplayEntityPart(this, interactionEntity, partUUIDRandom);
+            part =  new SpawnedDisplayEntityPart(this, entity, partUUIDRandom);
         }
         else{
             part.setGroup(this);
         }
         if (getVehicle() != null){
-            alignInteractionWithMountedGroup(part, getVehicle());
+            alignNonDisplayWithMountedGroup(part, getVehicle());
         }
         return part;
-    }
-
-    /**
-     * Add a valid part entity (Display or Interaction) to this group, when you don't know the type of entity you're dealing with
-     * @param entity the part entity to add
-     * @return a corresponding {@link SpawnedDisplayEntityPart} or null if the entity is not a part entity
-     */
-    public SpawnedDisplayEntityPart addPartEntity(@NotNull Entity entity){
-        if (entity instanceof Interaction interaction){
-            return addInteractionEntity(interaction);
-        }
-        else if (entity instanceof Display display){
-            return addDisplayEntity(display);
-        }
-        else{
-            return null;
-        }
     }
 
     /**
@@ -202,7 +187,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
     /**
      * Check if this group and an Interaction entity share the same creation time. If this returns true this does not guarantee
-     * that the part is registered to this group. Using {@link SpawnedDisplayEntityGroup#addInteractionEntity(Interaction)} will
+     * that the part is registered to this group. Using {@link SpawnedDisplayEntityGroup#addEntity(Interaction)} will
      * add the interaction entity to the group if it is not added already
      * @param interaction
      * @return a boolean
@@ -223,27 +208,21 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     /**
-     * Add Interactions that are meant to be a part of this group
-     * Usually these Interactions are unadded when a SpawnedDisplayEntityGroup is created during a new play session
-     * @param searchRange Distance to search for Interaction entities from the group's location
-     * @return a list of the interaction entities added to the group
+     * Add entities that are meant to be a part of this group.
+     * Usually these entities are unadded when a {@link SpawnedDisplayEntityGroup} is created during a new play session
+     * @param searchRange distance to search for  entities from the group's location
+     * @return a list of the entities added to the group
      */
-    public List<Interaction> addMissingInteractionEntities(double searchRange){
-        List<Interaction> interactions = new ArrayList<>();
-        //List<Entity> existingInteractions = getSpawnedPartEntities(SpawnedDisplayEntityPart.PartType.INTERACTION);
+    public @NotNull List<Entity> addMissingEntities(double searchRange){
+        List<Entity> entities = new ArrayList<>();
 
         for (Entity e : getMasterPart().getEntity().getNearbyEntities(searchRange, searchRange, searchRange)) {
-            if (!(e instanceof Interaction i)){
-                continue;
-            }
-            //if (!existingInteractions.contains(i) && sameCreationTime(i)){
-            if (!sameCreationTime(i)){
-                continue;
-            }
+            if (!DisplayUtils.isPartEntity(e) || e instanceof Display) continue;
+            if (!sameCreationTime(e)) continue;
 
-            SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(i);
+            SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(e);
             if (part == null){
-                new SpawnedDisplayEntityPart(this, i, partUUIDRandom);
+                new SpawnedDisplayEntityPart(this, e, partUUIDRandom);
             }
             else{
                 if (this == part.getGroup()){ //Already in this group
@@ -251,9 +230,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 }
                 part.setGroup(this);
             }
-            interactions.add(i);
+            entities.add(e);
         }
-        return interactions;
+        return entities;
     }
 
     @ApiStatus.Internal
@@ -275,8 +254,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     @Override
     public void showToPlayer(@NotNull Player player){
-        for (ActivePart part : groupParts.values()){
-            ((SpawnedDisplayEntityPart) part).showToPlayer(player);
+        for (SpawnedDisplayEntityPart part : groupParts.values()){
+            part.showToPlayer(player);
         }
     }
 
@@ -330,8 +309,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 if ((e instanceof Interaction interaction)){
                     if (!existingInteractions.contains(e)){
                         if (addToGroup){
-                            addInteractionEntity(interaction);
-
+                            addEntity(interaction);
                         }
                         interactions.add(interaction);
                     }
@@ -844,7 +822,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
 
         for (SpawnedDisplayEntityPart interactionPart: this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
-            alignInteractionWithMountedGroup(interactionPart, vehicle);
+            alignNonDisplayWithMountedGroup(interactionPart, vehicle);
         }
         return true;
     }
@@ -871,7 +849,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return getVehicle() != null;
     }
 
-    private void alignInteractionWithMountedGroup(SpawnedDisplayEntityPart part, Entity vehicle){
+    private void alignNonDisplayWithMountedGroup(SpawnedDisplayEntityPart part, Entity vehicle){
         final Interaction interaction = (Interaction) part.getEntity();
         DisplayAPI.getScheduler().entityRunTimer(interaction, new Scheduler.SchedulerRunnable() {
             Location lastLoc = getLocation();

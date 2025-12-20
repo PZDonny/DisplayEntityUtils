@@ -9,10 +9,12 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
+import org.bukkit.entity.Mannequin;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,19 +35,17 @@ class GroupAddTargetCMD extends PlayerSubCommand {
             return;
         }
 
+
         Entity entity = player.getTargetEntity(10);
-        if (!(entity instanceof Interaction interaction)) {
-            player.sendMessage(Component.text("Your targeted entity must be an interaction entity within 10 blocks of you", NamedTextColor.RED));
+        if (!(entity instanceof Interaction || entity instanceof Mannequin)) {
+            player.sendMessage(Component.text("Your targeted entity must be an interaction or mannequin entity within 10 blocks of you", NamedTextColor.RED));
             return;
         }
-        /*if (FramePointDisplay.isRelativePointEntity(entity)){
-            player.sendMessage(Component.text("Your cannot add the interaction entity from a point preview!", NamedTextColor.RED));
-            return;
-        }*/
-        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(interaction);
+
+        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
         if (part != null) {
             if (part.getGroup() == group) {
-                player.sendMessage(Component.text("That interaction entity is already apart of your selected group!", NamedTextColor.RED));
+                player.sendMessage(Component.text("That entity is already apart of your selected group!", NamedTextColor.RED));
             }
             else {
                 part.setGroup(group);
@@ -53,10 +53,10 @@ class GroupAddTargetCMD extends PlayerSubCommand {
             return;
         }
         else {
-            group.addInteractionEntity(interaction);
+            group.addEntity(entity);
             SpawnedPartSelection sel = (SpawnedPartSelection) DisplayGroupManager.getPartSelection(player);
             sel.refresh();
         }
-        player.sendMessage(Component.text("Successfully added interaction entity to your selected group!", NamedTextColor.GREEN));
+        player.sendMessage(Component.text("Successfully added entity to your selected group!", NamedTextColor.GREEN));
     }
 }

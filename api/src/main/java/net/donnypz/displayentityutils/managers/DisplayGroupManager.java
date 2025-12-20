@@ -548,26 +548,27 @@ public final class DisplayGroupManager {
 
 
     /**
-     * Get a Spawned Display Entity Group through an interaction entity
-     *
-     * @param interaction The interaction entity part of a display entity group
-     * @param radius The radius to check for a spawned display entity group
-     * @return SpawnedDisplayEntityGroup containing the interaction entity. Null if not found.
+     * Get a {@link SpawnedDisplayEntityGroup} through an eligible part entity
+     * @param entity The entity that's in a group
+     * @param radius The radius to search for the group
+     * @return a {@link SpawnedDisplayEntityGroup} containing the entity. Null if not found.
      */
-    public static SpawnedDisplayEntityGroup getSpawnedGroup(@NotNull Interaction interaction, double radius) {
+    public static @Nullable SpawnedDisplayEntityGroup getSpawnedGroup(@NotNull Entity entity, double radius) {
+        if (!DisplayUtils.isPartEntity(entity)) return null;
+
         //Check for existing group
-        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(interaction);
+        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
         if (part != null && part.getGroup() != null) {
             return part.getGroup();
         }
 
         //Get Nearby Groups
-        List<GroupResult> results = getSpawnedGroupsNearLocation(interaction.getLocation(), radius);
+        List<GroupResult> results = getSpawnedGroupsNearLocation(entity.getLocation(), radius);
         if (results.isEmpty()){
             return null;
         }
         //Check if Interaction is part of group
-        part = SpawnedDisplayEntityPart.getPart(interaction);
+        part = SpawnedDisplayEntityPart.getPart(entity);
         return part == null ? null : part.getGroup();
     }
 
@@ -635,7 +636,7 @@ public final class DisplayGroupManager {
                 continue;
             }
             if (addInteractions){
-                result.group().addMissingInteractionEntities(DisplayConfig.getMaximumInteractionSearchRange());
+                result.group().addMissingEntities(DisplayConfig.getMaximumInteractionSearchRange());
             }
             results.add(result);
         }

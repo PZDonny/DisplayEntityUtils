@@ -79,7 +79,7 @@ final class AutoGroup {
 
                 SpawnedDisplayEntityGroup group = result.group();
                 foundGroups.add(group);
-                group.addMissingInteractionEntities(DisplayConfig.getMaximumInteractionSearchRange());
+                group.addMissingEntities(DisplayConfig.getMaximumInteractionSearchRange());
 
                 if (!result.alreadyLoaded()){
                     group.playSpawnAnimation();
@@ -133,7 +133,7 @@ final class AutoGroup {
                     SpawnedDisplayEntityGroup group = result.group();
 
                     if (group.hasSameCreationTime(interaction)) {
-                        group.addInteractionEntity(interaction);
+                        group.addEntity(interaction);
 
                         if (!events.containsKey(group)){
                             addedInteractionsForEvent.putIfAbsent(result.group(), new HashSet<>());

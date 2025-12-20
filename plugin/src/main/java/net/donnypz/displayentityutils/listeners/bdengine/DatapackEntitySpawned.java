@@ -119,8 +119,8 @@ public final class DatapackEntitySpawned implements Listener {
                 }
             }
 
-            for (Entity part : laterParts){
-                group.addPartEntity(part);
+            for (Entity partEntity : laterParts){
+                group.addEntity(partEntity);
             }
         }
     }

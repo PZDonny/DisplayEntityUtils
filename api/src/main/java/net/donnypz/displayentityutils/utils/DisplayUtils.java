@@ -40,7 +40,7 @@ public final class DisplayUtils {
     private static final ListPersistentDataType<String, String> tagPDCType = PersistentDataType.LIST.strings();
     private DisplayUtils(){}
 
-    public static boolean isPartEntity(@NotNull Entity entity){
+    public static boolean isPartEntity(Entity entity){ // don't add notnull annotation
         return SpawnedDisplayEntityPart.PartType.getType(entity) != null;
     }
 

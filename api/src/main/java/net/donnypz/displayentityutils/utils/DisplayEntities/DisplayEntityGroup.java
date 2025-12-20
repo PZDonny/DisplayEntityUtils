@@ -236,7 +236,7 @@ public final class DisplayEntityGroup implements Serializable{
                     masterDisplay.getLocation(),
                     settings);
 
-            SpawnedDisplayEntityPart part = group.addInteractionEntity(interaction);
+            SpawnedDisplayEntityPart part = group.addEntity(interaction);
             if (entity.hasLegacyPartTags()){
                 part.adaptScoreboardTags(true);
             }

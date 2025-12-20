@@ -691,7 +691,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         }
     }
 
-
     @Override
     public float getInteractionHeight() {
         if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {

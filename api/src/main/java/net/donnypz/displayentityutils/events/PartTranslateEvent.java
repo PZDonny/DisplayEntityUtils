@@ -11,12 +11,13 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.util.Transformation;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Called when a {@link Display} or {@link Interaction} changes its translation using methods within the {@link DisplayGroupManager}.
- * Can be cancelled
+ * Called when an entity changes its translation through the {@link DisplayUtils#translate(Display, Vector, double, int, int)} or similar methods.
+ * <br>Can be cancelled
  */
 public final class PartTranslateEvent extends Event implements Cancellable {
 
@@ -28,10 +29,6 @@ public final class PartTranslateEvent extends Event implements Cancellable {
     Transformation oldTransformation;
     Transformation newTransformation;
 
-    /**
-     * Called when a Display Entity or Interaction Entity changes its translation through the DisplayGroupManager.
-     * Can be cancelled
-     */
     public PartTranslateEvent(@NotNull Entity entity, Location destination, Transformation oldTransformation, Transformation newTransformation){
         this.entity = entity;
         this.destination = destination;
@@ -61,12 +58,7 @@ public final class PartTranslateEvent extends Event implements Cancellable {
      * @return a {@link SpawnedDisplayEntityPart}, null if this entity is not a part
      */
     public @Nullable SpawnedDisplayEntityPart getEntityAsSpawnedDisplayEntityPart(){
-        if (entity instanceof Interaction i){
-            return SpawnedDisplayEntityPart.getPart(i);
-        }
-        else{
-            return SpawnedDisplayEntityPart.getPart((Display) entity);
-        }
+        return SpawnedDisplayEntityPart.getPart(entity);
     }
 
     /**
@@ -93,19 +85,12 @@ public final class PartTranslateEvent extends Event implements Cancellable {
         return newTransformation;
     }
 
-
-
     /**
      * Get the tag of this entity's group.
      * @return group tag, null if not grouped
      */
     public String getGroupTag(){
-        if (entity instanceof Interaction i){
-            return DisplayUtils.getGroupTag(i);
-        }
-        else{
-            return DisplayUtils.getGroupTag((Display) entity);
-        }
+        return DisplayUtils.getGroupTag(entity);
     }
 
     @Override

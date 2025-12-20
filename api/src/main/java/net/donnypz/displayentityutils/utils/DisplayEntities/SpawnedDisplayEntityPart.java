@@ -271,7 +271,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @return The SpawnedDisplayEntityPart. Null if not created during play session or not associated with any group
      */
     public static @Nullable SpawnedDisplayEntityPart getPart(@NotNull Entity entity){
-        if (!(entity instanceof Interaction || entity instanceof Display)) return null;
+        if (DisplayUtils.isPartEntity(entity)) return null;
         return allParts.get(new PartData(entity));
     }
 
@@ -347,7 +347,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
 
         this.group = newGroup;
-        if (type != PartType.INTERACTION){
+        if (isDisplay()){
             Display display = (Display) getEntity();
             if (isMaster() && this != newGroup.masterPart){
                 newGroup.masterPart = this;
@@ -662,20 +662,18 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public void setGlowColor(@Nullable Color color){
         Entity entity = getEntity();
-        if (entity instanceof Interaction){
-            return;
+        if (entity instanceof Display display){
+            display.setGlowColorOverride(color);
         }
-        Display display = (Display) entity;
-        display.setGlowColorOverride(color);
     }
 
     @Override
     public @Nullable Color getGlowColor(){
-        if (type == PartType.INTERACTION){
-            return null;
-        }
         Entity entity = getEntity();
-        return ((Display) entity).getGlowColorOverride();
+        if (entity instanceof Display display){
+            return display.getGlowColorOverride();
+        }
+        return null;
     }
 
     /**
@@ -757,7 +755,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             i.setInteractionWidth(width);
             i.setInteractionHeight(height);
         });
-        group.addInteractionEntity(interaction);
+        group.addEntity(interaction);
 
         return interaction;
     }
@@ -1058,11 +1056,8 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public @Nullable Vector getNonDisplayTranslation() {
-        if (type != PartType.INTERACTION) {
-            return null;
-        }
-        if (group == null) return null;
-        return DisplayUtils.getNonDisplayTranslation((Interaction) getEntity(), group.getLocation());
+        if (isDisplay() || group == null) return null;
+        return DisplayUtils.getNonDisplayTranslation(getEntity(), group.getLocation());
     }
 
     @Override
