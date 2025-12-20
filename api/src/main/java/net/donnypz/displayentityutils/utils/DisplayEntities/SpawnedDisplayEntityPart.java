@@ -1057,12 +1057,12 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
-    public @Nullable Vector getInteractionTranslation() {
+    public @Nullable Vector getNonDisplayTranslation() {
         if (type != PartType.INTERACTION) {
             return null;
         }
         if (group == null) return null;
-        return DisplayUtils.getInteractionTranslation((Interaction) getEntity(), group.getLocation());
+        return DisplayUtils.getNonDisplayTranslation((Interaction) getEntity(), group.getLocation());
     }
 
     @Override

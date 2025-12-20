@@ -448,28 +448,6 @@ public abstract class ActivePart implements Active{
      */
     public abstract @Nullable ItemStack getItemDisplayItem();
 
-    public abstract void setMannequinPose(Pose pose);
-
-    public abstract @Nullable Pose getMannequinPose();
-
-    public abstract void setMannequinScale(double scale);
-
-    public abstract double getMannequinScale();
-
-    public abstract void setMannequinImmovable(boolean immovable);
-
-    public abstract boolean isMannequinImmovable();
-
-    public abstract void setMannequinGravity(boolean gravity);
-
-    public abstract boolean hasMannequinGravity();
-
-    public abstract void setMannequinMainHand(@NotNull MainHand mainHand);
-
-    public abstract @Nullable MainHand getMannequinMainHand();
-
-    public abstract void setMannequinHandItem(@NotNull ItemStack itemStack, boolean mainHand);
-
     /**
      * Set an attribute on this part, and send the updated attribute to viewing players.
      * @param attribute the attribute
@@ -509,11 +487,10 @@ public abstract class ActivePart implements Active{
     public abstract int getTeleportDuration();
 
     /**
-     * Get the interaction translation of this part, relative to its group's location
-     * group's location <bold><u>only</u></bold> if the part's type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.
-     * @return a {@link Vector} or null if the part is not an Interaction, or if the part is ungrouped
+     * Get the translation of this non-display entity part, relative to its group's location
+     * @return a {@link Vector} or null if the part is a display entity, or if the part is ungrouped
      */
-    public abstract @Nullable Vector getInteractionTranslation();
+    public abstract @Nullable Vector getNonDisplayTranslation();
 
     public abstract void setInteractionHeight(float height);
 
@@ -538,6 +515,28 @@ public abstract class ActivePart implements Active{
      * @return a boolean
      */
     public abstract boolean isInteractionResponsive();
+
+    public abstract void setMannequinPose(Pose pose);
+
+    public abstract void setMannequinScale(double scale);
+
+    public abstract void setMannequinImmovable(boolean immovable);
+
+    public abstract void setMannequinGravity(boolean gravity);
+
+    public abstract void setMannequinMainHand(@NotNull MainHand mainHand);
+
+    public abstract void setMannequinHandItem(@NotNull ItemStack itemStack, boolean mainHand);
+
+    public abstract @Nullable Pose getMannequinPose();
+
+    public abstract double getMannequinScale();
+
+    public abstract boolean isMannequinImmovable();
+
+    public abstract boolean hasMannequinGravity();
+
+    public abstract @Nullable MainHand getMannequinMainHand();
 
     /**
      * Adds a command to this part to execute when clicked, if its type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}

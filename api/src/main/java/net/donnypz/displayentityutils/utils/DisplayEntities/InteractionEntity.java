@@ -38,7 +38,7 @@ final class InteractionEntity implements Serializable {
         this.height = interaction.getInteractionHeight();
         this.width = interaction.getInteractionWidth();
         this.isResponsive = interaction.isResponsive();
-        this.vector = DisplayUtils.getInteractionTranslation(interaction).toVector3f();
+        this.vector = DisplayUtils.getNonDisplayTranslation(interaction).toVector3f();
         this.partUUID = DisplayUtils.getPartUUID(interaction);
 
         try{
@@ -55,7 +55,7 @@ final class InteractionEntity implements Serializable {
         this.height = c.getAttributeOrDefault(DisplayAttributes.Interaction.HEIGHT, 1f);
         this.width = c.getAttributeOrDefault(DisplayAttributes.Interaction.WIDTH, 1f);
         this.isResponsive = c.getAttributeOrDefault(DisplayAttributes.Interaction.RESPONSIVE, false);
-        this.vector = part.getInteractionTranslation().toVector3f();
+        this.vector = part.getNonDisplayTranslation().toVector3f();
         this.partUUID = part.partUUID;
 
         try{

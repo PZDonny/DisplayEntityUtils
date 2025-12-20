@@ -506,7 +506,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 DisplayUtils.scaleInteraction(i, newHeight, newWidth, durationInTicks, 0);
 
             //Reset Translation then multiply by newScaleMultiplier
-                Vector translationVector = DisplayUtils.getInteractionTranslation(i);
+                Vector translationVector = DisplayUtils.getNonDisplayTranslation(i);
                 if (translationVector == null){
                     continue;
                 }

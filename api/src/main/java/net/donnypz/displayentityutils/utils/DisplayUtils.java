@@ -314,33 +314,26 @@ public final class DisplayUtils {
 
 
     /**
-     * Get the translation vector from the group's master part to the interaction's location
-     * @param interaction the interaction
-     * @return a vector or null if the Interaction entity is not in a group
+     * Get the translation vector from the entity's group's master part to the entity's location
+     * @param entity the interaction
+     * @return a vector or null if the entity is not in a group
      */
-    public static Vector getInteractionTranslation(@NotNull Interaction interaction){
-        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(interaction);
+    public static @Nullable Vector getNonDisplayTranslation(@NotNull Entity entity){
+        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
         if (part == null){
             return null;
         }
-        return getInteractionTranslation(interaction, part.getGroup().getLocation());
-        /*return part
-                .getGroup()
-                .getMasterPart()
-                .getEntity()
-                .getLocation()
-                .toVector()
-                .subtract(interaction.getLocation().toVector());*/
+        return getNonDisplayTranslation(entity, part.getGroup().getLocation());
     }
 
     /**
-     * Get the translation vector from a location to the interaction's location
-     * @param interaction the interaction
+     * Get the translation vector from a location to the entity's location
+     * @param entity the entity
      * @param referenceLocation the reference location
      * @return a vector
      */
-    public static Vector getInteractionTranslation(@NotNull Interaction interaction, @NotNull Location referenceLocation){
-        return referenceLocation.toVector().subtract(interaction.getLocation().toVector());
+    public static @NotNull Vector getNonDisplayTranslation(@NotNull Entity entity, @NotNull Location referenceLocation){
+        return referenceLocation.toVector().subtract(entity.getLocation().toVector());
     }
 
     /**
@@ -581,7 +574,7 @@ public final class DisplayUtils {
      * @param angleInDegrees the pivot angle in degrees
      */
     public static void pivot(@NotNull Interaction interaction, @NotNull Location center, double angleInDegrees){
-        Vector3f translationVector = DisplayUtils.getInteractionTranslation(interaction, center).toVector3f();
+        Vector3f translationVector = DisplayUtils.getNonDisplayTranslation(interaction, center).toVector3f();
         new Quaternionf()
                 .rotateY((float) Math.toRadians(-angleInDegrees))
                 .transform(translationVector);

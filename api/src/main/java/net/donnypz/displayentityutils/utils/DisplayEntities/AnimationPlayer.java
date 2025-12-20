@@ -187,7 +187,7 @@ public abstract class AnimationPlayer {
                 continue;
             }
 
-            Vector currentVector = part.getInteractionTranslation();
+            Vector currentVector = part.getNonDisplayTranslation();
             if (currentVector == null){
                 continue;
             }

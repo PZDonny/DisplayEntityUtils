@@ -326,7 +326,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 PacketUtils.scaleInteraction(p, newHeight, newWidth, durationInTicks, 0);
 
                 //Reset Translation then multiply by newScaleMultiplier
-                Vector translationVector = p.getInteractionTranslation();
+                Vector translationVector = p.getNonDisplayTranslation();
                 if (translationVector == null){
                     continue;
                 }

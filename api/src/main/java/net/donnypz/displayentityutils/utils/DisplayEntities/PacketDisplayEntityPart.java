@@ -158,7 +158,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         }
         DEUUser.getOrCreateUser(player).trackPacketEntity(this);
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION && hasGroup()){
-            Vector translation = getInteractionTranslation(group.getLocation());
+            Vector translation = getNonDisplayTranslation(group.getLocation());
             location = location.clone().add(translation);
         }
         attributeContainer.sendEntity(type, getEntityId(), player, location);
@@ -207,7 +207,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             }
         }
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION && hasGroup()){
-            Vector translation = getInteractionTranslation(group.getLocation());
+            Vector translation = getNonDisplayTranslation(group.getLocation());
             location = location.clone().add(translation);
         }
         attributeContainer.sendEntityUsingPlayers(type, getEntityId(), plrs, location);
@@ -655,12 +655,19 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
 
     @Override
-    public @Nullable Vector getInteractionTranslation() {
-        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
-            return null;
-        }
-        if (group == null) return null;
-        return getInteractionTranslation(group.getLocation());
+    public @Nullable Vector getNonDisplayTranslation() {
+        if (isDisplay() || group == null) return null;
+        return getNonDisplayTranslation(group.getLocation());
+    }
+
+    /**
+     * Get the Interaction's translation vector relative to a location
+     * @param referenceLocation the reference location
+     * @return A vector or null if the part is not an interaction
+     */
+    public Vector getNonDisplayTranslation(@NotNull Location referenceLocation){
+        if (isDisplay()) return null;
+        return referenceLocation.toVector().subtract(getLocation().toVector());
     }
 
     @Override
@@ -682,18 +689,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
             attributeContainer.setAttributeAndSend(DisplayAttributes.Interaction.RESPONSIVE, responsive, getEntityId(), viewers);
         }
-    }
-
-    /**
-     * Get the Interaction's translation vector relative to a location
-     * @param referenceLocation the reference location
-     * @return A vector or null if the part is not an interaction
-     */
-    public Vector getInteractionTranslation(@NotNull Location referenceLocation){
-        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) {
-            return null;
-        }
-        return referenceLocation.toVector().subtract(getLocation().toVector());
     }
 
 
