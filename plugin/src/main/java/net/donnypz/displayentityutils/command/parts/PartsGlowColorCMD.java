@@ -39,8 +39,8 @@ class PartsGlowColorCMD extends PartsSubCommand {
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         Color color = getColor(player, args[2]);
         if (color == null) return false;
-        if (selectedPart.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Interaction entities cannot have a glow color applied!", NamedTextColor.RED)));
+        if (!selectedPart.isDisplay()) {
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Only display entities cannot have a glow color applied!", NamedTextColor.RED)));
             return false;
         }
         else{

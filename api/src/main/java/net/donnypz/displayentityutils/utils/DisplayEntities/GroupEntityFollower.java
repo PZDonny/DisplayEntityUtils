@@ -173,7 +173,7 @@ class GroupEntityFollower {
 
 
     private void pivotDisplayPitch(ActivePart part, boolean zero, float newPitch){
-        if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+        if (!part.isDisplay()){
             return;
         }
         Transformation t = part.getTransformation();

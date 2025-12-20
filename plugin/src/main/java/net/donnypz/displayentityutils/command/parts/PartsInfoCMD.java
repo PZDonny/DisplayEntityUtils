@@ -91,26 +91,26 @@ class PartsInfoCMD extends PlayerSubCommand {
                     .hoverEvent(HoverEvent.showText(Component.text("Click to copy", NamedTextColor.GREEN)))
                     .clickEvent(ClickEvent.copyToClipboard(partUUID.toString())));
 
-
-
             player.sendMessage(MiniMessage.miniMessage().deserialize("Is Master Part: "+(part.isMaster() ? "<green>TRUE" : "<red>FALSE")));
             player.sendMessage(Component.empty());
-            if (part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getViewRange()));
-                sendBrightness(player, part);
-                DEUCommandUtils.sendGlowColor(player, part.getGlowColor());
-            }
-            else{
-                player.sendMessage(MiniMessage.miniMessage().deserialize("Height: <yellow>"+part.getInteractionHeight()));
-                player.sendMessage(MiniMessage.miniMessage().deserialize("Width: <yellow>"+part.getInteractionWidth()));
-                player.sendMessage(MiniMessage.miniMessage().deserialize("Responsive: "+(part.isInteractionResponsive() ? "<green>ENABLED" : "<red>DISABLED")));
-            }
         }
-        else{
+        if (part.isDisplay()){
             player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getViewRange()));
             sendBrightness(player, part);
             DEUCommandUtils.sendGlowColor(player, part.getGlowColor());
         }
+        else if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Height: <yellow>"+part.getInteractionHeight()));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Width: <yellow>"+part.getInteractionWidth()));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Responsive: "+(part.isInteractionResponsive() ? "<green>ENABLED" : "<red>DISABLED")));
+        }
+        else if (part.getType() == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Immovable: <yellow>"+(part.isMannequinImmovable() ? "<green>ENABLED" : "<red>DISABLED")));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Gravity: <yellow>"+(part.hasMannequinGravity() ? "<green>ENABLED" : "<red>DISABLED")));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Pose: <yellow>"+part.getMannequinPose()));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Scale: <yellow>"+part.getMannequinScale()));
+        }
+
         player.sendMessage(Component.empty());
         player.sendMessage(Component.text("| Click to view Part Tags", NamedTextColor.GOLD)
                 .clickEvent(ClickEvent.suggestCommand("/deu parts listtags")));
@@ -122,9 +122,7 @@ class PartsInfoCMD extends PlayerSubCommand {
     }
 
     private void sendBrightness(Player player, ActivePart part){
-        if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            return;
-        }
+        if (!part.isDisplay()) return;
         Display.Brightness brightness = part.getBrightness();
         if (brightness == null){
             player.sendMessage(MiniMessage.miniMessage().deserialize("Brightness: <red>NOT SET"));

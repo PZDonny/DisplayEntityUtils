@@ -154,7 +154,7 @@ public class GroupSpawnSettings {
     }
 
     boolean applyAttributes(PacketDisplayEntityPart part){
-        if (part.type != SpawnedDisplayEntityPart.PartType.INTERACTION){
+        if (part.isDisplay()){
             //Teleport Duration
             part.attributeContainer.setAttribute(DisplayAttributes.TELEPORTATION_DURATION, teleportationDuration);
 

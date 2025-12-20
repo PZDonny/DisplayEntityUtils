@@ -538,7 +538,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     @Override
     public void pivot(float angleInDegrees) {
         for (PacketDisplayEntityPart part : groupParts.values()){
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (!part.isDisplay()){
                 part.pivot(angleInDegrees);
             }
         }

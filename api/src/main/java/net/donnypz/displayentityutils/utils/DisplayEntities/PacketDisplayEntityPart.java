@@ -80,13 +80,12 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     private void setDefaultTransformValues(){
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            return;
+        if (isDisplay()){
+            attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.TRANSLATION, new Vector3f());
+            attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.SCALE, new Vector3f(1));
+            attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.LEFT_ROTATION, new Quaternionf());
+            attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.RIGHT_ROTATION, new Quaternionf());
         }
-        attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.TRANSLATION, new Vector3f());
-        attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.SCALE, new Vector3f(1));
-        attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.LEFT_ROTATION, new Quaternionf());
-        attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.RIGHT_ROTATION, new Quaternionf());
     }
 
     /**
@@ -157,7 +156,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             return;
         }
         DEUUser.getOrCreateUser(player).trackPacketEntity(this);
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION && hasGroup()){
+        if (!isDisplay() && hasGroup()){
             Vector translation = getNonDisplayTranslation(group.getLocation());
             location = location.clone().add(translation);
         }
@@ -206,7 +205,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
                 DEUUser.getOrCreateUser(player).trackPacketEntity(this);
             }
         }
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION && hasGroup()){
+        if (!isDisplay() && hasGroup()){
             Vector translation = getNonDisplayTranslation(group.getLocation());
             location = location.clone().add(translation);
         }
@@ -928,7 +927,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void pivot(float angleInDegrees) {
-        if (type != SpawnedDisplayEntityPart.PartType.INTERACTION) return;
+        if (!isDisplay()) return;
         pivot(getYaw(), getPitch(), angleInDegrees);
     }
 
@@ -994,7 +993,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public @Nullable Location getLocation(){
-        if (!isMaster && group != null && type != SpawnedDisplayEntityPart.PartType.INTERACTION){
+        if (!isMaster && group != null && isDisplay()){
             return group.getLocation();
         }
         if (packetLocation != null){
@@ -1032,7 +1031,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+        if (!isDisplay()){
             PacketUtils.translateNonDisplay(this, direction, distance, durationInTicks, delayInTicks);
         }
         else{

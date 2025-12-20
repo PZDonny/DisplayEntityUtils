@@ -24,7 +24,7 @@ class PartsScaleCMD extends PartsSubCommand {
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         for (ActivePart selectedPart : selection.getSelectedParts()){
-            if (selectedPart.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (!selectedPart.isDisplay()){
                 continue;
             }
             try {
@@ -41,8 +41,8 @@ class PartsScaleCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
-        if (selectedPart.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
-            player.sendMessage(Component.text("You cannot do this with an interaction part entity!", NamedTextColor.RED));
+        if (!selectedPart.isDisplay()) {
+            player.sendMessage(Component.text("You can only do this with a display entity!", NamedTextColor.RED));
             player.sendMessage(Component.text("| Use \"/deu interaction scale\" instead", NamedTextColor.GRAY));
             return false;
         }

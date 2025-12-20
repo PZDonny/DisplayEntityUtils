@@ -169,7 +169,7 @@ public abstract class ActivePart implements Active{
      * @param heightAdder The amount of height to be added to the culling range
      */
     public void autoCull(float widthAdder, float heightAdder){
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
+        if (!isDisplay()) return;
         Transformation transformation = getTransformation();
         if (transformation == null) return;
         DisplayAPI.getScheduler().partRunAsync(this, () -> {
@@ -193,7 +193,9 @@ public abstract class ActivePart implements Active{
      * @return a boolean
      */
     public boolean canGlow(){
-        return type != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY && type != SpawnedDisplayEntityPart.PartType.INTERACTION;
+        return type != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY
+                && type != SpawnedDisplayEntityPart.PartType.INTERACTION
+                && type != SpawnedDisplayEntityPart.PartType.SHULKER;
     }
 
     public boolean isDisplay(){
@@ -207,8 +209,9 @@ public abstract class ActivePart implements Active{
      * @param player the player
      */
     public void glow(@NotNull Player player){
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
-        PacketUtils.setGlowing(player, getEntityId(), true);
+        if (canGlow()){
+            PacketUtils.setGlowing(player, getEntityId(), true);
+        }
     }
 
     /**

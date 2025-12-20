@@ -325,9 +325,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     @Override
     public void glow(@NotNull Player player, long durationInTicks){
         for (ActivePart part : groupParts.values()){
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
-                continue;
-            }
+            if (!part.canGlow()) continue;
             if (!part.isGlowing()){
                 part.glow(player, durationInTicks);
             }
@@ -466,7 +464,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     public List<T> getDisplayParts(){
         List<T> partList = new ArrayList<>();
         for (T part : groupParts.sequencedValues()){
-            if (part.type != SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (part.isDisplay()){
                 partList.add(part);
             }
         }

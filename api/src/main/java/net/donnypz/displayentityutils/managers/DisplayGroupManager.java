@@ -136,7 +136,7 @@ public final class DisplayGroupManager {
             Chunk mainChunk = spawnedGroup.getLocation().getChunk();
             ticketChunk(mainChunk, chunks);
             for (SpawnedDisplayEntityPart part : spawnedGroup.getParts()) {
-                if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){ //Chunk may be different from main chunk
+                if (!part.isDisplay()){ //Chunk may be different from main chunk
                     Entity e = part.getEntity();
                     Chunk c = e.getChunk();
                     if (c != mainChunk){

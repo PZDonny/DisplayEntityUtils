@@ -35,8 +35,8 @@ class PartsBillboardCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
-        if (selectedPart.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Interaction entities cannot have a billboard applied!", NamedTextColor.RED)));
+        if (!selectedPart.isDisplay()) {
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Only display entities can have a billboard applied!", NamedTextColor.RED)));
         }
         else{
             Display.Billboard billboard = getBillboard(player, args[2]);
