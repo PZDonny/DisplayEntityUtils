@@ -1034,7 +1034,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     @Override
     public boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks) {
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            PacketUtils.translateInteraction(this, direction, distance, durationInTicks, delayInTicks);
+            PacketUtils.translateNonDisplay(this, direction, distance, durationInTicks, delayInTicks);
         }
         else{
             PacketUtils.translate(this, direction, distance, durationInTicks, delayInTicks);

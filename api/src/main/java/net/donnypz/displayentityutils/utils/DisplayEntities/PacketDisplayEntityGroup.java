@@ -336,7 +336,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
 
                 Vector moveVector = oldVector.subtract(translationVector);
-                PacketUtils.translateInteraction(p, moveVector, moveVector.length(), durationInTicks, 0);
+                PacketUtils.translateNonDisplay(p, moveVector, moveVector.length(), durationInTicks, 0);
             }
         }
 
@@ -556,7 +556,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
         for (PacketDisplayEntityPart part : groupParts.values()){
             if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                PacketUtils.translateInteraction(part, direction, distance, durationInTicks, 0);
+                PacketUtils.translateNonDisplay(part, direction, distance, durationInTicks, 0);
             }
         }
         DisplayAPI.getScheduler().partRunTimerAsync(masterPart, new Scheduler.SchedulerRunnable() {
