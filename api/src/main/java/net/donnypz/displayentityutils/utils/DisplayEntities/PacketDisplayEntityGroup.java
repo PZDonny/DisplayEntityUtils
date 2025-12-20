@@ -555,7 +555,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 .multiply(movementIncrement);
 
         for (PacketDisplayEntityPart part : groupParts.values()){
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (!part.isDisplay()){
                 PacketUtils.translateNonDisplay(part, direction, distance, durationInTicks, 0);
             }
         }
@@ -600,7 +600,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
         masterPart.teleportUnsetPassengers(tpLocation);
         for (PacketDisplayEntityPart part : groupParts.values()){
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (!part.isDisplay()){
                 Vector vector = oldMasterLoc.toVector().subtract(part.getLocation().toVector());
                 Location interactionTpLoc = tpLocation.clone().subtract(vector);
                 part.teleport(interactionTpLoc);

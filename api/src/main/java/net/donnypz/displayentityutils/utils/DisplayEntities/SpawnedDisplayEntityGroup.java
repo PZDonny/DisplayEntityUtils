@@ -532,8 +532,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         for (SpawnedDisplayEntityPart part : this.getParts()){
             part.getEntity().setRotation(location.getYaw(), location.getPitch());
 
-        //Interaction Entity TP
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+        //Non-Display TP
+            if (!part.isDisplay()){
                 Interaction interaction = (Interaction) part.getEntity();
                 Vector vector = oldMasterLoc.toVector().subtract(interaction.getLocation().toVector());
                 Location tpLocation = location.clone().subtract(vector);
@@ -546,37 +546,43 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
     }
 
-    private static void translateInteractionEventless(@NotNull Interaction interaction, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
-        Location destination = interaction.getLocation().clone().add(direction.clone().normalize().multiply(distance));
+    private static void translateEntityEventless(@NotNull Entity entity, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
+        DisplayUtils.translate(entity, direction, distance, durationInTicks, delayInTicks);
+        Location destination = entity.getLocation().clone().add(direction.clone().normalize().multiply(distance));
+
+        if (durationInTicks <= 0 && delayInTicks <= 0){
+            FoliaUtils.teleport(entity, destination);
+            return;
+        }
+
         double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
         Vector incrementVector = direction
                 .clone()
                 .normalize()
                 .multiply(movementIncrement);
 
-        DisplayAPI.getScheduler().entityRunTimer(interaction, new Scheduler.SchedulerRunnable(){
+        DisplayAPI.getScheduler().entityRunTimer(entity, new Scheduler.SchedulerRunnable() {
             double currentDistance = 0;
-            float lastYaw = interaction.getYaw();
+            float lastYaw = entity.getYaw();
             @Override
             public void run() {
-                float newYaw = interaction.getYaw();
+                float newYaw = entity.getYaw();
                 if (newYaw != lastYaw){
                     incrementVector.rotateAroundY(Math.toRadians(lastYaw-newYaw));
                     lastYaw = newYaw;
                 }
                 currentDistance+=Math.abs(movementIncrement);
-                Location tpLoc = interaction.getLocation().clone().add(incrementVector);
+                Location tpLoc = entity.getLocation().clone().add(incrementVector);
 
                 if (currentDistance >= distance){
-                    FoliaUtils.teleport(interaction, destination);
+                    FoliaUtils.teleport(entity, destination);
                     cancel();
                 }
                 else{
-                    FoliaUtils.teleport(interaction, tpLoc);
+                    FoliaUtils.teleport(entity, tpLoc);
                 }
             }
         }, delayInTicks, 1);
-
     }
 
     @Override
@@ -594,8 +600,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 .multiply(movementIncrement);
 
         for (SpawnedDisplayEntityPart part : groupParts.values()){
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                translateInteractionEventless((Interaction) part.getEntity(), direction, distance, durationInTicks, 0);
+            if (!part.isDisplay()){
+                translateEntityEventless(part.getEntity(), direction, distance, durationInTicks, 0);
             }
         }
 

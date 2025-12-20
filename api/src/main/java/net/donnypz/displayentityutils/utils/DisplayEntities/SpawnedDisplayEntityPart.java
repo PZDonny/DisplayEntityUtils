@@ -97,12 +97,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     private void applyData(Random random, Entity entity){
         adaptLegacyPartTags();
         entity.getPersistentDataContainer().set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, group.getCreationTime());
-        if (entity instanceof Display display){
-            removeFromPreviousGroup(display);
-        }
-        else{
-            removeFromPreviousGroup((Interaction) entity);
-        }
+        removeFromPreviousGroup(entity);
 
         this.partData = new PartData(entity);
         this.entityUUID = entity.getUniqueId();
@@ -164,15 +159,8 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return group.groupParts.containsKey(partUUID);
     }
 
-    private void removeFromPreviousGroup(Display display){
-        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(display);
-        if (part != null){
-            part.remove(false);
-        }
-    }
-
-    private void removeFromPreviousGroup(Interaction i){
-        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(i);
+    private void removeFromPreviousGroup(Entity entity){
+        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
         if (part != null){
             part.remove(false);
         }

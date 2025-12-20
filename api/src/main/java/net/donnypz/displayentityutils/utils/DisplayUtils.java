@@ -467,24 +467,24 @@ public final class DisplayUtils {
     }
 
     /**
-     * Attempts to change the translation of an interaction entity similar
+     * Attempts to change the translation of an entity similar
      * to a Display Entity, through smooth teleportation.
-     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
-     * @param direction The direction to translate the interaction entity
-     * @param interaction Interaction Entity to translate
-     * @param distance How far the interaction entity should be translated
+     * Doing multiple translations on an entity at the same time may have unexpected results
+     * @param direction The direction to translate the entity
+     * @param entity entity to translate
+     * @param distance How far the entity should be translated
      * @param durationInTicks How long it should take for the translation to complete
      * @param delayInTicks How long before the translation should begin
      */
-    public static void translate(@NotNull Interaction interaction, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
+    public static void translate(@NotNull Entity entity, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
         if (distance == 0) return;
-        Location destination = interaction.getLocation().clone().add(direction.clone().normalize().multiply(distance));
-        if (!new PartTranslateEvent(interaction, destination, null,null).callEvent()){
+        Location destination = entity.getLocation().clone().add(direction.clone().normalize().multiply(distance));
+        if (!new PartTranslateEvent(entity, destination, null,null).callEvent()){
             return;
         }
 
         if (durationInTicks <= 0 && delayInTicks <= 0){
-            FoliaUtils.teleport(interaction, destination);
+            FoliaUtils.teleport(entity, destination);
             return;
         }
 
@@ -494,25 +494,25 @@ public final class DisplayUtils {
                 .normalize()
                 .multiply(movementIncrement);
 
-        DisplayAPI.getScheduler().entityRunTimer(interaction, new Scheduler.SchedulerRunnable() {
+        DisplayAPI.getScheduler().entityRunTimer(entity, new Scheduler.SchedulerRunnable() {
             double currentDistance = 0;
-            float lastYaw = interaction.getYaw();
+            float lastYaw = entity.getYaw();
             @Override
             public void run() {
-                float newYaw = interaction.getYaw();
+                float newYaw = entity.getYaw();
                 if (newYaw != lastYaw){
                     incrementVector.rotateAroundY(Math.toRadians(lastYaw-newYaw));
                     lastYaw = newYaw;
                 }
                 currentDistance+=Math.abs(movementIncrement);
-                Location tpLoc = interaction.getLocation().clone().add(incrementVector);
+                Location tpLoc = entity.getLocation().clone().add(incrementVector);
 
                 if (currentDistance >= distance){
-                    FoliaUtils.teleport(interaction, destination);
+                    FoliaUtils.teleport(entity, destination);
                     cancel();
                 }
                 else{
-                    FoliaUtils.teleport(interaction, tpLoc);
+                    FoliaUtils.teleport(entity, tpLoc);
                 }
             }
         }, delayInTicks, 1);
@@ -520,17 +520,17 @@ public final class DisplayUtils {
 
 
     /**
-     * Attempts to change the translation of an interaction entity similar
+     * Attempts to change the translation of an entity similar
      * to a Display Entity, through smooth teleportation.
-     * Doing multiple translations on an Interaction entity at the same time may have unexpected results
-     * @param interaction Interaction Entity to translate
-     * @param direction The direction to translate the interaction entity
-     * @param distance How far the interaction entity should be translated
+     * Doing multiple translations on an entity at the same time may have unexpected results
+     * @param entity entity to translate
+     * @param direction The direction to translate the entity
+     * @param distance How far the entity should be translated
      * @param durationInTicks How long it should take for the translation to complete
      * @param delayInTicks How long before the translation should begin
      */
-    public static void translate(@NotNull Interaction interaction, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
-        translate(interaction, direction.getVector(interaction, true), distance, durationInTicks, delayInTicks);
+    public static void translate(@NotNull Entity entity, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
+        translate(entity, direction.getVector(entity, true), distance, durationInTicks, delayInTicks);
     }
 
     /**
@@ -544,8 +544,8 @@ public final class DisplayUtils {
      * @param delayInTicks How long before the translation should begin
      */
     public static void translate(@NotNull SpawnedDisplayEntityPart part, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
-        if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            translate((Interaction) part.getEntity(), direction, distance, durationInTicks, delayInTicks);
+        if (!part.isDisplay()){
+            translate(part.getEntity(), direction, distance, durationInTicks, delayInTicks);
             return;
         }
         translate((Display) part.getEntity(), direction, distance, durationInTicks, delayInTicks);
@@ -562,9 +562,9 @@ public final class DisplayUtils {
      * @param delayInTicks How long before the translation should begin
      */
     public static void translate(@NotNull SpawnedDisplayEntityPart part, @NotNull Direction direction, double distance, int durationInTicks, int delayInTicks){
-        if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            Interaction interaction = (Interaction) part.getEntity();
-            translate(interaction, direction.getVector(interaction, true), distance, durationInTicks, delayInTicks);
+        if (!part.isDisplay()){
+            Entity entity = part.getEntity();
+            translate(entity, direction.getVector(entity, true), distance, durationInTicks, delayInTicks);
             return;
         }
         Display display = (Display) part.getEntity();
