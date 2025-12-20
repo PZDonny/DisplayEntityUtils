@@ -652,49 +652,24 @@ public final class DisplayUtils {
     }
 
     /**
-     * Gets the group tag of a Display Entity
-     * @param display Display Entity to retrieve the tag from
-     * @return Group tag of the entity. Null if the entity did not have a group tag.
+     * Gets the group tag of a valid part entity
+     * @param entity entity to retrieve the tag from
+     * @return a string, null if the entity did not have a group tag.
      */
-    public static @Nullable String getGroupTag(Display display){
-        return getPDCGroupTag(display);
-    }
-
-    /**
-     * Gets the group tag of an Interaction Entity
-     * @param interaction Interaction Entity to retrieve the tag from
-     * @return Group tag of the entity. Null if the entity did not have a group tag.
-     */
-    public static @Nullable String getGroupTag(Interaction interaction){
-        return getPDCGroupTag(interaction);
-    }
-
-    private static String getPDCGroupTag(Entity entity){
+    public static @Nullable String getGroupTag(Entity entity){
+        if (entity == null) return null;
         PersistentDataContainer pdc = entity.getPersistentDataContainer();
         return pdc.get(DisplayAPI.getGroupTagKey(), PersistentDataType.STRING);
     }
 
     /**
-     * Gets the part uuid of a Display Entity
-     * @param display Display Entity to retrieve the uuid from
-     * @return Part UUID of the entity. Null if the entity is not part of a display entity group. Will still return a value if the entity
+     * Gets the part uuid of a valid part entity
+     * @param entity entity to retrieve the uuid from
+     * @return a UUID or null if the entity is not part of a group. Will still return a value if the entity
      * was previously part of a group, but later removed.
      */
-    public static @Nullable UUID getPartUUID(Display display){
-        return getPDCPartUUID(display);
-    }
-
-    /**
-     * Gets the part uuid of an Interaction Entity
-     * @param interaction Interaction Entity to retrieve the uuid from
-     * @return Part UUID of the entity. Null if the entity is not part of a display entity group. Will still return a value if the entity
-     * was previously part of a group, but later removed.
-     */
-    public static @Nullable UUID getPartUUID(Interaction interaction){
-        return getPDCPartUUID(interaction);
-    }
-
-    private static UUID getPDCPartUUID(Entity entity){
+    public static @Nullable UUID getPartUUID(Entity entity){
+        if (entity == null) return null;
         PersistentDataContainer pdc = entity.getPersistentDataContainer();
         String value = pdc.get(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING);
         if (value != null){
@@ -709,7 +684,6 @@ public final class DisplayUtils {
      * @return List of commands stored on this interaction entity
      */
     public static @NotNull List<String> getInteractionCommands(@NotNull Interaction interaction){
-
         List<String> commands = new ArrayList<>();
         commands.addAll(getInteractionLeftConsoleCommands(interaction));
         commands.addAll(getInteractionLeftPlayerCommands(interaction));
