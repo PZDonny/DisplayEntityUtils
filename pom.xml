@@ -143,8 +143,8 @@
 
         <!--Libs Disguises-->
         <repository>
-            <id>md_5-public</id>
-            <url>https://repo.md-5.net/content/groups/public/</url>
+            <id>libsdisguises-public</id>
+            <url>https://mvn.lib.co.nz/public</url>
         </repository>
 
 
