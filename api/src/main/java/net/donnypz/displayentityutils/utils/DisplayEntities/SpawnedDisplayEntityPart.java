@@ -1208,6 +1208,16 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                 return null;
             }
         }
+
+        public boolean isOfType(Entity e){
+            if (e instanceof BlockDisplay && this == BLOCK_DISPLAY) return true;
+            if (e instanceof ItemDisplay && this == ITEM_DISPLAY) return true;
+            if (e instanceof TextDisplay && this == TEXT_DISPLAY) return true;
+            if (e instanceof Interaction && this == INTERACTION) return true;
+            if (e instanceof Shulker && this == SHULKER) return true;
+            if (e instanceof Mannequin && this == MANNEQUIN) return true;
+            return false;
+        }
     }
 
     /**
