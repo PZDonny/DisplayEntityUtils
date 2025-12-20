@@ -10,9 +10,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 
 public class DisplayEntitySelector extends RelativePointSelector<RelativePoint> {
 
@@ -63,6 +61,22 @@ public class DisplayEntitySelector extends RelativePointSelector<RelativePoint> 
                 .setSelectedPartSelection(new SinglePartSelection(part), false);
         part.glow(player, 30);
         RelativePointUtils.removeRelativePoints(player);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text((entity instanceof Display ? "Display" : "Interaction")+" Entity Selected!", NamedTextColor.GREEN)));
+        String entityType;
+        switch(entity){
+            case Display d -> {
+                entityType = "Display";
+            }
+            case Interaction i -> {
+                entityType = "Interaction";
+            }
+            case Mannequin m -> {
+                entityType = "Mannequin";
+            }
+            case Shulker s -> {
+                entityType = "Shulker";
+            }
+            default -> entityType = "";
+        }
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text(entityType+" Entity Selected!", NamedTextColor.GREEN)));
     }
 }

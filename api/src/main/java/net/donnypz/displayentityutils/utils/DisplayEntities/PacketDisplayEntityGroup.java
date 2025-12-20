@@ -288,7 +288,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
         for (PacketDisplayEntityPart p : groupParts.values()){
             //Displays
-            if (p.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (p.isDisplay()){
                 DisplayAttributeMap attributeMap = new DisplayAttributeMap();
                 Transformation transformation = p.getTransformation();
                 //Reset Scale then multiply by newScaleMultiplier

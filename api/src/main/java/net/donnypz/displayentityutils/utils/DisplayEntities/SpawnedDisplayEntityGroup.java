@@ -469,7 +469,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
         for (SpawnedDisplayEntityPart p : groupParts.values()){
             //Displays
-            if (p.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (p.isDisplay()){
                 Display d = (Display) p.getEntity();
                 Transformation transformation = d.getTransformation();
 

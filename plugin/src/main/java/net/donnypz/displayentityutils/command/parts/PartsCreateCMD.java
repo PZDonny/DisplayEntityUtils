@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.command.parts;
 
+import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
@@ -77,6 +78,17 @@ class PartsCreateCMD extends PlayerSubCommand {
                 });
                 selectEntity(player, entity.getUniqueId(), "Interaction");
             }
+            case "mannequin" -> {
+                if (!VersionUtils.canSpawnMannequins()){
+                    player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your server version cannot spawn Mannequins!", NamedTextColor.RED)));
+                    return;
+                }
+                Mannequin entity = loc.getWorld().spawn(loc, Mannequin.class, m -> {
+                    m.setProfile(ResolvableProfile.resolvableProfile(player.getPlayerProfile()));
+                    m.setInvulnerable(true);
+                });
+                selectEntity(player, entity.getUniqueId(), "Mannequin");
+            }
             default -> {
                 incorrectUsage(player);
             }
@@ -84,7 +96,7 @@ class PartsCreateCMD extends PlayerSubCommand {
     }
 
     private void incorrectUsage(Player player){
-        player.sendMessage(Component.text("Incorrect Usage! /deu parts create <block | item | text | interaction>", NamedTextColor.RED));
+        player.sendMessage(Component.text("Incorrect Usage! /deu parts create <block | item | text | interaction | mannequin>", NamedTextColor.RED));
     }
 
     private void selectEntity(Player player, UUID entityUUID, String displayName){
@@ -94,5 +106,4 @@ class PartsCreateCMD extends PlayerSubCommand {
         player.sendMessage(Component.text("| The created part has been automatically selected, removing previous selections", NamedTextColor.GRAY, TextDecoration.ITALIC));
         DEUUser.getOrCreateUser(player).setSelectedPartSelection(new SinglePartSelection(SpawnedDisplayEntityPart.create(entityUUID)), false);
     }
-
 }

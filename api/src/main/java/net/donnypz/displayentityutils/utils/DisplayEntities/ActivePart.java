@@ -16,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -188,6 +189,20 @@ public abstract class ActivePart implements Active{
     }
 
     /**
+     * Get whether this part will visually glow if glowing is applied to it
+     * @return a boolean
+     */
+    public boolean canGlow(){
+        return type != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY && type != SpawnedDisplayEntityPart.PartType.INTERACTION;
+    }
+
+    public boolean isDisplay(){
+        return type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY
+                || type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY
+                || type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY;
+    }
+
+    /**
      * Make this part glow for a player
      * @param player the player
      */
@@ -202,9 +217,8 @@ public abstract class ActivePart implements Active{
      */
     @Override
     public void glow(long durationInTicks){
-        if (type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
+        if (canGlow()){
             glow();
-
             DisplayAPI.getScheduler().partRunLater(this, this::unglow, durationInTicks);
         }
     }
@@ -217,7 +231,7 @@ public abstract class ActivePart implements Active{
      */
     @Override
     public void glow(@NotNull Player player, long durationInTicks){
-        if (type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
+        if (canGlow()){
             if (durationInTicks <= -1){
                 PacketUtils.setGlowing(player, getEntityId(), true);
             }
@@ -267,7 +281,7 @@ public abstract class ActivePart implements Active{
      */
     @Override
     public void unglow(@NotNull Player player) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
+        if (!canGlow()) return;
         PacketUtils.setGlowing(player, getEntityId(), false);
     }
 
@@ -433,6 +447,28 @@ public abstract class ActivePart implements Active{
      * @return an {@link ItemStack} or null
      */
     public abstract @Nullable ItemStack getItemDisplayItem();
+
+    public abstract void setMannequinPose(Pose pose);
+
+    public abstract @Nullable Pose getMannequinPose();
+
+    public abstract void setMannequinScale(double scale);
+
+    public abstract double getMannequinScale();
+
+    public abstract void setMannequinImmovable(boolean immovable);
+
+    public abstract boolean isMannequinImmovable();
+
+    public abstract void setMannequinGravity(boolean gravity);
+
+    public abstract boolean hasMannequinGravity();
+
+    public abstract void setMannequinMainHand(@NotNull MainHand mainHand);
+
+    public abstract @Nullable MainHand getMannequinMainHand();
+
+    public abstract void setMannequinHandItem(@NotNull ItemStack itemStack, boolean mainHand);
 
     /**
      * Set an attribute on this part, and send the updated attribute to viewing players.

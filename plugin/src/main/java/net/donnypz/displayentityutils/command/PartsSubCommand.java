@@ -1,8 +1,11 @@
 package net.donnypz.displayentityutils.command;
 
+import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,4 +67,12 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
     protected abstract boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args);
 
     protected abstract boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args);
+
+    protected boolean isInvalidType(Player player, ActivePart part, SpawnedDisplayEntityPart.PartType validType){
+        if (part.getType() != validType){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with "+validType.name().toLowerCase().replace("_"," ")+" entities", NamedTextColor.RED)));
+            return true;
+        }
+        return false;
+    }
 }

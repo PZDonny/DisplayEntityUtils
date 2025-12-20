@@ -10,9 +10,11 @@ import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Transformation;
@@ -34,36 +36,17 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     private UUID entityUUID;
     private final boolean isSingle;
 
-    SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Display displayEntity, Random random){
-        super(displayEntity.getEntityId(), true);
+    SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Entity entity, Random random){
+        super(entity.getEntityId(), true);
         this.group = group;
-        this.entity = displayEntity;
-        if (displayEntity instanceof BlockDisplay){
-            this.type = PartType.BLOCK_DISPLAY;
-        }
-        else if (displayEntity instanceof ItemDisplay){
-            this.type = PartType.ITEM_DISPLAY;
-        }
-        else {
-            this.type = PartType.TEXT_DISPLAY;
-        }
+        this.entity = entity;
+        this.type = PartType.getType(entity);
 
         applyData(random, entity);
         if (isMaster()){
             group.masterPart = this;
         }
-        partTags.addAll(DisplayUtils.getTags(displayEntity));
-        isSingle = false;
-    }
-
-
-    SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Interaction interactionEntity, Random random){
-        super(interactionEntity.getEntityId(), false);
-        this.group = group;
-        this.entity = interactionEntity;
-        this.type = PartType.INTERACTION;
-        applyData(random, interactionEntity);
-        partTags.addAll(DisplayUtils.getTags(interactionEntity));
+        partTags.addAll(DisplayUtils.getTags(entity));
         isSingle = false;
     }
 
@@ -73,7 +56,12 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             case BlockDisplay blockDisplay -> this.type = PartType.BLOCK_DISPLAY;
             case ItemDisplay itemDisplay -> this.type = PartType.ITEM_DISPLAY;
             case TextDisplay textDisplay -> this.type = PartType.TEXT_DISPLAY;
-            default -> this.type = PartType.INTERACTION;
+            case Interaction interaction -> this.type = PartType.INTERACTION;
+            case Shulker shulker -> this.type = PartType.SHULKER;
+            case Mannequin mannequin -> this.type = PartType.MANNEQUIN;
+            default -> {
+                throw new IllegalArgumentException("The provided entity is not a valid part entity!");
+            }
         }
         this.entity = entity;
         this.entityUUID = entity.getUniqueId();
@@ -86,42 +74,24 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * If the entity is already included in a group, its respective part will be returned.
      * @param uuid the entity uuid
      * @return a {@link SpawnedDisplayEntityPart} or null if the entity uuid is not a display or interaction
+     * @throws IllegalArgumentException if the entity is not a valid entity
      */
-    public static @Nullable SpawnedDisplayEntityPart create(@NotNull UUID uuid){
-        Entity entity = Bukkit.getEntity(uuid);
-        if (entity instanceof Interaction i){
-            return create(i);
-        }
-        else if (entity instanceof Display d){
-            return create(d);
-        }
-        return null;
+    public static @NotNull SpawnedDisplayEntityPart create(@NotNull UUID uuid){
+        return new SpawnedDisplayEntityPart(Bukkit.getEntity(uuid));
     }
 
     /**
      * Create a {@link SpawnedDisplayEntityPart} that is not included in any group.
      * <br>
      * If the entity is already included in a group, its respective part will be returned.
-     * @param display the display entity
+     * @param entity the valid part entity
      * @return a {@link SpawnedDisplayEntityPart}
+     * @throws IllegalArgumentException if the entity is not a valid entity
      */
-    public static @NotNull SpawnedDisplayEntityPart create(@NotNull Display display){
-        SpawnedDisplayEntityPart part = getPart(display);
+    public static @NotNull SpawnedDisplayEntityPart create(@NotNull Entity entity){
+        SpawnedDisplayEntityPart part = getPart(entity);
         if (part != null) return part;
-        return new SpawnedDisplayEntityPart(display);
-    }
-
-    /**
-     * Create a {@link SpawnedDisplayEntityPart} that is not included in any group.
-     * <br>
-     * If the entity is already included in a group, its respective part will be returned.
-     * @param interaction the interaction entity
-     * @return a {@link SpawnedDisplayEntityPart}
-     */
-    public static @NotNull SpawnedDisplayEntityPart create(@NotNull Interaction interaction){
-        SpawnedDisplayEntityPart part = getPart(interaction);
-        if (part != null) return part;
-        return new SpawnedDisplayEntityPart(interaction);
+        return new SpawnedDisplayEntityPart(entity);
     }
 
     private void applyData(Random random, Entity entity){
@@ -133,8 +103,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         else{
             removeFromPreviousGroup((Interaction) entity);
         }
-
-
 
         this.partData = new PartData(entity);
         this.entityUUID = entity.getUniqueId();
@@ -221,7 +189,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     /**
      * Get whether this part can be added to a group. This returns false if the part was
-     * created through {@link #create(Display)} or {@link #create(Interaction)}
+     * created through {@link #create(Entity)}
      * @return a boolean.
      */
     @Override
@@ -298,7 +266,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     /**
-     * Get the {@link SpawnedDisplayEntityPart} of an entity, during this play session. Use {@link #create(Display)} or similar methods if the part is not grouped.
+     * Get the {@link SpawnedDisplayEntityPart} of an entity, during this play session. Use {@link #create(Entity)} if the part is not grouped.
      * @param entity the part entity (Display/Interaction)
      * @return The SpawnedDisplayEntityPart. Null if not created during play session or not associated with any group
      */
@@ -477,18 +445,13 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
 
-
-
-
     /**
      * Adds the glow effect to this SpawnDisplayEntityPart. This does <b><u>NOT</u></b> apply to Interaction or Text Display entities. Use {@link #markInteraction(Player, long)} to show an outline of
      * an interaction for a specific player.
      */
     public void glow(){
+        if (!canGlow()) return;
         Entity entity = getEntity();
-        if (type == PartType.INTERACTION || type == PartType.TEXT_DISPLAY) {
-            return;
-        }
         entity.setGlowing(true);
     }
 
@@ -499,10 +462,9 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     @Override
     public void glow(long durationInTicks){
+        if (!canGlow()) return;
+
         Entity entity = getEntity();
-        if (type == PartType.INTERACTION || type == PartType.TEXT_DISPLAY) {
-            return;
-        }
         entity.setGlowing(true);
 
         DisplayAPI.getScheduler().entityRunLater(entity, () -> {
@@ -521,7 +483,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     @Override
     public void unglow(){
-        if (type != PartType.INTERACTION) {
+        if (canGlow()) {
             getEntity().setGlowing(false);
         }
     }
@@ -532,7 +494,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     @Override
     public void unglow(@NotNull Player player){
-        if (type != PartType.INTERACTION) {
+        if (canGlow()) {
             PacketUtils.setGlowing(player, getEntityId(), false);
         }
     }
@@ -568,9 +530,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public boolean setXScale(float scale){
-        if (type == PartType.INTERACTION){
-            return false;
-        }
+        if (!isDisplay()) return false;
         Transformation t = getTransformation();
         Vector3f v = t.getScale();
         Transformation newT = new Transformation(t.getTranslation(), t.getLeftRotation(), new Vector3f(scale, v.y, v.z), t.getRightRotation());
@@ -581,7 +541,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public boolean setYScale(float scale){
-        if (type == PartType.INTERACTION) return false;
+        if (!isDisplay()) return false;
         Transformation t = getTransformation();
         Vector3f v = t.getScale();
         Transformation newT = new Transformation(t.getTranslation(), t.getLeftRotation(), new Vector3f(v.x, scale, v.z), t.getRightRotation());
@@ -592,7 +552,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public boolean setZScale(float scale){
-        if (type == PartType.INTERACTION) return false;
+        if (!isDisplay()) return false;
         Transformation t = getTransformation();
         Vector3f v = t.getScale();
         Transformation newT = new Transformation(t.getTranslation(), t.getLeftRotation(), new Vector3f(v.x, v.y, scale), t.getRightRotation());
@@ -603,15 +563,13 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public boolean setScale(float x, float y, float z){
-        if (type == PartType.INTERACTION) return false;
+        if (!isDisplay()) return false;
         Transformation t = getTransformation();
         Transformation newT = new Transformation(t.getTranslation(), t.getLeftRotation(), new Vector3f(x, y, z), t.getRightRotation());
         Display entity = (Display) getEntity();
         entity.setTransformation(newT);
         return true;
     }
-
-
 
 
     /**
@@ -621,11 +579,9 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public void setBrightness(@Nullable Display.Brightness brightness){
         Entity entity = getEntity();
-        if (entity instanceof Interaction){
-            return;
+        if (entity instanceof Display display){
+            display.setBrightness(brightness);
         }
-        Display display = (Display) entity;
-        display.setBrightness(brightness);
     }
 
     /**
@@ -635,11 +591,9 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public void setBillboard(@NotNull Display.Billboard billboard){
         Entity entity = getEntity();
-        if (entity instanceof Interaction){
-            return;
+        if (entity instanceof Display display){
+            display.setBillboard(billboard);
         }
-        Display display = (Display) entity;
-        display.setBillboard(billboard);
     }
 
     /**
@@ -647,9 +601,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     @Override
     public void setTeleportDuration(int teleportDuration) {
-        if (type == PartType.INTERACTION) return;
-        Display display = (Display) getEntity();
-        display.setTeleportDuration(teleportDuration);
+        Entity entity = getEntity();
+        if (entity instanceof Display display){
+            display.setTeleportDuration(teleportDuration);
+        }
     }
 
     /**
@@ -658,11 +613,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     @Override
     public void setInterpolationDuration(int interpolationDuration) {
-        if (type == PartType.INTERACTION){
-            return;
+        Entity entity = getEntity();
+        if (entity instanceof Display display){
+            display.setInterpolationDuration(interpolationDuration);
         }
-        Display display = (Display) getEntity();
-        display.setInterpolationDuration(interpolationDuration);
     }
 
     /**
@@ -671,11 +625,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     @Override
     public void setInterpolationDelay(int interpolationDelay) {
-        if (type == PartType.INTERACTION){
-            return;
+        Entity entity = getEntity();
+        if (entity instanceof Display display){
+            display.setInterpolationDelay(interpolationDelay);
         }
-        Display display = (Display) getEntity();
-        display.setInterpolationDelay(interpolationDelay);
     }
 
     /**
@@ -685,16 +638,15 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public void setViewRange(float viewRangeMultiplier){
         Entity entity = getEntity();
-        if (entity instanceof Interaction){
-            return;
+        if (entity instanceof Display display){
+            display.setViewRange(viewRangeMultiplier);
         }
-        Display display = (Display) entity;
-        display.setViewRange(viewRangeMultiplier);
     }
 
 
     @Override
     protected void cull(float width, float height){
+        if (!isDisplay()) return;
         Entity entity = getEntity();
         if (entity instanceof Display display){
             display.setDisplayHeight(height);
@@ -777,9 +729,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public void pivot(float angleInDegrees){
         Entity entity = getEntity();
-        if (type != PartType.INTERACTION || isSingle){
-            return;
-        }
+        if (isDisplay() || isSingle) return;
         Interaction i = (Interaction) entity;
         DisplayUtils.pivot(i, group.getLocation(), angleInDegrees);
     }
@@ -814,13 +764,13 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public void setTransformation(@NotNull Transformation transformation) {
-        if (type == PartType.INTERACTION) return;
+        if (!isDisplay()) return;
         ((Display) getEntity()).setTransformation(transformation);
     }
 
     @Override
     public void setTransformationMatrix(@NotNull Matrix4f matrix) {
-        if (type == PartType.INTERACTION) return;
+        if (!isDisplay()) return;
         ((Display) getEntity()).setTransformationMatrix(matrix);
     }
 
@@ -989,6 +939,100 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return display.getItemStack();
     }
 
+    @Override
+    public void setMannequinPose(Pose pose) {
+        if (type != PartType.MANNEQUIN) return;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return;
+        if (pose == null) pose = Pose.STANDING;
+        mannequin.setPose(pose, true);
+    }
+
+    @Override
+    public @Nullable Pose getMannequinPose() {
+        if (type != PartType.MANNEQUIN) return null;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return null;
+        return mannequin.getPose();
+    }
+
+    @Override
+    public void setMannequinScale(double scale) {
+        if (type != PartType.MANNEQUIN) return;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return;
+        mannequin.getAttribute(Attribute.SCALE).setBaseValue(scale);
+    }
+
+    @Override
+    public double getMannequinScale() {
+        if (type != PartType.MANNEQUIN) return -1;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return -1;
+        return mannequin.getAttribute(Attribute.SCALE).getBaseValue();
+    }
+
+    @Override
+    public void setMannequinImmovable(boolean immovable) {
+        if (type != PartType.MANNEQUIN) return;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return;
+        mannequin.setImmovable(immovable);
+    }
+
+    @Override
+    public boolean isMannequinImmovable() {
+        if (type != PartType.MANNEQUIN) return false;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return false;
+        return mannequin.isImmovable();
+    }
+
+    @Override
+    public void setMannequinGravity(boolean gravity) {
+        if (type != PartType.MANNEQUIN) return;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return;
+        mannequin.setGravity(gravity);
+    }
+
+    @Override
+    public boolean hasMannequinGravity() {
+        if (type != PartType.MANNEQUIN) return false;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return false;
+        return mannequin.hasGravity();
+    }
+
+    @Override
+    public void setMannequinMainHand(@NotNull MainHand mainHand) {
+        if (type != PartType.MANNEQUIN) return;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return;
+        mannequin.setMainHand(mainHand);
+    }
+
+    @Override
+    public @Nullable MainHand getMannequinMainHand() {
+        if (type != PartType.MANNEQUIN) return null;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return null;
+        return mannequin.getMainHand();
+    }
+
+    @Override
+    public void setMannequinHandItem(@NotNull ItemStack itemStack, boolean mainHand) {
+        if (type != PartType.MANNEQUIN) return;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return;
+        if (mainHand){
+            mannequin.getEquipment().setItemInMainHand(itemStack, true);
+        }
+        else{
+            mannequin.getEquipment().setItemInOffHand(itemStack, true);
+        }
+    }
+
     /**
      * {@inheritDoc}
      * The applied changes do not reflect the entity data server-side
@@ -1045,7 +1089,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public @Nullable Transformation getTransformation() {
-        if (type == PartType.INTERACTION) {
+        if (!isDisplay()) {
             return null;
         }
         return ((Display) getEntity()).getTransformation();
@@ -1053,7 +1097,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public @Nullable Display.Brightness getBrightness() {
-        if (type == PartType.INTERACTION){
+        if (!isDisplay()){
             return null;
         }
         return ((Display) getEntity()).getBrightness();
@@ -1061,7 +1105,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public float getViewRange() {
-        if (type == PartType.INTERACTION){
+        if (!isDisplay()){
             return -1;
         }
         return ((Display) getEntity()).getViewRange();
@@ -1115,7 +1159,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public int getTeleportDuration() {
-        if (type == PartType.INTERACTION){
+        if (!isDisplay()){
             return -1;
         }
         return ((Display) getEntity()).getTeleportDuration();
@@ -1125,23 +1169,43 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         BLOCK_DISPLAY,
         ITEM_DISPLAY,
         TEXT_DISPLAY,
-        INTERACTION;
+        INTERACTION,
+        SHULKER,
+        MANNEQUIN;
 
+        /**
+         * Get a type, respective of the given entity
+         * @param entity the entity
+         * @return a {@link PartType} or null if the entity does not have a type.
+         */
         public static PartType getType(@NotNull Entity entity){
-            switch (entity){
-                case Interaction i -> {
-                    return INTERACTION;
+            try{
+                switch (entity){
+                    case Interaction i -> {
+                        return INTERACTION;
+                    }
+                    case BlockDisplay d -> {
+                        return BLOCK_DISPLAY;
+                    }
+                    case ItemDisplay d -> {
+                        return ITEM_DISPLAY;
+                    }
+                    case TextDisplay d -> {
+                        return TEXT_DISPLAY;
+                    }
+                    case Shulker s -> {
+                        return SHULKER;
+                    }
+                    case Mannequin m -> {
+                        return MANNEQUIN;
+                    }
+                    default -> {
+                        return null;
+                    }
                 }
-                case BlockDisplay d -> {
-                    return BLOCK_DISPLAY;
-                }
-                case ItemDisplay d -> {
-                    return ITEM_DISPLAY;
-                }
-                case TextDisplay d -> {
-                    return TEXT_DISPLAY;
-                }
-                default -> throw new IllegalStateException("Unexpected value: " + entity);
+            }
+            catch (NoClassDefFoundError e){ //Mannequin on < 1.21.9
+                return null;
             }
         }
     }

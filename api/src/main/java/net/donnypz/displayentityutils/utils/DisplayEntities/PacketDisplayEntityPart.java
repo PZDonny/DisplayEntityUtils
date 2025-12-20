@@ -22,11 +22,9 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.ItemDisplay;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
@@ -289,19 +287,19 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @Override
     public void setTransformation(@NotNull Transformation transformation) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
+        if (!isDisplay()) return;
         attributeContainer.setTransformationAndSend(transformation, getEntityId(), viewers);
     }
 
     @Override
     public void setTransformationMatrix(@NotNull Matrix4f matrix) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
+        if (!isDisplay()) return;
         attributeContainer.setTransformationMatrixAndSend(matrix, getEntityId(), viewers);
     }
 
     @Override
     public boolean setXScale(float scale) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return false;
+        if (!isDisplay()) return false;
         Vector3f vec = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.SCALE, new Vector3f());
         vec.x = scale;
         attributeContainer.setAttributeAndSend(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
@@ -310,7 +308,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @Override
     public boolean setYScale(float scale) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return false;
+        if (!isDisplay()) return false;
         Vector3f vec = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.SCALE, new Vector3f());
         vec.y = scale;
         attributeContainer.setAttributeAndSend(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
@@ -319,7 +317,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @Override
     public boolean setZScale(float scale) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return false;
+        if (!isDisplay()) return false;
         Vector3f vec = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.SCALE, new Vector3f());
         vec.z = scale;
         attributeContainer.setAttributeAndSend(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
@@ -328,7 +326,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @Override
     public boolean setScale(float x, float y, float z) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return false;
+        if (!isDisplay()) return false;
         Vector3f vec = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.SCALE, new Vector3f());
         vec.x = x;
         vec.y = y;
@@ -531,6 +529,72 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         return attributeContainer.getAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK);
     }
 
+    @Override
+    public void setMannequinPose(Pose pose) {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
+        setAndSend(DisplayAttributes.Mannequin.POSE, pose);
+    }
+
+    @Override
+    public @Nullable Pose getMannequinPose() {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return null;
+        return attributeContainer.getAttribute(DisplayAttributes.Mannequin.POSE);
+    }
+
+    @Override
+    public void setMannequinScale(double scale) {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
+        setAndSend(DisplayAttributes.Mannequin.SCALE, (float) scale);
+    }
+
+    @Override
+    public double getMannequinScale() {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return -1;
+        return attributeContainer.getAttribute(DisplayAttributes.Mannequin.SCALE);
+    }
+
+    @Override
+    public void setMannequinImmovable(boolean immovable) {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
+        setAndSend(DisplayAttributes.Mannequin.IMMOVABLE, immovable);
+    }
+
+    @Override
+    public boolean isMannequinImmovable() {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return false;
+        return attributeContainer.getAttribute(DisplayAttributes.Mannequin.IMMOVABLE);
+    }
+
+    @Override
+    public void setMannequinGravity(boolean gravity) {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
+        setAndSend(DisplayAttributes.Mannequin.NO_GRAVITY, !gravity);
+    }
+
+    @Override
+    public boolean hasMannequinGravity() {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return false;
+        return !attributeContainer.getAttribute(DisplayAttributes.Mannequin.NO_GRAVITY);
+    }
+
+    @Override
+    public void setMannequinMainHand(@NotNull MainHand mainHand) {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
+        setAndSend(DisplayAttributes.Mannequin.MAIN_HAND, mainHand);
+    }
+
+    @Override
+    public @Nullable MainHand getMannequinMainHand() {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return null;
+        return attributeContainer.getAttribute(DisplayAttributes.Mannequin.MAIN_HAND);
+    }
+
+    @Override
+    public void setMannequinHandItem(@NotNull ItemStack itemStack, boolean mainHand) {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
+        //TODO
+    }
+
 
     @Override
     public <T, V> void setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value) {
@@ -557,7 +621,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @Override
     public Transformation getTransformation(){
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+        if (!isDisplay()){
             return null;
         }
         return new Transformation(
@@ -570,7 +634,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @Override
     public int getTeleportDuration() {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+        if (!isDisplay()){
             return -1;
         }
         return attributeContainer.getAttributeOrDefault(DisplayAttributes.TELEPORTATION_DURATION, 0);
@@ -583,7 +647,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @Override
     public float getViewRange(){
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+        if (!isDisplay()){
             return -1;
         }
         return attributeContainer.getAttributeOrDefault(DisplayAttributes.VIEW_RANGE, 1f);
@@ -719,7 +783,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @Override
     protected void cull(float width, float height) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
+        if (!isDisplay()) return;
         attributeContainer
             .setAttributesAndSend(new DisplayAttributeMap()
                     .add(DisplayAttributes.Culling.HEIGHT, height)
@@ -748,25 +812,31 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @Override
     public @Nullable Color getGlowColor() {
-        return attributeContainer.getAttribute(DisplayAttributes.GLOW_COLOR_OVERRIDE);
+        if (isDisplay()){
+            return attributeContainer.getAttribute(DisplayAttributes.GLOW_COLOR_OVERRIDE);
+        }
+        return null;
     }
 
     @Override
     public void setGlowColor(@Nullable Color color) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
-        setAndSend(DisplayAttributes.GLOW_COLOR_OVERRIDE, color);
+        if (isDisplay()){
+            setAndSend(DisplayAttributes.GLOW_COLOR_OVERRIDE, color);
+        }
     }
 
     @Override
     public void glow() {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
-        setAndSend(DisplayAttributes.GLOWING, true);
+        if (canGlow()){
+            setAndSend(DisplayAttributes.GLOWING, true);
+        }
     }
 
     @Override
     public void unglow() {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
-        setAndSend(DisplayAttributes.GLOWING, false);
+        if (canGlow()){
+            setAndSend(DisplayAttributes.GLOWING, false);
+        }
     }
 
     /**
@@ -774,8 +844,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void setTeleportDuration(int teleportDuration) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
-        setAndSend(DisplayAttributes.TELEPORTATION_DURATION, teleportDuration);
+        if (isDisplay()){
+            setAndSend(DisplayAttributes.TELEPORTATION_DURATION, teleportDuration);
+        }
     }
 
     /**
@@ -784,10 +855,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void setInterpolationDuration(int interpolationDuration) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            return;
+        if (isDisplay()){
+            setAndSend(DisplayAttributes.Interpolation.DURATION, interpolationDuration);
         }
-        setAndSend(DisplayAttributes.Interpolation.DURATION, interpolationDuration);
     }
 
     /**
@@ -796,28 +866,30 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void setInterpolationDelay(int interpolationDelay) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            return;
+        if (isDisplay()){
+            setAndSend(DisplayAttributes.Interpolation.DELAY, interpolationDelay);
         }
-        setAndSend(DisplayAttributes.Interpolation.DELAY, interpolationDelay);
     }
 
     @Override
     public void setViewRange(float viewRangeMultiplier) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
-        setAndSend(DisplayAttributes.VIEW_RANGE, viewRangeMultiplier);
+        if (isDisplay()){
+            setAndSend(DisplayAttributes.VIEW_RANGE, viewRangeMultiplier);
+        }
     }
 
     @Override
     public void setBillboard(Display.@NotNull Billboard billboard) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
-        setAndSend(DisplayAttributes.BILLBOARD, billboard);
+        if (isDisplay()){
+            setAndSend(DisplayAttributes.BILLBOARD, billboard);
+        }
     }
 
     @Override
     public void setBrightness(Display.@Nullable Brightness brightness) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
-        setAndSend(DisplayAttributes.BRIGHTNESS, brightness);
+        if (isDisplay()){
+            setAndSend(DisplayAttributes.BRIGHTNESS, brightness);
+        }
     }
 
     @Override

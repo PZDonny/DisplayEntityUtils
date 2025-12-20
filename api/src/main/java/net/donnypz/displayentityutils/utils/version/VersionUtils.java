@@ -22,7 +22,7 @@ public final class VersionUtils {
     public static boolean IS_1_21_7 = Bukkit.getUnsafe().getProtocolVersion() >= 772;
     public static boolean IS_1_21_9 = Bukkit.getUnsafe().getProtocolVersion() >= 773;
 
-    public static boolean canViewDialogs(Player player, boolean sendErrorMessage){
+    public static boolean canViewDialogs(@NotNull Player player, boolean sendErrorMessage){
         if (!serverHasDialogs()){
             if (sendErrorMessage){
                 player.sendMessage(DisplayAPI.pluginPrefix
@@ -40,6 +40,10 @@ public final class VersionUtils {
             return false;
         }
         return true;
+    }
+
+    public static boolean canSpawnMannequins(){
+        return IS_1_21_9;
     }
 
     private static int getProtocolVersion(Player player){

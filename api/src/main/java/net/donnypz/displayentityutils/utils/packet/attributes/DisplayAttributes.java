@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.packet.attributes;
 
+import com.github.retrooper.packetevents.protocol.attribute.Attributes;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import net.kyori.adventure.text.Component;
 
@@ -64,6 +65,15 @@ public final class DisplayAttributes {
         public static final BasicDisplayAttribute<Float> WIDTH = new BasicDisplayAttribute<>(8, Float.class, EntityDataTypes.FLOAT);
         public static final BasicDisplayAttribute<Float> HEIGHT = new BasicDisplayAttribute<>(9, Float.class, EntityDataTypes.FLOAT);
         public static final BasicDisplayAttribute<Boolean> RESPONSIVE = new BasicDisplayAttribute<>(10, Boolean.class, EntityDataTypes.BOOLEAN);
+    }
+
+    public static final class Mannequin{
+        public static final BasicDisplayAttribute<Boolean> NO_GRAVITY = new BasicDisplayAttribute<>(5, Boolean.class, EntityDataTypes.BOOLEAN);
+        public static final AttributeDisplayAttribute SCALE = new AttributeDisplayAttribute(Attributes.SCALE);
+        public static final PoseDisplayAttribute POSE = new PoseDisplayAttribute(6);
+        public static final MainHandDisplayAttribute MAIN_HAND = new MainHandDisplayAttribute(15);
+        public static final ResolvableProfileDisplayAttribute RESOLVABLE_PROFILE = new ResolvableProfileDisplayAttribute(17);
+        public static final BasicDisplayAttribute<Boolean> IMMOVABLE = new BasicDisplayAttribute<>(18, Boolean.class, EntityDataTypes.BOOLEAN);
     }
 
 }

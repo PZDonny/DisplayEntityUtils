@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.command.bdengine.BDEngineCMD;
 import net.donnypz.displayentityutils.command.group.GroupCMD;
 import net.donnypz.displayentityutils.command.interaction.InteractionCMD;
 import net.donnypz.displayentityutils.command.item.ItemCMD;
+import net.donnypz.displayentityutils.command.mannequin.MannequinCMD;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.command.place.PlaceCMD;
 import net.donnypz.displayentityutils.command.text.TextCMD;
@@ -47,6 +48,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         subCommands.put("item", new ItemCMD());
         subCommands.put("text", new TextCMD());
         subCommands.put("interaction", new InteractionCMD());
+        subCommands.put("mannequin", new MannequinCMD());
         subCommands.put("place", new PlaceCMD());
         subCommands.put("anim", new AnimCMD());
         subCommands.put("bdengine", new BDEngineCMD());
@@ -198,6 +200,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         CMDUtils.sendCMD(sender, "/deu item", "Commands related to the Item Display parts of a Display Entity Model/Group");
         CMDUtils.sendCMD(sender, "/deu text", "Commands related to the Text Display parts of a Display Entity Model/Group");
         CMDUtils.sendCMD(sender, "/deu interaction", "Commands related to manipulating Interaction entities");
+        CMDUtils.sendCMD(sender, "/deu mannequin", "Commands related to manipulating Mannequin entities");
         CMDUtils.sendCMD(sender, "/deu place", "Assign a Display Entity Model/Group to an block that will spawn when placed");
         CMDUtils.sendCMD(sender, "/deu anim", "Animation related commands");
         CMDUtils.sendCMD(sender, "/deu listgroups <storage> [page-number]", "List all saved Display Entity Models/Groups");
@@ -222,7 +225,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
             String subcmd = args[0].toLowerCase();
             String current = args[1];
             switch (subcmd) {
-                case "interaction", "anim", "group", "parts", "bdengine", "text", "item", "place" -> {
+                case "interaction", "anim", "group", "parts", "bdengine", "text", "item", "place", "mannequin" -> {
                     return getTabComplete(subcmd, current);
                 }
                 case "listgroups", "listanims" -> suggestions.addAll(DEUSubCommand.TabSuggestion.STORAGES.suggestions);
