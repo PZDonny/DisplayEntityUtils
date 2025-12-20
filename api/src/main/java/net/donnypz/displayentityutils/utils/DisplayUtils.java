@@ -40,11 +40,15 @@ public final class DisplayUtils {
     private static final ListPersistentDataType<String, String> tagPDCType = PersistentDataType.LIST.strings();
     private DisplayUtils(){}
 
+    public static boolean isPartEntity(@NotNull Entity entity){
+        return SpawnedDisplayEntityPart.PartType.getType(entity) != null;
+    }
+
 
     public static @NotNull List<Entity> getUngroupedPartEntities(@NotNull Location location, double distance){
         List<Entity> parts = new ArrayList<>();
         for (Entity e : location.getNearbyEntities(distance, distance, distance)) {
-            if (!(e instanceof Display) && !(e instanceof Interaction)) continue;
+            if (!isPartEntity(e)) continue;
             if (e instanceof Display){
                 if (e.getVehicle() instanceof BlockDisplay) continue;
             }
@@ -166,13 +170,13 @@ public final class DisplayUtils {
     }
 
     /**
-     * Get the location where a {@link PacketDisplayEntityPart} display entity is translated based off of its {@link Transformation}'s translation alone.<br>
+     * Get the location where an {@link PacketDisplayEntityPart} display entity is translated based off of its {@link Transformation}'s translation alone.<br>
      * This may not be a perfect representation of where the model's location actually is, due to the shape of models varying (e.g.: Stone Block vs Stone Pressure Plate)
      * @param part The entity to get the location from
      * @return the location where the part is translated at. Null if the part is an interaction entity or if the transformation/location of the entity is unset
      */
     public static @Nullable Location getFixedModelLocation(@NotNull PacketDisplayEntityPart part){
-        if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+        if (!part.isDisplay()){
             return null;
         }
 
@@ -185,13 +189,13 @@ public final class DisplayUtils {
     }
 
     /**
-     * Get the location where a {@link PacketDisplayEntityPart} display entity is translated based off of its {@link Transformation} and pitch and yaw.<br>
+     * Get the location where an {@link ActivePart} display entity is translated based off of its {@link Transformation} and pitch and yaw.<br>
      * This may not be a perfect representation of where the model's location actually is, due to the shape of models varying (e.g.: Stone Block vs Stone Pressure Plate)
      * @param part The entity to get the location from
-     * @return the location where the part is translated at. Null if the part is an interaction entity
+     * @return the location where the part is translated at. Null if the part is not a display
      */
     public static @Nullable Location getModelLocation(@NotNull ActivePart part){
-        if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+        if (!part.isDisplay()){
             return null;
         }
 
@@ -218,7 +222,7 @@ public final class DisplayUtils {
     /**
      * Calculate and get the culling values that would be applied to a {@link Display}
      * @param display the display
-     * @return a float array containing the width and height, respectively
+     * @return a float array containing the width and height, respectively. null if the part is not a display
      */
     public static float[] getAutoCullValues(@NotNull Display display){
         return getAutoCullValues(display, DisplayConfig.widthCullingAdder(), DisplayConfig.heightCullingAdder());
@@ -229,7 +233,7 @@ public final class DisplayUtils {
      * @param display the display
      * @param widthAdder the fixed value to increase the calculated width by
      * @param heightAdder the fixed value to increase the calculated height by
-     * @return a float array containing the width and height, respectively
+     * @return a float array containing the width and height, respectively. null if the part is not a display
      */
     public static float[] getAutoCullValues(@NotNull Display display, float widthAdder, float heightAdder){
         SpawnedDisplayEntityPart.PartType type = display instanceof BlockDisplay ? SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY : null;
@@ -240,7 +244,7 @@ public final class DisplayUtils {
     /**
      * Calculate and get the culling values that would be applied to an {@link ActivePart}
      * @param part the part
-     * @return a float array containing the width and height, respectively
+     * @return a float array containing the width and height, respectively. null if the part is not a display
      */
     public static float[] getAutoCullValues(@NotNull ActivePart part){
         return getAutoCullValues(part, DisplayConfig.widthCullingAdder(), DisplayConfig.heightCullingAdder());
@@ -251,9 +255,10 @@ public final class DisplayUtils {
      * @param part the part
      * @param widthAdder the fixed value to increase the calculated width by
      * @param heightAdder the fixed value to increase the calculated height by
-     * @return a float array containing the width and height, respectively
+     * @return a float array containing the width and height, respectively. null if the part is not a display
      */
     public static float[] getAutoCullValues(@NotNull ActivePart part, float widthAdder, float heightAdder){
+        if (!part.isDisplay()) return null;
         Transformation t = part.getTransformation();
         return getAutoCullValues(part.getType(), t.getTranslation(), t.getScale(), t.getLeftRotation(), widthAdder, heightAdder);
     }
@@ -915,27 +920,14 @@ public final class DisplayUtils {
 
 
     /**
-     * Checks if this display entity has the specified group tag
-     * @param display Display Entity to check for a group tag
-     * @param tag The tag to check for
-     * @return boolean whether this display entity has the group tag
+     * Checks if an entity has the specified group tag
+     * @param entity entity to check for a group tag
+     * @param tag the group tag
+     * @return a boolean
      */
-    public static boolean isGroupTag(Display display, @NotNull String tag){
-        String value = display.getPersistentDataContainer().get(DisplayAPI.getGroupTagKey(), PersistentDataType.STRING);
-        if (value == null){
-            return false;
-        }
-        return tag.equals(value);
-    }
-
-    /**
-     * Checks if this interaction entity has the specified group tag
-     * @param interaction Interaction Entity to check for a group tag
-     * @param tag The tag to check for
-     * @return boolean whether this interaction entity has the group tag
-     */
-    public static boolean isGroupTag(Interaction interaction, @NotNull String tag){
-        String value = interaction.getPersistentDataContainer().get(DisplayAPI.getGroupTagKey(), PersistentDataType.STRING);
+    public static boolean isGroupTag(Entity entity, @NotNull String tag){
+        if (entity == null) return false;
+        String value = entity.getPersistentDataContainer().get(DisplayAPI.getGroupTagKey(), PersistentDataType.STRING);
         if (value == null){
             return false;
         }
@@ -948,31 +940,7 @@ public final class DisplayUtils {
      * @return a boolean
      */
     public static boolean isInGroup(Entity entity){
-        if (entity instanceof Display display){
-            return SpawnedDisplayEntityPart.getPart(display) != null;
-        }
-        else if (entity instanceof Interaction interaction){
-            return SpawnedDisplayEntityPart.getPart(interaction) != null;
-        }
-        return false;
-    }
-
-    /**
-     * Get the creation time of a Display Entity
-     * @param display The Display Entity to check for a creation time
-     * @return The Display Entity's Group's Creation time. -1 if this display is not part of a group
-     */
-    public static long getCreationTime(Display display){
-        return getCreationTime((Entity) display);
-    }
-
-    /**
-     * Get the creation time of an Interaction Entity
-     * @param interaction The Interaction to check for a creation time
-     * @return The Interaction's Group's Creation time. -1 if this interaction is not part of a group
-     */
-    public static long getCreationTime(Interaction interaction){
-        return getCreationTime((Entity) interaction);
+        return SpawnedDisplayEntityPart.getPart(entity) != null;
     }
 
     /**
