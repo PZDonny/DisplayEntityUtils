@@ -622,27 +622,4 @@ public final class PacketUtils {
             setGlowing(player, entityId, false);
         }, durationInTicks);
     }
-
-    @ApiStatus.Internal
-    public static int[] getTrackedIntersection(DEUUser user, SequencedCollection<PacketDisplayEntityPart> parts){
-        Player p = Bukkit.getPlayer(user.getUserUUID());
-        return parts.stream()
-                .filter(part -> {
-                    if (part.isTrackedBy(user.getUserUUID())){
-                        part.hideFromPlayer(p);
-                        return true;
-                    }
-                    return false;
-                })
-                .mapToInt(PacketDisplayEntityPart::getEntityId)
-                .toArray();
-
-        /*int[] ids = new int[parts.size()];
-        int i = 0;
-        for (PacketDisplayEntityPart part : parts){
-            ids[i] = part.getEntityId();
-            i++;
-        }
-        return ids;*/
-    }
 }
