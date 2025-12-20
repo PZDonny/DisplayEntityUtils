@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
+import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.utils.relativepoints.DisplayEntitySelector;
@@ -9,8 +10,6 @@ import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Interaction;
-import org.bukkit.entity.Mannequin;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,13 +31,10 @@ class PartsSelectCMD extends PlayerSubCommand {
         try{
             String arg = args[2];
             if (arg.equalsIgnoreCase("-target")){
-                Entity entity = player.getTargetEntity(10);
-                if (!(entity instanceof Interaction || entity instanceof Mannequin)) {
-                    player.sendMessage(Component.text("Your targeted entity must be an interaction or mannequin entity within 10 blocks of you", NamedTextColor.RED));
-                }
-                else{
-                    DisplayEntitySelector.select(player, entity);
-                }
+                Entity entity = DisplayEntityPluginCommand.getTargetEntity(player);
+                if (entity == null) return;
+
+                DisplayEntitySelector.select(player, entity);
                 return;
             }
 

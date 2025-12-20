@@ -36,11 +36,8 @@ class GroupAddTargetCMD extends PlayerSubCommand {
         }
 
 
-        Entity entity = player.getTargetEntity(10);
-        if (!(entity instanceof Interaction || entity instanceof Mannequin)) {
-            player.sendMessage(Component.text("Your targeted entity must be an interaction or mannequin entity within 10 blocks of you", NamedTextColor.RED));
-            return;
-        }
+        Entity entity = DisplayEntityPluginCommand.getTargetEntity(player);
+        if (entity == null) return;
 
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
         if (part != null) {

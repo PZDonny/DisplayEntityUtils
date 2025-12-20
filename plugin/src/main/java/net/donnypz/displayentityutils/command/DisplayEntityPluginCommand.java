@@ -18,6 +18,9 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Interaction;
+import org.bukkit.entity.Mannequin;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -145,6 +148,15 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         if (RelativePointUtils.removeRelativePoints(player)){
             player.sendMessage(Component.text("Your previewed points have been hidden.", NamedTextColor.GRAY, TextDecoration.ITALIC));
         }
+    }
+
+    public static Entity getTargetEntity(Player player){
+        Entity entity = player.getTargetEntity(10);
+        if (!(entity instanceof Interaction || entity instanceof Mannequin)) {
+            player.sendMessage(Component.text("Your targeted entity must be an interaction or mannequin entity within 10 blocks of you", NamedTextColor.RED));
+            return null;
+        }
+        return entity;
     }
 
     @Override
