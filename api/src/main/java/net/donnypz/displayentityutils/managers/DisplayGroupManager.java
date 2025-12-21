@@ -507,8 +507,8 @@ public final class DisplayGroupManager {
      * Get the {@link GroupResult} of a display entity containing its {@link SpawnedDisplayEntityGroup}, if applicable.
      * <br>
      * If a group is created as a result of this, {@link GroupRegisteredEvent} will be called
-     *
-     * @param displayEntity The display entity within a group
+     * @param displayEntity The display entity that's in a group
+     * @return a {@link GroupResult} or null
      */
     public static @Nullable GroupResult getSpawnedGroup(@NotNull Display displayEntity) {
         //Check for already registered group
@@ -544,6 +544,17 @@ public final class DisplayGroupManager {
         }
         group.setPersistent(displayEntity.isPersistent());
         return new GroupResult(group, false);
+    }
+
+
+    /**
+     * Get a {@link SpawnedDisplayEntityGroup} through an Interaction entity
+     * @param interaction The interaction
+     * @param radius The radius to search for the group
+     * @return a {@link SpawnedDisplayEntityGroup} containing the interaction. Null if not found.
+     */
+    public static @Nullable SpawnedDisplayEntityGroup getSpawnedGroup(@NotNull Interaction interaction, double radius){ //Keep this just to prevent breakage
+        return getSpawnedGroup((Entity) interaction, radius);
     }
 
 
