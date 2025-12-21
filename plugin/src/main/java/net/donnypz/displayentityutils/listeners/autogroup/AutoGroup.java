@@ -2,7 +2,7 @@ package net.donnypz.displayentityutils.listeners.autogroup;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
-import net.donnypz.displayentityutils.events.ChunkAddGroupInteractionsEvent;
+import net.donnypz.displayentityutils.events.ChunkAddGroupEntitiesEvent;
 import net.donnypz.displayentityutils.events.ChunkRegisterGroupEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -15,7 +15,6 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Interaction;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -48,22 +47,18 @@ final class AutoGroup {
         String worldName = world.getName();
         Set<Long> chunks = readChunks.computeIfAbsent(worldName, name -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
 
-        if (chunks.contains(chunk.getChunkKey())){
+        if (!chunks.add(chunk.getChunkKey())){ //Already Contained
             refreshGroupPartEntities(entities);
             if (!DisplayConfig.readSameChunks()) return;
         }
-        else{
-            chunks.add(chunk.getChunkKey());
-        }
+
 
         DisplayGroupManager.spawnPersistentPacketGroups(chunk);
-
-
         if (entities.isEmpty()) return;
 
         Set<SpawnedDisplayEntityGroup> foundGroups = new HashSet<>();
-        HashMap<SpawnedDisplayEntityGroup, Set<Interaction>> addedInteractionsForEvent = new HashMap<>();
-        Set<Interaction> interactions = new HashSet<>();
+        HashMap<SpawnedDisplayEntityGroup, Set<Entity>> addedEntitiesForEvent = new HashMap<>();
+        Set<Entity> eligibleNonDisplays = new HashSet<>();
         HashMap<SpawnedDisplayEntityGroup, ChunkRegisterGroupEvent> events = new HashMap<>();
 
         for (Entity entity : entities){
@@ -98,13 +93,13 @@ final class AutoGroup {
                     events.put(group, new ChunkRegisterGroupEvent(group, chunk));
                 }
             }
-
-            //Interaction Entities (Required if the interaction happens to be in a different chunk)
-            else if (entity instanceof Interaction interaction) {
-                interactions.add(interaction);
-            }
-            //Entity with Packet Based Controller
             else{
+                //(Required if the entity happens to be in a different chunk)
+                if (DisplayUtils.isPartEntity(entity)) {
+                    eligibleNonDisplays.add(entity);
+                }
+
+                //Entity with Packet Based Controller
                 PersistentDataContainer pdc = entity.getPersistentDataContainer();
                 String controllerID = pdc.get(DisplayControllerManager.controllerIdKey, PersistentDataType.STRING);
                 if (controllerID == null) continue; //Not a packet based controller
@@ -118,13 +113,13 @@ final class AutoGroup {
             }
         }
 
-        for (Interaction interaction : interactions){ //Processed after all Display Entities
-            if (SpawnedDisplayEntityPart.getPart(interaction) != null){ //Already added to a group
+        for (Entity entity : eligibleNonDisplays){ //Processed after all Display Entities
+            if (SpawnedDisplayEntityPart.getPart(entity) != null){ //Already added to a group
                 continue;
             }
 
             //Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> {
-                List<GroupResult> results = DisplayGroupManager.getSpawnedGroupsNearLocation(interaction.getLocation(), DisplayConfig.getMaximumInteractionSearchRange());
+                List<GroupResult> results = DisplayGroupManager.getSpawnedGroupsNearLocation(entity.getLocation(), DisplayConfig.getMaximumInteractionSearchRange());
                 if (results.isEmpty()){ //Group has not been created yet, or it is not a group interaction
                     continue;
                 }
@@ -132,12 +127,12 @@ final class AutoGroup {
                 for (GroupResult result : results){
                     SpawnedDisplayEntityGroup group = result.group();
 
-                    if (group.hasSameCreationTime(interaction)) {
-                        group.addEntity(interaction);
+                    if (group.hasSameCreationTime(entity)) {
+                        group.addEntity(entity);
 
                         if (!events.containsKey(group)){
-                            addedInteractionsForEvent.putIfAbsent(result.group(), new HashSet<>());
-                            addedInteractionsForEvent.get(group).add(interaction);
+                            addedEntitiesForEvent.putIfAbsent(result.group(), new HashSet<>());
+                            addedEntitiesForEvent.get(group).add(entity);
                         }
                     }
                 }
@@ -156,15 +151,15 @@ final class AutoGroup {
             event.callEvent();
         }
 
-        for (Map.Entry<SpawnedDisplayEntityGroup, Set<Interaction>> entry : addedInteractionsForEvent.entrySet()){
+        for (Map.Entry<SpawnedDisplayEntityGroup, Set<Entity>> entry : addedEntitiesForEvent.entrySet()){
             SpawnedDisplayEntityGroup g = entry.getKey();
             if (!g.isSpawned()){
                 continue;
             }
 
-            Collection<Interaction> coll = entry.getValue();
+            Set<Entity> coll = entry.getValue();
             if (!coll.isEmpty()){
-                new ChunkAddGroupInteractionsEvent(g, addedInteractionsForEvent.get(g), chunk).callEvent();
+                new ChunkAddGroupEntitiesEvent(g, addedEntitiesForEvent.get(g), chunk).callEvent();
             }
         }
     }
