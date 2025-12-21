@@ -10,6 +10,7 @@ import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -1219,34 +1220,13 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
          * @return a {@link PartType} or null if the entity does not have a type.
          */
         public static PartType getType(@NotNull Entity entity){
-            try{
-                switch (entity){
-                    case Interaction i -> {
-                        return INTERACTION;
-                    }
-                    case BlockDisplay d -> {
-                        return BLOCK_DISPLAY;
-                    }
-                    case ItemDisplay d -> {
-                        return ITEM_DISPLAY;
-                    }
-                    case TextDisplay d -> {
-                        return TEXT_DISPLAY;
-                    }
-                    case Shulker s -> {
-                        return SHULKER;
-                    }
-                    case Mannequin m -> {
-                        return MANNEQUIN;
-                    }
-                    default -> {
-                        return null;
-                    }
-                }
-            }
-            catch (NoClassDefFoundError e){ //Mannequin on < 1.21.9
-                return null;
-            }
+            if (entity instanceof BlockDisplay) return BLOCK_DISPLAY;
+            if (entity instanceof ItemDisplay) return ITEM_DISPLAY;
+            if (entity instanceof TextDisplay) return TEXT_DISPLAY;
+            if (entity instanceof Interaction) return INTERACTION;
+            if (entity instanceof Shulker) return SHULKER;
+            if (VersionUtils.IS_1_21_9 && entity instanceof Mannequin) return MANNEQUIN;
+            return null;
         }
 
         public boolean isOfType(Entity e){
