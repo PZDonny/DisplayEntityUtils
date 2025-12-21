@@ -175,35 +175,18 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     /**
-     * Check if this group and a Display entity share the same creation time. If this returns true this does not guarantee
-     * that the part is registered to this group. Using {@link SpawnedDisplayEntityGroup#addDisplayEntity(Display)} will
-     * add the display entity to the group if it is not added already
-     * @param display
-     * @return a boolean
-     */
-    public boolean hasSameCreationTime(Display display){
-        return sameCreationTime(display);
-    }
-
-    /**
-     * Check if this group and an Interaction entity share the same creation time. If this returns true this does not guarantee
-     * that the part is registered to this group. Using {@link SpawnedDisplayEntityGroup#addEntity(Interaction)} will
+     * Check if this group and an entity share the same creation time. If this returns true this does not guarantee
+     * that the part is registered to this group.
+     * <br>Using {@link SpawnedDisplayEntityGroup#addEntity(Entity)} will
      * add the interaction entity to the group if it is not added already
-     * @param interaction
+     * @param entity the entity
      * @return a boolean
      */
-    public boolean hasSameCreationTime(Interaction interaction){
-        return sameCreationTime(interaction);
-    }
-
-
-
-    private boolean sameCreationTime(Entity entity){
+    public boolean hasSameCreationTime(Entity entity){
         PersistentDataContainer container = entity.getPersistentDataContainer();
         if (!container.has(creationTimeKey, PersistentDataType.LONG)){
             return false;
         }
-
         return creationTime == container.get(creationTimeKey, PersistentDataType.LONG);
     }
 
@@ -218,7 +201,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
         for (Entity e : getMasterPart().getEntity().getNearbyEntities(searchRange, searchRange, searchRange)) {
             if (!DisplayUtils.isPartEntity(e) || e instanceof Display) continue;
-            if (!sameCreationTime(e)) continue;
+            if (!hasSameCreationTime(e)) continue;
 
             SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(e);
             if (part == null){
