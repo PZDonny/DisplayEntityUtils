@@ -995,10 +995,13 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
-     * Set the location of this packet-based entity. The part should be hidden first with {@link #hide()} if being teleported to a different world.
+     * Set the location of this packet-based entity.
+     * {@inheritDoc}
+     * <br>The part should be hidden first with {@link #hide()} if being teleported to a different world.
      * @param location the location
      */
     public void teleport(@NotNull Location location){
+        if (hasGroup() && isDisplay() && !isMaster) return;
         packetLocation = new PacketLocation(location);
         for (UUID uuid : getViewers()){
             Player player = Bukkit.getPlayer(uuid);
@@ -1007,10 +1010,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         }
     }
 
-    /**
-     * Set the location of this packet-based entity. The part should be hidden first with {@link #hide()} if being teleported to a different world.
-     * @param location the location
-     */
+
     void teleportUnsetPassengers(@NotNull Location location){
         packetLocation = new PacketLocation(location);
         for (UUID uuid : getViewers()){

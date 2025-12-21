@@ -188,6 +188,15 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
+    public void teleport(@NotNull Location location) {
+        if (group != null && isDisplay() && !isMaster()){
+            return;
+        }
+        Entity e = getEntity();
+        if (e != null) e.teleport(location);
+    }
+
+    @Override
     public float getPitch() {
         return getEntity().getPitch();
     }

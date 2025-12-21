@@ -160,6 +160,12 @@ public abstract class ActivePart implements Active{
 
     public abstract boolean hasGroup();
 
+    /**
+     * Teleport this part to the given location. This will fail if the part is a display entity, in a group, and is not the group's master part.
+     * @param location the teleport location
+     */
+    public abstract void teleport(@NotNull Location location);
+
     public abstract @Nullable Location getLocation();
 
     protected abstract void cull(float width, float height);
