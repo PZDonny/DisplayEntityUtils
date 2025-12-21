@@ -270,7 +270,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @return The SpawnedDisplayEntityPart. Null if not created during play session or not associated with any group
      */
     public static @Nullable SpawnedDisplayEntityPart getPart(@NotNull Entity entity){
-        if (DisplayUtils.isPartEntity(entity)) return null;
+        if (!DisplayUtils.isPartEntity(entity)) return null;
         return allParts.get(new PartData(entity));
     }
 
