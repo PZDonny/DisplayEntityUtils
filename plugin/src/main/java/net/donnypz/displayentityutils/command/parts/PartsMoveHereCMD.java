@@ -1,48 +1,62 @@
 package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
+import net.donnypz.displayentityutils.command.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-class PartsMoveHereCMD extends PlayerSubCommand {
+class PartsMoveHereCMD extends PartsSubCommand {
 
-    PartsMoveHereCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("movehere", parentSubCommand, Permission.PARTS_TRANSFORM);
+    public PartsMoveHereCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("movehere", parentSubCommand, Permission.PARTS_TRANSFORM, 2, 2);
     }
 
     @Override
     public void execute(Player player, String[] args) {
-        ActivePartSelection<?> selection = DisplayGroupManager.getPartSelection(player);
-        if (selection == null){
-            DisplayEntityPluginCommand.noPartSelection(player);
+        if (RelativePointUtils.isViewingRelativePoints(player)){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot play do that while viewing points!", NamedTextColor.RED)));
             return;
+        }
+        super.execute(player, args);
+    }
+
+    @Override
+    protected void sendIncorrectUsage(@NotNull Player player) {
+        player.sendMessage(Component.text("Incorrect Usage! /deu parts movehere [-all]", NamedTextColor.RED));
+    }
+
+    @Override
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+        for (ActivePart part : selection.getSelectedParts()){
+            if (part.isDisplay()) continue;
+            Location loc = player.getLocation();
+            loc.setYaw(part.getYaw());
+            loc.setPitch(part.getPitch());
+            part.teleport(loc);
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Moved ALL selected non-display parts to your location!", NamedTextColor.GREEN)));
+        }
+        return true;
+    }
+
+    @Override
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        if (selectedPart.isDisplay() && group != null){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot do this for grouped display entities!", NamedTextColor.RED)));
+            player.sendMessage(Component.text("| Use \"/deu parts translate\" instead", NamedTextColor.GRAY));
+            return false;
         }
 
-        if (PartsCMD.isUnwantedMultiSelection(player, selection)){
-            return;
-        }
-
-        if (!selection.hasSelectedPart()){
-            PartsCMD.invalidPartSelection(player);
-            return;
-        }
-        Entity e = ((SpawnedDisplayEntityPart) selection.getSelectedPart()).getEntity();
         Location loc = player.getLocation();
-        loc.setYaw(e.getYaw());
-        loc.setPitch(e.getPitch());
-        FoliaUtils.teleport(e, loc);
+        loc.setYaw(selectedPart.getYaw());
+        loc.setPitch(selectedPart.getPitch());
+        selectedPart.teleport(loc);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Moved your selected part to your location!", NamedTextColor.GREEN)));
+        return true;
     }
 }

@@ -104,8 +104,8 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         }
         else{
             CMDUtils.sendCMD(sender, "/deu parts scale <x | y | z | -all> <scale> [-all]", "Change the scale of your selected part, by axis");
-            CMDUtils.sendCMD(sender, "/deu parts move <direction> <distance>", "Change the actual location of your selected part");
-            CMDUtils.sendCMD(sender, "/deu parts movehere", "Change your selected part's actual location to your location");
+            CMDUtils.sendCMD(sender, "/deu parts move <direction> <distance> [-all]", "Change the actual location of your selected part");
+            CMDUtils.sendCMD(sender, "/deu parts movehere [-all]", "Change your selected part's actual location to your location");
             CMDUtils.sendCMD(sender, "/deu parts setblock <\"-held\" | \"-target\" | block-id> [-all]", "Change the block of a block display part");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
