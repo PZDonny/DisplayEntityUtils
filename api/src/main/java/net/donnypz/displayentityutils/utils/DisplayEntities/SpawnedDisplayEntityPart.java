@@ -848,6 +848,13 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
+    public boolean hasItemDisplayItemGlint() {
+        ItemStack itemStack = getItemDisplayItem();
+        if (itemStack == null) return false;
+        return itemStack.getItemMeta().getEnchantmentGlintOverride();
+    }
+
+    @Override
     public @Nullable Component getTextDisplayText() {
         if (type != PartType.TEXT_DISPLAY) return null;
         TextDisplay td = (TextDisplay) getEntity();

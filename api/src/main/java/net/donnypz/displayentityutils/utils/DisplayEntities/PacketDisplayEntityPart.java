@@ -445,6 +445,17 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
+    public boolean hasItemDisplayItemGlint() {
+        if (type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
+            ItemStack i = attributeContainer.getAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK);
+            if (i == null) return false;
+            return i.getItemMeta().getEnchantmentGlintOverride();
+        }
+        return false;
+    }
+
+
+    @Override
     public @Nullable Component getTextDisplayText() {
         if (type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
             return attributeContainer.getAttribute(DisplayAttributes.TextDisplay.TEXT);

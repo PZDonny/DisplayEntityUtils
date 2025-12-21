@@ -429,6 +429,8 @@ public abstract class ActivePart implements Active{
      */
     public abstract void setItemDisplayItemGlint(boolean hasGlint);
 
+    public abstract boolean hasItemDisplayItemGlint();
+
     public abstract @Nullable Component getTextDisplayText();
 
     public abstract int getTextDisplayLineWidth();
