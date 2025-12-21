@@ -16,9 +16,6 @@ class PartsAdaptTagsCMD extends PartsSubCommand {
     }
 
     @Override
-    public void execute(Player player, String[] args) {}
-
-    @Override
     protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
