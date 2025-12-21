@@ -60,7 +60,7 @@ class AnimOverwriteFrameCMD extends PlayerSubCommand {
             frame.setDelay(delay);
             frame.setDuration(duration);
 
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully overwritten animation frame", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("The animation frame has been overwritten", NamedTextColor.GREEN)));
             player.playSound(player, Sound.ENTITY_SHEEP_SHEAR, 1, 0.75f);
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid value entered! Enter whole numbers >= 0", NamedTextColor.RED));

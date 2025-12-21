@@ -35,7 +35,7 @@ class PlaceSetCMD extends PlayerSubCommand {
         String groupTag = args[2];
 
         PlaceableGroupManager.assign(heldItem, groupTag, true);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully assigned a group to your held block <white>(Tag: "+groupTag+")")));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Assigned a group to your held block <white>(Tag: "+groupTag+")")));
         player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>| The group will spawn using <light_purple>packets"));
     }
 }

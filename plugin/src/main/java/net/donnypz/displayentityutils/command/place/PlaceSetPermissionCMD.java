@@ -30,6 +30,6 @@ class PlaceSetPermissionCMD extends PlayerSubCommand {
 
         String permission = args[2];
         PlaceableGroupManager.setPlacePermission(heldItem, permission);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully set the permission to place your held item's assigned group <white>(Permission: "+permission+")")));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Set the permission to place your held item's assigned group <white>(Permission: "+permission+")")));
     }
 }

@@ -33,7 +33,7 @@ class TextFontCMD extends PartsSubCommand {
                 part.setTextDisplayText(part.getTextDisplayText().font(font));
             }
         }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Font successfully set to "+args[2]+" for ALL selected text displays", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Font set to "+args[2]+" for ALL selected text displays", NamedTextColor.GREEN)));
         return true;
     }
 
@@ -46,7 +46,7 @@ class TextFontCMD extends PartsSubCommand {
         Key font = getFont(args, player);
         if (font == null) return false;
         selectedPart.setTextDisplayText(selectedPart.getTextDisplayText().font(font));
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Font successfully set to "+args[2], NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Font set to "+args[2], NamedTextColor.GREEN)));
         return true;
     }
 

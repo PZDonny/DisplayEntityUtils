@@ -37,7 +37,7 @@ class MannequinPoseCMD extends PartsSubCommand {
                 if (p.getType() != SpawnedDisplayEntityPart.PartType.MANNEQUIN) continue;
                 p.setMannequinPose(pose);
             }
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set pose of ALL selected mannequins!", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set pose of ALL selected mannequins!", NamedTextColor.GREEN)));
             return true;
         }
         catch(IllegalArgumentException e){
@@ -53,7 +53,7 @@ class MannequinPoseCMD extends PartsSubCommand {
         try{
             Pose pose = Pose.valueOf(poseStr.toUpperCase());
             selectedPart.setMannequinPose(pose);
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set mannequin pose!", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set mannequin pose!", NamedTextColor.GREEN)));
             return true;
         }
         catch(IllegalArgumentException e){

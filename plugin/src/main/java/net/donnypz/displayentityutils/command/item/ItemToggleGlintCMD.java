@@ -66,8 +66,9 @@ class ItemToggleGlintCMD extends PartsSubCommand {
         }
         ItemStack item = selectedPart.getItemDisplayItem();
         if (item == null) return false;
-        selectedPart.setItemDisplayItemGlint(!item.getItemMeta().getEnchantmentGlintOverride());
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Toggled glint of selected item display!", NamedTextColor.GREEN)));
+        selectedPart.setItemDisplayItemGlint(!selectedPart.hasItemDisplayItemGlint());
+        String status = selectedPart.hasItemDisplayItemGlint() ? "<green>ON" : "<red>OFF";
+        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled glint of selected item display "+status)));
         return true;
     }
 }

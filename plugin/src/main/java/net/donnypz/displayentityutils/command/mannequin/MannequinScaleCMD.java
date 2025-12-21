@@ -32,7 +32,7 @@ class MannequinScaleCMD extends PartsSubCommand {
                 if (p.getType() != SpawnedDisplayEntityPart.PartType.MANNEQUIN) continue;
                 p.setMannequinScale(scale);
             }
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set scale of ALL selected mannequins!", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set scale of ALL selected mannequins!", NamedTextColor.GREEN)));
             return true;
         }
         catch(IllegalArgumentException e){
@@ -48,7 +48,7 @@ class MannequinScaleCMD extends PartsSubCommand {
         try{
             float scale = Float.parseFloat(scaleStr);
             selectedPart.setMannequinScale(scale);
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set mannequin scale!", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set mannequin scale!", NamedTextColor.GREEN)));
             return true;
         }
         catch(IllegalArgumentException e){

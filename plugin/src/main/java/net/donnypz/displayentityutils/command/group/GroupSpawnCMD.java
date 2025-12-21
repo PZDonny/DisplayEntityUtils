@@ -147,7 +147,7 @@ public class GroupSpawnCMD extends PlayerSubCommand {
                     return;
                 }
                 DisplayAnimationManager.setSelectedSpawnedAnimation(p, anim.toSpawnedDisplayAnimation());
-                p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully selected display animation! <white>(Tagged: "+tag+")")));
+                p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Animation selected! <white>(Tagged: "+tag+")")));
             }
         });
     }

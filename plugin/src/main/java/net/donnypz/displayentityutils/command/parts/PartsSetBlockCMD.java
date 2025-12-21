@@ -36,7 +36,7 @@ class PartsSetBlockCMD extends PartsSubCommand {
                 setBlock(part, blockData);
             }
         }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set block of ALL selected block displays!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set block of ALL selected block displays!", NamedTextColor.GREEN)));
         return true;
     }
 
@@ -49,7 +49,7 @@ class PartsSetBlockCMD extends PartsSubCommand {
             return false;
         }
 
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set block of selected block display!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set block of selected block display!", NamedTextColor.GREEN)));
         setBlock(selectedPart, blockData);
         return true;
     }

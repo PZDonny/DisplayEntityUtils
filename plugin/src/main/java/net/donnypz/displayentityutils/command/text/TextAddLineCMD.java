@@ -40,7 +40,7 @@ class TextAddLineCMD extends PartsSubCommand {
         Key font = currentText.font();
         Component comp = currentText.appendNewline().append(LegacyComponentSerializer.legacyAmpersand().deserialize(TextSetCMD.getTextResult(args)));
         selectedPart.setTextDisplayText(comp.font(font));
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully added line to text display!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Added line to text display!", NamedTextColor.GREEN)));
         return true;
     }
 }

@@ -31,7 +31,7 @@ class PartsGlowColorCMD extends PartsSubCommand {
         if (color == null) return false;
         selection.setGlowColor(color);
         selection.glow(player, 60);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Glow color successfully set for selected display entity part(s) in your selection!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Glow color set for selected display entity part(s) in your selection!", NamedTextColor.GREEN)));
         return true;
     }
 
@@ -40,13 +40,13 @@ class PartsGlowColorCMD extends PartsSubCommand {
         Color color = getColor(player, args[2]);
         if (color == null) return false;
         if (!selectedPart.isDisplay()) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Only display entities cannot have a glow color applied!", NamedTextColor.RED)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Only display entities can have a glow color applied!", NamedTextColor.RED)));
             return false;
         }
         else{
             selectedPart.setGlowColor(color);
             selectedPart.glow(player, 60);
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Glow color successfully set for your selected part!", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Glow color set for your selected part!", NamedTextColor.GREEN)));
             return true;
         }
     }

@@ -48,7 +48,7 @@ class AnimEditAllFramesCMD extends PlayerSubCommand {
                 frame.setDelay(delay);
                 frame.setDuration(duration);
             }
-            player.sendMessage(Component.text("All frames successfully edited!", NamedTextColor.GREEN));
+            player.sendMessage(Component.text("All frames have been edited!", NamedTextColor.GREEN));
             player.sendMessage(Component.text("Delay: " + delay, NamedTextColor.GRAY));
             player.sendMessage(Component.text("Duration: " + duration, NamedTextColor.GRAY));
         } catch (NumberFormatException e) {

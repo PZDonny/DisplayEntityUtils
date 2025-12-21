@@ -40,7 +40,7 @@ class TextSetCMD extends PartsSubCommand {
         Key font = currentText.font();
         Component comp = LegacyComponentSerializer.legacyAmpersand().deserialize(getTextResult(args));
         selectedPart.setTextDisplayText(comp.font(font));
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set text on text display!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set text display's text!", NamedTextColor.GREEN)));
         player.sendMessage(Component.text("You can include \"\\n\" in your to create a new line.", NamedTextColor.GRAY));
         return true;
     }

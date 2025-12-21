@@ -61,7 +61,8 @@ class MannequinToggleImmovableCMD extends PartsSubCommand {
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.MANNEQUIN);
         selectedPart.setMannequinImmovable(!selectedPart.isMannequinImmovable());
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Toggled immovability of selected mannequin!", NamedTextColor.GREEN)));
+        String status = selectedPart.isMannequinImmovable() ? "<green>ON" : "<red>OFF";
+        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled immovability of selected mannequin "+status)));
         return true;
     }
 }

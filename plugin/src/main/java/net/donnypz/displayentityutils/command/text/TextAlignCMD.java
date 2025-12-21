@@ -33,7 +33,7 @@ class TextAlignCMD extends PartsSubCommand {
                 part.setTextDisplayAlignment(alignment);
             }
         }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Text alignment successfully set to "+args[2]+" for ALL selected text displays", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Text alignment set to "+args[2]+" for ALL selected text displays", NamedTextColor.GREEN)));
         return true;
     }
 
@@ -46,7 +46,7 @@ class TextAlignCMD extends PartsSubCommand {
         TextDisplay.TextAlignment alignment = getAlignment(args[2], player);
         if (alignment == null) return false;
         selectedPart.setTextDisplayAlignment(alignment);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Text alignment successfully set to "+args[2], NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Text alignment set to "+args[2], NamedTextColor.GREEN)));
         return true;
     }
 

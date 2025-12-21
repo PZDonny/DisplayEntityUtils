@@ -22,7 +22,7 @@ class GroupDespawnCMD extends GroupSubCommand {
 
     @Override
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully despawned your selected display entity group!", NamedTextColor.GRAY)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Despawned your selected display entity group!", NamedTextColor.GRAY)));
         if (group instanceof SpawnedDisplayEntityGroup sg){
             DisplayGroupManager.deselectGroup(player);
             sg.unregister(true, true);

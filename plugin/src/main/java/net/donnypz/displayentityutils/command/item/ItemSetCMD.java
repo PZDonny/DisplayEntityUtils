@@ -37,7 +37,7 @@ class ItemSetCMD extends PartsSubCommand {
                 part.setItemDisplayItem(itemStack);
             }
         }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set item of ALL selected item displays!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set item of ALL selected item displays!", NamedTextColor.GREEN)));
         return true;
     }
 
@@ -52,7 +52,7 @@ class ItemSetCMD extends PartsSubCommand {
             return false;
         }
         selectedPart.setItemDisplayItem(itemStack);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set item of selected item display!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set item of selected item display!", NamedTextColor.GREEN)));
         return true;
     }
 }

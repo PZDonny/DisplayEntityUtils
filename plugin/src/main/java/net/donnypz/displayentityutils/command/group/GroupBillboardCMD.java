@@ -29,7 +29,7 @@ class GroupBillboardCMD extends GroupSubCommand {
         try{
             Display.Billboard billboard = Display.Billboard.valueOf(args[2].toUpperCase());
             group.setBillboard(billboard);
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Billboard successfully set for your selected group!", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Billboard set for your selected group!", NamedTextColor.GREEN)));
         }
         catch(IllegalArgumentException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid billboard type!", NamedTextColor.RED)));

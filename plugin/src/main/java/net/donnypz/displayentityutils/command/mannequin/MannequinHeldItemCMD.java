@@ -51,7 +51,7 @@ class MannequinHeldItemCMD extends PartsSubCommand {
                 part.setMannequinHandItem(itemStack, isMainHand);
             }
         }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set "+hand.toLowerCase()+" hand item of ALL selected mannequins!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set "+hand.toLowerCase()+" hand item of ALL selected mannequins!", NamedTextColor.GREEN)));
         return true;
     }
 
@@ -76,7 +76,7 @@ class MannequinHeldItemCMD extends PartsSubCommand {
         if (itemStack == null) return false;
 
         selectedPart.setMannequinHandItem(itemStack, isMainHand);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set "+hand.toLowerCase()+" hand item of selected mannequin!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set "+hand.toLowerCase()+" hand item of selected mannequin!", NamedTextColor.GREEN)));
         return true;
     }
 }

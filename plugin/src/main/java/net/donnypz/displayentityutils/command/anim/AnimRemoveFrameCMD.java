@@ -46,7 +46,7 @@ class AnimRemoveFrameCMD extends PlayerSubCommand {
                 return;
             }
             anim.removeFrame(frames.get(id));
-            player.sendMessage(Component.text("Frame successfully removed!", NamedTextColor.GREEN));
+            player.sendMessage(Component.text("Frame removed!", NamedTextColor.GREEN));
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid ID! ID's must be 0 or larger", NamedTextColor.RED));
         }

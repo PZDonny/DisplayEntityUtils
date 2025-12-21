@@ -34,7 +34,7 @@ class PartsRemoveCMD extends PartsSubCommand {
                 p.remove(true);
             }
         }
-        player.sendMessage(Component.text("Successfully despawned all selected parts!", NamedTextColor.GREEN));
+        player.sendMessage(Component.text("Despawned all selected parts!", NamedTextColor.GREEN));
         removeGroupIfEmpty(player, group);
         return true;
     }
@@ -51,7 +51,7 @@ class PartsRemoveCMD extends PartsSubCommand {
         else if (selectedPart instanceof PacketDisplayEntityPart pp){
             pp.remove();
         }
-        player.sendMessage(Component.text("Successfully despawned your selected part!", NamedTextColor.GREEN));
+        player.sendMessage(Component.text("Despawned your selected part!", NamedTextColor.GREEN));
         removePartSelectionIfEmpty(player, selection);
         removeGroupIfEmpty(player, group);
         return true;

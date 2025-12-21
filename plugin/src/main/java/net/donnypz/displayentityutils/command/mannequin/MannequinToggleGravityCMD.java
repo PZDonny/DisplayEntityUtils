@@ -61,7 +61,8 @@ class MannequinToggleGravityCMD extends PartsSubCommand {
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.MANNEQUIN)) return false;
         selectedPart.setMannequinGravity(!selectedPart.hasMannequinGravity());
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Toggled gravity of selected mannequin!", NamedTextColor.GREEN)));
+        String status = selectedPart.hasMannequinGravity() ? "<green>ON" : "<red>OFF";
+        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled gravity of selected mannequin "+status)));
         return true;
     }
 }

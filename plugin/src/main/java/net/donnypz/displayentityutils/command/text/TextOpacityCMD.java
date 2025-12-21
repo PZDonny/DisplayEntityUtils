@@ -32,7 +32,7 @@ class TextOpacityCMD extends PartsSubCommand {
             }
         }
         player.sendMessage(DisplayAPI.pluginPrefix
-                .append(Component.text("Successfully set text display's opacity to "+opacity+" for ALL selected text displays", NamedTextColor.GREEN)));
+                .append(Component.text("Set text display's opacity to "+opacity+" for ALL selected text displays", NamedTextColor.GREEN)));
         return true;
     }
 
@@ -46,7 +46,7 @@ class TextOpacityCMD extends PartsSubCommand {
         }
         selectedPart.setTextDisplayTextOpacity(opacity);
         player.sendMessage(DisplayAPI.pluginPrefix
-                .append(Component.text("Successfully set text display's opacity to "+opacity, NamedTextColor.GREEN)));
+                .append(Component.text("Set text display's opacity to "+opacity, NamedTextColor.GREEN)));
         return true;
     }
 

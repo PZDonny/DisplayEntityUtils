@@ -29,7 +29,7 @@ class PartsBillboardCMD extends PartsSubCommand {
         Display.Billboard billboard = getBillboard(player, args[2]);
         if (billboard == null) return false;
         selection.setBillboard(billboard);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Billboard successfully set for selected display entity part(s) in your selection!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Billboard set for selected display entity part(s) in your selection!", NamedTextColor.GREEN)));
         return true;
     }
 
@@ -42,7 +42,7 @@ class PartsBillboardCMD extends PartsSubCommand {
             Display.Billboard billboard = getBillboard(player, args[2]);
             if (billboard == null) return false;
             selectedPart.setBillboard(billboard);
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Billboard successfully set for your selected part!", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Billboard set for your selected part!", NamedTextColor.GREEN)));
         }
         return true;
     }

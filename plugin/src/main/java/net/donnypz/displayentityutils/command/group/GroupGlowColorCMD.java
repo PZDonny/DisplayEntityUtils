@@ -34,7 +34,7 @@ class GroupGlowColorCMD extends GroupSubCommand {
         }
         group.setGlowColor(c);
         group.glow(player, 60);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Glow color successfully set for display entity group!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Glow color set for display entity group!", NamedTextColor.GREEN)));
     }
 
 }

@@ -25,6 +25,6 @@ class GroupSetTagCMD extends GroupSubCommand {
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
         String tag = args[2];
         group.setTag(tag);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully tagged your selected group! <white>(Tagged: "+tag+")")));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Tagged your selected group! <white>(Tagged: "+tag+")")));
     }
 }

@@ -39,7 +39,7 @@ class InteractionHeightCMD extends PlayerSubCommand {
                 i.setWidth(change);
             }
 
-            p.sendMessage(Component.text("Successfully set interaction's "+dim+" to "+change, NamedTextColor.GREEN));
+            p.sendMessage(Component.text("Set interaction's "+dim+" to "+change, NamedTextColor.GREEN));
         }
         catch(NumberFormatException e) {
             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid " + dim + ", enter a number!", NamedTextColor.RED)));

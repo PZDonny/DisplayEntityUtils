@@ -34,7 +34,7 @@ class TextBackgroundCMD extends PartsSubCommand {
                 part.setTextDisplayBackgroundColor(color);
             }
         }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set background color for ALL selected text displays", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set background color for ALL selected text displays", NamedTextColor.GREEN)));
         return true;
     }
 
@@ -47,7 +47,7 @@ class TextBackgroundCMD extends PartsSubCommand {
             return false;
         }
         selectedPart.setTextDisplayBackgroundColor(color);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set text display's background color", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set text display's background color", NamedTextColor.GREEN)));
         return true;
     }
 

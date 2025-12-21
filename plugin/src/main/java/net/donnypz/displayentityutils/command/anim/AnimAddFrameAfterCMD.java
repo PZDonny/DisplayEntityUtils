@@ -68,7 +68,7 @@ class AnimAddFrameAfterCMD extends PlayerSubCommand {
             frames.add(id + 1, frame);
             anim.setFrames(frames);
 
-            player.sendMessage(Component.text(  "Frame successfully added after frame-id " + id + "!", NamedTextColor.GREEN));
+            player.sendMessage(Component.text(  "Added frame after frame-id " + id + "!", NamedTextColor.GREEN));
             player.playSound(player, Sound.ENTITY_SHEEP_SHEAR, 1, 0.75f);
         }
         catch (NumberFormatException e) {

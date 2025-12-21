@@ -34,7 +34,7 @@ class MannequinMainHandCMD extends PartsSubCommand {
                 if (p.getType() != SpawnedDisplayEntityPart.PartType.MANNEQUIN) continue;
                 p.setMannequinMainHand(hand);
             }
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set main hand of ALL selected mannequins!", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set main hand of ALL selected mannequins!", NamedTextColor.GREEN)));
             return true;
         }
         catch(IllegalArgumentException e){
@@ -51,7 +51,7 @@ class MannequinMainHandCMD extends PartsSubCommand {
         try{
             MainHand hand = MainHand.valueOf(handStr);
             selectedPart.setMannequinMainHand(hand);
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set mannequin's main hand!", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set mannequin's main hand!", NamedTextColor.GREEN)));
             return true;
         }
         catch(IllegalArgumentException e){

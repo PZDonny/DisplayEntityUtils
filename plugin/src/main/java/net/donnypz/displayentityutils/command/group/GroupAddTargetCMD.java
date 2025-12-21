@@ -54,6 +54,6 @@ class GroupAddTargetCMD extends PlayerSubCommand {
             SpawnedPartSelection sel = (SpawnedPartSelection) DisplayGroupManager.getPartSelection(player);
             sel.refresh();
         }
-        player.sendMessage(Component.text("Successfully added entity to your selected group!", NamedTextColor.GREEN));
+        player.sendMessage(Component.text("Added entity to your selected group!", NamedTextColor.GREEN));
     }
 }

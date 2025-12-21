@@ -47,6 +47,6 @@ class AnimMovePointCMD extends PlayerSubCommand {
         pLoc.setPitch(0);
         pLoc.setYaw(0);
         rp.setLocation(group, pLoc);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully moved frame point to your location")));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Moved the frame point to your location")));
     }
 }

@@ -44,7 +44,7 @@ class AnimSelectJSONCMD extends PlayerSubCommand {
 
         DisplayAnimationManager.setSelectedSpawnedAnimation(p, anim);
 
-        p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully selected animation! <white>(Tagged: "+anim.getAnimationTag()+")")));
+        p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Selected animation! <white>(Tagged: "+anim.getAnimationTag()+")")));
 
         DisplayEntityPluginCommand.hideRelativePoints(p);
     }

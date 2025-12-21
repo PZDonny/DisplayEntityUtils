@@ -37,12 +37,12 @@ class TextSeeThroughCMD extends PartsSubCommand {
         if (s.equalsIgnoreCase("on")){
             status = true;
             player.sendMessage(DisplayAPI.pluginPrefix
-                    .append(MiniMessage.miniMessage().deserialize("<green>Successfully toggled see through for ALL selected text displays ON")));
+                    .append(MiniMessage.miniMessage().deserialize("<green>Toggled see through for ALL selected text displays ON")));
         }
         else if (s.equalsIgnoreCase("off")){
             status = false;
             player.sendMessage(DisplayAPI.pluginPrefix
-                    .append(MiniMessage.miniMessage().deserialize("<green>Successfully toggled see through for ALL selected text displays <red>OFF")));
+                    .append(MiniMessage.miniMessage().deserialize("<green>Toggled see through for ALL selected text displays <red>OFF")));
         }
         else{
             sendIncorrectUsage(player);
@@ -64,7 +64,8 @@ class TextSeeThroughCMD extends PartsSubCommand {
             return false;
         }
         selectedPart.setTextDisplaySeeThrough(!selectedPart.isTextDisplaySeeThrough());
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully toggled see through for text display!", NamedTextColor.GREEN)));
+        String status = selectedPart.isTextDisplaySeeThrough() ? "<green>ON" : "<red>OFF";
+        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled see through for your selected text display "+status)));
         return true;
     }
 }

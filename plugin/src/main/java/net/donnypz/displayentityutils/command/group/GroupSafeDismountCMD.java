@@ -100,7 +100,7 @@ class GroupSafeDismountCMD extends ConsoleUsableSubCommand {
 
 
         DisplayControllerManager.unregisterEntity(vehicle);
-        sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully dismounted all groups riding the entity!", NamedTextColor.GREEN)));
+        sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Dismounted all groups riding the entity!", NamedTextColor.GREEN)));
     }
 
 }

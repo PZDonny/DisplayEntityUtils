@@ -30,7 +30,7 @@ class ItemTransformCMD extends PartsSubCommand {
         for (ActivePart part : selection.getSelectedParts()){
             part.setItemDisplayTransform(transform);
         }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set item transform of ALL selected item displays!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set item transform of ALL selected item displays!", NamedTextColor.GREEN)));
         return true;
     }
 
@@ -43,7 +43,7 @@ class ItemTransformCMD extends PartsSubCommand {
             return false;
         }
         selectedPart.setItemDisplayTransform(transform);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set item transform of selected item display!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set item transform of selected item display!", NamedTextColor.GREEN)));
         return true;
     }
 
