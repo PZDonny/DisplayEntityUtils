@@ -34,7 +34,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
     private static final ConcurrentHashMap<String, WorldData> allPacketGroups = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<UUID, PassengerGroupData> groupVehicles = new ConcurrentHashMap<>();
-    int interactionCount;
     int[] passengerIds;
     UUID vehicleUUID;
     boolean autoShow;
@@ -196,7 +195,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     @Override
     public void addPart(@NotNull PacketDisplayEntityPart part){
         addPartSilent(part);
-        updatePartCount(part, true);
+        updatePassengerIds(part.getEntityId(), true);
     }
 
      void addPartSilent(PacketDisplayEntityPart part){
@@ -216,21 +215,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
          }
     }
 
-    void updatePartCount(PacketDisplayEntityPart part, boolean add){
-        if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            if (add){
-                interactionCount++;
-            }
-            else{
-                interactionCount--;
-            }
-        }
-        else{
-            updatePassengerIds(part.getEntityId(), add);
-        }
-    }
-
-    private void updatePassengerIds(int passengerId, boolean add){
+    void updatePassengerIds(int passengerId, boolean add){
         int[] ids;
         if (add){
             ids = new int[passengerIds.length+1];

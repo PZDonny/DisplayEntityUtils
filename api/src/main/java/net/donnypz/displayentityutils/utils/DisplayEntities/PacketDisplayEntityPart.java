@@ -1198,7 +1198,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (!hasGroup()) return;
         group.groupParts.remove(partUUID);
         if (!isMaster){
-            group.updatePartCount(this, false);
+            group.updatePassengerIds(getEntityId(), false);
         }
         group = null;
         if (unregister){
