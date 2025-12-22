@@ -84,9 +84,9 @@ public class PacketPartSelection extends MultiPartSelection<PacketDisplayEntityP
     }
 
     @Override
-    public void setRotation(float pitch, float yaw, boolean pivotIfInteraction) {
+    public void setRotation(float pitch, float yaw, boolean pivot) {
         for (PacketDisplayEntityPart part : selectedParts){
-            part.setRotation(pitch, yaw, pivotIfInteraction);
+            part.setRotation(pitch, yaw, pivot);
         }
     }
 

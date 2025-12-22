@@ -216,12 +216,12 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     /**
      * Change the yaw of this group
      * @param yaw The yaw to set for this group
-     * @param pivotInteractions true if interactions should pivot around the group with the yaw change
+     * @param pivot whether non-display entities should pivot around the group
      */
     @Override
-    public void setYaw(float yaw, boolean pivotInteractions){
+    public void setYaw(float yaw, boolean pivot){
         for (ActivePart part : groupParts.values()){
-            part.setYaw(yaw, pivotInteractions);
+            part.setYaw(yaw, pivot);
         }
     }
 

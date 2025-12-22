@@ -651,13 +651,13 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
 
     /**
-     * Pivot all Interaction parts in this selection around this group's master part
+     * Pivot all non-display parts in this group around the group
      * @param angleInDegrees the pivot angle
      */
     @Override
     public void pivot(float angleInDegrees){
         for (ActivePart part : groupParts.values()){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (!part.isDisplay()){
                 part.pivot(angleInDegrees);
             }
         }

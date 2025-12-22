@@ -106,6 +106,10 @@ public final class SinglePartSelection extends ActivePartSelection<SpawnedDispla
         selectedPart.setYaw(yaw, pivot);
     }
 
+    /**
+     * Pivot a non-display entity around its group's master part
+     * @param angleInDegrees the pivot angle
+     */
     @Override
     public void pivot(float angleInDegrees) {
         selectedPart.pivot(angleInDegrees);

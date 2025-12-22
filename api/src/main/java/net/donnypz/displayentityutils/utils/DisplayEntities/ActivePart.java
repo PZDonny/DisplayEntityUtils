@@ -334,32 +334,32 @@ public abstract class ActivePart implements Active{
     public abstract void setTransformationMatrix(@NotNull Matrix4f matrix);
 
     /**
-     * Change the X scale of this part
-     * @param scale The X scale to set for this part
-     * @return false if this part is an Interaction
+     * Change this display entity part's X scale
+     * @param scale The X scale to set
+     * @return false if this part is not a display entity
      */
     public abstract boolean setXScale(float scale);
 
     /**
-     * Change the Y scale of this part
-     * @param scale The Y scale to set for this part
-     * @return false if this part is an Interaction
+     * Change this display entity part's Y scale
+     * @param scale The Y scale to set
+     * @return false if this part is not a display entity
      */
     public abstract boolean setYScale(float scale);
 
     /**
-     * Change the Z scale of this part
-     * @param scale The Z scale to set for this part
-     * @return false if this part is an Interaction
+     * Change this display entity part's Z scale
+     * @param scale The Z scale to set
+     * @return false if this part is not a display entity
      */
     public abstract boolean setZScale(float scale);
 
     /**
-     * Change the scale of this part
-     * @param x The X scale to set for this part
-     * @param y The Y scale to set for this part
-     * @param z The Z scale to set for this part
-     * @return false if this part is an Interaction
+     * Change this display entity part's scale
+     * @param x The X scale to set
+     * @param y The Y scale to set
+     * @param z The Z scale to set
+     * @return false if this part is not a display entity
      */
     public abstract boolean setScale(float x, float y, float z);
 

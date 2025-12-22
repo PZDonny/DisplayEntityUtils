@@ -928,8 +928,8 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public void setRotation(float pitch, float yaw, boolean pivotIfInteraction){
-        if (pivotIfInteraction && type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+    public void setRotation(float pitch, float yaw, boolean pivot){
+        if (pivot && !isDisplay()){
             pivot(yaw, pitch);
         }
         else if (!viewers.isEmpty()){
@@ -948,6 +948,11 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         setRotation(pitch, getYaw(), false);
     }
 
+    /**
+     * Change the yaw of this part
+     * @param yaw The yaw to set for this part
+     * @param pivot whether the part should pivot around its group's location, if it has one, and if the part is an Interaction
+     */
     @Override
     public void setYaw(float yaw, boolean pivot) {
         setRotation(getPitch(), yaw, pivot);
@@ -964,7 +969,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
-     * Pivot an Interaction Entity around its group's master part
+     * Pivot a non-display entity around its group's master part
      * @param angleInDegrees the pivot angle
      */
     @Override
@@ -978,6 +983,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     private void pivot(float yaw, float pitch, float angleInDegrees){
+        if (group == null || isDisplay()) return;
         Location groupLoc = group.getLocation();
         Location pivotedLoc = DisplayUtils.getPivotLocation(getLocation(), groupLoc, angleInDegrees);
         packetLocation.setCoordinates(pivotedLoc);

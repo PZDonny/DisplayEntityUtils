@@ -507,12 +507,12 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     /**
      * Change the yaw of this part
      * @param yaw The yaw to set for this part
-     * @param pivotIfInteraction true if this part's type is {@link PartType#INTERACTION} and it should pivot around the group's location
+     * @param pivot whether the part should pivot around its group's location, if it has one, and if the part is an Interaction
      */
     @Override
-    public void setYaw(float yaw, boolean pivotIfInteraction){
+    public void setYaw(float yaw, boolean pivot){
         Entity entity = getEntity();
-        if (type == PartType.INTERACTION && pivotIfInteraction){
+        if (!isDisplay() && pivot){
             pivot(yaw-entity.getYaw());
         }
         entity.setRotation(yaw, entity.getPitch());
@@ -721,14 +721,14 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     /**
-     * Pivot an Interaction Entity around its group's master part
+     * Pivot a non-display entity around its group's master part
      * @param angleInDegrees the pivot angle
      */
     @Override
     public void pivot(float angleInDegrees){
-        Entity entity = getEntity();
-        if (isDisplay() || isSingle) return;
-        Interaction i = (Interaction) entity;
+        if (isDisplay() || isSingle || group == null) return;
+        Interaction i = (Interaction) getEntity();
+        if (i == null) return;
         DisplayUtils.pivot(i, group.getLocation(), angleInDegrees);
     }
 
