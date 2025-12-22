@@ -299,7 +299,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public boolean setXScale(float scale) {
+    public boolean setDisplayXScale(float scale) {
         if (!isDisplay()) return false;
         Vector3f vec = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.SCALE, new Vector3f());
         vec.x = scale;
@@ -308,7 +308,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public boolean setYScale(float scale) {
+    public boolean setDisplayYScale(float scale) {
         if (!isDisplay()) return false;
         Vector3f vec = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.SCALE, new Vector3f());
         vec.y = scale;
@@ -317,7 +317,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public boolean setZScale(float scale) {
+    public boolean setDisplayZScale(float scale) {
         if (!isDisplay()) return false;
         Vector3f vec = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.SCALE, new Vector3f());
         vec.z = scale;
@@ -326,7 +326,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public boolean setScale(float x, float y, float z) {
+    public boolean setDisplayScale(float x, float y, float z) {
         if (!isDisplay()) return false;
         Vector3f vec = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.SCALE, new Vector3f());
         vec.x = x;

@@ -76,16 +76,16 @@ class PartsScaleCMD extends PartsSubCommand {
     private boolean applyScaleChange(String dim, float scale, ActivePart part, Player player){
         switch (dim){
             case "x" -> {
-                part.setXScale(scale);
+                part.setDisplayXScale(scale);
             }
             case "y" -> {
-                part.setYScale(scale);
+                part.setDisplayYScale(scale);
             }
             case "z" -> {
-                part.setZScale(scale);
+                part.setDisplayZScale(scale);
             }
             case "-all" -> {
-                part.setScale(scale, scale, scale);
+                part.setDisplayScale(scale, scale, scale);
             }
             default -> {
                 sendIncorrectUsage(player);

@@ -338,21 +338,21 @@ public abstract class ActivePart implements Active{
      * @param scale The X scale to set
      * @return false if this part is not a display entity
      */
-    public abstract boolean setXScale(float scale);
+    public abstract boolean setDisplayXScale(float scale);
 
     /**
      * Change this display entity part's Y scale
      * @param scale The Y scale to set
      * @return false if this part is not a display entity
      */
-    public abstract boolean setYScale(float scale);
+    public abstract boolean setDisplayYScale(float scale);
 
     /**
      * Change this display entity part's Z scale
      * @param scale The Z scale to set
      * @return false if this part is not a display entity
      */
-    public abstract boolean setZScale(float scale);
+    public abstract boolean setDisplayZScale(float scale);
 
     /**
      * Change this display entity part's scale
@@ -361,7 +361,7 @@ public abstract class ActivePart implements Active{
      * @param z The Z scale to set
      * @return false if this part is not a display entity
      */
-    public abstract boolean setScale(float x, float y, float z);
+    public abstract boolean setDisplayScale(float x, float y, float z);
 
     /**
      * Set the text of this part if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.

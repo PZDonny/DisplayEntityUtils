@@ -529,7 +529,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
-    public boolean setXScale(float scale){
+    public boolean setDisplayXScale(float scale){
         if (!isDisplay()) return false;
         Transformation t = getTransformation();
         Vector3f v = t.getScale();
@@ -540,7 +540,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
-    public boolean setYScale(float scale){
+    public boolean setDisplayYScale(float scale){
         if (!isDisplay()) return false;
         Transformation t = getTransformation();
         Vector3f v = t.getScale();
@@ -551,7 +551,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
-    public boolean setZScale(float scale){
+    public boolean setDisplayZScale(float scale){
         if (!isDisplay()) return false;
         Transformation t = getTransformation();
         Vector3f v = t.getScale();
@@ -562,7 +562,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
-    public boolean setScale(float x, float y, float z){
+    public boolean setDisplayScale(float x, float y, float z){
         if (!isDisplay()) return false;
         Transformation t = getTransformation();
         Transformation newT = new Transformation(t.getTranslation(), t.getLeftRotation(), new Vector3f(x, y, z), t.getRightRotation());
