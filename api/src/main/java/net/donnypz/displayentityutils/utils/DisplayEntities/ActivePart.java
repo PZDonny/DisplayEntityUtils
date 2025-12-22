@@ -533,6 +533,8 @@ public abstract class ActivePart implements Active{
 
     public abstract void setMannequinProfile(@NotNull ResolvableProfile profile);
 
+    public abstract void setMannequinName(@Nullable Component text);
+
     public abstract void setMannequinBelowName(@Nullable Component text);
 
     public abstract void setMannequinPose(Pose pose);

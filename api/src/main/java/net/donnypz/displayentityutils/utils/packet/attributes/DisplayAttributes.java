@@ -10,6 +10,8 @@ import net.kyori.adventure.text.Component;
 public final class DisplayAttributes {
 
     public static final GlowingDisplayAttribute GLOWING = new GlowingDisplayAttribute(0);
+    public static final OptionalComponentDisplayAttribute CUSTOM_NAME = new OptionalComponentDisplayAttribute(2);
+    public static final BasicDisplayAttribute<Boolean> CUSTOM_NAME_VISIBLE = new BasicDisplayAttribute<>(3, Boolean.class, EntityDataTypes.BOOLEAN);
 
     public static final class Interpolation {
         public static final BasicDisplayAttribute<Integer> DELAY = new BasicDisplayAttribute<>(8, Integer.class, EntityDataTypes.INT);
@@ -40,7 +42,6 @@ public final class DisplayAttributes {
         public static final BasicDisplayAttribute<Float> WIDTH = new BasicDisplayAttribute<>(20, Float.class, EntityDataTypes.FLOAT);
         public static final BasicDisplayAttribute<Float> HEIGHT = new BasicDisplayAttribute<>(21, Float.class, EntityDataTypes.FLOAT);
     }
-
 
     public static final ColorDisplayAttribute GLOW_COLOR_OVERRIDE = new ColorDisplayAttribute(22);
 
