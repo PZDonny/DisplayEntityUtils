@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.command.parts;
+package net.donnypz.displayentityutils.command.display;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
@@ -15,9 +15,9 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-class PartsTranslateCMD extends PartsSubCommand {
-    PartsTranslateCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("translate", parentSubCommand, Permission.PARTS_TRANSLATE, 5, 5);
+class DisplayTranslateCMD extends PartsSubCommand {
+    DisplayTranslateCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("translate", parentSubCommand, Permission.DISPLAY_TRANSLATE, 5, 5);
         setTabComplete(2, TabSuggestion.DIRECTIONS);
         setTabComplete(3, "<distance>");
         setTabComplete(4, "<tick-duration>");
@@ -34,7 +34,7 @@ class PartsTranslateCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("/deu parts translate <direction> <distance> <tick-duration> [-all]", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("/deu display translate <direction> <distance> <tick-duration> [-all]", NamedTextColor.RED)));
     }
 
     @Override
@@ -43,16 +43,17 @@ class PartsTranslateCMD extends PartsSubCommand {
         if (objects == null) return false;
 
         selection.translate((Direction) objects[0], (float) objects[1], (int) objects[2], -1);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Translating all selected parts!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Translating all selected display parts!", NamedTextColor.GREEN)));
         return true;
     }
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        if (isNotDisplay(player, selectedPart)) return false;
         Object[] objects = getArgs(player, args);
         if (objects == null) return false;
         selectedPart.translate((Direction) objects[0], (float) objects[1], (int) objects[2], -1);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Translating your selected part!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Translating your selected display!", NamedTextColor.GREEN)));
         return true;
     }
 

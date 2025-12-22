@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.command.parts;
+package net.donnypz.displayentityutils.command.display;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
@@ -15,15 +15,15 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-class PartsSetBlockCMD extends PartsSubCommand {
-    PartsSetBlockCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("setblock", parentSubCommand, Permission.PARTS_SET_BLOCK, 3, 3);
+class DisplaySetBlockCMD extends PartsSubCommand {
+    DisplaySetBlockCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("setblock", parentSubCommand, Permission.DISPLAY_SET_BLOCK, 3, 3);
         setTabComplete(2, List.of("-held", "-target", "<block-id>"));
     }
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /deu parts setblock <\"-held\" | \"-target\" | block-id> [-all]", NamedTextColor.RED));
+        player.sendMessage(Component.text("Incorrect Usage! /deu display setblock <\"-held\" | \"-target\" | block-id> [-all]", NamedTextColor.RED));
     }
 
     @Override
@@ -42,12 +42,9 @@ class PartsSetBlockCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        if (isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY)) return false;
         BlockData blockData = DEUCommandUtils.getBlockFromText(args[2], player);
         if (blockData == null) return false;
-        if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with block display entities", NamedTextColor.RED)));
-            return false;
-        }
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set block of selected block display!", NamedTextColor.GREEN)));
         setBlock(selectedPart, blockData);

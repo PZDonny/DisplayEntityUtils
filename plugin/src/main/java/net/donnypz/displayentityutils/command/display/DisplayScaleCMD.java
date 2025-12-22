@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.command.parts;
+package net.donnypz.displayentityutils.command.display;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
@@ -13,9 +13,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-class PartsScaleCMD extends PartsSubCommand {
+class DisplayScaleCMD extends PartsSubCommand {
 
-    PartsScaleCMD(@NotNull DEUSubCommand parentSubCommand) {
+    DisplayScaleCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("scale", parentSubCommand, Permission.PARTS_TRANSFORM, 4, 4);
         setTabComplete(2, List.of("x", "y", "z", "-all"));
         setTabComplete(3, "<scale>");
@@ -29,7 +29,7 @@ class PartsScaleCMD extends PartsSubCommand {
             }
             try {
                 if (applyScaleChange(getDimension(args), getScale(args), selectedPart, player)) {
-                    player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Scale Updated!", NamedTextColor.GREEN)));
+                    player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Scale updated for selected display parts!", NamedTextColor.GREEN)));
                 }
             } catch (NumberFormatException e) {
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the scale!", NamedTextColor.RED)));
@@ -41,14 +41,10 @@ class PartsScaleCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
-        if (!selectedPart.isDisplay()) {
-            player.sendMessage(Component.text("You can only do this with a display entity!", NamedTextColor.RED));
-            player.sendMessage(Component.text("| Use \"/deu interaction scale\" instead", NamedTextColor.GRAY));
-            return false;
-        }
+        if (isNotDisplay(player, selectedPart)) return false;
         try {
             if (applyScaleChange(getDimension(args), getScale(args), selectedPart, player)) {
-                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Scale Updated!", NamedTextColor.GREEN)));
+                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Scale updated!", NamedTextColor.GREEN)));
                 return true;
             }
             else{
@@ -62,7 +58,7 @@ class PartsScaleCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /deu parts scale <x | y | z | -all> <scale> [-all]", NamedTextColor.RED));
+        player.sendMessage(Component.text("Incorrect Usage! /deu display scale <x | y | z | -all> <scale> [-all]", NamedTextColor.RED));
     }
 
     private String getDimension(String[] args){

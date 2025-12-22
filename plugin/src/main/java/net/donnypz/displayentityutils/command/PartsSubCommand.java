@@ -70,7 +70,15 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
 
     protected boolean isInvalidType(Player player, ActivePart part, SpawnedDisplayEntityPart.PartType validType){
         if (part.getType() != validType){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with "+validType.name().toLowerCase().replace("_"," ")+" entities", NamedTextColor.RED)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with "+validType.name().toLowerCase().replace("_"," ")+" entities!", NamedTextColor.RED)));
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean isNotDisplay(Player player, ActivePart part){
+        if (!part.isDisplay()){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with display entities!", NamedTextColor.RED)));
             return true;
         }
         return false;

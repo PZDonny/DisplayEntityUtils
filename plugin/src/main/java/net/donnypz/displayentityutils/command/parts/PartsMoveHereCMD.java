@@ -48,7 +48,7 @@ class PartsMoveHereCMD extends PartsSubCommand {
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (selectedPart.isDisplay() && group != null){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot do this for grouped display entities!", NamedTextColor.RED)));
-            player.sendMessage(Component.text("| Use \"/deu parts translate\" instead", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Use \"/deu display translate\" instead", NamedTextColor.GRAY));
             return false;
         }
 

@@ -20,7 +20,6 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         new PartsCycleCMD(this);
         new PartsGlowCMD(this);
         new PartsUnglowCMD(this);
-        new PartsGlowColorCMD(this);
         new PartsFilterTagsCMD(this);
         new PartsFilterTypesCMD(this);
         new PartsFilterBlocksCMD(this);
@@ -32,16 +31,10 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         new PartsRemoveTagCMD(this);
         new PartsListTagsCMD(this);
         new PartsRemoveCMD(this);
-        new PartsTranslateCMD(this);
-        new PartsSetBlockCMD(this);
-        new PartsBillboardCMD(this);
-        new PartsViewRangeCMD(this);
-        new PartsBrightnessCMD(this);
         new PartsPitchCMD(this);
         new PartsYawCMD(this);
         new PartsMoveHereCMD(this);
         new PartsMoveCMD(this);
-        new PartsScaleCMD(this);
     }
 
     @Override
@@ -64,9 +57,9 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         sender.sendMessage(Component.empty());
         sender.sendMessage(DisplayAPI.pluginPrefixLong);
         if (page <= 1){
-            sender.sendMessage(Component.text("\"Parts\" are each individual display/interaction entity that is contained within a group", NamedTextColor.AQUA));
-            sender.sendMessage(Component.text("| Add tags to parts to identify each part in a group", NamedTextColor.AQUA));
-            sender.sendMessage(Component.text("| \"-all\" will apply the command to all parts within your part selection where valid. By default a selected group's parts is your part selection", NamedTextColor.GOLD));
+            sender.sendMessage(Component.text("- \"Parts\" are each entity in a group/model", NamedTextColor.AQUA));
+            sender.sendMessage(Component.text("-  Add tags to parts to identify each part in a group", NamedTextColor.AQUA));
+            sender.sendMessage(Component.text("-  \"-all\" will apply a command to all parts in your selection/filter where valid. By default, all of your selected group's parts are your in selection", NamedTextColor.GOLD));
             sender.sendMessage(Component.empty());
             CMDUtils.sendCMD(sender, "/deu parts help <page-number>", "Get help for parts");
             CMDUtils.sendCMD(sender, "/deu parts info", "Get information about your current part/selection");
@@ -93,20 +86,11 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/deu parts glow [-all]", "Make your selected part glow");
             CMDUtils.sendCMD(sender, "/deu parts unglow [-all]", "Remove the glow from your selected part");
         }
-        else if (page == 4){
-            CMDUtils.sendCMD(sender, "/deu parts glowcolor <color | hex-code> [-all]", "Set your selected part's glow color");
-            CMDUtils.sendCMD(sender, "/deu parts brightness <block> <sky> [-all]", "Set your selected part's brightness. Enter values between 0-15. -1 resets");
-            CMDUtils.sendCMD(sender, "/deu parts viewrange <view-range-multiplier> [-all]", "Set the view range multiplier for your selected part");
-            CMDUtils.sendCMD(sender, "/deu parts billboard <fixed | vertical | horizontal | center> [-all]", "Set the billboard of your selected part");
-            CMDUtils.sendCMD(sender, "/deu parts translate <direction> <distance> <tick-duration> [-all]", "Translate your selected part");
+        else{
             CMDUtils.sendCMD(sender, "/deu parts pitch <pitch>", "Set the pitch of an ungrouped part entity");
             CMDUtils.sendCMD(sender, "/deu parts yaw <yaw>", "Set the yaw of an ungrouped part entity");
-        }
-        else{
-            CMDUtils.sendCMD(sender, "/deu parts scale <x | y | z | -all> <scale> [-all]", "Change the scale of your selected part, by axis");
             CMDUtils.sendCMD(sender, "/deu parts move <direction> <distance> [-all]", "Change the actual location of your selected part");
             CMDUtils.sendCMD(sender, "/deu parts movehere [-all]", "Change your selected part's actual location to your location");
-            CMDUtils.sendCMD(sender, "/deu parts setblock <\"-held\" | \"-target\" | block-id> [-all]", "Change the block of a block display part");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }

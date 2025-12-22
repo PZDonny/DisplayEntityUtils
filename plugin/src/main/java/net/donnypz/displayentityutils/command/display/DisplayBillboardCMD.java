@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.command.parts;
+package net.donnypz.displayentityutils.command.display;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
@@ -12,16 +12,16 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-class PartsBillboardCMD extends PartsSubCommand {
-    PartsBillboardCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("billboard", parentSubCommand, Permission.PARTS_BILLBOARD, 3, 3);
+class DisplayBillboardCMD extends PartsSubCommand {
+    DisplayBillboardCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("billboard", parentSubCommand, Permission.DISPLAY_BILLBOARD, 3, 3);
         setTabComplete(2, TabSuggestion.BILLBOARDS);
     }
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid billboard type!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/deu parts billboard <fixed | vertical | horizontal | center> [-all]", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("/deu display billboard <fixed | vertical | horizontal | center> [-all]", NamedTextColor.GRAY));
     }
 
     @Override
@@ -42,7 +42,7 @@ class PartsBillboardCMD extends PartsSubCommand {
             Display.Billboard billboard = getBillboard(player, args[2]);
             if (billboard == null) return false;
             selectedPart.setBillboard(billboard);
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Billboard set for your selected part!", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Billboard set for your selected display!", NamedTextColor.GREEN)));
         }
         return true;
     }

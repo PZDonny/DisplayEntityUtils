@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.command.parts;
+package net.donnypz.displayentityutils.command.display;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
@@ -11,15 +11,15 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-class PartsViewRangeCMD extends PartsSubCommand {
-    PartsViewRangeCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("viewrange", parentSubCommand, Permission.PARTS_VIEWRANGE, 3, 3);
+class DisplayViewRangeCMD extends PartsSubCommand {
+    DisplayViewRangeCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("viewrange", parentSubCommand, Permission.DISPLAY_VIEW_RANGE, 3, 3);
         setTabComplete(2, "<view-range-multiplier>");
     }
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Provide a part tag! /deu parts viewrange <view-range-multiplier> [-all]", NamedTextColor.RED));
+        player.sendMessage(Component.text("Provide a part tag! /deu display viewrange <view-range-multiplier> [-all]", NamedTextColor.RED));
     }
 
     @Override
@@ -27,7 +27,7 @@ class PartsViewRangeCMD extends PartsSubCommand {
         Float viewRange = getViewRange(player, args[2]);
         if (viewRange == null) return false;
         selection.setViewRange(viewRange);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("View range multiplier updated for all selected parts!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("View range multiplier updated for all selected displays!", NamedTextColor.GREEN)));
         player.sendMessage(Component.text("New View Range: "+viewRange, NamedTextColor.GRAY));
         return true;
     }
