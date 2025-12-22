@@ -619,9 +619,23 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public void setMannequinName(@Nullable Component text) {
-        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
+    public void setCustomName(@Nullable Component text) {
         setAndSend(DisplayAttributes.CUSTOM_NAME, text);
+    }
+
+    @Override
+    public void setCustomNameVisible(boolean visible) {
+        setAndSend(DisplayAttributes.CUSTOM_NAME_VISIBLE, visible);
+    }
+
+    @Override
+    public @Nullable Component getCustomName() {
+        return attributeContainer.getAttribute(DisplayAttributes.CUSTOM_NAME);
+    }
+
+    @Override
+    public boolean isCustomNameVisible(){
+        return attributeContainer.getAttributeOrDefault(DisplayAttributes.CUSTOM_NAME_VISIBLE, false);
     }
 
     @Override

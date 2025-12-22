@@ -1052,11 +1052,31 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
-    public void setMannequinName(@Nullable Component text) {
-        if (type != PartType.MANNEQUIN) return;
-        Mannequin mannequin = (Mannequin) getEntity();
-        if (mannequin == null) return;
-        mannequin.customName(text);
+    public void setCustomName(@Nullable Component text) {
+        Entity e = getEntity();
+        if (e == null) return;
+        e.customName(text);
+    }
+
+    @Override
+    public void setCustomNameVisible(boolean visible) {
+        Entity e = getEntity();
+        if (e == null) return;
+        e.setCustomNameVisible(visible);
+    }
+
+    @Override
+    public @Nullable Component getCustomName() {
+        Entity e = getEntity();
+        if (e == null) return null;
+        return e.customName();
+    }
+
+    @Override
+    public boolean isCustomNameVisible() {
+        Entity e = getEntity();
+        if (e == null) return false;
+        return e.isCustomNameVisible();
     }
 
     @Override

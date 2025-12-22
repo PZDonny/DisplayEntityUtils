@@ -505,6 +505,15 @@ public abstract class ActivePart implements Active{
      */
     public abstract @Nullable Vector getNonDisplayTranslation();
 
+
+    public abstract void setCustomName(@Nullable Component text);
+
+    public abstract void setCustomNameVisible(boolean visible);
+
+    public abstract @Nullable Component getCustomName();
+
+    public abstract boolean isCustomNameVisible();
+
     public abstract void setInteractionHeight(float height);
 
     public abstract void setInteractionWidth(float width);
@@ -532,8 +541,6 @@ public abstract class ActivePart implements Active{
     public abstract void setMannequinProfile(@NotNull PlayerProfile profile);
 
     public abstract void setMannequinProfile(@NotNull ResolvableProfile profile);
-
-    public abstract void setMannequinName(@Nullable Component text);
 
     public abstract void setMannequinBelowName(@Nullable Component text);
 
