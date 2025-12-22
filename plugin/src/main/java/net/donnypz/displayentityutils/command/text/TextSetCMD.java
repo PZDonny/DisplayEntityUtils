@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-class TextSetCMD extends PartsSubCommand {
+public class TextSetCMD extends PartsSubCommand {
 
     public TextSetCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("set", parentSubCommand, Permission.TEXT_SET_TEXT, 3, 0);
@@ -45,7 +45,7 @@ class TextSetCMD extends PartsSubCommand {
         return true;
     }
 
-    static String getTextResult(String[] args){
+    public static String getTextResult(String[] args){
         StringBuilder builder = new StringBuilder();
         for (int i = 2; i < args.length; i++){
             builder.append(args[i]);

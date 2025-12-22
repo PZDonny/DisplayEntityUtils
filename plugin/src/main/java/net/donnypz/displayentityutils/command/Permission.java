@@ -83,6 +83,9 @@ public enum Permission {
     INTERACTION_SPAWN("deu.interaction.spawn"),
     INTERACTION_INFO("deu.interaction.info"),
 
+    MANNEQUIN_SKIN("deu.mannequin.skin"),
+    MANNEQUIN_NAME("deu.mannequin.name"),
+    MANNEQUIN_NAME_VISIBLE("deu.mannequin.namevisible"),
     MANNEQUIN_POSE("deu.mannequin.pose"),
     MANNEQUIN_SCALE("deu.mannequin.scale"),
     MANNEQUIN_GRAVITY("deu.mannequin.gravity"),
