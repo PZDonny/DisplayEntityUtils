@@ -43,14 +43,11 @@ class ItemSetCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        if (isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY)) return false;
         String item = args[2];
         ItemStack itemStack = DEUCommandUtils.getItemFromText(item, player);
         if (itemStack == null) return false;
 
-        if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with item display entities", NamedTextColor.RED)));
-            return false;
-        }
         selectedPart.setItemDisplayItem(itemStack);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set item of selected item display!", NamedTextColor.GREEN)));
         return true;

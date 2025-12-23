@@ -38,12 +38,10 @@ class TextOpacityCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        if (isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)) return false;
+
         Byte opacity = getOpacity(args, player);
         if (opacity == null) return false;
-        if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
-            return false;
-        }
         selectedPart.setTextDisplayTextOpacity(opacity);
         player.sendMessage(DisplayAPI.pluginPrefix
                 .append(Component.text("Set text display's opacity to "+opacity, NamedTextColor.GREEN)));

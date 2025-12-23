@@ -36,12 +36,9 @@ class ItemTransformCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        if (isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY)) return false;
         ItemDisplay.ItemDisplayTransform transform = getTransform(player, args[2]);
         if (transform == null) return false;
-        if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with item display entities", NamedTextColor.RED)));
-            return false;
-        }
         selectedPart.setItemDisplayTransform(transform);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set item transform of selected item display!", NamedTextColor.GREEN)));
         return true;
