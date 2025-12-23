@@ -5,7 +5,6 @@ import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
-import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.player.Equipment;
 import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
@@ -20,10 +19,12 @@ import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.attributes.AttributeDisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.donnypz.displayentityutils.utils.packet.attributes.EquipmentAttribute;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
@@ -536,7 +537,8 @@ public class PacketAttributeContainer implements Cloneable{
         }
 
         Equipment createEquipmentData(DisplayAttribute<?, ?> attribute, Object value){
-            return new Equipment(EquipmentSlot.values()[attribute.getIndex()], (ItemStack) value);
+            return new Equipment(EquipmentSlot.values()[attribute.getIndex()],
+                    ((EquipmentAttribute) attribute).getOutputValue((ItemStack) value));
         }
 
         WrapperPlayServerUpdateAttributes.Property createAttributeData(DisplayAttribute<?, ?> attribute, Object value){

@@ -17,6 +17,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Transformation;
@@ -554,7 +555,7 @@ public abstract class ActivePart implements Active{
 
     public abstract void setMannequinMainHand(@NotNull MainHand mainHand);
 
-    public abstract void setMannequinHandItem(@NotNull ItemStack itemStack, boolean mainHand);
+    public abstract void setMannequinEquipment(@NotNull EquipmentSlot slot, @NotNull ItemStack itemStack);
 
     public abstract ResolvableProfile getMannequinProfile();
 
@@ -569,6 +570,8 @@ public abstract class ActivePart implements Active{
     public abstract boolean hasMannequinGravity();
 
     public abstract @Nullable MainHand getMannequinMainHand();
+
+    public abstract @NotNull ItemStack getMannequinEquipment(@NotNull EquipmentSlot equipmentSlot);
 
     /**
      * Adds a command to this part to execute when clicked, if its type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}

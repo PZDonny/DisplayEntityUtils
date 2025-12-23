@@ -19,12 +19,10 @@ import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import net.donnypz.displayentityutils.utils.packet.attributes.TextDisplayOptions;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Transformation;
@@ -602,9 +600,15 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public void setMannequinHandItem(@NotNull ItemStack itemStack, boolean mainHand) {
+    public @NotNull ItemStack getMannequinEquipment(@NotNull EquipmentSlot equipmentSlot) {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return ItemStack.of(Material.AIR);
+        return attributeContainer.getAttribute(DisplayAttributes.Equipment.getAttribute(equipmentSlot));
+    }
+
+    @Override
+    public void setMannequinEquipment(@NotNull EquipmentSlot slot, @NotNull ItemStack itemStack) {
         if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
-        //TODO
+        setAndSend(DisplayAttributes.Equipment.getAttribute(slot), itemStack);
     }
 
     @Override

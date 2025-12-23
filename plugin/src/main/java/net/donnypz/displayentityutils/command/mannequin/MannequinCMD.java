@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.command.mannequin;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -34,6 +35,10 @@ public class MannequinCMD extends ConsoleUsableSubCommand {
             help(sender, 1);
         }
         else{
+            if (VersionUtils.IS_1_21_9){
+                sender.sendMessage(Component.text("Your server version does not support Mannequin entities!", NamedTextColor.RED));
+                return;
+            }
             DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
         }
     }

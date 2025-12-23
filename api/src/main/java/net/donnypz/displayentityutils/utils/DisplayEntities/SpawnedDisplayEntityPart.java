@@ -16,6 +16,7 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -1026,16 +1027,20 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
-    public void setMannequinHandItem(@NotNull ItemStack itemStack, boolean mainHand) {
+    public @NotNull ItemStack getMannequinEquipment(@NotNull EquipmentSlot equipmentSlot) {
+        if (type != PartType.MANNEQUIN) return null;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return null;
+        return mannequin.getEquipment().getItem(equipmentSlot);
+    }
+
+
+    @Override
+    public void setMannequinEquipment(@NotNull EquipmentSlot slot, @NotNull ItemStack itemStack) {
         if (type != PartType.MANNEQUIN) return;
         Mannequin mannequin = (Mannequin) getEntity();
         if (mannequin == null) return;
-        if (mainHand){
-            mannequin.getEquipment().setItemInMainHand(itemStack, true);
-        }
-        else{
-            mannequin.getEquipment().setItemInOffHand(itemStack, true);
-        }
+        mannequin.getEquipment().setItem(slot, itemStack);
     }
 
     @Override

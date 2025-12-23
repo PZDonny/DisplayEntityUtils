@@ -1,8 +1,8 @@
 package net.donnypz.displayentityutils.utils.packet.attributes;
 
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
+import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 public class EquipmentAttribute extends DisplayAttribute<ItemStack, com.github.retrooper.packetevents.protocol.item.ItemStack>{

@@ -9,6 +9,7 @@ import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,7 +49,7 @@ class MannequinHeldItemCMD extends PartsSubCommand {
 
         for (ActivePart part : selection.getSelectedParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.MANNEQUIN) {
-                part.setMannequinHandItem(itemStack, isMainHand);
+                part.setMannequinEquipment(isMainHand ? EquipmentSlot.HAND : EquipmentSlot.OFF_HAND, itemStack);
             }
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set "+hand.toLowerCase()+" hand item of ALL selected mannequins!", NamedTextColor.GREEN)));
@@ -75,7 +76,7 @@ class MannequinHeldItemCMD extends PartsSubCommand {
         ItemStack itemStack = DEUCommandUtils.getItemFromText(item, player);
         if (itemStack == null) return false;
 
-        selectedPart.setMannequinHandItem(itemStack, isMainHand);
+        selectedPart.setMannequinEquipment(isMainHand ? EquipmentSlot.HAND : EquipmentSlot.OFF_HAND, itemStack);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set "+hand.toLowerCase()+" hand item of selected mannequin!", NamedTextColor.GREEN)));
         return true;
     }
