@@ -129,10 +129,9 @@ class PartsCycleCMD extends PlayerSubCommand {
                 }
             }
             case MANNEQUIN -> {
-                ResolvableProfile profile = part.getMannequinProfile();
-                String name = profile.name();
-                if (name == null) name = "Unnamed Mannequin";
-                desc = Component.text("("+name+")");
+                Component customName = part.getCustomName();
+                if (customName == null) customName = Component.text("Unnamed Mannequin");
+                desc = Component.text("(").append(customName).append(Component.text(")"));
             }
             default -> throw new IllegalStateException("Unexpected part type");
         }
