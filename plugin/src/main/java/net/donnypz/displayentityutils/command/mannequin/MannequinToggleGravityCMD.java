@@ -32,6 +32,11 @@ class MannequinToggleGravityCMD extends PartsSubCommand {
             return false;
         }
 
+        if (group != null){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot change the gravity of mannequins in a group!", NamedTextColor.RED)));
+            return false;
+        }
+
         boolean status;
         String s = args[3];
         if (s.equalsIgnoreCase("on")){
@@ -60,6 +65,10 @@ class MannequinToggleGravityCMD extends PartsSubCommand {
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.MANNEQUIN)) return false;
+        if (group != null){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot change the gravity of a mannequin in a group!", NamedTextColor.RED)));
+            return false;
+        }
         selectedPart.setMannequinGravity(!selectedPart.hasMannequinGravity());
         String status = selectedPart.hasMannequinGravity() ? "<green>ON" : "<red>OFF";
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled gravity of selected mannequin "+status)));

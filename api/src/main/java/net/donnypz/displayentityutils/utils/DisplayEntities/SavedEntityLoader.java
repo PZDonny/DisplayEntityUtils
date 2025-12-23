@@ -21,9 +21,7 @@ class SavedEntityLoader {
                 origin.getYaw());
 
         return spawnLoc.getWorld().spawn(spawnLoc, org.bukkit.entity.Mannequin.class, m ->{
-            m.setInvulnerable(true);
-            m.setImmovable(true);
-            m.setGravity(false);
+            DisplayUtils.prepareMannequin(m);
 
             m.customName(mannequinEntity.customName != null ? MiniMessage.miniMessage().deserialize(mannequinEntity.customName): null);
             m.setDescription(mannequinEntity.description != null ? MiniMessage.miniMessage().deserialize(mannequinEntity.description) : null);

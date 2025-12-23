@@ -32,6 +32,11 @@ class MannequinToggleImmovableCMD extends PartsSubCommand {
             return false;
         }
 
+        if (group != null){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot change the immovability of mannequins in a group!", NamedTextColor.RED)));
+            return false;
+        }
+
         boolean status;
         String s = args[3];
         if (s.equalsIgnoreCase("on")){
@@ -59,7 +64,12 @@ class MannequinToggleImmovableCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
-        isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.MANNEQUIN);
+        if (isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.MANNEQUIN)) return false;
+
+        if (group != null){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot change the immovability of a mannequin in a group!", NamedTextColor.RED)));
+            return false;
+        }
         selectedPart.setMannequinImmovable(!selectedPart.isMannequinImmovable());
         String status = selectedPart.isMannequinImmovable() ? "<green>ON" : "<red>OFF";
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled immovability of selected mannequin "+status)));

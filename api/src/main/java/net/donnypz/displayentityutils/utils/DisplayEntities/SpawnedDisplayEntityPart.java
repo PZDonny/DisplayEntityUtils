@@ -50,23 +50,16 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (isMaster()){
             group.masterPart = this;
         }
+        if (VersionUtils.IS_1_21_9 && entity instanceof Mannequin m){
+            DisplayUtils.prepareMannequin(m);
+        }
         partTags.addAll(DisplayUtils.getTags(entity));
         isSingle = false;
     }
 
     SpawnedDisplayEntityPart(Entity entity){
         super(entity.getEntityId(), false);
-        switch (entity) {
-            case BlockDisplay blockDisplay -> this.type = PartType.BLOCK_DISPLAY;
-            case ItemDisplay itemDisplay -> this.type = PartType.ITEM_DISPLAY;
-            case TextDisplay textDisplay -> this.type = PartType.TEXT_DISPLAY;
-            case Interaction interaction -> this.type = PartType.INTERACTION;
-            case Shulker shulker -> this.type = PartType.SHULKER;
-            case Mannequin mannequin -> this.type = PartType.MANNEQUIN;
-            default -> {
-                throw new IllegalArgumentException("The provided entity is not a valid part entity!");
-            }
-        }
+        this.type = PartType.getType(entity);
         this.entity = entity;
         this.entityUUID = entity.getUniqueId();
         isSingle = true;

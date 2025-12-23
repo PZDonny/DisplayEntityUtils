@@ -8,6 +8,7 @@ import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SinglePartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.donnypz.displayentityutils.utils.dialogs.TextDisplayDialog;
 import net.kyori.adventure.text.Component;
@@ -85,7 +86,7 @@ class PartsCreateCMD extends PlayerSubCommand {
                 }
                 Mannequin entity = loc.getWorld().spawn(loc, Mannequin.class, m -> {
                     m.setProfile(ResolvableProfile.resolvableProfile(player.getPlayerProfile()));
-                    m.setInvulnerable(true);
+                    DisplayUtils.prepareMannequin(m);
                 });
                 selectEntity(player, entity.getUniqueId(), "Mannequin");
             }

@@ -9,10 +9,7 @@ import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.BlockDisplay;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Interaction;
+import org.bukkit.entity.*;
 import org.bukkit.persistence.ListPersistentDataType;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -963,6 +960,13 @@ public final class DisplayUtils {
     public static boolean isMaster(Display display){
         PersistentDataContainer container = display.getPersistentDataContainer();
         return container.has(DisplayAPI.getMasterKey(), PersistentDataType.BOOLEAN);
+    }
+
+    @ApiStatus.Internal
+    public static void prepareMannequin(Mannequin mannequin){
+        mannequin.setInvulnerable(true);
+        mannequin.setImmovable(true);
+        mannequin.setGravity(false);
     }
 
 
