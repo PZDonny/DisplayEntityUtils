@@ -35,7 +35,7 @@ public class MannequinCMD extends ConsoleUsableSubCommand {
             help(sender, 1);
         }
         else{
-            if (VersionUtils.IS_1_21_9){
+            if (!VersionUtils.IS_1_21_9){
                 sender.sendMessage(Component.text("Your server version does not support Mannequin entities!", NamedTextColor.RED));
                 return;
             }
