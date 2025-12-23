@@ -556,7 +556,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     @Override
     public void setMannequinScale(double scale) {
         if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
-        setAndSend(DisplayAttributes.Mannequin.SCALE, (float) scale);
+        setAndSend(DisplayAttributes.Mannequin.SCALE, scale);
     }
 
     @Override
