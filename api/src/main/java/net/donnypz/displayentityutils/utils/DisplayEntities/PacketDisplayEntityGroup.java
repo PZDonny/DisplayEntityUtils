@@ -160,7 +160,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         Location oldLoc = getLocation();
         //Remove from previous
         if (oldLoc != null){
-            if (location.getWorld().equals(oldLoc.getWorld()) && location.getChunk().getChunkKey() == oldLoc.getChunk().getChunkKey()){
+            if (location.getWorld().equals(oldLoc.getWorld()) && location.getChunk().getChunkKey() == oldLoc.getChunk().getChunkKey() && vehicleUUID == null){
                return;
             }
             String oldWorldName = oldLoc.getWorld().getName();
@@ -403,7 +403,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                     }
                     updateChunkAndWorld(entity.getLocation());
                 }
-            }, 0, 30);
+            }, 0, 20);
         }
         return true;
     }
