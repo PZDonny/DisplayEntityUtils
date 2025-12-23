@@ -40,11 +40,11 @@ class BDEItemDisplay extends BDEDisplay<ItemDisplay> {
 
             //For Player Heads
             if (playerHeadTexture != null && !playerHeadTexture.isBlank()){
-                item.editMeta(SkullMeta.class, meta -> {
-                    PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
-                    profile.setProperty(new ProfileProperty("textures", playerHeadTexture));
-                    meta.setPlayerProfile(profile);
-                });
+                SkullMeta meta = (SkullMeta) item.getItemMeta();
+                PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
+                profile.setProperty(new ProfileProperty("textures", playerHeadTexture));
+                meta.setPlayerProfile(profile);
+                item.setItemMeta(meta);
             }
             display.setItemStack(item);
         }

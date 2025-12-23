@@ -19,6 +19,7 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MainHand;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Transformation;
@@ -261,8 +262,8 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     /**
      * Get the {@link SpawnedDisplayEntityPart} of an entity, during this play session. Use {@link #create(Entity)} if the part is not grouped.
-     * @param entity the part entity (Display/Interaction)
-     * @return The SpawnedDisplayEntityPart. Null if not created during play session or not associated with any group
+     * @param entity the part entity
+     * @return a {@link SpawnedDisplayEntityPart} or null if not created during play session
      */
     public static @Nullable SpawnedDisplayEntityPart getPart(@NotNull Entity entity){
         if (!DisplayUtils.isPartEntity(entity)) return null;
@@ -845,9 +846,9 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     public void setItemDisplayItemGlint(boolean hasGlint) {
         ItemStack itemStack = getItemDisplayItem();
         if (itemStack == null) return;
-        itemStack.editMeta(meta -> {
-            meta.setEnchantmentGlintOverride(hasGlint);
-        });
+        ItemMeta meta = itemStack.getItemMeta();
+        meta.setEnchantmentGlintOverride(hasGlint);
+        itemStack.setItemMeta(meta);
         ((ItemDisplay) getEntity()).setItemStack(itemStack);
     }
 

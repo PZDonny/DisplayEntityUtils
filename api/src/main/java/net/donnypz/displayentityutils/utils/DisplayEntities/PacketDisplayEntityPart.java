@@ -25,6 +25,7 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MainHand;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
@@ -435,9 +436,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (type != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) return;
         ItemStack item = getItemDisplayItem();
         if (item != null){
-            item.editMeta(meta -> {
-               meta.setEnchantmentGlintOverride(hasGlint);
-            });
+            ItemMeta meta = item.getItemMeta();
+            meta.setEnchantmentGlintOverride(hasGlint);
+            item.setItemMeta(meta);
             setAndSend(DisplayAttributes.ItemDisplay.ITEMSTACK, item);
         }
     }
