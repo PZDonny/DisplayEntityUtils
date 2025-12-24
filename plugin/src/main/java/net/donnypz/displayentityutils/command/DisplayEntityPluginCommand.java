@@ -144,7 +144,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
 
     public static void invalidStorage(CommandSender sender){
         sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid Storage!", NamedTextColor.RED)));
-        sender.sendMessage(Component.text("<gray>| Valid Storages: local, mysql, mongodb>", NamedTextColor.GRAY));
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray>| Storages: local, mysql, mongodb"));
     }
 
     public static void hideRelativePoints(Player player){
