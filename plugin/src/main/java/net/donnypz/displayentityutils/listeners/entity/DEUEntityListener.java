@@ -10,6 +10,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityG
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import org.bukkit.Location;
 import org.bukkit.damage.DamageSource;
@@ -42,6 +43,14 @@ public final class DEUEntityListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDamaged(EntityDamageEvent e){
         applyState(e.getEntity(), MachineState.StateType.DAMAGED);
+    }
+
+    //Disable non-display entity damage, if in a group
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onMannequinDamaged(EntityDamageByEntityEvent e){
+        if (DisplayUtils.isInGroup(e.getEntity())) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
