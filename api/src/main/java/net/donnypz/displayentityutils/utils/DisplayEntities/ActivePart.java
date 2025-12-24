@@ -44,6 +44,9 @@ public abstract class ActivePart implements Active{
         if (mapped) {
             partsById.put(entityId, this);
         }
+        else{
+            partUUID = UUID.randomUUID();
+        }
     }
 
     protected synchronized void unregister(){
@@ -542,6 +545,16 @@ public abstract class ActivePart implements Active{
     public abstract void setMannequinProfile(@NotNull PlayerProfile profile);
 
     public abstract void setMannequinProfile(@NotNull ResolvableProfile profile);
+
+    public void setMannequinProfile(@NotNull PlayerProfile profile, Player player){
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
+        setMannequinProfile(ResolvableProfile.resolvableProfile(profile), player);
+    }
+
+    public void setMannequinProfile(@NotNull ResolvableProfile profile, Player player){
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
+        PacketUtils.setAttribute(player, entityId, DisplayAttributes.Mannequin.RESOLVABLE_PROFILE, profile);
+    }
 
     public abstract void setMannequinBelowName(@Nullable Component text);
 

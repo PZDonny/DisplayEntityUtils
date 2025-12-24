@@ -36,6 +36,7 @@ public class DEUUser {
     private AnimationParticleBuilder particleBuilder;
     private final Location[] pointPositions = new Location[3];
     private final Set<PacketDisplayEntityPart> trackedPacketEntities = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private Integer armorEditMannequinEntityId;
 
     private PreAnimationCameraData preAnimationCameraData;
     private final Object animationCameraLock = new Object();
@@ -84,6 +85,21 @@ public class DEUUser {
             return true;
         }
         return false;
+    }
+
+    @ApiStatus.Internal
+    public boolean isEditingMannequinArmor(){
+        return armorEditMannequinEntityId != null;
+    }
+
+    @ApiStatus.Internal
+    public int getEditingMannequin(){
+        return armorEditMannequinEntityId;
+    }
+
+    @ApiStatus.Internal
+    public void setEditingMannequinArmor(Integer armorEditMannequinEntityId){
+        this.armorEditMannequinEntityId = armorEditMannequinEntityId;
     }
 
     /**

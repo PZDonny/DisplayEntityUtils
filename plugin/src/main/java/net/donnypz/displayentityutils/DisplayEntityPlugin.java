@@ -10,6 +10,7 @@ import net.donnypz.displayentityutils.listeners.autogroup.DEULoadingListeners;
 import net.donnypz.displayentityutils.listeners.bdengine.DatapackEntitySpawned;
 import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUInteractionListener;
+import net.donnypz.displayentityutils.listeners.entity.DEUMannequinEditorListener;
 import net.donnypz.displayentityutils.listeners.entity.mythic.DEUMythicListener;
 import net.donnypz.displayentityutils.listeners.player.*;
 import net.donnypz.displayentityutils.managers.LocalManager;
@@ -135,6 +136,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
         Bukkit.getPluginManager().registerEvents(new DEUInteractionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerPlaceBlockListener(), this);
+        Bukkit.getPluginManager().registerEvents(new DEUMannequinEditorListener(), this);
     }
 
     private void initializeBStats(){
