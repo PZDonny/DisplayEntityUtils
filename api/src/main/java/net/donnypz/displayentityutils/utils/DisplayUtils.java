@@ -937,7 +937,8 @@ public final class DisplayUtils {
      * @return a boolean
      */
     public static boolean isInGroup(Entity entity){
-        return SpawnedDisplayEntityPart.getPart(entity) != null;
+        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
+        return part != null && part.hasGroup();
     }
 
     /**
@@ -968,6 +969,4 @@ public final class DisplayUtils {
         mannequin.setImmovable(true);
         mannequin.setGravity(false);
     }
-
-
 }
