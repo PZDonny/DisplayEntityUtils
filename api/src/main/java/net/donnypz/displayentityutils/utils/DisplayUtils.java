@@ -570,22 +570,22 @@ public final class DisplayUtils {
 
 
     /**
-     * Pivot an Interaction entity around a location
-     * @param interaction the interaction
-     * @param center the location the interaction should pivot around
+     * Pivot an entity around a location
+     * @param entity the entity
+     * @param center the location the entity should pivot around
      * @param angleInDegrees the pivot angle in degrees
      */
-    public static void pivot(@NotNull Interaction interaction, @NotNull Location center, double angleInDegrees){
-        Vector3f translationVector = DisplayUtils.getNonDisplayTranslation(interaction, center).toVector3f();
+    public static void pivot(@NotNull Entity entity, @NotNull Location center, double angleInDegrees){
+        Vector3f translationVector = DisplayUtils.getNonDisplayTranslation(entity, center).toVector3f();
         new Quaternionf()
                 .rotateY((float) Math.toRadians(-angleInDegrees))
                 .transform(translationVector);
         Location newLoc = center.clone().subtract(Vector.fromJOML(translationVector));
-        FoliaUtils.teleport(interaction, newLoc);
+        FoliaUtils.teleport(entity, newLoc);
     }
 
     /**
-     * Get the location an interaction entity would be pivoted to after using {@link DisplayUtils#pivot(Interaction, Location, double)}
+     * Get the location an interaction entity would be pivoted to after using {@link DisplayUtils#pivot(Entity, Location, double)}
      * @param offsetLocation the interaction entity's location
      * @param origin the location the interaction should pivot around
      * @param angleInDegrees the pivot angle in degrees
@@ -597,7 +597,7 @@ public final class DisplayUtils {
     }
 
     /**
-     * Get the location an interaction entity would be pivoted to after using {@link DisplayUtils#pivot(Interaction, Location, double)}
+     * Get the location an interaction entity would be pivoted to after using {@link DisplayUtils#pivot(Entity, Location, double)}
      * @param translationVector the translation offset for an interaction entity from a center location
      * @param origin the location the interaction should pivot around
      * @param angleInDegrees the pivot angle in degrees
@@ -608,7 +608,7 @@ public final class DisplayUtils {
     }
 
     /**
-     * Get the location an interaction entity would be pivoted to after using {@link DisplayUtils#pivot(Interaction, Location, double)}
+     * Get the location an interaction entity would be pivoted to after using {@link DisplayUtils#pivot(Entity, Location, double)}
      * @param translationVector the translation offset for an interaction entity from a center location
      * @param origin the location the interaction should pivot around
      * @param angleInDegrees the pivot angle in degrees
@@ -628,7 +628,7 @@ public final class DisplayUtils {
      * @param durationInTicks how long the scaling should take
      * @param delayInTicks how long before the scaling should start
      */
-    public static void scaleInteraction(Interaction interaction, float newHeight, float newWidth, int durationInTicks, int delayInTicks){
+    public static void scaleInteraction(@NotNull Interaction interaction, float newHeight, float newWidth, int durationInTicks, int delayInTicks){
         if (durationInTicks <= 0 && delayInTicks <= 0){
             interaction.setInteractionHeight(newHeight);
             interaction.setInteractionWidth(newWidth);

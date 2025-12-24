@@ -722,9 +722,9 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public void pivot(float angleInDegrees){
         if (isDisplay() || isSingle || group == null) return;
-        Interaction i = (Interaction) getEntity();
-        if (i == null) return;
-        DisplayUtils.pivot(i, group.getLocation(), angleInDegrees);
+        Entity e = getEntity();
+        if (e == null) return;
+        DisplayUtils.pivot(e, group.getLocation(), angleInDegrees);
     }
 
 
