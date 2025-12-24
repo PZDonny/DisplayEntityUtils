@@ -45,13 +45,13 @@ class SavedEntityBuilder {
 
         mannequinEntity.isRightMainHand = mannequin.getMainHand() == MainHand.RIGHT;
         EntityEquipment equipment = mannequin.getEquipment();
-        mannequinEntity.mainHandItemStack = serializeItemStack(equipment.getItemInMainHand());
-        mannequinEntity.offHandItemStack = serializeItemStack(equipment.getItemInOffHand());
-        mannequinEntity.armorItemStacks = new byte[][]{
+        mannequinEntity.equipment = new byte[][]{
                 serializeItemStack(equipment.getHelmet()),
                 serializeItemStack(equipment.getChestplate()),
                 serializeItemStack(equipment.getLeggings()),
-                serializeItemStack(equipment.getBoots())
+                serializeItemStack(equipment.getBoots()),
+                serializeItemStack(equipment.getItemInMainHand()),
+                serializeItemStack(equipment.getItemInOffHand())
         };
 
         mannequinEntity.vector = DisplayUtils.getNonDisplayTranslation(mannequin).toVector3f();
@@ -90,13 +90,13 @@ class SavedEntityBuilder {
         mannequinEntity.pose = pose.name();
 
         mannequinEntity.isRightMainHand = part.getMannequinMainHand() == MainHand.RIGHT;
-        mannequinEntity.mainHandItemStack = serializeItemStack(part.getMannequinEquipment(EquipmentSlot.HAND));
-        mannequinEntity.offHandItemStack = serializeItemStack(part.getMannequinEquipment(EquipmentSlot.OFF_HAND));
-        mannequinEntity.armorItemStacks = new byte[][]{
+        mannequinEntity.equipment = new byte[][]{
                 serializeItemStack(part.getMannequinEquipment(EquipmentSlot.HEAD)),
                 serializeItemStack(part.getMannequinEquipment(EquipmentSlot.CHEST)),
                 serializeItemStack(part.getMannequinEquipment(EquipmentSlot.LEGS)),
-                serializeItemStack(part.getMannequinEquipment(EquipmentSlot.FEET))
+                serializeItemStack(part.getMannequinEquipment(EquipmentSlot.FEET)),
+                serializeItemStack(part.getMannequinEquipment(EquipmentSlot.HAND)),
+                serializeItemStack(part.getMannequinEquipment(EquipmentSlot.OFF_HAND))
         };
 
 

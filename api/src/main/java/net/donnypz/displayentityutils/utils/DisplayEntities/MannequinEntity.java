@@ -35,9 +35,7 @@ final class MannequinEntity implements Serializable {
     double scale;
     String pose;
     boolean isRightMainHand;
-    byte[] mainHandItemStack;
-    byte[] offHandItemStack;
-    byte[][] armorItemStacks; //0,1,2,3 = helm,chest,legs,boots, x bytes for itemstack
+    byte[][] equipment; //0,1,2,3,4,5 = helm,chest,legs,boots,main,off | x bytes for itemstack
     byte[] persistentDataContainer = null;
 
 
@@ -62,8 +60,6 @@ final class MannequinEntity implements Serializable {
                 .setAttribute(DisplayAttributes.Equipment.BOOTS, getBoots())
                 .setAttribute(DisplayAttributes.Equipment.MAIN_HAND, getMainHand())
                 .setAttribute(DisplayAttributes.Equipment.OFF_HAND, getOffHand());
-
-        //TODO ARMOR AND ITEMS
 
         Location spawnLoc = DisplayUtils.getPivotLocation(
                 vector,
@@ -90,28 +86,28 @@ final class MannequinEntity implements Serializable {
         return part;
     }
 
-    ItemStack getMainHand(){
-        return getItemStack(mainHandItemStack);
-    }
-
-    ItemStack getOffHand(){
-        return getItemStack(offHandItemStack);
-    }
-
     ItemStack getHelmet(){
-        return getItemStack(armorItemStacks[0]);
+        return getItemStack(equipment[0]);
     }
 
     ItemStack getChestplate(){
-        return getItemStack(armorItemStacks[1]);
+        return getItemStack(equipment[1]);
     }
 
     ItemStack getLeggings(){
-        return getItemStack(armorItemStacks[2]);
+        return getItemStack(equipment[2]);
     }
 
     ItemStack getBoots(){
-        return getItemStack(armorItemStacks[3]);
+        return getItemStack(equipment[3]);
+    }
+
+    ItemStack getMainHand(){
+        return getItemStack(equipment[4]);
+    }
+
+    ItemStack getOffHand(){
+        return getItemStack(equipment[5]);
     }
 
     Vector getVector(){
