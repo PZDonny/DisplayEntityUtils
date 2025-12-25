@@ -111,11 +111,22 @@ public class AnimationSound implements Externalizable, Cloneable {
     }
 
     public void playSound(@NotNull Location location){
-        location.getWorld().playSound(location, sound, volume, pitch);
+        if (sound == null){
+            location.getWorld().playSound(location, soundName, volume, pitch);
+        }
+        else{
+            location.getWorld().playSound(location, sound, volume, pitch);
+        }
+
     }
 
     public void playSound(@NotNull Location location, Player player){
-        player.playSound(location, sound, volume, pitch);
+        if (sound == null){
+            player.playSound(location, soundName, volume, pitch);
+        }
+        else{
+            player.playSound(location, sound, volume, pitch);
+        }
     }
 
     public void playSound(@NotNull Location location, Collection<Player> players){

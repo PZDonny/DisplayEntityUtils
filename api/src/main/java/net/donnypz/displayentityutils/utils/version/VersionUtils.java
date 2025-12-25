@@ -83,7 +83,15 @@ public final class VersionUtils {
 
     public static Sound getSound(String soundName){
         if (soundName == null) return null;
-        return Registry.SOUNDS.get(NamespacedKey.minecraft(soundName));
+        String[] split = soundName.split(":");
+        if (split.length < 2){
+            return Registry.SOUNDS.get(NamespacedKey.minecraft(soundName));
+        }
+        else{
+            String namespace = split[0];
+            String key = split[1];
+            return Registry.SOUNDS.get(new NamespacedKey(namespace, key));
+        }
     }
 
     public static boolean serverHasDialogs(){ //Dialog API came to Paper in 1.21.7, Dialog System came to MC in 1.21.6
