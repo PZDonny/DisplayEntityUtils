@@ -1,58 +1,45 @@
 package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.*;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-class PartsYawCMD extends PlayerSubCommand {
+class PartsYawCMD extends PartsSubCommand {
 
     PartsYawCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("yaw", parentSubCommand, Permission.PARTS_TRANSFORM);
+        super("yaw", parentSubCommand, Permission.PARTS_TRANSFORM, 3, 0);
         setTabComplete(2, "<yaw>");
     }
 
     @Override
-    public void execute(Player player, String[] args) {
-        ActivePartSelection<?> selection = DisplayGroupManager.getPartSelection(player);
-        if (selection == null){
-            DisplayEntityPluginCommand.noPartSelection(player);
-            return;
-        }
+    protected void sendIncorrectUsage(@NotNull Player player) {
+        player.sendMessage(Component.text("Incorrect Usage! /deu parts yaw <yaw>", NamedTextColor.RED));
+    }
 
-        if (PartsCMD.isUnwantedMultiSelection(player, selection)){
-            return;
-        }
+    @Override
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+        return false;
+    }
 
-        if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /deu parts yaw <yaw>", NamedTextColor.RED));
-            return;
-        }
-
-        if (!selection.hasSelectedPart()){
-            PartsCMD.invalidPartSelection(player);
-            return;
-        }
-
+    @Override
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         try{
             float yaw = Float.parseFloat(args[2]);
-            ActivePart part = selection.getSelectedPart();
-            double oldYaw = part.getYaw();
-            part.setYaw(yaw, false);
+            double oldYaw = selectedPart.getYaw();
+            selectedPart.setYaw(yaw, false);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Yaw set!", NamedTextColor.GREEN)));
             player.sendMessage(Component.text("| Old Yaw: "+oldYaw, NamedTextColor.GRAY));
+            return true;
         }
         catch(NumberFormatException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the yaw!", NamedTextColor.RED)));
+            return false;
         }
     }
 }

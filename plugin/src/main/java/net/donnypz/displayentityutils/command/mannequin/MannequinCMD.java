@@ -57,8 +57,8 @@ public class MannequinCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/deu mannequin toggleimmovable [-all <on | off>]", "Toggle the immovability of an mannequin");
         }
         else{
-            CMDUtils.sendCMD(sender, "/deu mannequin mainhand <left | right>", "Set the mannequin's main hand");
             CMDUtils.sendCMD(sender, "/deu mannequin equipment ", "Open a GUI to edit your selected mannequin's equipment.");
+            CMDUtils.sendCMD(sender, "/deu mannequin mainhand <left | right>", "Set your selected mannequin's main hand");
             CMDUtils.sendCMD(sender, "/deu mannequin pose <pose> [-all]", "Change your selected mannequin's pose");
             CMDUtils.sendCMD(sender, "/deu mannequin scale <scale> [-all]", "Set your selected mannequin's scale");
             CMDUtils.sendCMD(sender, "/deu mannequin clone", "Clone a mannequin");
