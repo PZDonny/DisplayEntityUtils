@@ -10,6 +10,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Base64;
 import java.util.List;
 
 @ApiStatus.Internal
@@ -25,14 +26,21 @@ final class JSONAdapter_DisplayEntity implements JsonDeserializer<DisplayEntity>
         entity.type = DisplayEntity.Type.valueOf(obj.get("type").getAsString().toUpperCase());
         entity.isMaster = obj.get("isMaster").getAsBoolean();
 
-        List<Number> list = ctx.deserialize(obj.get("persistentDataContainer"), List.class);
-        byte[] bytes = new byte[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            bytes[i] = list.get(i).byteValue();
+        if (obj.has(DEUJSONAdapter.PDC_FIELD)){
+            try{
+                List<Number> list = ctx.deserialize(obj.get(DEUJSONAdapter.PDC_FIELD), List.class);
+                byte[] bytes = new byte[list.size()];
+                for (int i = 0; i < list.size(); i++) {
+                    bytes[i] = list.get(i).byteValue();
+                }
+
+                entity.persistentDataContainer = bytes;
+            }
+            catch(JsonParseException e){
+                String base64 = ctx.deserialize(obj.get(DEUJSONAdapter.PDC_FIELD), String.class);
+                entity.persistentDataContainer = Base64.getDecoder().decode(base64);
+            }
         }
-
-        entity.persistentDataContainer = bytes;
-
 
         JsonObject specificsJson = obj.getAsJsonObject("specifics");
         switch (entity.type) {
@@ -59,6 +67,9 @@ final class JSONAdapter_DisplayEntity implements JsonDeserializer<DisplayEntity>
         //Convert Specifics, and remove legacy part tags array
         json.add("specifics", ctx.serialize(src.specifics, DisplayEntitySpecifics.class));
 
+        //partUUID
+        json.addProperty(DEUJSONAdapter.PART_UUID_FIELD, src.specifics.getPartUUID().toString());
+
         //Add part tags
         try{
             PersistentDataContainer pdc = new ItemStack(Material.STICK).getItemMeta().getPersistentDataContainer();
@@ -66,14 +77,13 @@ final class JSONAdapter_DisplayEntity implements JsonDeserializer<DisplayEntity>
             List<String> tags = pdc.get(DisplayAPI.getPartPDCTagKey(), PersistentDataType.LIST.strings());
             json.add("partTags", new Gson().toJsonTree(tags));
         }
-        catch(IOException e){}
+        catch(IOException | NullPointerException e){}
 
-        //Convert byte arr to int arr
-        JsonArray arr = new JsonArray();
-        for (byte b : src.persistentDataContainer){
-            arr.add((int) b);
+        //pdc to base64
+        byte[] pdc = src.persistentDataContainer;
+        if (pdc != null){
+            json.addProperty(DEUJSONAdapter.PDC_FIELD, Base64.getEncoder().encodeToString(pdc));
         }
-        json.add("persistentDataContainer", arr);
 
         return json;
     }

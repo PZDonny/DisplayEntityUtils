@@ -36,7 +36,7 @@ final class MannequinEntity implements Serializable {
     String pose;
     boolean isRightMainHand;
     byte[][] equipment; //0,1,2,3,4,5 = helm,chest,legs,boots,main,off | x bytes for itemstack
-    byte[] persistentDataContainer = null;
+    byte[] persistentDataContainer;
 
 
     MannequinEntity(){}
@@ -68,19 +68,17 @@ final class MannequinEntity implements Serializable {
 
         PacketDisplayEntityPart part = attributeContainer.createPart(SpawnedDisplayEntityPart.PartType.MANNEQUIN, spawnLoc);
 
-        if (persistentDataContainer != null){
-            ItemStack i = new ItemStack(Material.STICK);
-            PersistentDataContainer pdc = i.getItemMeta().getPersistentDataContainer();
+        ItemStack i = new ItemStack(Material.STICK);
+        PersistentDataContainer pdc = i.getItemMeta().getPersistentDataContainer();
 
-            try {
-                pdc.readFromBytes(persistentDataContainer);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            part.partTags = DisplayEntity.getSetFromPDC(pdc, DisplayAPI.getPartPDCTagKey());
-            part.partUUID = DisplayEntity.getPDCPartUUID(pdc);
+        try {
+            pdc.readFromBytes(persistentDataContainer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+
+        part.partTags = DisplayEntity.getSetFromPDC(pdc, DisplayAPI.getPartPDCTagKey());
+        part.partUUID = DisplayEntity.getPDCPartUUID(pdc);
         settings.applyAttributes(part);
 
         return part;

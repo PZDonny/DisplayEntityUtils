@@ -31,15 +31,16 @@ final class InteractionEntity implements Serializable {
     UUID partUUID;
     float height;
     float width;
-    private byte[] persistentDataContainer = null;
+    byte[] persistentDataContainer = null;
     boolean isResponsive;
+
+    InteractionEntity(){}
 
     InteractionEntity(Interaction interaction){
         this.height = interaction.getInteractionHeight();
         this.width = interaction.getInteractionWidth();
         this.isResponsive = interaction.isResponsive();
         this.vector = DisplayUtils.getNonDisplayTranslation(interaction).toVector3f();
-        this.partUUID = DisplayUtils.getPartUUID(interaction); //for json file
 
         try{
             persistentDataContainer = interaction.getPersistentDataContainer().serializeToBytes();
@@ -56,7 +57,6 @@ final class InteractionEntity implements Serializable {
         this.width = c.getAttributeOrDefault(DisplayAttributes.Interaction.WIDTH, 1f);
         this.isResponsive = c.getAttributeOrDefault(DisplayAttributes.Interaction.RESPONSIVE, false);
         this.vector = part.getNonDisplayTranslation().toVector3f();
-        this.partUUID = part.partUUID; //for json file
 
         try{
             ItemStack i = new ItemStack(Material.STICK);

@@ -252,22 +252,6 @@ public final class DisplayGroupManager {
                 }
             }
 
-//            if (obj.has(PART_TAG_FIELD)){
-//                JsonArray arr = obj.getAsJsonArray(PDC_FIELD);
-//                if (arr != null){
-//                    byte[] bytes = new byte[arr.size()];
-//                    ItemStack stick = new ItemStack(Material.STICK);
-//                    PersistentDataContainer pdc = stick.getItemMeta().getPersistentDataContainer();
-//                    try{
-//                        pdc.readFromBytes(bytes);
-//                        List<String> tags = pdc.get(DisplayAPI.getPartPDCTagKey(), PersistentDataType.LIST.strings());
-//                        obj.add(PART_TAG_FIELD, gson.toJsonTree(tags));
-//                    }
-//                    catch(IOException e){}
-//                }
-//            }
-
-
             for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
                 serializeJsonElement(entry.getValue());
             }
