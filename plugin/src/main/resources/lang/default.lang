@@ -22,6 +22,7 @@ parttype:
     item_display: item
     text_display: text
     interaction: interaction
+    mannequin: mannequin
 
 types:
     groupspawnreason: group spawn reason¦s
