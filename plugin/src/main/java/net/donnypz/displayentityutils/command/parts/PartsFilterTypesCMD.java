@@ -72,7 +72,8 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
             }
 
             try{
-                if (!typeText.equals(SpawnedDisplayEntityPart.PartType.INTERACTION.name())){
+                if (!typeText.equals(SpawnedDisplayEntityPart.PartType.INTERACTION.name())
+                        && !typeText.equals(SpawnedDisplayEntityPart.PartType.MANNEQUIN.name())){
                     typeText = typeText+"_DISPLAY";
                 }
 
@@ -87,7 +88,7 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
             }
             catch(IllegalArgumentException e){
                 player.sendMessage(Component.text("Invalid Part Type listed!", NamedTextColor.RED));
-                player.sendMessage(Component.text("Valid Types: BLOCK, ITEM, TEXT, INTERACTION", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                player.sendMessage(Component.text("Valid Types: BLOCK, ITEM, TEXT, INTERACTION, MANNEQUIN", NamedTextColor.GRAY, TextDecoration.ITALIC));
                 return;
             }
             player.sendMessage(Component.text("- "+typeText, NamedTextColor.YELLOW));
