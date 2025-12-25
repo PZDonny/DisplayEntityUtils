@@ -231,7 +231,7 @@ public class BDEngineLegacyDPConverter {
                         String replacement = player.getName();
                         line = line.replace("@s", replacement);
                     }
-                    line = line.substring(0, line.length()-2)+",\""+LocalManager.datapackConvertDeleteSubParentTag+"\"]}";
+                    line = line.substring(0, line.length()-2)+",\""+BDEngineDPConverter.CONVERT_DELETE_SUB_PARENT_TAG +"\"]}";
                 }
 
                 else if (zipEntry.getName().contains("start_animation.mcfunction")){
