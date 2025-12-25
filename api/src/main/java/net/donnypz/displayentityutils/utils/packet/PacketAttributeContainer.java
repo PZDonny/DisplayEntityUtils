@@ -429,9 +429,6 @@ public class PacketAttributeContainer implements Cloneable{
             case INTERACTION -> {
                 return EntityTypes.INTERACTION;
             }
-            case SHULKER -> {
-                return EntityTypes.SHULKER;
-            }
             case MANNEQUIN -> {
                 return EntityTypes.MANNEQUIN;
             }

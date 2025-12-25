@@ -72,9 +72,6 @@ public class DisplayEntitySelector extends RelativePointSelector<RelativePoint> 
             case Mannequin m -> {
                 entityType = "Mannequin";
             }
-            case Shulker s -> {
-                entityType = "Shulker";
-            }
             default -> entityType = "";
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text(entityType+" Entity Selected!", NamedTextColor.GREEN)));

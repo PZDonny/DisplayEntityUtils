@@ -1241,7 +1241,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         ITEM_DISPLAY,
         TEXT_DISPLAY,
         INTERACTION,
-        SHULKER,
         MANNEQUIN;
 
         /**
@@ -1254,7 +1253,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             if (entity instanceof ItemDisplay) return ITEM_DISPLAY;
             if (entity instanceof TextDisplay) return TEXT_DISPLAY;
             if (entity instanceof Interaction) return INTERACTION;
-            if (entity instanceof Shulker) return SHULKER;
             if (VersionUtils.IS_1_21_9 && entity instanceof Mannequin) return MANNEQUIN;
             return null;
         }
@@ -1264,7 +1262,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             if (e instanceof ItemDisplay && this == ITEM_DISPLAY) return true;
             if (e instanceof TextDisplay && this == TEXT_DISPLAY) return true;
             if (e instanceof Interaction && this == INTERACTION) return true;
-            if (e instanceof Shulker && this == SHULKER) return true;
             if (e instanceof Mannequin && this == MANNEQUIN) return true;
             return false;
         }

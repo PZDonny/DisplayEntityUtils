@@ -206,8 +206,7 @@ public abstract class ActivePart implements Active{
      */
     public boolean canGlow(){
         return type != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY
-                && type != SpawnedDisplayEntityPart.PartType.INTERACTION
-                && type != SpawnedDisplayEntityPart.PartType.SHULKER;
+                && type != SpawnedDisplayEntityPart.PartType.INTERACTION;
     }
 
     public boolean isDisplay(){
