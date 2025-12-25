@@ -511,6 +511,9 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             pivot(yaw-entity.getYaw());
         }
         entity.setRotation(yaw, entity.getPitch());
+        if (entity instanceof LivingEntity le){
+            le.setBodyYaw(yaw);
+        }
     }
 
     /**
