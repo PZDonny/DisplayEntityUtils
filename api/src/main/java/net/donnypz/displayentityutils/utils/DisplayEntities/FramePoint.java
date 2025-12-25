@@ -447,7 +447,7 @@ public class FramePoint extends RelativePoint implements Serializable {
                     msgComp = msgComp.append(Component.text(" [UNKNOWN]", NamedTextColor.GRAY));
                     hoverComp = hoverComp
                             .append(Component.newline())
-                            .append(Component.text("This sound no longer exists!", NamedTextColor.RED));
+                            .append(Component.text("This sound no longer exists or is a resource pack sound!", NamedTextColor.RED));
                 }
 
                 msgComp = msgComp.hoverEvent(HoverEvent.showText(hoverComp));
