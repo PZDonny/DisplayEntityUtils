@@ -61,7 +61,7 @@ class AnimAddSoundCMD extends PlayerSubCommand {
             player.sendMessage(MiniMessage.miniMessage().deserialize("| Delay: <yellow>"+delayInTicks));
 
             if (VersionUtils.getSound(args[2]) == null){
-                player.sendMessage(Component.text("| The provided sound is not a vanilla Minecraft sound!", NamedTextColor.GRAY));
+                player.sendMessage(Component.text("| The provided sound is not a vanilla Minecraft sound, or does not exist in this game version!", NamedTextColor.GRAY));
             }
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             player.sendMessage(Component.text("Invalid number entered! Enter a number >= 0", NamedTextColor.RED));
