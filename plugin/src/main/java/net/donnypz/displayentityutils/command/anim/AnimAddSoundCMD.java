@@ -47,22 +47,22 @@ class AnimAddSoundCMD extends PlayerSubCommand {
             return;
         }
         try {
-            Sound sound = VersionUtils.getSound(args[2]);
-            if (sound == null){
-                player.sendMessage(Component.text("Invalid Sound Name!", NamedTextColor.RED));
-                return;
-            }
+            String soundStr = args[2];
             float volume = Float.parseFloat(args[3]);
             float pitch = Float.parseFloat(args[4]);
             int delayInTicks = Integer.parseInt(args[5]);
 
-            display.getRelativePoint().addSound(new AnimationSound(sound, volume, pitch, delayInTicks));
+            display.getRelativePoint().addSound(new AnimationSound(soundStr, volume, pitch, delayInTicks));
 
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Sound Added to Frame Point!", NamedTextColor.GREEN)));
-            player.sendMessage(MiniMessage.miniMessage().deserialize("| Sound: <yellow>"+sound));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("| Sound: <yellow>"+soundStr));
             player.sendMessage(MiniMessage.miniMessage().deserialize("| Volume: <yellow>"+volume));
             player.sendMessage(MiniMessage.miniMessage().deserialize("| Pitch: <yellow>"+pitch));
             player.sendMessage(MiniMessage.miniMessage().deserialize("| Delay: <yellow>"+delayInTicks));
+
+            if (VersionUtils.getSound(args[2]) == null){
+                player.sendMessage(Component.text("| The provided sound is not a vanilla Minecraft sound!", NamedTextColor.GRAY));
+            }
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             player.sendMessage(Component.text("Invalid number entered! Enter a number >= 0", NamedTextColor.RED));
             player.sendMessage(Component.text("| Delay must be a whole number", NamedTextColor.GRAY));
