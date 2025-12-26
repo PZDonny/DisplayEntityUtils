@@ -87,6 +87,7 @@ public enum Permission {
     MANNEQUIN_NAME("deu.mannequin.name"),
     MANNEQUIN_NAME_VISIBLE("deu.mannequin.namevisible"),
     MANNEQUIN_POSE("deu.mannequin.pose"),
+    MANNEQUIN_PIVOT("deu.mannequin.pivot"),
     MANNEQUIN_SCALE("deu.mannequin.scale"),
     MANNEQUIN_GRAVITY("deu.mannequin.gravity"),
     MANNEQUIN_IMMOVABLE("deu.mannequin.immovable"),

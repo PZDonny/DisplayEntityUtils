@@ -16,6 +16,7 @@ public class MannequinCMD extends ConsoleUsableSubCommand {
         new MannequinToggleNameVisibilityCMD(this);
         new MannequinSkinCMD(this);
         new MannequinPoseCMD(this);
+        new MannequinPivotCMD(this);
         new MannequinScaleCMD(this);
         new MannequinToggleGravityCMD(this);
         new MannequinToggleImmovableCMD(this);
@@ -59,6 +60,7 @@ public class MannequinCMD extends ConsoleUsableSubCommand {
         else{
             CMDUtils.sendCMD(sender, "/deu mannequin equipment ", "Open a GUI to edit your selected mannequin's equipment.");
             CMDUtils.sendCMD(sender, "/deu mannequin mainhand <left | right>", "Set your selected mannequin's main hand");
+            CMDUtils.sendCMD(sender, "/deu mannequin pivot <angle> [-all]");
             CMDUtils.sendCMD(sender, "/deu mannequin pose <pose> [-all]", "Change your selected mannequin's pose");
             CMDUtils.sendCMD(sender, "/deu mannequin scale <scale> [-all]", "Set your selected mannequin's scale");
             CMDUtils.sendCMD(sender, "/deu mannequin clone", "Clone a mannequin");
