@@ -5,7 +5,7 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationSound;
+import net.donnypz.displayentityutils.utils.DisplayEntities.DEUSound;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.relativepoints.FramePointSelector;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointSelector;
@@ -14,7 +14,6 @@ import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -52,7 +51,7 @@ class AnimAddSoundCMD extends PlayerSubCommand {
             float pitch = Float.parseFloat(args[4]);
             int delayInTicks = Integer.parseInt(args[5]);
 
-            display.getRelativePoint().addSound(new AnimationSound(soundStr, volume, pitch, delayInTicks));
+            display.getRelativePoint().addSound(new DEUSound(soundStr, volume, pitch, delayInTicks));
 
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Sound Added to Frame Point!", NamedTextColor.GREEN)));
             player.sendMessage(MiniMessage.miniMessage().deserialize("| Sound: <yellow>"+soundStr));

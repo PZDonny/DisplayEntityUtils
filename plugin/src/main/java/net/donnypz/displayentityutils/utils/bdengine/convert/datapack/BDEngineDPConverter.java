@@ -38,7 +38,7 @@ public class BDEngineDPConverter {
     private final String groupSaveTag;
     private final String animationSavePrefix;
     private final LinkedHashMap<String, ArrayList<ZipEntry>> animations = new LinkedHashMap<>();
-    private final HashSet<AnimationSound> bufferedSounds = new HashSet<>();
+    private final HashSet<DEUSound> bufferedSounds = new HashSet<>();
 
     Location spawnLoc;
 
@@ -205,7 +205,7 @@ public class BDEngineDPConverter {
                 //Add Sounds
                 if (!bufferedSounds.isEmpty()){
                     FramePoint point = new FramePoint(FRAME_POINT_SOUND_TAG, createdGroup, spawnLoc);
-                    for (AnimationSound sound : bufferedSounds){
+                    for (DEUSound sound : bufferedSounds){
                         point.addSound(sound);
                     }
                     bufferedSounds.clear();
@@ -291,13 +291,13 @@ public class BDEngineDPConverter {
 
                 //Animation Sound
                 if (line.startsWith("playsound")){
-                    AnimationSound sound = getSound(line);
+                    DEUSound sound = getSound(line);
                     if (sound != null){
                         bufferedSounds.add(sound);
                     }
                 }
                 else if (line.startsWith("execute") && line.contains("playsound")){
-                    AnimationSound sound = getSound("."+line.split(" playsound ")[1]);
+                    DEUSound sound = getSound("."+line.split(" playsound ")[1]);
                     if (sound != null){
                         bufferedSounds.add(sound);
                     }
@@ -337,7 +337,7 @@ public class BDEngineDPConverter {
     }
 
 
-    AnimationSound getSound(String line){
+    DEUSound getSound(String line){
         String[] strings = line.split(" ");
         String soundStr = strings[1];
 
@@ -355,6 +355,6 @@ public class BDEngineDPConverter {
                 pitch = 1;
             }
         }
-        return new AnimationSound(soundStr, volume, pitch, 0);
+        return new DEUSound(soundStr, volume, pitch, 0);
     }
 }
