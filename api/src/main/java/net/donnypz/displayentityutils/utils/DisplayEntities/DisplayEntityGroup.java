@@ -312,7 +312,7 @@ public final class DisplayEntityGroup implements Serializable{
             packetGroup.addPartSilent(part);
         }
 
-        if (mannequinEntities != null){
+        if (mannequinEntities != null){ //old models won't have this field
             for (MannequinEntity entity : mannequinEntities){
                 PacketDisplayEntityPart part = entity.createPacketPart(spawnLocation, settings);
                 packetGroup.addPartSilent(part);
