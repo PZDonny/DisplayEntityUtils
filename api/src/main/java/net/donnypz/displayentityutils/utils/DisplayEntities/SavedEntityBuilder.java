@@ -82,7 +82,7 @@ class SavedEntityBuilder {
             mannequinEntity.profileUUID = profile.uuid();
         }
 
-        mannequinEntity.scale = c.getAttributeOrDefault(DisplayAttributes.Mannequin.SCALE, 1.0);
+        mannequinEntity.scale = c.getAttributeOrDefault(DisplayAttributes.Mannequin.SCALE, 1.0f);
         Pose pose = part.getMannequinPose();
         if (pose == null){
             pose = Pose.STANDING;

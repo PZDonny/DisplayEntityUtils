@@ -43,6 +43,7 @@ final class MannequinEntity implements Serializable {
 
     PacketDisplayEntityPart createPacketPart(Location origin, GroupSpawnSettings settings){
         PacketAttributeContainer attributeContainer = new PacketAttributeContainer()
+                .setAttribute(DisplayAttributes.Mannequin.SCALE, (float) scale)
                 .setAttribute(DisplayAttributes.Mannequin.IMMOVABLE, true)
                 .setAttribute(DisplayAttributes.Mannequin.NO_GRAVITY, true)
                 .setAttribute(DisplayAttributes.CUSTOM_NAME, customName != null ? MiniMessage.miniMessage().deserialize(customName): null)

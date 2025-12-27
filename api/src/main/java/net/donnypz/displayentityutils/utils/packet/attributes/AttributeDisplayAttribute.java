@@ -3,11 +3,11 @@ package net.donnypz.displayentityutils.utils.packet.attributes;
 import com.github.retrooper.packetevents.protocol.attribute.Attribute;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 
-public class AttributeDisplayAttribute extends DisplayAttribute<Double, Double>{
+public class AttributeDisplayAttribute extends DisplayAttribute<Float, Float>{
 
     Attribute attribute;
     protected AttributeDisplayAttribute(Attribute attribute) {
-        super(0, Double.class, EntityDataTypes.FLOAT);
+        super(0, Float.class, EntityDataTypes.FLOAT);
         this.attribute = attribute;
         setAttributeType(AttributeType.ATTRIBUTE);
     }
@@ -17,7 +17,7 @@ public class AttributeDisplayAttribute extends DisplayAttribute<Double, Double>{
     }
 
     @Override
-    public Double getOutputValue(Double value) {
+    public Float getOutputValue(Float value) {
         return value;
     }
 }

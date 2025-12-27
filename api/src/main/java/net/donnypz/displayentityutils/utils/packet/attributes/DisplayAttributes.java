@@ -15,6 +15,7 @@ public final class DisplayAttributes {
     public static final OptionalComponentDisplayAttribute CUSTOM_NAME = new OptionalComponentDisplayAttribute(2);
     public static final BasicDisplayAttribute<Boolean> CUSTOM_NAME_VISIBLE = new BasicDisplayAttribute<>(3, Boolean.class, EntityDataTypes.BOOLEAN);
 
+    private DisplayAttributes(){}
 
     public static final class Equipment{
         public static final EquipmentAttribute HELMET = new EquipmentAttribute(EquipmentSlot.HELMET);
@@ -111,8 +112,8 @@ public final class DisplayAttributes {
     }
 
     public static final class Mannequin{
-        public static final BasicDisplayAttribute<Boolean> NO_GRAVITY = new BasicDisplayAttribute<>(5, Boolean.class, EntityDataTypes.BOOLEAN);
         public static final AttributeDisplayAttribute SCALE = new AttributeDisplayAttribute(Attributes.SCALE);
+        public static final BasicDisplayAttribute<Boolean> NO_GRAVITY = new BasicDisplayAttribute<>(5, Boolean.class, EntityDataTypes.BOOLEAN);
         public static final PoseDisplayAttribute POSE = new PoseDisplayAttribute(6);
         public static final MainHandDisplayAttribute MAIN_HAND = new MainHandDisplayAttribute(15);
         public static final ResolvableProfileDisplayAttribute RESOLVABLE_PROFILE = new ResolvableProfileDisplayAttribute(17);
