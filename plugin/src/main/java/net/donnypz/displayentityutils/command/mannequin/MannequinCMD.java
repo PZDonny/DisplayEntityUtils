@@ -52,7 +52,7 @@ public class MannequinCMD extends ConsoleUsableSubCommand {
             sender.sendMessage(Component.text("| Commands with \"-all\" will apply the command to all mannequins within a part selection", NamedTextColor.GOLD));
             CMDUtils.sendCMD(sender, "/deu mannequin help", "Get help for mannequins");
             CMDUtils.sendCMD(sender, "/deu mannequin name <name>", "Set your selected mannequin's name");
-            CMDUtils.sendCMD(sender, "/deu mannequin unname", "Remove your selected mannequin's name");
+            CMDUtils.sendCMD(sender, "/deu mannequin unname [-all]", "Remove your selected mannequin's name");
             CMDUtils.sendCMD(sender, "/deu mannequin belowname <text>", "Set the text below your selected mannequin's name");
             CMDUtils.sendCMD(sender, "/deu mannequin togglenamevisibility [-all <on | off>]", "Toggle the gravity of an mannequin");
             CMDUtils.sendCMD(sender, "/deu mannequin skin <player-name> [-all]", "Set your selected mannequin's skin");
