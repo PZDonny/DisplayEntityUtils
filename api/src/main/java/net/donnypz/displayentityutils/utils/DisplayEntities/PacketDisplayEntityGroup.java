@@ -695,23 +695,28 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * @return a cloned {@link PacketDisplayEntityGroup}
      */
     public PacketDisplayEntityGroup clone(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow){
-        //Reset Interaction pivot to 0 yaw
-        HashMap<ActivePart, Float> oldYaws = new HashMap<>();
-        for (ActivePart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
-            float oldYaw = part.getYaw();
-            oldYaws.put(part,  oldYaw);
-            part.pivot(-oldYaw);
+        //Reset pivot to 0
+        float groupYaw = getLocation().getYaw();
+        HashSet<ActivePart> resettedParts = new HashSet<>();
+        for (ActivePart part : groupParts.values()){
+            if (part.isDisplay()) continue;
+            part.pivot(-groupYaw);
+            resettedParts.add(part);
         }
+
 
         DisplayEntityGroup group = toDisplayEntityGroup();
+        float newYaw = location.getYaw();
+        location = location.clone();
+        location.setYaw(0);
         PacketDisplayEntityGroup clone = group.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.CLONE, playSpawnAnimation, autoShow);
 
-        //Restore Interaction Pivot
-        for (Map.Entry<ActivePart, Float> entry : oldYaws.entrySet()){
-            ActivePart part = entry.getKey();
-            float oldYaw = entry.getValue();
-            part.pivot(oldYaw);
+        //Restore pivot
+        for (ActivePart part : resettedParts){
+            part.pivot(groupYaw);
         }
+
+        clone.setYaw(newYaw, true);
         if (this.isPersistent()) clone.setPersistent(true);
         return clone;
     }

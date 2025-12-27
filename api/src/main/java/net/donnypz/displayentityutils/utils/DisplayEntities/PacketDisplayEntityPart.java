@@ -994,12 +994,12 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
-     * Pivot a non-display entity around its group's master part
+     * Pivot a non-display entity around its group\
      * @param angleInDegrees the pivot angle
      */
     @Override
     public void pivot(float angleInDegrees) {
-        if (!isDisplay()) return;
+        if (isDisplay() || group == null) return;
         pivot(getYaw(), getPitch(), angleInDegrees);
     }
 

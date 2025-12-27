@@ -719,7 +719,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     /**
-     * Pivot a non-display entity around its group's master part
+     * Pivot a non-display entity around its group
      * @param angleInDegrees the pivot angle
      */
     @Override
