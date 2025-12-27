@@ -24,7 +24,6 @@ class GroupDespawnCMD extends GroupSubCommand {
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Despawned your selected display entity group!", NamedTextColor.GRAY)));
         if (group instanceof SpawnedDisplayEntityGroup sg){
-            DisplayGroupManager.deselectGroup(player);
             sg.unregister(true, true);
         }
         else if (group instanceof PacketDisplayEntityGroup pg){
@@ -35,6 +34,7 @@ class GroupDespawnCMD extends GroupSubCommand {
                 pg.unregister();
             }
         }
+        DisplayGroupManager.deselectGroup(player);
         DisplayEntityPluginCommand.hideRelativePoints(player);
     }
 }
