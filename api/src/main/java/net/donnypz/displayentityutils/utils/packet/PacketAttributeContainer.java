@@ -410,7 +410,7 @@ public class PacketAttributeContainer implements Cloneable{
                 getEntityType(partType),
                 //SpigotConversionUtil.fromBukkitLocation(getTrueLocation(partType, location)),
                 SpigotConversionUtil.fromBukkitLocation(location),
-                0,
+                location.getYaw(),
                 0,
                 null);
     }

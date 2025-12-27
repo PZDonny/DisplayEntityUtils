@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityHeadLook;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityRotation;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
@@ -958,9 +959,15 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             pivot(yaw, pitch);
         }
         else if (!viewers.isEmpty()){
+            WrapperPlayServerEntityHeadLook headLook = getHeadLookPacket(yaw);
             WrapperPlayServerEntityRotation rotPacket = new WrapperPlayServerEntityRotation(getEntityId(), yaw, pitch, false);
             for (UUID uuid : getViewers()){
-                PacketEvents.getAPI().getPlayerManager().sendPacket(Bukkit.getPlayer(uuid), rotPacket);
+                Player p = Bukkit.getPlayer(uuid);
+                if (p == null) continue;
+                PacketEvents.getAPI().getPlayerManager().sendPacket(p, rotPacket);
+                if (packetLocation.yaw != yaw && type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
+                    PacketEvents.getAPI().getPlayerManager().sendPacket(p, headLook);
+                }
             }
         }
         packetLocation.pitch = pitch;
@@ -1014,14 +1021,19 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         packetLocation.setCoordinates(pivotedLoc);
 
 
+        WrapperPlayServerEntityHeadLook headLook = getHeadLookPacket(yaw);
+        WrapperPlayServerEntityTeleport teleport = new WrapperPlayServerEntityTeleport(getEntityId(),
+                new Vector3d(pivotedLoc.x(), pivotedLoc.y(), pivotedLoc.z()),
+                yaw,
+                pitch,
+                false);
         for (UUID uuid : getViewers()){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
-            PacketEvents.getAPI().getPlayerManager().sendPacket(player, new WrapperPlayServerEntityTeleport(getEntityId(),
-                    new Vector3d(pivotedLoc.x(), pivotedLoc.y(), pivotedLoc.z()),
-                    yaw,
-                    pitch,
-                    false));
+            PacketEvents.getAPI().getPlayerManager().sendPacket(player, teleport);
+            if (type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
+                PacketEvents.getAPI().getPlayerManager().sendPacket(player, headLook);
+            }
         }
     }
 
@@ -1229,6 +1241,14 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (unregister){
             remove();
         }
+    }
+
+    private WrapperPlayServerEntityHeadLook getHeadLookPacket(float yaw){
+        return new WrapperPlayServerEntityHeadLook(getEntityId(), yaw);
+    }
+
+    private void sendHeadLookPacket(Player player, float yaw){
+        PacketEvents.getAPI().getPlayerManager().sendPacket(player, getHeadLookPacket(yaw));
     }
 
     static final class PacketLocation {
