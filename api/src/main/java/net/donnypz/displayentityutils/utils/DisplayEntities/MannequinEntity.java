@@ -1,6 +1,5 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
@@ -18,6 +17,7 @@ import org.joml.Vector3f;
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -32,6 +32,12 @@ final class MannequinEntity implements Serializable {
     String description;
     String profileName;
     UUID profileUUID;
+    List<ProfileProperty> profileProperties;
+    String profileSkinPatchBody;
+    String profileSkinPatchCape;
+    String profileSkinPatchElytra;
+    String profileSkinPatchModel;
+
     double scale;
     String pose;
     boolean isRightMainHand;
@@ -46,13 +52,7 @@ final class MannequinEntity implements Serializable {
                 .setAttribute(DisplayAttributes.Mannequin.SCALE, (float) scale)
                 .setAttribute(DisplayAttributes.Mannequin.IMMOVABLE, true)
                 .setAttribute(DisplayAttributes.Mannequin.NO_GRAVITY, true)
-                .setAttribute(DisplayAttributes.CUSTOM_NAME, customName != null ? MiniMessage.miniMessage().deserialize(customName): null)
                 .setAttribute(DisplayAttributes.CUSTOM_NAME_VISIBLE, customNameVisible)
-                .setAttribute(DisplayAttributes.Mannequin.BELOW_NAME, description != null ? MiniMessage.miniMessage().deserialize(description): null)
-                .setAttribute(DisplayAttributes.Mannequin.RESOLVABLE_PROFILE, ResolvableProfile.resolvableProfile()
-                        .name(profileName)
-                        .uuid(profileUUID)
-                        .build())
                 .setAttribute(DisplayAttributes.Mannequin.POSE, Pose.valueOf(pose))
                 .setAttribute(DisplayAttributes.Mannequin.MAIN_HAND, isRightMainHand ? MainHand.RIGHT : MainHand.LEFT)
                 .setAttribute(DisplayAttributes.Equipment.HELMET, getHelmet())
@@ -61,6 +61,22 @@ final class MannequinEntity implements Serializable {
                 .setAttribute(DisplayAttributes.Equipment.BOOTS, getBoots())
                 .setAttribute(DisplayAttributes.Equipment.MAIN_HAND, getMainHand())
                 .setAttribute(DisplayAttributes.Equipment.OFF_HAND, getOffHand());
+
+        if (customName != null){
+            attributeContainer.setAttribute(DisplayAttributes.CUSTOM_NAME, MiniMessage.miniMessage().deserialize(customName));
+        }
+
+        if (description != null){
+           attributeContainer.setAttribute(DisplayAttributes.Mannequin.BELOW_NAME, MiniMessage.miniMessage().deserialize(description));
+        }
+
+        if (profileName != null || profileUUID != null){
+            attributeContainer
+                    .setAttribute(
+                            DisplayAttributes.Mannequin.RESOLVABLE_PROFILE,
+                            SavedEntityLoader.getMannequinProfile(this)
+                    );
+        }
 
         Location spawnLoc = DisplayUtils.getPivotLocation(
                 vector,
@@ -114,7 +130,31 @@ final class MannequinEntity implements Serializable {
     }
 
     ItemStack getItemStack(byte[] itemStack){
-        if (itemStack == null) return ItemStack.of(Material.AIR);
+        if (itemStack == null) return new ItemStack(Material.AIR);
         return ItemStack.deserializeBytes(itemStack);
+    }
+
+    static class ProfileProperty implements Serializable{
+
+        @Serial
+        private static final long serialVersionUID = 99L;
+
+        String name;
+        String value;
+        String signature;
+
+        ProfileProperty(com.destroystokyo.paper.profile.ProfileProperty property){
+            this(property.getName(), property.getValue(), property.getSignature());
+        }
+
+        ProfileProperty(String name, String value, String signature){
+            this.name = name;
+            this.value = value;
+            this.signature = signature;
+        }
+
+        com.destroystokyo.paper.profile.ProfileProperty toBukkitProperty(){
+            return new com.destroystokyo.paper.profile.ProfileProperty(name, value, signature);
+        }
     }
 }

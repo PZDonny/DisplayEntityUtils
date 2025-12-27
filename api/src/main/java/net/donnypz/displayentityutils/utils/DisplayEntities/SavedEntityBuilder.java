@@ -1,10 +1,12 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import com.destroystokyo.paper.profile.ProfileProperty;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
@@ -17,9 +19,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.profile.PlayerTextures;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 class SavedEntityBuilder {
 
@@ -34,11 +39,7 @@ class SavedEntityBuilder {
         Component description = mannequin.getDescription();
         mannequinEntity.description = description != null ? MiniMessage.miniMessage().serialize(description) : null;
 
-        ResolvableProfile profile = mannequin.getProfile();
-        if (profile != null){
-            mannequinEntity.profileName = profile.name();
-            mannequinEntity.profileUUID = profile.uuid();
-        }
+        setProfileFields(mannequinEntity, mannequin.getProfile());
 
         mannequinEntity.scale = mannequin.getAttribute(Attribute.SCALE).getBaseValue();
         mannequinEntity.pose = mannequin.getPose().name();
@@ -76,11 +77,7 @@ class SavedEntityBuilder {
         Component description = part.getMannequinBelowName();
         mannequinEntity.description = description != null ? MiniMessage.miniMessage().serialize(description) : null;
 
-        ResolvableProfile profile = part.getMannequinProfile();
-        if (profile != null){
-            mannequinEntity.profileName = profile.name();
-            mannequinEntity.profileUUID = profile.uuid();
-        }
+        setProfileFields(mannequinEntity, part.getMannequinProfile());
 
         mannequinEntity.scale = c.getAttributeOrDefault(DisplayAttributes.Mannequin.SCALE, 1.0f);
         Pose pose = part.getMannequinPose();
@@ -118,5 +115,36 @@ class SavedEntityBuilder {
     static byte[] serializeItemStack(ItemStack itemStack){
         if (itemStack == null || itemStack.isEmpty()) return null;
         return itemStack.serializeAsBytes();
+    }
+
+    private static void setProfileFields(MannequinEntity mannequinEntity, ResolvableProfile profile){
+        if (profile != null){
+            mannequinEntity.profileName = profile.name();
+            mannequinEntity.profileUUID = profile.uuid();
+
+            Collection<ProfileProperty> bukkitProperties = profile.properties();
+            if (bukkitProperties != null){
+                List<MannequinEntity.ProfileProperty> properties = new ArrayList<>();
+                for (ProfileProperty prop : bukkitProperties){
+                    properties.add(new MannequinEntity.ProfileProperty(prop));
+                }
+                mannequinEntity.profileProperties = properties;
+            }
+
+            ResolvableProfile.SkinPatch skinPatch = profile.skinPatch();
+            if (skinPatch.isEmpty()) {
+                return;
+            }
+
+            Key body = skinPatch.body();
+            Key cape = skinPatch.cape();
+            Key elytra = skinPatch.elytra();
+            PlayerTextures.SkinModel model = skinPatch.model();
+
+            if (body != null) mannequinEntity.profileSkinPatchBody = body.asString();
+            if (cape != null) mannequinEntity.profileSkinPatchCape = cape.asString();
+            if (elytra != null) mannequinEntity.profileSkinPatchElytra = elytra.asString();
+            if (model != null) mannequinEntity.profileSkinPatchModel = model.name();
+        }
     }
 }

@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.player.PlayerModelType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
+import net.kyori.adventure.key.Key;
 import org.bukkit.profile.PlayerTextures;
 
 import java.util.ArrayList;
@@ -21,25 +22,35 @@ public class ResolvableProfileDisplayAttribute extends DisplayAttribute<Resolvab
     public ItemProfile getOutputValue(ResolvableProfile value) {
         String name = value.name();
         UUID uuid = value.uuid();
-        value.properties();
 
         List<ItemProfile.Property> properties = new ArrayList<>();
         for (ProfileProperty prop : value.properties()){
             properties.add(new ItemProfile.Property(prop.getName(), prop.getValue(), prop.getSignature()));
         }
+        ItemProfile.SkinPatch skinPatch;
         ResolvableProfile.SkinPatch bukkitSkinPatch = value.skinPatch();
-        PlayerModelType modelType;
-        if (bukkitSkinPatch.model() == null){
-            modelType = PlayerModelType.WIDE;
+        if (bukkitSkinPatch.isEmpty()){
+            skinPatch = ItemProfile.SkinPatch.EMPTY;
         }
         else{
-            modelType = (bukkitSkinPatch.model() == PlayerTextures.SkinModel.CLASSIC) ? PlayerModelType.WIDE : PlayerModelType.SLIM;
+            PlayerModelType modelType;
+            if (bukkitSkinPatch.model() == null){
+                modelType = null;
+            }
+            else{
+                modelType = (bukkitSkinPatch.model() == PlayerTextures.SkinModel.CLASSIC) ? PlayerModelType.WIDE : PlayerModelType.SLIM;
+            }
+            Key bodyKey = bukkitSkinPatch.body();
+            Key capeKey = bukkitSkinPatch.cape();
+            Key elytraKey = bukkitSkinPatch.elytra();
+
+            skinPatch = new ItemProfile.SkinPatch(
+                    bodyKey == null ? null : new ResourceLocation(bodyKey),
+                    capeKey == null ? null : new ResourceLocation(capeKey),
+                    elytraKey == null ? null : new ResourceLocation(elytraKey),
+                    modelType);
         }
-        ItemProfile.SkinPatch skinPatch = new ItemProfile.SkinPatch(
-                new ResourceLocation(bukkitSkinPatch.body()),
-                new ResourceLocation(bukkitSkinPatch.cape()),
-                new ResourceLocation(bukkitSkinPatch.elytra()),
-                modelType);
+
         return new ItemProfile(name, uuid, properties, skinPatch);
     }
 }
