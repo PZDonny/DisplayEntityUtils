@@ -35,10 +35,9 @@ public enum Permission {
     GROUP_WORLD_EDIT("deu.group.worldedit"),
 
     PLACE_SET_ITEM("deu.place.setitem"),
-    PLACE_TOGGLE_PACKET("deu.place.togglepacket"),
-    PLACE_TOGGLE_FACING("deu.place.togglefacing"),
     PLACE_TOGGLE_PACKET("deu.place.toggle.packet"),
-    PLACE_TOGGLE_FACING("deu.place.toggle.playerfacing"),
+    PLACE_TOGGLE_PLAYER_FACING("deu.place.toggle.playerfacing"),
+    PLACE_TOGGLE_BLOCK_FACE("deu.place.toggle.blockface"),
     PLACE_SET_PERMISSION("deu.place.setpermission"),
 
 

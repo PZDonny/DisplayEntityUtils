@@ -88,9 +88,10 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         DisplayAPI.spawnAnimationLoadMethodKey = new NamespacedKey(this, "spawnanimationloader");
         DisplayAPI.chunkPacketGroupsKey = new NamespacedKey(this, "chunkpacketgroups");
         DisplayAPI.placeableGroupKey = new NamespacedKey(this, "placeablegroup");
-        DisplayAPI.placeableGroupPacketBasedKey = new NamespacedKey(this, "placeablegrouppacketbased");
-        DisplayAPI.placeableGroupPermissionKey = new NamespacedKey(this, "placeablegroupperm");
-        DisplayAPI.placeableGroupRespectFacingKey = new NamespacedKey(this, "placeblegroupfacing");
+        DisplayAPI.placeableGroupPacketBasedKey = new NamespacedKey(this, "placeablegroup_packet");
+        DisplayAPI.placeableGroupPermissionKey = new NamespacedKey(this, "placeablegroup_perm");
+        DisplayAPI.placeableGroupRespectFacingKey = new NamespacedKey(this, "placeblegroup_playerfacing");
+        DisplayAPI.placeableGroupRespectFacingKey = new NamespacedKey(this, "placeblegroup_blockface");
 
     }
 

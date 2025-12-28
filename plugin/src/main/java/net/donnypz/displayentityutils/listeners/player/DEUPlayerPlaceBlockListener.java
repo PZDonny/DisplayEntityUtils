@@ -4,12 +4,15 @@ import net.donnypz.displayentityutils.managers.PlaceableGroupManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
+import org.joml.Quaternionf;
 
 
 public class DEUPlayerPlaceBlockListener implements Listener {
@@ -32,13 +35,33 @@ public class DEUPlayerPlaceBlockListener implements Listener {
             return;
         }
 
-        Location placeLoc = e.getBlockPlaced().getLocation();
-        placeLoc.add(0.5, 0, 0.5);
+        BlockFace face = e.getBlockAgainst().getFace(e.getBlockPlaced());
+        Quaternionf rot;
+        Location placeLoc;
 
-        if (PlaceableGroupManager.isRespectingPlayerFacing(heldItem)){
+        if (face != null && PlaceableGroupManager.isRespectingBlockFace(heldItem)){
+            Vector faceDir = face.getDirection();
+            rot = getRotation(faceDir);
+            placeLoc = e.getBlockPlaced().getLocation()
+                    .add(0.5f, 0.5f, 0.5f)
+                    .subtract(faceDir.multiply(0.499));
+        }
+        else{
+            rot = new Quaternionf();
+            placeLoc = e.getBlockPlaced().getLocation().add(0.5, 0, 0.5);
+        }
+
+
+        if ((face == BlockFace.UP || face == BlockFace.DOWN || face == BlockFace.SELF) && PlaceableGroupManager.isRespectingPlayerFacing(heldItem)){
             placeLoc.setYaw(player.getYaw()+180);
         }
 
-        PlaceableGroupManager.spawnGroup(heldItem, placeLoc, player);
+        PlaceableGroupManager.spawnGroup(heldItem, placeLoc, rot, player);
+
+    }
+
+    private Quaternionf getRotation(Vector faceDir){
+        Vector upVec = new Vector(0, 1, 0);
+        return upVec.toVector3f().rotationTo(faceDir.toVector3f(), new Quaternionf());
     }
 }

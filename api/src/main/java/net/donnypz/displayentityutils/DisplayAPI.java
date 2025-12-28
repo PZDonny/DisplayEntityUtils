@@ -31,6 +31,7 @@ public final class DisplayAPI {
     static NamespacedKey placeableGroupPacketBasedKey;
     static NamespacedKey placeableGroupPermissionKey;
     static NamespacedKey placeableGroupRespectFacingKey;
+    static NamespacedKey placeableGroupRespectBlockFace;
 
     static boolean isMythicMobsInstalled;
     static boolean isLibsDisguisesInstalled;
@@ -101,8 +102,12 @@ public final class DisplayAPI {
         return placeableGroupPermissionKey;
     }
 
-    public static @NotNull NamespacedKey getPlaceableGroupRespectFacing(){
+    public static @NotNull NamespacedKey getPlaceableGroupRespectPlayerFacing(){
         return placeableGroupRespectFacingKey;
+    }
+
+    public static @NotNull NamespacedKey getPlaceableGroupRespectBlockFace(){
+        return placeableGroupRespectBlockFace;
     }
 
 

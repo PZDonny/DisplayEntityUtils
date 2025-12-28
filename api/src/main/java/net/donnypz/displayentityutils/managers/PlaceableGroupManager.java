@@ -15,6 +15,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
 
 public final class PlaceableGroupManager {
 
@@ -34,7 +35,7 @@ public final class PlaceableGroupManager {
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         pdc.set(DisplayAPI.getPlaceableGroupKey(), PersistentDataType.STRING, groupTag);
         pdc.set(DisplayAPI.getPlaceableGroupPacketBasedKey(), PersistentDataType.BOOLEAN, spawnUsingPackets);
-        pdc.set(DisplayAPI.getPlaceableGroupRespectFacing(), PersistentDataType.BOOLEAN, true);
+        pdc.set(DisplayAPI.getPlaceableGroupRespectPlayerFacing(), PersistentDataType.BOOLEAN, true);
         itemStack.setItemMeta(meta);
     }
 
@@ -63,7 +64,7 @@ public final class PlaceableGroupManager {
         pdc.set(DisplayAPI.getPlaceableGroupKey(), PersistentDataType.STRING, groupTag);
         pdc.set(DisplayAPI.getPlaceableGroupPacketBasedKey(), PersistentDataType.BOOLEAN, spawnUsingPackets);
         pdc.set(DisplayAPI.getPlaceableGroupPermissionKey(), PersistentDataType.STRING, placePermission);
-        pdc.set(DisplayAPI.getPlaceableGroupRespectFacing(), PersistentDataType.BOOLEAN, true);
+        pdc.set(DisplayAPI.getPlaceableGroupRespectPlayerFacing(), PersistentDataType.BOOLEAN, true);
         itemStack.setItemMeta(meta);
     }
 
@@ -87,7 +88,7 @@ public final class PlaceableGroupManager {
         pdc.remove(DisplayAPI.getPlaceableGroupKey());
         pdc.remove(DisplayAPI.getPlaceableGroupPacketBasedKey());
         pdc.remove(DisplayAPI.getPlaceableGroupPermissionKey());
-        pdc.remove(DisplayAPI.getPlaceableGroupRespectFacing());
+        pdc.remove(DisplayAPI.getPlaceableGroupRespectPlayerFacing());
         itemStack.setItemMeta(meta);
     }
 
@@ -200,7 +201,7 @@ public final class PlaceableGroupManager {
     public static void setRespectPlayerFacing(@NotNull ItemStack itemStack, boolean respect){
         ItemMeta meta = itemStack.getItemMeta();
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
-        pdc.set(DisplayAPI.getPlaceableGroupRespectFacing(), PersistentDataType.BOOLEAN, respect);
+        pdc.set(DisplayAPI.getPlaceableGroupRespectPlayerFacing(), PersistentDataType.BOOLEAN, respect);
         itemStack.setItemMeta(meta);
     }
 
@@ -211,7 +212,29 @@ public final class PlaceableGroupManager {
      */
     public static boolean isRespectingPlayerFacing(@NotNull ItemStack itemStack){
         PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
-        return Boolean.TRUE.equals(pdc.get(DisplayAPI.getPlaceableGroupRespectFacing(), PersistentDataType.BOOLEAN));
+        return Boolean.TRUE.equals(pdc.get(DisplayAPI.getPlaceableGroupRespectPlayerFacing(), PersistentDataType.BOOLEAN));
+    }
+
+    /**
+     * Set whether the group associated with the given item should spawn with respect to the block face its placed on
+     * @param itemStack the item
+     * @param respect whether the group should respect the block face its placed on
+     */
+    public static void setRespectBlockFace(@NotNull ItemStack itemStack, boolean respect){
+        ItemMeta meta = itemStack.getItemMeta();
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        pdc.set(DisplayAPI.getPlaceableGroupRespectBlockFace(), PersistentDataType.BOOLEAN, respect);
+        itemStack.setItemMeta(meta);
+    }
+
+    /**
+     * Get whether the group associated with the given item will respect the block face its placed on
+     * @param itemStack the item
+     * @return a boolean
+     */
+    public static boolean isRespectingBlockFace(@NotNull ItemStack itemStack){
+        PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+        return Boolean.TRUE.equals(pdc.get(DisplayAPI.getPlaceableGroupRespectBlockFace(), PersistentDataType.BOOLEAN));
     }
 
 
@@ -221,6 +244,15 @@ public final class PlaceableGroupManager {
      * @param spawnLocation the spawn location
      */
     public static void spawnGroup(@NotNull ItemStack itemStack, @NotNull Location spawnLocation, @Nullable Player itemHolder){
+        spawnGroup(itemStack, spawnLocation, new Quaternionf(), itemHolder);
+    }
+
+    /**
+     * Spawn the {@link DisplayEntityGroup} associated with an item at a location
+     * @param itemStack the item
+     * @param spawnLocation the spawn location
+     */
+    public static void spawnGroup(@NotNull ItemStack itemStack, @NotNull Location spawnLocation, @NotNull Quaternionf rotation, @Nullable Player itemHolder){
         String tag = getAssignedGroupTag(itemStack);
         boolean isPacket = isSpawningPacketGroup(itemStack);
         if (tag == null) return;
@@ -231,11 +263,13 @@ public final class PlaceableGroupManager {
             if (isPacket){
                 PacketDisplayEntityGroup pg = group.createPacketGroup(spawnLocation, GroupSpawnedEvent.SpawnReason.ITEMSTACK, true, true);
                 pg.setPersistent(true);
+                pg.rotateDisplays(rotation);
                 new ItemPlaceGroupEvent(pg, itemStack, itemHolder).callEvent();
             }
             else{
                 DisplayAPI.getScheduler().run(() -> {
                     SpawnedDisplayEntityGroup sg = group.spawn(spawnLocation, GroupSpawnedEvent.SpawnReason.ITEMSTACK);
+                    sg.rotateDisplays(rotation);
                     new ItemPlaceGroupEvent(sg, itemStack, itemHolder).callEvent();
                 });
             }

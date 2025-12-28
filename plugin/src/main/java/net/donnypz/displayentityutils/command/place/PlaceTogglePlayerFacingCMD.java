@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 class PlaceTogglePlayerFacingCMD extends PlayerSubCommand {
     PlaceTogglePlayerFacingCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("toggleplayerfacing", parentSubCommand, Permission.PLACE_TOGGLE_FACING);
+        super("toggleplayerfacing", parentSubCommand, Permission.PLACE_TOGGLE_PLAYER_FACING);
     }
 
     @Override
