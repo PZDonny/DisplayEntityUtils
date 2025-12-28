@@ -21,6 +21,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
 
 import java.util.*;
 
@@ -210,6 +211,16 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     public void setInterpolationDelay(int interpolationDelay){
         for (ActivePart part : groupParts.values()){
             part.setInterpolationDelay(interpolationDelay);
+        }
+    }
+
+    /**
+     * Rotate the display entities in this group
+     * @param rotation the rotation
+     */
+    public void rotateDisplays(@NotNull Quaternionf rotation){
+        for (ActivePart p : groupParts.values()){
+            p.rotateDisplay(rotation, true);
         }
     }
 

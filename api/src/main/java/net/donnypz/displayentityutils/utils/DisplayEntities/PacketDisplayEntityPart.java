@@ -336,6 +336,24 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         return true;
     }
 
+    @Override
+    public void rotateDisplay(@NotNull Quaternionf rotation, boolean rotateTranslation) {
+        if (!isDisplay()) return;
+        Vector3f translation = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.TRANSLATION, new Vector3f());
+        Quaternionf originalRot = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.LEFT_ROTATION, new Quaternionf());
+
+        //World Space Rot
+        if (rotateTranslation){
+            translation.rotate(rotation);
+        }
+
+        rotation.mul(originalRot, originalRot);
+
+        attributeContainer.setAttributesAndSend(new DisplayAttributeMap()
+                .add(DisplayAttributes.Transform.TRANSLATION, translation)
+                .add(DisplayAttributes.Transform.LEFT_ROTATION, originalRot), getEntityId(), viewers);
+    }
+
 
     @Override
     public void setTextDisplayText(@NotNull Component text) {

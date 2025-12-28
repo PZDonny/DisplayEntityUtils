@@ -25,6 +25,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -365,6 +366,13 @@ public abstract class ActivePart implements Active{
      * @return false if this part is not a display entity
      */
     public abstract boolean setDisplayScale(float x, float y, float z);
+
+    /**
+     * Rotate this display entity part by a given quaternion
+     * @param rotation the rotation
+     * @param rotateTranslation whether the display's translation should be rotated, pivoting it around the entity's location
+     */
+    public abstract void rotateDisplay(@NotNull Quaternionf rotation, boolean rotateTranslation);
 
     /**
      * Set the text of this part if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.

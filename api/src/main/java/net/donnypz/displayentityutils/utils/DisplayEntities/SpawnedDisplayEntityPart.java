@@ -28,6 +28,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -569,6 +570,25 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return true;
     }
 
+    @Override
+    public void rotateDisplay(@NotNull Quaternionf rotation, boolean rotateTranslation) {
+        if (!isDisplay()) return;
+        Display display = (Display) getEntity();
+        if (display == null) return;
+        Transformation t = getTransformation();
+        Vector3f translation = t.getTranslation();
+        Quaternionf originalRot = t.getLeftRotation();
+
+        //World Space Rot
+        if (rotateTranslation){
+            translation.rotate(rotation);
+        }
+
+        rotation.mul(originalRot, originalRot);
+
+        Transformation newT = new Transformation(translation, originalRot, t.getScale(), t.getRightRotation());
+        display.setTransformation(newT);
+    }
 
     /**
      * Set the brightness of this part
