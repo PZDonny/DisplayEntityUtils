@@ -89,6 +89,7 @@ public final class PlaceableGroupManager {
         pdc.remove(DisplayAPI.getPlaceableGroupPacketBasedKey());
         pdc.remove(DisplayAPI.getPlaceableGroupPermissionKey());
         pdc.remove(DisplayAPI.getPlaceableGroupRespectPlayerFacing());
+        pdc.remove(DisplayAPI.getPlaceableGroupRespectBlockFace());
         itemStack.setItemMeta(meta);
     }
 
