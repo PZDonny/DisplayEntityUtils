@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Called before the stored {@link DisplayEntityGroup} on an item can be spawned when a player places the item's block or when
- * {@link PlaceableGroupManager#spawnGroup(ItemStack, Location, Player)} is called.
+ * {@link PlaceableGroupManager#spawnGroup(ItemStack, Location, Player)} or similar is called.
  */
 public class PreItemPlaceGroupEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();

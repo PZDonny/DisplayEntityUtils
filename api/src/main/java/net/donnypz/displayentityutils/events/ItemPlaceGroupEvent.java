@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.events;
 
-import net.donnypz.displayentityutils.managers.PlaceableGroupManager;
+import net.donnypz.displayentityutils.managers.PlaceableGroupData;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Called when a player places an {@link ActiveGroup} using an item that
- * has an assigned group through {@link PlaceableGroupManager#assign(ItemStack, String, boolean)} (ItemStack, String)} or similar methods.
+ * has an assigned group with {@link PlaceableGroupData}.
  */
 public class ItemPlaceGroupEvent extends Event {
     private static final HandlerList handlers = new HandlerList();

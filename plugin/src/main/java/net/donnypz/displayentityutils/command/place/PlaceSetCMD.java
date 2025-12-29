@@ -4,7 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.managers.PlaceableGroupManager;
+import net.donnypz.displayentityutils.managers.PlaceableGroupData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -34,7 +34,8 @@ class PlaceSetCMD extends PlayerSubCommand {
 
         String groupTag = args[2];
 
-        PlaceableGroupManager.assign(heldItem, groupTag, true);
+        new PlaceableGroupData(groupTag)
+                .apply(heldItem);
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Assigned a group to your held block <white>(Tag: "+groupTag+")")));
         player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>| The group will spawn using <light_purple>packets"));
     }

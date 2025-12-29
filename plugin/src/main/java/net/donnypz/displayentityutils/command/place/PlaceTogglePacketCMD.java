@@ -22,12 +22,12 @@ class PlaceTogglePacketCMD extends PlayerSubCommand {
         ItemStack heldItem = PlaceCMD.getHeldItem(player, true);
         if (heldItem == null) return;
 
-        if (PlaceableGroupManager.isSpawningPacketGroup(heldItem)){
-            PlaceableGroupManager.setSpawnPacketGroup(heldItem, false);
+        if (PlaceableGroupManager.isUsingPackets(heldItem)){
+            PlaceableGroupManager.setUsePackets(heldItem, false);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your held item's group will no longer spawn using packets", NamedTextColor.RED)));
         }
         else{
-            PlaceableGroupManager.setSpawnPacketGroup(heldItem, true);
+            PlaceableGroupManager.setUsePackets(heldItem, true);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your held item's group will spawn using packets", NamedTextColor.GREEN)));
         }
         PlaceableGroupManager.unassign(heldItem);
