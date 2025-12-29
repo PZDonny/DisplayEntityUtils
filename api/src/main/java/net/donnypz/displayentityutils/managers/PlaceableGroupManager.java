@@ -244,18 +244,27 @@ public final class PlaceableGroupManager {
             CompletableFuture<ActiveGroup<?>> result = new CompletableFuture<>();
 
             if (isPacket){
-                PacketDisplayEntityGroup pg = group.createPacketGroup(spawnLocation, GroupSpawnedEvent.SpawnReason.ITEMSTACK, true, true);
-                pg.setPersistent(true);
-                pg.rotateDisplays(rotation);
-                new ItemPlaceGroupEvent(pg, itemStack, itemHolder).callEvent();
-                result.complete(pg);
+                try{
+                    PacketDisplayEntityGroup pg = group.createPacketGroup(spawnLocation, GroupSpawnedEvent.SpawnReason.ITEMSTACK, true, true);
+                    pg.setPersistent(true);
+                    pg.rotateDisplays(rotation);
+                    new ItemPlaceGroupEvent(pg, itemStack, itemHolder).callEvent();
+                    result.complete(pg);
+                }
+                catch(NullPointerException e){
+                    result.completeExceptionally(e);
+                }
             }
             else{
                 DisplayAPI.getScheduler().run(() -> {
-                    SpawnedDisplayEntityGroup sg = group.spawn(spawnLocation, GroupSpawnedEvent.SpawnReason.ITEMSTACK);
-                    sg.rotateDisplays(rotation);
-                    new ItemPlaceGroupEvent(sg, itemStack, itemHolder).callEvent();
-                    result.complete(sg);
+                    try{
+                        SpawnedDisplayEntityGroup sg = group.spawn(spawnLocation, GroupSpawnedEvent.SpawnReason.ITEMSTACK);
+                        sg.rotateDisplays(rotation);
+                        new ItemPlaceGroupEvent(sg, itemStack, itemHolder).callEvent();
+                        result.complete(sg);
+                    } catch (RuntimeException e) {
+                        result.completeExceptionally(e);
+                    }
                 });
             }
             return result;
