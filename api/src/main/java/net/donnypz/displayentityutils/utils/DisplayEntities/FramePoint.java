@@ -435,27 +435,8 @@ public class FramePoint extends RelativePoint implements Serializable {
         player.sendMessage(Component.empty());
 
         //Sounds
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Sounds: <yellow>"+sounds.size()));
-        if (sounds.isEmpty()){
-            player.sendMessage(Component.text("| NONE", NamedTextColor.GRAY));
-        }
-        else{
-            for (DEUSound sound : sounds.values()){
-                Component msgComp = Component.text("- "+sound.getSoundName(), NamedTextColor.YELLOW);
-                Component hoverComp = Component.text("| Vol: "+sound.getVolume()+", Pitch: "+sound.getPitch(), NamedTextColor.GRAY);
-                if (!sound.existsInGameVersion()){
-                    msgComp = msgComp.append(Component.text(" [UNKNOWN]", NamedTextColor.GRAY));
-                    hoverComp = hoverComp
-                            .append(Component.newline())
-                            .append(Component.text("This sound no longer exists or is a resource pack sound!", NamedTextColor.RED));
-                }
+        DEUSound.sendInfo(sounds.values(), player, null, null);
 
-                msgComp = msgComp.hoverEvent(HoverEvent.showText(hoverComp));
-                player.sendMessage(msgComp);
-            }
-        }
-
-        player.sendMessage(Component.empty());
         player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>RIGHT</yellow> <aqua>click to preview effects"));
     }
 

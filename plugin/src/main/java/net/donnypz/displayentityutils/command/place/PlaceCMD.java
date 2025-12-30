@@ -22,6 +22,7 @@ public class PlaceCMD extends ConsoleUsableSubCommand {
         new PlaceTogglePlayerFacingCMD(this);
         new PlaceToggleBlockFaceCMD(this);
         new PlaceInfoCMD(this);
+        new PlaceAddSoundCMD(this);
     }
 
     @Override
@@ -55,6 +56,7 @@ public class PlaceCMD extends ConsoleUsableSubCommand {
         else{
             CMDUtils.sendCMD(sender, "/deu place toggleplayerfacing", "Toggle whether the placed group will respect the player's facing direction. True by default");
             CMDUtils.sendCMD(sender, "/deu place toggleblockface", "Toggle whether the placed group will respect the block face it is placed on. True by default");
+            CMDUtils.sendCMD(sender, "/deu place addsound <place | break> <sound> <volume> <pitch>", "Add a sound to play when the block is placed or broken");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }
@@ -66,8 +68,8 @@ public class PlaceCMD extends ConsoleUsableSubCommand {
             return null;
         }
 
-        if (mustBeAssigned && !PlaceableGroupManager.hasAssignedGroup(heldItem)){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your held item does not have an assigned group!", NamedTextColor.RED)));
+        if (mustBeAssigned && !PlaceableGroupManager.hasData(heldItem)){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your held item does not have placeable group data!", NamedTextColor.RED)));
             return null;
         }
         return heldItem;

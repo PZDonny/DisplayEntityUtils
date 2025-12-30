@@ -2,6 +2,11 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.version.VersionUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
@@ -10,9 +15,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.util.Collection;
+import java.util.function.Consumer;
 
-@ApiStatus.Internal
-public class DEUSound implements Externalizable, Cloneable {
+public class DEUSound implements Externalizable, Cloneable { //i have no clue what i was doing when making this class, now its externalizable forever
     transient Sound sound;
     String soundName;
     float volume;
@@ -191,5 +196,44 @@ public class DEUSound implements Externalizable, Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
+    }
+
+    @ApiStatus.Internal
+    public void sendInfo(Player player, Consumer<DEUSound> clickRemovalAction){
+        Component msgComp = Component.text("- "+soundName, NamedTextColor.YELLOW);
+        Component hoverComp = Component.text("| Vol: "+volume+", Pitch: "+pitch, NamedTextColor.GRAY);
+        if (!existsInGameVersion){
+            msgComp = msgComp.append(Component.text(" [UNKNOWN]", NamedTextColor.GRAY));
+            hoverComp = hoverComp
+                    .append(Component.newline())
+                    .append(Component.text("This sound no longer exists or is a resource pack sound!", NamedTextColor.RED));
+        }
+
+        if (clickRemovalAction != null){
+            hoverComp = hoverComp.append(Component.newline())
+                    .append(Component.text("Click to remove this sound", NamedTextColor.YELLOW));
+            msgComp = msgComp.clickEvent(ClickEvent.callback(a -> {
+                clickRemovalAction.accept(this);
+                a.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Sound Removed!", NamedTextColor.YELLOW)));
+            }));
+        }
+
+        msgComp = msgComp.hoverEvent(HoverEvent.showText(hoverComp));
+        player.sendMessage(msgComp);
+    }
+
+    @ApiStatus.Internal
+    public static void sendInfo(Collection<DEUSound> sounds, Player player, String soundListTitle, Consumer<DEUSound> clickRemovalAction){
+        if (soundListTitle == null) soundListTitle = "Sounds";
+        player.sendMessage(MiniMessage.miniMessage().deserialize(soundListTitle+": <yellow>"+sounds.size()));
+        if (sounds.isEmpty()){
+            player.sendMessage(Component.text("| NONE", NamedTextColor.GRAY));
+        }
+        else{
+            for (DEUSound sound : sounds){
+                sound.sendInfo(player, clickRemovalAction);
+            }
+        }
+        player.sendMessage(Component.empty());
     }
 }

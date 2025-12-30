@@ -90,8 +90,10 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         DisplayAPI.placeableGroupKey = new NamespacedKey(this, "placeablegroup");
         DisplayAPI.placeableGroupPacketBasedKey = new NamespacedKey(this, "placeablegroup_packet");
         DisplayAPI.placeableGroupPermissionKey = new NamespacedKey(this, "placeablegroup_perm");
-        DisplayAPI.placeableGroupRespectFacingKey = new NamespacedKey(this, "placeblegroup_playerfacing");
-        DisplayAPI.placeableGroupRespectBlockFace = new NamespacedKey(this, "placeblegroup_blockface");
+        DisplayAPI.placeableGroupRespectFacingKey = new NamespacedKey(this, "placeablegroup_playerfacing");
+        DisplayAPI.placeableGroupRespectBlockFace = new NamespacedKey(this, "placeablegroup_blockface");
+        DisplayAPI.placeableGroupPlaceSounds = new NamespacedKey(this, "placeablegroup_placesounds");
+        DisplayAPI.placeableGroupBreakSounds = new NamespacedKey(this, "placeablegroup_breaksounds");
 
     }
 

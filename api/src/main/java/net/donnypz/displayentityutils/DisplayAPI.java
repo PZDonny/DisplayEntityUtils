@@ -32,6 +32,8 @@ public final class DisplayAPI {
     static NamespacedKey placeableGroupPermissionKey;
     static NamespacedKey placeableGroupRespectFacingKey;
     static NamespacedKey placeableGroupRespectBlockFace;
+    static NamespacedKey placeableGroupPlaceSounds;
+    static NamespacedKey placeableGroupBreakSounds;
 
     static boolean isMythicMobsInstalled;
     static boolean isLibsDisguisesInstalled;
@@ -109,6 +111,16 @@ public final class DisplayAPI {
     public static @NotNull NamespacedKey getPlaceableGroupRespectBlockFace(){
         return placeableGroupRespectBlockFace;
     }
+
+    public static @NotNull NamespacedKey getPlaceableGroupPlaceSounds(){
+        return placeableGroupPlaceSounds;
+    }
+
+    public static @NotNull NamespacedKey getPlaceableGroupBreakSounds(){
+        return placeableGroupBreakSounds;
+    }
+
+
 
 
     @ApiStatus.Internal

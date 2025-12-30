@@ -4,11 +4,10 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.events.ItemPlaceGroupEvent;
 import net.donnypz.displayentityutils.events.PreItemPlaceGroupEvent;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -18,6 +17,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public final class PlaceableGroupManager {
@@ -43,6 +45,8 @@ public final class PlaceableGroupManager {
     public static void setGroup(@NotNull ItemStack itemStack, @NotNull String groupTag){
         ItemMeta meta = itemStack.getItemMeta();
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        checkExistingData(pdc);
+
         pdc.set(DisplayAPI.getPlaceableGroupKey(), PersistentDataType.STRING, groupTag);
         itemStack.setItemMeta(meta);
     }
@@ -56,6 +60,8 @@ public final class PlaceableGroupManager {
     public static void setUsePackets(@NotNull ItemStack itemStack, boolean packet){
         ItemMeta meta = itemStack.getItemMeta();
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        checkExistingData(pdc);
+
         pdc.set(DisplayAPI.getPlaceableGroupPacketBasedKey(), PersistentDataType.BOOLEAN, packet);
         itemStack.setItemMeta(meta);
     }
@@ -69,6 +75,8 @@ public final class PlaceableGroupManager {
     public static void setPlacePermission(@NotNull ItemStack itemStack, @Nullable String placePermission){
         ItemMeta meta = itemStack.getItemMeta();
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        checkExistingData(pdc);
+
         if (placePermission == null){
             pdc.remove(DisplayAPI.getPlaceableGroupPermissionKey());
         }
@@ -87,6 +95,8 @@ public final class PlaceableGroupManager {
     public static void setRespectPlayerFacing(@NotNull ItemStack itemStack, boolean respect){
         ItemMeta meta = itemStack.getItemMeta();
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        checkExistingData(pdc);
+
         pdc.set(DisplayAPI.getPlaceableGroupRespectPlayerFacing(), PersistentDataType.BOOLEAN, respect);
         itemStack.setItemMeta(meta);
     }
@@ -100,8 +110,218 @@ public final class PlaceableGroupManager {
     public static void setRespectBlockFace(@NotNull ItemStack itemStack, boolean respect){
         ItemMeta meta = itemStack.getItemMeta();
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        checkExistingData(pdc);
+
         pdc.set(DisplayAPI.getPlaceableGroupRespectBlockFace(), PersistentDataType.BOOLEAN, respect);
         itemStack.setItemMeta(meta);
+    }
+
+    /**
+     * Add a sound to play when the given item's assigned group is placed or removed/broken
+     * @param itemStack the sound's index
+     * @param sound the sound
+     * @param isPlace whether the sound should play when placed or removed/broken
+     * @throws IllegalArgumentException if the provided itemstack did not already have placeable group data applied with {@link PlaceableGroupData}
+     */
+    public static void addSound(@NotNull ItemStack itemStack, @NotNull DEUSound sound, boolean isPlace){
+        ItemMeta meta = itemStack.getItemMeta();
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        checkExistingData(pdc);
+
+        List<DEUSound> sounds = getSounds(pdc, isPlace);
+        sounds.add(sound);
+
+        pdc.set(getSoundKey(isPlace), PersistentDataType.BYTE_ARRAY, writeSoundList(sounds));
+        itemStack.setItemMeta(meta);
+    }
+
+    /**
+     * Remove a sound to placed when the given item's assigned group is placed or removed/broken
+     * @param itemStack the item
+     * @param index the sound's index
+     * @param isPlace whether to remove a place or remove/break sound
+     * @throws IllegalArgumentException if the provided itemstack did not already have placeable group data applied with {@link PlaceableGroupData}
+     */
+    public static void removeSound(@NotNull ItemStack itemStack, int index, boolean isPlace){
+        ItemMeta meta = itemStack.getItemMeta();
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        checkExistingData(pdc);
+
+        List<DEUSound> sounds = getSounds(pdc, isPlace);
+        sounds.remove(index);
+
+        pdc.set(getSoundKey(isPlace), PersistentDataType.BYTE_ARRAY, writeSoundList(sounds));
+        itemStack.setItemMeta(meta);
+    }
+
+        /**
+         * Remove a sound to placed when the given item's assigned group is placed or removed/broken
+         * @param itemStack the item
+         * @param sound the sound
+         * @param isPlace whether to remove a place or remove/break sound
+         * @throws IllegalArgumentException if the provided itemstack did not already have placeable group data applied with {@link PlaceableGroupData}
+         */
+        public static void removeSound(@NotNull ItemStack itemStack, @NotNull DEUSound sound, boolean isPlace){
+            removeSound(itemStack, sound.getSoundName(), sound.getVolume(), sound.getPitch(), isPlace);
+        }
+
+    /**
+     * Remove a sound to placed when the given item's assigned group is placed or removed/broken
+     * @param itemStack the item
+     * @param sound the sound
+     * @param isPlace whether to remove a place or remove/break sound
+     * @throws IllegalArgumentException if the provided itemstack did not already have placeable group data applied with {@link PlaceableGroupData}
+     */
+    public static void removeSound(@NotNull ItemStack itemStack, @NotNull Sound sound, boolean isPlace){
+        ItemMeta meta = itemStack.getItemMeta();
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        checkExistingData(pdc);
+
+        List<DEUSound> sounds = getSounds(pdc, isPlace);
+        sounds.removeIf(s -> sound == s.getSound());
+
+        pdc.set(getSoundKey(isPlace), PersistentDataType.BYTE_ARRAY, writeSoundList(sounds));
+        itemStack.setItemMeta(meta);
+    }
+
+    /**
+     * Remove a sound to placed when the given item's assigned group is placed or removed/broken
+     * @param itemStack the item
+     * @param sound the sound
+     * @param isPlace whether to remove a place or remove/break sound
+     * @throws IllegalArgumentException if the provided itemstack did not already have placeable group data applied with {@link PlaceableGroupData}
+     */
+    public static void removeSound(@NotNull ItemStack itemStack, @NotNull String sound, boolean isPlace){
+        ItemMeta meta = itemStack.getItemMeta();
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        checkExistingData(pdc);
+
+        List<DEUSound> sounds = getSounds(pdc, isPlace);
+        sounds.removeIf(s -> s.getSoundName().equalsIgnoreCase(sound));
+
+        pdc.set(getSoundKey(isPlace), PersistentDataType.BYTE_ARRAY, writeSoundList(sounds));
+        itemStack.setItemMeta(meta);
+    }
+
+    /**
+     * Remove a sound to placed when the given item's assigned group is placed or removed/broken
+     * @param itemStack the item
+     * @param sound the sound
+     * @param isPlace whether to remove a place or remove/break sound
+     * @throws IllegalArgumentException if the provided itemstack did not already have placeable group data applied with {@link PlaceableGroupData}
+     */
+    public static void removeSound(@NotNull ItemStack itemStack, @NotNull String sound, float volume, float pitch, boolean isPlace){
+        ItemMeta meta = itemStack.getItemMeta();
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        checkExistingData(pdc);
+
+        List<DEUSound> sounds = getSounds(pdc, isPlace);
+        sounds.removeIf(s ->
+                        s.getSoundName().equalsIgnoreCase(sound)
+                                && s.getVolume() == volume
+                                && s.getPitch() == pitch
+                );
+
+        pdc.set(getSoundKey(isPlace), PersistentDataType.BYTE_ARRAY, writeSoundList(sounds));
+        itemStack.setItemMeta(meta);
+    }
+
+    /**
+     * Remove a sound to placed when the given item's assigned group is placed or removed/broken
+     * @param itemStack the item
+     * @param isPlace whether to remove place or remove/break sounds
+     * @throws IllegalArgumentException if the provided itemstack did not already have placeable group data applied with {@link PlaceableGroupData}
+     */
+    public static void removeAllSounds(@NotNull ItemStack itemStack, boolean isPlace){
+        ItemMeta meta = itemStack.getItemMeta();
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        checkExistingData(pdc);
+
+        pdc.remove(getSoundKey(isPlace));
+        itemStack.setItemMeta(meta);
+    }
+
+    /**
+     * Get the {@link DEUSound}s added to an item that will play when the item is placed or removed/broken
+     * @param itemStack the item
+     * @param isPlace whether to get place or break sounds
+     * @return a {@link DEUSound} list
+     * @throws IllegalArgumentException if the provided itemstack did not already have placeable group data applied with {@link PlaceableGroupData}
+     */
+    public static @NotNull List<DEUSound> getSounds(@NotNull ItemStack itemStack, boolean isPlace){
+        ItemMeta meta = itemStack.getItemMeta();
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        checkExistingData(pdc);
+        return getSounds(pdc, isPlace);
+    }
+
+    private static List<DEUSound> getSounds(PersistentDataContainer pdc, boolean isPlace){
+        NamespacedKey key = getSoundKey(isPlace);
+        byte[] soundArr = pdc.get(key, PersistentDataType.BYTE_ARRAY);
+        return soundArr == null ? new ArrayList<>() : readSoundList(soundArr);
+    }
+
+
+    /**
+     *
+     * @param itemStack the item
+     * @param location where the sounds should play
+     * @param isPlace whether to play place or break sounds
+     * @throws IllegalArgumentException if the provided itemstack did not already have placeable group data applied with {@link PlaceableGroupData}
+     */
+    public static void playSounds(@NotNull ItemStack itemStack, @NotNull Location location, boolean isPlace){
+        ItemMeta meta = itemStack.getItemMeta();
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        checkExistingData(pdc);
+
+        for (DEUSound sound : getSounds(pdc, isPlace)){
+            sound.playSound(location);
+        }
+    }
+
+    private static NamespacedKey getSoundKey(boolean isPlace){
+        return isPlace ? DisplayAPI.getPlaceableGroupPlaceSounds() : DisplayAPI.getPlaceableGroupBreakSounds();
+    }
+
+    private static byte[] writeSoundList(List<DEUSound> sounds) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(baos);
+
+            out.writeInt(sounds.size());
+            for (DEUSound sound : sounds) {
+                sound.writeExternal(out);
+            }
+
+            out.flush();
+            return baos.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to write DEUSound list", e);
+        }
+    }
+
+    private static List<DEUSound> readSoundList(byte[] data) {
+        try {
+            ObjectInputStream in =
+                    new ObjectInputStream(new ByteArrayInputStream(data));
+
+            int size = in.readInt();
+            List<DEUSound> sounds = new ArrayList<>(size);
+
+            for (int i = 0; i < size; i++) {
+                DEUSound sound = new DEUSound();
+                sound.readExternal(in);
+                sounds.add(sound);
+            }
+
+            return sounds;
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("Failed to read DEUSound list", e);
+        }
+    }
+
+    private static void checkExistingData(PersistentDataContainer pdc){
+        if (!pdc.has(DisplayAPI.getPlaceableGroupKey())) throw new IllegalArgumentException("ItemStack was never provided PlaceableGroupData");
     }
 
     /**
@@ -124,7 +344,7 @@ public final class PlaceableGroupManager {
      * @param itemStack the item
      * @return a boolean
      */
-    public static boolean hasAssignedGroup(@NotNull ItemStack itemStack){
+    public static boolean hasData(@NotNull ItemStack itemStack){
         PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
         return pdc.has(DisplayAPI.getPlaceableGroupKey(), PersistentDataType.STRING);
     }
@@ -134,7 +354,7 @@ public final class PlaceableGroupManager {
      * @param itemStack the item
      * @return the group's tag or null
      */
-    public static @Nullable String getAssignedGroupTag(@NotNull ItemStack itemStack){
+    public static @Nullable String getGroupTag(@NotNull ItemStack itemStack){
         PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
         return pdc.get(DisplayAPI.getPlaceableGroupKey(), PersistentDataType.STRING);
     }
@@ -144,8 +364,8 @@ public final class PlaceableGroupManager {
      * @param itemStack the item
      * @return the {@link DisplayEntityGroup} or null if the group doesn't exist or if the item doesn't have placeable group data
      */
-    public static @Nullable DisplayEntityGroup getAssignedGroup(@NotNull ItemStack itemStack){
-        String tag = getAssignedGroupTag(itemStack);
+    public static @Nullable DisplayEntityGroup getGroup(@NotNull ItemStack itemStack){
+        String tag = getGroupTag(itemStack);
         return tag == null ? null : DisplayGroupManager.getGroup(tag);
     }
 
@@ -231,7 +451,7 @@ public final class PlaceableGroupManager {
      * @return a completable future with an {@link ActiveGroup}, or null if the itemstack does not contain placeable group data or if the {@link PreItemPlaceGroupEvent} is cancelled
      */
     public static @Nullable CompletableFuture<ActiveGroup<?>> spawnGroup(@NotNull ItemStack itemStack, @NotNull Location spawnLocation, @NotNull Quaternionf rotation, @Nullable Player itemHolder){
-        String tag = getAssignedGroupTag(itemStack);
+        String tag = getGroupTag(itemStack);
         boolean isPacket = isUsingPackets(itemStack);
         if (tag == null) return null;
 
@@ -270,4 +490,6 @@ public final class PlaceableGroupManager {
             return result;
         });
     }
+
+
 }

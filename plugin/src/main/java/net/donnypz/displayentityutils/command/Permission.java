@@ -40,6 +40,7 @@ public enum Permission {
     PLACE_TOGGLE_PLAYER_FACING("deu.place.toggle.playerfacing"),
     PLACE_TOGGLE_BLOCK_FACE("deu.place.toggle.blockface"),
     PLACE_SET_PERMISSION("deu.place.setpermission"),
+    PLACE_SOUND("deu.place.sound"),
 
 
     PARTS_INFO("deu.parts.info"),

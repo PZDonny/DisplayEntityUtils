@@ -25,7 +25,7 @@ public class DEUPlayerPlaceBlockListener implements Listener {
             return;
         }
 
-        if (!PlaceableGroupManager.hasAssignedGroup(heldItem)){
+        if (!PlaceableGroupManager.hasData(heldItem)){
             return;
         }
 
@@ -57,7 +57,7 @@ public class DEUPlayerPlaceBlockListener implements Listener {
         }
 
         PlaceableGroupManager.spawnGroup(heldItem, placeLoc, rot, player);
-
+        PlaceableGroupManager.playSounds(heldItem, placeLoc, true);
     }
 
     private Quaternionf getRotation(Vector faceDir){
