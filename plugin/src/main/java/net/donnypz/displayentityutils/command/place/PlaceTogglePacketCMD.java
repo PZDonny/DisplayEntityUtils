@@ -7,7 +7,6 @@ import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.PlaceableGroupManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +29,5 @@ class PlaceTogglePacketCMD extends PlayerSubCommand {
             PlaceableGroupManager.setUsePackets(heldItem, true);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your held item's group will spawn using packets", NamedTextColor.GREEN)));
         }
-        PlaceableGroupManager.unassign(heldItem);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Your held item no longer has an assigned group")));
     }
 }
