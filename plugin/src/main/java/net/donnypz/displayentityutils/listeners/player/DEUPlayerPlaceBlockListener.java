@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.listeners.player;
 import net.donnypz.displayentityutils.managers.PlaceableGroupManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -36,6 +37,11 @@ public class DEUPlayerPlaceBlockListener implements Listener {
         }
 
         BlockFace face = e.getBlockAgainst().getFace(e.getBlockPlaced());
+        if (face == BlockFace.SELF){
+            player.sendMessage(Component.text("You cannot place this inside another block!", NamedTextColor.RED));
+            return;
+        }
+
         Quaternionf rot;
         Location placeLoc;
 
@@ -52,12 +58,17 @@ public class DEUPlayerPlaceBlockListener implements Listener {
         }
 
 
-        if ((face == BlockFace.UP || face == BlockFace.DOWN || face == BlockFace.SELF) && PlaceableGroupManager.isRespectingPlayerFacing(heldItem)){
+        if ((face == BlockFace.UP || face == BlockFace.DOWN) && PlaceableGroupManager.isRespectingPlayerFacing(heldItem)){
             placeLoc.setYaw(player.getYaw()+180);
         }
 
-        PlaceableGroupManager.spawnGroup(heldItem, placeLoc, rot, player);
-        PlaceableGroupManager.playSounds(heldItem, placeLoc, true);
+        ItemStack itemClone = heldItem.clone();
+        itemClone.setAmount(1);
+        PlaceableGroupManager.spawnGroup(itemClone, placeLoc, rot, player);
+        PlaceableGroupManager.playSounds(itemClone, placeLoc, true);
+        if (player.getGameMode() != GameMode.CREATIVE){
+            heldItem.setAmount(heldItem.getAmount()-1);
+        }
     }
 
     private Quaternionf getRotation(Vector faceDir){
