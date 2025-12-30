@@ -39,6 +39,8 @@ public enum Permission {
     PLACE_TOGGLE_PACKET("deu.place.toggle.packet"),
     PLACE_TOGGLE_PLAYER_FACING("deu.place.toggle.playerfacing"),
     PLACE_TOGGLE_BLOCK_FACE("deu.place.toggle.blockface"),
+    PLACE_TOGGLE_DROP_ITEM("deu.place.toggle.dropitem"),
+    PLACE_TOGGLE_PLACER_ONLY("deu.place.toggle.placeronly"),
     PLACE_SET_PERMISSION("deu.place.setpermission"),
     PLACE_SOUND("deu.place.sound"),
 

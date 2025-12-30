@@ -11,9 +11,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-class PlaceTogglePacketCMD extends PlayerSubCommand {
-    PlaceTogglePacketCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("togglepacket", parentSubCommand, Permission.PLACE_TOGGLE_PACKET);
+class PlaceTogglePlacerOnlyCMD extends PlayerSubCommand {
+    PlaceTogglePlacerOnlyCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("toggleplaceronly", parentSubCommand, Permission.PLACE_TOGGLE_PLACER_ONLY);
     }
 
     @Override
@@ -21,13 +21,13 @@ class PlaceTogglePacketCMD extends PlayerSubCommand {
         ItemStack heldItem = PlaceCMD.getHeldItem(player, true);
         if (heldItem == null) return;
 
-        if (PlaceableGroupManager.isUsingPackets(heldItem)){
-            PlaceableGroupManager.setUsePackets(heldItem, false);
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your held item's group will no longer spawn using packets", NamedTextColor.RED)));
+        if (PlaceableGroupManager.isPlacerBreaksOnly(heldItem)){
+            PlaceableGroupManager.setPlacerBreaksOnly(heldItem, false);
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your held item's group can only broken by any player", NamedTextColor.RED)));
         }
         else{
-            PlaceableGroupManager.setUsePackets(heldItem, true);
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your held item's group will spawn using packets", NamedTextColor.GREEN)));
+            PlaceableGroupManager.setPlacerBreaksOnly(heldItem, true);
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your held item's group can only be broken by the player who placed it", NamedTextColor.GREEN)));
         }
     }
 }

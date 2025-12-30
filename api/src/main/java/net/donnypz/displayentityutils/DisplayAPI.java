@@ -28,12 +28,16 @@ public final class DisplayAPI {
     static NamespacedKey spawnAnimationLoadMethodKey;
     static NamespacedKey chunkPacketGroupsKey;
     static NamespacedKey placeableGroupKey;
-    static NamespacedKey placeableGroupPacketBasedKey;
     static NamespacedKey placeableGroupPermissionKey;
     static NamespacedKey placeableGroupRespectFacingKey;
     static NamespacedKey placeableGroupRespectBlockFace;
     static NamespacedKey placeableGroupPlaceSounds;
     static NamespacedKey placeableGroupBreakSounds;
+    static NamespacedKey placeableGroupDropItem;
+    static NamespacedKey placeableGroupPlacerBreaksOnly;
+    static NamespacedKey placeableGroupItemStack;
+    static NamespacedKey placeableGroupPlacer;
+    static NamespacedKey placeableGroupId;
 
     static boolean isMythicMobsInstalled;
     static boolean isLibsDisguisesInstalled;
@@ -96,9 +100,6 @@ public final class DisplayAPI {
         return placeableGroupKey;
     }
 
-    public static @NotNull NamespacedKey getPlaceableGroupPacketBasedKey(){
-        return placeableGroupPacketBasedKey;
-    }
 
     public static @NotNull NamespacedKey getPlaceableGroupPermissionKey(){
         return placeableGroupPermissionKey;
@@ -120,6 +121,26 @@ public final class DisplayAPI {
         return placeableGroupBreakSounds;
     }
 
+    public static @NotNull NamespacedKey getPlaceableGroupPlacerBreaksOnly() {
+        return placeableGroupPlacerBreaksOnly;
+    }
+
+    public static @NotNull NamespacedKey getPlaceableGroupDropItem() {
+        return placeableGroupDropItem;
+    }
+
+
+    public static @NotNull NamespacedKey getPlaceableGroupItemStack(){
+        return placeableGroupItemStack;
+    }
+
+    public static @NotNull NamespacedKey getPlaceableGroupId(){
+        return placeableGroupId;
+    }
+
+    public static @NotNull NamespacedKey getPlaceableGroupPlacer() {
+        return placeableGroupPlacer;
+    }
 
 
 

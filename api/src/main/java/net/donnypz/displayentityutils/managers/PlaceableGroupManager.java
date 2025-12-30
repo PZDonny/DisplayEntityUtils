@@ -1,13 +1,13 @@
 package net.donnypz.displayentityutils.managers;
 
+import com.jeff_media.customblockdata.CustomBlockData;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.events.ItemPlaceGroupEvent;
 import net.donnypz.displayentityutils.events.PreItemPlaceGroupEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
-import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,7 +20,7 @@ import org.joml.Quaternionf;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.UUID;
 
 public final class PlaceableGroupManager {
 
@@ -51,20 +51,6 @@ public final class PlaceableGroupManager {
         itemStack.setItemMeta(meta);
     }
 
-    /**
-     * Set whether the group associated with the given item should spawn as a {@link PacketDisplayEntityGroup}
-     * @param itemStack the item
-     * @param packet whether the group should spawn pack-based
-     * @throws IllegalArgumentException if the provided itemstack did not already have placeable group data applied with {@link PlaceableGroupData}
-     */
-    public static void setUsePackets(@NotNull ItemStack itemStack, boolean packet){
-        ItemMeta meta = itemStack.getItemMeta();
-        PersistentDataContainer pdc = meta.getPersistentDataContainer();
-        checkExistingData(pdc);
-
-        pdc.set(DisplayAPI.getPlaceableGroupPacketBasedKey(), PersistentDataType.BOOLEAN, packet);
-        itemStack.setItemMeta(meta);
-    }
 
     /**
      * Set the permission a player needs to place an itemstack's assigned group. Set the permission to {@code null} to unset it
@@ -113,6 +99,35 @@ public final class PlaceableGroupManager {
         checkExistingData(pdc);
 
         pdc.set(DisplayAPI.getPlaceableGroupRespectBlockFace(), PersistentDataType.BOOLEAN, respect);
+        itemStack.setItemMeta(meta);
+    }
+
+    /**
+     * Set whether the item used to place the group should be dropped when the group is broken
+     * @param itemStack the item
+     * @param dropItem
+     * @throws IllegalArgumentException if the provided itemstack did not already have placeable group data applied with {@link PlaceableGroupData}
+     */
+    public static void setDropItemOnBreak(@NotNull ItemStack itemStack, boolean dropItem){
+        ItemMeta meta = itemStack.getItemMeta();
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        checkExistingData(pdc);
+
+        pdc.set(DisplayAPI.getPlaceableGroupDropItem(), PersistentDataType.BOOLEAN, dropItem);
+        itemStack.setItemMeta(meta);
+    }
+
+    /**
+     * Set whether only the placer of the group can break the group
+     * @param itemStack the item
+     * @param placerBreaksOnly
+     */
+    public static void setPlacerBreaksOnly(@NotNull ItemStack itemStack, boolean placerBreaksOnly){
+        ItemMeta meta = itemStack.getItemMeta();
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        checkExistingData(pdc);
+
+        pdc.set(DisplayAPI.getPlaceableGroupPlacerBreaksOnly(), PersistentDataType.BOOLEAN, placerBreaksOnly);
         itemStack.setItemMeta(meta);
     }
 
@@ -332,10 +347,13 @@ public final class PlaceableGroupManager {
         ItemMeta meta = itemStack.getItemMeta();
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         pdc.remove(DisplayAPI.getPlaceableGroupKey());
-        pdc.remove(DisplayAPI.getPlaceableGroupPacketBasedKey());
         pdc.remove(DisplayAPI.getPlaceableGroupPermissionKey());
         pdc.remove(DisplayAPI.getPlaceableGroupRespectPlayerFacing());
         pdc.remove(DisplayAPI.getPlaceableGroupRespectBlockFace());
+        pdc.remove(DisplayAPI.getPlaceableGroupPlaceSounds());
+        pdc.remove(DisplayAPI.getPlaceableGroupBreakSounds());
+        pdc.remove(DisplayAPI.getPlaceableGroupPlacerBreaksOnly());
+        pdc.remove(DisplayAPI.getPlaceableGroupDropItem());
         itemStack.setItemMeta(meta);
     }
 
@@ -370,16 +388,6 @@ public final class PlaceableGroupManager {
     }
 
 
-    /**
-     * Get whether the group associated with the given item will spawn as a {@link PacketDisplayEntityGroup}
-     * @param itemStack the item
-     * @return a boolean
-     */
-    public static boolean isUsingPackets(@NotNull ItemStack itemStack){
-        PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
-        return Boolean.TRUE.equals(pdc.get(DisplayAPI.getPlaceableGroupPacketBasedKey(), PersistentDataType.BOOLEAN));
-    }
-
 
     /**
      * Check if an itemstack has a place permission, determining if a player can place its assigned group
@@ -402,18 +410,6 @@ public final class PlaceableGroupManager {
     }
 
     /**
-     * Check if the given player has permission to place the itemstack's assigned group
-     * @param itemStack the item
-     * @param player the player
-     * @return a boolean
-     */
-    public static boolean canPlace(@NotNull ItemStack itemStack, @NotNull Player player){
-        String placePerm = getPlacePermission(itemStack);
-        if (placePerm == null) return true;
-        return player.hasPermission(placePerm);
-    }
-
-    /**
      * Get whether the group associated with the given item will respect the player's facing direction
      * @param itemStack the item
      * @return a boolean
@@ -433,14 +429,46 @@ public final class PlaceableGroupManager {
         return Boolean.TRUE.equals(pdc.get(DisplayAPI.getPlaceableGroupRespectBlockFace(), PersistentDataType.BOOLEAN));
     }
 
+    /**
+     * Get whether only the placer of a placed group can break it
+     * @param itemStack the item
+     * @return a boolean
+     */
+    public static boolean isPlacerBreaksOnly(@NotNull ItemStack itemStack){
+        PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+        return Boolean.TRUE.equals(pdc.get(DisplayAPI.getPlaceableGroupPlacerBreaksOnly(), PersistentDataType.BOOLEAN));
+    }
+
+    /**
+     * Get whether the itemstack used to place a group will drop when the group is broken
+     * @param itemStack the item
+     * @return a boolean
+     */
+    public static boolean isDropItem(@NotNull ItemStack itemStack){
+        PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+        return Boolean.TRUE.equals(pdc.get(DisplayAPI.getPlaceableGroupDropItem(), PersistentDataType.BOOLEAN));
+    }
+
+    /**
+     * Check if the given player has permission to place the itemstack's assigned group
+     * @param itemStack the item
+     * @param player the player
+     * @return a boolean
+     */
+    public static boolean canPlace(@NotNull ItemStack itemStack, @NotNull Player player){
+        String placePerm = getPlacePermission(itemStack);
+        if (placePerm == null) return true;
+        return player.hasPermission(placePerm);
+    }
+
 
     /**
      * Spawn the placeable group stored on an item
      * @param itemStack the item
      * @param spawnLocation the spawn location
-     * @return an {@link ActiveGroup} or null if the itemstack does not contain placeable group data, or if the {@link PreItemPlaceGroupEvent} is cancelled
+     * @return a {@link PacketDisplayEntityGroup} or null if the itemstack does not contain placeable group data, or if the {@link PreItemPlaceGroupEvent} is cancelled
      */
-    public static @Nullable CompletableFuture<ActiveGroup<?>> spawnGroup(@NotNull ItemStack itemStack, @NotNull Location spawnLocation, @Nullable Player itemHolder){
+    public static @Nullable PacketDisplayEntityGroup spawnGroup(@NotNull ItemStack itemStack, @NotNull Location spawnLocation, @Nullable Player itemHolder){
         return spawnGroup(itemStack, spawnLocation, new Quaternionf(), itemHolder);
     }
 
@@ -448,48 +476,53 @@ public final class PlaceableGroupManager {
      * Spawn the placeable group stored on an item
      * @param itemStack the item
      * @param spawnLocation the spawn location
-     * @return a completable future with an {@link ActiveGroup}, or null if the itemstack does not contain placeable group data or if the {@link PreItemPlaceGroupEvent} is cancelled
+     * @return a {@link PacketDisplayEntityGroup}, or null if the itemstack does not contain placeable group data or if the {@link PreItemPlaceGroupEvent} is cancelled
      */
-    public static @Nullable CompletableFuture<ActiveGroup<?>> spawnGroup(@NotNull ItemStack itemStack, @NotNull Location spawnLocation, @NotNull Quaternionf rotation, @Nullable Player itemHolder){
+    public static @Nullable PacketDisplayEntityGroup spawnGroup(@NotNull ItemStack itemStack, @NotNull Location spawnLocation, @NotNull Quaternionf rotation, @Nullable Player itemHolder){
         String tag = getGroupTag(itemStack);
-        boolean isPacket = isUsingPackets(itemStack);
         if (tag == null) return null;
 
-        return CompletableFuture.supplyAsync(() -> {
-            return DisplayGroupManager.getGroup(tag);
-        }).thenCompose(group -> {
-            if (group == null) return CompletableFuture.completedFuture(null);
-            if (!new PreItemPlaceGroupEvent(group, itemStack, itemHolder).callEvent()) return CompletableFuture.completedFuture(null);
+        DisplayEntityGroup group = DisplayGroupManager.getGroup(tag);
+        if (group == null) return null;
+        if (!new PreItemPlaceGroupEvent(group, itemStack, itemHolder).callEvent()) return null;
 
-            CompletableFuture<ActiveGroup<?>> result = new CompletableFuture<>();
+        PacketDisplayEntityGroup pg = group.createPacketGroup(spawnLocation, GroupSpawnedEvent.SpawnReason.ITEMSTACK, true, true);
+        if (pg == null) return null;
+        pg.setPersistent(true);
+        pg.rotateDisplays(rotation);
 
-            if (isPacket){
-                try{
-                    PacketDisplayEntityGroup pg = group.createPacketGroup(spawnLocation, GroupSpawnedEvent.SpawnReason.ITEMSTACK, true, true);
-                    pg.setPersistent(true);
-                    pg.rotateDisplays(rotation);
-                    new ItemPlaceGroupEvent(pg, itemStack, itemHolder).callEvent();
-                    result.complete(pg);
-                }
-                catch(NullPointerException e){
-                    result.completeExceptionally(e);
-                }
-            }
-            else{
-                DisplayAPI.getScheduler().run(() -> {
-                    try{
-                        SpawnedDisplayEntityGroup sg = group.spawn(spawnLocation, GroupSpawnedEvent.SpawnReason.ITEMSTACK);
-                        sg.rotateDisplays(rotation);
-                        new ItemPlaceGroupEvent(sg, itemStack, itemHolder).callEvent();
-                        result.complete(sg);
-                    } catch (RuntimeException e) {
-                        result.completeExceptionally(e);
-                    }
-                });
-            }
-            return result;
+        Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> {
+            setBlockData(itemHolder, spawnLocation.getBlock(), itemStack.clone(), pg.getPersistentGlobalId());
+            new ItemPlaceGroupEvent(pg, itemStack, itemHolder).callEvent();
         });
+
+        return pg;
+    }
+    /**
+     * Get the UUID of the player who placed a group
+     * @param group the placed group
+     * @return a {@link UUID} or null if the group wasn't placed with an item or if a placer wasn't specified
+     */
+    public static UUID getWhoPlaced(@NotNull PacketDisplayEntityGroup group){
+        return null;
     }
 
+    private static void setBlockData(Player itemHolder, Block block, ItemStack itemStack, String groupID){
+        block.setType(Material.BARRIER);
+        PersistentDataContainer pdc = new CustomBlockData(block, DisplayAPI.getPlugin());
+        pdc.set(DisplayAPI.getPlaceableGroupId(), PersistentDataType.STRING, groupID);
 
+        itemStack.setAmount(1);
+        pdc.set(DisplayAPI.getPlaceableGroupItemStack(), PersistentDataType.BYTE_ARRAY, itemStack.serializeAsBytes());
+        if (itemHolder != null) pdc.set(DisplayAPI.getPlaceableGroupPlacer(), PersistentDataType.STRING, itemHolder.getUniqueId().toString());
+    }
+
+    /**
+     * Get whether an itemstack can be used to place groups
+     * @param itemStack the itemstack
+     * @return a boolean
+     */
+    public static boolean isValidItem(@NotNull ItemStack itemStack){
+        return itemStack.getType() != Material.AIR && itemStack.getType().isBlock();
+    }
 }

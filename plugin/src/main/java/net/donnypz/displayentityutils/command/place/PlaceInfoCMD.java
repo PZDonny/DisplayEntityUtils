@@ -32,7 +32,8 @@ class PlaceInfoCMD extends PlayerSubCommand {
         }
         boolean respectPlayerFacing = PlaceableGroupManager.isRespectingPlayerFacing(heldItem);
         boolean respectBlockFace = PlaceableGroupManager.isRespectingBlockFace(heldItem);
-        boolean packetBased = PlaceableGroupManager.isUsingPackets(heldItem);
+        boolean dropsItems = PlaceableGroupManager.isDropItem(heldItem);
+        boolean placerBreaksOnly = PlaceableGroupManager.isPlacerBreaksOnly(heldItem);
         List<DEUSound> placeSounds = PlaceableGroupManager.getSounds(heldItem, true);
         List<DEUSound> breakSounds = PlaceableGroupManager.getSounds(heldItem, false);
 
@@ -40,8 +41,8 @@ class PlaceInfoCMD extends PlayerSubCommand {
         player.sendMessage(MiniMessage.miniMessage().deserialize("Place Permission: <yellow>"+permission));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Respect Player Facing: "+(respectPlayerFacing ? "<green>ENABLED" : "<red>DISABLED")));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Respect Block Face: "+(respectBlockFace ? "<green>ENABLED" : "<red>DISABLED")));
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Packet Based: "+(packetBased ? "<green>TRUE" : "<red>FALSE")));
-
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Item Drop: "+(dropsItems ? "<green>ENABLED" : "<red>DISABLED")));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Placer Breaks Only: "+(placerBreaksOnly ? "<green>ENABLED" : "<red>DISABLED")));
         DEUSound.sendInfo(placeSounds, player, "Place Sounds",
                 player.hasPermission(Permission.PLACE_SOUND.getPermission())
                 ? s ->

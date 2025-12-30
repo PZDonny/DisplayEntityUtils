@@ -6,7 +6,6 @@ import net.donnypz.displayentityutils.managers.PlaceableGroupManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -18,9 +17,10 @@ public class PlaceCMD extends ConsoleUsableSubCommand {
         new PlaceUnsetCMD(this);
         new PlaceSetPermissionCMD(this);
         new PlaceUnsetPermissionCMD(this);
-        new PlaceTogglePacketCMD(this);
         new PlaceTogglePlayerFacingCMD(this);
         new PlaceToggleBlockFaceCMD(this);
+        new PlaceToggleDropItemCMD(this);
+        new PlaceTogglePlacerOnlyCMD(this);
         new PlaceInfoCMD(this);
         new PlaceAddSoundCMD(this);
     }
@@ -56,6 +56,8 @@ public class PlaceCMD extends ConsoleUsableSubCommand {
         else{
             CMDUtils.sendCMD(sender, "/deu place toggleplayerfacing", "Toggle whether the placed group will respect the player's facing direction. True by default");
             CMDUtils.sendCMD(sender, "/deu place toggleblockface", "Toggle whether the placed group will respect the block face it is placed on. True by default");
+            CMDUtils.sendCMD(sender, "/deu place toggledropitem", "Toggle whether the placed group will drop the item used to place it, when broken. True by default");
+            CMDUtils.sendCMD(sender, "/deu place toggleplaceronly", "Toggle whether only the player who placed a group can break it. True by default");
             CMDUtils.sendCMD(sender, "/deu place addsound <place | break> <sound> <volume> <pitch>", "Add a sound to play when the block is placed or broken");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
@@ -63,7 +65,7 @@ public class PlaceCMD extends ConsoleUsableSubCommand {
 
     static ItemStack getHeldItem(Player player, boolean mustBeAssigned){
         ItemStack heldItem = player.getInventory().getItemInMainHand();
-        if (!heldItem.getType().isBlock() || heldItem.getType() == Material.AIR){
+        if (!PlaceableGroupManager.isValidItem(heldItem)){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You must be holding a block to do this command!", NamedTextColor.RED)));
             return null;
         }

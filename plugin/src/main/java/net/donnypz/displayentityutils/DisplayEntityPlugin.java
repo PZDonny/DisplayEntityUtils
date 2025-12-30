@@ -87,13 +87,18 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         DisplayAPI.spawnAnimationTypeKey = new NamespacedKey(this, "spawnanimationtype");
         DisplayAPI.spawnAnimationLoadMethodKey = new NamespacedKey(this, "spawnanimationloader");
         DisplayAPI.chunkPacketGroupsKey = new NamespacedKey(this, "chunkpacketgroups");
+
         DisplayAPI.placeableGroupKey = new NamespacedKey(this, "placeablegroup");
-        DisplayAPI.placeableGroupPacketBasedKey = new NamespacedKey(this, "placeablegroup_packet");
         DisplayAPI.placeableGroupPermissionKey = new NamespacedKey(this, "placeablegroup_perm");
         DisplayAPI.placeableGroupRespectFacingKey = new NamespacedKey(this, "placeablegroup_playerfacing");
         DisplayAPI.placeableGroupRespectBlockFace = new NamespacedKey(this, "placeablegroup_blockface");
         DisplayAPI.placeableGroupPlaceSounds = new NamespacedKey(this, "placeablegroup_placesounds");
         DisplayAPI.placeableGroupBreakSounds = new NamespacedKey(this, "placeablegroup_breaksounds");
+        DisplayAPI.placeableGroupPlacerBreaksOnly = new NamespacedKey(this, "placeablegroup_placerbreaks");
+        DisplayAPI.placeableGroupDropItem = new NamespacedKey(this, "placeablegroup_dropitem");
+        DisplayAPI.placeableGroupItemStack = new NamespacedKey(this, "placeablegroup_itemstack");
+        DisplayAPI.placeableGroupPlacer = new NamespacedKey(this, "placeablegroup_placer");
+        DisplayAPI.placeableGroupId = new NamespacedKey(this, "placeablegroup_groupid");
 
     }
 
@@ -131,14 +136,15 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     private void registerListeners(){
         Bukkit.getPluginManager().registerEvents(this, this);
+        Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
         Bukkit.getPluginManager().registerEvents(new DatapackEntitySpawned(), this);
+        Bukkit.getPluginManager().registerEvents(new DEUEntityListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerChatListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerWorldListener(), this);
-        Bukkit.getPluginManager().registerEvents(new DEUEntityListener(), this);
-        Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
-        Bukkit.getPluginManager().registerEvents(new DEUInteractionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerPlaceBlockListener(), this);
+        Bukkit.getPluginManager().registerEvents(new DEUPlayerDigListener(), this);
+        Bukkit.getPluginManager().registerEvents(new DEUInteractionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUMannequinEditorListener(), this);
     }
 

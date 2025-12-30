@@ -17,9 +17,10 @@ public class PlaceableGroupData {
 
     String groupTag;
     String permission;
-    boolean packetBased = true;
     boolean respectPlayerFacing = true;
     boolean respectBlockFace = true;
+    boolean dropItemOnBreak = true;
+    boolean placerBreaksOnly = true;
 
 
     public PlaceableGroupData(@NotNull String groupTag) {
@@ -46,15 +47,6 @@ public class PlaceableGroupData {
         return this;
     }
 
-    /**
-     * Set whether the group should be packet-based when spawned. True by default
-     * @param packetBased
-     * @return this
-     */
-    public PlaceableGroupData setPacketBased(boolean packetBased) {
-        this.packetBased = packetBased;
-        return this;
-    }
 
     /**
      * Set whether the group should spawn with respect to the player's facing direction. True by default
@@ -77,16 +69,38 @@ public class PlaceableGroupData {
     }
 
     /**
+     * Set whether the item used to place the group should be dropped when the group is destroyed
+     * @param dropItemOnDestroy
+     * @return this
+     */
+    public PlaceableGroupData setDropItemOnDestroy(boolean dropItemOnDestroy){
+        this.dropItemOnBreak = dropItemOnDestroy;
+        return this;
+    }
+
+    /**
+     * Set whether only the placer of the group is the one who can break it
+     * @param placerBreaksOnly
+     * @return this
+     */
+    public PlaceableGroupData setPlacerBreaksOnly(boolean placerBreaksOnly){
+        this.placerBreaksOnly = placerBreaksOnly;
+        return this;
+    }
+
+    /**
      * Apply the data to a provided itemstack, spawning the group when placed
      * @param itemStack
      * @throws IllegalArgumentException if the itemstack is not of a block type
      */
     public void apply(@NotNull ItemStack itemStack){
+        if (!PlaceableGroupManager.isValidItem(itemStack)){
+            throw new IllegalArgumentException("The provided ItemStack is not of a block type");
+        }
         ItemMeta meta = itemStack.getItemMeta();
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
 
         pdc.set(DisplayAPI.getPlaceableGroupKey(), PersistentDataType.STRING, groupTag);
-        pdc.set(DisplayAPI.getPlaceableGroupPacketBasedKey(), PersistentDataType.BOOLEAN, packetBased);
 
         if (permission != null){
             pdc.set(DisplayAPI.getPlaceableGroupPermissionKey(), PersistentDataType.STRING, permission);
@@ -94,6 +108,10 @@ public class PlaceableGroupData {
 
         pdc.set(DisplayAPI.getPlaceableGroupRespectPlayerFacing(), PersistentDataType.BOOLEAN, respectPlayerFacing);
         pdc.set(DisplayAPI.getPlaceableGroupRespectBlockFace(), PersistentDataType.BOOLEAN, respectBlockFace);
+
+
+        pdc.set(DisplayAPI.getPlaceableGroupPlacerBreaksOnly(), PersistentDataType.BOOLEAN, placerBreaksOnly);
+        pdc.set(DisplayAPI.getPlaceableGroupDropItem(), PersistentDataType.BOOLEAN, dropItemOnBreak);
         itemStack.setItemMeta(meta);
     }
 }
