@@ -13,7 +13,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -25,9 +24,6 @@ class PlaceWhoPlacedCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        ItemStack heldItem = PlaceCMD.getHeldItem(player, true);
-        if (heldItem == null) return;
-
         Block targetBlock = player.getTargetBlock(null, 15);
         final UUID uuid = PlaceableGroupManager.getWhoPlaced(targetBlock);
         if (uuid == null){
