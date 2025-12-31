@@ -900,7 +900,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (type != PartType.TEXT_DISPLAY) return -1;
         TextDisplay td = (TextDisplay) getEntity();
         if (td == null) return -1;
-        return getTextDisplayTextOpacity();
+        return td.getTextOpacity();
     }
 
     @Override
