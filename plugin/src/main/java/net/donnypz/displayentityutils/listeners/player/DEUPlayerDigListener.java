@@ -65,8 +65,8 @@ public class DEUPlayerDigListener implements Listener {
         if (!new PlacedGroupBreakEvent(block, group, player).callEvent()) return;
 
 
-        String b64 = data.get(DisplayAPI.getPlaceableGroupItemStack(), PersistentDataType.STRING);
-        ItemStack itemStack = ItemStack.deserializeBytes(Base64.getDecoder().decode(b64));
+        ItemStack itemStack = PlaceableGroupManager.getItemStack(block);
+
 
         String uuidString = data.get(DisplayAPI.getPlaceableGroupPlacer(), PersistentDataType.STRING);
         UUID placerUUID = uuidString == null ? null : UUID.fromString(uuidString);

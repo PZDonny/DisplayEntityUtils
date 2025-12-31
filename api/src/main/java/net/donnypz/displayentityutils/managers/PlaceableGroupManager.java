@@ -527,6 +527,33 @@ public final class PlaceableGroupManager {
         return uuidStr == null ? null : UUID.fromString(uuidStr);
     }
 
+    /**
+     * Get the ItemStack used to place a group
+     * @param group the placed group
+     * @return an item or null if the group wasn't placed with an item
+     */
+    public static @Nullable ItemStack getItemStack(@NotNull PacketDisplayEntityGroup group){
+        if (!group.isPlaced()) return null;
+
+        Location loc = group.getLocation();
+        if (loc == null) return null;
+
+        return getItemStack(loc.getBlock());
+    }
+
+    /**
+     * Get the ItemStack used to place a group
+     * @param block the block where a placed group is
+     * @return an item or null if the group wasn't placed with an item
+     */
+    public static @Nullable ItemStack getItemStack(@NotNull Block block){
+        if (!CustomBlockData.hasCustomBlockData(block, DisplayAPI.getPlugin())) return null;
+        CustomBlockData data = new CustomBlockData(block, DisplayAPI.getPlugin());
+
+        String b64 = data.get(DisplayAPI.getPlaceableGroupItemStack(), PersistentDataType.STRING);
+        return ItemStack.deserializeBytes(Base64.getDecoder().decode(b64));
+    }
+
     private static void setBlockData(Player itemHolder, Block block, ItemStack itemStack, String groupID){
         block.setType(Material.BARRIER);
         PersistentDataContainer pdc = new CustomBlockData(block, DisplayAPI.getPlugin());
@@ -537,6 +564,7 @@ public final class PlaceableGroupManager {
         pdc.set(DisplayAPI.getPlaceableGroupItemStack(), PersistentDataType.STRING, b64);
         if (itemHolder != null) pdc.set(DisplayAPI.getPlaceableGroupPlacer(), PersistentDataType.STRING, itemHolder.getUniqueId().toString());
     }
+
 
     /**
      * Get whether an itemstack can be used to place groups

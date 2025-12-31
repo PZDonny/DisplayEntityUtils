@@ -24,6 +24,7 @@ public class PlaceCMD extends ConsoleUsableSubCommand {
         new PlaceInfoCMD(this);
         new PlaceAddSoundCMD(this);
         new PlaceWhoPlacedCMD(this);
+        new PlaceGetItemCMD(this);
     }
 
     @Override
@@ -61,6 +62,7 @@ public class PlaceCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/deu place toggleplaceronly", "Toggle whether only the player who placed a group can break it. True by default");
             CMDUtils.sendCMD(sender, "/deu place addsound <place | break> <sound> <volume> <pitch>", "Add a sound to play when the block is placed or broken");
             CMDUtils.sendCMD(sender, "/deu place whoplaced", "Get the name and UUID of the player who placed a group");
+            CMDUtils.sendCMD(sender, "/deu place getitem", "Get the item used to placed a group");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }
