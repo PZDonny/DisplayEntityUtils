@@ -35,15 +35,13 @@ import java.util.*;
 
 public final class SpawnedDisplayEntityPart extends ActivePart implements Spawned {
 
-    private static final HashMap<PartData, SpawnedDisplayEntityPart> allParts = new HashMap<>();
     private SpawnedDisplayEntityGroup group;
     private Entity entity;
-    private PartData partData;
     private UUID entityUUID;
     private final boolean isSingle;
 
     SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Entity entity, Random random){
-        super(entity.getEntityId(), true);
+        super(entity.getEntityId(), false);
         this.group = group;
         this.entity = entity;
         this.type = PartType.getType(entity);
@@ -61,6 +59,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     SpawnedDisplayEntityPart(Entity entity){
         super(entity.getEntityId(), false);
+        if (PartType.getType(entity) == null) throw new IllegalArgumentException("Entity is not a valid part type entity");
         this.type = PartType.getType(entity);
         this.entity = entity;
         this.entityUUID = entity.getUniqueId();
@@ -76,7 +75,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @throws IllegalArgumentException if the entity is not a valid entity
      */
     public static @NotNull SpawnedDisplayEntityPart create(@NotNull UUID uuid){
-        return new SpawnedDisplayEntityPart(Bukkit.getEntity(uuid));
+        return create(Bukkit.getEntity(uuid));
     }
 
     /**
@@ -89,18 +88,21 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     public static @NotNull SpawnedDisplayEntityPart create(@NotNull Entity entity){
         SpawnedDisplayEntityPart part = getPart(entity);
-        if (part != null) return part;
-        return new SpawnedDisplayEntityPart(entity);
+        return part != null ? part : new SpawnedDisplayEntityPart(entity);
     }
 
     private void applyData(Random random, Entity entity){
         adaptLegacyPartTags();
         entity.getPersistentDataContainer().set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, group.getCreationTime());
-        removeFromPreviousGroup(entity);
 
-        this.partData = new PartData(entity);
+        //Remove from previous group
+        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
+        if (part != null && part.group != group){
+            part.remove(false);
+        }
+        partsById.put(getEntityId(), this);
+
         this.entityUUID = entity.getUniqueId();
-        allParts.put(partData, this);
 
         setPartUUID(random);
         group.groupParts.put(partUUID, this);
@@ -158,11 +160,15 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return group.groupParts.containsKey(partUUID);
     }
 
-    private void removeFromPreviousGroup(Entity entity){
-        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
-        if (part != null){
-            part.remove(false);
+    private void adaptLegacyPartTags(){ //Don't use getEntity()
+        List<String> legacyTags = new ArrayList<>();
+        for (String s : new HashSet<>(entity.getScoreboardTags())){
+            if (s.contains(DisplayAPI.getLegacyPartTagPrefix())){
+                legacyTags.add(s.replace(DisplayAPI.getLegacyPartTagPrefix(), ""));
+                entity.removeScoreboardTag(s);
+            }
         }
+        DisplayUtils.addTags(entity, legacyTags);
     }
 
     /**
@@ -256,11 +262,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return getEntity().getLocation();
     }
 
-
-    PartData getPartData() {
-        return partData;
-    }
-
     /**
      * Get the {@link SpawnedDisplayEntityPart} of an entity, during this play session. Use {@link #create(Entity)} if the part is not grouped.
      * @param entity the part entity
@@ -268,7 +269,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     public static @Nullable SpawnedDisplayEntityPart getPart(@NotNull Entity entity){
         if (!DisplayUtils.isPartEntity(entity)) return null;
-        return allParts.get(new PartData(entity));
+        return (SpawnedDisplayEntityPart) getPart(entity.getEntityId());
     }
 
 
@@ -312,18 +313,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             addTag(tag);
         }
         return this;
-    }
-
-
-    private void adaptLegacyPartTags(){ //Don't use getEntity()
-        List<String> legacyTags = new ArrayList<>();
-        for (String s : new HashSet<>(entity.getScoreboardTags())){
-            if (s.contains(DisplayAPI.getLegacyPartTagPrefix())){
-                legacyTags.add(s.replace(DisplayAPI.getLegacyPartTagPrefix(), ""));
-                entity.removeScoreboardTag(s);
-            }
-        }
-        DisplayUtils.addTags(entity, legacyTags);
     }
 
     SpawnedDisplayEntityPart setMaster(){
@@ -1305,7 +1294,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             }
         }
         this.entity = null;
-        this.partData = null;
         this.unregister();
         return entity;
     }
@@ -1317,7 +1305,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     public void removeFromGroup() {
         if (group != null){
-            allParts.remove(partData);
             group.groupParts.remove(partUUID);
             for (SpawnedPartSelection selection : group.partSelections){
                 selection.removePart(this);

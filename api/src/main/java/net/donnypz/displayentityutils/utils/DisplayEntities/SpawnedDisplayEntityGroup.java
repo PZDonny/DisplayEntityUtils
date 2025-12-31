@@ -509,8 +509,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
 
         FoliaUtils.teleport(master, location, TeleportFlag.EntityState.RETAIN_PASSENGERS);
-        World w = location.getWorld();
-
 
         for (SpawnedDisplayEntityPart part : this.getParts()){
             part.getEntity().setRotation(location.getYaw(), location.getPitch());
@@ -521,10 +519,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 Vector vector = oldMasterLoc.toVector().subtract(interaction.getLocation().toVector());
                 Location tpLocation = location.clone().subtract(vector);
                 FoliaUtils.teleport(part.getEntity(), tpLocation, TeleportFlag.EntityState.RETAIN_PASSENGERS);
-            }
-
-            if (w != null && part.getEntity().getWorld() != w){ //Keep world name consistent within part's data
-                part.getPartData().setWorldName(w.getName());
             }
         }
     }
