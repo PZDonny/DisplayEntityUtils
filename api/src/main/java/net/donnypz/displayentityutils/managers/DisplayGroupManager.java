@@ -860,9 +860,17 @@ public final class DisplayGroupManager {
     @ApiStatus.Internal
     public static void spawnPersistentPacketGroups(@NotNull Chunk chunk){
         List<String> list = getChunkList(chunk.getPersistentDataContainer());
-        for (String json : list){
+        Iterator<String>  i = list.iterator();
+
+        while (i.hasNext()){
+            String json = i.next();
             PersistentPacketGroup cpg = gson.fromJson(json, PersistentPacketGroup.class);
-            cpg.spawn(chunk).setPersistentIds(cpg.id, chunk);
+            if (cpg == null){
+                i.remove();
+            }
+            else{
+                cpg.spawn(chunk).setPersistentIds(cpg.id, chunk);
+            }
         }
     }
 

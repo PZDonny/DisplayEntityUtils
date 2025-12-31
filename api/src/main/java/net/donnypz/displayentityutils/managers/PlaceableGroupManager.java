@@ -19,6 +19,7 @@ import org.joml.Quaternionf;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -513,7 +514,8 @@ public final class PlaceableGroupManager {
         pdc.set(DisplayAPI.getPlaceableGroupId(), PersistentDataType.STRING, groupID);
 
         itemStack.setAmount(1);
-        pdc.set(DisplayAPI.getPlaceableGroupItemStack(), PersistentDataType.BYTE_ARRAY, itemStack.serializeAsBytes());
+        String b64 = Base64.getEncoder().encodeToString(itemStack.serializeAsBytes());
+        pdc.set(DisplayAPI.getPlaceableGroupItemStack(), PersistentDataType.STRING, b64);
         if (itemHolder != null) pdc.set(DisplayAPI.getPlaceableGroupPlacer(), PersistentDataType.STRING, itemHolder.getUniqueId().toString());
     }
 

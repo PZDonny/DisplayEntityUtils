@@ -4,6 +4,7 @@ import com.jeff_media.customblockdata.CustomBlockData;
 import io.papermc.paper.event.block.BlockBreakProgressUpdateEvent;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.PlacedGroupBreakEvent;
+import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.PlaceableGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
@@ -18,9 +19,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.Base64;
 import java.util.UUID;
 
 public class DEUPlayerDigListener implements Listener {
@@ -49,14 +50,14 @@ public class DEUPlayerDigListener implements Listener {
     }
 
     private void breakPlacedGroup(Player player, Block block){
-        PersistentDataContainer pdc = new CustomBlockData(block, DisplayAPI.getPlugin());
+        CustomBlockData data = new CustomBlockData(block, DisplayAPI.getPlugin());
 
-        String groupId = pdc.get(DisplayAPI.getPlaceableGroupId(), PersistentDataType.STRING);
+        String groupId = data.get(DisplayAPI.getPlaceableGroupId(), PersistentDataType.STRING);
         if (groupId == null) return; //Not a placed group block
 
         PacketDisplayEntityGroup group = PacketDisplayEntityGroup.getGroup(groupId);
         if (group == null){ //group was removed by other means
-            clearPDC(pdc);
+            clearPDC(data);
             if (block.getType() == Material.BARRIER) block.setType(Material.AIR);
             return;
         }
@@ -64,10 +65,10 @@ public class DEUPlayerDigListener implements Listener {
         if (!new PlacedGroupBreakEvent(block, group, player).callEvent()) return;
 
 
-        byte[] itemStackArr = pdc.get(DisplayAPI.getPlaceableGroupItemStack(), PersistentDataType.BYTE_ARRAY);
-        ItemStack itemStack = ItemStack.deserializeBytes(itemStackArr);
+        String b64 = data.get(DisplayAPI.getPlaceableGroupItemStack(), PersistentDataType.STRING);
+        ItemStack itemStack = ItemStack.deserializeBytes(Base64.getDecoder().decode(b64));
 
-        String uuidString = pdc.get(DisplayAPI.getPlaceableGroupPlacer(), PersistentDataType.STRING);
+        String uuidString = data.get(DisplayAPI.getPlaceableGroupPlacer(), PersistentDataType.STRING);
         UUID placerUUID = uuidString == null ? null : UUID.fromString(uuidString);
 
         if (placerUUID != null && PlaceableGroupManager.isPlacerBreaksOnly(itemStack) && !player.getUniqueId().equals(placerUUID)) {
@@ -84,15 +85,16 @@ public class DEUPlayerDigListener implements Listener {
             });
         }
 
-        group.unregister();
+        DisplayGroupManager.removePersistentPacketGroup(group, true);
         PlaceableGroupManager.playSounds(itemStack, blockLoc, false);
-        clearPDC(pdc);
+        clearPDC(data);
         block.setType(Material.AIR);
     }
 
-    private void clearPDC(PersistentDataContainer pdc){
-        pdc.remove(DisplayAPI.getPlaceableGroupId());
-        pdc.remove(DisplayAPI.getPlaceableGroupPlacer());
-        pdc.remove(DisplayAPI.getPlaceableGroupItemStack());
+    private void clearPDC(CustomBlockData data){
+        data.clear();
+//        data.remove(DisplayAPI.getPlaceableGroupId());
+//        data.remove(DisplayAPI.getPlaceableGroupPlacer());
+//        data.remove(DisplayAPI.getPlaceableGroupItemStack());
     }
 }
