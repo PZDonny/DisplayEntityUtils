@@ -78,7 +78,7 @@ public class DEUPlayerDigListener implements Listener {
 
         Location blockLoc = block.getLocation().add(0.5f, 0.5f, 0.5f);
 
-        if (PlaceableGroupManager.isDropItem(itemStack)) {
+        if (PlaceableGroupManager.isDropItem(itemStack) && player.getGameMode() != GameMode.CREATIVE) {
             final ItemStack finalItemStack = itemStack;
             DisplayAPI.getScheduler().run(() -> {
                 block.getWorld().dropItemNaturally(blockLoc, finalItemStack);
