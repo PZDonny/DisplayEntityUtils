@@ -352,6 +352,7 @@ public class DEUUser {
     }
 
     public @Nullable ActiveGroup<?> getSelectedGroup(){
+        if (selectedGroup != null && !selectedGroup.isRegistered()) selectedGroup = null;
         return selectedGroup;
     }
 
