@@ -22,11 +22,14 @@ class GroupDespawnCMD extends GroupSubCommand {
 
     @Override
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Despawned your selected display entity group!", NamedTextColor.GRAY)));
         if (group instanceof SpawnedDisplayEntityGroup sg){
             sg.unregister(true, true);
         }
         else if (group instanceof PacketDisplayEntityGroup pg){
+            if (pg.isPlaced()){
+                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You must manually break a placed group's block to remove it!", NamedTextColor.RED)));
+                return;
+            }
             if (pg.isPersistent()){
                 DisplayGroupManager.removePersistentPacketGroup(pg, true);
             }
@@ -34,6 +37,7 @@ class GroupDespawnCMD extends GroupSubCommand {
                 pg.unregister();
             }
         }
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Despawned your selected display entity group!", NamedTextColor.GRAY)));
         DisplayGroupManager.deselectGroup(player);
         DisplayEntityPluginCommand.hideRelativePoints(player);
     }
