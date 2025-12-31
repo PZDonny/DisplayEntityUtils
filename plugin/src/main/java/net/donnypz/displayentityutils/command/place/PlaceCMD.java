@@ -25,6 +25,7 @@ public class PlaceCMD extends ConsoleUsableSubCommand {
         new PlaceAddSoundCMD(this);
         new PlaceWhoPlacedCMD(this);
         new PlaceGetItemCMD(this);
+        new PlaceBreakModeCMD(this);
     }
 
     @Override
@@ -49,19 +50,22 @@ public class PlaceCMD extends ConsoleUsableSubCommand {
         if (page == 1){
             CMDUtils.sendCMD(sender, "/deu place help", "Get help for placeable groups");
             CMDUtils.sendCMD(sender, "/deu place info", "Get placeable group information for your held block");
+            CMDUtils.sendCMD(sender, "/deu place breakmode", "Enter/Exit break-mode allowing you to break any placed group");
             CMDUtils.sendCMD(sender, "/deu place set <group-tag>", "Assign a group to your held block, which will be spawned when the block is placed");
             CMDUtils.sendCMD(sender, "/deu place unset", "Unassign a group from your held block");
             CMDUtils.sendCMD(sender, "/deu place setpermission", "Set the permission required to place the group");
             CMDUtils.sendCMD(sender, "/deu place unsetpermission", "Set the permission required to place the group");
-            CMDUtils.sendCMD(sender, "/deu place togglepacket", "Toggle whether the placed group will be packet-based. True by default");
         }
-        else{
+        else if (page == 2){
+            CMDUtils.sendCMD(sender, "/deu place togglepacket", "Toggle whether the placed group will be packet-based. True by default");
             CMDUtils.sendCMD(sender, "/deu place toggleplayerfacing", "Toggle whether the placed group will respect the player's facing direction. True by default");
             CMDUtils.sendCMD(sender, "/deu place toggleblockface", "Toggle whether the placed group will respect the block face it is placed on. True by default");
             CMDUtils.sendCMD(sender, "/deu place toggledropitem", "Toggle whether the placed group will drop the item used to place it, when broken. True by default");
             CMDUtils.sendCMD(sender, "/deu place toggleplaceronly", "Toggle whether only the player who placed a group can break it. True by default");
             CMDUtils.sendCMD(sender, "/deu place addsound <place | break> <sound> <volume> <pitch>", "Add a sound to play when the block is placed or broken");
             CMDUtils.sendCMD(sender, "/deu place whoplaced", "Get the name and UUID of the player who placed a group");
+        }
+        else{
             CMDUtils.sendCMD(sender, "/deu place getitem", "Get the item used to placed a group");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));

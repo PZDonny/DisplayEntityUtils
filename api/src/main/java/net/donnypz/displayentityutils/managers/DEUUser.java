@@ -42,6 +42,8 @@ public class DEUUser {
     private final Object animationCameraLock = new Object();
     private UUID cameraPlayerUUID;
 
+    private boolean placedGroupBreakMode = false;
+
 
     private DEUUser(UUID userUUID){
         this.userUUID = userUUID;
@@ -318,6 +320,22 @@ public class DEUUser {
         synchronized (animationCameraLock){
             return cameraPlayerUUID.equals(this.cameraPlayerUUID);
         }
+    }
+
+    /**
+     * Set whether this user should be able to break any placed group, regardless of who placed it
+     * @param breakMode whether the break mode should be enabled
+     */
+    public void setPlacedGroupBreakMode(boolean breakMode){
+        this.placedGroupBreakMode = breakMode;
+    }
+
+    /**
+     * Get whether this user can break any placed group, regardless of who placed it
+     * @return a boolean
+     */
+    public boolean isInPlacedGroupBreakMode(){
+        return this.placedGroupBreakMode;
     }
 
     /**

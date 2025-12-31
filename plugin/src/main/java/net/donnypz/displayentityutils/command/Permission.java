@@ -45,6 +45,7 @@ public enum Permission {
     PLACE_SET_PERMISSION("deu.place.setpermission"),
     PLACE_SOUND("deu.place.sound"),
     PLACE_WHO_PLACED("deu.place.whoplaced"),
+    PLACE_BREAK_MODE("deu.place.breakmode"),
 
 
     PARTS_INFO("deu.parts.info"),
