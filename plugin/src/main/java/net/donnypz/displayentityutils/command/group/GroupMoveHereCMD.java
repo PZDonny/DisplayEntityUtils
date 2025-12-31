@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.command.group;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,6 +23,11 @@ class GroupMoveHereCMD extends GroupSubCommand {
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
         if (RelativePointUtils.isViewingRelativePoints(player)){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot play do that while viewing points!", NamedTextColor.RED)));
+            return;
+        }
+
+        if (group instanceof PacketDisplayEntityGroup pg && pg.isPlaced()){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot move a group placed by a player's item!", NamedTextColor.RED)));
             return;
         }
 

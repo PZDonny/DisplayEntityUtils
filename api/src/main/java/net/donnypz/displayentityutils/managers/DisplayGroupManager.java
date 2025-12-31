@@ -707,7 +707,7 @@ public final class DisplayGroupManager {
         else{
             id = gson.fromJson(list.getLast(), PersistentPacketGroup.class).id+1;
         }
-        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, group.isAutoShow());
+        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, group.isAutoShow(), group.isPlaced());
         if (cpg == null) return;
 
         String json = gson.toJson(cpg);
@@ -731,7 +731,7 @@ public final class DisplayGroupManager {
         else{
             id = gson.fromJson(list.getLast(), PersistentPacketGroup.class).id+1;
         }
-        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, autoShow);
+        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, autoShow, false);
         if (cpg == null) return null;
 
         String json = gson.toJson(cpg);
@@ -760,7 +760,7 @@ public final class DisplayGroupManager {
 
         PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, spawnReason, true, settings);
         displayEntityGroup = pdeg.toDisplayEntityGroup();
-        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, pdeg.isAutoShow());
+        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, pdeg.isAutoShow(), false);
         if (cpg != null){
             String json = gson.toJson(cpg);
             list.add(json);
@@ -903,10 +903,11 @@ public final class DisplayGroupManager {
         String groupBase64;
         String groupTag;
         boolean autoShow = true; //Don't change
+        boolean isPlaced = false;
 
         private PersistentPacketGroup(){}
 
-        static PersistentPacketGroup create(int id, Location location, DisplayEntityGroup group, boolean autoShow){
+        static PersistentPacketGroup create(int id, Location location, DisplayEntityGroup group, boolean autoShow, boolean isPlaced){
             PersistentPacketGroup cpg = new PersistentPacketGroup();
             cpg.id = id;
             cpg.x = location.x();
@@ -916,6 +917,7 @@ public final class DisplayGroupManager {
             cpg.pitch = location.getPitch();
             cpg.groupTag = group.getTag();
             cpg.autoShow = autoShow;
+            cpg.isPlaced = isPlaced;
             cpg.setGroup(group);
             return (cpg.groupBase64 == null) ? null : cpg;
         }
@@ -965,7 +967,12 @@ public final class DisplayGroupManager {
             Location spawnLoc = getLocation(chunk);
             DisplayEntityGroup g = getGroup();
             if (spawnLoc == null || g == null) return null;
-            return g.createPacketGroup(spawnLoc, GroupSpawnedEvent.SpawnReason.INTERNAL, true, autoShow);
+            if (isPlaced){
+                return g.createPacketGroup(spawnLoc, GroupSpawnedEvent.SpawnReason.CHUNK_LOAD_PLACED, true, autoShow);
+            }
+            else{
+                return g.createPacketGroup(spawnLoc, GroupSpawnedEvent.SpawnReason.INTERNAL, true, autoShow);
+            }
         }
     }
 }

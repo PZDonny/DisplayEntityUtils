@@ -40,6 +40,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     Predicate<Player> autoShowCondition;
     int persistentLocalId = -1;
     String persistentGlobalId;
+    boolean isPlaced;
 
 
     PacketDisplayEntityGroup(String tag){
@@ -125,6 +126,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return chunk.getWorld().getName()+"|"+chunk.getChunkKey()+"|"+localId; //world,chunkkey,localid
     }
 
+    /**
+     * {@inheritDoc}
+     * <br><br>The group cannot become persistent if {@link #isRiding()} is true
+     * <br>The group cannot become non-persistent if {@link #isPlaced()} is true
+     */
     @Override
     public void setPersistent(boolean persistent) {
         if (persistent){
@@ -134,7 +140,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             }
         }
         else{
-            if (isPersistent()){
+            if (isPersistent() && !isPlaced){
                 DisplayGroupManager.removePersistentPacketGroup(this, false);
                 setPersistentIds(-1, null);
             }
@@ -148,6 +154,14 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     @Override
     public boolean isPersistent(){
         return this.persistentLocalId != -1;
+    }
+
+    /**
+     * Get whether this group was placed by a player's held item
+     * @return a boolean
+     */
+    public boolean isPlaced(){
+        return this.isPlaced;
     }
 
     @ApiStatus.Internal
@@ -575,10 +589,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     /**
      * {@inheritDoc}
      * <br>It is not recommended to use this multiple times in the same tick, unexpected results may occur.
+     * <br><br>This will fail if {@link #isRiding()} or {@link #isPlaced()} is true
      */
     @Override
     public boolean teleport(@NotNull Location tpLocation, boolean respectGroupDirection){
-        if (isRiding()) return false;
+        if (isRiding() || isPlaced) return false;
         Location oldMasterLoc = getLocation();
         attemptLocationUpdate(oldMasterLoc, tpLocation);
 

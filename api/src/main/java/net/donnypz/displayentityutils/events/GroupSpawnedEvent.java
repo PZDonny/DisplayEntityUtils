@@ -1,9 +1,15 @@
 package net.donnypz.displayentityutils.events;
 
+import net.donnypz.displayentityutils.managers.PlaceableGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -54,8 +60,18 @@ public class GroupSpawnedEvent extends Event {
          */
         PLAYER_SENT_CHUNK,
         PLAYER_SENT_PASSENGER_GROUP,
+        /**
+         * This is only applicable to the {@link PacketDisplayEntityGroup} placed by an item, through {@link PlaceableGroupManager#spawnGroup(ItemStack, Location, Player)} or similar
+         */
+        @ApiStatus.Internal
         ITEMSTACK,
+        /**
+         * This is only applicable to the {@link PacketDisplayEntityGroup} placed by an item, through {@link PlaceableGroupManager#spawnGroup(ItemStack, Location, Player)} or similar
+         */
+        @ApiStatus.Internal
+        CHUNK_LOAD_PLACED,
         SKRIPT,
+        @ApiStatus.Internal
         INTERNAL;
     }
 }

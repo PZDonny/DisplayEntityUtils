@@ -332,6 +332,10 @@ public final class DisplayEntityGroup implements Serializable{
             packetGroup.autoCull(widthCullingAdder, heightCullingAdder);
         }
 
+        if (spawnReason == GroupSpawnedEvent.SpawnReason.CHUNK_LOAD_PLACED || spawnReason == GroupSpawnedEvent.SpawnReason.ITEMSTACK){
+            packetGroup.isPlaced = true;
+        }
+
         return packetGroup;
     }
 }
