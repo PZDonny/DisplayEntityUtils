@@ -499,13 +499,32 @@ public final class PlaceableGroupManager {
 
         return pg;
     }
+
+
     /**
      * Get the UUID of the player who placed a group
      * @param group the placed group
      * @return a {@link UUID} or null if the group wasn't placed with an item or if a placer wasn't specified
      */
-    public static UUID getWhoPlaced(@NotNull PacketDisplayEntityGroup group){
-        return null;
+    public static @Nullable UUID getWhoPlaced(@NotNull PacketDisplayEntityGroup group){
+        if (!group.isPlaced()) return null;
+
+        Location loc = group.getLocation();
+        if (loc == null) return null;
+
+        return getWhoPlaced(loc.getBlock());
+    }
+
+    /**
+     * Get the UUID of the player who placed a group
+     * @param block the block where a placed group is
+     * @return a {@link UUID} or null if the group wasn't placed with an item or if a placer wasn't specified
+     */
+    public static @Nullable UUID getWhoPlaced(@NotNull Block block){
+        if (!CustomBlockData.hasCustomBlockData(block, DisplayAPI.getPlugin())) return null;
+        CustomBlockData data = new CustomBlockData(block, DisplayAPI.getPlugin());
+        String uuidStr = data.get(DisplayAPI.getPlaceableGroupPlacer(), PersistentDataType.STRING);
+        return uuidStr == null ? null : UUID.fromString(uuidStr);
     }
 
     private static void setBlockData(Player itemHolder, Block block, ItemStack itemStack, String groupID){

@@ -43,6 +43,7 @@ public enum Permission {
     PLACE_TOGGLE_PLACER_ONLY("deu.place.toggle.placeronly"),
     PLACE_SET_PERMISSION("deu.place.setpermission"),
     PLACE_SOUND("deu.place.sound"),
+    PLACE_WHO_PLACED("deu.place.whoplaced"),
 
 
     PARTS_INFO("deu.parts.info"),
