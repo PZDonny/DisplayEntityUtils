@@ -554,6 +554,19 @@ public final class PlaceableGroupManager {
         return ItemStack.deserializeBytes(Base64.getDecoder().decode(b64));
     }
 
+    /**
+     * Get the {@link PacketDisplayEntityGroup} placed at a block
+     * @param block the block where a placed group is
+     * @return an {@link PacketDisplayEntityGroup} or null
+     */
+    public static @Nullable PacketDisplayEntityGroup getPlacedGroup(@NotNull Block block){
+        if (!CustomBlockData.hasCustomBlockData(block, DisplayAPI.getPlugin())) return null;
+        CustomBlockData data = new CustomBlockData(block, DisplayAPI.getPlugin());
+
+        String id = data.get(DisplayAPI.getPlaceableGroupId(), PersistentDataType.STRING);
+        return PacketDisplayEntityGroup.getGroup(id);
+    }
+
     private static void setBlockData(Player itemHolder, Block block, ItemStack itemStack, String groupID){
         block.setType(Material.BARRIER);
         PersistentDataContainer pdc = new CustomBlockData(block, DisplayAPI.getPlugin());
