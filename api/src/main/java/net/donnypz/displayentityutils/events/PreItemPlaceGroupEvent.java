@@ -3,7 +3,6 @@ package net.donnypz.displayentityutils.events;
 import net.donnypz.displayentityutils.managers.PlaceableGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -13,30 +12,27 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Called before the stored {@link DisplayEntityGroup} on an item can be spawned when a player places the item's block or when
- * {@link PlaceableGroupManager#spawnGroup(ItemStack, Location, Player)} or similar is called.
+ * Called before the stored {@link DisplayEntityGroup} on an item can be spawned when a player places the item's block
  */
 public class PreItemPlaceGroupEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-    DisplayEntityGroup group;
     ItemStack itemStack;
     Player player;
 
     private boolean isCancelled = false;
 
-    public PreItemPlaceGroupEvent(@Nullable DisplayEntityGroup group, @NotNull ItemStack itemStack, @Nullable Player player){
+    public PreItemPlaceGroupEvent(@NotNull ItemStack itemStack, @Nullable Player player){
         super(!Bukkit.isPrimaryThread());
-        this.group = group;
         this.itemStack = itemStack;
         this.player = player;
     }
 
     /**
-     * Get the {@link DisplayEntityGroup} involved in this event.
-     * @return a {@link DisplayEntityGroup} or null if the item's group could not be found
+     * Get the group tag of the group involved in this event.
+     * @return the group tag or null
      */
-    public @Nullable DisplayEntityGroup getGroup() {
-        return group;
+    public @Nullable String getGroupTag() {
+        return PlaceableGroupManager.getGroupTag(itemStack);
     }
 
     /**

@@ -1,5 +1,7 @@
 package net.donnypz.displayentityutils.listeners.player;
 
+import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.events.PreItemPlaceGroupEvent;
 import net.donnypz.displayentityutils.managers.PlaceableGroupManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -64,8 +66,11 @@ public class DEUPlayerPlaceBlockListener implements Listener {
 
         ItemStack itemClone = heldItem.clone();
         itemClone.setAmount(1);
-        PlaceableGroupManager.spawnGroup(itemClone, placeLoc, rot, player);
-        PlaceableGroupManager.playSounds(itemClone, placeLoc, true);
+        if (!new PreItemPlaceGroupEvent(itemClone, player).callEvent()) return;
+        DisplayAPI.getScheduler().runAsync(() -> {
+            PlaceableGroupManager.spawnGroup(itemClone, placeLoc, rot, player);
+            PlaceableGroupManager.playSounds(itemClone, placeLoc, true);
+        });
         if (player.getGameMode() != GameMode.CREATIVE){
             heldItem.setAmount(heldItem.getAmount()-1);
         }

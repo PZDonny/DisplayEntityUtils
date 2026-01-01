@@ -485,7 +485,6 @@ public final class PlaceableGroupManager {
 
         DisplayEntityGroup group = DisplayGroupManager.getGroup(tag);
         if (group == null) return null;
-        if (!new PreItemPlaceGroupEvent(group, itemStack, itemHolder).callEvent()) return null;
 
         PacketDisplayEntityGroup pg = group.createPacketGroup(spawnLocation, GroupSpawnedEvent.SpawnReason.ITEMSTACK, true, true);
         if (pg == null) return null;
