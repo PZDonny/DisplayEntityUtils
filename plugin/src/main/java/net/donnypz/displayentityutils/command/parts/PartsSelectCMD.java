@@ -47,7 +47,7 @@ class PartsSelectCMD extends PlayerSubCommand {
             RelativePointUtils.spawnDisplayEntityPoints(distance, player);
         }
         catch(IllegalArgumentException e){
-            player.sendMessage(Component.text("Invalid input! Enter a positive number for the distance, or -target to select a targeted Interaction entity", NamedTextColor.RED));
+            player.sendMessage(Component.text("Invalid input! Enter a positive number for the distance, or -target to select a targeted Interaction/Mannequin entity", NamedTextColor.RED));
         }
     }
 }
