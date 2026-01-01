@@ -705,7 +705,13 @@ public final class DisplayGroupManager {
             id = 1;
         }
         else{
-            id = gson.fromJson(list.getLast(), PersistentPacketGroup.class).id+1;
+            PersistentPacketGroup ppg = gson.fromJson(list.getLast(), PersistentPacketGroup.class);
+            if (ppg == null){
+                id = list.size()+1;
+            }
+            else{
+                id = gson.fromJson(list.getLast(), PersistentPacketGroup.class).id+1;
+            }
         }
         PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, group.isAutoShow(), group.isPlaced());
         if (cpg == null) return;
