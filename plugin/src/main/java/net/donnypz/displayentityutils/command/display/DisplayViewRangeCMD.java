@@ -19,7 +19,7 @@ class DisplayViewRangeCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Provide a part tag! /deu display viewrange <view-range-multiplier> [-all]", NamedTextColor.RED));
+        player.sendMessage(Component.text("Incorrect Usage! /deu display viewrange <view-range-multiplier> [-all]", NamedTextColor.RED));
     }
 
     @Override
