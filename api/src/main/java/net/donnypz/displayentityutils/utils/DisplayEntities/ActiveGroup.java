@@ -61,6 +61,13 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      */
     public abstract void addPart(T part);
 
+    /**
+     * Add an entity to this group as a part, when you don't know the type of entity you're dealing with
+     * @param entity the eligible entity to add
+     * @return a corresponding part or null if the entity is not an eligible part entity
+     */
+    public abstract @Nullable T addEntity(@NotNull Entity entity);
+
 
     /**
      * Get this group's tag

@@ -81,6 +81,34 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         setDefaultTransformValues();
     }
 
+    /**
+     * Create a {@link PacketDisplayEntityPart} representative of the given entity
+     * @return a {@link PacketDisplayEntityPart} or null if the entity is not an eligible part entity
+     */
+    public static @Nullable PacketDisplayEntityPart getPart(@NotNull Entity entity, boolean removeExistingEntity){
+        SpawnedDisplayEntityPart.PartType pt = SpawnedDisplayEntityPart.PartType.getType(entity);
+        if (pt == null) return null;
+        PacketDisplayEntityPart part;
+        switch (entity){
+            case Display d -> {
+                part = new DisplayEntity(d, DisplayEntity.Type.fromPartType(pt))
+                        .createPacketPart(null, entity.getLocation(), null);
+            }
+            case Interaction inter -> {
+                part = new InteractionEntity(inter).createPacketPart(entity.getLocation(), null);
+            }
+            case Mannequin man -> {
+                MannequinEntity m = SavedEntityBuilder.buildMannequin(entity);
+                part = m.createPacketPart(entity.getLocation(), null);
+            }
+            default -> {
+                return null;
+            }
+        }
+        if (removeExistingEntity) entity.remove();
+        return part;
+    }
+
     private void setDefaultTransformValues(){
         if (isDisplay()){
             attributeContainer.setAttributeIfAbsent(DisplayAttributes.Transform.TRANSLATION, new Vector3f());
@@ -1268,6 +1296,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     private void sendHeadLookPacket(Player player, float yaw){
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, getHeadLookPacket(yaw));
     }
+
 
     static final class PacketLocation {
 

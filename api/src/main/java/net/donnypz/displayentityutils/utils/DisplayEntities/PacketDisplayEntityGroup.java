@@ -212,7 +212,19 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         updatePassengerIds(part.getEntityId(), true);
     }
 
-     void addPartSilent(PacketDisplayEntityPart part){
+    /**
+     * {@inheritDoc}
+     * This will create a {@link PacketDisplayEntityPart} representative of the entity
+     */
+    @Override
+    public @Nullable PacketDisplayEntityPart addEntity(@NotNull Entity entity) {
+        PacketDisplayEntityPart part = PacketDisplayEntityPart.getPart(entity, true);
+        if (part == null) return null;
+        addPart(part);
+        return part;
+    }
+
+    void addPartSilent(PacketDisplayEntityPart part){
          if (groupParts.get(part.partUUID) == part) return;
 
          if (part.partUUID == null){

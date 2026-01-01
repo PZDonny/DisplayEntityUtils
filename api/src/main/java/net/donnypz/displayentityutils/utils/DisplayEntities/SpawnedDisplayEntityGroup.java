@@ -121,6 +121,28 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public @Nullable SpawnedDisplayEntityPart addEntity(@NotNull Entity entity){
+        if (entity instanceof Display display){
+            return addDisplayEntity(display);
+        }
+
+        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
+        if (part == null){
+            part =  new SpawnedDisplayEntityPart(this, entity, partUUIDRandom);
+        }
+        else{
+            part.setGroup(this);
+        }
+        if (getVehicle() != null){
+            alignNonDisplayWithMountedGroup(part, getVehicle());
+        }
+        return part;
+    }
+
+    /**
      * Add a display entity to this group. If this group already contains this display entity as a registered part it will return the existing
      * {@link SpawnedDisplayEntityPart}. If it doesn't then it will return a new {@link SpawnedDisplayEntityPart}
      * @param displayEntity
@@ -151,28 +173,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return part;
     }
 
-    /**
-     * Add a valid part entity to this group, when you don't know the type of entity you're dealing with
-     * @param entity the part entity to add
-     * @return a corresponding {@link SpawnedDisplayEntityPart} or null if the entity is not an eligible part entity
-     */
-    public @Nullable SpawnedDisplayEntityPart addEntity(@NotNull Entity entity){
-        if (entity instanceof Display display){
-            return addDisplayEntity(display);
-        }
 
-        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
-        if (part == null){
-            part =  new SpawnedDisplayEntityPart(this, entity, partUUIDRandom);
-        }
-        else{
-            part.setGroup(this);
-        }
-        if (getVehicle() != null){
-            alignNonDisplayWithMountedGroup(part, getVehicle());
-        }
-        return part;
-    }
 
     /**
      * Check if this group and an entity share the same creation time. If this returns true this does not guarantee

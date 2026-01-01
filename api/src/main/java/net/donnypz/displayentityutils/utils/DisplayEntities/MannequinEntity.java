@@ -96,7 +96,7 @@ final class MannequinEntity implements Serializable {
 
         part.partTags = DisplayEntity.getSetFromPDC(pdc, DisplayAPI.getPartPDCTagKey());
         part.partUUID = DisplayEntity.getPDCPartUUID(pdc);
-        settings.applyAttributes(part);
+        if (settings != null) settings.applyAttributes(part);
 
         return part;
     }

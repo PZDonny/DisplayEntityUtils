@@ -131,7 +131,7 @@ final class InteractionEntity implements Serializable {
             part.partUUID = partUUID != null ? partUUID : DisplayEntity.getPDCPartUUID(pdc);
             part.interactionCommands = getInteractionCommands(pdc);
         }
-        settings.applyAttributes(part);
+        if (settings != null) settings.applyAttributes(part);
 
         return part;
     }
