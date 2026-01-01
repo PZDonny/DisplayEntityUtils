@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -299,7 +300,8 @@ public final class PlaceableGroupManager {
         return isPlace ? DisplayAPI.getPlaceableGroupPlaceSounds() : DisplayAPI.getPlaceableGroupBreakSounds();
     }
 
-    private static byte[] writeSoundList(List<DEUSound> sounds) {
+    @ApiStatus.Internal
+    public static byte[] writeSoundList(List<DEUSound> sounds) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream out = new ObjectOutputStream(baos);
