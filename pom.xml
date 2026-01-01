@@ -64,6 +64,10 @@
                                     <pattern>org.bstats</pattern>
                                     <shadedPattern>net.donnypz.displayentityutils.bstats</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>com.jeff_media.customblockdata</pattern>
+                                    <shadedPattern>net.donnypz.displayentityutils.customblockdata</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>

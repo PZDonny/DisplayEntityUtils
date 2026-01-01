@@ -45,6 +45,13 @@
             <version>7.3.5</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.jeff-media</groupId>
+            <artifactId>custom-block-data</artifactId>
+            <version>2.2.4</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>
