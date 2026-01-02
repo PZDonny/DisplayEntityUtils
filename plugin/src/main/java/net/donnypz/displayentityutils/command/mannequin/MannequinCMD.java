@@ -65,8 +65,6 @@ public class MannequinCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/deu mannequin pivot <angle> [-all]");
             CMDUtils.sendCMD(sender, "/deu mannequin pose <pose> [-all]", "Change your selected mannequin's pose");
             CMDUtils.sendCMD(sender, "/deu mannequin scale <scale> [-all]", "Set your selected mannequin's scale");
-            CMDUtils.sendCMD(sender, "/deu mannequin clone", "Clone a mannequin");
-            CMDUtils.sendCMD(sender, "/deu mannequin clonehere", "Clone a mannequin at your current location");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }
