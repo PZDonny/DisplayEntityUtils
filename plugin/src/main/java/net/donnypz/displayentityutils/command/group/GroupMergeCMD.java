@@ -52,7 +52,7 @@ class GroupMergeCMD extends GroupSubCommand {
                 }
                 sg.merge(result.group());
             }
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully merged nearby groups", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Nearby non-packet groups have been merged", NamedTextColor.GREEN)));
             sg.glowAndMarkInteractions(player, 60);
         }
         catch(NumberFormatException e){

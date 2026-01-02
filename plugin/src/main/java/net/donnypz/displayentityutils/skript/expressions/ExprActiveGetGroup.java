@@ -12,6 +12,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
 import net.donnypz.displayentityutils.utils.GroupResult;
 import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,8 +51,8 @@ public class ExprActiveGetGroup extends SimplePropertyExpression<Object, ActiveG
             if (result == null) return null;
             return result.group();
         }
-        else if (obj instanceof Interaction interaction){
-            return DisplayGroupManager.getSpawnedGroup(interaction, DisplayConfig.getMaximumInteractionSearchRange());
+        else if (obj instanceof Entity entity){
+            return DisplayGroupManager.getSpawnedGroup(entity, DisplayConfig.getMaximumInteractionSearchRange());
         }
         return null;
     }

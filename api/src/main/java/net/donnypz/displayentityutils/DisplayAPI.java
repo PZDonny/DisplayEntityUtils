@@ -27,6 +27,17 @@ public final class DisplayAPI {
     static NamespacedKey spawnAnimationTypeKey;
     static NamespacedKey spawnAnimationLoadMethodKey;
     static NamespacedKey chunkPacketGroupsKey;
+    static NamespacedKey placeableGroupKey;
+    static NamespacedKey placeableGroupPermissionKey;
+    static NamespacedKey placeableGroupRespectFacingKey;
+    static NamespacedKey placeableGroupRespectBlockFace;
+    static NamespacedKey placeableGroupPlaceSounds;
+    static NamespacedKey placeableGroupBreakSounds;
+    static NamespacedKey placeableGroupDropItem;
+    static NamespacedKey placeableGroupPlacerBreaksOnly;
+    static NamespacedKey placeableGroupItemStack;
+    static NamespacedKey placeableGroupPlacer;
+    static NamespacedKey placeableGroupId;
 
     static boolean isMythicMobsInstalled;
     static boolean isLibsDisguisesInstalled;
@@ -85,10 +96,54 @@ public final class DisplayAPI {
         return chunkPacketGroupsKey;
     }
 
-    /**
-     * Used for older versions of DisplayEntityUtils Plugin
-     * This will NEVER have to be called manually
-     */
+    public static @NotNull NamespacedKey getPlaceableGroupKey(){
+        return placeableGroupKey;
+    }
+
+
+    public static @NotNull NamespacedKey getPlaceableGroupPermissionKey(){
+        return placeableGroupPermissionKey;
+    }
+
+    public static @NotNull NamespacedKey getPlaceableGroupRespectPlayerFacing(){
+        return placeableGroupRespectFacingKey;
+    }
+
+    public static @NotNull NamespacedKey getPlaceableGroupRespectBlockFace(){
+        return placeableGroupRespectBlockFace;
+    }
+
+    public static @NotNull NamespacedKey getPlaceableGroupPlaceSounds(){
+        return placeableGroupPlaceSounds;
+    }
+
+    public static @NotNull NamespacedKey getPlaceableGroupBreakSounds(){
+        return placeableGroupBreakSounds;
+    }
+
+    public static @NotNull NamespacedKey getPlaceableGroupPlacerBreaksOnly() {
+        return placeableGroupPlacerBreaksOnly;
+    }
+
+    public static @NotNull NamespacedKey getPlaceableGroupDropItem() {
+        return placeableGroupDropItem;
+    }
+
+
+    public static @NotNull NamespacedKey getPlaceableGroupItemStack(){
+        return placeableGroupItemStack;
+    }
+
+    public static @NotNull NamespacedKey getPlaceableGroupId(){
+        return placeableGroupId;
+    }
+
+    public static @NotNull NamespacedKey getPlaceableGroupPlacer() {
+        return placeableGroupPlacer;
+    }
+
+
+
     @ApiStatus.Internal
     public static String getLegacyPartTagPrefix(){
         return legacyPartTagPrefix;
@@ -104,7 +159,7 @@ public final class DisplayAPI {
 
     /**
      * Get whether LibsDisguises is installed on this server
-     * @return true if MythicMobs is present
+     * @return true if LibsDisguises is present
      */
     public static boolean isLibsDisguisesInstalled() {
         return isLibsDisguisesInstalled;

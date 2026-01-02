@@ -14,6 +14,7 @@ import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -121,6 +122,28 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public @Nullable SpawnedDisplayEntityPart addEntity(@NotNull Entity entity){
+        if (entity instanceof Display display){
+            return addDisplayEntity(display);
+        }
+
+        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
+        if (part == null){
+            part =  new SpawnedDisplayEntityPart(this, entity, partUUIDRandom);
+        }
+        else{
+            part.setGroup(this);
+        }
+        if (getVehicle() != null){
+            alignNonDisplayWithMountedGroup(part, getVehicle());
+        }
+        return part;
+    }
+
+    /**
      * Add a display entity to this group. If this group already contains this display entity as a registered part it will return the existing
      * {@link SpawnedDisplayEntityPart}. If it doesn't then it will return a new {@link SpawnedDisplayEntityPart}
      * @param displayEntity
@@ -152,98 +175,39 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
 
-    /**
-     * Add an interaction entity to this group. If this group already contains this interaction entity as a registered part it will return the existing
-     * {@link SpawnedDisplayEntityPart}. If it doesn't then it will return a new {@link SpawnedDisplayEntityPart}
-     * @param interactionEntity
-     * @return a {@link SpawnedDisplayEntityPart} representing the Interaction entity
-     */
-    public SpawnedDisplayEntityPart addInteractionEntity(@NotNull Interaction interactionEntity){
-        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(interactionEntity);
-        if (part == null){
-            part =  new SpawnedDisplayEntityPart(this, interactionEntity, partUUIDRandom);
-        }
-        else{
-            part.setGroup(this);
-        }
-        if (getVehicle() != null){
-            alignInteractionWithMountedGroup(part, getVehicle());
-        }
-        return part;
-    }
 
     /**
-     * Add a valid part entity (Display or Interaction) to this group, when you don't know the type of entity you're dealing with
-     * @param entity the part entity to add
-     * @return a corresponding {@link SpawnedDisplayEntityPart} or null if the entity is not a part entity
-     */
-    public SpawnedDisplayEntityPart addPartEntity(@NotNull Entity entity){
-        if (entity instanceof Interaction interaction){
-            return addInteractionEntity(interaction);
-        }
-        else if (entity instanceof Display display){
-            return addDisplayEntity(display);
-        }
-        else{
-            return null;
-        }
-    }
-
-    /**
-     * Check if this group and a Display entity share the same creation time. If this returns true this does not guarantee
-     * that the part is registered to this group. Using {@link SpawnedDisplayEntityGroup#addDisplayEntity(Display)} will
-     * add the display entity to the group if it is not added already
-     * @param display
-     * @return a boolean
-     */
-    public boolean hasSameCreationTime(Display display){
-        return sameCreationTime(display);
-    }
-
-    /**
-     * Check if this group and an Interaction entity share the same creation time. If this returns true this does not guarantee
-     * that the part is registered to this group. Using {@link SpawnedDisplayEntityGroup#addInteractionEntity(Interaction)} will
+     * Check if this group and an entity share the same creation time. If this returns true this does not guarantee
+     * that the part is registered to this group.
+     * <br>Using {@link SpawnedDisplayEntityGroup#addEntity(Entity)} will
      * add the interaction entity to the group if it is not added already
-     * @param interaction
+     * @param entity the entity
      * @return a boolean
      */
-    public boolean hasSameCreationTime(Interaction interaction){
-        return sameCreationTime(interaction);
-    }
-
-
-
-    private boolean sameCreationTime(Entity entity){
+    public boolean hasSameCreationTime(Entity entity){
         PersistentDataContainer container = entity.getPersistentDataContainer();
         if (!container.has(creationTimeKey, PersistentDataType.LONG)){
             return false;
         }
-
         return creationTime == container.get(creationTimeKey, PersistentDataType.LONG);
     }
 
     /**
-     * Add Interactions that are meant to be a part of this group
-     * Usually these Interactions are unadded when a SpawnedDisplayEntityGroup is created during a new play session
-     * @param searchRange Distance to search for Interaction entities from the group's location
-     * @return a list of the interaction entities added to the group
+     * Add entities that are meant to be a part of this group.
+     * Usually these entities are unadded when a {@link SpawnedDisplayEntityGroup} is created during a new play session
+     * @param searchRange distance to search for  entities from the group's location
+     * @return a list of the entities added to the group
      */
-    public List<Interaction> addMissingInteractionEntities(double searchRange){
-        List<Interaction> interactions = new ArrayList<>();
-        //List<Entity> existingInteractions = getSpawnedPartEntities(SpawnedDisplayEntityPart.PartType.INTERACTION);
+    public @NotNull List<Entity> addMissingEntities(double searchRange){
+        List<Entity> entities = new ArrayList<>();
 
         for (Entity e : getMasterPart().getEntity().getNearbyEntities(searchRange, searchRange, searchRange)) {
-            if (!(e instanceof Interaction i)){
-                continue;
-            }
-            //if (!existingInteractions.contains(i) && sameCreationTime(i)){
-            if (!sameCreationTime(i)){
-                continue;
-            }
+            if (!DisplayUtils.isPartEntity(e) || e instanceof Display) continue;
+            if (!hasSameCreationTime(e)) continue;
 
-            SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(i);
+            SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(e);
             if (part == null){
-                new SpawnedDisplayEntityPart(this, i, partUUIDRandom);
+                new SpawnedDisplayEntityPart(this, e, partUUIDRandom);
             }
             else{
                 if (this == part.getGroup()){ //Already in this group
@@ -251,9 +215,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 }
                 part.setGroup(this);
             }
-            interactions.add(i);
+            entities.add(e);
         }
-        return interactions;
+        return entities;
     }
 
     @ApiStatus.Internal
@@ -275,8 +239,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     @Override
     public void showToPlayer(@NotNull Player player){
-        for (ActivePart part : groupParts.values()){
-            ((SpawnedDisplayEntityPart) part).showToPlayer(player);
+        for (SpawnedDisplayEntityPart part : groupParts.values()){
+            part.showToPlayer(player);
         }
     }
 
@@ -330,8 +294,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 if ((e instanceof Interaction interaction)){
                     if (!existingInteractions.contains(e)){
                         if (addToGroup){
-                            addInteractionEntity(interaction);
-
+                            addEntity(interaction);
                         }
                         interactions.add(interaction);
                     }
@@ -451,7 +414,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     @Override
-    public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions){
+    public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays){
         if (newScaleMultiplier <= 0){
             throw new IllegalArgumentException("New Scale Multiplier cannot be <= 0");
         }
@@ -467,10 +430,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             return false;
         }
 
-        for (SpawnedDisplayEntityPart p : groupParts.values()){
+        for (SpawnedDisplayEntityPart part : groupParts.values()){
             //Displays
-            if (p.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
-                Display d = (Display) p.getEntity();
+            if (part.isDisplay()){
+                Display d = (Display) part.getEntity();
                 Transformation transformation = d.getTransformation();
 
                 //Reset Scale then multiply by newScaleMultiplier
@@ -493,30 +456,38 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 }
                 //Culling
                 if (DisplayConfig.autoCulling()){
-                    p.autoCull(DisplayConfig.widthCullingAdder(), DisplayConfig.heightCullingAdder());
+                    part.autoCull(DisplayConfig.widthCullingAdder(), DisplayConfig.heightCullingAdder());
                 }
             }
             //Interactions
-            else if (scaleInteractions){
-                Interaction i = (Interaction) p.getEntity();
+            else if (scaleNonDisplays){
+                if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                    Interaction i = (Interaction) part.getEntity();
 
-                //Reset Scale then multiply by newScaleMultiplier
-                float newHeight = (i.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier;
-                float newWidth = (i.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier;
-                DisplayUtils.scaleInteraction(i, newHeight, newWidth, durationInTicks, 0);
+                    //Reset Scale then multiply by newScaleMultiplier
+                    float newHeight = (i.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier;
+                    float newWidth = (i.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier;
+                    DisplayUtils.scaleInteraction(i, newHeight, newWidth, durationInTicks, 0);
 
-            //Reset Translation then multiply by newScaleMultiplier
-                Vector translationVector = DisplayUtils.getInteractionTranslation(i);
-                if (translationVector == null){
-                    continue;
+                    //Reset Translation then multiply by newScaleMultiplier
+                    Vector translationVector = DisplayUtils.getNonDisplayTranslation(i);
+                    if (translationVector == null){
+                        continue;
+                    }
+                    Vector oldVector = new Vector(translationVector.getX(), translationVector.getY(), translationVector.getZ());
+                    translationVector.setX((translationVector.getX()/scaleMultiplier)*newScaleMultiplier);
+                    translationVector.setY((translationVector.getY()/scaleMultiplier)*newScaleMultiplier);
+                    translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
+
+                    Vector moveVector = oldVector.subtract(translationVector);
+                    part.translateForce(moveVector, (float) moveVector.length(), durationInTicks, 0);
                 }
-                Vector oldVector = new Vector(translationVector.getX(), translationVector.getY(), translationVector.getZ());
-                translationVector.setX((translationVector.getX()/scaleMultiplier)*newScaleMultiplier);
-                translationVector.setY((translationVector.getY()/scaleMultiplier)*newScaleMultiplier);
-                translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
-
-                Vector moveVector = oldVector.subtract(translationVector);
-                p.translateForce(moveVector, (float) moveVector.length(), durationInTicks, 0);
+                else if (part.type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
+                    Mannequin m = (Mannequin) part.getEntity();
+                    double scale = m.getAttribute(Attribute.SCALE).getBaseValue();
+                    scale = (scale/scaleMultiplier)*newScaleMultiplier;
+                    m.getAttribute(Attribute.SCALE).setBaseValue(scale);
+                }
             }
         }
 
@@ -548,57 +519,57 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
 
         FoliaUtils.teleport(master, location, TeleportFlag.EntityState.RETAIN_PASSENGERS);
-        World w = location.getWorld();
-
 
         for (SpawnedDisplayEntityPart part : this.getParts()){
             part.getEntity().setRotation(location.getYaw(), location.getPitch());
 
-        //Interaction Entity TP
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+        //Non-Display TP
+            if (!part.isDisplay()){
                 Interaction interaction = (Interaction) part.getEntity();
                 Vector vector = oldMasterLoc.toVector().subtract(interaction.getLocation().toVector());
                 Location tpLocation = location.clone().subtract(vector);
                 FoliaUtils.teleport(part.getEntity(), tpLocation, TeleportFlag.EntityState.RETAIN_PASSENGERS);
             }
-
-            if (w != null && part.getEntity().getWorld() != w){ //Keep world name consistent within part's data
-                part.getPartData().setWorldName(w.getName());
-            }
         }
     }
 
-    private static void translateInteractionEventless(@NotNull Interaction interaction, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
-        Location destination = interaction.getLocation().clone().add(direction.clone().normalize().multiply(distance));
+    private static void translateEntityEventless(@NotNull Entity entity, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
+        DisplayUtils.translate(entity, direction, distance, durationInTicks, delayInTicks);
+        Location destination = entity.getLocation().clone().add(direction.clone().normalize().multiply(distance));
+
+        if (durationInTicks <= 0 && delayInTicks <= 0){
+            FoliaUtils.teleport(entity, destination);
+            return;
+        }
+
         double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
         Vector incrementVector = direction
                 .clone()
                 .normalize()
                 .multiply(movementIncrement);
 
-        DisplayAPI.getScheduler().entityRunTimer(interaction, new Scheduler.SchedulerRunnable(){
+        DisplayAPI.getScheduler().entityRunTimer(entity, new Scheduler.SchedulerRunnable() {
             double currentDistance = 0;
-            float lastYaw = interaction.getYaw();
+            float lastYaw = entity.getYaw();
             @Override
             public void run() {
-                float newYaw = interaction.getYaw();
+                float newYaw = entity.getYaw();
                 if (newYaw != lastYaw){
                     incrementVector.rotateAroundY(Math.toRadians(lastYaw-newYaw));
                     lastYaw = newYaw;
                 }
                 currentDistance+=Math.abs(movementIncrement);
-                Location tpLoc = interaction.getLocation().clone().add(incrementVector);
+                Location tpLoc = entity.getLocation().clone().add(incrementVector);
 
                 if (currentDistance >= distance){
-                    FoliaUtils.teleport(interaction, destination);
+                    FoliaUtils.teleport(entity, destination);
                     cancel();
                 }
                 else{
-                    FoliaUtils.teleport(interaction, tpLoc);
+                    FoliaUtils.teleport(entity, tpLoc);
                 }
             }
         }, delayInTicks, 1);
-
     }
 
     @Override
@@ -616,8 +587,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 .multiply(movementIncrement);
 
         for (SpawnedDisplayEntityPart part : groupParts.values()){
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                translateInteractionEventless((Interaction) part.getEntity(), direction, distance, durationInTicks, 0);
+            if (!part.isDisplay()){
+                translateEntityEventless(part.getEntity(), direction, distance, durationInTicks, 0);
             }
         }
 
@@ -684,13 +655,13 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
 
     /**
-     * Pivot all Interaction parts in this selection around this group's master part
+     * Pivot all non-display parts in this group around the group
      * @param angleInDegrees the pivot angle
      */
     @Override
     public void pivot(float angleInDegrees){
         for (ActivePart part : groupParts.values()){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (!part.isDisplay()){
                 part.pivot(angleInDegrees);
             }
         }
@@ -844,7 +815,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
 
         for (SpawnedDisplayEntityPart interactionPart: this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
-            alignInteractionWithMountedGroup(interactionPart, vehicle);
+            alignNonDisplayWithMountedGroup(interactionPart, vehicle);
         }
         return true;
     }
@@ -871,7 +842,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return getVehicle() != null;
     }
 
-    private void alignInteractionWithMountedGroup(SpawnedDisplayEntityPart part, Entity vehicle){
+    private void alignNonDisplayWithMountedGroup(SpawnedDisplayEntityPart part, Entity vehicle){
         final Interaction interaction = (Interaction) part.getEntity();
         DisplayAPI.getScheduler().entityRunTimer(interaction, new Scheduler.SchedulerRunnable() {
             Location lastLoc = getLocation();
@@ -1156,12 +1127,13 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * @return a cloned {@link SpawnedDisplayEntityGroup}
      */
     public SpawnedDisplayEntityGroup clone(@NotNull Location location, @NotNull GroupSpawnSettings settings){
-        //Reset Interaction pivot to 0 yaw
-        HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
-        for (SpawnedDisplayEntityPart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
-            float oldYaw = part.getYaw();
-            oldYaws.put(part,  oldYaw);
-            part.pivot(-oldYaw);
+        //Reset pivot to 0 yaw
+        float groupYaw = getLocation().getYaw();
+        HashSet<ActivePart> resettedParts = new HashSet<>();
+        for (ActivePart part : groupParts.values()){
+            if (part.isDisplay()) continue;
+            part.pivot(-groupYaw);
+            resettedParts.add(part);
         }
 
         DisplayEntityGroup savedGroup = toDisplayEntityGroup();
@@ -1170,23 +1142,22 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         location.setYaw(0);
         SpawnedDisplayEntityGroup cloned = savedGroup.spawn(location, GroupSpawnedEvent.SpawnReason.CLONE, settings);
 
-        //Restore Interaction Pivot
-        for (Map.Entry<SpawnedDisplayEntityPart, Float> entry : oldYaws.entrySet()){
-            SpawnedDisplayEntityPart part = entry.getKey();
-            float oldYaw = entry.getValue();
-            part.pivot(oldYaw);
+        //Restore pivot
+        for (ActivePart part : resettedParts){
+            part.pivot(groupYaw);
         }
+
         cloned.setYaw(newYaw, true);
         return cloned;
     }
 
     public PacketDisplayEntityGroup toPacket(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow, boolean persistent){
-        //Reset Interaction pivot to 0 yaw
-        HashMap<SpawnedDisplayEntityPart, Float> oldYaws = new HashMap<>();
-        for (SpawnedDisplayEntityPart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
-            float oldYaw = part.getEntity().getYaw();
-            oldYaws.put(part, oldYaw);
-            part.pivot(-oldYaw);
+        //Reset pivot to 0 yaw
+        float groupYaw = getLocation().getYaw();
+        HashSet<ActivePart> resettedParts = new HashSet<>();
+        for (ActivePart part : groupParts.values()){
+            part.pivot(-groupYaw);
+            resettedParts.add(part);
         }
 
         DisplayEntityGroup savedGroup = toDisplayEntityGroup();
@@ -1195,7 +1166,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         location.setYaw(0);
 
         PacketDisplayEntityGroup packetGroup;
-
         if (persistent){
             packetGroup = DisplayGroupManager.addPersistentPacketGroup(location, savedGroup, autoShow, GroupSpawnedEvent.SpawnReason.INTERNAL);
         }
@@ -1203,11 +1173,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             packetGroup = savedGroup.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.INTERNAL, playSpawnAnimation, autoShow);
         }
 
-        //Restore Interaction Pivot
-        for (Map.Entry<SpawnedDisplayEntityPart, Float> entry : oldYaws.entrySet()){
-            SpawnedDisplayEntityPart part = entry.getKey();
-            float oldYaw = entry.getValue();
-            part.pivot(oldYaw);
+        //Restore pivot
+        for (ActivePart part : resettedParts){
+            part.pivot(groupYaw);
         }
         packetGroup.setYaw(newYaw, true);
         return packetGroup;

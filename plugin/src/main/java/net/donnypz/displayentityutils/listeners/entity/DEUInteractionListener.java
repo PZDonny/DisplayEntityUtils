@@ -128,7 +128,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
     }
 
     //Right Click
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void rClick(PlayerInteractEntityEvent e){
         if (e.getRightClicked() instanceof Interaction entity){
             determineBukkitAction(entity, e.getPlayer(), InteractionClickEvent.ClickType.RIGHT);
@@ -136,7 +136,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
     }
 
     //Left Click
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void lClick(EntityDamageByEntityEvent e){
         if (e.getEntity() instanceof Interaction entity){
             determineBukkitAction(entity, (Player) e.getDamager(), InteractionClickEvent.ClickType.LEFT);

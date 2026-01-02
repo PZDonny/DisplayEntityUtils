@@ -91,7 +91,7 @@ public class DisplayController {
         return grouplessControllers.containsKey(this);
     }
 
-    @ApiStatus.Internal
+
     /**
      * Set the {@link DisplayEntityGroup} this controller should use
      * @param group

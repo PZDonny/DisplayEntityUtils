@@ -7,9 +7,10 @@ import org.bukkit.event.HandlerList;
 
 /**
  * Called when a Chunk loads a {@link SpawnedDisplayEntityGroup} and registers it.
- * <p>It is not guaranteed that all Interaction entities in the given group will be added at group registration time.
+ * <p>It is not guaranteed that all non-display entities in the given group will be added at group registration time.
  * <br>
- * In rare cases, it is recommended to use the {@link ChunkAddGroupInteractionsEvent} if Interaction entities are expected, but are infrequently (or not at all) added found in a group, through this event.</p>
+ * In rare cases, it is recommended to use the {@link ChunkAddGroupEntitiesEvent} if non-display entities are expected,
+ * but are infrequently (or not at all) added found in a group, through this event.</p>
  */
 public class ChunkRegisterGroupEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
@@ -37,8 +38,6 @@ public class ChunkRegisterGroupEvent extends Event {
     public Chunk getChunk() {
         return chunk;
     }
-
-
 
     @Override
     public HandlerList getHandlers() {

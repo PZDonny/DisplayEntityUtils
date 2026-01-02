@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
+import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
@@ -30,7 +31,7 @@ class PartsFilterBlocksCMD extends PlayerSubCommand {
     public void execute(Player player, String[] args) {
         ActivePartSelection<?> sel = DisplayGroupManager.getPartSelection(player);
         if (sel == null){
-            PartsCMD.noPartSelection(player);
+            DisplayEntityPluginCommand.noPartSelection(player);
             return;
         }
 

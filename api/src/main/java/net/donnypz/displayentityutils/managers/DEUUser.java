@@ -36,12 +36,13 @@ public class DEUUser {
     private AnimationParticleBuilder particleBuilder;
     private final Location[] pointPositions = new Location[3];
     private final Set<PacketDisplayEntityPart> trackedPacketEntities = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private Integer armorEditMannequinEntityId;
 
     private PreAnimationCameraData preAnimationCameraData;
     private final Object animationCameraLock = new Object();
     private UUID cameraPlayerUUID;
 
-
+    private boolean placedGroupBreakMode = false;
 
 
     private DEUUser(UUID userUUID){
@@ -86,6 +87,21 @@ public class DEUUser {
             return true;
         }
         return false;
+    }
+
+    @ApiStatus.Internal
+    public boolean isEditingMannequinArmor(){
+        return armorEditMannequinEntityId != null;
+    }
+
+    @ApiStatus.Internal
+    public int getEditingMannequin(){
+        return armorEditMannequinEntityId;
+    }
+
+    @ApiStatus.Internal
+    public void setEditingMannequinArmor(Integer armorEditMannequinEntityId){
+        this.armorEditMannequinEntityId = armorEditMannequinEntityId;
     }
 
     /**
@@ -307,6 +323,22 @@ public class DEUUser {
     }
 
     /**
+     * Set whether this user should be able to break any placed group, regardless of who placed it
+     * @param breakMode whether the break mode should be enabled
+     */
+    public void setPlacedGroupBreakMode(boolean breakMode){
+        this.placedGroupBreakMode = breakMode;
+    }
+
+    /**
+     * Get whether this user can break any placed group, regardless of who placed it
+     * @return a boolean
+     */
+    public boolean isInPlacedGroupBreakMode(){
+        return this.placedGroupBreakMode;
+    }
+
+    /**
      * Check if this user is tracking a {@link PacketDisplayEntityPart}
      * @param part the {@link PacketDisplayEntityPart}
      * @return a boolean
@@ -320,6 +352,7 @@ public class DEUUser {
     }
 
     public @Nullable ActiveGroup<?> getSelectedGroup(){
+        if (selectedGroup != null && !selectedGroup.isRegistered()) selectedGroup = null;
         return selectedGroup;
     }
 

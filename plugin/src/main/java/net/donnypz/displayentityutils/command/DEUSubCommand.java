@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.utils.Direction;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
+import org.bukkit.entity.Pose;
 import org.bukkit.entity.TextDisplay;
 import org.jetbrains.annotations.NotNull;
 
@@ -57,7 +58,15 @@ public abstract class DEUSubCommand {
                 .suggestUsingCurrentString();
         public static final TabSuggestion BILLBOARDS = new TabSuggestion(Arrays.stream(Display.Billboard.values()).map(Enum::name).toList())
                 .suggestUsingCurrentString();
-        public static final TabSuggestion  PART_TYPES = new TabSuggestion(List.of("block", "item", "text", "interaction"))
+        public static final TabSuggestion PART_TYPES = new TabSuggestion(List.of("block", "item", "text", "interaction", "mannequin"))
+                .suggestUsingCurrentString();
+        public static final TabSuggestion MANNEQUIN_POSES = new TabSuggestion(List.of(
+                Pose.SLEEPING.name(),
+                Pose.SWIMMING.name(),
+                Pose.SNEAKING.name(),
+                Pose.STANDING.name(),
+                Pose.FALL_FLYING.name() //ELYTRA
+                ))
                 .suggestUsingCurrentString();
         public static final TabSuggestion ITEM_DISPLAY_TRANSFORMS = new TabSuggestion(Arrays.stream(ItemDisplay.ItemDisplayTransform.values()).map(Enum::name).toList())
                 .suggestUsingCurrentString();

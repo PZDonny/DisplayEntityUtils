@@ -1,8 +1,8 @@
 package net.donnypz.displayentityutils.listeners.bdengine;
 
-import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.bdengine.convert.datapack.BDEngineDPConverter;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
@@ -71,7 +71,7 @@ public final class DatapackEntitySpawned implements Listener {
                     //DisplayEntityGroups created outside the animator spawn ungrouped parts last,
                     //while the animator spawns them after the MAIN master part
                     if (tag.contains(projectValue +"_")) {
-                        display.addScoreboardTag(LocalManager.datapackUngroupedAddLaterTag);
+                        display.addScoreboardTag(BDEngineDPConverter.UNGROUPED_ADD_LATER_TAG);
                     }
                     group.addDisplayEntity(display);
                 }
@@ -108,10 +108,10 @@ public final class DatapackEntitySpawned implements Listener {
                 }
 
                 Display display = (Display) part.getEntity();
-                if (display.getScoreboardTags().contains(LocalManager.datapackConvertDeleteSubParentTag)){
+                if (display.getScoreboardTags().contains(BDEngineDPConverter.CONVERT_DELETE_SUB_PARENT_TAG)){
                     part.remove(true);
                 }
-                else if (display.getScoreboardTags().contains(LocalManager.datapackUngroupedAddLaterTag)){
+                else if (display.getScoreboardTags().contains(BDEngineDPConverter.UNGROUPED_ADD_LATER_TAG)){
                     laterParts.add(part.remove(false));
                 }
                 else{
@@ -119,8 +119,8 @@ public final class DatapackEntitySpawned implements Listener {
                 }
             }
 
-            for (Entity part : laterParts){
-                group.addPartEntity(part);
+            for (Entity partEntity : laterParts){
+                group.addEntity(partEntity);
             }
         }
     }

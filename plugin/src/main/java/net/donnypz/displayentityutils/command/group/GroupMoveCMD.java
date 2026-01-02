@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -13,22 +14,27 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupMoveCMD extends GroupSubCommand {
     GroupMoveCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("move", parentSubCommand, Permission.GROUP_TRANSFORM, 5, false);
+        super("move", parentSubCommand, Permission.GROUP_TRANSFORM, 4, false);
         setTabComplete(2, TabSuggestion.DIRECTIONS);
         setTabComplete(3, "<distance>");
-        setTabComplete(4, "<tick-duration>");
+        setTabComplete(4, "[tick-duration]");
     }
 
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("/deu group move <direction> <distance> <tick-duration>", NamedTextColor.RED));
+        player.sendMessage(Component.text("/deu group move <direction> <distance> [tick-duration]", NamedTextColor.RED));
     }
 
     @Override
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
         if (RelativePointUtils.isViewingRelativePoints(player)){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot play do that while viewing points!", NamedTextColor.RED)));
+            return;
+        }
+
+        if (group instanceof PacketDisplayEntityGroup pg && pg.isPlaced()){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot move a group placed by a player's item!", NamedTextColor.RED)));
             return;
         }
 
@@ -39,6 +45,14 @@ class GroupMoveCMD extends GroupSubCommand {
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number greater than 0 for the distance!", NamedTextColor.RED)));
                 return;
             }
+
+            if (args.length == 4){
+                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Teleporting your selected group!", NamedTextColor.GREEN)));
+                group.teleport(direction, distance);
+                return;
+            }
+
+            //With duration
             int duration = Integer.parseInt(args[4]);
             if (duration <= 0){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a whole number greater than 0 for the duration!", NamedTextColor.RED)));

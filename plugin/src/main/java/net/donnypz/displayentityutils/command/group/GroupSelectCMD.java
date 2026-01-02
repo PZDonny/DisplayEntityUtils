@@ -96,8 +96,8 @@ class GroupSelectCMD extends PlayerSubCommand {
                         }
                         boolean selectResult = DisplayGroupManager.setSelectedGroup(p, g);
                         if (selectResult){
-                            g.addMissingInteractionEntities(distance);
-                            p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully selected group!", NamedTextColor.GREEN)));
+                            g.addMissingEntities(distance);
+                            p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Group selected!", NamedTextColor.GREEN)));
                             DisplayEntityPluginCommand.hideRelativePoints(player);
                         }
                         else{

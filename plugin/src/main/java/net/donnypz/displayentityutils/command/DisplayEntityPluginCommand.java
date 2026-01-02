@@ -3,19 +3,26 @@ package net.donnypz.displayentityutils.command;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.anim.AnimCMD;
 import net.donnypz.displayentityutils.command.bdengine.BDEngineCMD;
+import net.donnypz.displayentityutils.command.display.DisplayCMD;
 import net.donnypz.displayentityutils.command.group.GroupCMD;
 import net.donnypz.displayentityutils.command.interaction.InteractionCMD;
 import net.donnypz.displayentityutils.command.item.ItemCMD;
+import net.donnypz.displayentityutils.command.mannequin.MannequinCMD;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
+import net.donnypz.displayentityutils.command.place.PlaceCMD;
 import net.donnypz.displayentityutils.command.text.TextCMD;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Interaction;
+import org.bukkit.entity.Mannequin;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -43,9 +50,12 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         subCommands.put("hidepoints", new HidePointsCMD());
         subCommands.put("group", new GroupCMD());
         subCommands.put("parts", new PartsCMD());
+        subCommands.put("display", new DisplayCMD());
         subCommands.put("item", new ItemCMD());
         subCommands.put("text", new TextCMD());
         subCommands.put("interaction", new InteractionCMD());
+        subCommands.put("mannequin", new MannequinCMD());
+        subCommands.put("place", new PlaceCMD());
         subCommands.put("anim", new AnimCMD());
         subCommands.put("bdengine", new BDEngineCMD());
         subCommands.put("reload", new ReloadCMD());
@@ -117,8 +127,9 @@ public class DisplayEntityPluginCommand implements TabExecutor {
     }
 
     public static void noPartSelection(Player player){
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You have not selected a part!", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You have not selected any part(s)!", NamedTextColor.RED)));
         player.sendMessage(Component.text("/deu parts cycle <first | prev | next>", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("/deu parts select <distance | -target>", NamedTextColor.GRAY));
     }
 
     public static void invalidTag(Player player, String tag){
@@ -133,7 +144,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
 
     public static void invalidStorage(CommandSender sender){
         sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid Storage!", NamedTextColor.RED)));
-        sender.sendMessage(Component.text("<gray>| Valid Storages: local, mysql, mongodb>", NamedTextColor.GRAY));
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray>| Storages: local, mysql, mongodb"));
     }
 
     public static void hideRelativePoints(Player player){
@@ -142,16 +153,46 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         }
     }
 
+    public static Entity getTargetEntity(Player player){
+        Entity entity = player.getTargetEntity(10);
+        if (!(entity instanceof Interaction || entity instanceof Mannequin)) {
+            player.sendMessage(Component.text("Your targeted entity must be an interaction or mannequin entity within 10 blocks of you", NamedTextColor.RED));
+            return null;
+        }
+        return entity;
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            mainCommandHelp(sender);
+            mainCommandHelp(sender, 1);
             return true;
         }
+
+        int pageNum;
         String arg = args[0];
+        if (arg.equalsIgnoreCase("help")){
+            if (args.length >= 2){
+                try{
+                    pageNum = Integer.parseInt(args[1]);
+                }
+                catch(IllegalArgumentException e){
+                    pageNum = 1;
+                }
+            }
+            else{
+                pageNum = 1;
+            }
+        }
+        else{
+            pageNum = 1;
+        }
+
+
         DEUSubCommand subCommand = subCommands.get(arg);
+
         if (subCommand == null){
-            mainCommandHelp(sender);
+            mainCommandHelp(sender, pageNum);
         }
         else{
             executeCommand(subCommand, sender, args);
@@ -184,24 +225,34 @@ public class DisplayEntityPluginCommand implements TabExecutor {
     }
 
 
-    static void mainCommandHelp(CommandSender sender){
+    static void mainCommandHelp(CommandSender sender, int page){
         if (!hasPermission(sender, Permission.HELP)) {
             return;
         }
+        sender.sendMessage(Component.empty());
         sender.sendMessage(DisplayAPI.pluginPrefixLong);
-        sender.sendMessage(Component.text("v"+DisplayAPI.getVersion(), NamedTextColor.GRAY));
-        CMDUtils.sendCMD(sender, "/deu group", "Display Entity Models/Groups related commands");
-        CMDUtils.sendCMD(sender, "/deu anim", "Animation related commands");
-        CMDUtils.sendCMD(sender, "/deu parts", "Commands related to the parts (individual display entities) of a Display Entity Model/Group");
-        CMDUtils.sendCMD(sender, "/deu item", "Commands related to the Item Display parts of a Display Entity Model/Group");
-        CMDUtils.sendCMD(sender, "/deu text", "Commands related to the Text Display parts of a Display Entity Model/Group");
-        CMDUtils.sendCMD(sender, "/deu interaction", "Commands related to manipulating Interaction entities");
-        CMDUtils.sendCMD(sender, "/deu listgroups <storage> [page-number]", "List all saved Display Entity Models/Groups");
-        CMDUtils.sendCMD(sender, "/deu listanims <storage> [page-number]", "List all saved animations");
-        CMDUtils.sendCMD(sender, "/deu hidepoints", "Hide any visible points (frame points, persistent packet group points, etc.)");
-        CMDUtils.sendCMD(sender, "/deu bdengine", "Import/Convert models from BDEngine");
-        CMDUtils.sendCMD(sender, "/deu reload <config | controllers>", "Reload the plugin's config or Display Controllers." +
-                " To reload Local, MySQL or MongoDB config save options, the server must be restarted");
+        if (page == 1){
+            sender.sendMessage(Component.text("v"+DisplayAPI.getVersion(), NamedTextColor.GRAY));
+            CMDUtils.sendCMD(sender, "/deu help <page-number>", "Display the plugin's help commands");
+            CMDUtils.sendCMD(sender, "/deu group", "Display Entity Models/Groups related commands");
+            CMDUtils.sendCMD(sender, "/deu parts", "Commands related to the parts (individual display entities) of a Display Entity Model/Group");
+            CMDUtils.sendCMD(sender, "/deu display", "Commands related to display entities");
+            CMDUtils.sendCMD(sender, "/deu item", "Commands related to specifically Item Displays");
+            CMDUtils.sendCMD(sender, "/deu text", "Commands related to specifically Text Displays");
+            CMDUtils.sendCMD(sender, "/deu interaction", "Commands related to Interaction entities");
+            CMDUtils.sendCMD(sender, "/deu mannequin", "Commands related to Mannequin entities");
+        }
+        else{
+            CMDUtils.sendCMD(sender, "/deu place", "Assign a Display Entity Model/Group to an block that will spawn when placed");
+            CMDUtils.sendCMD(sender, "/deu anim", "Animation related commands");
+            CMDUtils.sendCMD(sender, "/deu listgroups <storage> [page-number]", "List all saved Display Entity Models/Groups");
+            CMDUtils.sendCMD(sender, "/deu listanims <storage> [page-number]", "List all saved animations");
+            CMDUtils.sendCMD(sender, "/deu hidepoints", "Hide any visible points (frame points, persistent packet group points, etc.)");
+            CMDUtils.sendCMD(sender, "/deu bdengine", "Import/Convert models from BDEngine");
+            CMDUtils.sendCMD(sender, "/deu reload <config | controllers>", "Reload the plugin's config or Display Controllers." +
+                    " To reload Local, MySQL or MongoDB config save options, the server must be restarted");
+        }
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }
 
     @Override
@@ -218,7 +269,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
             String subcmd = args[0].toLowerCase();
             String current = args[1];
             switch (subcmd) {
-                case "interaction", "anim", "group", "parts", "bdengine", "text", "item" -> {
+                case "interaction", "anim", "group", "parts", "display", "bdengine", "text", "item", "place", "mannequin" -> {
                     return getTabComplete(subcmd, current);
                 }
                 case "listgroups", "listanims" -> suggestions.addAll(DEUSubCommand.TabSuggestion.STORAGES.suggestions);

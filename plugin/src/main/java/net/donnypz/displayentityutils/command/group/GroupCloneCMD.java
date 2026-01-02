@@ -30,7 +30,7 @@ class GroupCloneCMD extends GroupSubCommand {
             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to clone your selected group!", NamedTextColor.RED)));
         }
         else{
-            p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully cloned your selected group", NamedTextColor.GREEN)));
+            p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Cloned your selected group", NamedTextColor.GREEN)));
             p.sendMessage(Component.text("- Your group selection has been changed to the newly created group", NamedTextColor.GRAY, TextDecoration.ITALIC));
             DisplayGroupManager.setSelectedGroup(p, clonedGroup);
             clonedGroup.glowAndMarkInteractions(p, 80);

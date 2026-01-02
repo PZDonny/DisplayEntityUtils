@@ -4,10 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.listeners.bdengine.DatapackEntitySpawned;
 import net.donnypz.displayentityutils.managers.*;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
-import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationCamera;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import net.kyori.adventure.text.Component;
@@ -23,14 +20,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class BDEngineDPConverter {
+
+    private static final String FRAME_POINT_SOUND_TAG = "deu_dp_convert";
+    public static final String CONVERT_DELETE_SUB_PARENT_TAG = "deu_delete_sub_parent";
+    public static final String UNGROUPED_ADD_LATER_TAG = "deu_add_later";
 
     static final CommandSender silentSender = Bukkit.createCommandSender(feedback -> {});
     static final String FUNCTION_FOLDER = VersionUtils.IS_1_21 ? "function" : "functions";
@@ -40,6 +38,8 @@ public class BDEngineDPConverter {
     private final String groupSaveTag;
     private final String animationSavePrefix;
     private final LinkedHashMap<String, ArrayList<ZipEntry>> animations = new LinkedHashMap<>();
+    private final HashSet<DEUSound> bufferedSounds = new HashSet<>();
+
     Location spawnLoc;
 
     public BDEngineDPConverter(@NotNull Player player, @NotNull String datapackName, @NotNull String groupSaveTag, @NotNull String animationSavePrefix){
@@ -201,6 +201,17 @@ public class BDEngineDPConverter {
 
                 //Create Frame
                 frame.setTransformation(createdGroup);
+
+                //Add Sounds
+                if (!bufferedSounds.isEmpty()){
+                    FramePoint point = new FramePoint(FRAME_POINT_SOUND_TAG, createdGroup, spawnLoc);
+                    for (DEUSound sound : bufferedSounds){
+                        point.addSound(sound);
+                    }
+                    bufferedSounds.clear();
+                    frame.addFramePoint(point);
+                }
+
                 anim.addFrame(frame);
                 i++;
             }
@@ -261,8 +272,9 @@ public class BDEngineDPConverter {
                         line = line.replace("@s", player.getName());
                         line = "execute"+line.split("nearest]")[1];
                     }
-
-                    line = line.substring(0, line.length()-2)+",\""+LocalManager.datapackConvertDeleteSubParentTag+"\"]}";
+                    if (!line.startsWith("ride")) {
+                        line = line.substring(0, line.length()-2)+",\""+CONVERT_DELETE_SUB_PARENT_TAG+"\"]}";
+                    }
                 }
 
                 else if (line.startsWith("schedule")) {
@@ -275,6 +287,20 @@ public class BDEngineDPConverter {
                         setCameraVectorAndDirection(frame, line);
                     }
                     continue;
+                }
+
+                //Animation Sound
+                if (line.startsWith("playsound")){
+                    DEUSound sound = getSound(line);
+                    if (sound != null){
+                        bufferedSounds.add(sound);
+                    }
+                }
+                else if (line.startsWith("execute") && line.contains("playsound")){
+                    DEUSound sound = getSound("."+line.split(" playsound ")[1]);
+                    if (sound != null){
+                        bufferedSounds.add(sound);
+                    }
                 }
 
                 String coordinates = ConversionUtils.getCoordinateString(spawnLoc);
@@ -308,7 +334,27 @@ public class BDEngineDPConverter {
             Location cameraLoc = spawnLoc.clone().add(x, y, z);
             cameraLoc.getWorld().spawnParticle(Particle.DRAGON_BREATH, cameraLoc, 1, 0,0,0,0);
         } catch(IndexOutOfBoundsException e){}
+    }
 
 
+    DEUSound getSound(String line){
+        String[] strings = line.split(" ");
+        String soundStr = strings[1];
+
+        float volume = -1;
+        float pitch = -1;
+        try{
+            volume = Float.parseFloat(strings[7]);
+            pitch = Float.parseFloat(strings[8]);
+        }
+        catch(IllegalArgumentException | IndexOutOfBoundsException e){
+            if (volume == -1){
+                volume = 1;
+            }
+            if (pitch == -1){
+                pitch = 1;
+            }
+        }
+        return new DEUSound(soundStr, volume, pitch, 0);
     }
 }

@@ -31,15 +31,16 @@ final class InteractionEntity implements Serializable {
     UUID partUUID;
     float height;
     float width;
-    private byte[] persistentDataContainer = null;
+    byte[] persistentDataContainer = null;
     boolean isResponsive;
+
+    InteractionEntity(){}
 
     InteractionEntity(Interaction interaction){
         this.height = interaction.getInteractionHeight();
         this.width = interaction.getInteractionWidth();
         this.isResponsive = interaction.isResponsive();
-        this.vector = DisplayUtils.getInteractionTranslation(interaction).toVector3f();
-        this.partUUID = DisplayUtils.getPartUUID(interaction);
+        this.vector = DisplayUtils.getNonDisplayTranslation(interaction).toVector3f();
 
         try{
             persistentDataContainer = interaction.getPersistentDataContainer().serializeToBytes();
@@ -55,13 +56,13 @@ final class InteractionEntity implements Serializable {
         this.height = c.getAttributeOrDefault(DisplayAttributes.Interaction.HEIGHT, 1f);
         this.width = c.getAttributeOrDefault(DisplayAttributes.Interaction.WIDTH, 1f);
         this.isResponsive = c.getAttributeOrDefault(DisplayAttributes.Interaction.RESPONSIVE, false);
-        this.vector = part.getInteractionTranslation().toVector3f();
-        this.partUUID = part.partUUID;
+        this.vector = part.getNonDisplayTranslation().toVector3f();
 
         try{
             ItemStack i = new ItemStack(Material.STICK);
             PersistentDataContainer pdc = i.getItemMeta().getPersistentDataContainer();
             pdc.set(DisplayAPI.getPartPDCTagKey(), PersistentDataType.LIST.strings(), new ArrayList<>(part.getTags()));
+            pdc.set(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING, part.partUUID.toString());
             persistentDataContainer = pdc.serializeToBytes();
         }
         catch(IOException e){
@@ -92,7 +93,11 @@ final class InteractionEntity implements Serializable {
             }
 
             if (partUUID != null){
-                i.getPersistentDataContainer().set(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
+                i
+                    .getPersistentDataContainer()
+                    .set(DisplayAPI.getPartUUIDKey(),
+                            PersistentDataType.STRING,
+                            partUUID.toString());
             }
 
             settings.apply(i);
@@ -123,10 +128,10 @@ final class InteractionEntity implements Serializable {
             }
 
             part.partTags = DisplayEntity.getSetFromPDC(pdc, DisplayAPI.getPartPDCTagKey());
-            part.partUUID = DisplayEntity.getPDCPartUUID(pdc);
+            part.partUUID = partUUID != null ? partUUID : DisplayEntity.getPDCPartUUID(pdc);
             part.interactionCommands = getInteractionCommands(pdc);
         }
-        settings.applyAttributes(part);
+        if (settings != null) settings.applyAttributes(part);
 
         return part;
     }
@@ -146,21 +151,5 @@ final class InteractionEntity implements Serializable {
 
     boolean hasLegacyPartTags(){
         return partTags != null && !partTags.isEmpty();
-    }
-
-    ArrayList<String> getLegacyPartTags() {
-        return partTags;
-    }
-    
-    float getHeight() {
-        return height;
-    }
-
-    float getWidth() {
-        return width;
-    }
-
-    boolean isReponsive(){
-        return isResponsive;
     }
 }

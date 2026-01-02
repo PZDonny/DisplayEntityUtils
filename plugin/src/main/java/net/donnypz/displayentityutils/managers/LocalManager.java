@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
 public final class LocalManager implements DisplayStorage{
-    public static final String datapackConvertDeleteSubParentTag = "deu_delete_sub_parent";
-    public static final String datapackUngroupedAddLaterTag = "deu_add_later";
 
     public boolean saveDisplayEntityGroup(@NotNull DisplayEntityGroup displayEntityGroup, @Nullable Player saver){
         try{

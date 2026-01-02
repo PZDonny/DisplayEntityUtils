@@ -10,7 +10,7 @@ import java.util.Collection;
 
 public interface Packeted{
 
-    void setRotation(float pitch, float yaw, boolean pivotIfInteraction);
+    void setRotation(float pitch, float yaw, boolean pivot);
 
     @Nullable Location getLocation();
 

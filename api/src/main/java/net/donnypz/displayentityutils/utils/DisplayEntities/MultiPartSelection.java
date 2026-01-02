@@ -487,7 +487,7 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
     }
 
     /**
-     * Pivot all Interaction parts in this selection around the SpawnedDisplayEntityGroup's master part
+     * Pivot all non-display parts in this selection around this selection's group
      * @param angleInDegrees the pivot angle
      */
     @Override
@@ -500,11 +500,12 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
     /**
      * Set the yaw of all parts in this selection
      * @param yaw the yaw to set
+     * @param pivot whether non-display entities should pivot around the group
      */
     @Override
-    public void setYaw(float yaw, boolean pivotInteractions){
+    public void setYaw(float yaw, boolean pivot){
         for (T part : selectedParts){
-            part.setYaw(yaw, pivotInteractions);
+            part.setYaw(yaw, pivot);
         }
     }
 

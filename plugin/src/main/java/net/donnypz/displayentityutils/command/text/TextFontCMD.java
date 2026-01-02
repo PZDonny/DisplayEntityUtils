@@ -33,20 +33,18 @@ class TextFontCMD extends PartsSubCommand {
                 part.setTextDisplayText(part.getTextDisplayText().font(font));
             }
         }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Font successfully set to "+args[2]+" for ALL selected text displays", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Font set to "+args[2]+" for ALL selected text displays", NamedTextColor.GREEN)));
         return true;
     }
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
-        if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
-            return false;
-        }
+        if (isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)) return false;
+
         Key font = getFont(args, player);
         if (font == null) return false;
         selectedPart.setTextDisplayText(selectedPart.getTextDisplayText().font(font));
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Font successfully set to "+args[2], NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Font set to "+args[2], NamedTextColor.GREEN)));
         return true;
     }
 

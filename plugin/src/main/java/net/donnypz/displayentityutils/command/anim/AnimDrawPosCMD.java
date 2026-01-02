@@ -38,7 +38,7 @@ class AnimDrawPosCMD extends PlayerSubCommand {
             int pos = Integer.parseInt(args[2]);
 
             user.setPointPos(player.getLocation(), pos);
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set draw pos", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Draw pos set", NamedTextColor.GREEN)));
             player.sendMessage(Component.text("| Pos: "+pos, NamedTextColor.GRAY));
         }
         catch(NumberFormatException e) {

@@ -448,10 +448,11 @@ public class SkriptTypes {
 
         EnumWrapper<SpawnedDisplayEntityPart.PartType> partTypeWrapper = new EnumWrapper<>(SpawnedDisplayEntityPart.PartType.class, null, null);
         partTypeWrapper.replace("interaction", "deu_interaction");
+        partTypeWrapper.replace("mannequin", "deu_mannequin");
         Classes.registerClass(partTypeWrapper.getClassInfo("parttype")
                 .user("part( | -)?type")
                 .name("Part Type")
-                .description("Represents a part type being BLOCK_DISPLAY, ITEM_DISPLAY, TEXT_DISPLAY, or INTERACTION")
+                .description("Represents a part's (display, interaction, etc.) type")
                 .since("2.6.2, 3.3.6 (Removed \"parttype_\" prefix)"));
 
         EnumWrapper<InteractionClickEvent.ClickType> clickTypeWrapper = new EnumWrapper<>(InteractionClickEvent.ClickType.class, "iClickType", null);

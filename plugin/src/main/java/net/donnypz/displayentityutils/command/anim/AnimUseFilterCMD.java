@@ -35,7 +35,7 @@ class AnimUseFilterCMD extends PlayerSubCommand {
 
         ActivePartSelection<?> selection = DisplayGroupManager.getPartSelection(player);
         if (selection == null){
-            PartsCMD.noPartSelection(player);
+            DisplayEntityPluginCommand.noPartSelection(player);
             return;
         }
 

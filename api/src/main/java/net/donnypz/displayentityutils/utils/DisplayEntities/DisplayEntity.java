@@ -137,12 +137,14 @@ final class DisplayEntity implements Serializable {
 
             part.partTags = getSetFromPDC(pdc, DisplayAPI.getPartPDCTagKey());
             part.partUUID = specifics.getPartUUID();
-            if (group.masterPart == null && isMaster){
-                part.isMaster = true;
-                group.setSpawnAnimation(pdc);
+            if (group != null){
+                if (group.masterPart == null && isMaster){
+                    part.isMaster = true;
+                    group.setSpawnAnimation(pdc);
+                }
             }
         }
-        settings.applyAttributes(part);
+        if (settings != null) settings.applyAttributes(part);
 
         return part;
     }

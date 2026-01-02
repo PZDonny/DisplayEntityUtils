@@ -54,7 +54,7 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
                 return;
             }
 
-            group.addMissingInteractionEntities(searchDistance);
+            group.addMissingEntities(searchDistance);
             int selectDuration = 50;
             group.glowAndMarkInteractions(player, selectDuration);
             Entity entity = group.getMasterPart().getEntity();

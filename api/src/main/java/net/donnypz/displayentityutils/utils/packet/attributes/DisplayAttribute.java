@@ -8,6 +8,7 @@ public abstract class DisplayAttribute<T, V> {
     Class<T> inputType;
     Class<V> outputType;
     EntityDataType<?> entityDataType;
+    AttributeType type = AttributeType.METADATA;
 
     protected DisplayAttribute(int index, Class<T> type, EntityDataType<?> entityDataType){
         this.index = index;
@@ -39,4 +40,30 @@ public abstract class DisplayAttribute<T, V> {
     }
 
     public abstract V getOutputValue(T value);
+
+    DisplayAttribute<T, V> setAttributeType(AttributeType type){
+        this.type = type;
+        return this;
+    }
+
+    public boolean isMetadata(){
+        return type == AttributeType.METADATA;
+    }
+
+    public boolean isEquipment(){
+        return type == AttributeType.EQUIPMENT;
+    }
+
+    public boolean isAttribute(){
+        return type == AttributeType.ATTRIBUTE;
+    }
+
+
+
+
+    enum AttributeType{
+        METADATA,
+        EQUIPMENT,
+        ATTRIBUTE
+    }
 }

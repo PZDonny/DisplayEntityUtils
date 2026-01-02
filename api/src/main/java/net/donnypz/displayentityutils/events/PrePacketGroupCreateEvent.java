@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.events;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -23,6 +24,7 @@ public class PrePacketGroupCreateEvent extends Event implements Cancellable {
     private boolean isCancelled = false;
 
     public PrePacketGroupCreateEvent(DisplayEntityGroup group, GroupSpawnedEvent.SpawnReason spawnReason){
+        super(!Bukkit.isPrimaryThread());
         this.displayEntityGroup = group;
         this.spawnReason = spawnReason;
     }

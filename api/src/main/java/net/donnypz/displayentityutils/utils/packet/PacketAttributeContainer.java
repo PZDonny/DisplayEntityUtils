@@ -5,19 +5,26 @@ import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
+import com.github.retrooper.packetevents.protocol.player.Equipment;
+import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.packet.attributes.AttributeDisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.donnypz.displayentityutils.utils.packet.attributes.EquipmentAttribute;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
@@ -138,7 +145,7 @@ public class PacketAttributeContainer implements Cloneable{
      */
     public <T, V> PacketAttributeContainer setAttributeAndSend(@NotNull DisplayAttribute<T, V> attribute, T value, int entityId, @NotNull Player player){
         this.attributes.put(attribute, value);
-        sendAttributes(player, entityId, getMetadataList(Map.of(attribute, value)));
+        new PacketResult(entityId, attribute, value).send(player);
         return this;
     }
 
@@ -151,7 +158,7 @@ public class PacketAttributeContainer implements Cloneable{
      */
     public <T, V> void setAttributeAndSend(@NotNull DisplayAttribute<T, V> attribute, T value, int entityId, @NotNull Collection<UUID> playerUUIDs){
         this.attributes.put(attribute, value);
-        sendAttributesToUUIDs(playerUUIDs, entityId, getMetadataList(new DisplayAttributeMap().add(attribute, value).attributes));
+        new PacketResult(entityId, attribute, value).sendUUIDs(playerUUIDs);
     }
 
     /**
@@ -164,7 +171,7 @@ public class PacketAttributeContainer implements Cloneable{
      */
     public PacketAttributeContainer setAttributesAndSend(@NotNull DisplayAttributeMap attributeMap, int entityId, @NotNull Player player){
         this.attributes.putAll(attributeMap.attributes);
-        sendAttributes(player, entityId, getMetadataList(attributeMap.attributes));
+        new PacketResult(entityId, attributeMap).send(player);
         return this;
     }
 
@@ -178,7 +185,7 @@ public class PacketAttributeContainer implements Cloneable{
      */
     public PacketAttributeContainer setAttributesAndSend(@NotNull DisplayAttributeMap attributeMap, int entityId, @NotNull Collection<UUID> playerUUIDs){
         this.attributes.putAll(attributeMap.attributes);
-        sendAttributesToUUIDs(playerUUIDs, entityId, getMetadataList(attributeMap.attributes));
+        new PacketResult(entityId, attributeMap).sendUUIDs(playerUUIDs);
         return this;
     }
 
@@ -358,7 +365,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @return this
      */
     private PacketAttributeContainer sendAttributes(SpawnedDisplayEntityPart.PartType partType, Player player, int entityId){
-        sendAttributes(player, entityId, getMetadataList(attributes, partType));
+        new PacketResult(entityId).send(player);
         return this;
     }
 
@@ -370,7 +377,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @return this
      */
     public PacketAttributeContainer sendAttributes(@NotNull Player player, int entityId){
-        sendAttributes(player, entityId, getMetadataList(attributes));
+        new PacketResult(entityId).send(player);
         return this;
     }
 
@@ -381,7 +388,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @return this
      */
     public PacketAttributeContainer sendAttributesUsingUUIDs(@NotNull Collection<UUID> playerUUIDs, int entityId){
-        sendAttributesToUUIDs(playerUUIDs, entityId, getMetadataList(attributes));
+        new PacketResult(entityId).sendUUIDs(playerUUIDs);
         return this;
     }
 
@@ -392,24 +399,8 @@ public class PacketAttributeContainer implements Cloneable{
      * @return this
      */
     public PacketAttributeContainer sendAttributesUsingPlayers(@NotNull Collection<Player> players, int entityId){
-        sendAttributesToPlayers(players, entityId, getMetadataList(attributes));
+        new PacketResult(entityId).send(players);
         return this;
-    }
-
-    private void sendAttributes(@NotNull Player player, int entityId, List<EntityData<?>> data){
-        PacketEvents.getAPI().getPlayerManager().sendPacket(player, new WrapperPlayServerEntityMetadata(entityId, data));
-    }
-
-    private void sendAttributesToPlayers(@NotNull Collection<Player> players, int entityId, List<EntityData<?>> data){
-        for (Player player : players){
-            PacketEvents.getAPI().getPlayerManager().sendPacket(player, new WrapperPlayServerEntityMetadata(entityId, data));
-        }
-    }
-
-    private void sendAttributesToUUIDs(@NotNull Collection<UUID> playerUUIDs, int entityId, List<EntityData<?>> data){
-        for (UUID uuid : playerUUIDs){
-            PacketEvents.getAPI().getPlayerManager().sendPacket(Bukkit.getPlayer(uuid), new WrapperPlayServerEntityMetadata(entityId, data));
-        }
     }
 
     private WrapperPlayServerSpawnEntity createEntityPacket(int entityId, SpawnedDisplayEntityPart.PartType partType, Location location){
@@ -419,85 +410,10 @@ public class PacketAttributeContainer implements Cloneable{
                 getEntityType(partType),
                 //SpigotConversionUtil.fromBukkitLocation(getTrueLocation(partType, location)),
                 SpigotConversionUtil.fromBukkitLocation(location),
-                0,
+                location.getYaw(),
                 0,
                 null);
     }
-
-    private WrapperPlayServerEntityMetadata createFullMetadataPacket(int entityId){
-        return new WrapperPlayServerEntityMetadata(entityId, getMetadataList());
-    }
-
-
-
-    private List<EntityData<?>> getMetadataList() {
-        return getMetadataList(attributes);
-    }
-
-    private List<EntityData<?>> getMetadataList(Map<DisplayAttribute<?, ?>, Object> attributes){
-        List<EntityData<?>> metadata = new ArrayList<>();
-        for (Map.Entry<DisplayAttribute<?, ?>, Object> entry : attributes.entrySet()) {
-            DisplayAttribute<?, ?> attr = entry.getKey();
-            Object val = entry.getValue();
-
-
-            DisplayAttribute<Object, Object> castedAttr = (DisplayAttribute<Object, Object>) attr;
-
-            Object outputValue = castedAttr.getOutputValue(castedAttr.getInputType().cast(val));
-
-            EntityDataType<Object> entityDataType = (EntityDataType<Object>) castedAttr.getEntityDataType();
-
-            metadata.add(new EntityData<>(
-                    castedAttr.getIndex(),
-                    entityDataType,
-                    outputValue
-            ));
-        }
-        return metadata;
-    }
-
-    private List<EntityData<?>> getMetadataList(Map<DisplayAttribute<?, ?>, Object> attributes, SpawnedDisplayEntityPart.PartType partType){
-        List<EntityData<?>> metadata = new ArrayList<>();
-        for (Map.Entry<DisplayAttribute<?, ?>, Object> entry : attributes.entrySet()) {
-            DisplayAttribute<?, ?> attr = entry.getKey();
-            Object val = entry.getValue();
-
-
-            DisplayAttribute<Object, Object> castedAttr = (DisplayAttribute<Object, Object>) attr;
-
-
-            Object outputValue = castedAttr.getOutputValue(castedAttr.getInputType().cast(val));
-
-            EntityDataType<Object> entityDataType = (EntityDataType<Object>) castedAttr.getEntityDataType();
-
-            metadata.add(new EntityData<>(
-                    castedAttr.getIndex(),
-                    entityDataType,
-                    outputValue
-            ));
-        }
-        return metadata;
-    }
-
-    /*private <T, V> List<EntityData<?>> getDefinedMetadataList(Map<DisplayAttribute<T, V>, T> attributes){
-        List<EntityData<?>> metadata = new ArrayList<>();
-        for (Map.Entry<DisplayAttribute<T, V>, T> entry : attributes.entrySet()) {
-            DisplayAttribute<T, V> attr = entry.getKey();
-            Object val = entry.getValue();
-
-
-            V outputValue = attr.getOutputValue(attr.getInputType().cast(val));
-
-            EntityDataType<V> entityDataType = (EntityDataType<V>) attr.getEntityDataType();
-
-            metadata.add(new EntityData<>(
-                    attr.getIndex(),
-                    entityDataType,
-                    outputValue
-            ));
-        }
-        return metadata;
-    }*/
 
     EntityType getEntityType(SpawnedDisplayEntityPart.PartType partType){
         switch (partType){
@@ -513,8 +429,11 @@ public class PacketAttributeContainer implements Cloneable{
             case INTERACTION -> {
                 return EntityTypes.INTERACTION;
             }
+            case MANNEQUIN -> {
+                return EntityTypes.MANNEQUIN;
+            }
             default -> {
-                throw new IllegalArgumentException("Invalid part type, expected a display entity type.");
+                throw new IllegalArgumentException("Invalid part type.");
             }
         }
     }
@@ -549,6 +468,114 @@ public class PacketAttributeContainer implements Cloneable{
             return clone;
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    class PacketResult{
+        int entityId;
+        WrapperPlayServerEntityMetadata metadataPacket;
+        WrapperPlayServerEntityEquipment equipmentPacket;
+        WrapperPlayServerUpdateAttributes attributesPacket;
+
+        PacketResult(int entityId){
+            this.entityId = entityId;
+            setPackets(attributes);
+        }
+
+        PacketResult(int entityId, DisplayAttributeMap map){
+            this.entityId = entityId;
+            setPackets(map.attributes);
+        }
+
+        PacketResult(int entityId, DisplayAttribute<?, ?> attribute, Object value){
+            this.entityId = entityId;
+            setPackets(Map.of(attribute, value));
+        }
+
+        void setPackets(Map<DisplayAttribute<?, ?>, Object> attributeMap){
+            List<EntityData<?>> entityData = new ArrayList<>();
+            List<Equipment> equipmentData = new ArrayList<>();
+            List<WrapperPlayServerUpdateAttributes.Property> attributeData = new ArrayList<>();
+            for(Map.Entry<DisplayAttribute<?, ?>, Object> entry : attributeMap.entrySet()){
+                DisplayAttribute<?, ?> attr = entry.getKey();
+                Object val = entry.getValue();
+                if (attr.isMetadata()){
+                    entityData.add(createEntityData(attr, val));
+                }
+                else if (attr.isEquipment()){
+                    equipmentData.add(createEquipmentData(attr, val));
+                }
+                else if (attr.isAttribute()){
+                    attributeData.add(createAttributeData(attr, val));
+                }
+            }
+
+            if (!entityData.isEmpty()){
+                metadataPacket = new WrapperPlayServerEntityMetadata(entityId, entityData);
+            }
+            if (!equipmentData.isEmpty()){
+                equipmentPacket = new WrapperPlayServerEntityEquipment(entityId, equipmentData);
+            }
+            if (!attributeData.isEmpty()){
+                attributesPacket = new WrapperPlayServerUpdateAttributes(entityId, attributeData);
+            }
+        }
+
+        EntityData<?> createEntityData(DisplayAttribute<?, ?> attribute, Object value){
+            DisplayAttribute<Object, Object> castedAttr = (DisplayAttribute<Object, Object>) attribute;
+            Object outputValue = castedAttr.getOutputValue(castedAttr.getInputType().cast(value));
+
+            EntityDataType<Object> entityDataType = (EntityDataType<Object>) castedAttr.getEntityDataType();
+            return new EntityData<>(
+                    castedAttr.getIndex(),
+                    entityDataType,
+                    outputValue
+            );
+        }
+
+        Equipment createEquipmentData(DisplayAttribute<?, ?> attribute, Object value){
+            return new Equipment(EquipmentSlot.values()[attribute.getIndex()],
+                    ((EquipmentAttribute) attribute).getOutputValue((ItemStack) value));
+        }
+
+        WrapperPlayServerUpdateAttributes.Property createAttributeData(DisplayAttribute<?, ?> attribute, Object value){
+            if (attribute == DisplayAttributes.Mannequin.SCALE){
+                value = Math.clamp((float) value, 0, 16);
+            }
+            return new WrapperPlayServerUpdateAttributes.Property(((AttributeDisplayAttribute) attribute).getAttribute(),
+                    (float) value,
+                    List.of());
+        }
+
+        void send(Player player){
+            if (metadataPacket != null){
+                PacketEvents.getAPI().getPlayerManager().sendPacket(player, metadataPacket);
+            }
+
+            if (equipmentPacket != null){
+                PacketEvents.getAPI().getPlayerManager().sendPacket(player, equipmentPacket);
+            }
+
+            if (attributesPacket != null){
+                PacketEvents.getAPI().getPlayerManager().sendPacket(player, attributesPacket);
+            }
+        }
+
+        void send(UUID playerUUID){
+            Player p = Bukkit.getPlayer(playerUUID);
+            if (p != null) send(p);
+        }
+
+        void send(Collection<Player> players){
+            for (Player p : players){
+                send(p);
+            }
+        }
+
+        void sendUUIDs(Collection<UUID> playerUUIDs){
+            for (UUID uuid : playerUUIDs){
+                send(uuid);
+            }
         }
     }
 }

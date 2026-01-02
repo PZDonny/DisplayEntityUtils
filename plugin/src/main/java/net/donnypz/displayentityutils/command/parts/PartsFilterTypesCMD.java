@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
+import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
@@ -29,7 +30,7 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
     public void execute(Player player, String[] args) {
         ActivePartSelection<?> sel = DisplayGroupManager.getPartSelection(player);
         if (sel == null){
-            PartsCMD.noPartSelection(player);
+            DisplayEntityPluginCommand.noPartSelection(player);
             return;
         }
 
@@ -71,7 +72,8 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
             }
 
             try{
-                if (!typeText.equals(SpawnedDisplayEntityPart.PartType.INTERACTION.name())){
+                if (!typeText.equals(SpawnedDisplayEntityPart.PartType.INTERACTION.name())
+                        && !typeText.equals(SpawnedDisplayEntityPart.PartType.MANNEQUIN.name())){
                     typeText = typeText+"_DISPLAY";
                 }
 
@@ -86,7 +88,7 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
             }
             catch(IllegalArgumentException e){
                 player.sendMessage(Component.text("Invalid Part Type listed!", NamedTextColor.RED));
-                player.sendMessage(Component.text("Valid Types: BLOCK, ITEM, TEXT, INTERACTION", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                player.sendMessage(Component.text("Valid Types: BLOCK, ITEM, TEXT, INTERACTION, MANNEQUIN", NamedTextColor.GRAY, TextDecoration.ITALIC));
                 return;
             }
             player.sendMessage(Component.text("- "+typeText, NamedTextColor.YELLOW));

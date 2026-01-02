@@ -21,6 +21,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
 
 import java.util.*;
 
@@ -59,6 +60,13 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param part the part to add
      */
     public abstract void addPart(T part);
+
+    /**
+     * Add an entity to this group as a part, when you don't know the type of entity you're dealing with
+     * @param entity the eligible entity to add
+     * @return a corresponding part or null if the entity is not an eligible part entity
+     */
+    public abstract @Nullable T addEntity(@NotNull Entity entity);
 
 
     /**
@@ -125,10 +133,10 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * Change the scale of all parts in this group by the given scale multiplier
      * @param newScaleMultiplier the scale multiplier to apply to this group
      * @param durationInTicks how long it should take for the group to scale
-     * @param scaleInteractions whether interaction entities should be scaled
+     * @param scaleNonDisplays whether non-display entities should scale
      * @throws IllegalArgumentException if newScaleMultiplier is less than or equal to 0
      */
-    public abstract boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions);
+    public abstract boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays);
 
     /**
      * Change the true location of this group.
@@ -137,6 +145,31 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @return true if the teleport was successful
      */
     public abstract boolean teleport(@NotNull Location location, boolean respectGroupDirection);
+
+
+    /**
+     * Teleport this group in the given direction.
+     * @param direction The direction to translate the group
+     * @param distance How far the group should be translated
+     * @return true if the teleport was successful
+     */
+    public boolean teleport(@NotNull Direction direction, double distance){
+        return teleport(direction.getVector(masterPart, false), distance);
+    }
+
+    /**
+     * Teleport this group in the given vector's direction.
+     * @param direction The direction to translate the group
+     * @param distance How far the group should be translated
+     * @return true if the teleport was successful
+     */
+    public boolean teleport(@NotNull Vector direction, double distance){
+        Location l = getLocation();
+        if (l == null) return false;
+        l.add(direction.clone().normalize().multiply(distance));
+        teleport(l, true);
+        return true;
+    }
 
     /**
      * Move the model through smooth teleportation of both interaction and display entities. Doing this multiple times in a short amount of time may bring unexpected results.
@@ -154,7 +187,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param distance How far the group should be translated
      * @param durationInTicks How long it should take for the translation to complete
      */
-    public abstract void teleportMove(Vector direction, double distance, int durationInTicks);
+    public abstract void teleportMove(@NotNull Vector direction, double distance, int durationInTicks);
 
     /**
      * Set the teleportation duration of all parts in this group
@@ -189,14 +222,24 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
+     * Rotate the display entities in this group
+     * @param rotation the rotation
+     */
+    public void rotateDisplays(@NotNull Quaternionf rotation){
+        for (ActivePart p : groupParts.values()){
+            p.rotateDisplay(rotation, true);
+        }
+    }
+
+    /**
      * Change the yaw of this group
      * @param yaw The yaw to set for this group
-     * @param pivotInteractions true if interactions should pivot around the group with the yaw change
+     * @param pivot whether non-display entities should pivot around the group
      */
     @Override
-    public void setYaw(float yaw, boolean pivotInteractions){
+    public void setYaw(float yaw, boolean pivot){
         for (ActivePart part : groupParts.values()){
-            part.setYaw(yaw, pivotInteractions);
+            part.setYaw(yaw, pivot);
         }
     }
 
@@ -300,9 +343,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     @Override
     public void glow(@NotNull Player player, long durationInTicks){
         for (ActivePart part : groupParts.values()){
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION || part.type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
-                continue;
-            }
+            if (!part.canGlow()) continue;
             if (!part.isGlowing()){
                 part.glow(player, durationInTicks);
             }
@@ -441,7 +482,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     public List<T> getDisplayParts(){
         List<T> partList = new ArrayList<>();
         for (T part : groupParts.sequencedValues()){
-            if (part.type != SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (part.isDisplay()){
                 partList.add(part);
             }
         }

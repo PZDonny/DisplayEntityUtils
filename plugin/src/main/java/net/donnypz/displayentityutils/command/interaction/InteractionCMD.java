@@ -28,7 +28,6 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
         new InteractionWidthCMD(this);
         new InteractionScaleCMD(this);
         new InteractionPivotCMD(this);
-        new InteractionPivotSelectionCMD(this);
         new InteractionResponsiveCMD(this);
         new InteractionAddToGroupCMD(this);
         new InteractionSpawnHereCMD(this);
@@ -66,8 +65,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/deu interaction scale <height> <width> <tick-duration> <tick-delay>", "Scale an interaction entity over a period of time");
             CMDUtils.sendCMD(sender, "/deu interaction addcmd <player | console> <left | right | both> <command>", "Add a command to an interaction");
             CMDUtils.sendCMD(sender, "/deu interaction listcmds", "List all commands stored on an interaction");
-            CMDUtils.sendCMD(sender, "/deu interaction pivot <angle>", " Pivot an interaction around it's group's actual location center");
-            CMDUtils.sendCMD(sender, "/deu interaction pivotselection <angle>", "Pivot all Interactions included in your selected group's part filter");
+            CMDUtils.sendCMD(sender, "/deu interaction pivot <angle> [-all]", " Pivot an interaction around it's group's");
             CMDUtils.sendCMD(sender, "/deu interaction responsive", "Toggle the hit sound of an interaction entity");
         }
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));

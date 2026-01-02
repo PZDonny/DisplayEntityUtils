@@ -31,20 +31,19 @@ class TextLineWidthCMD extends PartsSubCommand {
                 part.setTextDisplayLineWidth(width);
             }
         }
-        player.sendMessage(Component.text("Successfully set text display's line width to "+width+" for ALL selected text displays", NamedTextColor.GREEN));
+        player.sendMessage(Component.text("Set text display's line width to "+width+" for ALL selected text displays", NamedTextColor.GREEN));
         return true;
     }
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        if (isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)) return false;
+
         int width = getLineWidth(args, player);
         if (width == -1) return false;
-        if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
-            return false;
-        }
+
         selectedPart.setTextDisplayLineWidth(width);
-        player.sendMessage(Component.text("Successfully set text display's line width to "+width, NamedTextColor.GREEN));
+        player.sendMessage(Component.text("Set text display's line width to "+width, NamedTextColor.GREEN));
         return true;
     }
 

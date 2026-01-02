@@ -22,7 +22,7 @@ public final class VersionUtils {
     public static boolean IS_1_21_7 = Bukkit.getUnsafe().getProtocolVersion() >= 772;
     public static boolean IS_1_21_9 = Bukkit.getUnsafe().getProtocolVersion() >= 773;
 
-    public static boolean canViewDialogs(Player player, boolean sendErrorMessage){
+    public static boolean canViewDialogs(@NotNull Player player, boolean sendErrorMessage){
         if (!serverHasDialogs()){
             if (sendErrorMessage){
                 player.sendMessage(DisplayAPI.pluginPrefix
@@ -40,6 +40,10 @@ public final class VersionUtils {
             return false;
         }
         return true;
+    }
+
+    public static boolean canSpawnMannequins(){
+        return IS_1_21_9;
     }
 
     private static int getProtocolVersion(Player player){
@@ -83,7 +87,15 @@ public final class VersionUtils {
 
     public static Sound getSound(String soundName){
         if (soundName == null) return null;
-        return Registry.SOUNDS.get(NamespacedKey.minecraft(soundName));
+        String[] split = soundName.split(":");
+        if (split.length < 2){
+            return Registry.SOUNDS.get(NamespacedKey.minecraft(soundName));
+        }
+        else{
+            String namespace = split[0];
+            String key = split[1];
+            return Registry.SOUNDS.get(new NamespacedKey(namespace, key));
+        }
     }
 
     public static boolean serverHasDialogs(){ //Dialog API came to Paper in 1.21.7, Dialog System came to MC in 1.21.6

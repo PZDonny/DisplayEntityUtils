@@ -33,6 +33,6 @@ class AnimReverseCMD extends PlayerSubCommand {
             return;
         }
         anim.reverse();
-        player.sendMessage(Component.text("Animation successfully reversed!", NamedTextColor.GREEN));
+        player.sendMessage(Component.text("The animation has been reversed!", NamedTextColor.GREEN));
     }
 }

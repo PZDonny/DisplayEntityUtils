@@ -40,7 +40,7 @@ class InteractionAddToGroupCMD extends GroupSubCommand {
         if (group instanceof SpawnedDisplayEntityGroup sg){
             Interaction i = spawnInteraction(player, spawn, args);
             if (i == null) return;
-            sg.addInteractionEntity(i);
+            sg.addEntity(i);
         }
         else if (group instanceof PacketDisplayEntityGroup pg){
             spawnInteraction(pg, player, spawn, args);

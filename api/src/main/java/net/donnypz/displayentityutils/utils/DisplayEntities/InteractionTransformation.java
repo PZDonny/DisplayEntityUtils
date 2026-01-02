@@ -30,6 +30,16 @@ class InteractionTransformation extends Vector3f implements Externalizable {
        this.width = width;
     }
 
+
+    InteractionTransformation(Vector vector, float groupYawAtCreation, float groupPitchAtCreation, float height, float width){
+        super(vector.toVector3f());
+        this.vector = new Vector(vector.getX(), vector.getY(), vector.getZ());
+        this.groupYawAtCreation = groupYawAtCreation;
+        this.groupPitchAtCreation = groupPitchAtCreation;
+        this.height = height;
+        this.width = width;
+    }
+
     @ApiStatus.Internal
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeFloat(this.x);

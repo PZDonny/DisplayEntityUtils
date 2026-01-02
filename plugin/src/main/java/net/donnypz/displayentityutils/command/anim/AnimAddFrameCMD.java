@@ -52,7 +52,7 @@ class AnimAddFrameCMD extends PlayerSubCommand {
 
             boolean isUnique = anim.addFrame(frame);
             if (isUnique){
-                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully captured animation frame", NamedTextColor.GREEN)));
+                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Animation frame captured!", NamedTextColor.GREEN)));
                 player.playSound(player, Sound.ENTITY_SHEEP_SHEAR, 1, 0.75f);
             }
             else{

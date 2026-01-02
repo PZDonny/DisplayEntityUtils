@@ -187,7 +187,7 @@ public abstract class AnimationPlayer {
                 continue;
             }
 
-            Vector currentVector = part.getInteractionTranslation();
+            Vector currentVector = part.getNonDisplayTranslation();
             if (currentVector == null){
                 continue;
             }
@@ -227,7 +227,7 @@ public abstract class AnimationPlayer {
                     part.translate(moveVector, (float) moveVector.length(), frame.duration, 0);
                 }
                 else {
-                    PacketUtils.translateInteraction(players, part, moveVector, (float) moveVector.length(), frame.duration, 0);
+                    PacketUtils.translateNonDisplay(players, part, moveVector, (float) moveVector.length(), frame.duration, 0);
                 }
             }
 

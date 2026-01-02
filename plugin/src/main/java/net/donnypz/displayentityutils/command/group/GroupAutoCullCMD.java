@@ -20,7 +20,7 @@ class GroupAutoCullCMD extends GroupSubCommand {
 
     @Override
     protected void execute(@NotNull Player player, @NotNull ActiveGroup<?> group, @NotNull String[] args) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully added culling bounds to your selected group!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Added culling bounds to your selected group!", NamedTextColor.GREEN)));
         group.autoCull(DisplayConfig.widthCullingAdder(), DisplayConfig.heightCullingAdder());
     }
 }

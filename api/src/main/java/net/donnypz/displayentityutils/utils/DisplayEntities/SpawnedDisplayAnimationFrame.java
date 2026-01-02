@@ -124,7 +124,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
             if (p.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
 
                 InteractionTransformation transform = new InteractionTransformation(
-                        p.getInteractionTranslation().toVector3f(),
+                        p.getNonDisplayTranslation(),
                         gLoc.getYaw(),
                         gLoc.getPitch(),
                         p.getInteractionHeight(),
@@ -157,7 +157,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
             if (p.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
 
                 InteractionTransformation transform = new InteractionTransformation(
-                        p.getInteractionTranslation().toVector3f(),
+                        p.getNonDisplayTranslation(),
                         gLoc.getYaw(),
                         gLoc.getPitch(),
                         p.getInteractionHeight(),

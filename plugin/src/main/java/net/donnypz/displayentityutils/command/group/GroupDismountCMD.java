@@ -61,7 +61,7 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
                 sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your selected group is not riding an entity!", NamedTextColor.RED)));
             }
             else{
-                sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully dismounted your selected group!", NamedTextColor.GREEN)));
+                sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Dismounted your selected group!", NamedTextColor.GREEN)));
                 dismount(group, despawn);
                 if (despawn) despawnMessage(sender);
                 DisplayControllerManager.unregisterEntity(vehicle);
@@ -79,7 +79,7 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
         }
 
         DisplayControllerManager.unregisterEntity(vehicle);
-        sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully dismounted all non-packet groups riding the entity!", NamedTextColor.GREEN)));
+        sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Dismounted all non-packet groups riding the entity!", NamedTextColor.GREEN)));
         if (despawn) despawnMessage(sender);
     }
 

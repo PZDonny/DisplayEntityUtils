@@ -4,10 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
-import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-class TextSetCMD extends PartsSubCommand {
+public class TextSetCMD extends PartsSubCommand {
 
     public TextSetCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("set", parentSubCommand, Permission.TEXT_SET_TEXT, 3, 0);
@@ -35,6 +32,18 @@ class TextSetCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        if (isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)) return false;
+
+        Component currentText = selectedPart.getTextDisplayText();
+        Key font = currentText.font();
+        Component comp = LegacyComponentSerializer.legacyAmpersand().deserialize(getTextResult(args));
+        selectedPart.setTextDisplayText(comp.font(font));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set text display's text!", NamedTextColor.GREEN)));
+        player.sendMessage(Component.text("You can include \"\\n\" in your to create a new line.", NamedTextColor.GRAY));
+        return true;
+    }
+
+    public static String getTextResult(String[] args){
         StringBuilder builder = new StringBuilder();
         for (int i = 2; i < args.length; i++){
             builder.append(args[i]);
@@ -42,13 +51,6 @@ class TextSetCMD extends PartsSubCommand {
                 builder.append(" ");
             }
         }
-        Component currentText = selectedPart.getTextDisplayText();
-        String textResult = builder.toString().replace("\\n", "\n");
-        Key oldFont = currentText.font();
-        Component comp = LegacyComponentSerializer.legacyAmpersand().deserialize(textResult);
-        selectedPart.setTextDisplayText(comp.font(oldFont));
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully set text on text display!", NamedTextColor.GREEN)));
-        player.sendMessage(Component.text("Keep in mind, you can include \"\\n\" in your text display to create a new line.", NamedTextColor.GRAY));
-        return true;
+        return builder.toString().replace("\\n", "\n");
     }
 }

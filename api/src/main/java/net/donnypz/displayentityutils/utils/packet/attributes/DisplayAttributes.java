@@ -1,14 +1,60 @@
 package net.donnypz.displayentityutils.utils.packet.attributes;
 
+import com.github.retrooper.packetevents.protocol.attribute.Attributes;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
+import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * A class containing all {@link DisplayAttribute}s that apply to both Display and Interaction entities
+ * A class containing all {@link DisplayAttribute}s that apply to eligible part type entities
  */
 public final class DisplayAttributes {
 
     public static final GlowingDisplayAttribute GLOWING = new GlowingDisplayAttribute(0);
+    public static final OptionalComponentDisplayAttribute CUSTOM_NAME = new OptionalComponentDisplayAttribute(2);
+    public static final BasicDisplayAttribute<Boolean> CUSTOM_NAME_VISIBLE = new BasicDisplayAttribute<>(3, Boolean.class, EntityDataTypes.BOOLEAN);
+
+    private DisplayAttributes(){}
+
+    public static final class Equipment{
+        public static final EquipmentAttribute HELMET = new EquipmentAttribute(EquipmentSlot.HELMET);
+        public static final EquipmentAttribute CHESTPLATE = new EquipmentAttribute(EquipmentSlot.CHEST_PLATE);
+        public static final EquipmentAttribute LEGGINGS = new EquipmentAttribute(EquipmentSlot.LEGGINGS);
+        public static final EquipmentAttribute BOOTS = new EquipmentAttribute(EquipmentSlot.BOOTS);
+        public static final EquipmentAttribute MAIN_HAND = new EquipmentAttribute(EquipmentSlot.MAIN_HAND);
+        public static final EquipmentAttribute OFF_HAND = new EquipmentAttribute(EquipmentSlot.OFF_HAND);
+        public static final EquipmentAttribute BODY = new EquipmentAttribute(EquipmentSlot.BODY);
+
+        public static EquipmentAttribute getAttribute(@NotNull org.bukkit.inventory.EquipmentSlot slot){
+            switch (slot){
+                case HEAD -> {
+                    return HELMET;
+                }
+                case CHEST -> {
+                    return CHESTPLATE;
+                }
+                case LEGS ->  {
+                    return LEGGINGS;
+                }
+                case FEET -> {
+                    return BOOTS;
+                }
+                case BODY -> {
+                    return BODY;
+                }
+                case HAND -> {
+                    return MAIN_HAND;
+                }
+                case OFF_HAND -> {
+                    return OFF_HAND;
+                }
+                default -> {
+                    throw new IllegalArgumentException("Invalid/Unexpected slot type");
+                }
+            }
+        }
+    }
 
     public static final class Interpolation {
         public static final BasicDisplayAttribute<Integer> DELAY = new BasicDisplayAttribute<>(8, Integer.class, EntityDataTypes.INT);
@@ -40,7 +86,6 @@ public final class DisplayAttributes {
         public static final BasicDisplayAttribute<Float> HEIGHT = new BasicDisplayAttribute<>(21, Float.class, EntityDataTypes.FLOAT);
     }
 
-
     public static final ColorDisplayAttribute GLOW_COLOR_OVERRIDE = new ColorDisplayAttribute(22);
 
     public static final class BlockDisplay{
@@ -66,4 +111,13 @@ public final class DisplayAttributes {
         public static final BasicDisplayAttribute<Boolean> RESPONSIVE = new BasicDisplayAttribute<>(10, Boolean.class, EntityDataTypes.BOOLEAN);
     }
 
+    public static final class Mannequin{
+        public static final AttributeDisplayAttribute SCALE = new AttributeDisplayAttribute(Attributes.SCALE);
+        public static final BasicDisplayAttribute<Boolean> NO_GRAVITY = new BasicDisplayAttribute<>(5, Boolean.class, EntityDataTypes.BOOLEAN);
+        public static final PoseDisplayAttribute POSE = new PoseDisplayAttribute(6);
+        public static final MainHandDisplayAttribute MAIN_HAND = new MainHandDisplayAttribute(15);
+        public static final ResolvableProfileDisplayAttribute RESOLVABLE_PROFILE = new ResolvableProfileDisplayAttribute(17);
+        public static final BasicDisplayAttribute<Boolean> IMMOVABLE = new BasicDisplayAttribute<>(18, Boolean.class, EntityDataTypes.BOOLEAN);
+        public static final OptionalComponentDisplayAttribute BELOW_NAME = new OptionalComponentDisplayAttribute(19);
+    }
 }

@@ -34,13 +34,13 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
     private static final ConcurrentHashMap<String, WorldData> allPacketGroups = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<UUID, PassengerGroupData> groupVehicles = new ConcurrentHashMap<>();
-    int interactionCount;
     int[] passengerIds;
     UUID vehicleUUID;
     boolean autoShow;
     Predicate<Player> autoShowCondition;
     int persistentLocalId = -1;
     String persistentGlobalId;
+    boolean isPlaced;
 
 
     PacketDisplayEntityGroup(String tag){
@@ -126,6 +126,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return chunk.getWorld().getName()+"|"+chunk.getChunkKey()+"|"+localId; //world,chunkkey,localid
     }
 
+    /**
+     * {@inheritDoc}
+     * <br><br>The group cannot become persistent if {@link #isRiding()} is true
+     * <br>The group cannot become non-persistent if {@link #isPlaced()} is true
+     */
     @Override
     public void setPersistent(boolean persistent) {
         if (persistent){
@@ -135,7 +140,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             }
         }
         else{
-            if (isPersistent()){
+            if (isPersistent() && !isPlaced){
                 DisplayGroupManager.removePersistentPacketGroup(this, false);
                 setPersistentIds(-1, null);
             }
@@ -151,6 +156,14 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return this.persistentLocalId != -1;
     }
 
+    /**
+     * Get whether this group was placed by a player's held item
+     * @return a boolean
+     */
+    public boolean isPlaced(){
+        return this.isPlaced;
+    }
+
     @ApiStatus.Internal
     public static void removeWorld(@NotNull World world){
         //Viewers are already removed since this is only called on unloaded worlds (Viewers are forced to a new world)
@@ -161,7 +174,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         Location oldLoc = getLocation();
         //Remove from previous
         if (oldLoc != null){
-            if (location.getWorld().equals(oldLoc.getWorld()) && location.getChunk().getChunkKey() == oldLoc.getChunk().getChunkKey()){
+            if (location.getWorld().equals(oldLoc.getWorld()) && location.getChunk().getChunkKey() == oldLoc.getChunk().getChunkKey() && vehicleUUID == null){
                return;
             }
             String oldWorldName = oldLoc.getWorld().getName();
@@ -196,10 +209,22 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     @Override
     public void addPart(@NotNull PacketDisplayEntityPart part){
         addPartSilent(part);
-        updatePartCount(part, true);
+        updatePassengerIds(part.getEntityId(), true);
     }
 
-     void addPartSilent(PacketDisplayEntityPart part){
+    /**
+     * {@inheritDoc}
+     * This will create a {@link PacketDisplayEntityPart} representative of the entity
+     */
+    @Override
+    public @Nullable PacketDisplayEntityPart addEntity(@NotNull Entity entity) {
+        PacketDisplayEntityPart part = PacketDisplayEntityPart.getPart(entity, true);
+        if (part == null) return null;
+        addPart(part);
+        return part;
+    }
+
+    void addPartSilent(PacketDisplayEntityPart part){
          if (groupParts.get(part.partUUID) == part) return;
 
          if (part.partUUID == null){
@@ -216,21 +241,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
          }
     }
 
-    void updatePartCount(PacketDisplayEntityPart part, boolean add){
-        if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            if (add){
-                interactionCount++;
-            }
-            else{
-                interactionCount--;
-            }
-        }
-        else{
-            updatePassengerIds(part.getEntityId(), add);
-        }
-    }
-
-    private void updatePassengerIds(int passengerId, boolean add){
+    void updatePassengerIds(int passengerId, boolean add){
         int[] ids;
         if (add){
             ids = new int[passengerIds.length+1];
@@ -278,7 +289,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
 
     @Override
-    public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions) {
+    public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays) {
         if (newScaleMultiplier <= 0){
             throw new IllegalArgumentException("New Scale Multiplier cannot be <= 0");
         }
@@ -286,11 +297,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             return true;
         }
 
-        for (PacketDisplayEntityPart p : groupParts.values()){
+        for (PacketDisplayEntityPart part : groupParts.values()){
             //Displays
-            if (p.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (part.isDisplay()){
                 DisplayAttributeMap attributeMap = new DisplayAttributeMap();
-                Transformation transformation = p.getTransformation();
+                Transformation transformation = part.getTransformation();
                 //Reset Scale then multiply by newScaleMultiplier
                 Vector3f scale = transformation.getScale();
                 scale.x = (scale.x/scaleMultiplier)*newScaleMultiplier;
@@ -303,40 +314,46 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 translationVector.y = (translationVector.y/scaleMultiplier)*newScaleMultiplier;
                 translationVector.z = (translationVector.z/scaleMultiplier)*newScaleMultiplier;
 
-                if (!transformation.equals(p.getTransformation())){
+                if (!transformation.equals(part.getTransformation())){
                     attributeMap.add(DisplayAttributes.Interpolation.DURATION, durationInTicks)
                         .add(DisplayAttributes.Interpolation.DELAY, -1)
                         .addTransformation(transformation);
                 }
                 //Culling
                 if (DisplayConfig.autoCulling()){
-                    float[] values = DisplayUtils.getAutoCullValues(p, DisplayConfig.widthCullingAdder(), DisplayConfig.heightCullingAdder());
+                    float[] values = DisplayUtils.getAutoCullValues(part, DisplayConfig.widthCullingAdder(), DisplayConfig.heightCullingAdder());
                     attributeMap.add(DisplayAttributes.Culling.HEIGHT, values[1])
                         .add(DisplayAttributes.Culling.WIDTH, values[0]);
                 }
 
-                p.attributeContainer.setAttributesAndSend(attributeMap, p.getEntityId(), p.viewers);
+                part.attributeContainer.setAttributesAndSend(attributeMap, part.getEntityId(), part.viewers);
             }
-            //Interactions
-            else if (scaleInteractions){
+            //Non Displays
+            else if (scaleNonDisplays){
+                if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                    //Reset Scale then multiply by newScaleMultiplier
+                    float newHeight = (part.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier;
+                    float newWidth = (part.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier;
+                    PacketUtils.scaleInteraction(part, newHeight, newWidth, durationInTicks, 0);
 
-                //Reset Scale then multiply by newScaleMultiplier
-                float newHeight = (p.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier;
-                float newWidth = (p.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier;
-                PacketUtils.scaleInteraction(p, newHeight, newWidth, durationInTicks, 0);
+                    //Reset Translation then multiply by newScaleMultiplier
+                    Vector translationVector = part.getNonDisplayTranslation();
+                    if (translationVector == null){
+                        continue;
+                    }
+                    Vector oldVector = new Vector(translationVector.getX(), translationVector.getY(), translationVector.getZ());
+                    translationVector.setX((translationVector.getX()/scaleMultiplier)*newScaleMultiplier);
+                    translationVector.setY((translationVector.getY()/scaleMultiplier)*newScaleMultiplier);
+                    translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
 
-                //Reset Translation then multiply by newScaleMultiplier
-                Vector translationVector = p.getInteractionTranslation();
-                if (translationVector == null){
-                    continue;
+                    Vector moveVector = oldVector.subtract(translationVector);
+                    PacketUtils.translateNonDisplay(part, moveVector, moveVector.length(), durationInTicks, 0);
                 }
-                Vector oldVector = new Vector(translationVector.getX(), translationVector.getY(), translationVector.getZ());
-                translationVector.setX((translationVector.getX()/scaleMultiplier)*newScaleMultiplier);
-                translationVector.setY((translationVector.getY()/scaleMultiplier)*newScaleMultiplier);
-                translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
-
-                Vector moveVector = oldVector.subtract(translationVector);
-                PacketUtils.translateInteraction(p, moveVector, moveVector.length(), durationInTicks, 0);
+                else if (part.type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
+                        double scale = part.attributeContainer.getAttributeOrDefault(DisplayAttributes.Mannequin.SCALE, 1f);
+                        scale = (scale/scaleMultiplier)*newScaleMultiplier;
+                        part.attributeContainer.setAttributeAndSend(DisplayAttributes.Mannequin.SCALE, (float) scale, part.getEntityId(), part.viewers);
+                }
             }
         }
 
@@ -418,7 +435,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                     }
                     updateChunkAndWorld(entity.getLocation());
                 }
-            }, 0, 30);
+            }, 0, 20);
         }
         return true;
     }
@@ -529,23 +546,27 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     @Override
-    public void setRotation(float pitch, float yaw, boolean pivotIfInteraction){
+    public void setRotation(float pitch, float yaw, boolean pivot){
         for (PacketDisplayEntityPart part : groupParts.values()){
-            part.setRotation(pitch, yaw, pivotIfInteraction);
+            part.setRotation(pitch, yaw, pivot);
         }
     }
 
+    /**
+     * Pivot all non-display parts in this group around the group
+     * @param angleInDegrees the pivot angle
+     */
     @Override
     public void pivot(float angleInDegrees) {
         for (PacketDisplayEntityPart part : groupParts.values()){
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (!part.isDisplay()){
                 part.pivot(angleInDegrees);
             }
         }
     }
 
     @Override
-    public void teleportMove(Vector direction, double distance, int durationInTicks) {
+    public void teleportMove(@NotNull Vector direction, double distance, int durationInTicks) {
         Location destination = getLocation().add(direction.clone().normalize().multiply(distance));
 
         double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
@@ -555,8 +576,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 .multiply(movementIncrement);
 
         for (PacketDisplayEntityPart part : groupParts.values()){
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                PacketUtils.translateInteraction(part, direction, distance, durationInTicks, 0);
+            if (!part.isDisplay()){
+                PacketUtils.translateNonDisplay(part, direction, distance, durationInTicks, 0);
             }
         }
         DisplayAPI.getScheduler().partRunTimerAsync(masterPart, new Scheduler.SchedulerRunnable() {
@@ -586,10 +607,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     /**
      * {@inheritDoc}
      * <br>It is not recommended to use this multiple times in the same tick, unexpected results may occur.
+     * <br><br>This will fail if {@link #isRiding()} or {@link #isPlaced()} is true
      */
     @Override
     public boolean teleport(@NotNull Location tpLocation, boolean respectGroupDirection){
-        if (isRiding()) return false;
+        if (isRiding() || isPlaced) return false;
         Location oldMasterLoc = getLocation();
         attemptLocationUpdate(oldMasterLoc, tpLocation);
 
@@ -600,7 +622,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
         masterPart.teleportUnsetPassengers(tpLocation);
         for (PacketDisplayEntityPart part : groupParts.values()){
-            if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+            if (!part.isDisplay()){
                 Vector vector = oldMasterLoc.toVector().subtract(part.getLocation().toVector());
                 Location interactionTpLoc = tpLocation.clone().subtract(vector);
                 part.teleport(interactionTpLoc);
@@ -706,23 +728,28 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * @return a cloned {@link PacketDisplayEntityGroup}
      */
     public PacketDisplayEntityGroup clone(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow){
-        //Reset Interaction pivot to 0 yaw
-        HashMap<ActivePart, Float> oldYaws = new HashMap<>();
-        for (ActivePart part : this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
-            float oldYaw = part.getYaw();
-            oldYaws.put(part,  oldYaw);
-            part.pivot(-oldYaw);
+        //Reset pivot to 0
+        float groupYaw = getLocation().getYaw();
+        HashSet<ActivePart> resettedParts = new HashSet<>();
+        for (ActivePart part : groupParts.values()){
+            if (part.isDisplay()) continue;
+            part.pivot(-groupYaw);
+            resettedParts.add(part);
         }
+
 
         DisplayEntityGroup group = toDisplayEntityGroup();
+        float newYaw = location.getYaw();
+        location = location.clone();
+        location.setYaw(0);
         PacketDisplayEntityGroup clone = group.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.CLONE, playSpawnAnimation, autoShow);
 
-        //Restore Interaction Pivot
-        for (Map.Entry<ActivePart, Float> entry : oldYaws.entrySet()){
-            ActivePart part = entry.getKey();
-            float oldYaw = entry.getValue();
-            part.pivot(oldYaw);
+        //Restore pivot
+        for (ActivePart part : resettedParts){
+            part.pivot(groupYaw);
         }
+
+        clone.setYaw(newYaw, true);
         if (this.isPersistent()) clone.setPersistent(true);
         return clone;
     }

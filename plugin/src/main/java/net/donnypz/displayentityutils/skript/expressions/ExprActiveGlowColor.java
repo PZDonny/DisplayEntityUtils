@@ -49,8 +49,8 @@ public class ExprActiveGlowColor extends SimplePropertyExpression<Object, Color>
             if (part.getGlowColor() != null){
                 return ColorRGB.fromBukkitColor(part.getGlowColor());
             }
-            else if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                Skript.error("You can not get the glow color of an INTERACTION active part");
+            else if (!part.isDisplay()){
+                Skript.error("You can only get the glow color of a DISPLAY active part");
             }
             return null;
         }

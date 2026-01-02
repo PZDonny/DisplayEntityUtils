@@ -5,12 +5,11 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
-import org.bukkit.entity.Interaction;
+import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Translated Location of Active Part / Entity")
@@ -32,27 +31,19 @@ public class ExprActivePartTransLocation extends SimplePropertyExpression<Object
     @Override
     @Nullable
     public Location convert(Object o) {
-        if (o instanceof SpawnedDisplayEntityPart part){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                return part.getLocation();
-            }
-            else{
-                return DisplayUtils.getModelLocation((Display) part.getEntity());
-            }
-        }
-        else if (o instanceof PacketDisplayEntityPart part){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                return part.getLocation();
-            }
-            else{
+        if (o instanceof ActivePart part){
+            if (part.isDisplay()){
                 return DisplayUtils.getModelLocation(part);
+            }
+            else{
+                return part.getLocation();
             }
         }
         else if (o instanceof Display d){
             return DisplayUtils.getModelLocation(d);
         }
-        else if (o instanceof Interaction i){
-            return i.getLocation();
+        else if (o instanceof Entity e && DisplayUtils.isPartEntity(e)){
+            return e.getLocation();
         }
         return null;
     }

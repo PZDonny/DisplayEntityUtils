@@ -136,7 +136,7 @@ public final class DisplayGroupManager {
             Chunk mainChunk = spawnedGroup.getLocation().getChunk();
             ticketChunk(mainChunk, chunks);
             for (SpawnedDisplayEntityPart part : spawnedGroup.getParts()) {
-                if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){ //Chunk may be different from main chunk
+                if (!part.isDisplay()){ //Chunk may be different from main chunk
                     Entity e = part.getEntity();
                     Chunk c = e.getChunk();
                     if (c != mainChunk){
@@ -208,7 +208,7 @@ public final class DisplayGroupManager {
             saveFile.createNewFile();
 
             FileWriter fileWriter = new FileWriter(saveFile);
-            Gson gson = DEGJSONAdapter.GSON;
+            Gson gson = DEUJSONAdapter.GSON;
 
             JsonElement jsonEl = gson.toJsonTree(displayEntityGroup);
             JsonObject jsonObj = jsonEl.getAsJsonObject();
@@ -251,22 +251,6 @@ public final class DisplayGroupManager {
                     obj.add(field, jsonElement);
                 }
             }
-
-//            if (obj.has(PART_TAG_FIELD)){
-//                JsonArray arr = obj.getAsJsonArray(PDC_FIELD);
-//                if (arr != null){
-//                    byte[] bytes = new byte[arr.size()];
-//                    ItemStack stick = new ItemStack(Material.STICK);
-//                    PersistentDataContainer pdc = stick.getItemMeta().getPersistentDataContainer();
-//                    try{
-//                        pdc.readFromBytes(bytes);
-//                        List<String> tags = pdc.get(DisplayAPI.getPartPDCTagKey(), PersistentDataType.LIST.strings());
-//                        obj.add(PART_TAG_FIELD, gson.toJsonTree(tags));
-//                    }
-//                    catch(IOException e){}
-//                }
-//            }
-
 
             for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
                 serializeJsonElement(entry.getValue());
@@ -488,7 +472,7 @@ public final class DisplayGroupManager {
         deserializeJsonElement(jsonObject);
         jsonObject.remove(PLUGIN_VERSION_FIELD);
 
-        return DEGJSONAdapter
+        return DEUJSONAdapter
                 .GSON
                 .fromJson(jsonObject, DisplayEntityGroup.class);
     }
@@ -507,8 +491,8 @@ public final class DisplayGroupManager {
      * Get the {@link GroupResult} of a display entity containing its {@link SpawnedDisplayEntityGroup}, if applicable.
      * <br>
      * If a group is created as a result of this, {@link GroupRegisteredEvent} will be called
-     *
-     * @param displayEntity The display entity within a group
+     * @param displayEntity The display entity that's in a group
+     * @return a {@link GroupResult} or null
      */
     public static @Nullable GroupResult getSpawnedGroup(@NotNull Display displayEntity) {
         //Check for already registered group
@@ -548,26 +532,38 @@ public final class DisplayGroupManager {
 
 
     /**
-     * Get a Spawned Display Entity Group through an interaction entity
-     *
-     * @param interaction The interaction entity part of a display entity group
-     * @param radius The radius to check for a spawned display entity group
-     * @return SpawnedDisplayEntityGroup containing the interaction entity. Null if not found.
+     * Get a {@link SpawnedDisplayEntityGroup} through an Interaction entity
+     * @param interaction The interaction
+     * @param radius The radius to search for the group
+     * @return a {@link SpawnedDisplayEntityGroup} containing the interaction. Null if not found.
      */
-    public static SpawnedDisplayEntityGroup getSpawnedGroup(@NotNull Interaction interaction, double radius) {
+    public static @Nullable SpawnedDisplayEntityGroup getSpawnedGroup(@NotNull Interaction interaction, double radius){ //Keep this just to prevent breakage
+        return getSpawnedGroup((Entity) interaction, radius);
+    }
+
+
+    /**
+     * Get a {@link SpawnedDisplayEntityGroup} through an eligible part entity
+     * @param entity The entity that's in a group
+     * @param radius The radius to search for the group
+     * @return a {@link SpawnedDisplayEntityGroup} containing the entity. Null if not found.
+     */
+    public static @Nullable SpawnedDisplayEntityGroup getSpawnedGroup(@NotNull Entity entity, double radius) {
+        if (!DisplayUtils.isPartEntity(entity)) return null;
+
         //Check for existing group
-        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(interaction);
+        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
         if (part != null && part.getGroup() != null) {
             return part.getGroup();
         }
 
         //Get Nearby Groups
-        List<GroupResult> results = getSpawnedGroupsNearLocation(interaction.getLocation(), radius);
+        List<GroupResult> results = getSpawnedGroupsNearLocation(entity.getLocation(), radius);
         if (results.isEmpty()){
             return null;
         }
         //Check if Interaction is part of group
-        part = SpawnedDisplayEntityPart.getPart(interaction);
+        part = SpawnedDisplayEntityPart.getPart(entity);
         return part == null ? null : part.getGroup();
     }
 
@@ -635,7 +631,7 @@ public final class DisplayGroupManager {
                 continue;
             }
             if (addInteractions){
-                result.group().addMissingInteractionEntities(DisplayConfig.getMaximumInteractionSearchRange());
+                result.group().addMissingEntities(DisplayConfig.getMaximumInteractionSearchRange());
             }
             results.add(result);
         }
@@ -709,9 +705,15 @@ public final class DisplayGroupManager {
             id = 1;
         }
         else{
-            id = gson.fromJson(list.getLast(), PersistentPacketGroup.class).id+1;
+            PersistentPacketGroup ppg = gson.fromJson(list.getLast(), PersistentPacketGroup.class);
+            if (ppg == null){
+                id = list.size()+1;
+            }
+            else{
+                id = gson.fromJson(list.getLast(), PersistentPacketGroup.class).id+1;
+            }
         }
-        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, group.isAutoShow());
+        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, group.isAutoShow(), group.isPlaced());
         if (cpg == null) return;
 
         String json = gson.toJson(cpg);
@@ -735,7 +737,7 @@ public final class DisplayGroupManager {
         else{
             id = gson.fromJson(list.getLast(), PersistentPacketGroup.class).id+1;
         }
-        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, autoShow);
+        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, autoShow, false);
         if (cpg == null) return null;
 
         String json = gson.toJson(cpg);
@@ -764,7 +766,7 @@ public final class DisplayGroupManager {
 
         PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, spawnReason, true, settings);
         displayEntityGroup = pdeg.toDisplayEntityGroup();
-        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, pdeg.isAutoShow());
+        PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, pdeg.isAutoShow(), false);
         if (cpg != null){
             String json = gson.toJson(cpg);
             list.add(json);
@@ -864,9 +866,17 @@ public final class DisplayGroupManager {
     @ApiStatus.Internal
     public static void spawnPersistentPacketGroups(@NotNull Chunk chunk){
         List<String> list = getChunkList(chunk.getPersistentDataContainer());
-        for (String json : list){
+        Iterator<String>  i = list.iterator();
+
+        while (i.hasNext()){
+            String json = i.next();
             PersistentPacketGroup cpg = gson.fromJson(json, PersistentPacketGroup.class);
-            cpg.spawn(chunk).setPersistentIds(cpg.id, chunk);
+            if (cpg == null){
+                i.remove();
+            }
+            else{
+                cpg.spawn(chunk).setPersistentIds(cpg.id, chunk);
+            }
         }
     }
 
@@ -899,10 +909,11 @@ public final class DisplayGroupManager {
         String groupBase64;
         String groupTag;
         boolean autoShow = true; //Don't change
+        boolean isPlaced = false;
 
         private PersistentPacketGroup(){}
 
-        static PersistentPacketGroup create(int id, Location location, DisplayEntityGroup group, boolean autoShow){
+        static PersistentPacketGroup create(int id, Location location, DisplayEntityGroup group, boolean autoShow, boolean isPlaced){
             PersistentPacketGroup cpg = new PersistentPacketGroup();
             cpg.id = id;
             cpg.x = location.x();
@@ -912,6 +923,7 @@ public final class DisplayGroupManager {
             cpg.pitch = location.getPitch();
             cpg.groupTag = group.getTag();
             cpg.autoShow = autoShow;
+            cpg.isPlaced = isPlaced;
             cpg.setGroup(group);
             return (cpg.groupBase64 == null) ? null : cpg;
         }
@@ -961,7 +973,12 @@ public final class DisplayGroupManager {
             Location spawnLoc = getLocation(chunk);
             DisplayEntityGroup g = getGroup();
             if (spawnLoc == null || g == null) return null;
-            return g.createPacketGroup(spawnLoc, GroupSpawnedEvent.SpawnReason.INTERNAL, true, autoShow);
+            if (isPlaced){
+                return g.createPacketGroup(spawnLoc, GroupSpawnedEvent.SpawnReason.CHUNK_LOAD_PLACED, true, autoShow);
+            }
+            else{
+                return g.createPacketGroup(spawnLoc, GroupSpawnedEvent.SpawnReason.INTERNAL, true, autoShow);
+            }
         }
     }
 }

@@ -23,7 +23,7 @@ class ItemToggleGlintCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /deu item toggleglint -all <on | off>", NamedTextColor.RED)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /deu item toggleglint [-all <on | off>]", NamedTextColor.RED)));
     }
 
     @Override
@@ -38,12 +38,12 @@ class ItemToggleGlintCMD extends PartsSubCommand {
         if (s.equalsIgnoreCase("on")){
             status = true;
             player.sendMessage(DisplayAPI.pluginPrefix
-                    .append(MiniMessage.miniMessage().deserialize("<green>Successfully toggled glint for ALL selected item displays ON")));
+                    .append(MiniMessage.miniMessage().deserialize("<green>Toggled glint for ALL selected item displays ON")));
         }
         else if (s.equalsIgnoreCase("off")){
             status = false;
             player.sendMessage(DisplayAPI.pluginPrefix
-                    .append(MiniMessage.miniMessage().deserialize("<green>Successfully toggled glint for ALL selected item displays <red>OFF")));
+                    .append(MiniMessage.miniMessage().deserialize("<green>Toggled glint for ALL selected item displays <red>OFF")));
         }
         else{
             sendIncorrectUsage(player);
@@ -55,20 +55,18 @@ class ItemToggleGlintCMD extends PartsSubCommand {
                 part.setItemDisplayItemGlint(status);
             }
         }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully toggled glint of ALL selected item displays!", NamedTextColor.GREEN)));
         return true;
     }
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
-        if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with item display entities", NamedTextColor.RED)));
-            return false;
-        }
+        if (isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY)) return false;
+
         ItemStack item = selectedPart.getItemDisplayItem();
         if (item == null) return false;
-        selectedPart.setItemDisplayItemGlint(!item.getItemMeta().getEnchantmentGlintOverride());
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully toggled glint of selected item display!", NamedTextColor.GREEN)));
+        selectedPart.setItemDisplayItemGlint(!selectedPart.hasItemDisplayItemGlint());
+        String status = selectedPart.hasItemDisplayItemGlint() ? "<green>ON" : "<red>OFF";
+        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled glint of selected item display "+status)));
         return true;
     }
 }

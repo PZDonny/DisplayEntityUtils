@@ -37,12 +37,12 @@ class TextShadowCMD extends PartsSubCommand {
         if (s.equalsIgnoreCase("on")){
             status = true;
             player.sendMessage(DisplayAPI.pluginPrefix
-                    .append(MiniMessage.miniMessage().deserialize("<green>Successfully toggled shadowed for ALL selected text displays ON")));
+                    .append(MiniMessage.miniMessage().deserialize("<green>Toggled shadowed for ALL selected text displays ON")));
         }
         else if (s.equalsIgnoreCase("off")){
             status = false;
             player.sendMessage(DisplayAPI.pluginPrefix
-                    .append(MiniMessage.miniMessage().deserialize("<green>Successfully toggled shadowed for ALL selected text displays <red>OFF")));
+                    .append(MiniMessage.miniMessage().deserialize("<green>Toggled shadowed for ALL selected text displays <red>OFF")));
         }
         else{
             sendIncorrectUsage(player);
@@ -54,18 +54,17 @@ class TextShadowCMD extends PartsSubCommand {
                 part.setTextDisplayShadowed(status);
             }
         }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully toggled shadowed for ALL selected text displays!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Toggled shadowed for ALL selected text displays!", NamedTextColor.GREEN)));
         return true;
     }
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
-        if (selectedPart.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with text display entities", NamedTextColor.RED)));
-            return false;
-        }
+        if (isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)) return false;
+
         selectedPart.setTextDisplayShadowed(!selectedPart.isTextDisplayShadowed());
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully toggled shadow for text display!", NamedTextColor.GREEN)));
+        String status = selectedPart.isTextDisplayShadowed() ? "<green>ON" : "<red>OFF";
+        player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled shadow for your selected text display "+status)));
         return true;
     }
 }

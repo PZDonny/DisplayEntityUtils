@@ -1,5 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
+import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
@@ -15,19 +17,22 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ActivePart implements Active{
-    private static final ConcurrentHashMap<Integer, ActivePart> partsById = new ConcurrentHashMap<>();
+    protected static final ConcurrentHashMap<Integer, ActivePart> partsById = new ConcurrentHashMap<>();
     protected SpawnedDisplayEntityPart.PartType type;
     protected UUID partUUID;
     private int entityId;
@@ -35,9 +40,9 @@ public abstract class ActivePart implements Active{
     private boolean valid = true;
     final Set<ClientAnimationPlayer> clientAnimationPlayers = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    protected ActivePart(int entityId, boolean mapped){
+    protected ActivePart(int entityId, boolean autoMap){
         this.entityId = entityId;
-        if (mapped) {
+        if (autoMap) {
             partsById.put(entityId, this);
         }
     }
@@ -157,6 +162,12 @@ public abstract class ActivePart implements Active{
 
     public abstract boolean hasGroup();
 
+    /**
+     * Teleport this part to the given location. This will fail if the part is a display entity, in a group, and is not the group's master part.
+     * @param location the teleport location
+     */
+    public abstract void teleport(@NotNull Location location);
+
     public abstract @Nullable Location getLocation();
 
     protected abstract void cull(float width, float height);
@@ -168,7 +179,7 @@ public abstract class ActivePart implements Active{
      * @param heightAdder The amount of height to be added to the culling range
      */
     public void autoCull(float widthAdder, float heightAdder){
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
+        if (!isDisplay()) return;
         Transformation transformation = getTransformation();
         if (transformation == null) return;
         DisplayAPI.getScheduler().partRunAsync(this, () -> {
@@ -188,12 +199,28 @@ public abstract class ActivePart implements Active{
     }
 
     /**
+     * Get whether this part will visually glow if glowing is applied to it
+     * @return a boolean
+     */
+    public boolean canGlow(){
+        return type != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY
+                && type != SpawnedDisplayEntityPart.PartType.INTERACTION;
+    }
+
+    public boolean isDisplay(){
+        return type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY
+                || type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY
+                || type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY;
+    }
+
+    /**
      * Make this part glow for a player
      * @param player the player
      */
     public void glow(@NotNull Player player){
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
-        PacketUtils.setGlowing(player, getEntityId(), true);
+        if (canGlow()){
+            PacketUtils.setGlowing(player, getEntityId(), true);
+        }
     }
 
     /**
@@ -202,9 +229,8 @@ public abstract class ActivePart implements Active{
      */
     @Override
     public void glow(long durationInTicks){
-        if (type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
+        if (canGlow()){
             glow();
-
             DisplayAPI.getScheduler().partRunLater(this, this::unglow, durationInTicks);
         }
     }
@@ -217,7 +243,7 @@ public abstract class ActivePart implements Active{
      */
     @Override
     public void glow(@NotNull Player player, long durationInTicks){
-        if (type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
+        if (canGlow()){
             if (durationInTicks <= -1){
                 PacketUtils.setGlowing(player, getEntityId(), true);
             }
@@ -267,7 +293,7 @@ public abstract class ActivePart implements Active{
      */
     @Override
     public void unglow(@NotNull Player player) {
-        if (type == SpawnedDisplayEntityPart.PartType.INTERACTION) return;
+        if (!canGlow()) return;
         PacketUtils.setGlowing(player, getEntityId(), false);
     }
 
@@ -309,34 +335,41 @@ public abstract class ActivePart implements Active{
     public abstract void setTransformationMatrix(@NotNull Matrix4f matrix);
 
     /**
-     * Change the X scale of this part
-     * @param scale The X scale to set for this part
-     * @return false if this part is an Interaction
+     * Change this display entity part's X scale
+     * @param scale The X scale to set
+     * @return false if this part is not a display entity
      */
-    public abstract boolean setXScale(float scale);
+    public abstract boolean setDisplayXScale(float scale);
 
     /**
-     * Change the Y scale of this part
-     * @param scale The Y scale to set for this part
-     * @return false if this part is an Interaction
+     * Change this display entity part's Y scale
+     * @param scale The Y scale to set
+     * @return false if this part is not a display entity
      */
-    public abstract boolean setYScale(float scale);
+    public abstract boolean setDisplayYScale(float scale);
 
     /**
-     * Change the Z scale of this part
-     * @param scale The Z scale to set for this part
-     * @return false if this part is an Interaction
+     * Change this display entity part's Z scale
+     * @param scale The Z scale to set
+     * @return false if this part is not a display entity
      */
-    public abstract boolean setZScale(float scale);
+    public abstract boolean setDisplayZScale(float scale);
 
     /**
-     * Change the scale of this part
-     * @param x The X scale to set for this part
-     * @param y The Y scale to set for this part
-     * @param z The Z scale to set for this part
-     * @return false if this part is an Interaction
+     * Change this display entity part's scale
+     * @param x The X scale to set
+     * @param y The Y scale to set
+     * @param z The Z scale to set
+     * @return false if this part is not a display entity
      */
-    public abstract boolean setScale(float x, float y, float z);
+    public abstract boolean setDisplayScale(float x, float y, float z);
+
+    /**
+     * Rotate this display entity part by a given quaternion
+     * @param rotation the rotation
+     * @param rotateTranslation whether the display's translation should be rotated, pivoting it around the entity's location
+     */
+    public abstract void rotateDisplay(@NotNull Quaternionf rotation, boolean rotateTranslation);
 
     /**
      * Set the text of this part if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
@@ -410,6 +443,8 @@ public abstract class ActivePart implements Active{
      */
     public abstract void setItemDisplayItemGlint(boolean hasGlint);
 
+    public abstract boolean hasItemDisplayItemGlint();
+
     public abstract @Nullable Component getTextDisplayText();
 
     public abstract int getTextDisplayLineWidth();
@@ -473,11 +508,19 @@ public abstract class ActivePart implements Active{
     public abstract int getTeleportDuration();
 
     /**
-     * Get the interaction translation of this part, relative to its group's location
-     * group's location <bold><u>only</u></bold> if the part's type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}.
-     * @return a {@link Vector} or null if the part is not an Interaction, or if the part is ungrouped
+     * Get the translation of this non-display entity part, relative to its group's location
+     * @return a {@link Vector} or null if the part is a display entity, or if the part is ungrouped
      */
-    public abstract @Nullable Vector getInteractionTranslation();
+    public abstract @Nullable Vector getNonDisplayTranslation();
+
+
+    public abstract void setCustomName(@Nullable Component text);
+
+    public abstract void setCustomNameVisible(boolean visible);
+
+    public abstract @Nullable Component getCustomName();
+
+    public abstract boolean isCustomNameVisible();
 
     public abstract void setInteractionHeight(float height);
 
@@ -504,6 +547,131 @@ public abstract class ActivePart implements Active{
     public abstract boolean isInteractionResponsive();
 
     /**
+     * Set the profile of this mannequin part effectively changing its skin, if its type is {@link  SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param profile the profile
+     */
+    public abstract void setMannequinProfile(@NotNull PlayerProfile profile);
+
+    /**
+     * Set the profile of this mannequin part effectively changing its skin, if its type is {@link  SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param profile the profile
+     */
+    public abstract void setMannequinProfile(@NotNull ResolvableProfile profile);
+
+    /**
+     * Set the profile of this mannequin part effectively changing its skin, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}.
+     * The profile change will only be visible for the provided player
+     * @param profile the profile
+     * @param player the player to send profile change to
+     */
+    public void setMannequinProfile(@NotNull PlayerProfile profile, @NotNull Player player){
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
+        setMannequinProfile(ResolvableProfile.resolvableProfile(profile), player);
+    }
+
+    /**
+     * Set the profile of this mannequin part effectively changing its skin, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}.
+     * The profile change will only be visible for the provided player
+     * @param profile the profile
+     * @param player the player to send profile change to
+     */
+    public void setMannequinProfile(@NotNull ResolvableProfile profile, @NotNull Player player){
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
+        PacketUtils.setAttribute(player, entityId, DisplayAttributes.Mannequin.RESOLVABLE_PROFILE, profile);
+    }
+
+    /**
+     * Set the description/below name text of this mannequin part, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param text the pose text
+     */
+    public abstract void setMannequinBelowName(@Nullable Component text);
+
+    /**
+     * Set the pose of this mannequin part, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param pose the pose
+     */
+    public abstract void setMannequinPose(Pose pose);
+
+    /**
+     * Set the scale attribute of this mannequin part, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param scale the scale
+     */
+    public abstract void setMannequinScale(double scale);
+
+    /**
+     * Set whether the mannequin part should be immovable, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param immovable the immovability
+     */
+    public abstract void setMannequinImmovable(boolean immovable);
+
+    /**
+     * Set whether the mannequin part should have gravity, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param gravity the gravity
+     */
+    public abstract void setMannequinGravity(boolean gravity);
+
+    /**
+     * Set the mannequin part's main hand, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param mainHand the main hand
+     */
+    public abstract void setMannequinMainHand(@NotNull MainHand mainHand);
+
+    /**
+     * Set the item in mannequin part's equipment slot, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param slot the equipment slot
+     * @param itemStack the item to put in the slot
+     */
+    public abstract void setMannequinEquipment(@NotNull EquipmentSlot slot, @NotNull ItemStack itemStack);
+
+    /**
+     * Get a mannequin part's profile, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @return a {@link ResolvableProfile} or null
+     */
+    public abstract ResolvableProfile getMannequinProfile();
+
+    /**
+     * Get a mannequin part's description/below name text, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @return a {@link Component} or null
+     */
+    public abstract @Nullable Component getMannequinBelowName();
+
+    /**
+     * Get a mannequin part's pose, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @return a {@link Pose} or null
+     */
+    public abstract @Nullable Pose getMannequinPose();
+
+    /**
+     * Get a mannequin part's scale attribute, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @return a double or -1 if the part is not a mannequin
+     */
+    public abstract double getMannequinScale();
+
+    /**
+     * Get whether mannequin part is immovable, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @return a boolean, always false if the part is not a mannequin
+     */
+    public abstract boolean isMannequinImmovable();
+
+    /**
+     * Get whether mannequin part has gravity, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @return a boolean, always false if the part is not a mannequin
+     */
+    public abstract boolean hasMannequinGravity();
+
+    /**
+     * Get whether mannequin part has gravity, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @return a {@link MainHand} or null if the part is not a mannequin
+     */
+    public abstract @Nullable MainHand getMannequinMainHand();
+
+    /**
+     * Get the item in a mannequin part's equipment slot, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @return a {@link ItemStack} or null if the part is not a mannequin
+     */
+    public abstract @Nullable ItemStack getMannequinEquipment(@NotNull EquipmentSlot equipmentSlot);
+
+    /**
      * Adds a command to this part to execute when clicked, if its type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}
      * @param command The command to assign
      * @param isLeftClick whether the command is executed on left click
@@ -520,58 +688,4 @@ public abstract class ActivePart implements Active{
     public abstract @NotNull List<String> getInteractionCommands();
 
     public abstract @NotNull List<InteractionCommand> getInteractionCommandsWithData();
-
-    static class PartData {
-
-        private final UUID entityUUID;
-        private String worldName;
-
-        PartData(@NotNull Entity entity) {
-            this(entity.getUniqueId(), entity.getWorld().getName());
-        }
-
-        PartData(@NotNull UUID entityUUID, @NotNull String worldName) {
-            this.entityUUID = entityUUID;
-            this.worldName = worldName;
-        }
-
-        void setWorldName(String worldName) {
-            this.worldName = worldName;
-        }
-
-        /**
-         * Get the UUID of the entity this PartData represents
-         * @return a UUID
-         */
-        public UUID getUUID() {
-            return entityUUID;
-        }
-
-        /**
-         * Get the world name of the entity this PartData represents
-         *
-         * @return a string
-         */
-        public String getWorldName() {
-            return worldName;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null || getClass() != obj.getClass()) {
-                return false;
-            }
-
-            PartData data = (PartData) obj;
-            return entityUUID.equals(data.entityUUID) && worldName.equals(data.worldName);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(entityUUID, worldName);
-        }
-    }
 }

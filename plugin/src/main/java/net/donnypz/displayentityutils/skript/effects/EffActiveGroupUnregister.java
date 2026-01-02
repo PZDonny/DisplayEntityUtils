@@ -9,6 +9,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
+import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -48,7 +49,12 @@ public class EffActiveGroupUnregister extends Effect {
             sg.unregister(despawn, forced);
         }
         else if (g instanceof PacketDisplayEntityGroup pg){
-            pg.unregister();
+            if (pg.isPersistent()){
+                DisplayGroupManager.removePersistentPacketGroup(pg, true);
+            }
+            else{
+                pg.unregister();
+            }
         }
     }
 

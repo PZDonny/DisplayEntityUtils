@@ -22,7 +22,7 @@ import java.util.*;
 public class FramePoint extends RelativePoint implements Serializable {
 
     Set<AnimationParticle> particles = new HashSet<>();
-    Map<String, AnimationSound> sounds = new HashMap<>();
+    Map<String, DEUSound> sounds = new HashMap<>();
 
     @Serial
     private static final long serialVersionUID = 99L;
@@ -44,7 +44,7 @@ public class FramePoint extends RelativePoint implements Serializable {
         for (AnimationParticle p : point.particles){
             this.particles.add(p.clone());
         }
-        for (Map.Entry<String, AnimationSound> entry : point.sounds.entrySet()){
+        for (Map.Entry<String, DEUSound> entry : point.sounds.entrySet()){
             this.sounds.put(entry.getKey(), entry.getValue().clone());
         }
     }
@@ -234,7 +234,7 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param limited whether to limit the played audio only to players who can visibly see the group
      */
     public void playSounds(@NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, boolean limited){
-        for (AnimationSound sound : sounds.values()){
+        for (DEUSound sound : sounds.values()){
             if (limited){
                 sound.playSound(getLocation(group), group, animator, getPlayers(group));
             }
@@ -252,7 +252,7 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param limited whether to limit the played audio only to players who can visibly see the group
      */
     public void playSounds(@NotNull ActiveGroup<?> group, @NotNull Location location, @Nullable DisplayAnimator animator, boolean limited){
-        for (AnimationSound sound : sounds.values()){
+        for (DEUSound sound : sounds.values()){
             if (limited){
                 sound.playSound(location, group, animator, getPlayers(group));
             }
@@ -284,7 +284,7 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param player the player
      */
     public void playSounds(@NotNull Location location, @NotNull Player player){
-        for (AnimationSound sound : sounds.values()){
+        for (DEUSound sound : sounds.values()){
             sound.playSound(location, player);
         }
     }
@@ -295,7 +295,7 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param players the players
      */
     public void playSounds(@NotNull Location location, @NotNull Collection<Player> players){
-        for (AnimationSound sound : sounds.values()){
+        for (DEUSound sound : sounds.values()){
             sound.playSound(location, players);
         }
     }
@@ -323,23 +323,23 @@ public class FramePoint extends RelativePoint implements Serializable {
      * @param location the location to play the sounds
      */
     public void playSounds(@NotNull Location location){
-        for (AnimationSound sound : sounds.values()){
+        for (DEUSound sound : sounds.values()){
             sound.playSound(location);
         }
     }
 
     /**
-     * Add a {@link AnimationSound} to play at this frame point
+     * Add a {@link DEUSound} to play at this frame point
      * @param sound
      * @return this
      */
-    public FramePoint addSound(@NotNull AnimationSound sound){
+    public FramePoint addSound(@NotNull DEUSound sound){
         sounds.put(sound.soundName, sound);
         return this;
     }
 
     /**
-     * Remove all {@link AnimationSound}s from this frame point
+     * Remove all {@link DEUSound}s from this frame point
      * @return this
      */
     public FramePoint removeAllSounds(){
@@ -348,11 +348,11 @@ public class FramePoint extends RelativePoint implements Serializable {
     }
 
     /**
-     * Remove a {@link AnimationSound} that would be played at this point during an animation frame
+     * Remove a {@link DEUSound} that would be played at this point during an animation frame
      * @param sound
      * @return true if the sound was removed
      */
-    public boolean removeSound(@NotNull AnimationSound sound){
+    public boolean removeSound(@NotNull DEUSound sound){
         return sounds.remove(sound.soundName) != null;
     }
 
@@ -393,10 +393,10 @@ public class FramePoint extends RelativePoint implements Serializable {
     }
 
     /**
-     * Get the {@link AnimationSound}s that will be played at this frame point
-     * @return a collection of {@link AnimationSound}
+     * Get the {@link DEUSound}s that will be played at this frame point
+     * @return a collection of {@link DEUSound}
      */
-    public Collection<AnimationSound> getSounds(){
+    public Collection<DEUSound> getSounds(){
         return sounds.values();
     }
 
@@ -435,27 +435,8 @@ public class FramePoint extends RelativePoint implements Serializable {
         player.sendMessage(Component.empty());
 
         //Sounds
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Sounds: <yellow>"+sounds.size()));
-        if (sounds.isEmpty()){
-            player.sendMessage(Component.text("| NONE", NamedTextColor.GRAY));
-        }
-        else{
-            for (AnimationSound sound : sounds.values()){
-                Component msgComp = Component.text("- "+sound.getSoundName(), NamedTextColor.YELLOW);
-                Component hoverComp = Component.text("| Vol: "+sound.getVolume()+", Pitch: "+sound.getPitch(), NamedTextColor.GRAY);
-                if (!sound.existsInGameVersion()){
-                    msgComp = msgComp.append(Component.text(" [UNKNOWN]", NamedTextColor.GRAY));
-                    hoverComp = hoverComp
-                            .append(Component.newline())
-                            .append(Component.text("This sound no longer exists!", NamedTextColor.RED));
-                }
+        DEUSound.sendInfo(sounds.values(), player, null, null);
 
-                msgComp = msgComp.hoverEvent(HoverEvent.showText(hoverComp));
-                player.sendMessage(msgComp);
-            }
-        }
-
-        player.sendMessage(Component.empty());
         player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>RIGHT</yellow> <aqua>click to preview effects"));
     }
 

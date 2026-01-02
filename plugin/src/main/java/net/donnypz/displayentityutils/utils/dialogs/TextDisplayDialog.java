@@ -43,8 +43,6 @@ public final class TextDisplayDialog{
     private static final String COLOR_CODE = "deu_text_display_color_code";
     private static final String BACKGROUND_COLOR = "deu_text_display_background_color";
 
-    private static final DialogAction CONFIRM_ACTION = getConfirmAction();
-
 
     private TextDisplayDialog(){}
 
@@ -55,19 +53,7 @@ public final class TextDisplayDialog{
       * @param miniMessageFormatted whether the text display's text should be formatted as minimessage or ampersand
      */
     public static void sendDialog(@NotNull Player player, @NotNull TextDisplay textDisplay, boolean miniMessageFormatted){
-        Dialog dialog = Dialog.create(builder -> {
-            builder.empty()
-                    .base(DialogBase.builder(Component.text("Edit a Text Display"))
-                            .inputs(getInputs(textDisplay, miniMessageFormatted))
-                            .build())
-                    .type(DialogType.confirmation(ActionButton.create(Component.text("Confirm", NamedTextColor.GREEN),
-                            Component.text("Set your selected text display's text", NamedTextColor.YELLOW),
-                            200, CONFIRM_ACTION),
-                            ActionButton.create(Component.text("Cancel", NamedTextColor.RED),
-                                    Component.text("Cancel this action", NamedTextColor.YELLOW),
-                                    200, null)));
-        });
-        player.showDialog(dialog);
+        sendDialog(player, SpawnedDisplayEntityPart.create(textDisplay), miniMessageFormatted);
     }
 
     /**
@@ -85,7 +71,7 @@ public final class TextDisplayDialog{
                             .build())
                     .type(DialogType.confirmation(ActionButton.create(Component.text("Confirm", NamedTextColor.GREEN),
                                     Component.text("Set your selected text display's text", NamedTextColor.YELLOW),
-                                    200, CONFIRM_ACTION),
+                                    200, getConfirmAction(textDisplayPart)),
                             ActionButton.create(Component.text("Cancel", NamedTextColor.RED),
                                     Component.text("Cancel this action", NamedTextColor.YELLOW),
                                     200, null)));
@@ -106,21 +92,6 @@ public final class TextDisplayDialog{
             return;
         }
         sendDialog(player, textDisplay, miniMessageFormatted);
-    }
-
-    private static List<DialogInput> getInputs(TextDisplay textDisplay, boolean miniMessageFormatted){
-        return List.of(
-                getColorType(miniMessageFormatted),
-                getTextInput(textDisplay.text(), miniMessageFormatted),
-                getFont(textDisplay.text().font()),
-                getAlignment(textDisplay.getAlignment()),
-                getLineWidth(textDisplay.getLineWidth()),
-                getOpacity(textDisplay.getTextOpacity()),
-                getBackgroundColor(),
-                getShadow(textDisplay.isShadowed()),
-                getSeeThrough(textDisplay.isSeeThrough()),
-                getDefaultBackground(textDisplay.isDefaultBackground())
-        );
     }
 
     private static List<DialogInput> getInputs(ActivePart part, boolean miniMessageFormatted){
@@ -230,17 +201,12 @@ public final class TextDisplayDialog{
                 .build();
     }
 
-    private static DialogAction getConfirmAction(){
+    private static DialogAction getConfirmAction(ActivePart part){
         return DialogAction.customClick((view, audience) -> {
             Player p = (Player) audience;
             ActivePartSelection<?> selection = DisplayGroupManager.getPartSelection(p);
-            if (selection == null){
+            if (selection == null) {
                 p.sendMessage(Component.text("Part selection lost!", NamedTextColor.RED));
-                return;
-            }
-            ActivePart part = selection.getSelectedPart();
-            if (part == null || part.getType() != SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
-                p.sendMessage(Component.text("You do not have a text display selected!", NamedTextColor.RED));
                 return;
             }
 

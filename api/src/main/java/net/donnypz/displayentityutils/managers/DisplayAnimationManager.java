@@ -252,7 +252,7 @@ public final class DisplayAnimationManager {
         }
         try(ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes);
             GZIPInputStream gzipInputStream = new GZIPInputStream(byteStream);
-            ObjectInputStream objIn = new DisplayAnimationInputStream(gzipInputStream)
+            ObjectInputStream objIn = new DisplayObjectInputStream(gzipInputStream)
         ){
 
             DisplayAnimation anim = (DisplayAnimation) objIn.readObject();
@@ -277,7 +277,7 @@ public final class DisplayAnimationManager {
     //Not Compressed (Will be an older file version, before gzip compression)
         catch (ZipException z){
             try(ByteArrayInputStream byteStream  = new ByteArrayInputStream(bytes);
-                ObjectInputStream objIn = new DisplayAnimationInputStream(byteStream)
+                ObjectInputStream objIn = new DisplayObjectInputStream(byteStream)
             ){
                 DisplayAnimation anim = (DisplayAnimation) objIn.readObject();
                 anim.adaptOldSounds();
@@ -384,7 +384,7 @@ public final class DisplayAnimationManager {
         DisplayGroupManager.deserializeJsonElement(jsonObject);
         jsonObject.remove(DisplayGroupManager.PLUGIN_VERSION_FIELD);
 
-        return DEGJSONAdapter
+        return DEUJSONAdapter
                 .GSON
                 .fromJson(jsonObject, DisplayAnimation.class);
     }

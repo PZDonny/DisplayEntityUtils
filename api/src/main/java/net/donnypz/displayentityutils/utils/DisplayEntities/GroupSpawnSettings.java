@@ -7,10 +7,7 @@ import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Interaction;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -154,7 +151,7 @@ public class GroupSpawnSettings {
     }
 
     boolean applyAttributes(PacketDisplayEntityPart part){
-        if (part.type != SpawnedDisplayEntityPart.PartType.INTERACTION){
+        if (part.isDisplay()){
             //Teleport Duration
             part.attributeContainer.setAttribute(DisplayAttributes.TELEPORTATION_DURATION, teleportationDuration);
 
@@ -285,21 +282,35 @@ public class GroupSpawnSettings {
         interaction.setPersistent(persistentByDefault);
     }
 
-    private void determineVisibleByDefault(Display display){
-        for (String tag : hiddenPartTags.keySet()){
-            if (DisplayUtils.hasPartTag(display, tag)){
-                display.setVisibleByDefault(false);
-                reveal(display, tag);
-                break;
+    void apply(Mannequin mannequin){
+        //Determine Visibility
+        if (!visibleByDefault){
+            mannequin.setVisibleByDefault(false);
+            if (!visiblePlayers.isEmpty()){ //Reveal for players
+                for (UUID uuid : visiblePlayers){
+                    Player player = Bukkit.getPlayer(uuid);
+                    if (player != null && player.isOnline()){
+                        player.showEntity(DisplayAPI.getPlugin(), mannequin);
+                    }
+                }
+            }
+        }
+        else{
+            if (hiddenPartTags.isEmpty()){
+                mannequin.setVisibleByDefault(true);
+            }
+            else{
+                determineVisibleByDefault(mannequin);
             }
         }
     }
 
-    private void determineVisibleByDefault(Interaction interaction){
+
+    private void determineVisibleByDefault(Entity entity){
         for (String tag : hiddenPartTags.keySet()){
-            if (DisplayUtils.hasPartTag(interaction, tag)){
-                interaction.setVisibleByDefault(false);
-                reveal(interaction, tag);
+            if (DisplayUtils.hasPartTag(entity, tag)){
+                entity.setVisibleByDefault(false);
+                reveal(entity, tag);
                 break;
             }
         }

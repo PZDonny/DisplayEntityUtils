@@ -28,8 +28,8 @@ public final class DisplayAnimationFrame implements Serializable {
     HashMap<OldSound, Float[]> startSoundMap;
     HashMap<OldSound, Float[]> endSoundMap;
 
-    HashMap<String, AnimationSound> startSounds;
-    HashMap<String, AnimationSound> endSounds;
+    HashMap<String, DEUSound> startSounds;
+    HashMap<String, DEUSound> endSounds;
 
     transient Set<AnimationParticle> frameStartParticles;
     transient Set<AnimationParticle> frameEndParticles;
@@ -79,9 +79,9 @@ public final class DisplayAnimationFrame implements Serializable {
 
             //Start Sounds
             if (startSounds != null){
-                for (Map.Entry<String, AnimationSound> entry : startSounds.entrySet()){
+                for (Map.Entry<String, DEUSound> entry : startSounds.entrySet()){
                     String soundName = entry.getKey();
-                    AnimationSound sound = entry.getValue();
+                    DEUSound sound = entry.getValue();
                     sound.delay = 0;
                     point.sounds.put(soundName, sound);
                 }
@@ -89,11 +89,10 @@ public final class DisplayAnimationFrame implements Serializable {
 
             //End Sounds
             if (endSounds != null){
-                for (Map.Entry<String, AnimationSound> entry : endSounds.entrySet()){
-                    String soundName = entry.getKey();
-                    AnimationSound sound = entry.getValue();
-                    sound.delay = duration;
-                    point.sounds.put(soundName, sound);
+                for (Map.Entry<String, DEUSound> entry : endSounds.entrySet()){
+                    DEUSound sound = entry.getValue();
+                    sound.delay = this.duration;
+                    point.addSound(sound);
                 }
             }
 
@@ -108,9 +107,8 @@ public final class DisplayAnimationFrame implements Serializable {
             for (AnimationParticle particle : frameStartParticles){
                 String pointTag = OLD_ANIM_PARTICLE+animationParticle;
                 FramePoint point = new FramePoint(pointTag, particle.getVector(), particle.getGroupYawAtCreation(), particle.getGroupPitchAtCreation());
-                particle.setDelayInTicks(0);
-                point.particles.add(particle);
-                frame.framePoints.put(pointTag, point);
+                point.addParticle(particle);
+                frame.addFramePoint(point);
                 animationParticle++;
             }
         }
@@ -121,8 +119,8 @@ public final class DisplayAnimationFrame implements Serializable {
                 String pointTag = OLD_ANIM_PARTICLE+animationParticle;
                 FramePoint point = new FramePoint(pointTag, particle.getVector(), particle.getGroupYawAtCreation(), particle.getGroupPitchAtCreation());
                 particle.setDelayInTicks(duration);
-                point.particles.add(particle);
-                frame.framePoints.put(pointTag, point);
+                point.addParticle(particle);
+                frame.addFramePoint(point);
                 animationParticle++;
             }
         }
@@ -130,7 +128,7 @@ public final class DisplayAnimationFrame implements Serializable {
         //Frame Points
         if (framePoints != null){
             for (FramePoint fp : framePoints.values()){
-                frame.framePoints.put(fp.tag, new FramePoint(fp));
+                frame.addFramePoint(new FramePoint(fp));
             }
         }
 
@@ -177,25 +175,25 @@ public final class DisplayAnimationFrame implements Serializable {
 
 
     void repairOldSounds(){
-        HashMap<String, AnimationSound> map1 = handleOldSoundMaps(startSoundMap, 0);
+        HashMap<String, DEUSound> map1 = handleEnumSoundMaps(startSoundMap, 0);
         if (!map1.isEmpty()){
             if (startSounds == null) startSounds = new HashMap<>();
             startSounds.putAll(map1);
         }
 
-        HashMap<String, AnimationSound> map2 = handleOldSoundMaps(endSoundMap, duration);
+        HashMap<String, DEUSound> map2 = handleEnumSoundMaps(endSoundMap, duration);
         if (!map2.isEmpty()){
             if (endSounds == null) endSounds = new HashMap<>();
             endSounds.putAll(map2);
         }
     }
 
-    private HashMap<String, AnimationSound> handleOldSoundMaps(HashMap<OldSound, Float[]> soundMap, int delayInTicks) {
+    private HashMap<String, DEUSound> handleEnumSoundMaps(HashMap<OldSound, Float[]> soundMap, int delayInTicks) {
         if (soundMap == null || soundMap.isEmpty()){
             return new HashMap<>();
         }
 
-        HashMap<String, AnimationSound> convertedMap = new HashMap<>();
+        HashMap<String, DEUSound> convertedMap = new HashMap<>();
         for (Map.Entry<OldSound, Float[]> entry : soundMap.entrySet()) {
             OldSound sound = entry.getKey();
             Float[] values = entry.getValue();
@@ -204,10 +202,10 @@ public final class DisplayAnimationFrame implements Serializable {
             String soundName = sound.getKey().getKey();
             Sound foundSound = VersionUtils.getSound(soundName);
             if (foundSound != null){
-                convertedMap.put(foundSound.getKey().getKey(), new AnimationSound(foundSound, volume, pitch, delayInTicks));
+                convertedMap.put(foundSound.getKey().getKey(), new DEUSound(foundSound, volume, pitch, delayInTicks));
             }
             else{
-                convertedMap.put(soundName, new AnimationSound(soundName, volume, pitch, delayInTicks));
+                convertedMap.put(soundName, new DEUSound(soundName, volume, pitch, delayInTicks));
             }
         }
         return convertedMap;
