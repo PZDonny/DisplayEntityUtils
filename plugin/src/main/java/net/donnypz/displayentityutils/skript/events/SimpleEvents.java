@@ -11,6 +11,7 @@ import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.UUID;
@@ -78,6 +79,22 @@ public class SimpleEvents extends SimpleEvent {
                     .since("3.0.0");
             EventValues.registerEventValue(PacketGroupDestroyEvent.class, PacketDisplayEntityGroup.class, PacketGroupDestroyEvent::getGroup);
             EventValues.registerEventValue(PacketGroupDestroyEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
+
+            //Pre Item Place Group Event
+            Skript.registerEvent("Item Place Group Event", SimpleEvents.class, PreItemPlaceGroupEvent.class, "pre item place[d] [packet] [display] group")
+                    .description("Called before a player places a packet-based using an item")
+                    .since("3.4.0");
+            EventValues.registerEventValue(PreItemPlaceGroupEvent.class, String.class, PreItemPlaceGroupEvent::getGroupTag);
+            EventValues.registerEventValue(PreItemPlaceGroupEvent.class, Player.class, PreItemPlaceGroupEvent::getPlayer);
+            EventValues.registerEventValue(PreItemPlaceGroupEvent.class, ItemStack.class, PreItemPlaceGroupEvent::getItemStack);
+
+            //Item Place Group Event
+            Skript.registerEvent("Item Place Group Event", SimpleEvents.class, ItemPlaceGroupEvent.class, "item place[d] [packet] [display] group")
+                    .description("Called when a player places a packet-based using an item")
+                    .since("3.4.0");
+            EventValues.registerEventValue(ItemPlaceGroupEvent.class, ActiveGroup.class, ItemPlaceGroupEvent::getGroup);
+            EventValues.registerEventValue(ItemPlaceGroupEvent.class, Player.class, ItemPlaceGroupEvent::getPlayer);
+            EventValues.registerEventValue(ItemPlaceGroupEvent.class, ItemStack.class, ItemPlaceGroupEvent::getItemStack);
 
             //Animation Start Event
             Skript.registerEvent("Animation Start", SimpleEvents.class, AnimationStartEvent.class, "[deu] anim[ation] start[ed]")
