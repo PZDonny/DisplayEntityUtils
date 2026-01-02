@@ -58,7 +58,7 @@ public enum Permission {
     PARTS_TRANSFORM("deu.parts.transform"),
 
 
-    DISPLAY_SET_BLOCK("deu.parts.setblock"),
+    DISPLAY_SET_BLOCK("deu.display.setblock"),
     DISPLAY_GLOW_COLOR("deu.display.glowcolor"),
     DISPLAY_TRANSLATE("deu.display.translate"),
     DISPLAY_TRANSFORM("deu.display.transform"),
