@@ -1033,7 +1033,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
-    public @NotNull ItemStack getMannequinEquipment(@NotNull EquipmentSlot equipmentSlot) {
+    public @Nullable ItemStack getMannequinEquipment(@NotNull EquipmentSlot equipmentSlot) {
         if (type != PartType.MANNEQUIN) return null;
         Mannequin mannequin = (Mannequin) getEntity();
         if (mannequin == null) return null;

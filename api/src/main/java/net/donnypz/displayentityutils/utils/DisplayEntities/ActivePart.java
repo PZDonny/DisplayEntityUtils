@@ -549,49 +549,130 @@ public abstract class ActivePart implements Active{
      */
     public abstract boolean isInteractionResponsive();
 
+    /**
+     * Set the profile of this mannequin part effectively changing its skin, if its type is {@link  SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param profile the profile
+     */
     public abstract void setMannequinProfile(@NotNull PlayerProfile profile);
 
+    /**
+     * Set the profile of this mannequin part effectively changing its skin, if its type is {@link  SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param profile the profile
+     */
     public abstract void setMannequinProfile(@NotNull ResolvableProfile profile);
 
-    public void setMannequinProfile(@NotNull PlayerProfile profile, Player player){
+    /**
+     * Set the profile of this mannequin part effectively changing its skin, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}.
+     * The profile change will only be visible for the provided player
+     * @param profile the profile
+     * @param player the player to send profile change to
+     */
+    public void setMannequinProfile(@NotNull PlayerProfile profile, @NotNull Player player){
         if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
         setMannequinProfile(ResolvableProfile.resolvableProfile(profile), player);
     }
 
-    public void setMannequinProfile(@NotNull ResolvableProfile profile, Player player){
+    /**
+     * Set the profile of this mannequin part effectively changing its skin, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}.
+     * The profile change will only be visible for the provided player
+     * @param profile the profile
+     * @param player the player to send profile change to
+     */
+    public void setMannequinProfile(@NotNull ResolvableProfile profile, @NotNull Player player){
         if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
         PacketUtils.setAttribute(player, entityId, DisplayAttributes.Mannequin.RESOLVABLE_PROFILE, profile);
     }
 
+    /**
+     * Set the description/below name text of this mannequin part, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param text the pose text
+     */
     public abstract void setMannequinBelowName(@Nullable Component text);
 
+    /**
+     * Set the pose of this mannequin part, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param pose the pose
+     */
     public abstract void setMannequinPose(Pose pose);
 
+    /**
+     * Set the scale attribute of this mannequin part, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param scale the scale
+     */
     public abstract void setMannequinScale(double scale);
 
+    /**
+     * Set whether the mannequin part should be immovable, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param immovable the immovability
+     */
     public abstract void setMannequinImmovable(boolean immovable);
 
+    /**
+     * Set whether the mannequin part should have gravity, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param gravity the gravity
+     */
     public abstract void setMannequinGravity(boolean gravity);
 
+    /**
+     * Set the mannequin part's main hand, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param mainHand the main hand
+     */
     public abstract void setMannequinMainHand(@NotNull MainHand mainHand);
 
+    /**
+     * Set the item in mannequin part's equipment slot, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @param slot the equipment slot
+     * @param itemStack the item to put in the slot
+     */
     public abstract void setMannequinEquipment(@NotNull EquipmentSlot slot, @NotNull ItemStack itemStack);
 
+    /**
+     * Get a mannequin part's profile, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @return a {@link ResolvableProfile} or null
+     */
     public abstract ResolvableProfile getMannequinProfile();
 
+    /**
+     * Get a mannequin part's description/below name text, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @return a {@link Component} or null
+     */
     public abstract @Nullable Component getMannequinBelowName();
 
+    /**
+     * Get a mannequin part's pose, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @return a {@link Pose} or null
+     */
     public abstract @Nullable Pose getMannequinPose();
 
+    /**
+     * Get a mannequin part's scale attribute, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @return a double or -1 if the part is not a mannequin
+     */
     public abstract double getMannequinScale();
 
+    /**
+     * Get whether mannequin part is immovable, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @return a boolean, always false if the part is not a mannequin
+     */
     public abstract boolean isMannequinImmovable();
 
+    /**
+     * Get whether mannequin part has gravity, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @return a boolean, always false if the part is not a mannequin
+     */
     public abstract boolean hasMannequinGravity();
 
+    /**
+     * Get whether mannequin part has gravity, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @return a {@link MainHand} or null if the part is not a mannequin
+     */
     public abstract @Nullable MainHand getMannequinMainHand();
 
-    public abstract @NotNull ItemStack getMannequinEquipment(@NotNull EquipmentSlot equipmentSlot);
+    /**
+     * Get the item in a mannequin part's equipment slot, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * @return a {@link ItemStack} or null if the part is not a mannequin
+     */
+    public abstract @Nullable ItemStack getMannequinEquipment(@NotNull EquipmentSlot equipmentSlot);
 
     /**
      * Adds a command to this part to execute when clicked, if its type is {@link SpawnedDisplayEntityPart.PartType#INTERACTION}

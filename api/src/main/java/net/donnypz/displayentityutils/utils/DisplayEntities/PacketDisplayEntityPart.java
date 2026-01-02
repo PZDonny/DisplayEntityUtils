@@ -648,9 +648,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public @NotNull ItemStack getMannequinEquipment(@NotNull EquipmentSlot equipmentSlot) {
-        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return ItemStack.of(Material.AIR);
-        return attributeContainer.getAttribute(DisplayAttributes.Equipment.getAttribute(equipmentSlot));
+    public @Nullable ItemStack getMannequinEquipment(@NotNull EquipmentSlot equipmentSlot) {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return null;
+        return attributeContainer.getAttributeOrDefault(DisplayAttributes.Equipment.getAttribute(equipmentSlot), new ItemStack(Material.AIR));
     }
 
     @Override
