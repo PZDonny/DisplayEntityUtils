@@ -19,6 +19,7 @@ import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import net.donnypz.displayentityutils.utils.packet.attributes.TextDisplayOptions;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
@@ -89,21 +90,19 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         SpawnedDisplayEntityPart.PartType pt = SpawnedDisplayEntityPart.PartType.getType(entity);
         if (pt == null) return null;
         PacketDisplayEntityPart part;
-        switch (entity){
-            case Display d -> {
-                part = new DisplayEntity(d, DisplayEntity.Type.fromPartType(pt))
-                        .createPacketPart(null, entity.getLocation(), null);
-            }
-            case Interaction inter -> {
-                part = new InteractionEntity(inter).createPacketPart(entity.getLocation(), null);
-            }
-            case Mannequin man -> {
-                MannequinEntity m = SavedEntityBuilder.buildMannequin(entity);
-                part = m.createPacketPart(entity.getLocation(), null);
-            }
-            default -> {
-                return null;
-            }
+        if (entity instanceof Display d){
+            part = new DisplayEntity(d, DisplayEntity.Type.fromPartType(pt))
+                    .createPacketPart(null, entity.getLocation(), null);
+        }
+        else if (entity instanceof Interaction i){
+            part = new InteractionEntity(i).createPacketPart(entity.getLocation(), null);
+        }
+        else if (VersionUtils.canSpawnMannequins() && entity instanceof Mannequin){
+            MannequinEntity m = SavedEntityBuilder.buildMannequin(entity);
+            part = m.createPacketPart(entity.getLocation(), null);
+        }
+        else{
+            return null;
         }
         if (removeExistingEntity) entity.remove();
         return part;

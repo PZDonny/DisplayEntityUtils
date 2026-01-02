@@ -8,6 +8,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.RelativePoint;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SinglePartSelection;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -83,17 +84,17 @@ public class DisplayEntitySelector extends RelativePointSelector<RelativePoint> 
         part.glow(player, 30);
         RelativePointUtils.removeRelativePoints(player);
         String entityType;
-        switch(entity){
-            case Display d -> {
-                entityType = "Display";
-            }
-            case Interaction i -> {
-                entityType = "Interaction";
-            }
-            case Mannequin m -> {
-                entityType = "Mannequin";
-            }
-            default -> entityType = "";
+        if (entity instanceof Display){
+            entityType = "Display";
+        }
+        else if (entity instanceof Interaction){
+            entityType = "Interaction";
+        }
+        else if (VersionUtils.canSpawnMannequins() && entity instanceof Mannequin){
+            entityType = "Mannequin";
+        }
+        else{
+            entityType = "";
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text(entityType+" Entity Selected!", NamedTextColor.GREEN)));
     }
