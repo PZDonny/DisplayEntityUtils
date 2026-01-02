@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.donnypz.displayentityutils</groupId>
         <artifactId>deu</artifactId>
-        <version>3.4.0-PRE-1</version>
+        <version>3.4.0</version>
     </parent>
 
     <artifactId>api</artifactId>
