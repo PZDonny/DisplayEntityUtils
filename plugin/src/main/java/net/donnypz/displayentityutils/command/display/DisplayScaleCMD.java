@@ -16,7 +16,7 @@ import java.util.List;
 class DisplayScaleCMD extends PartsSubCommand {
 
     DisplayScaleCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("scale", parentSubCommand, Permission.PARTS_TRANSFORM, 4, 4);
+        super("scale", parentSubCommand, Permission.DISPLAY_TRANSFORM, 4, 4);
         setTabComplete(2, List.of("x", "y", "z", "-all"));
         setTabComplete(3, "<scale>");
     }
