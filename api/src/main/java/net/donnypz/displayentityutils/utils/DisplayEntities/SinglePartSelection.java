@@ -23,6 +23,7 @@ public final class SinglePartSelection extends ActivePartSelection<SpawnedDispla
 
     @Override
     public void remove() {
+        selectedPart.remove(false);
         selectedPart = null;
     }
 

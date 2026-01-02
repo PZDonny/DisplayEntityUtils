@@ -40,13 +40,10 @@ public abstract class ActivePart implements Active{
     private boolean valid = true;
     final Set<ClientAnimationPlayer> clientAnimationPlayers = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    protected ActivePart(int entityId, boolean mapped){
+    protected ActivePart(int entityId, boolean autoMap){
         this.entityId = entityId;
-        if (mapped) {
+        if (autoMap) {
             partsById.put(entityId, this);
-        }
-        else{
-            partUUID = UUID.randomUUID();
         }
     }
 

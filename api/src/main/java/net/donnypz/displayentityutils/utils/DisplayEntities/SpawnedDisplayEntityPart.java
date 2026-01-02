@@ -58,12 +58,13 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     SpawnedDisplayEntityPart(Entity entity){
-        super(entity.getEntityId(), false);
+        super(entity.getEntityId(), true);
         if (PartType.getType(entity) == null) throw new IllegalArgumentException("Entity is not a valid part type entity");
         this.type = PartType.getType(entity);
         this.entity = entity;
         this.entityUUID = entity.getUniqueId();
-        isSingle = true;
+        this.partUUID = UUID.randomUUID();
+        this.isSingle = true;
     }
 
     /**

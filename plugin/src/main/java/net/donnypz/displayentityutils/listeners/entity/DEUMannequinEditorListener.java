@@ -38,7 +38,7 @@ public class DEUMannequinEditorListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent event){
-        if (!VersionUtils.IS_1_21_9) return;
+        if (!VersionUtils.canSpawnMannequins()) return;
         Inventory inv = event.getInventory();
 
         Player player = (Player) event.getWhoClicked();
@@ -61,7 +61,7 @@ public class DEUMannequinEditorListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (!VersionUtils.IS_1_21_9) return;
+        if (!VersionUtils.canSpawnMannequins()) return;
         Inventory inv = event.getInventory();
 
         Player player = (Player) event.getPlayer();
