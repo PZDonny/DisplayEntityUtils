@@ -4,7 +4,6 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.mannequin.ui.MannequinEquipmentGUI;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
