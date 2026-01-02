@@ -289,7 +289,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
 
     @Override
-    public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions) {
+    public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays) {
         if (newScaleMultiplier <= 0){
             throw new IllegalArgumentException("New Scale Multiplier cannot be <= 0");
         }
@@ -297,11 +297,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             return true;
         }
 
-        for (PacketDisplayEntityPart p : groupParts.values()){
+        for (PacketDisplayEntityPart part : groupParts.values()){
             //Displays
-            if (p.isDisplay()){
+            if (part.isDisplay()){
                 DisplayAttributeMap attributeMap = new DisplayAttributeMap();
-                Transformation transformation = p.getTransformation();
+                Transformation transformation = part.getTransformation();
                 //Reset Scale then multiply by newScaleMultiplier
                 Vector3f scale = transformation.getScale();
                 scale.x = (scale.x/scaleMultiplier)*newScaleMultiplier;
@@ -314,40 +314,46 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 translationVector.y = (translationVector.y/scaleMultiplier)*newScaleMultiplier;
                 translationVector.z = (translationVector.z/scaleMultiplier)*newScaleMultiplier;
 
-                if (!transformation.equals(p.getTransformation())){
+                if (!transformation.equals(part.getTransformation())){
                     attributeMap.add(DisplayAttributes.Interpolation.DURATION, durationInTicks)
                         .add(DisplayAttributes.Interpolation.DELAY, -1)
                         .addTransformation(transformation);
                 }
                 //Culling
                 if (DisplayConfig.autoCulling()){
-                    float[] values = DisplayUtils.getAutoCullValues(p, DisplayConfig.widthCullingAdder(), DisplayConfig.heightCullingAdder());
+                    float[] values = DisplayUtils.getAutoCullValues(part, DisplayConfig.widthCullingAdder(), DisplayConfig.heightCullingAdder());
                     attributeMap.add(DisplayAttributes.Culling.HEIGHT, values[1])
                         .add(DisplayAttributes.Culling.WIDTH, values[0]);
                 }
 
-                p.attributeContainer.setAttributesAndSend(attributeMap, p.getEntityId(), p.viewers);
+                part.attributeContainer.setAttributesAndSend(attributeMap, part.getEntityId(), part.viewers);
             }
-            //Interactions
-            else if (scaleInteractions){
+            //Non Displays
+            else if (scaleNonDisplays){
+                if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                    //Reset Scale then multiply by newScaleMultiplier
+                    float newHeight = (part.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier;
+                    float newWidth = (part.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier;
+                    PacketUtils.scaleInteraction(part, newHeight, newWidth, durationInTicks, 0);
 
-                //Reset Scale then multiply by newScaleMultiplier
-                float newHeight = (p.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier;
-                float newWidth = (p.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier;
-                PacketUtils.scaleInteraction(p, newHeight, newWidth, durationInTicks, 0);
+                    //Reset Translation then multiply by newScaleMultiplier
+                    Vector translationVector = part.getNonDisplayTranslation();
+                    if (translationVector == null){
+                        continue;
+                    }
+                    Vector oldVector = new Vector(translationVector.getX(), translationVector.getY(), translationVector.getZ());
+                    translationVector.setX((translationVector.getX()/scaleMultiplier)*newScaleMultiplier);
+                    translationVector.setY((translationVector.getY()/scaleMultiplier)*newScaleMultiplier);
+                    translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
 
-                //Reset Translation then multiply by newScaleMultiplier
-                Vector translationVector = p.getNonDisplayTranslation();
-                if (translationVector == null){
-                    continue;
+                    Vector moveVector = oldVector.subtract(translationVector);
+                    PacketUtils.translateNonDisplay(part, moveVector, moveVector.length(), durationInTicks, 0);
                 }
-                Vector oldVector = new Vector(translationVector.getX(), translationVector.getY(), translationVector.getZ());
-                translationVector.setX((translationVector.getX()/scaleMultiplier)*newScaleMultiplier);
-                translationVector.setY((translationVector.getY()/scaleMultiplier)*newScaleMultiplier);
-                translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
-
-                Vector moveVector = oldVector.subtract(translationVector);
-                PacketUtils.translateNonDisplay(p, moveVector, moveVector.length(), durationInTicks, 0);
+                else if (part.type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
+                        double scale = part.attributeContainer.getAttributeOrDefault(DisplayAttributes.Mannequin.SCALE, 1f);
+                        scale = (scale/scaleMultiplier)*newScaleMultiplier;
+                        part.attributeContainer.setAttributeAndSend(DisplayAttributes.Mannequin.SCALE, (float) scale, part.getEntityId(), part.viewers);
+                }
             }
         }
 

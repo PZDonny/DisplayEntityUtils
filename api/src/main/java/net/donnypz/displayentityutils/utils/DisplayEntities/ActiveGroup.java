@@ -133,10 +133,10 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * Change the scale of all parts in this group by the given scale multiplier
      * @param newScaleMultiplier the scale multiplier to apply to this group
      * @param durationInTicks how long it should take for the group to scale
-     * @param scaleInteractions whether interaction entities should be scaled
+     * @param scaleNonDisplays whether non-display entities should scale
      * @throws IllegalArgumentException if newScaleMultiplier is less than or equal to 0
      */
-    public abstract boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions);
+    public abstract boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays);
 
     /**
      * Change the true location of this group.

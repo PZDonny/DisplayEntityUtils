@@ -14,6 +14,7 @@ import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -413,7 +414,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     @Override
-    public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleInteractions){
+    public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays){
         if (newScaleMultiplier <= 0){
             throw new IllegalArgumentException("New Scale Multiplier cannot be <= 0");
         }
@@ -429,10 +430,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             return false;
         }
 
-        for (SpawnedDisplayEntityPart p : groupParts.values()){
+        for (SpawnedDisplayEntityPart part : groupParts.values()){
             //Displays
-            if (p.isDisplay()){
-                Display d = (Display) p.getEntity();
+            if (part.isDisplay()){
+                Display d = (Display) part.getEntity();
                 Transformation transformation = d.getTransformation();
 
                 //Reset Scale then multiply by newScaleMultiplier
@@ -455,30 +456,38 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 }
                 //Culling
                 if (DisplayConfig.autoCulling()){
-                    p.autoCull(DisplayConfig.widthCullingAdder(), DisplayConfig.heightCullingAdder());
+                    part.autoCull(DisplayConfig.widthCullingAdder(), DisplayConfig.heightCullingAdder());
                 }
             }
             //Interactions
-            else if (scaleInteractions){
-                Interaction i = (Interaction) p.getEntity();
+            else if (scaleNonDisplays){
+                if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
+                    Interaction i = (Interaction) part.getEntity();
 
-                //Reset Scale then multiply by newScaleMultiplier
-                float newHeight = (i.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier;
-                float newWidth = (i.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier;
-                DisplayUtils.scaleInteraction(i, newHeight, newWidth, durationInTicks, 0);
+                    //Reset Scale then multiply by newScaleMultiplier
+                    float newHeight = (i.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier;
+                    float newWidth = (i.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier;
+                    DisplayUtils.scaleInteraction(i, newHeight, newWidth, durationInTicks, 0);
 
-            //Reset Translation then multiply by newScaleMultiplier
-                Vector translationVector = DisplayUtils.getNonDisplayTranslation(i);
-                if (translationVector == null){
-                    continue;
+                    //Reset Translation then multiply by newScaleMultiplier
+                    Vector translationVector = DisplayUtils.getNonDisplayTranslation(i);
+                    if (translationVector == null){
+                        continue;
+                    }
+                    Vector oldVector = new Vector(translationVector.getX(), translationVector.getY(), translationVector.getZ());
+                    translationVector.setX((translationVector.getX()/scaleMultiplier)*newScaleMultiplier);
+                    translationVector.setY((translationVector.getY()/scaleMultiplier)*newScaleMultiplier);
+                    translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
+
+                    Vector moveVector = oldVector.subtract(translationVector);
+                    part.translateForce(moveVector, (float) moveVector.length(), durationInTicks, 0);
                 }
-                Vector oldVector = new Vector(translationVector.getX(), translationVector.getY(), translationVector.getZ());
-                translationVector.setX((translationVector.getX()/scaleMultiplier)*newScaleMultiplier);
-                translationVector.setY((translationVector.getY()/scaleMultiplier)*newScaleMultiplier);
-                translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
-
-                Vector moveVector = oldVector.subtract(translationVector);
-                p.translateForce(moveVector, (float) moveVector.length(), durationInTicks, 0);
+                else if (part.type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
+                    Mannequin m = (Mannequin) part.getEntity();
+                    double scale = m.getAttribute(Attribute.SCALE).getBaseValue();
+                    scale = (scale/scaleMultiplier)*newScaleMultiplier;
+                    m.getAttribute(Attribute.SCALE).setBaseValue(scale);
+                }
             }
         }
 

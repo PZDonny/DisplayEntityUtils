@@ -539,6 +539,9 @@ public class PacketAttributeContainer implements Cloneable{
         }
 
         WrapperPlayServerUpdateAttributes.Property createAttributeData(DisplayAttribute<?, ?> attribute, Object value){
+            if (attribute == DisplayAttributes.Mannequin.SCALE){
+                value = Math.clamp((float) value, 0, 16);
+            }
             return new WrapperPlayServerUpdateAttributes.Property(((AttributeDisplayAttribute) attribute).getAttribute(),
                     (float) value,
                     List.of());
