@@ -810,12 +810,13 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             return false;
         }
 
-        if (verticalOffset != 0) {
-            translate(Direction.UP, verticalOffset, -1, -1);
+        if (!rideOffset.isZero()) {
+            translate(rideOffset, -1, -1);
         }
 
-        for (SpawnedDisplayEntityPart interactionPart: this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
-            alignNonDisplayWithMountedGroup(interactionPart, vehicle);
+        for (SpawnedDisplayEntityPart part : groupParts.values()){
+            if (part.isDisplay()) continue;
+            alignNonDisplayWithMountedGroup(part, vehicle);
         }
         return true;
     }
@@ -830,8 +831,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         Entity masterEntity = getMasterEntity();
         if (masterEntity != null){
             if (masterEntity.leaveVehicle()){
-                if (verticalOffset != 0){
-                    translate(Direction.DOWN, verticalOffset, -1, -1);
+                if (!rideOffset.isZero()){
+                    translate(rideOffset.clone().multiply(-1), -1, -1);
                 }
             }
         }
@@ -843,8 +844,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     private void alignNonDisplayWithMountedGroup(SpawnedDisplayEntityPart part, Entity vehicle){
-        final Interaction interaction = (Interaction) part.getEntity();
-        DisplayAPI.getScheduler().entityRunTimer(interaction, new Scheduler.SchedulerRunnable() {
+        final Entity entity = part.getEntity();
+        DisplayAPI.getScheduler().entityRunTimer(entity, new Scheduler.SchedulerRunnable() {
             Location lastLoc = getLocation();
             @Override
             public void run() {
@@ -854,14 +855,14 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 }
 
                 Location newLoc = getLocation();
-                Location tpLoc = interaction.getLocation().clone();
+                Location tpLoc = entity.getLocation().clone();
                 double distance = lastLoc.distance(tpLoc);
 
                 if (distance != 0){
                     Vector adjustVec = lastLoc.toVector().subtract(newLoc.toVector());
                     tpLoc.subtract(adjustVec);
                     lastLoc = newLoc;
-                    FoliaUtils.teleport(interaction, tpLoc);
+                    FoliaUtils.teleport(entity, tpLoc);
                 }
 
                 if (getVehicle() != vehicle){

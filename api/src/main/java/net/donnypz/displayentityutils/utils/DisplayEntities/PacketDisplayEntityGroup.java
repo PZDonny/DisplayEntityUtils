@@ -404,8 +404,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 .computeIfAbsent(vehicleUUID, key -> new PassengerGroupData())
                 .addGroup(vehicleUUID, this);
 
-        if (verticalOffset != 0) {
-            translate(Direction.UP, verticalOffset, -1, -1);
+        if (!rideOffset.isZero()) {
+            translate(rideOffset, -1, -1);
         }
 
         if (runLocationUpdater){
@@ -463,8 +463,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         dismount(getTrackingPlayers());
 
         if (!vehicle.isDead()){
-            if (verticalOffset != 0){
-                translate(Direction.DOWN, verticalOffset, -1, -1);
+            if (!rideOffset.isZero()){
+                translate(rideOffset.clone().multiply(-1), -1, -1);
             }
         }
         return vehicle;

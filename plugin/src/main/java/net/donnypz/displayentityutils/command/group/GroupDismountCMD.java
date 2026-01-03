@@ -16,6 +16,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -99,7 +100,7 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
         else{
             group.dismount();
             group.unsetMachineState();
-            group.setVerticalOffset(0);
+            group.setRideOffset(new Vector());
             group.stopFollowingEntity();
         }
     }
