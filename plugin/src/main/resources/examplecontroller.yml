@@ -35,8 +35,11 @@ groupProperties:
   #Reverses this group's follow property directions
   #This is useful if your group was oriented in the opposite direction than intended
   flip: false
-  #The vertical offset that should be applied to the group when riding an entity
-  verticalOffset: 0
+  #The ride offset that should be applied to the group when riding an entity, from the ridden position
+  offset:
+    x: 0
+    y: 0
+    z: 0
   #Determine if the group should be visible by default when spawned
   visibleByDefault: true
 
