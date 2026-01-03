@@ -81,7 +81,7 @@ public class SimpleEvents extends SimpleEvent {
             EventValues.registerEventValue(PacketGroupDestroyEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
 
             //Pre Item Place Group Event
-            Skript.registerEvent("Item Place Group Event", SimpleEvents.class, PreItemPlaceGroupEvent.class, "pre item place[d] [packet] [display] group")
+            Skript.registerEvent("Pre Item Place Group Event", SimpleEvents.class, PreItemPlaceGroupEvent.class, "pre item place[d] [packet] [display] group")
                     .description("Called before a player places a packet-based using an item")
                     .since("3.4.0");
             EventValues.registerEventValue(PreItemPlaceGroupEvent.class, String.class, PreItemPlaceGroupEvent::getGroupTag);
