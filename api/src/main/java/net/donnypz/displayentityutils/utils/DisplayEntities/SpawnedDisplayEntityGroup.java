@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
+import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -1223,8 +1224,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             return;
         }
         DisplayStateMachine.unregisterFromStateMachine(this, false); //Animators will auto-stop
-        DisplayGroupManager.removeSpawnedGroup(this, despawnParts, force);
-        groupParts.clear();
+        removeSpawnedGroup(despawnParts, force);
+
         masterPart = null;
         synchronized (followerLock){
             followers.clear();
@@ -1232,6 +1233,57 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (defaultFollower != null){
             defaultFollower.remove();
             defaultFollower = null;
+        }
+    }
+
+    private void removeSpawnedGroup(boolean despawn, boolean force){
+        GroupUnregisteredEvent event = new GroupUnregisteredEvent(this, despawn);
+        if (!event.callEvent()) return;
+
+        despawn = event.isDespawning();
+
+        Iterator<SpawnedDisplayEntityPart> iter = groupParts.values().iterator();
+        if (despawn && force){
+            HashSet<Chunk> chunks = new HashSet<>();
+            Location groupLoc = getLocation();
+            long mainChunkKey = ConversionUtils.getChunkKey(groupLoc);
+            ticketChunk(groupLoc, chunks);
+
+            while (iter.hasNext()){
+                SpawnedDisplayEntityPart part = iter.next();
+                if (!part.isDisplay()){ //Chunk may be different from main chunk
+                    Entity e = part.getEntity();
+                    Location entityLoc = e.getLocation();
+                    long chunkKey = ConversionUtils.getChunkKey(entityLoc);
+                    if (chunkKey != mainChunkKey){
+                        ticketChunk(entityLoc, chunks);
+                    }
+                }
+                part.groupUnregisterRemove(despawn);
+                iter.remove();
+            }
+
+            for (Chunk c : chunks){ //Remove Chunk Tickets
+                c.removePluginChunkTicket(DisplayAPI.getPlugin());
+            }
+        }
+        else{
+            while (iter.hasNext()){
+                SpawnedDisplayEntityPart part = iter.next();
+                part.groupUnregisterRemove(despawn);
+                iter.remove();
+            }
+        }
+
+        DisplayGroupManager.removeSpawnedGroup(masterPart);
+        removeAllPartSelections();
+    }
+
+    private static void ticketChunk(Location location, HashSet<Chunk> chunks){
+        if (!location.isChunkLoaded()){
+            Chunk chunk = location.getChunk();
+            chunk.addPluginChunkTicket(DisplayAPI.getPlugin());
+            chunks.add(chunk);
         }
     }
 

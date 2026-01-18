@@ -121,43 +121,8 @@ public final class DisplayGroupManager {
 
 
     @ApiStatus.Internal
-    public static void removeSpawnedGroup(SpawnedDisplayEntityGroup spawnedGroup, boolean despawn, boolean force) {
-        GroupUnregisteredEvent event = new GroupUnregisteredEvent(spawnedGroup, despawn);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return;
-        }
-
-        //In the event a user changed this value
-        despawn = event.isDespawning();
-
-        if (despawn && force){
-            HashSet<Chunk> chunks = new HashSet<>();
-            Chunk mainChunk = spawnedGroup.getLocation().getChunk();
-            ticketChunk(mainChunk, chunks);
-            for (SpawnedDisplayEntityPart part : spawnedGroup.getParts()) {
-                if (!part.isDisplay()){ //Chunk may be different from main chunk
-                    Entity e = part.getEntity();
-                    Chunk c = e.getChunk();
-                    if (c != mainChunk){
-                        ticketChunk(c, chunks);
-                    }
-                }
-                part.remove(despawn);
-            }
-
-            for (Chunk c : chunks){ //Remove Chunk Tickets
-                c.removePluginChunkTicket(DisplayAPI.getPlugin());
-            }
-        }
-        else{
-            for (SpawnedDisplayEntityPart part : spawnedGroup.getParts()) {
-                part.remove(despawn);
-            }
-        }
-
-        allSpawnedGroups.remove(spawnedGroup.getMasterPart());
-        spawnedGroup.removeAllPartSelections();
+    public static void removeSpawnedGroup(SpawnedDisplayEntityPart masterPart) {
+        allSpawnedGroups.remove(masterPart);
     }
 
     private static void ticketChunk(Chunk chunk, HashSet<Chunk> chunks){
