@@ -244,6 +244,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     void updatePassengerIds(int passengerId, boolean add){
+        if (passengerIds == null) return;
         int[] ids;
         if (add){
             ids = new int[passengerIds.length+1];
@@ -1061,15 +1062,24 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         if (worldName != null){
             WorldData data = allPacketGroups.get(worldName);
             if (data != null){
-                data.removeGroup(getLocation().getChunk().getChunkKey(), this);
+                Location groupLoc = getLocation();
+                if (groupLoc != null){
+                    long chunkKey = ConversionUtils.getChunkKey(groupLoc);
+                    data.removeGroup(chunkKey, this);
+                }
                 if (data.groupMap.isEmpty()){
                     allPacketGroups.remove(worldName);
                 }
             }
         }
 
-        for (PacketDisplayEntityPart part : new HashSet<>(groupParts.values())){
-            part.removeFromGroup(true);
+        passengerIds = null;
+
+        Iterator<PacketDisplayEntityPart> iter = groupParts.values().iterator();
+        while (iter.hasNext()){
+            PacketDisplayEntityPart part = iter.next();
+            part.groupUnregisterRemove();
+            iter.remove();
         }
 
         DisplayStateMachine.unregisterFromStateMachine(this, false); //Animators will auto-stop

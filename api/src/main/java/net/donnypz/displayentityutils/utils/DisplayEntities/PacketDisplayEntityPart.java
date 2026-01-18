@@ -1265,7 +1265,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * */
     public void remove(){
         if (hasGroup()){
-            removeFromGroup(true);
+            removeFromGroup(false);
         }
         hide();
         unregister();
@@ -1286,6 +1286,11 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (unregister){
             remove();
         }
+    }
+
+    void groupUnregisterRemove(){
+        group = null;
+        remove();
     }
 
     private WrapperPlayServerEntityHeadLook getHeadLookPacket(float yaw){
