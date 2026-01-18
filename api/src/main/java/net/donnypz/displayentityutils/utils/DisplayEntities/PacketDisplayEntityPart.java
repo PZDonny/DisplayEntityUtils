@@ -165,8 +165,10 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (packetLocation == null){
             throw new RuntimeException("Location must be set for packet-based part before showing it to players.");
         }
-        if (!viewers.add(player.getUniqueId())){  //Already viewing
-            return;
+        synchronized (viewers){
+            if (!viewers.add(player.getUniqueId())){  //Already viewing
+                return;
+            }
         }
         DEUUser.getOrCreateUser(player).trackPacketEntity(this);
         attributeContainer.sendEntity(type, getEntityId(), player, getLocation());
@@ -181,8 +183,10 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      */
     @Override
     public void showToPlayer(@NotNull Player player, GroupSpawnedEvent.@NotNull SpawnReason spawnReason, @NotNull Location location) {
-        if (!viewers.add(player.getUniqueId())){  //Already viewing
-            return;
+        synchronized (viewers){
+            if (!viewers.add(player.getUniqueId())){  //Already viewing
+                return;
+            }
         }
         DEUUser.getOrCreateUser(player).trackPacketEntity(this);
         if (!isDisplay() && hasGroup()){
@@ -193,8 +197,10 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     public void showToPlayer(@NotNull Player player, @NotNull Location location, GroupSpawnSettings settings) {
-        if (!viewers.add(player.getUniqueId())){  //Already viewing
-            return;
+        synchronized (viewers){
+            if (!viewers.add(player.getUniqueId())){  //Already viewing
+                return;
+            }
         }
         if (settings.applyVisibility(this, player)){
             DEUUser.getOrCreateUser(player).trackPacketEntity(this);
@@ -247,7 +253,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public void hide(){
         synchronized (viewers){
             if (viewers.isEmpty()) return;
-            for (UUID uuid : getViewers()){
+            for (UUID uuid : viewers){
                 Player player = Bukkit.getPlayer(uuid);
                 if (player != null && player.isConnected()){
                     PacketUtils.hideEntity(player, getEntityId());
