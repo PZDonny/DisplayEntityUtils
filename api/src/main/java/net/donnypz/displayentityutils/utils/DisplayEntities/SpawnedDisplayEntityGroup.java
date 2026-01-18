@@ -1193,21 +1193,17 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * ALL part selections in this group will become unusable afterwards.
      */
     public void removeAllPartSelections(){
-        for (SpawnedPartSelection selection : new ArrayList<>(partSelections)){
-            selection.remove();
+        Iterator<SpawnedPartSelection> iter = partSelections.iterator();
+        while (iter.hasNext()){
+            SpawnedPartSelection sel = iter.next();
+            sel.removeSilent();
+            iter.remove();
         }
     }
 
-
-    /**
-     * Removes a {@link SpawnedPartSelection} from this group
-     * The part selection will not be usable afterwards.
-     * @param partSelection The part selection to remove
-     */
-    public void removePartSelection(@NotNull SpawnedPartSelection partSelection){
-        if (partSelections.contains(partSelection)){
-            partSelection.removeNoManager();
-        }
+    void removePartSelection(@NotNull SpawnedPartSelection partSelection){
+        partSelections.remove(partSelection);
+        partSelection.removeSilent();
     }
 
     /**

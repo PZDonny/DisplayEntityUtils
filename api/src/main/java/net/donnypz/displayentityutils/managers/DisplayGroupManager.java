@@ -106,30 +106,10 @@ public final class DisplayGroupManager {
         return null;
     }
 
-    /**
-     * Removes the part selection from its associated group
-     * The part selection will not be usable afterward.
-     *
-     * @param partSelection The part selection to remove
-     */
-    public static void removePartSelection(@NotNull SpawnedPartSelection partSelection) {
-        SpawnedDisplayEntityGroup g = partSelection.getGroup();
-        if (g != null){
-            g.removePartSelection(partSelection);
-        }
-    }
-
 
     @ApiStatus.Internal
     public static void removeSpawnedGroup(SpawnedDisplayEntityPart masterPart) {
         allSpawnedGroups.remove(masterPart);
-    }
-
-    private static void ticketChunk(Chunk chunk, HashSet<Chunk> chunks){
-        if (!chunk.isLoaded()){
-            chunk.addPluginChunkTicket(DisplayAPI.getPlugin());
-            chunks.add(chunk);
-        }
     }
 
     public static boolean isGroupRegistered(@NotNull SpawnedDisplayEntityGroup spawnedGroup) {
