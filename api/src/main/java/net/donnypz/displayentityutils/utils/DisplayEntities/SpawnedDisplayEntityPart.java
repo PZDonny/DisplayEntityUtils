@@ -1288,15 +1288,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     public Entity remove(boolean kill) {
         this.removeFromGroup();
-        Entity entity = getEntity();
-        if (kill && entity != null) {
-            if (!entity.isDead()){
-                entity.remove();
-            }
-        }
-        this.entity = null;
-        this.unregister();
-        return entity;
+        return groupUnregisterRemove(kill);
     }
 
 
@@ -1312,5 +1304,18 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             }
             group = null;
         }
+    }
+
+    Entity groupUnregisterRemove(boolean despawn){
+        this.group = null;
+        Entity entity = getEntity();
+        if (despawn && entity != null) {
+            if (!entity.isDead()){
+                entity.remove();
+            }
+        }
+        this.entity = null;
+        this.unregister();
+        return entity;
     }
 }

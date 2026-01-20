@@ -72,17 +72,17 @@ public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDispla
 
 
     /**
-     * Remove this part selection.
-     * Players with this SpawnedPartSelection selection will have it deselected, and this selection will become invalid and unusable.
+     * Remove this part selection making it invalid and unusable for later use.
      */
     @Override
     public void remove(){
-        DisplayGroupManager.removePartSelection(this);
+        if (group == null) return;
+        ((SpawnedDisplayEntityGroup) group).removePartSelection(this);
+        removeSilent();
     }
 
-    void removeNoManager(){
+    void removeSilent(){
         reset(false);
-        ((SpawnedDisplayEntityGroup) group).partSelections.remove(this);
         group = null;
     }
 

@@ -224,7 +224,7 @@ public abstract class AnimationPlayer {
             if (!currentVector.equals(v)) {
                 Vector moveVector = currentVector.subtract(v);
                 if (players == null){
-                    part.translate(moveVector, (float) moveVector.length(), frame.duration, 0);
+                    part.translate(moveVector, frame.duration, 0);
                 }
                 else {
                     PacketUtils.translateNonDisplay(players, part, moveVector, (float) moveVector.length(), frame.duration, 0);
@@ -375,7 +375,9 @@ public abstract class AnimationPlayer {
         map.add(DisplayAttributes.Interpolation.DURATION, frame.duration);
 
         Vector3f translationVector = new Vector3f(transformation.getTranslation());
-        translationVector.add(0, group.getVerticalOffset(), 0);
+        if (group.isRiding()){
+            translationVector.add(group.getRideOffset3f());
+        }
         if (animation.respectGroupScale){
             Vector3f scaleVector = new Vector3f(transformation.getScale());
             if (group.getScaleMultiplier() != 1){
@@ -429,7 +431,9 @@ public abstract class AnimationPlayer {
         display.setInterpolationDuration(frame.duration);
 
         Vector3f translationVector = new Vector3f(transformation.getTranslation());
-        translationVector.add(0, group.getVerticalOffset(), 0);
+        if (group.isRiding()){
+            translationVector.add(group.getRideOffset3f());
+        }
         if (animation.respectGroupScale){
             Vector3f scaleVector = new Vector3f(transformation.getScale());
             if (group.getScaleMultiplier() != 1){

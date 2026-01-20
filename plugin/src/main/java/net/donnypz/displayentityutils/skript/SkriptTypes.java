@@ -453,7 +453,7 @@ public class SkriptTypes {
                 .user("part( | -)?type")
                 .name("Part Type")
                 .description("Represents a part's (display, interaction, etc.) type")
-                .since("2.6.2, 3.3.6 (Removed \"parttype_\" prefix)"));
+                .since("2.6.2, 3.3.6 (Removed \"parttype_\" prefix), 3.4.0 (Mannequin)"));
 
         EnumWrapper<InteractionClickEvent.ClickType> clickTypeWrapper = new EnumWrapper<>(InteractionClickEvent.ClickType.class, "iClickType", null);
         Classes.registerClass(clickTypeWrapper.getClassInfo("interactionclicktype")

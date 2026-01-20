@@ -44,6 +44,10 @@ public interface Active {
 
     void pivot(float angleInDegrees);
 
+    default boolean translate(@NotNull Vector direction, int durationInTicks, int delayInTicks){
+        return translate(direction, (float) direction.length(), durationInTicks, delayInTicks);
+    }
+
     boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks);
 
     boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks);

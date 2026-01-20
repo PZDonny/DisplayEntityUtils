@@ -22,6 +22,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.*;
 
@@ -40,7 +41,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     protected DisplayAnimator.AnimationType spawnAnimationType;
     protected MachineState currentMachineState;
     protected float scaleMultiplier = 1;
-    protected float verticalOffset = 0;
+    protected Vector rideOffset = new Vector();
     int lastAnimatedTick = -1;
 
 
@@ -910,19 +911,27 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     public abstract boolean isRiding();
 
     /**
-     * Set the vertical translation offset of this group, which will be used when riding entities and for animations
-     * @param verticalRideOffset the offset
+     * Set the ride translation offset of this group, which will be used when riding entities
+     * @param offset the offset
      */
-    public void setVerticalOffset(float verticalRideOffset) {
-        this.verticalOffset = verticalRideOffset;
+    public void setRideOffset(@NotNull Vector offset){
+        rideOffset = offset.clone();
     }
 
     /**
-     * Get the vertical translation offset of this group
-     * @return a float
+     * Get the ride translation offset of this group
+     * @return a {@link Vector}
      */
-    public float getVerticalOffset() {
-        return verticalOffset;
+    public synchronized @NotNull Vector getRideOffset() {
+        return rideOffset.clone();
+    }
+
+    /**
+     * Get the ride translation offset of this group
+     * @return a {@link Vector}
+     */
+    public @NotNull Vector3f getRideOffset3f() {
+        return getRideOffset().toVector3f();
     }
 
     /**

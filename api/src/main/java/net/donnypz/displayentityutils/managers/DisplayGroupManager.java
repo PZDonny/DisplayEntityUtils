@@ -106,65 +106,10 @@ public final class DisplayGroupManager {
         return null;
     }
 
-    /**
-     * Removes the part selection from its associated group
-     * The part selection will not be usable afterward.
-     *
-     * @param partSelection The part selection to remove
-     */
-    public static void removePartSelection(@NotNull SpawnedPartSelection partSelection) {
-        SpawnedDisplayEntityGroup g = partSelection.getGroup();
-        if (g != null){
-            g.removePartSelection(partSelection);
-        }
-    }
-
 
     @ApiStatus.Internal
-    public static void removeSpawnedGroup(SpawnedDisplayEntityGroup spawnedGroup, boolean despawn, boolean force) {
-        GroupUnregisteredEvent event = new GroupUnregisteredEvent(spawnedGroup, despawn);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return;
-        }
-
-        //In the event a user changed this value
-        despawn = event.isDespawning();
-
-        if (despawn && force){
-            HashSet<Chunk> chunks = new HashSet<>();
-            Chunk mainChunk = spawnedGroup.getLocation().getChunk();
-            ticketChunk(mainChunk, chunks);
-            for (SpawnedDisplayEntityPart part : spawnedGroup.getParts()) {
-                if (!part.isDisplay()){ //Chunk may be different from main chunk
-                    Entity e = part.getEntity();
-                    Chunk c = e.getChunk();
-                    if (c != mainChunk){
-                        ticketChunk(c, chunks);
-                    }
-                }
-                part.remove(despawn);
-            }
-
-            for (Chunk c : chunks){ //Remove Chunk Tickets
-                c.removePluginChunkTicket(DisplayAPI.getPlugin());
-            }
-        }
-        else{
-            for (SpawnedDisplayEntityPart part : spawnedGroup.getParts()) {
-                part.remove(despawn);
-            }
-        }
-
-        allSpawnedGroups.remove(spawnedGroup.getMasterPart());
-        spawnedGroup.removeAllPartSelections();
-    }
-
-    private static void ticketChunk(Chunk chunk, HashSet<Chunk> chunks){
-        if (!chunk.isLoaded()){
-            chunk.addPluginChunkTicket(DisplayAPI.getPlugin());
-            chunks.add(chunk);
-        }
+    public static void removeSpawnedGroup(SpawnedDisplayEntityPart masterPart) {
+        allSpawnedGroups.remove(masterPart);
     }
 
     public static boolean isGroupRegistered(@NotNull SpawnedDisplayEntityGroup spawnedGroup) {

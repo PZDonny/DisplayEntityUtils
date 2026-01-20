@@ -68,7 +68,7 @@ public class DisplayEntitySelector extends RelativePointSelector<RelativePoint> 
     public static void select(Player player, Entity entity){
         SpawnedDisplayEntityPart existing = SpawnedDisplayEntityPart.getPart(entity);
         if (existing != null){
-            player.sendMessage(Component.text("That part is already in a group!", NamedTextColor.RED));
+            player.sendMessage(Component.text("That part is already selected by a player or in a group!", NamedTextColor.RED));
             player.sendMessage(Component.text("| Select the group, then cycle through the group's parts", NamedTextColor.GRAY));
             return;
         }

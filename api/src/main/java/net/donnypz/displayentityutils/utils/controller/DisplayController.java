@@ -20,7 +20,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.ApiStatus;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,7 +42,7 @@ public class DisplayController {
 
     DisplayEntityGroup group;
     boolean configController;
-    float verticalOffset = 0;
+    Vector rideOffset = new Vector();
     boolean groupVisibleByDefault;
     boolean isPacketBased;
 
@@ -125,22 +125,22 @@ public class DisplayController {
     }
 
     /**
-     * Set the vertical offset for the {@link ActiveGroup} that will be spawned for entities using this controller.
+     * Set the ride offset for the {@link ActiveGroup} that will be spawned for entities using this controller.
      * The value is offset from the entity's passenger position
-     * @param verticalOffset
+     * @param rideOffset the offset
      * @return this
      */
-    public DisplayController setVerticalOffset(float verticalOffset){
-        this.verticalOffset = verticalOffset;
+    public DisplayController setRideOffset(@NotNull Vector rideOffset){
+        this.rideOffset = rideOffset;
         return this;
     }
 
     /**
-     * Get the vertical offset this controller will apply to {@link ActiveGroup}s of entities using this controller.
-     * @return a float
+     * Get the ride offset this controller will apply to {@link ActiveGroup}s of entities using this controller.
+     * @return a vector
      */
-    public float getVerticalOffset() {
-        return verticalOffset;
+    public @NotNull Vector getRideOffset() {
+        return rideOffset;
     }
 
     /**
@@ -329,7 +329,7 @@ public class DisplayController {
             pdc.set(DisplayControllerManager.controllerIdKey, PersistentDataType.STRING, controllerID);
         }
 
-        activeGroup.setVerticalOffset(verticalOffset);
+        activeGroup.setRideOffset(rideOffset);
 
         //Disguised Mythic Mob
         boolean isDisguised;
@@ -438,7 +438,20 @@ public class DisplayController {
 
             ConfigurationSection groupProp = config.getConfigurationSection("groupProperties");
             if (groupProp != null){
-                controller.verticalOffset = (float) groupProp.getDouble("verticalOffset");
+                //before added vector offset
+                if (groupProp.contains("verticalOffset")){
+                    controller.rideOffset = new Vector(0, groupProp.getDouble("verticalOffset"), 0);
+                    Bukkit.getLogger().warning("\"verticalOffset\" is outdated but will still function for display controller: "+fileName+". " +
+                            "See new examplecontroller on GitHub for new \"offset\"'s formatting in any direction.");
+                }
+                else if (groupProp.contains("offset")){
+                    ConfigurationSection offsetSect = groupProp.getConfigurationSection("offset");
+                    double x = offsetSect.getDouble("x");
+                    double y = offsetSect.getDouble("y");
+                    double z = offsetSect.getDouble("z");
+                    controller.rideOffset = new Vector(x,y,z);
+                }
+
                 controller.groupVisibleByDefault = groupProp.getBoolean("visibleByDefault", true);
                 flip = groupProp.getBoolean("flip", false);
             }
@@ -458,8 +471,6 @@ public class DisplayController {
                     grouplessControllers.put(controller, groupTag);
                 }
             }
-
-
 
             ConfigurationSection defaultPropsSection = config.getConfigurationSection("defaultFollowProperties");
             int deathDespawnDelay = defaultPropsSection.getInt("deathDespawnDelay");

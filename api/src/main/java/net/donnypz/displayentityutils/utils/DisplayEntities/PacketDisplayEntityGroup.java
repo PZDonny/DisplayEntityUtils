@@ -174,7 +174,9 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         Location oldLoc = getLocation();
         //Remove from previous
         if (oldLoc != null){
-            if (location.getWorld().equals(oldLoc.getWorld()) && location.getChunk().getChunkKey() == oldLoc.getChunk().getChunkKey() && vehicleUUID == null){
+            if (location.getWorld().equals(oldLoc.getWorld())
+                    && ConversionUtils.getChunkKey(location) == ConversionUtils.getChunkKey(oldLoc)
+                    && vehicleUUID == null){
                return;
             }
             String oldWorldName = oldLoc.getWorld().getName();
@@ -242,6 +244,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     void updatePassengerIds(int passengerId, boolean add){
+        if (passengerIds == null) return;
         int[] ids;
         if (add){
             ids = new int[passengerIds.length+1];
@@ -404,8 +407,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 .computeIfAbsent(vehicleUUID, key -> new PassengerGroupData())
                 .addGroup(vehicleUUID, this);
 
-        if (verticalOffset != 0) {
-            translate(Direction.UP, verticalOffset, -1, -1);
+        if (!rideOffset.isZero()) {
+            translate(rideOffset, -1, -1);
         }
 
         if (runLocationUpdater){
@@ -463,8 +466,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         dismount(getTrackingPlayers());
 
         if (!vehicle.isDead()){
-            if (verticalOffset != 0){
-                translate(Direction.DOWN, verticalOffset, -1, -1);
+            if (!rideOffset.isZero()){
+                translate(rideOffset.clone().multiply(-1), -1, -1);
             }
         }
         return vehicle;
@@ -1059,15 +1062,24 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         if (worldName != null){
             WorldData data = allPacketGroups.get(worldName);
             if (data != null){
-                data.removeGroup(getLocation().getChunk().getChunkKey(), this);
+                Location groupLoc = getLocation();
+                if (groupLoc != null){
+                    long chunkKey = ConversionUtils.getChunkKey(groupLoc);
+                    data.removeGroup(chunkKey, this);
+                }
                 if (data.groupMap.isEmpty()){
                     allPacketGroups.remove(worldName);
                 }
             }
         }
 
-        for (PacketDisplayEntityPart part : new HashSet<>(groupParts.values())){
-            part.removeFromGroup(true);
+        passengerIds = null;
+
+        Iterator<PacketDisplayEntityPart> iter = groupParts.values().iterator();
+        while (iter.hasNext()){
+            PacketDisplayEntityPart part = iter.next();
+            part.groupUnregisterRemove();
+            iter.remove();
         }
 
         DisplayStateMachine.unregisterFromStateMachine(this, false); //Animators will auto-stop

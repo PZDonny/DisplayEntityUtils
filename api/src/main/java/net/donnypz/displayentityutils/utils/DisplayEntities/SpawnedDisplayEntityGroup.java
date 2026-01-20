@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
+import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -810,12 +811,13 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             return false;
         }
 
-        if (verticalOffset != 0) {
-            translate(Direction.UP, verticalOffset, -1, -1);
+        if (!rideOffset.isZero()) {
+            translate(rideOffset, -1, -1);
         }
 
-        for (SpawnedDisplayEntityPart interactionPart: this.getParts(SpawnedDisplayEntityPart.PartType.INTERACTION)){
-            alignNonDisplayWithMountedGroup(interactionPart, vehicle);
+        for (SpawnedDisplayEntityPart part : groupParts.values()){
+            if (part.isDisplay()) continue;
+            alignNonDisplayWithMountedGroup(part, vehicle);
         }
         return true;
     }
@@ -830,8 +832,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         Entity masterEntity = getMasterEntity();
         if (masterEntity != null){
             if (masterEntity.leaveVehicle()){
-                if (verticalOffset != 0){
-                    translate(Direction.DOWN, verticalOffset, -1, -1);
+                if (!rideOffset.isZero()){
+                    translate(rideOffset.clone().multiply(-1), -1, -1);
                 }
             }
         }
@@ -843,8 +845,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     private void alignNonDisplayWithMountedGroup(SpawnedDisplayEntityPart part, Entity vehicle){
-        final Interaction interaction = (Interaction) part.getEntity();
-        DisplayAPI.getScheduler().entityRunTimer(interaction, new Scheduler.SchedulerRunnable() {
+        final Entity entity = part.getEntity();
+        DisplayAPI.getScheduler().entityRunTimer(entity, new Scheduler.SchedulerRunnable() {
             Location lastLoc = getLocation();
             @Override
             public void run() {
@@ -854,14 +856,14 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 }
 
                 Location newLoc = getLocation();
-                Location tpLoc = interaction.getLocation().clone();
+                Location tpLoc = entity.getLocation().clone();
                 double distance = lastLoc.distance(tpLoc);
 
                 if (distance != 0){
                     Vector adjustVec = lastLoc.toVector().subtract(newLoc.toVector());
                     tpLoc.subtract(adjustVec);
                     lastLoc = newLoc;
-                    FoliaUtils.teleport(interaction, tpLoc);
+                    FoliaUtils.teleport(entity, tpLoc);
                 }
 
                 if (getVehicle() != vehicle){
@@ -1191,21 +1193,17 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * ALL part selections in this group will become unusable afterwards.
      */
     public void removeAllPartSelections(){
-        for (SpawnedPartSelection selection : new ArrayList<>(partSelections)){
-            selection.remove();
+        Iterator<SpawnedPartSelection> iter = partSelections.iterator();
+        while (iter.hasNext()){
+            SpawnedPartSelection sel = iter.next();
+            sel.removeSilent();
+            iter.remove();
         }
     }
 
-
-    /**
-     * Removes a {@link SpawnedPartSelection} from this group
-     * The part selection will not be usable afterwards.
-     * @param partSelection The part selection to remove
-     */
-    public void removePartSelection(@NotNull SpawnedPartSelection partSelection){
-        if (partSelections.contains(partSelection)){
-            partSelection.removeNoManager();
-        }
+    void removePartSelection(@NotNull SpawnedPartSelection partSelection){
+        partSelections.remove(partSelection);
+        partSelection.removeSilent();
     }
 
     /**
@@ -1222,8 +1220,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             return;
         }
         DisplayStateMachine.unregisterFromStateMachine(this, false); //Animators will auto-stop
-        DisplayGroupManager.removeSpawnedGroup(this, despawnParts, force);
-        groupParts.clear();
+        removeSpawnedGroup(despawnParts, force);
+
         masterPart = null;
         synchronized (followerLock){
             followers.clear();
@@ -1231,6 +1229,57 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (defaultFollower != null){
             defaultFollower.remove();
             defaultFollower = null;
+        }
+    }
+
+    private void removeSpawnedGroup(boolean despawn, boolean force){
+        GroupUnregisteredEvent event = new GroupUnregisteredEvent(this, despawn);
+        if (!event.callEvent()) return;
+
+        despawn = event.isDespawning();
+
+        Iterator<SpawnedDisplayEntityPart> iter = groupParts.values().iterator();
+        if (despawn && force){
+            HashSet<Chunk> chunks = new HashSet<>();
+            Location groupLoc = getLocation();
+            long mainChunkKey = ConversionUtils.getChunkKey(groupLoc);
+            ticketChunk(groupLoc, chunks);
+
+            while (iter.hasNext()){
+                SpawnedDisplayEntityPart part = iter.next();
+                if (!part.isDisplay()){ //Chunk may be different from main chunk
+                    Entity e = part.getEntity();
+                    Location entityLoc = e.getLocation();
+                    long chunkKey = ConversionUtils.getChunkKey(entityLoc);
+                    if (chunkKey != mainChunkKey){
+                        ticketChunk(entityLoc, chunks);
+                    }
+                }
+                part.groupUnregisterRemove(despawn);
+                iter.remove();
+            }
+
+            for (Chunk c : chunks){ //Remove Chunk Tickets
+                c.removePluginChunkTicket(DisplayAPI.getPlugin());
+            }
+        }
+        else{
+            while (iter.hasNext()){
+                SpawnedDisplayEntityPart part = iter.next();
+                part.groupUnregisterRemove(despawn);
+                iter.remove();
+            }
+        }
+
+        DisplayGroupManager.removeSpawnedGroup(masterPart);
+        removeAllPartSelections();
+    }
+
+    private static void ticketChunk(Location location, HashSet<Chunk> chunks){
+        if (!location.isChunkLoaded()){
+            Chunk chunk = location.getChunk();
+            chunk.addPluginChunkTicket(DisplayAPI.getPlugin());
+            chunks.add(chunk);
         }
     }
 
