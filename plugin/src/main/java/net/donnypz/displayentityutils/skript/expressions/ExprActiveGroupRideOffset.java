@@ -54,6 +54,7 @@ public class ExprActiveGroupRideOffset extends SimplePropertyExpression<ActiveGr
         switch (mode) {
             case SET -> {
                 if (delta == null){
+                    group.setRideOffset(new Vector());
                     return;
                 }
                 Vector offset = (Vector) delta[0];
