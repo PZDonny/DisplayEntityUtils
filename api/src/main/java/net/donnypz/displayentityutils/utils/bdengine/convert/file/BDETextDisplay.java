@@ -34,7 +34,7 @@ public class BDETextDisplay extends BDEDisplay<TextDisplay>{
                 .decoration(TextDecoration.UNDERLINED, (boolean) options.getOrDefault("underline", false))
                 .decoration(TextDecoration.STRIKETHROUGH, (boolean) options.getOrDefault("strikethrough", false))
                 .decoration(TextDecoration.OBFUSCATED, (boolean) options.getOrDefault("obfuscated", false));
-        lineLength = (int) options.get("lineLength");
+        lineLength = ((Number) options.get("lineLength")).intValue();
         alignment = TextDisplay.TextAlignment.valueOf(((String) options.get("align")).toUpperCase());
     }
 
