@@ -36,7 +36,7 @@ public class ExprSpawnedGroupNearLocation extends SimpleExpression<SpawnedDispla
     private boolean isAll;
 
     @Override
-    protected SpawnedDisplayEntityGroup @Nullable [] get(Event event) {
+    protected SpawnedDisplayEntityGroup[] get(Event event) {
         Number n = range.getSingle(event);
         if (n == null) return new SpawnedDisplayEntityGroup[0];
         Location loc = location.getSingle(event);

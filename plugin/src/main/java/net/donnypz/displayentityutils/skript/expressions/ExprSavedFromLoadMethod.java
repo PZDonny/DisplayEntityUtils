@@ -34,7 +34,7 @@ public class ExprSavedFromLoadMethod extends SimpleExpression<Object> {
     private boolean isGroup;
 
     @Override
-    protected Object @Nullable [] get(Event event) {
+    protected Object[] get(Event event) {
         String t = tag.getSingle(event);
         if (t == null || loadMethod == null){
             return null;

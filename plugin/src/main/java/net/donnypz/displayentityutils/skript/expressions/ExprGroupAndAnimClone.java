@@ -45,7 +45,7 @@ public class ExprGroupAndAnimClone extends SimpleExpression<Object> {
     private Expression<GroupSpawnSettings> settings;
 
     @Override
-    protected Object @Nullable [] get(Event event) {
+    protected Object [] get(Event event) {
         Object obj = object.getSingle(event);
         if (obj instanceof SpawnedDisplayEntityGroup g){
             Location l = location == null ? g.getLocation() : location.getSingle(event);

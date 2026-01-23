@@ -34,7 +34,7 @@ public class ExprSavedGroupToSpawned extends SimpleExpression<SpawnedDisplayEnti
     private Expression<GroupSpawnSettings> groupSpawnSettings = null;
 
     @Override
-    protected SpawnedDisplayEntityGroup @Nullable [] get(Event event) {
+    protected SpawnedDisplayEntityGroup[] get(Event event) {
         DisplayEntityGroup saved = savedGroup.getSingle(event);
         if (saved == null) return new SpawnedDisplayEntityGroup[0];
         Location loc = location.getSingle(event);

@@ -36,16 +36,6 @@ public class ExprActiveGroupCreateSelection extends SimpleExpression<MultiPartSe
     private Expression<ActiveGroup> group;
 
     @Override
-    protected MultiPartSelection @Nullable [] get(Event event) {
-        ActiveGroup g = group.getSingle(event);
-        if (g == null){
-            return null;
-        }
-
-        return new MultiPartSelection[]{g.createPartSelection()};
-    }
-
-    @Override
     public boolean isSingle() {
         return true;
     }
@@ -64,5 +54,15 @@ public class ExprActiveGroupCreateSelection extends SimpleExpression<MultiPartSe
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         group = (Expression<ActiveGroup>) expressions[0];
         return true;
+    }
+
+    @Override
+    protected MultiPartSelection[] get(Event event) {
+        ActiveGroup g = group.getSingle(event);
+        if (g == null){
+            return null;
+        }
+
+        return new MultiPartSelection[]{g.createPartSelection()};
     }
 }

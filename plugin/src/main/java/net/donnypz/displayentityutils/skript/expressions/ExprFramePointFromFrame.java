@@ -29,7 +29,7 @@ public class ExprFramePointFromFrame extends SimpleExpression<FramePoint> {
     private Expression<String> tag;
 
     @Override
-    protected FramePoint @Nullable [] get(Event event) {
+    protected FramePoint[] get(Event event) {
         SpawnedDisplayAnimationFrame f = frame.getSingle(event);
         if (f == null) return new FramePoint[0];
         String t = tag.getSingle(event);

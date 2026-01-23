@@ -41,7 +41,7 @@ public class ExprSavedGroupToPacket extends SimpleExpression<PacketDisplayEntity
     private Expression<GroupSpawnSettings> groupSpawnSettings = null;
 
     @Override
-    protected PacketDisplayEntityGroup @Nullable [] get(Event event) {
+    protected PacketDisplayEntityGroup[] get(Event event) {
         DisplayEntityGroup saved = savedGroup.getSingle(event);
         if (saved == null) return new PacketDisplayEntityGroup[0];
         Location loc = location.getSingle(event);
