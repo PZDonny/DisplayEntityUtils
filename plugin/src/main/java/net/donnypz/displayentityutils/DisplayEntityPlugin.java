@@ -112,6 +112,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         DisplayAPI.isLibsDisguisesInstalled = Bukkit.getPluginManager().isPluginEnabled("LibsDisguises");
         DisplayAPI.isViaVerInstalled = Bukkit.getPluginManager().isPluginEnabled("ViaVersion");
         DisplayAPI.isWorldEditInstalled = Bukkit.getPluginManager().isPluginEnabled("WorldEdit");
+        DisplayAPI.isPAPIInstalled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
 
         //Skript
         DisplayAPI.isSkriptInstalled = Bukkit.getPluginManager().isPluginEnabled("Skript");
