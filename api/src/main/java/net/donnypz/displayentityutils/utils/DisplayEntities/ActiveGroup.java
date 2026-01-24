@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
+import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
@@ -560,6 +561,46 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
+     * Get the extra scale multiplier that will be applied to a player's view of this group
+     * @param player the associated player
+     * @return a float
+     */
+    public float getPlayerScaleMultiplier(@NotNull Player player){
+        DEUUser user = DEUUser.getUser(player);
+        return user != null ? user.getScaleMultiplier(this) : 1f;
+    }
+
+    /**
+     * Get whether the scale multiplier a player has for this group applies to Interactions
+     * @param player the player
+     * @return a boolean
+     */
+    public boolean isPlayerInteractionScaleMultiplier(@NotNull Player player){
+        DEUUser user = DEUUser.getUser(player);
+        return user != null && user.isInteractionScaleMultiplier(this);
+    }
+
+    /**
+     * Set the extra scale multiplier that will be applied to a player's viewing of this group
+     * @param player the associated player
+     * @param scaleMultiplier the scale multiplier
+     * @param scaleInteractions whether interactions should be scaled
+     */
+    public void setPlayerScaleMultiplier(@NotNull Player player, float scaleMultiplier, boolean scaleInteractions){
+        DEUUser.getOrCreateUser(player)
+                .setScaleMultiplier(this, scaleMultiplier, scaleInteractions);
+    }
+
+    /**
+     * Unset the extra scale multiplier that's applied to a player's viewing of this group
+     * @param player the associated animator
+     */
+    public void unsetPlayerScaleMultiplier(@NotNull Player player){
+        DEUUser user = DEUUser.getUser(player);
+        if (user != null) user.unsetScaleMultiplier(this);
+    }
+
+    /**
      * Get the teleport duration of this SpawnedDisplayEntityGroup
      * @return the group's teleport duration value
      */
@@ -1014,6 +1055,14 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      */
     public boolean isRegistered(){
         return masterPart != null;
+    }
+
+    protected void removeScaleMultipliers(){
+        for (Player p : getTrackingPlayers()){
+            DEUUser user = DEUUser.getUser(p);
+            if (user == null) continue;
+            user.unsetScaleMultiplier(this);
+        }
     }
 
     private static final class IDGenerator{

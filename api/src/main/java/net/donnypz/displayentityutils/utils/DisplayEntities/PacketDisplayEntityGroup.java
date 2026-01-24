@@ -1058,6 +1058,10 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * Use {@link DisplayGroupManager#removePersistentPacketGroup(PacketDisplayEntityGroup, boolean)} to unregister and stop persistence.
      */
     public void unregister(){
+        if (masterPart == null) return;
+
+        removeScaleMultipliers();
+
         String worldName = getWorldName();
         if (worldName != null){
             WorldData data = allPacketGroups.get(worldName);

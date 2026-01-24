@@ -191,6 +191,17 @@ public abstract class ActivePart implements Active{
     }
 
     /**
+     * Get the culling height of this part if it's type is a Display entity
+     * @return a float, 1 if not a display entity
+     */
+    public abstract float getDisplayCullHeight();
+
+    /**
+     * Get the culling width of this part if it's a Display entity
+     * @return a float, 1 if not a display entity
+     */
+    public abstract float getDisplayCullWidth();
+    /**
      * Get this part's type
      * @return a {@link SpawnedDisplayEntityPart.PartType}
      */

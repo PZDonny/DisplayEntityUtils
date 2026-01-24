@@ -12,8 +12,13 @@ import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
+import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Transformation;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,6 +46,7 @@ public class DEUUser {
     private PreAnimationCameraData preAnimationCameraData;
     private final Object animationCameraLock = new Object();
     private UUID cameraPlayerUUID;
+    private final ConcurrentHashMap<Integer, GroupScaleMultiplier> groupScaleMultipliers = new ConcurrentHashMap<>();
 
     private boolean placedGroupBreakMode = false;
 
@@ -192,6 +198,113 @@ public class DEUUser {
         if (particleBuilder != null){
             particleBuilder.remove();
             particleBuilder = null;
+        }
+    }
+
+
+    /**
+     * Get the scale multiplier that will be applied to a player's view of a given group
+     * @param group the associated group
+     * @return a float
+     */
+    public float getScaleMultiplier(@NotNull ActiveGroup<?> group){
+        if (!group.isRegistered()) return 1;
+        GroupScaleMultiplier m = groupScaleMultipliers.get(group.getId());
+        if (m == null) return 1;
+        return m.scaleMultiplier;
+    }
+
+    public boolean isInteractionScaleMultiplier(@NotNull ActiveGroup<?> group){
+        if (!group.isRegistered()) return false;
+        GroupScaleMultiplier m = groupScaleMultipliers.get(group.getId());
+        if (m == null) return false;
+        return m.scaleInteractions;
+    }
+
+    /**
+     * Set the scale multiplier that will be applied to a player's view of a given group
+     * @param group the associated group
+     * @param scaleMultiplier the scale multiplier
+     * @param scaleInteractions whether interactions should be scaled
+     */
+    public void setScaleMultiplier(@NotNull ActiveGroup<?> group, float scaleMultiplier, boolean scaleInteractions){
+        if (!group.isRegistered()) return;
+        if (scaleMultiplier == 1){
+            unsetScaleMultiplier(group);
+            return;
+        }
+
+        groupScaleMultipliers.put(group.getId(),
+                new GroupScaleMultiplier(scaleMultiplier, scaleInteractions));
+
+        Player player = Bukkit.getPlayer(userUUID);
+        if (player == null) return;
+        scale(player, group, scaleMultiplier, scaleInteractions);
+    }
+
+    /**
+     * Unset the scale multiplier that's applied to a player's view of a given group
+     * @param group the associated group
+     */
+    public void unsetScaleMultiplier(@NotNull ActiveGroup<?> group){
+        if (!group.isRegistered()) return;
+        GroupScaleMultiplier prev = groupScaleMultipliers.remove(group.getId());
+        if (prev != null && prev.scaleMultiplier != 1f){
+            Player p = Bukkit.getPlayer(userUUID);
+            if (p == null) return;
+            group.hideFromPlayer(p);
+            if (group instanceof PacketDisplayEntityGroup pg){
+                pg.showToPlayer(p, GroupSpawnedEvent.SpawnReason.INTERNAL);
+            }
+            else if (group instanceof SpawnedDisplayEntityGroup sg){
+                sg.showToPlayer(p);
+            }
+        }
+    }
+    private void scale(Player player, ActiveGroup<?> group, float extraMultiplier, boolean scaleInteractions) {
+        if (extraMultiplier == 1) return;
+
+        for (ActivePart part : group.getParts()) {
+            if (part.isDisplay()) {
+                Transformation transformation = part.getTransformation();
+                Vector3f scale = transformation.getScale().mul(extraMultiplier);
+                Vector3f translationVector = transformation.getTranslation().mul(extraMultiplier);
+
+                PacketAttributeContainer container = new PacketAttributeContainer()
+                        .setAttribute(DisplayAttributes.Transform.SCALE, scale)
+                        .setAttribute(DisplayAttributes.Transform.TRANSLATION, translationVector);
+
+                //Culling
+                if (DisplayConfig.autoCulling()) {
+                    container
+                            .setAttribute(DisplayAttributes.Culling.HEIGHT, part.getDisplayCullHeight() * extraMultiplier)
+                            .setAttribute(DisplayAttributes.Culling.WIDTH, part.getDisplayCullWidth() * extraMultiplier);
+                }
+                container.sendAttributes(player, part.getEntityId());
+            }
+            else {
+                if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION && scaleInteractions) {
+                    PacketUtils.scaleInteraction(player,
+                            part,
+                            part.getInteractionHeight() * extraMultiplier,
+                            part.getInteractionWidth() * extraMultiplier,
+                            0,
+                            0);
+
+                    org.bukkit.util.Vector translationVector = part.getNonDisplayTranslation();
+                    if (translationVector == null) continue;
+
+                    org.bukkit.util.Vector oldVector = new org.bukkit.util.Vector(translationVector.getX(), translationVector.getY(), translationVector.getZ());
+                    translationVector.multiply(extraMultiplier);
+                    Vector moveVector = oldVector.subtract(translationVector);
+                    PacketUtils.translateNonDisplay(player, part, moveVector, moveVector.length(), 0, 0);
+                } else if (part.getType() == SpawnedDisplayEntityPart.PartType.MANNEQUIN) {
+                    new PacketAttributeContainer().setAttributeAndSend(DisplayAttributes.Mannequin.SCALE,
+                            (float) part.getMannequinScale() * extraMultiplier,
+                            part.getEntityId(),
+                            player);
+                }
+            }
         }
     }
 
@@ -414,6 +527,7 @@ public class DEUUser {
         if (selectedPartSelection != null) selectedPartSelection.remove();
         if (particleBuilder != null) particleBuilder.remove();
         selectedAnimation = null;
+        groupScaleMultipliers.clear();
 
         Player player = Bukkit.getPlayer(userUUID);
 
@@ -455,4 +569,6 @@ public class DEUUser {
             PacketEvents.getAPI().getPlayerManager().sendPacket(player, tpPacket);
         }
     }
+
+    public record GroupScaleMultiplier(float scaleMultiplier, boolean scaleInteractions){}
 }

@@ -725,6 +725,23 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         this.attributeContainer.setAttributesAndSend(attributeMap, getEntityId(), viewers);
     }
 
+    /**
+     * Set an attribute of this part without sending the change to its viewers
+     * @param attribute the attribute
+     * @param value the value
+     */
+    public <T, V> void setAttributeSilent(@NotNull DisplayAttribute<T, V> attribute, T value) {
+        this.attributeContainer.setAttribute(attribute, value);
+    }
+
+    /**
+     * Set the attributes of this part without sending the changes to its viewers
+     * @param attributeMap the attribute map
+     */
+    public void setAttributesSilent(@NotNull DisplayAttributeMap attributeMap){
+        this.attributeContainer.setAttributes(attributeMap);
+    }
+
     private <T, V>void setAndSend(DisplayAttribute<T, V> attribute, T value){
         attributeContainer.setAttributeAndSend(attribute, value, getEntityId(), viewers);
     }
@@ -902,6 +919,16 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
                     .add(DisplayAttributes.Culling.WIDTH, width),
             getEntityId(),
             viewers);
+    }
+
+    @Override
+    public float getDisplayCullHeight() {
+        return attributeContainer.getAttributeOrDefault(DisplayAttributes.Culling.HEIGHT, 1f);
+    }
+
+    @Override
+    public float getDisplayCullWidth() {
+        return attributeContainer.getAttributeOrDefault(DisplayAttributes.Culling.WIDTH, 1f);
     }
 
     @Override

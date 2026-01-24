@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
+import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
@@ -235,18 +236,29 @@ public abstract class AnimationPlayer {
                 SpawnedDisplayEntityPart sp = (SpawnedDisplayEntityPart) part;
                 DisplayUtils.scaleInteraction((Interaction) sp.getEntity(), height, width, frame.duration, 0);
             }
-            else if (players != null){
-                PacketUtils.scaleInteraction(players, part, height, width, frame.duration, 0);
-            }
             else{
-                if (part instanceof SpawnedDisplayEntityPart){
-                    PacketUtils.scaleInteraction(part.getTrackingPlayers(), part, height, width, frame.duration, 0);
+                if (players == null){
+                    DisplayAttributeMap map = new DisplayAttributeMap()
+                            .add(DisplayAttributes.Interaction.HEIGHT, height)
+                            .add(DisplayAttributes.Interaction.WIDTH, width);
+                    if (part instanceof PacketDisplayEntityPart pp){
+                        pp.setAttributesSilent(map);
+                    }
+
+                    for (Player player : part.getTrackingPlayers()){
+                        boolean scaleInteractions = group.isPlayerInteractionScaleMultiplier(player);
+                        float scaleMultiplier = scaleInteractions ? group.getPlayerScaleMultiplier(player) : 1;
+                        PacketUtils.scaleInteraction(player, part, height*scaleMultiplier, width*scaleMultiplier, frame.duration, 0);
+                    }
                 }
                 else{
-                    PacketUtils.scaleInteraction((PacketDisplayEntityPart) part, height, width, frame.duration, 0);
+                    for (Player player : players){
+                        boolean scaleInteractions = group.isPlayerInteractionScaleMultiplier(player);
+                        float scaleMultiplier = scaleInteractions ? group.getPlayerScaleMultiplier(player) : 1;
+                        PacketUtils.scaleInteraction(player, part, height*scaleMultiplier, width*scaleMultiplier, frame.duration, 0);
+                    }
                 }
             }
-
         }
     }
 
@@ -375,14 +387,14 @@ public abstract class AnimationPlayer {
         map.add(DisplayAttributes.Interpolation.DURATION, frame.duration);
 
         Vector3f translationVector = new Vector3f(transformation.getTranslation());
-        if (group.isRiding()){
-            translationVector.add(group.getRideOffset3f());
-        }
+        if (group.isRiding()) translationVector.add(group.getRideOffset3f());
+
+        float groupScaleMultiplier = group.getScaleMultiplier();
         if (animation.respectGroupScale){
             Vector3f scaleVector = new Vector3f(transformation.getScale());
             if (group.getScaleMultiplier() != 1){
-                translationVector.mul(group.getScaleMultiplier());
-                scaleVector.mul(group.getScaleMultiplier());
+                translationVector.mul(groupScaleMultiplier);
+                scaleVector.mul(groupScaleMultiplier);
             }
             addFollowerDisplayPivot(group, part, translationVector);
 
@@ -396,19 +408,37 @@ public abstract class AnimationPlayer {
         }
 
         if (!group.isActiveAnimator(animator)) return;
+
         if (players == null){
-            part.setAttributes(map);
+            if (part instanceof PacketDisplayEntityPart ppart) {
+                ppart.setAttributesSilent(map);
+            }
+
+            for (Player p : part.getTrackingPlayers()){
+                sendDisplayAttributes(p, part.getEntityId(), map, transformation);
+            }
         }
         else{
             for (Player p : players){
-                PacketUtils.setAttributes(p, part.getEntityId(), map);
+                sendDisplayAttributes(p, p.getEntityId(), map, transformation);
             }
         }
-
 
         if (animation.allowsTextureChanges()){
             transformation.applyData(part);
         }
+    }
+
+    private void sendDisplayAttributes(Player player, int entityId, DisplayAttributeMap map, Transformation transformation){
+        float playerScaleMultiplier = group.getPlayerScaleMultiplier(player);
+
+        new PacketAttributeContainer()
+                .setAttributes(map)
+                .setAttribute(DisplayAttributes.Transform.SCALE, new Vector3f(transformation.getScale())
+                        .mul(playerScaleMultiplier))
+                .setAttribute(DisplayAttributes.Transform.TRANSLATION, new Vector3f(transformation.getTranslation())
+                        .mul(playerScaleMultiplier))
+                .sendAttributes(player, entityId);
     }
 
     private void applyDisplayTransformation(ActivePart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, ActiveGroup<?> group, DisplayTransformation transformation, boolean applyDataOnly){
