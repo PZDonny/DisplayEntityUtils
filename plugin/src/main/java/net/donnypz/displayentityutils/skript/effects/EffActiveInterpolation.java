@@ -14,14 +14,14 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.Active;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Active Group/Part / Multi Part Selection Interpolation")
-@Description("Set the interpolation duration/delay of an active group / spawned part / part selection")
+@Name("Active Group/Part/Multi Part Selection Interpolation")
+@Description("Set the interpolation duration/delay of an active group / active part / part filter")
 @Examples({"deu set interpolation duration of {_spawnedpart} to 5 ticks",
         "deu set {_spawnedgroup}'s interpolation delay to 2 ticks"})
 @Since("2.6.2, 3.0.0 (Packet)")
 public class EffActiveInterpolation extends Effect {
     static {
-        Skript.registerEffect(EffActiveInterpolation.class,"[deu ]set interpolation (:duration|delay) of %activegroups/multipartfilters/activeparts% to %timespan%",
+        Skript.registerEffect(EffActiveInterpolation.class,"[deu] set interpolation (:duration|delay) of %activegroups/multipartfilters/activeparts% to %timespan%",
                 "[deu] set %activegroups/multipartfilters/activeparts%'s interpolation (:duration|delay) to %timespan%");
     }
 

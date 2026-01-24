@@ -1,10 +1,7 @@
 package net.donnypz.displayentityutils.skript.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
@@ -19,8 +16,8 @@ import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Saved Group to Packet Group")
-@Description("Create a packet based group from a saved group")
+@Name("Spawn Packet-Based Group")
+@Description("Spawn a saved group at a location, using packets")
 @Examples({"set {_packetgroup} to packet based {_savedgroup} spawned at {_location}",
         "",
         "#(3.3.4+) Spawn packet based group that will persist after restarts",
@@ -29,10 +26,11 @@ import org.jetbrains.annotations.Nullable;
         "#(3.3.6+) Spawn packet based group with spawn settings, changing its properties",
         "set {_packetgroup} to packet based {_savedgroup} spawned at {_location} with {_groupspawnsettings}"})
 @Since("3.0.0, 3.3.4 (Persistent), 3.3.6 (GroupSpawnSettings)")
-public class ExprSavedGroupToPacket extends SimpleExpression<PacketDisplayEntityGroup> {
+@DocumentationId("ExprSavedGroupToPacket")
+public class ExprSpawnPacketGroup extends SimpleExpression<PacketDisplayEntityGroup> {
 
     static{
-        Skript.registerExpression(ExprSavedGroupToPacket.class, PacketDisplayEntityGroup.class, ExpressionType.COMBINED, "[:persistent] packet [based] %savedgroup% spawned at %location% [w:with %-groupspawnsetting%]");
+        Skript.registerExpression(ExprSpawnPacketGroup.class, PacketDisplayEntityGroup.class, ExpressionType.COMBINED, "[:persistent] packet [based] %savedgroup% spawned at %location% [w:with %-groupspawnsetting%]");
     }
 
     private Expression<DisplayEntityGroup> savedGroup;

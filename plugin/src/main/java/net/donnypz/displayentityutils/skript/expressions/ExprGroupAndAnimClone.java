@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
         "",
         "#Create an animation clone",
         "set {_animclone} to a clone of {_animation}"})
-@Since("2.6.2")
+@Since("2.6.2, 2.7.7 (Spawn Settings), 3.3.1 (Packet)")
 public class ExprGroupAndAnimClone extends SimpleExpression<Object> {
 
     static{

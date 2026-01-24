@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
 
-@Name("Animate Active Group")
+@Name("Play Animation on Active Group")
 @Description("Play an animation on an active group with a display animator")
 @Examples({"play animation on {_spawnedgroup} using {_displayanimator}",
         "",

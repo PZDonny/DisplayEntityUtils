@@ -36,7 +36,7 @@ import java.util.Arrays;
             "#Change Data",
             "set {_parts::*}'s deu text to \"&aMy New Text\"",
             "",
-            "if {_spawnedpart}'s active part type is block_display:",
+            "if {_spawnedpart}'s part type is block_display:",
             "\tset {_spawnedpart}'s deu block to oak_stairs[facing=east]"})
 @Since("3.3.6")
 public class ExprActivePartData extends SimplePropertyExpression<ActivePart, Object> {

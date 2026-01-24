@@ -1,10 +1,7 @@
 package net.donnypz.displayentityutils.skript.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
@@ -18,15 +15,16 @@ import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Saved Group to Spawned Group")
+@Name("Spawn Group")
 @Description("Spawn a saved group at a location")
 @Examples({"set {_spawnedgroup} to {_savedgroup} spawned at {_location}",
             "set {_spawnedgroup} to {_savedgroup} spawned at {_location} with {_groupspawnsettings}"})
 @Since("2.6.2")
-public class ExprSavedGroupToSpawned extends SimpleExpression<SpawnedDisplayEntityGroup> {
+@DocumentationId("ExprSavedGroupToSpawned")
+public class ExprSpawnGroup extends SimpleExpression<SpawnedDisplayEntityGroup> {
 
     static{
-        Skript.registerExpression(ExprSavedGroupToSpawned.class, SpawnedDisplayEntityGroup.class, ExpressionType.COMBINED, "%savedgroup% spawned at %location% [w:with %-groupspawnsetting%]");
+        Skript.registerExpression(ExprSpawnGroup.class, SpawnedDisplayEntityGroup.class, ExpressionType.COMBINED, "%savedgroup% spawned at %location% [w:with %-groupspawnsetting%]");
     }
 
     private Expression<DisplayEntityGroup> savedGroup;
