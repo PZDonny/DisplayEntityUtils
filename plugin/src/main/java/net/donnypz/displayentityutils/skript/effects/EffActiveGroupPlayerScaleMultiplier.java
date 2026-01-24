@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 @Description("Set the scale multiplier that will be applied to a player's viewing of a given active group. This is applied on top of a group's current scale multiplier." +
         "\nThe position of an Interaction entity may be incorrect if it is not packet-based.")
 @Examples({"set extra scale multiplier of {_activegroup} to 1.75 for {_player}",
-        "set extra scale multiplier of {_activegroup} to 2 for {_player} and ignore interaction entites",
+        "set extra scale multiplier of {_activegroup} to 2 for {_player} and ignore interaction entities",
         "",
         "#Reset",
         "set extra scale multiplier of {_activegroup} to 1 for {_player}"})
