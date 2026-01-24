@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Active Group Scale Multiplier")
+@Name("Active Group Player Scale Multiplier")
 @Description("Set the scale multiplier that will be applied to a player's viewing of a given active group. This is applied on top of a group's current scale multiplier." +
         "\nThe position of an Interaction entity may be incorrect if it is not packet-based.")
 @Examples({"set extra scale multiplier of {_activegroup} to 1.75 for {_player}",
