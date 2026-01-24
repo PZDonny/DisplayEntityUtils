@@ -25,9 +25,11 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class ActiveGroup<T extends ActivePart> implements Active{
 
+    private final int ID = IDGenerator.next();
     protected T masterPart;
     protected LinkedHashMap<UUID, T> groupParts = new LinkedHashMap<>();
     protected String tag;
@@ -44,6 +46,14 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     protected Vector rideOffset = new Vector();
     int lastAnimatedTick = -1;
 
+
+    /**
+     * Get this group's unique ID
+     * @return the group's ID
+     */
+    public int getId(){
+        return ID;
+    }
 
     /**
      * Make a player select this group
@@ -1004,5 +1014,13 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      */
     public boolean isRegistered(){
         return masterPart != null;
+    }
+
+    private static final class IDGenerator{
+        private static final AtomicInteger CURRENT = new AtomicInteger();
+
+        static int next() {
+            return CURRENT.incrementAndGet();
+        }
     }
 }
