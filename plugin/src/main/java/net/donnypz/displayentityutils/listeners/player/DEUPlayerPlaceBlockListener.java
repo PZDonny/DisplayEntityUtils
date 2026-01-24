@@ -23,12 +23,8 @@ public class DEUPlayerPlaceBlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlaceBlock(BlockPlaceEvent e){
         Player player = e.getPlayer();
-        ItemStack heldItem = player.getInventory().getItemInMainHand();
-        if (!heldItem.getType().isBlock()){
-            return;
-        }
-
-        if (!PlaceableGroupManager.hasData(heldItem)){
+        ItemStack heldItem = e.getItemInHand();
+        if (!heldItem.getType().isBlock() || !PlaceableGroupManager.hasData(heldItem)){
             return;
         }
 

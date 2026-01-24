@@ -62,7 +62,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/deu interaction width <width>", "Set the width of an interaction");
         }
         else{
-            CMDUtils.sendCMD(sender, "/deu interaction scale <height> <width> <tick-duration> <tick-delay>", "Scale an interaction entity over a period of time");
+            CMDUtils.sendCMD(sender, "/deu interaction scale <height> <width> [tick-duration] [tick-delay]", "Scale an interaction entity, optionally over a period of time");
             CMDUtils.sendCMD(sender, "/deu interaction addcmd <player | console> <left | right | both> <command>", "Add a command to an interaction");
             CMDUtils.sendCMD(sender, "/deu interaction listcmds", "List all commands stored on an interaction");
             CMDUtils.sendCMD(sender, "/deu interaction pivot <angle> [-all]", " Pivot an interaction around it's group's");
@@ -84,15 +84,11 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
             ActivePart part = selection.getSelectedPart();
             if (part == null || part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with interaction entities", NamedTextColor.RED)));
+                player.sendMessage(Component.text("| The Interaction cannot be in a packet-based group", NamedTextColor.GREEN));
                 return null;
             }
             return new SelectedInteraction(part);
         }
-    }
-
-    private static void noPartSelectionInteraction(Player player){
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You must look at the interaction you wish to add the command to, or select a part!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/deu parts cycle <first | prev | next | last>", NamedTextColor.GRAY));
     }
 
     static class SelectedInteraction {

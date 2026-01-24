@@ -33,7 +33,7 @@ public class ExprPersistentPacketGroupFromId extends SimpleExpression<PacketDisp
     private Expression<String> id;
 
     @Override
-    protected PacketDisplayEntityGroup @Nullable [] get(Event event) {
+    protected PacketDisplayEntityGroup[] get(Event event) {
         String id = this.id.getSingle(event);
         if (id == null){
             return null;

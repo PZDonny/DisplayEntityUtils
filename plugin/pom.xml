@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.donnypz.displayentityutils</groupId>
         <artifactId>deu</artifactId>
-        <version>3.4.1</version>
+        <version>3.4.2</version>
     </parent>
 
     <artifactId>plugin</artifactId>
@@ -45,6 +45,11 @@
             <id>skript-releases</id>
             <name>Skript Repository</name>
             <url>https://repo.skriptlang.org/releases</url>
+        </repository>
+
+        <repository>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/releases/</url>
         </repository>
     </repositories>
 
@@ -104,6 +109,13 @@
             <groupId>io.lumine</groupId>
             <artifactId>Mythic-Dist</artifactId>
             <version>5.8.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.11.7</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

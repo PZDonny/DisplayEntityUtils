@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
@@ -109,7 +110,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
                 //Execute Commands
                 if (clickType == InteractionClickEvent.ClickType.LEFT){
                     for (String cmd : part.getLeftConsoleInteractionCommands()){
-                        runConsoleCommand(cmd);
+                        runConsoleCommand(cmd, player);
                     }
                     for (String cmd : part.getLeftPlayerInteractionCommands()){
                         runPlayerCommand(cmd, player);
@@ -117,7 +118,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
                 }
                 else{
                     for (String cmd : part.getRightConsoleInteractionCommands()){
-                        runConsoleCommand(cmd);
+                        runConsoleCommand(cmd, player);
                     }
                     for (String cmd : part.getRightPlayerInteractionCommands()){
                         runPlayerCommand(cmd, player);
@@ -185,19 +186,27 @@ public class DEUInteractionListener implements Listener, PacketListener {
     }
 
     private void runCommand(InteractionCommand command, Player player){
-        if (!command.isConsoleCommand()){
-            player.performCommand(command.getCommand());
+        String cmd = command.getCommand();
+        if (command.isConsoleCommand()){
+            runConsoleCommand(cmd, player);
         }
         else{
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.getCommand());
+            runPlayerCommand(cmd, player);
         }
     }
 
     private void runPlayerCommand(String command, Player player){
-        player.performCommand(command);
+        player.performCommand(getPAPIReplaced(player, command));
     }
 
-    private void runConsoleCommand(String command){
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+    private void runConsoleCommand(String command, Player player){
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), getPAPIReplaced(player, command));
+    }
+
+    private String getPAPIReplaced(Player player, String command){
+        if (DisplayAPI.isPAPIInstalled()){
+            return PlaceholderAPI.setPlaceholders(player, command);
+        }
+        return command;
     }
 }

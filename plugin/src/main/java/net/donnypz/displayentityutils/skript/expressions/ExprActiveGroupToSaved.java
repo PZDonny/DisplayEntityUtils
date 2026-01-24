@@ -12,8 +12,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Active Group to Saved")
-@Description("Get a saved group from a active group")
+@Name("Save Active Group")
+@Description("Save an Active Group and get its saved version")
 @Examples({"set {_savedgroup} to {_spawnedgroup} as saved group",
             "set {_savedgroup} to {_packetgroup} as saved group"})
 @Since("3.3.1")
@@ -26,7 +26,7 @@ public class ExprActiveGroupToSaved extends SimpleExpression<Object> {
     private Expression<?> object;
 
     @Override
-    protected Object @Nullable [] get(Event event) {
+    protected Object[] get(Event event) {
         Object o = object.getSingle(event);
         if (o instanceof ActiveGroup<?> ag){
             return new DisplayEntityGroup[]{ag.toDisplayEntityGroup()};

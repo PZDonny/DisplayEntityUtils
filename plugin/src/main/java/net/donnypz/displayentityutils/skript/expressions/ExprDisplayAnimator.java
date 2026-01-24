@@ -30,7 +30,7 @@ public class ExprDisplayAnimator extends SimpleExpression<DisplayAnimator> {
     private Expression<SpawnedDisplayAnimation> animation;
 
     @Override
-    protected DisplayAnimator @Nullable [] get(Event event) {
+    protected DisplayAnimator[] get(Event event) {
         DisplayAnimator.AnimationType type = loop ? DisplayAnimator.AnimationType.LOOP : DisplayAnimator.AnimationType.LINEAR;
         SpawnedDisplayAnimation anim = animation.getSingle(event);
         if (anim == null){

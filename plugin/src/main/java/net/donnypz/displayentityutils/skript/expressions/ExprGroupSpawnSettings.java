@@ -28,7 +28,7 @@ public class ExprGroupSpawnSettings extends SimpleExpression<GroupSpawnSettings>
     }
 
     @Override
-    protected GroupSpawnSettings @Nullable [] get(Event event) {
+    protected GroupSpawnSettings[] get(Event event) {
         return new GroupSpawnSettings[]{new GroupSpawnSettings()};
     }
 

@@ -37,7 +37,7 @@ public class ExprBDEModelToSpawned extends SimpleExpression<SpawnedDisplayEntity
     private Expression<Location> location;
 
     @Override
-    protected SpawnedDisplayEntityGroup @Nullable [] get(Event event) {
+    protected SpawnedDisplayEntityGroup[] get(Event event) {
         String file = fileName.getSingle(event);
         Location loc = location.getSingle(event);
         if (file == null || loc == null){

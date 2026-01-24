@@ -44,6 +44,7 @@ public final class DisplayAPI {
     static boolean isViaVerInstalled;
     static boolean isSkriptInstalled;
     static boolean isWorldEditInstalled;
+    static boolean isPAPIInstalled;
 
     private static final String legacyPartTagPrefix = "deu.parttag_";
 
@@ -187,6 +188,14 @@ public final class DisplayAPI {
      */
     public static boolean isSkriptInstalled() {
         return isSkriptInstalled;
+    }
+
+    /**
+     * Get whether PlaceholderAPI is installed on this server
+     * @return true if PAPI is present
+     */
+    public static boolean isPAPIInstalled() {
+        return isPAPIInstalled;
     }
 
     public static DisplayStorage getStorage(@NotNull LoadMethod method){

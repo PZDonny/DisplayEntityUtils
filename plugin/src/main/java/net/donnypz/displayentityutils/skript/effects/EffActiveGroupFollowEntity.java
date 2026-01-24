@@ -19,7 +19,8 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Active Group Follow Entity Direction")
 @Description("Make an active group respect an entity's looking direction. " +
-        "\nIN VERSIONS BELOW v3.3.5, EACH TYPE IS PREFIXED WITH \"ft\": \"ft_body\", \"ft_pitch\", \"ft_yaw\", and \"ft_pitch_and_yaw\"!")
+        "\nIN VERSIONS BELOW v3.3.5, EACH TYPE IS PREFIXED WITH \"ft\": \"ft_body\", \"ft_pitch\", \"ft_yaw\", and \"ft_pitch_and_yaw\"!" +
+        "\n3.4.2+ replaces \"pitch_and_yaw\" with \"pitch and yaw\"")
 @Examples({
         "make {_activegroup} follow {_entity} using body yaw",
         "make {_activegroup} follow {_entity} using pitch and flip group",
@@ -32,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 public class EffActiveGroupFollowEntity extends Effect {
 
     static {
-        Skript.registerEffect(EffActiveGroupFollowEntity.class,"make %activegroups% (follow|respect) %entity% (with|using) (1¦pitch|2¦yaw|3¦pitch_and_yaw|4¦body [yaw]) " +
+        Skript.registerEffect(EffActiveGroupFollowEntity.class,"make %activegroups% (follow|respect) %entity% (with|using) (1¦pitch|2¦yaw|3¦pitch and yaw|4¦body [yaw]) " +
                 "[f: [and] flip group] [t: [and] (with|using) (teleport[ation] duration|smoothness) [of] %-number%] [d: [and] [after death] despawn after %-timespan%]"); //Keep the space between tag and "[and]"
     }
 

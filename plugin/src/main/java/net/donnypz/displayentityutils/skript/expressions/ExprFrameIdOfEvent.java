@@ -28,7 +28,7 @@ public class ExprFrameIdOfEvent extends SimpleExpression<Number> {
     }
 
     @Override
-    protected Number @Nullable [] get(Event event) {
+    protected Number[] get(Event event) {
         Integer frameId = null;
         if (event instanceof AnimationFrameEndEvent e){
             frameId = e.getFrameId();

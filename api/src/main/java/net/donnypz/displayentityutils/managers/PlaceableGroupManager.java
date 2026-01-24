@@ -366,7 +366,8 @@ public final class PlaceableGroupManager {
      * @return a boolean
      */
     public static boolean hasData(@NotNull ItemStack itemStack){
-        PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+        PersistentDataContainer pdc = getPDC(itemStack);
+        if (pdc == null) return false;
         return pdc.has(DisplayAPI.getPlaceableGroupKey(), PersistentDataType.STRING);
     }
 
@@ -376,7 +377,8 @@ public final class PlaceableGroupManager {
      * @return the group's tag or null
      */
     public static @Nullable String getGroupTag(@NotNull ItemStack itemStack){
-        PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+        PersistentDataContainer pdc = getPDC(itemStack);
+        if (pdc == null) return null;
         return pdc.get(DisplayAPI.getPlaceableGroupKey(), PersistentDataType.STRING);
     }
 
@@ -398,7 +400,8 @@ public final class PlaceableGroupManager {
      * @return a boolean
      */
     public static boolean hasPlacePermission(@NotNull ItemStack itemStack){
-        PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+        PersistentDataContainer pdc = getPDC(itemStack);
+        if (pdc == null) return false;
         return pdc.has(DisplayAPI.getPlaceableGroupPermissionKey(), PersistentDataType.STRING);
     }
 
@@ -408,7 +411,8 @@ public final class PlaceableGroupManager {
      * @return the permission or null if the item doesn't have placeable group data
      */
     public static @Nullable String getPlacePermission(@NotNull ItemStack itemStack){
-        PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+        PersistentDataContainer pdc = getPDC(itemStack);
+        if (pdc == null) return null;
         return pdc.get(DisplayAPI.getPlaceableGroupPermissionKey(), PersistentDataType.STRING);
     }
 
@@ -418,7 +422,8 @@ public final class PlaceableGroupManager {
      * @return a boolean
      */
     public static boolean isRespectingPlayerFacing(@NotNull ItemStack itemStack){
-        PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+        PersistentDataContainer pdc = getPDC(itemStack);
+        if (pdc == null) return false;
         return Boolean.TRUE.equals(pdc.get(DisplayAPI.getPlaceableGroupRespectPlayerFacing(), PersistentDataType.BOOLEAN));
     }
 
@@ -428,7 +433,8 @@ public final class PlaceableGroupManager {
      * @return a boolean
      */
     public static boolean isRespectingBlockFace(@NotNull ItemStack itemStack){
-        PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+        PersistentDataContainer pdc = getPDC(itemStack);
+        if (pdc == null) return false;
         return Boolean.TRUE.equals(pdc.get(DisplayAPI.getPlaceableGroupRespectBlockFace(), PersistentDataType.BOOLEAN));
     }
 
@@ -438,7 +444,8 @@ public final class PlaceableGroupManager {
      * @return a boolean
      */
     public static boolean isPlacerBreaksOnly(@NotNull ItemStack itemStack){
-        PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+        PersistentDataContainer pdc = getPDC(itemStack);
+        if (pdc == null) return false;
         return Boolean.TRUE.equals(pdc.get(DisplayAPI.getPlaceableGroupPlacerBreaksOnly(), PersistentDataType.BOOLEAN));
     }
 
@@ -448,7 +455,8 @@ public final class PlaceableGroupManager {
      * @return a boolean
      */
     public static boolean isDropItem(@NotNull ItemStack itemStack){
-        PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+        PersistentDataContainer pdc = getPDC(itemStack);
+        if (pdc == null) return false;
         return Boolean.TRUE.equals(pdc.get(DisplayAPI.getPlaceableGroupDropItem(), PersistentDataType.BOOLEAN));
     }
 
@@ -462,6 +470,12 @@ public final class PlaceableGroupManager {
         String placePerm = getPlacePermission(itemStack);
         if (placePerm == null) return true;
         return player.hasPermission(placePerm);
+    }
+
+    private static PersistentDataContainer getPDC(ItemStack itemStack){
+        ItemMeta meta = itemStack.getItemMeta();
+        if (meta == null) return null;
+        return meta.getPersistentDataContainer();
     }
 
 

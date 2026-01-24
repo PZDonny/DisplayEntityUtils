@@ -1216,9 +1216,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
      */
     public void unregister(boolean despawnParts, boolean force){
-        if (masterPart == null){
-            return;
-        }
+        if (masterPart == null) return;
+
+        removeScaleMultipliers();
         DisplayStateMachine.unregisterFromStateMachine(this, false); //Animators will auto-stop
         removeSpawnedGroup(despawnParts, force);
 

@@ -662,6 +662,26 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
     }
 
+    @Override
+    public float getDisplayCullHeight() {
+        if (!isDisplay()) return -1;
+        Entity entity = getEntity();
+        if (entity instanceof Display display) {
+            return display.getDisplayHeight();
+        }
+        return -1;
+    }
+
+    @Override
+    public float getDisplayCullWidth() {
+        if (!isDisplay()) return -1;
+        Entity entity = getEntity();
+        if (entity instanceof Display display) {
+            return display.getDisplayWidth();
+        }
+        return -1;
+    }
+
 
     /**
      * Set the glow color of this part

@@ -33,7 +33,7 @@ public class ExprFramePointRelativeLocation extends SimpleExpression<Location> {
     private Expression<Object> obj;
 
     @Override
-    protected Location @Nullable [] get(Event event) {
+    protected Location[] get(Event event) {
         FramePoint framePoint = fp.getSingle(event);
         if (framePoint != null) {
             Object o = obj.getSingle(event);
