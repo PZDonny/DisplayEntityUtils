@@ -188,10 +188,10 @@ public class DEUInteractionListener implements Listener, PacketListener {
     private void runCommand(InteractionCommand command, Player player){
         String cmd = command.getCommand();
         if (command.isConsoleCommand()){
-            runPlayerCommand(cmd, player);
+            runConsoleCommand(cmd, player);
         }
         else{
-            runConsoleCommand(cmd, player);
+            runPlayerCommand(cmd, player);
         }
     }
 
