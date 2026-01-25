@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 @Examples({"if {_savedgroup} has tag:", "\tbroadcast \"This group has a tag!\"",
         "",
         "if {_animation} doesn't have a tag:", "\tbroadcast \"This animation is tagless!\""})
-@Since({"2.6.2"})
+@Since("2.6.2")
 public class CondHasTag extends Condition {
 
     static {

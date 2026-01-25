@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 @Description("Add/Remove a part tag from an active part")
 @Examples({"add part tag \"newtag\" to {_spawnedpart}",
         "remove tag \"i_dont_want_this_tag\" from {_activepart}",})
-@Since({"2.6.2, 3.3.4 (Packet-Parts)"})
+@Since("2.6.2, 3.3.4 (Packet-Parts)")
 @DocumentationId("EffSpawnedPartTag")
 public class EffActivePartTag extends Effect {
     static {

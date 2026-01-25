@@ -42,12 +42,6 @@
 
     <repositories>
         <repository>
-            <id>skript-releases</id>
-            <name>Skript Repository</name>
-            <url>https://repo.skriptlang.org/releases</url>
-        </repository>
-
-        <repository>
             <id>placeholderapi</id>
             <url>https://repo.extendedclip.com/releases/</url>
         </repository>
@@ -94,7 +88,7 @@
         <dependency>
             <groupId>com.github.SkriptLang</groupId>
             <artifactId>Skript</artifactId>
-            <version>2.13.0</version>
+            <version>2.14.0</version>
             <scope>provided</scope>
         </dependency>
 
