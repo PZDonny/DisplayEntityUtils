@@ -85,7 +85,7 @@ public class BDEngineLegacyDPConverter {
         }
 
         DatapackEntitySpawned.finalizeAnimationPreparation(timeStamp);
-        createdGroup.seedPartUUIDs(SpawnedDisplayEntityGroup.defaultPartUUIDSeed);
+        createdGroup.seedPartUUIDs(SpawnedDisplayEntityGroup.DEFAULT_PART_UUID_SEED);
         final SpawnedDisplayAnimation anim = new SpawnedDisplayAnimation();
 
 
