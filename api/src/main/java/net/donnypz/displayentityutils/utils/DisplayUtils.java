@@ -665,6 +665,17 @@ public final class DisplayUtils {
     }
 
     /**
+     * Get the UNIX timestamp of when an entity was grouped
+     * @param entity the entity to check
+     * @return unix timestamp, -1 if entity was never grouped
+     */
+    public static long getCreationTime(Entity entity){
+        if (entity == null) return -1;
+        PersistentDataContainer pdc = entity.getPersistentDataContainer();
+        return pdc.getOrDefault(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, -1L);
+    }
+
+    /**
      * Gets the part uuid of a valid part entity
      * @param entity entity to retrieve the uuid from
      * @return a UUID or null if the entity is not part of a group. Will still return a value if the entity
@@ -939,18 +950,6 @@ public final class DisplayUtils {
     public static boolean isInGroup(Entity entity){
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
         return part != null && part.hasGroup();
-    }
-
-    /**
-     * Get the UNIX timestamp of when an entity was grouped
-     * @param entity the entity to check
-     * @return unix timestamp, -1 if entity was never grouped
-     */
-    private static long getCreationTime(Entity entity){
-        if (!entity.getPersistentDataContainer().has(SpawnedDisplayEntityGroup.creationTimeKey)){
-            return -1;
-        }
-        return entity.getPersistentDataContainer().get(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG);
     }
 
     /**

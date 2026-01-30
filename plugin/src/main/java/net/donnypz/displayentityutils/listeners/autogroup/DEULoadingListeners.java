@@ -39,7 +39,7 @@ public final class DEULoadingListeners implements Listener {
 
         World world = e.getWorld();
         String worldName = world.getName();
-        AutoGroup.readChunks.remove(worldName);
+        AutoGroup.worldData.remove(worldName);
 
         if (DisplayEntityPlugin.shouldUnregisterWorld(worldName)){
             for (SpawnedDisplayEntityGroup group : DisplayGroupManager.getSpawnedGroups(worldName)){
