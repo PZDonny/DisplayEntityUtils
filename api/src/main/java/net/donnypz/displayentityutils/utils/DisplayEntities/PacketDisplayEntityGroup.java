@@ -7,6 +7,7 @@ import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.managers.holders.AsyncGroupHolder;
 import net.donnypz.displayentityutils.utils.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
@@ -1071,7 +1072,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                     long chunkKey = ConversionUtils.getChunkKey(groupLoc);
                     data.removeGroup(chunkKey, this);
                 }
-                if (data.groupMap.isEmpty()){
+                if (data.isEmpty()){
                     allPacketGroups.remove(worldName);
                 }
             }
@@ -1091,55 +1092,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         masterPart = null;
     }
 
-    private static abstract class GroupHolder<T>{
-        final Map<T, Set<PacketDisplayEntityGroup>> groupMap = new ConcurrentHashMap<>();
-        final Object groupMapLock = new Object();
 
-
-        Set<PacketDisplayEntityGroup> getGroups(){
-            Set<PacketDisplayEntityGroup> groups = new HashSet<>();
-            synchronized (groupMapLock){
-                for (Set<PacketDisplayEntityGroup> g : groupMap.values()){
-                    groups.addAll(g);
-                }
-            }
-
-            return groups;
-        }
-
-        Set<PacketDisplayEntityGroup> getGroups(T key){
-            synchronized (groupMapLock){
-                Set<PacketDisplayEntityGroup> groups = groupMap.get(key);
-                if (groups == null) return Collections.emptySet();
-                return new HashSet<>(groups);
-            }
-        }
-
-        void addGroup(T key, PacketDisplayEntityGroup group){
-            groupMap.computeIfAbsent(key, k -> ConcurrentHashMap.newKeySet()).add(group);
-        }
-
-        void removeGroup(T key, PacketDisplayEntityGroup group){
-            Set<PacketDisplayEntityGroup> groups = groupMap.get(key);
-            if (groups != null) {
-                groups.remove(group);
-                if (groups.isEmpty()) groupMap.remove(key);
-            }
-        }
-
-        boolean isEmpty(){
-            return groupMap.isEmpty();
-        }
-    }
-
-    static class WorldData extends GroupHolder<Long>{
-        Set<PacketDisplayEntityGroup> getGroups(Chunk chunk){
-            return getGroups(chunk.getChunkKey());
-        }
-
+    static class WorldData extends AsyncGroupHolder<Long, PacketDisplayEntityGroup> {
         PacketDisplayEntityGroup getGroup(long chunkKey, int localId){
-            synchronized (groupMapLock){
-                Set<PacketDisplayEntityGroup> groups = groupMap.get(chunkKey);
+            synchronized (super.lock){
+                Set<PacketDisplayEntityGroup> groups = getRawGroups(chunkKey);
                 if (groups == null) return null;
                 for (PacketDisplayEntityGroup pdeg : groups){
                     if (localId == pdeg.persistentLocalId){
@@ -1151,7 +1108,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
     }
 
-    static class PassengerGroupData extends GroupHolder<UUID>{
+    static class PassengerGroupData extends AsyncGroupHolder<UUID, PacketDisplayEntityGroup> {
+
         Set<PacketDisplayEntityGroup> getGroups(Entity entity){
             return getGroups(entity.getUniqueId());
         }
