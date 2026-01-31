@@ -6,7 +6,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.GroupRegisteredEvent;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
-import net.donnypz.displayentityutils.events.GroupUnregisteredEvent;
+import net.donnypz.displayentityutils.managers.holders.GroupHolder;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -35,19 +35,342 @@ import java.util.zip.ZipException;
 public final class DisplayGroupManager {
 
     private static final Gson gson = new Gson();
-    private static final Map<SpawnedDisplayEntityPart, SpawnedDisplayEntityGroup> allSpawnedGroups = new HashMap<>();
+    private static final Map<String, GroupHolder<Long, SpawnedDisplayEntityGroup>> allSpawnedGroups = new HashMap<>(); //worldname, groupholder
     private static final String[] ITEM_STACK_FIELDS = new String[]{"itemStack", "itemStackAsBytes"};
     static final String PLUGIN_VERSION_FIELD = "pluginVersion";
 
     private DisplayGroupManager() {}
 
-    /**
-     * This will NEVER have to be called since it is already done automatically when a SpawnedDisplayEntityGroup is created.
-     * DO NOT CALL THIS METHOD
-     */
     @ApiStatus.Internal
-    public static void addSpawnedGroup(SpawnedDisplayEntityGroup spawnedGroup) {
-        allSpawnedGroups.put(spawnedGroup.getMasterPart(), spawnedGroup);
+    public static void addSpawnedGroup(Location groupLoc, SpawnedDisplayEntityGroup spawnedGroup) {
+        long chunkKey = ConversionUtils.getChunkKey(groupLoc);
+        allSpawnedGroups.computeIfAbsent(groupLoc.getWorld().getName(), n -> new GroupHolder<>())
+                        .addGroup(chunkKey, spawnedGroup);
+    }
+
+    @ApiStatus.Internal
+    public static void removeSpawnedGroup(Location location, SpawnedDisplayEntityGroup group) {
+        String worldName = location.getWorld().getName();
+        GroupHolder<Long, SpawnedDisplayEntityGroup> holder = allSpawnedGroups.get(worldName);
+        if (holder == null) return;
+        holder.removeGroup(ConversionUtils.getChunkKey(location), group);
+        if (holder.isEmpty()){
+            allSpawnedGroups.remove(worldName);
+        }
+    }
+
+    @ApiStatus.Internal
+    public static void updateSpawnedGroup(Location lastLoc, Location newLoc, SpawnedDisplayEntityGroup spawnedGroup){
+        long lastChunkKey = ConversionUtils.getChunkKey(lastLoc);
+        long newChunkKey = ConversionUtils.getChunkKey(newLoc);
+        if (lastLoc.getWorld().equals(newLoc.getWorld()) &&
+                lastChunkKey == newChunkKey) return;
+
+        String oldWorldName = lastLoc.getWorld().getName();
+        String newWorldName = newLoc.getWorld().getName();
+        GroupHolder<Long, SpawnedDisplayEntityGroup> oldData = allSpawnedGroups.get(oldWorldName);
+        if (oldData != null){
+
+            oldData.removeGroup(lastChunkKey, spawnedGroup);
+            if (oldData.isEmpty() && !newWorldName.equals(oldWorldName)){
+                allSpawnedGroups.remove(oldWorldName);
+            }
+        }
+
+        addSpawnedGroup(newLoc, spawnedGroup);
+    }
+
+    /**
+     * Get all {@link SpawnedDisplayEntityGroup}s that have been registered during this play session.
+     * @return a set of {@link SpawnedDisplayEntityGroup}s
+     */
+    public static @NotNull Set<SpawnedDisplayEntityGroup> getSpawnedGroups(){
+        if (allSpawnedGroups.isEmpty()) return Collections.emptySet();
+        Set<SpawnedDisplayEntityGroup> groups = new HashSet<>();
+        for (GroupHolder<Long, SpawnedDisplayEntityGroup> holder : allSpawnedGroups.values()){
+            groups.addAll(holder.getGroups());
+        }
+        return groups;
+    }
+
+    /**
+     * Get all {@link SpawnedDisplayEntityGroup}s that have been registered during this play session by world.
+     * @param world the world
+     * @return a set of {@link SpawnedDisplayEntityGroup}s
+     */
+    public static @NotNull Set<SpawnedDisplayEntityGroup> getSpawnedGroups(@NotNull World world) {
+        return getSpawnedGroups(world.getName());
+    }
+
+    /**
+     * Get all {@link SpawnedDisplayEntityGroup}s that have been registered during this play session by world name.
+     * @param worldName the world's name
+     * @return a set of {@link SpawnedDisplayEntityGroup}s
+     */
+    public static @NotNull Set<SpawnedDisplayEntityGroup> getSpawnedGroups(@NotNull String worldName) {
+        GroupHolder<Long, SpawnedDisplayEntityGroup> holder = allSpawnedGroups.get(worldName);
+        return holder == null ? Collections.emptySet() : holder.getGroups();
+    }
+
+    /**
+     * Get all {@link SpawnedDisplayEntityGroup}s that have been registered during this play session by chunk.
+     * @param chunk the chunk
+     * @return a set of {@link SpawnedDisplayEntityGroup}s
+     */
+    public static @NotNull Set<SpawnedDisplayEntityGroup> getSpawnedGroups(@NotNull Chunk chunk){
+        return getSpawnedGroups(chunk.getWorld().getName(), chunk.getChunkKey());
+    }
+
+    /**
+     * Get all {@link SpawnedDisplayEntityGroup}s that have been registered during this play session by chunk.
+     * @param world the chunk's world
+     * @param chunkKey the chunk's key
+     * @return a set of {@link SpawnedDisplayEntityGroup}s
+     */
+    public static @NotNull Set<SpawnedDisplayEntityGroup> getSpawnedGroups(@NotNull World world, long chunkKey){
+        return getSpawnedGroups(world.getName(), chunkKey);
+    }
+
+    /**
+     * Get all {@link SpawnedDisplayEntityGroup}s that have been registered during this play session by chunk.
+     * @param worldName the chunk's world name
+     * @param chunkKey the chunk's key
+     * @return a set of {@link SpawnedDisplayEntityGroup}s
+     */
+    public static @NotNull Set<SpawnedDisplayEntityGroup> getSpawnedGroups(@NotNull String worldName, long chunkKey){
+        GroupHolder<Long, SpawnedDisplayEntityGroup> holder = allSpawnedGroups.get(worldName);
+        return holder == null ? Collections.emptySet() : holder.getGroups(chunkKey);
+    }
+
+    public static @NotNull Set<SpawnedDisplayEntityGroup> getNearbySpawnedGroups(@NotNull Location location, double radius){
+        String worldName = location.getWorld().getName();
+        GroupHolder<Long, SpawnedDisplayEntityGroup> holder = allSpawnedGroups.get(worldName);
+        if (holder == null) return Collections.emptySet();
+
+        Set<SpawnedDisplayEntityGroup> groups = new HashSet<>();
+        Set<Chunk> chunks = getNearbyChunks(location, radius);
+        double radiusSquared = radius*radius;
+        for (Chunk c : chunks){
+            for (SpawnedDisplayEntityGroup group : holder.getGroups(c.getChunkKey())){
+                Location groupLoc = group.getLocation();
+                if (location.distanceSquared(groupLoc) > radiusSquared){
+                    continue;
+                }
+                groups.add(group);
+            }
+        }
+        return groups;
+    }
+
+    public static @Nullable SpawnedDisplayEntityGroup getNearestSpawnedGroup(@NotNull Location location, double radius){
+        String worldName = location.getWorld().getName();
+        GroupHolder<Long, SpawnedDisplayEntityGroup> holder = allSpawnedGroups.get(worldName);
+        if (holder == null) return null;
+
+        SpawnedDisplayEntityGroup nearest = null;
+        double lastDistSq = Double.MAX_VALUE;
+        Set<Chunk> chunks = getNearbyChunks(location, radius);
+        double radiusSquared = radius*radius;
+
+        for (Chunk c : chunks){
+            Set<SpawnedDisplayEntityGroup> groups = holder.getGroups(c.getChunkKey());
+            for (SpawnedDisplayEntityGroup group : groups){
+                Location groupLoc = group.getLocation();
+                double dist = location.distanceSquared(groupLoc);
+                if (dist > radiusSquared){
+                    continue;
+                }
+
+                if (nearest == null){
+                    nearest = group;
+                    lastDistSq = dist;
+                    continue;
+                }
+                if (dist < lastDistSq){
+                    nearest = group;
+                    lastDistSq = dist;
+                }
+            }
+        }
+        return nearest;
+    }
+
+    private static Set<Chunk> getNearbyChunks(Location loc, double radiusInBlocks) {
+        World world = loc.getWorld();
+
+        double minX = loc.getX() - radiusInBlocks;
+        double maxX = loc.getX() + radiusInBlocks;
+        double minZ = loc.getZ() - radiusInBlocks;
+        double maxZ = loc.getZ() + radiusInBlocks;
+
+        int minChunkX = (int) minX >> 4;
+        int maxChunkX = (int) maxX >> 4;
+        int minChunkZ = (int) minZ >> 4;
+        int maxChunkZ = (int) maxZ >> 4;
+
+        Set<Chunk> chunks = new HashSet<>();
+
+        for (int cx = minChunkX; cx <= maxChunkX; cx++) {
+            for (int cz = minChunkZ; cz <= maxChunkZ; cz++) {
+                chunks.add(world.getChunkAt(cx, cz));
+            }
+        }
+
+        return chunks;
+    }
+
+
+//    private static List<Chunk> getNearbyChunks(Location location, double radiusInBlocks){
+//        List<Chunk> nearbyChunks = new ArrayList<>();
+//        Chunk centerChunk = location.getChunk();
+//        nearbyChunks.add(centerChunk);
+//
+//        for (double dx = -radiusInBlocks; dx <= radiusInBlocks*2; dx+=radiusInBlocks){
+//            for (double dz = -radiusInBlocks; dz <= radiusInBlocks*2; dz+=radiusInBlocks){
+//                Location loc = location.clone();
+//                loc.add(dx, 0, dz);
+//                Chunk chunk = loc.getChunk();
+//                if (chunk == centerChunk){
+//                    continue;
+//                }
+//                nearbyChunks.add(chunk);
+//            }
+//        }
+//
+//        return nearbyChunks;
+//    }
+
+    /**
+     * Get the registered {@link SpawnedDisplayEntityGroup} of a display entity.
+     * <br>
+     * @param displayEntity The display entity that's in a group
+     * @return a {@link SpawnedDisplayEntityGroup} or null
+     */
+    public static @Nullable SpawnedDisplayEntityGroup getSpawnedGroup(@NotNull Display displayEntity) {
+        SpawnedDisplayEntityPart existingPart = SpawnedDisplayEntityPart.getPart(displayEntity);
+        if (existingPart == null) {
+            return null;
+        }
+        return existingPart.getGroup();
+    }
+
+    /**
+     * Get a {@link SpawnedDisplayEntityGroup} through an Interaction entity
+     * @param interaction The interaction
+     * @param radius The radius to search for the group
+     * @return a {@link SpawnedDisplayEntityGroup} containing the interaction. Null if not found.
+     */
+    public static @Nullable SpawnedDisplayEntityGroup getSpawnedGroup(@NotNull Interaction interaction, double radius){ //Keep this just to prevent breakage
+        return getSpawnedGroup((Entity) interaction, radius);
+    }
+
+    /**
+     * Get a registered {@link SpawnedDisplayEntityGroup} through an eligible part entity
+     * @param entity The entity that's in a group
+     * @param radius The radius to search for the group
+     * @return a {@link SpawnedDisplayEntityGroup} containing the entity. Null if not found.
+     */
+    public static @Nullable SpawnedDisplayEntityGroup getSpawnedGroup(@NotNull Entity entity, double radius) {
+        if (!DisplayUtils.isPartEntity(entity)) return null;
+
+        //Check for existing group
+        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
+        if (part != null && part.getGroup() != null) {
+            return part.getGroup();
+        }
+
+        //Get Nearby Groups
+        Set<GroupResult> results = getOrCreateNearbySpawnedGroups(entity.getLocation(), radius);
+        if (results.isEmpty()){
+            return null;
+        }
+        //Check if Interaction is part of group
+        part = SpawnedDisplayEntityPart.getPart(entity);
+        return part == null ? null : part.getGroup();
+    }
+
+    /**
+     * Get the {@link GroupResult} of a display entity containing its {@link SpawnedDisplayEntityGroup}, if applicable.
+     * <br>
+     * If a group is found and created as a result of this, {@link GroupRegisteredEvent} will be called
+     * @param displayEntity The display entity that's in a group
+     * @return a {@link GroupResult} or null
+     */
+    public static @Nullable GroupResult getOrCreateSpawnedGroup(@NotNull Display displayEntity) {
+        //Check for already registered group
+        SpawnedDisplayEntityPart existingPart = SpawnedDisplayEntityPart.getPart(displayEntity);
+        if (existingPart != null){
+            return new GroupResult(existingPart.getGroup(), true);
+        }
+
+        //Check for non-existing group on new session
+        SpawnedDisplayEntityGroup group;
+        if (displayEntity.getVehicle() != null && displayEntity.getVehicle() instanceof Display vehicle) {
+            displayEntity = vehicle;
+        }
+        else if (displayEntity.getPassengers().isEmpty()) {
+            return null;
+        }
+
+        boolean containsDisplay = false;
+        for (Entity e : displayEntity.getPassengers()) {
+            if (e instanceof Display) {
+                containsDisplay = true;
+                break;
+            }
+        }
+        if (!containsDisplay) {
+            return null;
+        }
+
+        group = new SpawnedDisplayEntityGroup(displayEntity);
+        new GroupRegisteredEvent(group).callEvent();
+        if (!group.isSpawned()){
+            return null;
+        }
+        group.setPersistent(displayEntity.isPersistent());
+        return new GroupResult(group, false);
+    }
+
+    /**
+     * Gets the nearest {@link SpawnedDisplayEntityGroup} near a location
+     * @param location Center of the search location
+     * @param radius The radius to check for a spawned display entity group
+     * @return A {@link GroupResult}. Null if not found.
+     */
+    public static @Nullable GroupResult getOrCreateNearestSpawnedGroup(@NotNull Location location, double radius) {
+        Display master = getNearestPotentialMasterDisplay(location, radius, null);
+        if (master != null){
+            return getOrCreateSpawnedGroup(master);
+        }
+        return null;
+    }
+
+    private static Display getNearestPotentialMasterDisplay(Location loc, double radius, String groupTag) {
+        Display nearest = null;
+        double lastDistance = Double.MAX_VALUE;
+        for (Entity e : loc.getNearbyEntities(radius, radius, radius)) {
+            if (!(e instanceof Display d) || d.getPassengers().isEmpty() || (groupTag != null && !DisplayUtils.isGroupTag(d, groupTag))) {
+                continue;
+            }
+
+            double distance = loc.distanceSquared(e.getLocation());
+            if (distance < lastDistance) {
+                lastDistance = distance;
+                nearest = d;
+            }
+        }
+        return nearest;
+    }
+
+    public static @NotNull Set<GroupResult> getOrCreateNearbySpawnedGroups(@NotNull Location location, double radius){
+        Set<GroupResult> results = new HashSet<>();
+        for (BlockDisplay display : location.getNearbyEntitiesByType(BlockDisplay.class, radius)) {
+            GroupResult result = getOrCreateSpawnedGroup(display);
+            if (result == null) continue;
+            results.add(result);
+        }
+        return results;
     }
 
     /**
@@ -106,14 +429,11 @@ public final class DisplayGroupManager {
         return null;
     }
 
-
-    @ApiStatus.Internal
-    public static void removeSpawnedGroup(SpawnedDisplayEntityPart masterPart) {
-        allSpawnedGroups.remove(masterPart);
-    }
-
     public static boolean isGroupRegistered(@NotNull SpawnedDisplayEntityGroup spawnedGroup) {
-        return allSpawnedGroups.containsKey(spawnedGroup.getMasterPart());
+        Location groupLoc = spawnedGroup.getLocation();
+        GroupHolder<Long, SpawnedDisplayEntityGroup> holder = allSpawnedGroups.get(groupLoc.getWorld().getName());
+        if (holder == null) return false;
+        return holder.getGroups(ConversionUtils.getChunkKey(groupLoc)).contains(spawnedGroup);
     }
 
 
@@ -422,207 +742,7 @@ public final class DisplayGroupManager {
                 .fromJson(jsonObject, DisplayEntityGroup.class);
     }
 
-    public static @Nullable SpawnedDisplayEntityGroup getExistingSpawnedGroup(Display displayEntity) {
-        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(displayEntity);
-        if (part == null) {
-            return null;
-        }
 
-        return part.getGroup();
-    }
-
-
-    /**
-     * Get the {@link GroupResult} of a display entity containing its {@link SpawnedDisplayEntityGroup}, if applicable.
-     * <br>
-     * If a group is created as a result of this, {@link GroupRegisteredEvent} will be called
-     * @param displayEntity The display entity that's in a group
-     * @return a {@link GroupResult} or null
-     */
-    public static @Nullable GroupResult getSpawnedGroup(@NotNull Display displayEntity) {
-        //Check for already registered group
-        SpawnedDisplayEntityPart existingPart = SpawnedDisplayEntityPart.getPart(displayEntity);
-        if (existingPart != null){
-            return new GroupResult(existingPart.getGroup(), true);
-        }
-
-        //Check for non-existing group on new session
-        SpawnedDisplayEntityGroup group;
-        if (displayEntity.getVehicle() != null && displayEntity.getVehicle() instanceof Display vehicle) {
-            displayEntity = vehicle;
-        }
-        else if (displayEntity.getPassengers().isEmpty()) {
-            return null;
-        }
-
-        boolean containsDisplay = false;
-        for (Entity e : displayEntity.getPassengers()) {
-            if (e instanceof Display) {
-                containsDisplay = true;
-                break;
-            }
-        }
-        if (!containsDisplay) {
-            return null;
-        }
-
-        group = new SpawnedDisplayEntityGroup(displayEntity);
-        new GroupRegisteredEvent(group).callEvent();
-        if (!group.isSpawned()){
-            return null;
-        }
-        group.setPersistent(displayEntity.isPersistent());
-        return new GroupResult(group, false);
-    }
-
-
-    /**
-     * Get a {@link SpawnedDisplayEntityGroup} through an Interaction entity
-     * @param interaction The interaction
-     * @param radius The radius to search for the group
-     * @return a {@link SpawnedDisplayEntityGroup} containing the interaction. Null if not found.
-     */
-    public static @Nullable SpawnedDisplayEntityGroup getSpawnedGroup(@NotNull Interaction interaction, double radius){ //Keep this just to prevent breakage
-        return getSpawnedGroup((Entity) interaction, radius);
-    }
-
-
-    /**
-     * Get a {@link SpawnedDisplayEntityGroup} through an eligible part entity
-     * @param entity The entity that's in a group
-     * @param radius The radius to search for the group
-     * @return a {@link SpawnedDisplayEntityGroup} containing the entity. Null if not found.
-     */
-    public static @Nullable SpawnedDisplayEntityGroup getSpawnedGroup(@NotNull Entity entity, double radius) {
-        if (!DisplayUtils.isPartEntity(entity)) return null;
-
-        //Check for existing group
-        SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
-        if (part != null && part.getGroup() != null) {
-            return part.getGroup();
-        }
-
-        //Get Nearby Groups
-        List<GroupResult> results = getSpawnedGroupsNearLocation(entity.getLocation(), radius);
-        if (results.isEmpty()){
-            return null;
-        }
-        //Check if Interaction is part of group
-        part = SpawnedDisplayEntityPart.getPart(entity);
-        return part == null ? null : part.getGroup();
-    }
-
-
-    /**
-     * Gets the nearest {@link SpawnedDisplayEntityGroup} near a location
-     * @param location Center of the search location
-     * @param radius The radius to check for a spawned display entity group
-     * @return A {@link GroupResult}. Null if not found.
-     */
-    public static @Nullable GroupResult getSpawnedGroupNearLocation(@NotNull Location location, double radius) {
-        Display master = getNearestPotentialMasterDisplay(location, radius, null);
-        if (master != null){
-            return getSpawnedGroup(master);
-        }
-        return null;
-    }
-
-    /**
-     * Gets the nearest {@link SpawnedDisplayEntityGroup} near a location
-     *
-     * @param location Center of the search location
-     * @param radius The radius to check for a spawned display entity group
-     * @param groupTag Tag of the groups to searched for
-     * @param getter Player who is getting the spawned group
-     * @return A {@link GroupResult}. Null if not found.
-     */
-    public static @Nullable GroupResult getSpawnedGroupNearLocation(@NotNull Location location, double radius, @NotNull String groupTag, @Nullable Player getter) {
-        Display master = getNearestPotentialMasterDisplay(location, radius, groupTag);
-        if (master == null) {
-            if (getter != null) {
-                getter
-                        .sendMessage(DisplayAPI.pluginPrefix
-                        .append(Component.text("Could not find display entities within "+radius+" blocks of you, with the tag, \""+groupTag+"\"", NamedTextColor.RED)));
-            }
-            return null;
-        }
-        return getSpawnedGroup(master);
-    }
-
-    /**
-     * Gets all the {@link SpawnedDisplayEntityGroup}s near a location
-     *
-     * @param location Center of the search location
-     * @param radius The radius to check for {@link SpawnedDisplayEntityGroup}s
-     * @return A list of {@link GroupResult}
-     */
-    public static @NotNull List<GroupResult> getSpawnedGroupsNearLocation(@NotNull Location location, double radius) {
-        return getSpawnedGroupsNearLocation(location, radius, true);
-    }
-
-    /**
-     * Gets all the {@link SpawnedDisplayEntityGroup}s near a location
-     *
-     * @param location Center of the search location
-     * @param radius The radius to check for {@link SpawnedDisplayEntityGroup}s
-     * @return A list of {@link GroupResult}
-     */
-    public static @NotNull List<GroupResult> getSpawnedGroupsNearLocation(@NotNull Location location, double radius, boolean addInteractions) {
-        List<GroupResult> results = new ArrayList<>();
-        for (BlockDisplay display : location.getNearbyEntitiesByType(BlockDisplay.class, radius)) {
-            //Check if found display is a part of a group
-            GroupResult result = getSpawnedGroup(display);
-            if (result == null || results.stream().anyMatch(r -> r.group().equals(result.group()))) {
-                continue;
-            }
-            if (addInteractions){
-                result.group().addMissingEntities(DisplayConfig.getMaximumInteractionSearchRange());
-            }
-            results.add(result);
-        }
-        return results;
-    }
-
-    /**
-     * Get the list of all the {@link SpawnedDisplayEntityGroup} that have been registered during this play session by world name.
-     *
-     * @return a list
-     */
-    public static @NotNull List<SpawnedDisplayEntityGroup> getSpawnedGroups(@NotNull String worldName) {
-        ArrayList<SpawnedDisplayEntityGroup> groups = new ArrayList<>();
-        for (SpawnedDisplayEntityGroup group : allSpawnedGroups.values()) {
-            if (group.getWorldName().equals(worldName)) {
-                groups.add(group);
-            }
-        }
-        return groups;
-    }
-
-    /**
-     * Get the list of all the {@link SpawnedDisplayEntityGroup}s that have been registered during this play session.
-     * @return a list
-     */
-    public static List<SpawnedDisplayEntityGroup> getAllSpawnedGroups() {
-        return new ArrayList<>(allSpawnedGroups.values());
-    }
-
-
-    private static Display getNearestPotentialMasterDisplay(Location loc, double radius, String groupTag) {
-        Display nearest = null;
-        double lastDistance = Double.MAX_VALUE;
-        for (Entity e : loc.getNearbyEntities(radius, radius, radius)) {
-            if (!(e instanceof Display d) || d.getPassengers().isEmpty() || (groupTag != null && !DisplayUtils.isGroupTag(d, groupTag))) {
-                continue;
-            }
-
-            double distance = loc.distanceSquared(e.getLocation());
-            if (distance < lastDistance) {
-                lastDistance = distance;
-                nearest = d;
-            }
-        }
-        return nearest;
-    }
 
     /**
      * Get the group tags of all saved {@link DisplayEntityGroup}s in a storage location.

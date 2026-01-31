@@ -23,7 +23,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.List;
+import java.util.Set;
 
 class GroupSelectCMD extends PlayerSubCommand {
     ClickCallback.Options clickOptions = ClickCallback.Options.builder()
@@ -58,7 +58,7 @@ class GroupSelectCMD extends PlayerSubCommand {
     }
 
     private void getSelectableGroups(Player player, double distance){
-        List<GroupResult> groups = DisplayGroupManager.getSpawnedGroupsNearLocation(player.getLocation(), distance);
+        Set<GroupResult> groups = DisplayGroupManager.getOrCreateNearbySpawnedGroups(player.getLocation(), distance);
         if (groups.isEmpty()){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("No nearby groups found!", NamedTextColor.RED)));
             player.sendMessage(Component.text("| Move to a different location or increase your search distance.", NamedTextColor.GRAY, TextDecoration.ITALIC));
@@ -70,6 +70,7 @@ class GroupSelectCMD extends PlayerSubCommand {
         for (GroupResult result : groups){
             SpawnedDisplayEntityGroup g = result.group();
             Component groupTag = MiniMessage.miniMessage().deserialize("- Tag: " + (g.hasTag() ? "<gray>" + g.getTag() : "<red>No Tag"));
+
             Component teleport = Component.text("[TELEPORT]", NamedTextColor.AQUA)
                     .clickEvent(ClickEvent.callback(audience -> {
                         Location groupLoc = g.getLocation();
@@ -79,6 +80,7 @@ class GroupSelectCMD extends PlayerSubCommand {
                         }
                         FoliaUtils.teleport((Player) audience, groupLoc, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                     }, clickOptions));
+
             Component glow = Component.text("[GLOW]", NamedTextColor.YELLOW)
                     .clickEvent(ClickEvent.callback(audience -> {
                         if (!g.isSpawned()){
@@ -87,6 +89,7 @@ class GroupSelectCMD extends PlayerSubCommand {
                         }
                         g.glowAndMarkInteractions((Player) audience, 40);
                     }, clickOptions));
+
             Component select = Component.text("[SELECT]", NamedTextColor.GREEN)
                     .clickEvent(ClickEvent.callback(audience -> {
                         Player p = (Player) audience;
@@ -96,7 +99,6 @@ class GroupSelectCMD extends PlayerSubCommand {
                         }
                         boolean selectResult = DisplayGroupManager.setSelectedGroup(p, g);
                         if (selectResult){
-                            g.addMissingEntities(distance);
                             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Group selected!", NamedTextColor.GREEN)));
                             DisplayEntityPluginCommand.hideRelativePoints(player);
                         }
@@ -126,6 +128,7 @@ class GroupSelectCMD extends PlayerSubCommand {
                             }
                         }, 0, 2);
                     }, clickOptions));
+
             Component groupMessage = groupTag
                     .appendSpace()
                     .append(select)

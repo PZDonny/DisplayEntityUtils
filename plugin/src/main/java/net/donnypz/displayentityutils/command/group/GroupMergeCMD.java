@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.Set;
 
 class GroupMergeCMD extends GroupSubCommand {
     GroupMergeCMD(@NotNull DEUSubCommand parentSubCommand) {
@@ -41,7 +41,7 @@ class GroupMergeCMD extends GroupSubCommand {
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number greater than 0 for the merging distance!", NamedTextColor.RED)));
                 return;
             }
-            List<GroupResult> results = DisplayGroupManager.getSpawnedGroupsNearLocation(sg.getLocation(), radius);
+            Set<GroupResult> results = DisplayGroupManager.getOrCreateNearbySpawnedGroups(sg.getLocation(), radius);
             if (results.isEmpty() || results.size() == 1){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your selected group is the only group within the set merging distance!", NamedTextColor.RED)));
                 return;

@@ -20,7 +20,6 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 final class AutoGroup {
 
@@ -66,7 +65,7 @@ final class AutoGroup {
                     continue;
                 }
 
-                GroupResult result = DisplayGroupManager.getSpawnedGroup(display);
+                GroupResult result = DisplayGroupManager.getOrCreateSpawnedGroup(display);
                 if (result == null) continue;
                 SpawnedDisplayEntityGroup group = result.group();
                 long creationTime = group.getCreationTime();

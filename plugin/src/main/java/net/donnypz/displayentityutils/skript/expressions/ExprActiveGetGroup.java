@@ -13,7 +13,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
 import net.donnypz.displayentityutils.utils.GroupResult;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Interaction;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Active Group From Active Part/Part Filter/Entity")
@@ -47,7 +46,7 @@ public class ExprActiveGetGroup extends SimplePropertyExpression<Object, ActiveG
             return sel.getGroup();
         }
         else if (obj instanceof Display display){
-            GroupResult result = DisplayGroupManager.getSpawnedGroup(display);
+            GroupResult result = DisplayGroupManager.getOrCreateSpawnedGroup(display);
             if (result == null) return null;
             return result.group();
         }
