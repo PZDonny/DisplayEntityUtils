@@ -409,18 +409,19 @@ public abstract class AnimationPlayer {
 
         if (!group.isActiveAnimator(animator)) return;
 
+        int entityId = part.getEntityId();
         if (players == null){
             if (part instanceof PacketDisplayEntityPart ppart) {
                 ppart.setAttributesSilent(map);
             }
 
             for (Player p : part.getTrackingPlayers()){
-                sendDisplayAttributes(p, part.getEntityId(), map, transformation);
+                sendDisplayAttributes(p, entityId, map, transformation);
             }
         }
         else{
             for (Player p : players){
-                sendDisplayAttributes(p, p.getEntityId(), map, transformation);
+                sendDisplayAttributes(p, entityId, map, transformation);
             }
         }
 
