@@ -219,29 +219,8 @@ public final class DisplayGroupManager {
         return chunks;
     }
 
-
-//    private static List<Chunk> getNearbyChunks(Location location, double radiusInBlocks){
-//        List<Chunk> nearbyChunks = new ArrayList<>();
-//        Chunk centerChunk = location.getChunk();
-//        nearbyChunks.add(centerChunk);
-//
-//        for (double dx = -radiusInBlocks; dx <= radiusInBlocks*2; dx+=radiusInBlocks){
-//            for (double dz = -radiusInBlocks; dz <= radiusInBlocks*2; dz+=radiusInBlocks){
-//                Location loc = location.clone();
-//                loc.add(dx, 0, dz);
-//                Chunk chunk = loc.getChunk();
-//                if (chunk == centerChunk){
-//                    continue;
-//                }
-//                nearbyChunks.add(chunk);
-//            }
-//        }
-//
-//        return nearbyChunks;
-//    }
-
     /**
-     * Get the registered {@link SpawnedDisplayEntityGroup} of a display entity.
+     * Get the {@link SpawnedDisplayEntityGroup} that has been registered during the current game session from a display entity.
      * <br>
      * @param displayEntity The display entity that's in a group
      * @return a {@link SpawnedDisplayEntityGroup} or null
@@ -255,7 +234,7 @@ public final class DisplayGroupManager {
     }
 
     /**
-     * Get a {@link SpawnedDisplayEntityGroup} through an Interaction entity
+     * Get a {@link SpawnedDisplayEntityGroup} that has been registered during the current game session through an Interaction entity
      * @param interaction The interaction
      * @param radius The radius to search for the group
      * @return a {@link SpawnedDisplayEntityGroup} containing the interaction. Null if not found.
@@ -265,7 +244,7 @@ public final class DisplayGroupManager {
     }
 
     /**
-     * Get a registered {@link SpawnedDisplayEntityGroup} through an eligible part entity
+     * Get a {@link SpawnedDisplayEntityGroup} that has been registered during the current game session through an eligible part entity
      * @param entity The entity that's in a group
      * @param radius The radius to search for the group
      * @return a {@link SpawnedDisplayEntityGroup} containing the entity. Null if not found.
@@ -273,6 +252,11 @@ public final class DisplayGroupManager {
     public static @Nullable SpawnedDisplayEntityGroup getSpawnedGroup(@NotNull Entity entity, double radius) {
         if (!DisplayUtils.isPartEntity(entity)) return null;
 
+        if (entity instanceof Display d){
+            GroupResult r = getOrCreateSpawnedGroup(d);
+            if (r == null) return null;
+            return r.group();
+        }
         //Check for existing group
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
         if (part != null && part.getGroup() != null) {
@@ -292,7 +276,7 @@ public final class DisplayGroupManager {
     /**
      * Get the {@link GroupResult} of a display entity containing its {@link SpawnedDisplayEntityGroup}, if applicable.
      * <br>
-     * If a group is found and created as a result of this, {@link GroupRegisteredEvent} will be called
+     * If a group is found and registered as a result of this, {@link GroupRegisteredEvent} will be called
      * @param displayEntity The display entity that's in a group
      * @return a {@link GroupResult} or null
      */
@@ -336,7 +320,7 @@ public final class DisplayGroupManager {
      * Gets the nearest {@link SpawnedDisplayEntityGroup} near a location
      * @param location Center of the search location
      * @param radius The radius to check for a spawned display entity group
-     * @return A {@link GroupResult}. Null if not found.
+     * @return A {@link GroupResult} or null if not found.
      */
     public static @Nullable GroupResult getOrCreateNearestSpawnedGroup(@NotNull Location location, double radius) {
         Display master = getNearestPotentialMasterDisplay(location, radius, null);
