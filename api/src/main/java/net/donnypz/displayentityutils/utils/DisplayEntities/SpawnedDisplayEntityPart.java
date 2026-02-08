@@ -561,22 +561,30 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
-    public void rotateDisplay(@NotNull Quaternionf rotation, boolean rotateTranslation) {
+    public void rotateDisplay(@NotNull Quaternionf rotation, boolean worldRotation) {
         if (!isDisplay()) return;
         Display display = (Display) getEntity();
         if (display == null) return;
+
         Transformation t = getTransformation();
         Vector3f translation = t.getTranslation();
         Quaternionf originalRot = t.getLeftRotation();
 
-        //World Space Rot
-        if (rotateTranslation){
+        Quaternionf finalRot;
+        if (worldRotation){
             translation.rotate(rotation);
+            finalRot = new Quaternionf(rotation).mul(originalRot);
+        }
+        else{
+            finalRot = new Quaternionf(originalRot.mul(rotation));
         }
 
-        rotation.mul(originalRot, originalRot);
-
-        Transformation newT = new Transformation(translation, originalRot, t.getScale(), t.getRightRotation());
+        Transformation newT = new Transformation(
+                translation,
+                finalRot,
+                t.getScale(),
+                t.getRightRotation()
+        );
         display.setTransformation(newT);
     }
 
