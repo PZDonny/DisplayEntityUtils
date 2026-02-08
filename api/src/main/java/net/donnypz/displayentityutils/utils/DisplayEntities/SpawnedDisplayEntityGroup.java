@@ -733,11 +733,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return true;
     }
 
-    /**
-     * Set this group's tag
-     * @param tag What to set this group's tag to. Null to remove the group tag
-     * @return this
-     */
     @Override
     public SpawnedDisplayEntityGroup setTag(@Nullable String tag){
         super.setTag(tag);
@@ -747,10 +742,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return this;
     }
 
-
     /**
-     * Get the name of this group's world
-     * @return name of group's world
+     * {@inheritDoc}
      * @throws NullPointerException if group is despawned or invalid
      */
     @Override

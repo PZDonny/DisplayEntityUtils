@@ -6,7 +6,7 @@ public record GroupResult(SpawnedDisplayEntityGroup group, boolean alreadyLoaded
 
     /**
      *
-     * @return true if this group has already been loaded during this play session. false if this group is not registered for whatever reason.
+     * @return true if this group has already been loaded/registered during the current game session. false if this group is not registered for whatever reason.
      */
     public boolean alreadyLoaded(){
         return alreadyLoaded;

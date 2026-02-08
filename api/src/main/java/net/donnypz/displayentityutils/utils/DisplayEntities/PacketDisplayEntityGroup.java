@@ -759,7 +759,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     /**
-     * Get the name of the world this group is in
+     * {@inheritDoc}
      * @return a string or null if the group's location was never set
      */
     @Override
