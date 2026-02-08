@@ -16,7 +16,7 @@ import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Active Group From Active Part/Part Filter/Entity")
-@Description("Get the active group of a active part, part filter, or a Display/Interaction entity")
+@Description("Get the active group of a active part, part filter, or an eligible part entity")
 @Examples({"set {_spawnedgroup} to {_spawnedpart}'s spawned group",
             "",
             "#3.0.0 and later",

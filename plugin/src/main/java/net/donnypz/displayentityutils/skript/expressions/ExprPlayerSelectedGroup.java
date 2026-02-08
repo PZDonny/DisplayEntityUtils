@@ -15,7 +15,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
 @Name("Player's Selected Active Group")
-@Description("Get/Set the selected spawned group of a player")
+@Description("Get/Set the selected active group of a player")
 @Examples({
         "#Get selected group",
         "set {_activegroup} to player's selected group",
