@@ -27,11 +27,17 @@ final class AutoGroup {
 
     static final HashMap<String, Data> worldData = new HashMap<>();
 
-    private static void refreshGroupPartEntities(List<Entity> entities){
+    private static void refreshGroupPartEntities(Chunk chunk, List<Entity> entities){
         if (entities.isEmpty()) return;
         DisplayAPI.getScheduler().runAsync(() -> {
+            Map<Long, SpawnedDisplayEntityGroup> groupsByCreationTime = DisplayGroupManager.getSpawnedGroupsByCreationTime(chunk);
             for (Entity e : entities){
-                SpawnedDisplayEntityPart p = SpawnedDisplayEntityPart.getPart(e);
+                if (!DisplayUtils.isPartEntity(e)) continue;
+                long creationTime = DisplayUtils.getCreationTime(e);
+                UUID partUUID = DisplayUtils.getPartUUID(e);
+                SpawnedDisplayEntityGroup g = groupsByCreationTime.get(creationTime);
+                if (g == null) continue;
+                SpawnedDisplayEntityPart p = g.getPart(partUUID);
                 if (p != null) p.refreshEntity(e);
             }
         });
@@ -39,7 +45,7 @@ final class AutoGroup {
 
     static void detectGroups(Chunk chunk, List<Entity> entities){
         if (!DisplayConfig.automaticGroupDetection()){
-            refreshGroupPartEntities(entities);
+            refreshGroupPartEntities(chunk, entities);
             return;
         }
 
@@ -47,7 +53,7 @@ final class AutoGroup {
         Data data = worldData.computeIfAbsent(world.getName(), name -> new Data());
 
         if (!data.chunkKeys.add(chunk.getChunkKey())){ //Chunk already read
-            refreshGroupPartEntities(entities);
+            refreshGroupPartEntities(chunk, entities);
             if (!DisplayConfig.readSameChunks()) return;
         }
 

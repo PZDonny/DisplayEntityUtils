@@ -35,7 +35,7 @@ import java.util.zip.ZipException;
 public final class DisplayGroupManager {
 
     private static final Gson gson = new Gson();
-    private static final Map<String, GroupHolder<Long, SpawnedDisplayEntityGroup>> allSpawnedGroups = new HashMap<>(); //worldname, groupholder
+    private static final Map<String, SpawnedGroupHolder> allSpawnedGroups = new HashMap<>(); //worldname, groupholder<chunkkey, group>
     private static final String[] ITEM_STACK_FIELDS = new String[]{"itemStack", "itemStackAsBytes"};
     static final String PLUGIN_VERSION_FIELD = "pluginVersion";
 
@@ -44,7 +44,7 @@ public final class DisplayGroupManager {
     @ApiStatus.Internal
     public static void addSpawnedGroup(Location groupLoc, SpawnedDisplayEntityGroup spawnedGroup) {
         long chunkKey = ConversionUtils.getChunkKey(groupLoc);
-        allSpawnedGroups.computeIfAbsent(groupLoc.getWorld().getName(), n -> new GroupHolder<>())
+        allSpawnedGroups.computeIfAbsent(groupLoc.getWorld().getName(), n -> new SpawnedGroupHolder())
                         .addGroup(chunkKey, spawnedGroup);
     }
 
@@ -122,6 +122,15 @@ public final class DisplayGroupManager {
     }
 
     /**
+     * Get all {@link SpawnedDisplayEntityGroup}s that have been registered during this play session by chunk, mapped by their creation time.
+     * @param chunk the chunk
+     * @return a map of {@link SpawnedDisplayEntityGroup}s, keyed by their creation time
+     */
+    public static @NotNull Map<Long, SpawnedDisplayEntityGroup> getSpawnedGroupsByCreationTime(@NotNull Chunk chunk){
+        return getSpawnedGroupsByCreationTime(chunk.getWorld().getName(), chunk.getChunkKey());
+    }
+
+    /**
      * Get all {@link SpawnedDisplayEntityGroup}s that have been registered during this play session by chunk.
      * @param world the chunk's world
      * @param chunkKey the chunk's key
@@ -140,6 +149,17 @@ public final class DisplayGroupManager {
     public static @NotNull Set<SpawnedDisplayEntityGroup> getSpawnedGroups(@NotNull String worldName, long chunkKey){
         GroupHolder<Long, SpawnedDisplayEntityGroup> holder = allSpawnedGroups.get(worldName);
         return holder == null ? Collections.emptySet() : holder.getGroups(chunkKey);
+    }
+
+    /**
+     * Get all {@link SpawnedDisplayEntityGroup}s that have been registered during this play session by chunk, mapped by their creation time.
+     * @param worldName the chunk's world name
+     * @param chunkKey the chunk's key
+     * @return a map of {@link SpawnedDisplayEntityGroup}s, keyed by their creation time
+     */
+    public static @NotNull Map<Long, SpawnedDisplayEntityGroup> getSpawnedGroupsByCreationTime(@NotNull String worldName, long chunkKey){
+        SpawnedGroupHolder holder = allSpawnedGroups.get(worldName);
+        return holder == null ? Collections.emptyMap() : holder.getGroupsByCreationTime(chunkKey);
     }
 
     public static @NotNull Set<SpawnedDisplayEntityGroup> getNearbySpawnedGroups(@NotNull Location location, double radius){
@@ -1028,6 +1048,22 @@ public final class DisplayGroupManager {
             else{
                 return g.createPacketGroup(spawnLoc, GroupSpawnedEvent.SpawnReason.INTERNAL, true, autoShow);
             }
+        }
+    }
+
+    private static class SpawnedGroupHolder extends GroupHolder<Long, SpawnedDisplayEntityGroup>{
+        private Map<Long, SpawnedDisplayEntityGroup> getGroupsByCreationTime(Chunk chunk){
+            return getGroupsByCreationTime(chunk.getChunkKey());
+        }
+
+        private Map<Long, SpawnedDisplayEntityGroup> getGroupsByCreationTime(long chunkKey){
+            Set<SpawnedDisplayEntityGroup> rawGroups = getRawGroups(chunkKey);
+            if (rawGroups == null) return Collections.emptyMap();
+            Map<Long, SpawnedDisplayEntityGroup> groups = new HashMap<>();
+            for (SpawnedDisplayEntityGroup g : getRawGroups(chunkKey)){
+                groups.put(g.getCreationTime(), g);
+            }
+            return groups;
         }
     }
 }
