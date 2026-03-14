@@ -1291,16 +1291,21 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             if (entity instanceof ItemDisplay) return ITEM_DISPLAY;
             if (entity instanceof TextDisplay) return TEXT_DISPLAY;
             if (entity instanceof Interaction) return INTERACTION;
-            if (VersionUtils.IS_1_21_9 && entity instanceof Mannequin) return MANNEQUIN;
+            if (VersionUtils.canSpawnMannequins() && entity instanceof Mannequin) return MANNEQUIN;
             return null;
         }
 
-        public boolean isOfType(Entity e){
-            if (e instanceof BlockDisplay && this == BLOCK_DISPLAY) return true;
-            if (e instanceof ItemDisplay && this == ITEM_DISPLAY) return true;
-            if (e instanceof TextDisplay && this == TEXT_DISPLAY) return true;
-            if (e instanceof Interaction && this == INTERACTION) return true;
-            if (e instanceof Mannequin && this == MANNEQUIN) return true;
+        /**
+         * Check if an entity is of the given part type
+         * @param entity the entity
+         * @return a boolean
+         */
+        public boolean isOfType(@NotNull Entity entity){
+            if (entity instanceof BlockDisplay && this == BLOCK_DISPLAY) return true;
+            if (entity instanceof ItemDisplay && this == ITEM_DISPLAY) return true;
+            if (entity instanceof TextDisplay && this == TEXT_DISPLAY) return true;
+            if (entity instanceof Interaction && this == INTERACTION) return true;
+            if (VersionUtils.canSpawnMannequins() && entity instanceof Mannequin && this == MANNEQUIN) return true;
             return false;
         }
     }
