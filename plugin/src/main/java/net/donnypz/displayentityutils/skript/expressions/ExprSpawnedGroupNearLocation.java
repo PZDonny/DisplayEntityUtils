@@ -26,7 +26,7 @@ import java.util.Set;
             "",
             "set {_nearest} to nearest spawned group within 2 blocks of {_location}",
             "set {_nearest} to nearest registered spawned group within 6 blocks of {_location}"})
-@Since("2.6.2, 3.4.3 (Existing)")
+@Since("2.6.2, 3.4.3 (Registered)")
 public class ExprSpawnedGroupNearLocation extends SimpleExpression<SpawnedDisplayEntityGroup> {
 
     static{
