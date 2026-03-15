@@ -561,22 +561,30 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
-    public void rotateDisplay(@NotNull Quaternionf rotation, boolean rotateTranslation) {
+    public void rotateDisplay(@NotNull Quaternionf rotation, boolean worldRotation) {
         if (!isDisplay()) return;
         Display display = (Display) getEntity();
         if (display == null) return;
+
         Transformation t = getTransformation();
         Vector3f translation = t.getTranslation();
         Quaternionf originalRot = t.getLeftRotation();
 
-        //World Space Rot
-        if (rotateTranslation){
+        Quaternionf finalRot;
+        if (worldRotation){
             translation.rotate(rotation);
+            finalRot = new Quaternionf(rotation).mul(originalRot);
+        }
+        else{
+            finalRot = new Quaternionf(originalRot.mul(rotation));
         }
 
-        rotation.mul(originalRot, originalRot);
-
-        Transformation newT = new Transformation(translation, originalRot, t.getScale(), t.getRightRotation());
+        Transformation newT = new Transformation(
+                translation,
+                finalRot,
+                t.getScale(),
+                t.getRightRotation()
+        );
         display.setTransformation(newT);
     }
 
@@ -1283,16 +1291,21 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             if (entity instanceof ItemDisplay) return ITEM_DISPLAY;
             if (entity instanceof TextDisplay) return TEXT_DISPLAY;
             if (entity instanceof Interaction) return INTERACTION;
-            if (VersionUtils.IS_1_21_9 && entity instanceof Mannequin) return MANNEQUIN;
+            if (VersionUtils.canSpawnMannequins() && entity instanceof Mannequin) return MANNEQUIN;
             return null;
         }
 
-        public boolean isOfType(Entity e){
-            if (e instanceof BlockDisplay && this == BLOCK_DISPLAY) return true;
-            if (e instanceof ItemDisplay && this == ITEM_DISPLAY) return true;
-            if (e instanceof TextDisplay && this == TEXT_DISPLAY) return true;
-            if (e instanceof Interaction && this == INTERACTION) return true;
-            if (e instanceof Mannequin && this == MANNEQUIN) return true;
+        /**
+         * Check if an entity is of the given part type
+         * @param entity the entity
+         * @return a boolean
+         */
+        public boolean isOfType(@NotNull Entity entity){
+            if (entity instanceof BlockDisplay && this == BLOCK_DISPLAY) return true;
+            if (entity instanceof ItemDisplay && this == ITEM_DISPLAY) return true;
+            if (entity instanceof TextDisplay && this == TEXT_DISPLAY) return true;
+            if (entity instanceof Interaction && this == INTERACTION) return true;
+            if (VersionUtils.canSpawnMannequins() && entity instanceof Mannequin && this == MANNEQUIN) return true;
             return false;
         }
     }

@@ -13,13 +13,18 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
-@Name("Active Group Stop Follow Entity Direction")
-@Description("Make an active group stop following an entity's looking direction")
-@Examples({"make {_spawnedgroup} stop following entity"})
-@Since("3.2.1")
+@Name("Active Group Stop Respecting Entity")
+@Description("Make an active group stop respecting an entity's looking direction")
+@Examples({"make {_spawnedgroup} stop following entity",
+            "make {_activegroup} stop following",
+            "",
+            "3.4.3+",
+            "make {_activegroup} stop respecting entity",
+            "make {_activegroup} end respect"})
+@Since({"3.2.1"})
 public class EffActiveGroupFollowStop extends Effect {
     static {
-        Skript.registerEffect(EffActiveGroupFollowStop.class,"make %activegroups% stop follow[ing] [entit(y|ies)]");
+        Skript.registerEffect(EffActiveGroupFollowStop.class,"make %activegroups% (stop|end) (follow|respect)[ing] [entit(y|ies)]");
     }
 
     Expression<ActiveGroup<?>> groups;
@@ -43,6 +48,6 @@ public class EffActiveGroupFollowStop extends Effect {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return groups.toString(event, debug)+" stop following entity";
+        return groups.toString(event, debug)+" stop respecting entity";
     }
 }

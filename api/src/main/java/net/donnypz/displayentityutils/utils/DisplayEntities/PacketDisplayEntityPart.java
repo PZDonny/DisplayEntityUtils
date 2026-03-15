@@ -370,21 +370,24 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public void rotateDisplay(@NotNull Quaternionf rotation, boolean rotateTranslation) {
+    public void rotateDisplay(@NotNull Quaternionf rotation, boolean worldRotation) {
         if (!isDisplay()) return;
         Vector3f translation = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.TRANSLATION, new Vector3f());
         Quaternionf originalRot = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.LEFT_ROTATION, new Quaternionf());
 
-        //World Space Rot
-        if (rotateTranslation){
-            translation.rotate(rotation);
-        }
 
-        rotation.mul(originalRot, originalRot);
+        Quaternionf finalRot;
+        if (worldRotation){
+            translation.rotate(rotation);
+            finalRot = new Quaternionf(rotation).mul(originalRot);
+        }
+        else{
+            finalRot = new Quaternionf(originalRot.mul(rotation));
+        }
 
         attributeContainer.setAttributesAndSend(new DisplayAttributeMap()
                 .add(DisplayAttributes.Transform.TRANSLATION, translation)
-                .add(DisplayAttributes.Transform.LEFT_ROTATION, originalRot), getEntityId(), viewers);
+                .add(DisplayAttributes.Transform.LEFT_ROTATION, finalRot), getEntityId(), viewers);
     }
 
 

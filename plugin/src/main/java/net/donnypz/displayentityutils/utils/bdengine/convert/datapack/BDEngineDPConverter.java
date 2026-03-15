@@ -125,7 +125,7 @@ public class BDEngineDPConverter {
 
         createdGroup.setTag(groupSaveTag.isBlank() ? datapackName.replace(".zip", "_auto") : groupSaveTag);
         DatapackEntitySpawned.finalizeAnimationPreparation(projectName);
-        createdGroup.seedPartUUIDs(SpawnedDisplayEntityGroup.defaultPartUUIDSeed);
+        createdGroup.seedPartUUIDs(SpawnedDisplayEntityGroup.DEFAULT_PART_UUID_SEED);
 
         player.sendMessage(Component.empty());
         boolean save = !groupSaveTag.equals("-");

@@ -104,10 +104,20 @@ public class ConversionUtils {
         return getChunkKey(chunkX, chunkZ);
     }
 
+
+    /**
+     * Get a chunk's x and z coordinates from a location
+     * @param location the location
+     * @return an int array containing the x and z coordinates, respectively
+     */
+    public static int[] getChunkCoordinates(@NotNull Location location){
+        return getChunkCoordinates(getChunkKey(location));
+    }
+
     /**
      * Get a chunk's x and z coordinates from a chunk's key
      * @param chunkKey chunk's key
-     * @return a int array containing the x and z coordinates, respectively
+     * @return an int array containing the x and z coordinates, respectively
      */
     public static int[] getChunkCoordinates(long chunkKey){
         int z = (int) (chunkKey >> 32);

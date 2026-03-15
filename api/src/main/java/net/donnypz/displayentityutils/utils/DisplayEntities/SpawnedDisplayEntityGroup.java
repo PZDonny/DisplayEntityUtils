@@ -29,8 +29,8 @@ import org.joml.Vector3f;
 import java.util.*;
 
 public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayEntityPart> implements Spawned {
-    public static final long defaultPartUUIDSeed = 99;
-    final Random partUUIDRandom = new Random(defaultPartUUIDSeed);
+    public static final long DEFAULT_PART_UUID_SEED = 99;
+    final Random partUUIDRandom = new Random(DEFAULT_PART_UUID_SEED);
 
     Set<SpawnedPartSelection> partSelections = new HashSet<>();
 
@@ -83,7 +83,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 addDisplayEntity((Display) entity);
             }
         }
-        DisplayGroupManager.addSpawnedGroup(this);
+        DisplayGroupManager.addSpawnedGroup(masterDisplay.getLocation(), this);
 
         if (DisplayConfig.autoCulling()){
             float widthCullingAdder = DisplayConfig.widthCullingAdder();
@@ -185,7 +185,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * @param entity the entity
      * @return a boolean
      */
-    public boolean hasSameCreationTime(Entity entity){
+    public boolean hasSameCreationTime(@NotNull Entity entity){
         PersistentDataContainer container = entity.getPersistentDataContainer();
         if (!container.has(creationTimeKey, PersistentDataType.LONG)){
             return false;
@@ -193,33 +193,33 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return creationTime == container.get(creationTimeKey, PersistentDataType.LONG);
     }
 
-    /**
-     * Add entities that are meant to be a part of this group.
-     * Usually these entities are unadded when a {@link SpawnedDisplayEntityGroup} is created during a new play session
-     * @param searchRange distance to search for  entities from the group's location
-     * @return a list of the entities added to the group
-     */
-    public @NotNull List<Entity> addMissingEntities(double searchRange){
-        List<Entity> entities = new ArrayList<>();
-
-        for (Entity e : getMasterPart().getEntity().getNearbyEntities(searchRange, searchRange, searchRange)) {
-            if (!DisplayUtils.isPartEntity(e) || e instanceof Display) continue;
-            if (!hasSameCreationTime(e)) continue;
-
-            SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(e);
-            if (part == null){
-                new SpawnedDisplayEntityPart(this, e, partUUIDRandom);
-            }
-            else{
-                if (this == part.getGroup()){ //Already in this group
-                    continue;
-                }
-                part.setGroup(this);
-            }
-            entities.add(e);
-        }
-        return entities;
-    }
+//    /**
+//     * Add entities that are meant to be a part of this group.
+//     * Usually these entities are unadded when a {@link SpawnedDisplayEntityGroup} is created during a new play session
+//     * @param searchRange distance to search for  entities from the group's location
+//     * @return a list of the entities added to the group
+//     */
+//    public @NotNull List<Entity> addMissingEntities(double searchRange){
+//        List<Entity> entities = new ArrayList<>();
+//
+//        for (Entity e : getMasterPart().getEntity().getNearbyEntities(searchRange, searchRange, searchRange)) {
+//            if (!DisplayUtils.isPartEntity(e) || e instanceof Display) continue;
+//            if (!hasSameCreationTime(e)) continue;
+//
+//            SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(e);
+//            if (part == null){
+//                new SpawnedDisplayEntityPart(this, e, partUUIDRandom);
+//            }
+//            else{
+//                if (this == part.getGroup()){ //Already in this group
+//                    continue;
+//                }
+//                part.setGroup(this);
+//            }
+//            entities.add(e);
+//        }
+//        return entities;
+//    }
 
     @ApiStatus.Internal
     public void seedPartUUIDs(long seed){
@@ -519,15 +519,17 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             location.setYaw(oldMasterLoc.getYaw());
         }
 
+        Location lastLoc = master.getLocation();
         FoliaUtils.teleport(master, location, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+        DisplayGroupManager.updateSpawnedGroup(lastLoc, location, this);
 
         for (SpawnedDisplayEntityPart part : this.getParts()){
             part.getEntity().setRotation(location.getYaw(), location.getPitch());
 
         //Non-Display TP
             if (!part.isDisplay()){
-                Interaction interaction = (Interaction) part.getEntity();
-                Vector vector = oldMasterLoc.toVector().subtract(interaction.getLocation().toVector());
+                Entity entity = part.getEntity();
+                Vector vector = oldMasterLoc.toVector().subtract(entity.getLocation().toVector());
                 Location tpLocation = location.clone().subtract(vector);
                 FoliaUtils.teleport(part.getEntity(), tpLocation, TeleportFlag.EntityState.RETAIN_PASSENGERS);
             }
@@ -605,13 +607,16 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 Location tpLoc = masterEntity.getLocation().clone().add(incrementVector);
 
                 masterEntity.setRotation(tpLoc.getYaw(), tpLoc.getPitch());
+                Location lastLoc = masterEntity.getLocation();
                 if (currentDistance >= distance){
                     FoliaUtils.teleport(masterEntity, destination, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                    DisplayGroupManager.updateSpawnedGroup(lastLoc, tpLoc, SpawnedDisplayEntityGroup.this);
                     new GroupTeleportMoveEndEvent(SpawnedDisplayEntityGroup.this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent();
                     cancel();
                 }
                 else{
                     FoliaUtils.teleport(masterEntity, tpLoc, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                    DisplayGroupManager.updateSpawnedGroup(lastLoc, tpLoc, SpawnedDisplayEntityGroup.this);
                 }
             }
         }, 0, 1);
@@ -728,11 +733,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return true;
     }
 
-    /**
-     * Set this group's tag
-     * @param tag What to set this group's tag to. Null to remove the group tag
-     * @return this
-     */
     @Override
     public SpawnedDisplayEntityGroup setTag(@Nullable String tag){
         super.setTag(tag);
@@ -742,10 +742,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return this;
     }
 
-
     /**
-     * Get the name of this group's world
-     * @return name of group's world
+     * {@inheritDoc}
      * @throws NullPointerException if group is despawned or invalid
      */
     @Override
@@ -815,6 +813,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             translate(rideOffset, -1, -1);
         }
 
+        updatePosition(vehicle);
         for (SpawnedDisplayEntityPart part : groupParts.values()){
             if (part.isDisplay()) continue;
             alignNonDisplayWithMountedGroup(part, vehicle);
@@ -822,26 +821,21 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return true;
     }
 
-    /**
-     * Make this group stop riding its vehicle
-     * @return the entity this group was riding
-     */
-    @Override
-    public @Nullable Entity dismount(){
-        Entity vehicle = getVehicle();
-        Entity masterEntity = getMasterEntity();
-        if (masterEntity != null){
-            if (masterEntity.leaveVehicle()){
-                if (!rideOffset.isZero()){
-                    translate(rideOffset.clone().multiply(-1), -1, -1);
+    private void updatePosition(final Entity vehicle){
+        DisplayAPI.getScheduler().entityRunTimer(vehicle, new Scheduler.SchedulerRunnable() {
+            Location lastLoc = getLocation();
+            @Override
+            public void run() {
+                if (vehicle != getVehicle() || !isSpawned() || !isRegistered()){
+                    cancel();
+                    return;
                 }
-            }
-        }
-        return vehicle;
-    }
 
-    public boolean isRiding(){
-        return getVehicle() != null;
+                Location newLoc = getLocation();
+                DisplayGroupManager.updateSpawnedGroup(lastLoc, newLoc, SpawnedDisplayEntityGroup.this);
+                lastLoc = newLoc;
+            }
+        }, 0, 1);
     }
 
     private void alignNonDisplayWithMountedGroup(SpawnedDisplayEntityPart part, Entity vehicle){
@@ -872,6 +866,30 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             }
         }, 0, 1);
     }
+
+    /**
+     * Make this group stop riding its vehicle
+     * @return the entity this group was riding
+     */
+    @Override
+    public @Nullable Entity dismount(){
+        Entity vehicle = getVehicle();
+        Entity masterEntity = getMasterEntity();
+        if (masterEntity != null){
+            if (masterEntity.leaveVehicle()){
+                if (!rideOffset.isZero()){
+                    translate(rideOffset.clone().multiply(-1), -1, -1);
+                }
+            }
+        }
+        return vehicle;
+    }
+
+    public boolean isRiding(){
+        return getVehicle() != null;
+    }
+
+
 
     /**
      * Get the entity this group is riding
@@ -1238,6 +1256,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
         despawn = event.isDespawning();
 
+        Location location = getLocation();
+
         Iterator<SpawnedDisplayEntityPart> iter = groupParts.values().iterator();
         if (despawn && force){
             HashSet<Chunk> chunks = new HashSet<>();
@@ -1271,7 +1291,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             }
         }
 
-        DisplayGroupManager.removeSpawnedGroup(masterPart);
+        DisplayGroupManager.removeSpawnedGroup(location, this);
         removeAllPartSelections();
     }
 

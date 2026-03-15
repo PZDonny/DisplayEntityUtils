@@ -49,7 +49,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
 
 
     /**
-     * Get this group's unique ID
+     * Get this group's unique ID created during the current game session
      * @return the group's ID
      */
     public int getId(){
@@ -68,7 +68,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
-     * Add a part to this group. If the part was not previously part of this group AND it represents a display entity.
+     * Add a part to this group. If the part was not previously part of this group.
      * @param part the part to add
      */
     public abstract void addPart(T part);
@@ -89,6 +89,11 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         return tag;
     }
 
+    /**
+     * Set this group's tag
+     * @param tag the group tag to set. Null to remove the group tag
+     * @return this
+     */
     public ActiveGroup<?> setTag(@Nullable String tag){
         this.tag = tag;
         return this;
@@ -550,6 +555,10 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
 
     public abstract Location getLocation();
 
+
+    /**
+     * Get the name of this group's world
+     */
     public abstract String getWorldName();
 
     /**

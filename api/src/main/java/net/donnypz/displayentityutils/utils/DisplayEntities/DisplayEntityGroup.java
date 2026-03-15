@@ -212,7 +212,7 @@ public final class DisplayEntityGroup implements Serializable{
             group.setTag(tag);
         }
 
-        DisplayGroupManager.addSpawnedGroup(group);
+        DisplayGroupManager.addSpawnedGroup(location, group);
 
         if (DisplayConfig.autoCulling()){
             float widthCullingAdder = DisplayConfig.widthCullingAdder();

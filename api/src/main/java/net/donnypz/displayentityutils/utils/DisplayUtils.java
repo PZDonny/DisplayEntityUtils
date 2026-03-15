@@ -360,23 +360,23 @@ public final class DisplayUtils {
     }
 
     /**
-     * Get the SpawnedDisplayEntityGroup passengers, with a specific group tag, riding an entity
+     * Get the {@link SpawnedDisplayEntityGroup} passengers, with a specific group tag, riding an entity
      * @param vehicleEntity the entity
-     * @return List of SpawnedDisplayEntityGroups riding the entity with the specified group tag
+     * @return a list
      */
     public static List<SpawnedDisplayEntityGroup> getGroupPassengers(@NotNull Entity vehicleEntity, @NotNull String groupTag){
         List<SpawnedDisplayEntityGroup> groups = new ArrayList<>();
         for (Entity e : vehicleEntity.getPassengers()){
             if (e instanceof Display display){
-                GroupResult result = DisplayGroupManager.getSpawnedGroup(display);
-                if (result == null || result.group() == null){
+                SpawnedDisplayEntityGroup group = DisplayGroupManager.getSpawnedGroup(display);
+                if (group == null){
                     continue;
                 }
-                if (!groupTag.equals(result.group().getTag())){
+                if (!groupTag.equals(group.getTag())){
                     continue;
                 }
-                if (!groups.contains(result.group())){
-                    groups.add(result.group());
+                if (!groups.contains(group)){
+                    groups.add(group);
                 }
             }
         }
@@ -384,20 +384,20 @@ public final class DisplayUtils {
     }
 
     /**
-     * Get the SpawnedDisplayEntityGroup passengers of an entity
+     * Get the {@link SpawnedDisplayEntityGroup} passengers of an entity
      * @param vehicleEntity the entity
-     * @return List of SpawnedDisplayEntityGroups riding the entity
+     * @return a list
      */
-    public static List<SpawnedDisplayEntityGroup> getGroupPassengers(@NotNull Entity vehicleEntity){
+    public static @NotNull List<SpawnedDisplayEntityGroup> getGroupPassengers(@NotNull Entity vehicleEntity){
         List<SpawnedDisplayEntityGroup> groups = new ArrayList<>();
         for (Entity e : vehicleEntity.getPassengers()){
             if (e instanceof Display display){
-                GroupResult result = DisplayGroupManager.getSpawnedGroup(display);
-                if (result == null || result.group() == null){
+                SpawnedDisplayEntityGroup group = DisplayGroupManager.getSpawnedGroup(display);
+                if (group == null){
                     continue;
                 }
-                if (!groups.contains(result.group())){
-                    groups.add(result.group());
+                if (!groups.contains(group)){
+                    groups.add(group);
                 }
             }
         }
@@ -662,6 +662,17 @@ public final class DisplayUtils {
         if (entity == null) return null;
         PersistentDataContainer pdc = entity.getPersistentDataContainer();
         return pdc.get(DisplayAPI.getGroupTagKey(), PersistentDataType.STRING);
+    }
+
+    /**
+     * Get the UNIX timestamp of when an entity was grouped
+     * @param entity the entity to check
+     * @return unix timestamp, -1 if entity was never grouped
+     */
+    public static long getCreationTime(Entity entity){
+        if (entity == null) return -1;
+        PersistentDataContainer pdc = entity.getPersistentDataContainer();
+        return pdc.getOrDefault(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, -1L);
     }
 
     /**
@@ -939,18 +950,6 @@ public final class DisplayUtils {
     public static boolean isInGroup(Entity entity){
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
         return part != null && part.hasGroup();
-    }
-
-    /**
-     * Get the UNIX timestamp of when an entity was grouped
-     * @param entity the entity to check
-     * @return unix timestamp, -1 if entity was never grouped
-     */
-    private static long getCreationTime(Entity entity){
-        if (!entity.getPersistentDataContainer().has(SpawnedDisplayEntityGroup.creationTimeKey)){
-            return -1;
-        }
-        return entity.getPersistentDataContainer().get(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG);
     }
 
     /**

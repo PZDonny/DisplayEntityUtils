@@ -378,9 +378,9 @@ public abstract class ActivePart implements Active{
     /**
      * Rotate this display entity part by a given quaternion
      * @param rotation the rotation
-     * @param rotateTranslation whether the display's translation should be rotated, pivoting it around the entity's location
+     * @param worldRotation whether rotation should occur in world space, rather than local
      */
-    public abstract void rotateDisplay(@NotNull Quaternionf rotation, boolean rotateTranslation);
+    public abstract void rotateDisplay(@NotNull Quaternionf rotation, boolean worldRotation);
 
     /**
      * Set the text of this part if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.

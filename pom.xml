@@ -6,7 +6,7 @@
 
     <groupId>net.donnypz.displayentityutils</groupId>
     <artifactId>deu</artifactId>
-    <version>3.4.2</version>
+    <version>3.4.3</version>
     <packaging>pom</packaging>
 
     <name>DisplayEntityUtils</name>
@@ -156,13 +156,19 @@
             <id>viaversion-repo</id>
             <url>https://repo.viaversion.com</url>
         </repository>
+
+        <repository>
+            <id>skript-releases</id>
+            <name>Skript Repository</name>
+            <url>https://repo.skriptlang.org/releases</url>
+        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>com.github.retrooper</groupId>
             <artifactId>packetevents-spigot</artifactId>
-            <version>2.11.0</version>
+            <version>2.11.2</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

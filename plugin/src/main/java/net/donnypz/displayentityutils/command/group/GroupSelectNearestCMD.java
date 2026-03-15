@@ -37,9 +37,9 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
         try {
             double searchDistance = Double.parseDouble(args[2]);
             if (searchDistance <= 0 ) throw new NumberFormatException();
-            GroupResult result = DisplayGroupManager.getSpawnedGroupNearLocation(player.getLocation(), searchDistance);
-            if (result == null || result.group() == null){
-                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You are not near any spawned display entity groups!", NamedTextColor.RED)));
+            GroupResult result = DisplayGroupManager.getOrCreateNearestSpawnedGroup(player.getLocation(), searchDistance);
+            if (result == null){
+                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("There are not any spawned groups in your defined distance!", NamedTextColor.RED)));
                 player.sendMessage(Component.text("| Use \"/deu group markpacketgroups\" to mark packet-based groups in your current chunk.", NamedTextColor.GRAY, TextDecoration.ITALIC));
                 return;
             }
@@ -54,7 +54,6 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
                 return;
             }
 
-            group.addMissingEntities(searchDistance);
             int selectDuration = 50;
             group.glowAndMarkInteractions(player, selectDuration);
             Entity entity = group.getMasterPart().getEntity();
