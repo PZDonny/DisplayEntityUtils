@@ -1,6 +1,5 @@
-package net.donnypz.displayentityutils.skript.conditions;
+package net.donnypz.displayentityutils.skript.general.elements;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -14,6 +13,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Group/Animation Has Tag?")
 @Description("Check if a saved or spawned group/animation has a tag")
@@ -23,11 +24,16 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class CondHasTag extends Condition {
 
-    static {
-        Skript.registerCondition(CondHasTag.class, "%activegroup/savedgroup/animation% (1¦has|2¦(has no|does(n't| not) have)) [a] tag");
-    }
-
     Expression<?> object;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.CONDITION,
+                SyntaxInfo.builder(CondHasTag.class)
+                        .addPattern("%activegroup/savedgroup/animation% (1¦has|2¦(has no|does(n't| not) have)) [a] tag")
+                        .supplier(CondHasTag::new)
+                        .build()
+        );
+    }
 
     @Override
     public boolean check(Event event) {

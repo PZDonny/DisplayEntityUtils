@@ -1,12 +1,10 @@
-package net.donnypz.displayentityutils.skript.expressions;
+package net.donnypz.displayentityutils.skript.io.elements;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
@@ -17,6 +15,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Get Group/Animation From Storage")
 @Description("Get a saved group/animation from a load method (local, mongodb, mysql)")
@@ -25,13 +25,18 @@ import org.jetbrains.annotations.Nullable;
 @Since("3.3.1")
 public class ExprSavedFromLoadMethod extends SimpleExpression<Object> {
 
-    static{
-        Skript.registerExpression(ExprSavedFromLoadMethod.class, Object.class, ExpressionType.SIMPLE, "(g:saved group|anim[ation]) [tagged] %string% from (1¦local|2¦mysql|3¦mongo[db]) [storage]");
-    }
-
     private Expression<String> tag;
     private LoadMethod loadMethod;
     private boolean isGroup;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EXPRESSION,
+                SyntaxInfo.Expression.builder(ExprSavedFromLoadMethod.class, Object.class)
+                        .addPattern("(g:saved group|anim[ation]) [tagged] %string% from (1¦local|2¦mysql|3¦mongo[db]) [storage]")
+                        .supplier(ExprSavedFromLoadMethod::new)
+                        .build()
+        );
+    }
 
     @Override
     protected Object[] get(Event event) {

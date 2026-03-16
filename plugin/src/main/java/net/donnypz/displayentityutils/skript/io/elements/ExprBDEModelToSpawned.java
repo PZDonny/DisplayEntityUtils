@@ -1,12 +1,10 @@
-package net.donnypz.displayentityutils.skript.expressions;
+package net.donnypz.displayentityutils.skript.io.elements;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
@@ -19,6 +17,8 @@ import net.donnypz.displayentityutils.utils.bdengine.convert.file.BDEModel;
 import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.io.File;
 
@@ -29,12 +29,17 @@ import java.io.File;
 @Since("3.3.0")
 public class ExprBDEModelToSpawned extends SimpleExpression<SpawnedDisplayEntityGroup> {
 
-    static{
-        Skript.registerExpression(ExprBDEModelToSpawned.class, SpawnedDisplayEntityGroup.class, ExpressionType.COMBINED, "bde[ngine] model %string% spawned at %location%");
-    }
-
     private Expression<String> fileName;
     private Expression<Location> location;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EXPRESSION,
+                SyntaxInfo.Expression.builder(ExprBDEModelToSpawned.class, SpawnedDisplayEntityGroup.class)
+                        .addPattern("bde[ngine] model %string% spawned at %location%")
+                        .supplier(ExprBDEModelToSpawned::new)
+                        .build()
+        );
+    }
 
     @Override
     protected SpawnedDisplayEntityGroup[] get(Event event) {

@@ -1,6 +1,5 @@
-package net.donnypz.displayentityutils.skript.conditions;
+package net.donnypz.displayentityutils.skript.group.spawnedgroup.elements;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -12,29 +11,37 @@ import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Spawned Group Is Visible By Default?")
-@Description("Check if a spawned group is visible by default")
-@Examples({"if {_group} is visible by default:", "\tbroadcast \"Players can see the group by default!\""})
+@Name("Spawned Group Is Registered?")
+@Description("Check if a spawned group is registered")
+@Examples({"if {_group} is registered:", "\tbroadcast \"The plugin recognizes this group!\""})
 @Since("2.6.2")
-public class CondSpawnedGroupIsVisibleByDefault extends Condition {
+public class CondSpawnedGroupIsRegistered extends Condition {
 
-    static {
-        Skript.registerCondition(CondSpawnedGroupIsVisibleByDefault.class, "%spawnedgroup% (1¦is|2¦is(n't| not)) visible by default");
-    }
 
     Expression<SpawnedDisplayEntityGroup> group;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.CONDITION,
+                SyntaxInfo.builder(CondSpawnedGroupIsRegistered.class)
+                        .addPattern("%spawnedgroup% (1¦is|2¦is(n't| not)) registered")
+                        .supplier(CondSpawnedGroupIsRegistered::new)
+                        .build()
+        );
+    }
 
     @Override
     public boolean check(Event event) {
         SpawnedDisplayEntityGroup g = group.getSingle(event);
         if (g == null) return isNegated();
-        return g.isVisibleByDefault() != isNegated();
+        return g.isRegistered() != isNegated();
     }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "Spawned group visible by default: "+group.toString(event, debug);
+        return "Group registered: "+group.toString(event, debug);
     }
 
     @SuppressWarnings("unchecked")

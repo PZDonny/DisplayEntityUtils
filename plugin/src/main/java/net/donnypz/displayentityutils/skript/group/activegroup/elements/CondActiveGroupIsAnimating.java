@@ -1,6 +1,5 @@
-package net.donnypz.displayentityutils.skript.conditions;
+package net.donnypz.displayentityutils.skript.group.activegroup.elements;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -12,6 +11,8 @@ import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Active Group Is Animating?")
 @Description("Check if an active group is animating")
@@ -19,11 +20,16 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class CondActiveGroupIsAnimating extends Condition {
 
-    static {
-        Skript.registerCondition(CondActiveGroupIsAnimating.class, "%activegroup% (1¦is|2¦is(n't| not)) animating");
-    }
-
     Expression<ActiveGroup> group;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.CONDITION,
+                SyntaxInfo.builder(CondActiveGroupIsAnimating.class)
+                        .addPattern("%activegroup% (1¦is|2¦is(n't| not)) animating")
+                        .supplier(CondActiveGroupIsAnimating::new)
+                        .build()
+        );
+    }
 
     @Override
     public boolean check(Event event) {

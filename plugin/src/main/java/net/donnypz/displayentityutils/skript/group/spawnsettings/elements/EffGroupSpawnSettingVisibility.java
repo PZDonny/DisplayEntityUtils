@@ -1,6 +1,5 @@
-package net.donnypz.displayentityutils.skript.effects;
+package net.donnypz.displayentityutils.skript.group.spawnsettings.elements;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -12,19 +11,27 @@ import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Group Spawn Settings Visible")
 @Description("Set the visibility property of a group spawn setting")
 @Examples({"set {_setting} to visible by default", "set {_setting}'s interactions to invisible by default"})
 @Since("2.6.2")
 public class EffGroupSpawnSettingVisibility extends Effect {
-    static {
-        Skript.registerEffect(EffGroupSpawnSettingVisibility.class,"(make|set) %groupspawnsetting%['s] [:interactions] [to] [:in]visible by default");
-    }
 
     Expression<GroupSpawnSettings> settings;
     boolean invisible;
     boolean forInteractions;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EFFECT,
+                SyntaxInfo.builder(EffGroupSpawnSettingVisibility.class)
+                        .addPattern("(make|set) %groupspawnsetting%['s] [:interactions] [to] [:in]visible by default")
+                        .supplier(EffGroupSpawnSettingVisibility::new)
+                        .build()
+        );
+    }
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {

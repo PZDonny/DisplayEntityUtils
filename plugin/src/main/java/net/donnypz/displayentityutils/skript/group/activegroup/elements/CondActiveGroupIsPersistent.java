@@ -1,6 +1,5 @@
-package net.donnypz.displayentityutils.skript.conditions;
+package net.donnypz.displayentityutils.skript.group.activegroup.elements;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
@@ -9,6 +8,8 @@ import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Active Group Is Persistent")
 @Description("Check if a spawned group is persistent")
@@ -19,11 +20,16 @@ import org.jetbrains.annotations.Nullable;
 @DocumentationId("CondSpawnedGroupIsPersistent")
 public class CondActiveGroupIsPersistent extends Condition {
 
-    static {
-        Skript.registerCondition(CondActiveGroupIsPersistent.class, "%activegroup% (1¦is|2¦is(n't| not)) persistent");
-    }
-
     Expression<ActiveGroup<?>> group;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.CONDITION,
+                SyntaxInfo.builder(CondActiveGroupIsPersistent.class)
+                        .addPattern("%activegroup% (1¦is|2¦is(n't| not)) persistent")
+                        .supplier(CondActiveGroupIsPersistent::new)
+                        .build()
+        );
+    }
 
     @Override
     public boolean check(Event event) {

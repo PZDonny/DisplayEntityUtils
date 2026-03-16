@@ -1,6 +1,5 @@
-package net.donnypz.displayentityutils.skript.effects;
+package net.donnypz.displayentityutils.skript.group.spawnsettings.elements;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -13,6 +12,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
 import org.bukkit.entity.Display;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Group Spawn Settings Billboard")
 @Description("Set the billboard property of a group spawn setting")
@@ -26,13 +27,20 @@ import org.jetbrains.annotations.Nullable;
         "make {_setting}'s billboard as center"})
 @Since("2.6.2")
 public class EffGroupSpawnSettingBillboard extends Effect {
-    static {
-        Skript.registerEffect(EffGroupSpawnSettingBillboard.class,"(make|deu set) %groupspawnsetting%['s] billboard (to|as) %billboard% [tags:for parts with tag[s] %-strings%]");
-    }
 
     Expression<GroupSpawnSettings> settings;
     Expression<Display.Billboard> billboard;
     Expression<String> tags;
+
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EFFECT,
+                SyntaxInfo.builder(EffGroupSpawnSettingBillboard.class)
+                        .addPattern("(make|deu set) %groupspawnsetting%['s] billboard (to|as) %billboard% [tags:for parts with tag[s] %-strings%]")
+                        .supplier(EffGroupSpawnSettingBillboard::new)
+                        .build()
+        );
+    }
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {

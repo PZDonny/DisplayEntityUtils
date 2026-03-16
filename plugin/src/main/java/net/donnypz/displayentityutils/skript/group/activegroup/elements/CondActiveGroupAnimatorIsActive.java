@@ -1,6 +1,5 @@
-package net.donnypz.displayentityutils.skript.conditions;
+package net.donnypz.displayentityutils.skript.group.activegroup.elements;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -13,6 +12,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("DisplayAnimator is animating ActiveGroup?")
 @Description("Check if a displayanimator is animating an active group")
@@ -20,12 +21,17 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class CondActiveGroupAnimatorIsActive extends Condition {
 
-    static {
-        Skript.registerCondition(CondActiveGroupAnimatorIsActive.class, "%displayanimator% (1¦is|2¦is(n't| not)) (animating|[a[n]] active animation) [on|of] %activegroup%");
-    }
-
     Expression<ActiveGroup<?>> group;
     Expression<DisplayAnimator> animator;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.CONDITION,
+                SyntaxInfo.builder(CondActiveGroupAnimatorIsActive.class)
+                        .addPattern("%displayanimator% (1¦is|2¦is(n't| not)) (animating|[a[n]] active animation) [on|of] %activegroup%")
+                        .supplier(CondActiveGroupAnimatorIsActive::new)
+                        .build()
+        );
+    }
 
     @Override
     public boolean check(Event event) {

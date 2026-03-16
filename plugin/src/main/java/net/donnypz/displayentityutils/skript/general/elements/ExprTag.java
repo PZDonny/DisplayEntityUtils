@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.skript.expressions;
+package net.donnypz.displayentityutils.skript.general.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
@@ -12,8 +12,10 @@ import ch.njol.util.coll.CollectionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Group/Animation Tag")
+@Name("Group/Animation/Frame Point Tag")
 @Description("Get or set the tag of a group/animation. Only the tag of a active group/animation can be changed")
 @Examples({"reset {_spawnedgroup}'s deu tag",
             "set {_savedgrouptag} to {_savedgroup}'s deu tag",
@@ -24,8 +26,14 @@ import org.jetbrains.annotations.Nullable;
             "set \"mynewgrouptag\" to {_packetgroup}'s deu tag"})
 @Since("2.6.2, 3.0.0 (Packet), 3.2.1 (Frame Point), 3.3.2 (Plural)")
 public class ExprTag extends SimplePropertyExpression<Object, String> {
-    static {
-        register(ExprTag.class, String.class, "deu tag", "activegroups/savedgroups/animations/framepoints");
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EXPRESSION,
+                SyntaxInfo.Expression.builder(ExprTag.class, String.class)
+                        .addPatterns(getPatterns("deu tag", "activegroups/savedgroups/animations/framepoints"))
+                        .supplier(ExprTag::new)
+                        .build()
+        );
     }
 
     @Override

@@ -1,13 +1,11 @@
-package net.donnypz.displayentityutils.skript.expressions;
+package net.donnypz.displayentityutils.skript.group.spawnsettings.elements;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
@@ -16,6 +14,8 @@ import net.donnypz.displayentityutils.events.PreGroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Create Group Spawn Settings")
 @Description("Create group spawn settings that can be applied to a saved group when spawning it")
@@ -23,8 +23,13 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class ExprGroupSpawnSettings extends SimpleExpression<GroupSpawnSettings> {
 
-    static{
-        Skript.registerExpression(ExprGroupSpawnSettings.class, GroupSpawnSettings.class, ExpressionType.SIMPLE, "[a] [new] [group] spawn setting[s]");
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EXPRESSION,
+                SyntaxInfo.Expression.builder(ExprGroupSpawnSettings.class, GroupSpawnSettings.class)
+                        .addPattern("[a] [new] [group] spawn setting[s]")
+                        .supplier(ExprGroupSpawnSettings::new)
+                        .build()
+        );
     }
 
     @Override
