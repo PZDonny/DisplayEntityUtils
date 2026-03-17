@@ -1,6 +1,5 @@
-package net.donnypz.displayentityutils.skript.conditions;
+package net.donnypz.displayentityutils.skript.animation.animator.conditions;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -13,18 +12,27 @@ import net.donnypz.displayentityutils.managers.DEUUser;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Is Player In Animation Camera?")
 @Description("Check if a player is in an animation camera")
-@Examples({"if {_player} is in an animation camera:", "\tbroadcast \"The player is viewing an animation from its camera!\""})
+@Examples({"if {_player} is in an animation camera:",
+        "\tbroadcast \"The player is viewing an animation from its camera!\""})
 @Since("3.3.6")
 public class CondIsInAnimationCamera extends Condition {
 
-    static {
-        Skript.registerCondition(CondIsInAnimationCamera.class, "%player% (1¦is|2¦is(n't| not)) in [a[n]] animation camera");
-    }
 
     Expression<Player> player;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.CONDITION,
+                SyntaxInfo.builder(CondIsInAnimationCamera.class)
+                        .addPattern("%player% (1¦is|2¦is(n't| not)) in [a[n]] animation camera")
+                        .supplier(CondIsInAnimationCamera::new)
+                        .build()
+        );
+    }
 
     @Override
     public boolean check(Event event) {

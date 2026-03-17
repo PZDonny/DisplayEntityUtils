@@ -8,11 +8,6 @@ groupspawnreason:
     internal: internal
     skript: skript
 
-animationtype:
-    linear: linear
-    loop: loop
-
-
 interactionclicktype:
     left: left
     right: right

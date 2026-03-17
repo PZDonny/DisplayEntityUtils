@@ -1,8 +1,6 @@
 package net.donnypz.displayentityutils.skript.group.activegroup;
 
 import net.donnypz.displayentityutils.skript.SkriptUtil;
-import net.donnypz.displayentityutils.skript.group.activegroup.elements.CondActiveGroupAnimatorIsActive;
-import net.donnypz.displayentityutils.skript.group.activegroup.elements.CondActiveGroupIsAnimating;
 import net.donnypz.displayentityutils.skript.group.activegroup.elements.CondActiveGroupIsPersistent;
 import net.donnypz.displayentityutils.skript.group.activegroup.sections.SecSpawnGroup;
 import org.skriptlang.skript.addon.AddonModule;
@@ -13,8 +11,6 @@ public class ActiveGroupModule implements AddonModule {
     @Override
     public void load(SkriptAddon skriptAddon) {
         SkriptUtil.registerModules(skriptAddon.syntaxRegistry(),
-                CondActiveGroupAnimatorIsActive::register,
-                CondActiveGroupIsAnimating::register,
                 CondActiveGroupIsPersistent::register,
 
                 SecSpawnGroup::register

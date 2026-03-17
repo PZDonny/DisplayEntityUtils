@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.skript.group.activegroup.elements;
+package net.donnypz.displayentityutils.skript.animation.animator.conditions;
 
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;

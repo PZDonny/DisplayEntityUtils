@@ -1,12 +1,10 @@
-package net.donnypz.displayentityutils.skript.expressions;
+package net.donnypz.displayentityutils.skript.animation.framepoints.expressions;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
@@ -14,19 +12,26 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Frame Point with tag from Animation Frame")
-@Description("Get a Frame Point with a given tag from an Animation Frame")
+@Name("Frame Point from Animation Frame")
+@Description("Get a Frame Point, of a given tag, from an Animation Frame")
 @Examples({"set {_framepoint} to point with tag \"myframepoint\" from {_animationframe}"})
 @Since("3.2.1")
 public class ExprFramePointFromFrame extends SimpleExpression<FramePoint> {
 
-    static{
-        Skript.registerExpression(ExprFramePointFromFrame.class, FramePoint.class, ExpressionType.COMBINED, "[frame[ |-]]point with tag %string% from %animationframe%");
-    }
-
     private Expression<SpawnedDisplayAnimationFrame> frame;
     private Expression<String> tag;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EXPRESSION,
+                SyntaxInfo.Expression.builder(ExprFramePointFromFrame.class, FramePoint.class)
+                        .addPattern("[frame[ |-]]point with tag %string% from %animationframe%")
+                        .supplier(ExprFramePointFromFrame::new)
+                        .build()
+        );
+    }
 
     @Override
     protected FramePoint[] get(Event event) {

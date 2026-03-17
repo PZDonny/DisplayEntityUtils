@@ -1,12 +1,10 @@
-package net.donnypz.displayentityutils.skript.expressions;
+package net.donnypz.displayentityutils.skript.animation.animator.expressions;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
@@ -14,6 +12,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Create Display Animator")
 @Description("Create a display animator to play animations on an active group")
@@ -22,12 +22,17 @@ import org.jetbrains.annotations.Nullable;
 @Since("2.6.2")
 public class ExprDisplayAnimator extends SimpleExpression<DisplayAnimator> {
 
-    static{
-        Skript.registerExpression(ExprDisplayAnimator.class, DisplayAnimator.class, ExpressionType.SIMPLE, "[a] [new] (linear|loop:loop[ing]) [display] animator using [anim[ation]] %animation%");
-    }
-
     private boolean loop;
     private Expression<SpawnedDisplayAnimation> animation;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EXPRESSION,
+                SyntaxInfo.Expression.builder(ExprDisplayAnimator.class, DisplayAnimator.class)
+                        .addPatterns("[a] [new] (linear|loop:loop[ing]) [display] animator using [anim[ation]] %animation%")
+                        .supplier(ExprDisplayAnimator::new)
+                        .build()
+        );
+    }
 
     @Override
     protected DisplayAnimator[] get(Event event) {

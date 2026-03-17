@@ -473,13 +473,6 @@ public class SkriptTypes {
                 .description("Represents a interaction click type of LEFT or RIGHT")
                 .since("2.6.2"));
 
-        EnumWrapper<DisplayAnimator.AnimationType> animationTypeWrapper = new EnumWrapper<>(DisplayAnimator.AnimationType.class, null, null);
-        Classes.registerClass(animationTypeWrapper.getClassInfo("animationtype")
-                .user("anim(ation)?( | -)?type")
-                .name("Animation Type")
-                .description("Represents an animation type, being LINEAR or LOOP")
-                .since("2.6.2, 3.3.6 (Removed \"animtype_\" prefix)"));
-
         EnumWrapper<GroupSpawnedEvent.SpawnReason> spawnReasonWrapper = new EnumWrapper<>(GroupSpawnedEvent.SpawnReason.class, "gsr", null);
         Classes.registerClass(spawnReasonWrapper.getClassInfo("groupspawnreason")
                 .user("group( |-)?spawn( |-)?reason")

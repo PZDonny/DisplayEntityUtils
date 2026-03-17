@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.skript.expressions;
+package net.donnypz.displayentityutils.skript.player.expressions;
 
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.doc.Description;
@@ -9,12 +9,13 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Player's Selected Active Group")
+@Name("Player's Selected Group")
 @Description("Get/Set the selected active group of a player")
 @Examples({
         "#Get selected group",
@@ -31,8 +32,14 @@ import org.jetbrains.annotations.Nullable;
         })
 @Since("2.6.2, 3.3.2 (Plural), 3.3.4 (Packet Group)")
 public class ExprPlayerSelectedGroup extends SimplePropertyExpression<Player, ActiveGroup> {
-    static {
-        register(ExprPlayerSelectedGroup.class, ActiveGroup.class, "selected [active] [display] [entity] group", "players");
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EXPRESSION,
+                SyntaxInfo.Expression.builder(ExprPlayerSelectedGroup.class, ActiveGroup.class)
+                        .addPatterns(getPatterns("selected [active] [display] [entity] group", "players"))
+                        .supplier(ExprPlayerSelectedGroup::new)
+                        .build()
+        );
     }
 
     @Override

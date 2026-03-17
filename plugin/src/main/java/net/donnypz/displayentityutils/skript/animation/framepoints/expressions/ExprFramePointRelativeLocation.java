@@ -1,12 +1,10 @@
-package net.donnypz.displayentityutils.skript.expressions;
+package net.donnypz.displayentityutils.skript.animation.framepoints.expressions;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
@@ -15,22 +13,29 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
 import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Frame Point Relative Location")
-@Description("Get the location of a Frame Point relative to a location or Active Group. " +
-        "The provided location is more accurate when used on an Active Group since group scale is taken into account.")
+@Description("Get the location of a Frame Point relative to a group or location. " +
+        "\nThe provided location is more accurate when used on an Active Group since group scale is included in calculation.")
 @Examples({"set {_loc} to {_framepoint}'s location relative to {_activegroup}",
             "",
             "set {_loc} to {_framepoint}'s location relative to {_location}"})
 @Since("3.2.1")
 public class ExprFramePointRelativeLocation extends SimpleExpression<Location> {
 
-    static{
-        Skript.registerExpression(ExprFramePointRelativeLocation.class, Location.class, ExpressionType.SIMPLE, "%framepoint% location relative [to|of] %activegroup/location%");
-    }
-
     private Expression<FramePoint> fp;
     private Expression<Object> obj;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EXPRESSION,
+                SyntaxInfo.Expression.builder(ExprFramePointRelativeLocation.class, Location.class)
+                        .addPattern("%framepoint% location relative [to|of] %activegroup/location%")
+                        .supplier(ExprFramePointRelativeLocation::new)
+                        .build()
+        );
+    }
 
     @Override
     protected Location[] get(Event event) {

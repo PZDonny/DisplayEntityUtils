@@ -1,6 +1,5 @@
-package net.donnypz.displayentityutils.skript.effects;
+package net.donnypz.displayentityutils.skript.animation.animator.effects;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -16,6 +15,8 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimat
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,6 +24,7 @@ import java.util.Collection;
 @Name("Play Animation Camera")
 @Description("Make players follow an animation's camera on an active group using a display animator or animation")
 @Examples({"play camera on {_packetgroup} with {_animator} for {_player}",
+            "",
             "play camera on {_activegroup} using {_animation} for {_player} starting at frame 3",
             "",
             "play camera on {_activegroup} using {_animation} for {_player} with a start transition of 3 ticks and end delay of 2 seconds",
@@ -30,10 +32,6 @@ import java.util.Collection;
             "play camera on {_activegroup} using {_animation} for {_player} starting at frame 8 with a start transition of 3 seconds and an end delay of 10 ticks"})
 @Since("3.3.6")
 public class EffActiveGroupPlayAnimationCamera extends Effect {
-    static {
-        Skript.registerEffect(EffActiveGroupPlayAnimationCamera.class,"(start|play) [anim[ation]] camera on %activegroup% (using|with) %displayanimator/animation% [frame:[starting] (at|on) frame %-number%] for %players%" +
-                " [sd:[and] [with] [a[n]] start[ing] transition of %-timespan%] [ed:[and] [with] [a[n]] end[ing] delay of %-timespan%]");
-    }
 
     Expression<ActiveGroup> group;
     Expression<?> animationObj;
@@ -41,6 +39,16 @@ public class EffActiveGroupPlayAnimationCamera extends Effect {
     Expression<Player> players;
     Expression<Timespan> startTransition;
     Expression<Timespan> endDelay;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EFFECT,
+                SyntaxInfo.builder(EffActiveGroupPlayAnimationCamera.class)
+                        .addPattern("(start|play) [anim[ation]] camera on %activegroup% (using|with) %displayanimator/animation% [frame:[starting] (at|on) frame %-number%] for %players%" +
+                                " [sd:[and] [with] [a[n]] start[ing] transition of %-timespan%] [ed:[and] [with] [a[n]] end[ing] delay of %-timespan%]")
+                        .supplier(EffActiveGroupPlayAnimationCamera::new)
+                        .build()
+        );
+    }
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {

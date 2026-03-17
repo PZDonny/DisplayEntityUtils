@@ -1,6 +1,5 @@
-package net.donnypz.displayentityutils.skript.effects;
+package net.donnypz.displayentityutils.skript.animation.animator.effects;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -15,11 +14,13 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-@Name("Play Animation on Active Group")
+@Name("Play Animation")
 @Description("Play an animation on an active group with a display animator")
 @Examples({"play animation on {_spawnedgroup} using {_displayanimator}",
         "",
@@ -31,9 +32,6 @@ import java.util.Collection;
         "start packet animation on {_packetgroup} with {_displayanimator} for {_player} and use camera"})
 @Since("2.6.2, 3.0.0 (Packet), 3.3.6 (Animation Camera)")
 public class EffActiveGroupPlayAnimation extends Effect {
-    static {
-        Skript.registerEffect(EffActiveGroupPlayAnimation.class,"(start|play) [p:packet] anim[ation] on %activegroup% (using|with) %displayanimator% [frame:[starting] (at|on) frame %-number%] [f:for %-players% [cam:and (with|us(e|ing)) cam[era]]]");
-    }
 
     Expression<ActiveGroup> group;
     Expression<DisplayAnimator> animator;
@@ -41,6 +39,15 @@ public class EffActiveGroupPlayAnimation extends Effect {
     Expression<Player> players;
     boolean packet;
     boolean camera;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EFFECT,
+                SyntaxInfo.builder(EffActiveGroupPlayAnimation.class)
+                        .addPattern("(start|play) [p:packet] anim[ation] on %activegroup% (using|with) %displayanimator% [frame:[starting] (at|on) frame %-number%] [f:for %-players% [cam:and (with|us(e|ing)) cam[era]]]")
+                        .supplier(EffActiveGroupPlayAnimation::new)
+                        .build()
+        );
+    }
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {

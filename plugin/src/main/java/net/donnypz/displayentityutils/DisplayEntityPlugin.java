@@ -17,11 +17,14 @@ import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
 import net.donnypz.displayentityutils.managers.PluginFolders;
 import net.donnypz.displayentityutils.skript.SkriptTypes;
+import net.donnypz.displayentityutils.skript.animation.animator.AnimatorModule;
+import net.donnypz.displayentityutils.skript.animation.framepoints.FramePointsModule;
 import net.donnypz.displayentityutils.skript.events.SimpleEvents;
 import net.donnypz.displayentityutils.skript.general.GeneralModule;
 import net.donnypz.displayentityutils.skript.group.activegroup.ActiveGroupModule;
 import net.donnypz.displayentityutils.skript.group.spawnedgroup.SpawnedGroupModule;
 import net.donnypz.displayentityutils.skript.io.IOModule;
+import net.donnypz.displayentityutils.skript.player.PlayerModule;
 import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationPlayerProviderImpl;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
@@ -130,11 +133,16 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         else{
             addon = Skript.instance().registerAddon(DisplayEntityPlugin.class, "DisplayEntityUtils");
             addon.loadModules(
+                    new AnimatorModule(),
+                    new FramePointsModule(),
+
                     new GeneralModule(),
                     new ActiveGroupModule(),
                     new SpawnedGroupModule(),
-                    new IOModule()
+                    new IOModule(),
+                    new PlayerModule()
             );
+            addon.localizer().setSourceDirectories("lang", null);
             SimpleEvents.register();
 //            try {
 //                addon.loadClasses("net.donnypz.displayentityutils.skript", "conditions", "events", "effects", "expressions", "sections");

@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.skript.expressions;
+package net.donnypz.displayentityutils.skript.animation.animator.expressions;
 
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -8,6 +8,8 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Animation of Display Animator")
 @Description("Get the animation set for a display animator.")
@@ -15,8 +17,13 @@ import org.jetbrains.annotations.Nullable;
 @Since("3.3.1, 3.3.2 (Plural)")
 public class ExprAnimatorAnimation extends SimplePropertyExpression<DisplayAnimator, SpawnedDisplayAnimation> {
 
-    static {
-        register(ExprAnimatorAnimation.class, SpawnedDisplayAnimation.class, "deu animation", "displayanimators");
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EXPRESSION,
+                SyntaxInfo.Expression.builder(ExprAnimatorAnimation.class, SpawnedDisplayAnimation.class)
+                        .addPatterns(getPatterns("deu animation", "displayanimators"))
+                        .supplier(ExprAnimatorAnimation::new)
+                        .build()
+        );
     }
 
     @Override

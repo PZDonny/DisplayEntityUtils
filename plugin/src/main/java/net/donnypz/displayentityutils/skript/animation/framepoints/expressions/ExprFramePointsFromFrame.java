@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.skript.expressions;
+package net.donnypz.displayentityutils.skript.animation.framepoints.expressions;
 
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -12,18 +12,24 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.Arrays;
 
 @Name("Frame Points from Animation Frame")
-@Description("Get the Frame Points contained in an animation frame")
-@Examples({"set {_framepoints::*} to {_animationframe}'s frame points",
-        "set {_framepoints::*} to {_animationframe}'s points"})
+@Description("Get the Frame Points of an animation frame")
+@Examples({"set {_framepoints::*} to {_animationframe}'s animation frame points"})
 @Since("3.2.1, 3.3.2 (Plural)")
 public class ExprFramePointsFromFrame extends PropertyExpression<SpawnedDisplayAnimationFrame, FramePoint> {
 
-    static {
-        register(ExprFramePointsFromFrame.class, FramePoint.class, "animation [frame[ |-]]points", "animationframes");
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EXPRESSION,
+                SyntaxInfo.Expression.builder(ExprFramePointsFromFrame.class, FramePoint.class)
+                        .addPatterns(getPatterns("anim[ation] [frame[ |-]]points", "animationframes"))
+                        .supplier(ExprFramePointsFromFrame::new)
+                        .build()
+        );
     }
 
 

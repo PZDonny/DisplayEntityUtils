@@ -1,6 +1,5 @@
-package net.donnypz.displayentityutils.skript.effects;
+package net.donnypz.displayentityutils.skript.animation.animator.effects;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -13,18 +12,26 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Stop All Player Packet Animations")
+@Name("Stop Animations for Player")
 @Description("Stop all packet animations playing on an active group for a player")
 @Examples({"stop packet animations from {_displayanimator} for {_player::*}"})
 @Since("3.0.0")
 public class EffPlayerStopAllPacketAnimations extends Effect {
-    static {
-        Skript.registerEffect(EffPlayerStopAllPacketAnimations.class,"stop [all] packet animations from %displayanimator% for %players%");
-    }
 
     Expression<DisplayAnimator> animator;
     Expression<Player> players;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EFFECT,
+                SyntaxInfo.builder(EffPlayerStopAllPacketAnimations.class)
+                        .addPattern("stop [all] packet animations from %displayanimator% for %players%")
+                        .supplier(EffPlayerStopAllPacketAnimations::new)
+                        .build()
+        );
+    }
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {

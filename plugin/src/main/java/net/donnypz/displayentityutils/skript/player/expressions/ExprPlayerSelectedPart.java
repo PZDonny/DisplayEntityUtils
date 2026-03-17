@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.skript.expressions;
+package net.donnypz.displayentityutils.skript.player.expressions;
 
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -10,16 +10,24 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Player's Selected Active Part")
+@Name("Player's Selected Part")
 @Description("Get the selected active part of a player")
 @Examples({
         "set {_activepart} to player's selected part"
 })
 @Since("3.4.3")
 public class ExprPlayerSelectedPart extends SimplePropertyExpression<Player, ActivePart> {
-    static {
-        register(ExprPlayerSelectedPart.class, ActivePart.class, "selected [active] [display] [entity] part", "players");
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EXPRESSION,
+                SyntaxInfo.Expression.builder(ExprPlayerSelectedPart.class, ActivePart.class)
+                        .addPatterns(getPatterns("selected [active] part", "players"))
+                        .supplier(ExprPlayerSelectedPart::new)
+                        .build()
+        );
     }
 
     @Override
