@@ -2,9 +2,11 @@ package net.donnypz.displayentityutils.skript.events;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.lang.util.SimpleEvent;
+import ch.njol.skript.registrations.EventConverter;
 import ch.njol.skript.registrations.EventValues;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.*;
+import net.donnypz.displayentityutils.skript.SkriptTypes;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
 import org.bukkit.Chunk;
@@ -19,7 +21,7 @@ import java.util.UUID;
 @ApiStatus.Internal
 public class SimpleEvents extends SimpleEvent {
 
-    static{
+    public static void register(){
         if (DisplayAPI.isSkriptInstalled()){
 
             //Group Registered Event
@@ -112,25 +114,39 @@ public class SimpleEvents extends SimpleEvent {
             //Animation Frame Start Event
             Skript.registerEvent("Animation Frame Start", SimpleEvents.class, AnimationFrameStartEvent.class, "[deu] anim[ation] frame start[ed]")
                     .description("Called when a frame begins animating on an active group")
-                    .examples("on deu anim frame start:",
-                            "\tset {_frameId} to event's frame id")
-                    .since("2.6.2");
+                    .since("2.6.2, 3.5.0 (Frame Id)");
             EventValues.registerEventValue(AnimationFrameStartEvent.class, ActiveGroup.class, AnimationFrameStartEvent::getGroup);
             EventValues.registerEventValue(AnimationFrameStartEvent.class, SpawnedDisplayAnimation.class, AnimationFrameStartEvent::getAnimation);
             EventValues.registerEventValue(AnimationFrameStartEvent.class, SpawnedDisplayAnimationFrame.class, AnimationFrameStartEvent::getFrame);
             EventValues.registerEventValue(AnimationFrameStartEvent.class, DisplayAnimator.class, AnimationFrameStartEvent::getAnimator);
+            EventValues.registerEventValue(AnimationFrameStartEvent.class, SkriptTypes.FrameId.class, new EventConverter<>() {
+                @Override
+                public void set(AnimationFrameStartEvent event, SkriptTypes.FrameId value) {}
+
+                @Override
+                public SkriptTypes.FrameId convert(AnimationFrameStartEvent from) {
+                    return new SkriptTypes.FrameId(from.getFrameId());
+                }
+            });
 
             //Animation Frame End Event
             Skript.registerEvent("Animation Frame End", SimpleEvents.class, AnimationFrameEndEvent.class, "[deu] anim[ation] frame (complete[d]|end[ed])")
                     .description("Called when a frame ends animating on an active group.",
                             "Ignores frame delay and is called after translation of parts")
-                    .examples("on deu anim frame end:",
-                            "\tset {_frameId} to event's frame id")
-                    .since("2.6.2");
+                    .since("2.6.2, 3.5.0 (Frame Id)");
             EventValues.registerEventValue(AnimationFrameEndEvent.class, ActiveGroup.class, AnimationFrameEndEvent::getGroup);
             EventValues.registerEventValue(AnimationFrameEndEvent.class, SpawnedDisplayAnimation.class, AnimationFrameEndEvent::getAnimation);
             EventValues.registerEventValue(AnimationFrameEndEvent.class, SpawnedDisplayAnimationFrame.class, AnimationFrameEndEvent::getFrame);
             EventValues.registerEventValue(AnimationFrameEndEvent.class, DisplayAnimator.class, AnimationFrameEndEvent::getAnimator);
+            EventValues.registerEventValue(AnimationFrameEndEvent.class, SkriptTypes.FrameId.class, new EventConverter<>() {
+                @Override
+                public void set(AnimationFrameEndEvent event, SkriptTypes.FrameId value) {}
+
+                @Override
+                public SkriptTypes.FrameId convert(AnimationFrameEndEvent from) {
+                    return new SkriptTypes.FrameId(from.getFrameId());
+                }
+            });
 
             //Animation Complete Event
             Skript.registerEvent("Animation Complete", SimpleEvents.class, AnimationCompleteEvent.class, "[deu] anim[ation] (complete[d]|end[ed])")
@@ -164,28 +180,43 @@ public class SimpleEvents extends SimpleEvent {
             Skript.registerEvent("Packet Animation Frame Start", SimpleEvents.class, PacketAnimationFrameStartEvent.class, "[deu] packet anim[ation] frame start[ed]")
                     .description("Called when a frame begins animating on a spawned group using packets.",
                             "If players are not specified, the animation is shown to all players who can see the group.")
-                    .examples("on packet anim frame start:",
-                            "\tset {_frameId} to event's frame id")
-                    .since("3.0.0");
+                    .since("3.0.0, 3.5.0 (Frame Id)");
             EventValues.registerEventValue(PacketAnimationFrameStartEvent.class, ActiveGroup.class, PacketAnimationFrameStartEvent::getGroup);
             EventValues.registerEventValue(PacketAnimationFrameStartEvent.class, SpawnedDisplayAnimation.class, PacketAnimationFrameStartEvent::getAnimation);
             EventValues.registerEventValue(PacketAnimationFrameStartEvent.class, SpawnedDisplayAnimationFrame.class, PacketAnimationFrameStartEvent::getFrame);
             EventValues.registerEventValue(PacketAnimationFrameStartEvent.class, DisplayAnimator.class, PacketAnimationFrameStartEvent::getAnimator);
             EventValues.registerEventValue(PacketAnimationFrameStartEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
+            EventValues.registerEventValue(PacketAnimationFrameStartEvent.class, SkriptTypes.FrameId.class, new EventConverter<>() {
+                @Override
+                public void set(PacketAnimationFrameStartEvent event, SkriptTypes.FrameId value) {}
+
+                @Override
+                public SkriptTypes.FrameId convert(PacketAnimationFrameStartEvent from) {
+                    return new SkriptTypes.FrameId(from.getFrameId());
+                }
+            });
 
             //Packet Animation Frame End Event
             Skript.registerEvent("Packet Animation Frame End", SimpleEvents.class, PacketAnimationFrameEndEvent.class, "[deu] packet anim[ation] frame (complete[d]|end[ed])")
                     .description("Called when a frame ends animating on an active group.",
                             "Ignores frame delay and is called after translation of parts.",
                             "If players are not specified, the animation is shown to all players who can see the group.")
-                    .examples("on packet anim frame end:",
-                            "\tset {_frameId} to event's frame id")
-                    .since("3.0.0");
+                    .since("3.0.0, 3.5.0 (Frame Id)");
             EventValues.registerEventValue(PacketAnimationFrameEndEvent.class, ActiveGroup.class, PacketAnimationFrameEndEvent::getGroup);
             EventValues.registerEventValue(PacketAnimationFrameEndEvent.class, SpawnedDisplayAnimation.class, PacketAnimationFrameEndEvent::getAnimation);
             EventValues.registerEventValue(PacketAnimationFrameEndEvent.class, SpawnedDisplayAnimationFrame.class, PacketAnimationFrameEndEvent::getFrame);
             EventValues.registerEventValue(PacketAnimationFrameEndEvent.class, DisplayAnimator.class, PacketAnimationFrameEndEvent::getAnimator);
             EventValues.registerEventValue(PacketAnimationFrameEndEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
+            EventValues.registerEventValue(PacketAnimationFrameEndEvent.class, SkriptTypes.FrameId.class, new EventConverter<>() {
+                @Override
+                public void set(PacketAnimationFrameEndEvent event, SkriptTypes.FrameId value) {}
+
+                @Override
+                public SkriptTypes.FrameId convert(PacketAnimationFrameEndEvent from) {
+                    return new SkriptTypes.FrameId(from.getFrameId());
+                }
+            });
+
 
             //Packet Animation Complete Event
             Skript.registerEvent("Packet Animation Complete", SimpleEvents.class, PacketAnimationCompleteEvent.class, "[deu] packet anim[ation] (complete[d]|end[ed])")
@@ -260,4 +291,6 @@ public class SimpleEvents extends SimpleEvent {
 
         }
     }
+
+
 }

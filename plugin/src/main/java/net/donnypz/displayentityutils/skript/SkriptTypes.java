@@ -15,6 +15,18 @@ import org.skriptlang.skript.lang.converter.Converters;
 
 public class SkriptTypes {
 
+    public static class FrameId{
+        int id;
+
+        public FrameId(int id){
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
+    }
+
     static{
 
         Classes.registerClass(new ClassInfo<>(ActiveGroup.class, "activegroup")
@@ -368,7 +380,7 @@ public class SkriptTypes {
         Classes.registerClass(new ClassInfo<>(FramePoint.class, "framepoint")
                 .user("frame( |-)?point")
                 .name("Frame Point")
-                .description("Represents a Frame Point from a Spawned Display Animation Frame")
+                .description("Represents a Frame Point from an Animation Frame")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(FramePoint.class))
                 .since("3.2.1")
@@ -390,6 +402,33 @@ public class SkriptTypes {
                     }
                 })
         );
+
+        Classes.registerClass(new ClassInfo<>(FrameId.class, "frameid")
+                .user("frame( |-)?id")
+                .name("Frame Id")
+                .description("Represents the frame id of ab Animation Frame")
+                .examples()
+                .defaultExpression(new EventValueExpression<>(FrameId.class))
+                .since("3.5.0")
+                .parser(new Parser<>() {
+
+                    @Override
+                    public boolean canParse(ParseContext context) {
+                        return false;
+                    }
+
+                    @Override
+                    public String toString(FrameId o, int flags) {
+                        return toVariableNameString(o);
+                    }
+
+                    @Override
+                    public String toVariableNameString(FrameId o) {
+                        return String.valueOf(o.id);
+                    }
+                })
+        );
+        Converters.registerConverter(FrameId.class, Number.class, FrameId::getId);
 
 
         Classes.registerClass(new ClassInfo<>(InteractionCommand.class, "interactioncommand")

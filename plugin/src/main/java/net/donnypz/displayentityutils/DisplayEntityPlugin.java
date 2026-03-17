@@ -17,10 +17,10 @@ import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
 import net.donnypz.displayentityutils.managers.PluginFolders;
 import net.donnypz.displayentityutils.skript.SkriptTypes;
+import net.donnypz.displayentityutils.skript.events.SimpleEvents;
 import net.donnypz.displayentityutils.skript.general.GeneralModule;
 import net.donnypz.displayentityutils.skript.group.activegroup.ActiveGroupModule;
 import net.donnypz.displayentityutils.skript.group.spawnedgroup.SpawnedGroupModule;
-import net.donnypz.displayentityutils.skript.group.spawnsettings.GroupSpawnSettingsModule;
 import net.donnypz.displayentityutils.skript.io.IOModule;
 import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationPlayerProviderImpl;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -133,9 +133,9 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
                     new GeneralModule(),
                     new ActiveGroupModule(),
                     new SpawnedGroupModule(),
-                    new GroupSpawnSettingsModule(),
                     new IOModule()
             );
+            SimpleEvents.register();
 //            try {
 //                addon.loadClasses("net.donnypz.displayentityutils.skript", "conditions", "events", "effects", "expressions", "sections");
 //                addon.setLanguageFileDirectory("lang");
