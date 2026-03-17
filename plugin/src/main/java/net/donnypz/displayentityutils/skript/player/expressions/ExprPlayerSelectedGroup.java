@@ -83,7 +83,7 @@ public class ExprPlayerSelectedGroup extends SimplePropertyExpression<Player, Ac
     @Override
     public Class<?>[] acceptChange(final Changer.ChangeMode mode) {
         if (mode == Changer.ChangeMode.SET || mode == Changer.ChangeMode.RESET) {
-            return CollectionUtils.array(SpawnedDisplayEntityGroup.class);
+            return CollectionUtils.array(ActiveGroup.class);
         }
         return null;
     }
