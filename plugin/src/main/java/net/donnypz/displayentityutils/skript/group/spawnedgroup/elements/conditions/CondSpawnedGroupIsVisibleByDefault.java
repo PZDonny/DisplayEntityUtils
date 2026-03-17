@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.skript.group.spawnedgroup.elements;
+package net.donnypz.displayentityutils.skript.group.spawnedgroup.elements.conditions;
 
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -14,19 +14,19 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Spawned Group Is Spawned?")
-@Description("Check if a spawned group is present in the game world")
-@Examples({"if {_group} is spawned:", "\tbroadcast \"The group is spawned in the world!\""})
+@Name("Spawned Group Is Visible By Default?")
+@Description("Check if a spawned group is visible by default")
+@Examples({"if {_group} is visible by default:", "\tbroadcast \"Players can see the group by default!\""})
 @Since("2.6.2")
-public class CondSpawnedGroupIsSpawned extends Condition {
+public class CondSpawnedGroupIsVisibleByDefault extends Condition {
 
     Expression<SpawnedDisplayEntityGroup> group;
 
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.CONDITION,
-                SyntaxInfo.builder(CondSpawnedGroupIsSpawned.class)
-                        .addPattern("%spawnedgroup% (1¦is|2¦is(n't| not)) spawned")
-                        .supplier(CondSpawnedGroupIsSpawned::new)
+                SyntaxInfo.builder(CondSpawnedGroupIsVisibleByDefault.class)
+                        .addPattern("%spawnedgroup% (1¦is|2¦is(n't| not)) visible by default")
+                        .supplier(CondSpawnedGroupIsVisibleByDefault::new)
                         .build()
         );
     }
@@ -35,12 +35,12 @@ public class CondSpawnedGroupIsSpawned extends Condition {
     public boolean check(Event event) {
         SpawnedDisplayEntityGroup g = group.getSingle(event);
         if (g == null) return isNegated();
-        return g.isSpawned() != isNegated();
+        return g.isVisibleByDefault() != isNegated();
     }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "Is group spawned: "+group.toString(event, debug);
+        return "Spawned group visible by default: "+group.toString(event, debug);
     }
 
     @SuppressWarnings("unchecked")

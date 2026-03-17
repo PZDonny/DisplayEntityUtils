@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.skript.group.spawnedgroup.elements;
+package net.donnypz.displayentityutils.skript.group.spawnedgroup.elements.conditions;
 
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;

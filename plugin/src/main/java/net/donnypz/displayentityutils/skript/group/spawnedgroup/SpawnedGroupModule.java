@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.skript.group.spawnedgroup;
 
 import net.donnypz.displayentityutils.skript.SkriptUtil;
-import net.donnypz.displayentityutils.skript.group.spawnedgroup.elements.*;
+import net.donnypz.displayentityutils.skript.group.spawnedgroup.elements.conditions.*;
 import org.skriptlang.skript.addon.AddonModule;
 import org.skriptlang.skript.addon.SkriptAddon;
 
@@ -14,7 +14,6 @@ public class SpawnedGroupModule implements AddonModule {
                 CondSpawnedGroupIsRegistered::register,
                 CondSpawnedGroupIsSpawned::register,
                 CondSpawnedGroupIsVisibleByDefault::register
-
         );
     }
 

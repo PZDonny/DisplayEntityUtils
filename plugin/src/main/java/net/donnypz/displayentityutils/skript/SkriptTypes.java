@@ -123,32 +123,6 @@ public class SkriptTypes {
                 })
         );
 
-        Classes.registerClass(new ClassInfo<>(GroupSpawnSettings.class, "groupspawnsetting")
-                .user("(group( |-)?)?spawn( |-)?settings?")
-                .name("Group Spawn Settings")
-                .description("Represents spawn settings that can be applied when spawning a saved group")
-                .examples()
-                .defaultExpression(new EventValueExpression<>(GroupSpawnSettings.class))
-                .since("2.6.2")
-                .parser(new Parser<>() {
-
-                    @Override
-                    public boolean canParse(ParseContext context) {
-                        return false;
-                    }
-
-                    @Override
-                    public String toString(GroupSpawnSettings o, int flags) {
-                        return toVariableNameString(o);
-                    }
-
-                    @Override
-                    public String toVariableNameString(GroupSpawnSettings o) {
-                        return "group spawn settings";
-                    }
-                })
-        );
-
         Classes.registerClass(new ClassInfo<>(ActivePart.class, "activepart")
                 .user("active( |-)?parts?")
                 .name("Active Part")

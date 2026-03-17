@@ -47,7 +47,6 @@ public class SimpleEvents extends SimpleEvent {
                     .since("2.6.2");
             EventValues.registerEventValue(PreGroupSpawnedEvent.class, DisplayEntityGroup.class, PreGroupSpawnedEvent::getGroup);
             EventValues.registerEventValue(PreGroupSpawnedEvent.class, GroupSpawnedEvent.SpawnReason.class, PreGroupSpawnedEvent::getSpawnReason);
-            EventValues.registerEventValue(PreGroupSpawnedEvent.class, GroupSpawnSettings.class, PreGroupSpawnedEvent::getNewSettings);
 
             //Group Spawned Event
             Skript.registerEvent("Group Spawned", SimpleEvents.class, GroupSpawnedEvent.class, "[spawned] [display] group spawn[ed]")
@@ -62,7 +61,6 @@ public class SimpleEvents extends SimpleEvent {
                     .since("3.0.0");
             EventValues.registerEventValue(PacketGroupSendEvent.class, PacketDisplayEntityGroup.class, PacketGroupSendEvent::getGroup);
             EventValues.registerEventValue(PacketGroupSendEvent.class, GroupSpawnedEvent.SpawnReason.class, PacketGroupSendEvent::getSpawnReason);
-            EventValues.registerEventValue(PacketGroupSendEvent.class, GroupSpawnSettings.class, PacketGroupSendEvent::getNewSettings);
             EventValues.registerEventValue(PacketGroupSendEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
 
             //Pre Packet Group Create Event
@@ -71,7 +69,6 @@ public class SimpleEvents extends SimpleEvent {
                     .since("3.3.6");
             EventValues.registerEventValue(PrePacketGroupCreateEvent.class, DisplayEntityGroup.class, PrePacketGroupCreateEvent::getGroup);
             EventValues.registerEventValue(PrePacketGroupCreateEvent.class, GroupSpawnedEvent.SpawnReason.class, PrePacketGroupCreateEvent::getSpawnReason);
-            EventValues.registerEventValue(PrePacketGroupCreateEvent.class, GroupSpawnSettings.class, PrePacketGroupCreateEvent::getNewSettings);
 
             //Packet Group Destroy Event
             Skript.registerEvent("Packet Group Destroyed", SimpleEvents.class, PacketGroupDestroyEvent.class, "packet [spawned] [display] group (destroy[ed]|remove[d]|hid(e|den))")

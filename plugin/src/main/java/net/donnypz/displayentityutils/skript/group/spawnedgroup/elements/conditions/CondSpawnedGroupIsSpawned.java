@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.skript.group.spawnedgroup.elements;
+package net.donnypz.displayentityutils.skript.group.spawnedgroup.elements.conditions;
 
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -14,20 +14,19 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Spawned Group Persistence Override")
-@Description("Check if a spawned group allows chunk loading to override its persistence")
-@Examples({"if {_group} allows persistence override:", "\tbroadcast \"The group's persistence will be overriden by config settings'!\""})
-@Since("2.6.3")
-public class CondSpawnedGroupAllowsPersistenceOverride extends Condition {
-
+@Name("Spawned Group Is Spawned?")
+@Description("Check if a spawned group is present in the game world")
+@Examples({"if {_group} is spawned:", "\tbroadcast \"The group is spawned in the world!\""})
+@Since("2.6.2")
+public class CondSpawnedGroupIsSpawned extends Condition {
 
     Expression<SpawnedDisplayEntityGroup> group;
 
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.CONDITION,
-                SyntaxInfo.builder(CondSpawnedGroupAllowsPersistenceOverride.class)
-                        .addPattern("%spawnedgroup% (1¦(is|allows)|2¦(is(n't| not) [allowing])) [chunk] persistence override")
-                        .supplier(CondSpawnedGroupAllowsPersistenceOverride::new)
+                SyntaxInfo.builder(CondSpawnedGroupIsSpawned.class)
+                        .addPattern("%spawnedgroup% (1¦is|2¦is(n't| not)) spawned")
+                        .supplier(CondSpawnedGroupIsSpawned::new)
                         .build()
         );
     }
@@ -36,12 +35,12 @@ public class CondSpawnedGroupAllowsPersistenceOverride extends Condition {
     public boolean check(Event event) {
         SpawnedDisplayEntityGroup g = group.getSingle(event);
         if (g == null) return isNegated();
-        return g.allowsPersistenceOverriding() != isNegated();
+        return g.isSpawned() != isNegated();
     }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "Group persistence override: "+group.toString(event, debug);
+        return "Is group spawned: "+group.toString(event, debug);
     }
 
     @SuppressWarnings("unchecked")
