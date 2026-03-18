@@ -127,7 +127,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     }
 
     private void registerSkript(){
-        if (Skript.getVersion().isSmallerThan(new Version(2,10,0))){
+        if (Skript.getVersion().isSmallerThan(new Version(2,14,0))){
             getServer().getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Skript Version below 2.10.0 Detected! Skript Syntax Disabled!", NamedTextColor.RED)));
             DisplayAPI.isSkriptInstalled = false;
         }
