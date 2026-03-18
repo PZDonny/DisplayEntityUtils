@@ -481,6 +481,12 @@ public abstract class ActivePart implements Active{
     public abstract @Nullable ItemStack getItemDisplayItem();
 
     /**
+     * Get the {@link ItemStack} of this part if its type is {@link SpawnedDisplayEntityPart.PartType#ITEM_DISPLAY}.
+     * @return an {@link ItemStack} or null
+     */
+    public abstract @Nullable ItemDisplay.ItemDisplayTransform getItemDisplayTransform();
+
+    /**
      * Set an attribute on this part, and send the updated attribute to viewing players.
      * @param attribute the attribute
      * @param value the corresponding attribute value

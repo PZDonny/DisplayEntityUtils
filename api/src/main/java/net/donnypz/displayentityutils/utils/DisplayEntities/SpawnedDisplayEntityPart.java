@@ -981,6 +981,14 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
+    public @Nullable ItemDisplay.ItemDisplayTransform getItemDisplayTransform() {
+        if (type != PartType.ITEM_DISPLAY) return null;
+        ItemDisplay display = (ItemDisplay) getEntity();
+        if (display == null) return null;
+        return display.getItemDisplayTransform();
+    }
+
+    @Override
     public void setMannequinPose(Pose pose) {
         if (type != PartType.MANNEQUIN) return;
         Mannequin mannequin = (Mannequin) getEntity();

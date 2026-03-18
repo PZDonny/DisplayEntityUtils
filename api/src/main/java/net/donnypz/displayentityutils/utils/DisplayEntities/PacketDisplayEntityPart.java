@@ -596,6 +596,12 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
+    public @Nullable ItemDisplay.ItemDisplayTransform getItemDisplayTransform() {
+        if (type != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) return null;
+        return attributeContainer.getAttribute(DisplayAttributes.ItemDisplay.ITEM_DISPLAY_TRANSFORM);
+    }
+
+    @Override
     public void setMannequinPose(Pose pose) {
         if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
         setAndSend(DisplayAttributes.Mannequin.POSE, pose);
