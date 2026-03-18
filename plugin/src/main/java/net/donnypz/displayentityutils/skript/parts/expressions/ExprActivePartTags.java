@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.skript.expressions;
+package net.donnypz.displayentityutils.skript.parts.expressions;
 
 import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.PropertyExpression;
@@ -8,17 +8,24 @@ import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.Arrays;
 
 @Name("Active Part's Tags")
-@Description("Get all the tags of an active part")
-@Examples({"set {_tags::*} to {_spawnedpart}'s part tags"})
+@Description("Get all the tags of a part")
+@Examples({"set {_tags::*} to {_activepart}'s part tags"})
 @Since("2.6.2, 3.0.0 (Packet), 3.3.2 (Plural)")
 public class ExprActivePartTags extends PropertyExpression<ActivePart, String> {
 
-    static {
-        register(ExprActivePartTags.class, String.class, "[active] part tags", "activeparts");
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EXPRESSION,
+                SyntaxInfo.Expression.builder(ExprActivePartTags.class, String.class)
+                        .addPatterns(getPatterns("[active] part tags", "activeparts"))
+                        .supplier(ExprActivePartTags::new)
+                        .build()
+        );
     }
 
     @Override

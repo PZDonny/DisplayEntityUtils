@@ -1,6 +1,5 @@
-package net.donnypz.displayentityutils.skript.conditions;
+package net.donnypz.displayentityutils.skript.parts.conditions;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -14,18 +13,26 @@ import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.entity.Display;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("ActivePart / Display Is Master Part?")
-@Description("Check if an active part or a display entity is the master part of an active group")
-@Examples({"if {_spawnedpart} is the master part:", "\tbroadcast \"All other parts are the passengers of this one!\""})
-@Since("2.6.2")
-public class CondIsMaster extends Condition {
-
-    static {
-        Skript.registerCondition(CondIsMaster.class, "%activepart/display% (1¦is|2¦is(n't| not)) [the] master part [of a [spawned|packet] group]");
-    }
+@Name("Is Part Master/Parent?")
+@Description("Check if an active part or a display entity is the master/parent part of an active group")
+@Examples({"if {_spawnedpart} is the master part:",
+        "\tbroadcast \"All other parts are the passengers of this one!\""})
+@Since("2.6.2, 3.5.0 (parent)")
+public class CondPartIsMaster extends Condition {
 
     Expression<?> object;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.CONDITION,
+                SyntaxInfo.builder(CondPartIsMaster.class)
+                        .addPattern("%activepart/display% (1¦is|2¦is(n't| not)) [the] (master|parent) part [of a [active] group]")
+                        .supplier(CondPartIsMaster::new)
+                        .build()
+        );
+    }
 
     @Override
     public boolean check(Event event) {

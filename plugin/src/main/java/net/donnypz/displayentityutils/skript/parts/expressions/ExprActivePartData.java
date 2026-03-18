@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.skript.expressions;
+package net.donnypz.displayentityutils.skript.parts.expressions;
 
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Changer;
@@ -104,36 +104,6 @@ public class ExprActivePartData extends SimplePropertyExpression<ActivePart, Obj
 //             return;
 //          }
             switch(mark){
-                //Block Displays
-                case 1 -> {
-                    if (mode == Changer.ChangeMode.RESET){
-                        part.setBlockDisplayBlock(Material.AIR.createBlockData());
-                        return;
-                    }
-                    if (obj instanceof BlockData bd){
-                        part.setBlockDisplayBlock(bd);
-                    }
-                    else if (obj instanceof ItemType it){
-                        part.setBlockDisplayBlock(it.getMaterial().createBlockData());
-                    }
-                }
-                //Item Displays
-                case 2 -> {
-                    if (mode == Changer.ChangeMode.RESET){
-                        part.setItemDisplayItem(new ItemStack(Material.AIR));
-                    }
-                    else{
-                        if (obj instanceof ItemStack i){
-                            part.setItemDisplayItem(i);
-                        }
-                        else if (obj instanceof BlockData bd){
-                            part.setItemDisplayItem(new ItemStack(bd.getMaterial()));
-                        }
-                        else{
-                            part.setItemDisplayItem(new ItemStack(((ItemType) obj).getMaterial()));
-                        }
-                    }
-                }
                 //Text Displays
                 case 3 -> {
                     if (mode == Changer.ChangeMode.RESET){

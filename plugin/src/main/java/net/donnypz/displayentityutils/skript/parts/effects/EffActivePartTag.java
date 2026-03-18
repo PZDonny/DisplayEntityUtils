@@ -1,6 +1,5 @@
-package net.donnypz.displayentityutils.skript.effects;
+package net.donnypz.displayentityutils.skript.parts.effects;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
@@ -9,21 +8,28 @@ import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Add/Remove Part Tag")
 @Description("Add/Remove a part tag from an active part")
 @Examples({"add part tag \"newtag\" to {_spawnedpart}",
         "remove tag \"i_dont_want_this_tag\" from {_activepart}",})
 @Since("2.6.2, 3.3.4 (Packet-Parts)")
-@DocumentationId("EffSpawnedPartTag")
 public class EffActivePartTag extends Effect {
-    static {
-        Skript.registerEffect(EffActivePartTag.class,"(:add|remove) [part][-| ]tag %strings% (to|from) %activeparts%");
-    }
 
     Expression<String> tags;
     Expression<ActivePart> part;
     boolean add;
+
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EFFECT,
+                SyntaxInfo.builder(EffActivePartTag.class)
+                        .addPattern("(:add|remove) [part][-| ]tag[s] %strings% (to|from) %activeparts%")
+                        .supplier(EffActivePartTag::new)
+                        .build()
+        );
+    }
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {

@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.skript.expressions;
+package net.donnypz.displayentityutils.skript.parts.expressions;
 
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -11,6 +11,8 @@ import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,16 +20,18 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 @Name("Active Parts of Group / Part Filter")
-@Description("Get the active/packet parts of a group or part filter")
-@Examples({"set {_spawnedparts::*} to {_spawnedgroup}'s parts",
-        "",
-        "#3.0.0 and later",
-        "set {_packetparts::*} to {_packetpartfilter}'s parts"})
+@Description("Get the parts of a group or part filter")
+@Examples({"set {_parts::*} to {_activegroup}'s parts"})
 @Since("2.6.2, 3.0.0 (Packet), 3.3.2 (Plural)")
 public class ExprActivePartsFromActive extends PropertyExpression<Object, ActivePart> {
 
-    static {
-        register(ExprActivePartsFromActive.class, ActivePart.class, "[active] parts", "activegroups/multipartfilters");
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.EXPRESSION,
+                SyntaxInfo.Expression.builder(ExprActivePartsFromActive.class, ActivePart.class)
+                        .addPatterns(getPatterns("[active] parts", "activegroups/multipartfilters"))
+                        .supplier(ExprActivePartsFromActive::new)
+                        .build()
+        );
     }
 
     @Override

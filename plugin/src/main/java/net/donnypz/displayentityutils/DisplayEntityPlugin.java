@@ -24,6 +24,7 @@ import net.donnypz.displayentityutils.skript.general.GeneralModule;
 import net.donnypz.displayentityutils.skript.group.activegroup.ActiveGroupModule;
 import net.donnypz.displayentityutils.skript.group.spawnedgroup.SpawnedGroupModule;
 import net.donnypz.displayentityutils.skript.io.IOModule;
+import net.donnypz.displayentityutils.skript.parts.PartsModule;
 import net.donnypz.displayentityutils.skript.player.PlayerModule;
 import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationPlayerProviderImpl;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -140,6 +141,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
                     new ActiveGroupModule(),
                     new SpawnedGroupModule(),
                     new IOModule(),
+                    new PartsModule(),
                     new PlayerModule()
             );
             addon.localizer().setSourceDirectories("lang", null);
