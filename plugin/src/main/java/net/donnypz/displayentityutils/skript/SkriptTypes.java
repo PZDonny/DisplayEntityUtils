@@ -138,8 +138,8 @@ public class SkriptTypes {
         Classes.registerClass(new ClassInfo<>(ActivePart.class, "activepart")
                 .user("active( |-)?parts?")
                 .name("Active Part")
-                .description("Represents an individual Display/Interaction entity from a spawned Display Entity Group/Model.",
-                        "This can be either a Spawned Part or Packet Part.")
+                .description("Represents an entity from an active Display Entity Group/Model.",
+                        "\nThis can be packet-based.")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(ActivePart.class))
                 .since("3.0.0")
@@ -166,7 +166,7 @@ public class SkriptTypes {
         Classes.registerClass(new ClassInfo<>(SpawnedDisplayEntityPart.class, "spawnedpart")
                 .user("spawned( |-)?parts?")
                 .name("Spawned Part")
-                .description("Represents an individual Display/Interaction entity from a spawned Display Entity Group/Model.",
+                .description("Represents an individual entity from an active Display Entity Group/Model.",
                         "A spawned part can be used as an entity in other expressions, effects, etc.")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(SpawnedDisplayEntityPart.class))
@@ -195,7 +195,7 @@ public class SkriptTypes {
         Classes.registerClass(new ClassInfo<>(PacketDisplayEntityPart.class, "packetpart")
                 .user("packet( |-)?parts?")
                 .name("Packet Part")
-                .description("Represents an individual Display/Interaction entity from a packet group.")
+                .description("Represents an individual entity from a packet-based active group.")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(PacketDisplayEntityPart.class))
                 .since("3.0.0")
