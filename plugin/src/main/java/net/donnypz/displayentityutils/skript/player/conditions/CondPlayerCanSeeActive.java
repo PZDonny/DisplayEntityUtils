@@ -1,6 +1,5 @@
-package net.donnypz.displayentityutils.skript.conditions;
+package net.donnypz.displayentityutils.skript.player.conditions;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -15,15 +14,22 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Active Group is Visible?")
+@Name("Player can see Active Group/Part?")
 @Description("Check if a player can see an active group or active part")
 @Examples({"if {_player} can see the deu {_group}:", "\tbroadcast \"The player can see this group\""})
-@Since("3.0.0")
-public class CondActiveIsVisible extends Condition {
+@Since({"3.0.0"})
+public class CondPlayerCanSeeActive extends Condition {
 
-    static {
-        Skript.registerCondition(CondActiveIsVisible.class, "%player% (1¦can|2¦can(t|( )not)) see [the] [deu] %activegroup/activepart%");
+    public static void register(SyntaxRegistry registry){
+        registry.register(SyntaxRegistry.CONDITION,
+                SyntaxInfo.builder(CondPlayerCanSeeActive.class)
+                        .addPattern("%player% (1¦can|2¦can(t|( )not)) see [the] deu %activegroup/activepart%")
+                        .supplier(CondPlayerCanSeeActive::new)
+                        .build()
+        );
     }
 
     Expression<Player> player;
@@ -48,7 +54,7 @@ public class CondActiveIsVisible extends Condition {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "Group is visible?: "+ active.toString(event, debug);
+        return "Player can see group/part?: "+ active.toString(event, debug);
     }
 
     @SuppressWarnings("unchecked")
