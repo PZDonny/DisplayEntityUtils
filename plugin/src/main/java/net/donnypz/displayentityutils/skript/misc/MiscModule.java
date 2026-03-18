@@ -1,12 +1,12 @@
-package net.donnypz.displayentityutils.skript.general;
+package net.donnypz.displayentityutils.skript.misc;
 
 import net.donnypz.displayentityutils.skript.SkriptUtil;
-import net.donnypz.displayentityutils.skript.general.elements.CondHasTag;
-import net.donnypz.displayentityutils.skript.general.elements.ExprTag;
+import net.donnypz.displayentityutils.skript.misc.elements.CondHasTag;
+import net.donnypz.displayentityutils.skript.misc.elements.ExprTag;
 import org.skriptlang.skript.addon.AddonModule;
 import org.skriptlang.skript.addon.SkriptAddon;
 
-public class GeneralModule implements AddonModule {
+public class MiscModule implements AddonModule {
 
     @Override
     public void load(SkriptAddon skriptAddon) {

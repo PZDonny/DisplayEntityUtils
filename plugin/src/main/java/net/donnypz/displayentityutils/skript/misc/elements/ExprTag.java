@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.skript.general.elements;
+package net.donnypz.displayentityutils.skript.misc.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;

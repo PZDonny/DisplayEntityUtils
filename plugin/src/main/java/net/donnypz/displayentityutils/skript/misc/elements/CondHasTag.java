@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.skript.general.elements;
+package net.donnypz.displayentityutils.skript.misc.elements;
 
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
