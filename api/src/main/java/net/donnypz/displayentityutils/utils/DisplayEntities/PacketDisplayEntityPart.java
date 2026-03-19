@@ -370,6 +370,18 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
+    public int getInterpolationDuration() {
+        if (!isDisplay()) return -1;
+        return attributeContainer.getAttributeOrDefault(DisplayAttributes.Interpolation.DURATION, 0);
+    }
+
+    @Override
+    public int getInterpolationDelay() {
+        if (!isDisplay()) return -1;
+        return attributeContainer.getAttributeOrDefault(DisplayAttributes.Interpolation.DELAY, 0);
+    }
+
+    @Override
     public void rotateDisplay(@NotNull Quaternionf rotation, boolean worldRotation) {
         if (!isDisplay()) return;
         Vector3f translation = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.TRANSLATION, new Vector3f());

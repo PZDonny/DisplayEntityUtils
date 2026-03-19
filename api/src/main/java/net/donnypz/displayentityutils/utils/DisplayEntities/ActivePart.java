@@ -376,6 +376,18 @@ public abstract class ActivePart implements Active{
     public abstract boolean setDisplayScale(float x, float y, float z);
 
     /**
+     * Get this display entity part's interpolation duration
+     * @return the duration
+     */
+    public abstract int getInterpolationDuration();
+
+    /**
+     * Get this display entity part's interpolation delay
+     * @return the delay
+     */
+    public abstract int getInterpolationDelay();
+
+    /**
      * Rotate this display entity part by a given quaternion
      * @param rotation the rotation
      * @param worldRotation whether rotation should occur in world space, rather than local

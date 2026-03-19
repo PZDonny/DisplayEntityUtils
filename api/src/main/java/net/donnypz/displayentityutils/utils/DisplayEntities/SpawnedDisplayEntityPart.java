@@ -561,6 +561,20 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
+    public int getInterpolationDuration() {
+        if (!isDisplay()) return -1;
+        Display entity = (Display) getEntity();
+        return entity.getInterpolationDuration();
+    }
+
+    @Override
+    public int getInterpolationDelay() {
+        if (!isDisplay()) return -1;
+        Display entity = (Display) getEntity();
+        return entity.getInterpolationDelay();
+    }
+
+    @Override
     public void rotateDisplay(@NotNull Quaternionf rotation, boolean worldRotation) {
         if (!isDisplay()) return;
         Display display = (Display) getEntity();
