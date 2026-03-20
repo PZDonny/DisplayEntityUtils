@@ -16,9 +16,9 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Is Part of Display Type?")
 @Description("Check if an active part is of a display entity type (block, item, text)")
-@Examples({"if {_spawnedpart} is the master part:",
-        "\tbroadcast \"All other parts are the passengers of this one!\""})
-@Since("2.6.2, 3.5.0 (parent)")
+@Examples({"if {_activepart} is a display part:",
+        "\tbroadcast \"This part is a block, item, or text display!\""})
+@Since("3.5.0")
 public class CondPartIsDisplayPart extends Condition {
 
     Expression<ActivePart> partExpr;
