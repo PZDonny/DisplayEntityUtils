@@ -413,6 +413,13 @@ public class SkriptTypes {
                 .user("part( | -)?type")
                 .name("Part Type")
                 .description("Represents a part's (display, interaction, etc.) type")
+                .examples(
+                        "if {_activepart}'s active part type is deu_interaction:",
+                        "\tbroadcast \"this part is an interaction!\"",
+                        "",
+                        "if {_activepart}'s active part type is text_display:",
+                        "\tbroadcast \"this part is a text display!\""
+                )
                 .since("2.6.2, 3.3.6 (Removed \"parttype_\" prefix), 3.4.0 (Mannequin)"));
 
         EnumWrapper<InteractionClickEvent.ClickType> clickTypeWrapper = new EnumWrapper<>(InteractionClickEvent.ClickType.class, "iclicktype", null);
