@@ -452,10 +452,11 @@ public class SkriptTypes {
 
                     @Override
                     public String toVariableNameString(InteractionCommand o) {
-                        return "interaction command: " + o.getCommand();
+                        return (o.isConsoleCommand() ? "console" : "player")+" interaction command: " + o.getCommand();
                     }
                 })
         );
+        Converters.registerConverter(InteractionCommand.class, String.class, InteractionCommand::getCommand);
 
         EnumWrapper<SpawnedDisplayEntityPart.PartType> partTypeWrapper = new EnumWrapper<>(SpawnedDisplayEntityPart.PartType.class, null, null);
         partTypeWrapper.replace("interaction", "deu_interaction");

@@ -26,7 +26,7 @@ public class SimpleEvents extends SimpleEvent {
 
             //Group Registered Event
             Skript.registerEvent("Group Registered", SimpleEvents.class, GroupRegisteredEvent.class, "[spawned] [display] group register[ed]")
-                    .description("Called when a spawned group is registered by nearby selection or when spawned from a saved group")
+                    .description("Called when a spawned group is registered by when automatically detected, nearby selection, or spawned from a saved group")
                     .since("2.6.2");
             EventValues.registerEventValue(GroupRegisteredEvent.class, SpawnedDisplayEntityGroup.class, GroupRegisteredEvent::getGroup);
 
@@ -39,7 +39,7 @@ public class SimpleEvents extends SimpleEvent {
 
             //Group Unregistered Event
             Skript.registerEvent("Group Unregistered", SimpleEvents.class, GroupUnregisteredEvent.class, "[spawned] [display] group unregister[ed]")
-                    .description("Called when a spawned group is unregistered")
+                    .description("Called when a spawned based group is unregistered")
                     .since("2.6.2");
             EventValues.registerEventValue(GroupUnregisteredEvent.class, SpawnedDisplayEntityGroup.class, GroupUnregisteredEvent::getGroup);
 
@@ -58,7 +58,7 @@ public class SimpleEvents extends SimpleEvent {
             EventValues.registerEventValue(GroupSpawnedEvent.class, GroupSpawnedEvent.SpawnReason.class, GroupSpawnedEvent::getSpawnReason);
 
             //Packet Group Send Event
-            Skript.registerEvent("Packet Group Send", SimpleEvents.class, PacketGroupSendEvent.class, "packet [spawned] [display] group (spawn[ed]|sent|create[d])")
+            Skript.registerEvent("Packet Group Send", SimpleEvents.class, PacketGroupSendEvent.class, "packet [display] group (spawn[ed]|sent|create[d])")
                     .description("Called when a packet-based group is sent to players")
                     .since("3.0.0");
             EventValues.registerEventValue(PacketGroupSendEvent.class, PacketDisplayEntityGroup.class, PacketGroupSendEvent::getGroup);
@@ -66,14 +66,14 @@ public class SimpleEvents extends SimpleEvent {
             EventValues.registerEventValue(PacketGroupSendEvent.class, Player[].class, e -> e.getPlayers().toArray(new Player[0]));
 
             //Pre Packet Group Create Event
-            Skript.registerEvent("Pre Packet Group Created", SimpleEvents.class, PrePacketGroupCreateEvent.class, "pre packet [spawned] [display] group (created[ed]|spawn[ed])")
+            Skript.registerEvent("Pre Packet Group Created", SimpleEvents.class, PrePacketGroupCreateEvent.class, "pre packet [display] group (created[ed]|spawn[ed])")
                     .description("Called before a packet-based group is created")
                     .since("3.3.6");
             EventValues.registerEventValue(PrePacketGroupCreateEvent.class, DisplayEntityGroup.class, PrePacketGroupCreateEvent::getGroup);
             EventValues.registerEventValue(PrePacketGroupCreateEvent.class, GroupSpawnedEvent.SpawnReason.class, PrePacketGroupCreateEvent::getSpawnReason);
 
             //Packet Group Destroy Event
-            Skript.registerEvent("Packet Group Destroyed", SimpleEvents.class, PacketGroupDestroyEvent.class, "packet [spawned] [display] group (destroy[ed]|remove[d]|hid(e|den))")
+            Skript.registerEvent("Packet Group Destroyed", SimpleEvents.class, PacketGroupDestroyEvent.class, "packet [display] group (destroy[ed]|remove[d]|hid(e|den))")
                     .description("Called when a packet-based group is hidden from players")
                     .since("3.0.0");
             EventValues.registerEventValue(PacketGroupDestroyEvent.class, PacketDisplayEntityGroup.class, PacketGroupDestroyEvent::getGroup);

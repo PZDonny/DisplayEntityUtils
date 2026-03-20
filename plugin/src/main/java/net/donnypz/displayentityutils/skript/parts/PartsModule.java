@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.skript.parts;
 import net.donnypz.displayentityutils.skript.SkriptUtil;
 import net.donnypz.displayentityutils.skript.parts.conditions.CondInteractionHasCommands;
 import net.donnypz.displayentityutils.skript.parts.conditions.CondInteractionIsResponsive;
+import net.donnypz.displayentityutils.skript.parts.conditions.CondPartIsDisplayPart;
 import net.donnypz.displayentityutils.skript.parts.conditions.CondPartIsMaster;
 import net.donnypz.displayentityutils.skript.parts.effects.EffActivePartTag;
 import net.donnypz.displayentityutils.skript.parts.expressions.*;
@@ -16,6 +17,7 @@ public class PartsModule implements AddonModule {
         SkriptUtil.registerModules(addon.syntaxRegistry(),
                 CondInteractionHasCommands::register,
                 CondInteractionIsResponsive::register,
+                CondPartIsDisplayPart::register,
                 CondPartIsMaster::register,
 
                 EffActivePartTag::register,
@@ -27,6 +29,8 @@ public class PartsModule implements AddonModule {
                 ExprActivePartTransLocation::register,
                 ExprActivePartType::register,
                 ExprActivePartUUID::register,
+                ExprSpawnedPartAsEntity::register,
+                ExprSpawnedPartOfEntity::register,
 
                 ExprBlockDisplayBlock::register,
                 ExprInteractionDimensions::register,

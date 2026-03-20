@@ -52,7 +52,7 @@ public class CondPartIsMaster extends Condition {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "Master part: "+object.toString(event, debug);
+        return "Is Master part: "+object.toString(event, debug);
     }
 
     @SuppressWarnings("unchecked")

@@ -77,7 +77,7 @@ public class SecSpawnGroup extends EffectSection {
 
         registry.register(SyntaxRegistry.SECTION,
                 SyntaxInfo.builder(SecSpawnGroup.class)
-                        .addPattern("deu spawn %savedgroup% at %location% [store:and store [it |the result] in %-objects%]")
+                        .addPattern("deu spawn %savedgroup% at %location% [store:[and] store[d] [it |the result] in %-objects%]")
                         .supplier(SecSpawnGroup::new)
                         .build()
         );

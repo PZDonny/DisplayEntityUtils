@@ -17,14 +17,17 @@ import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
 import net.donnypz.displayentityutils.managers.PluginFolders;
 import net.donnypz.displayentityutils.skript.SkriptTypes;
-import net.donnypz.displayentityutils.skript.animation.animator.AnimatorModule;
-import net.donnypz.displayentityutils.skript.animation.framepoints.FramePointsModule;
+import net.donnypz.displayentityutils.skript.active.ActiveModule;
+import net.donnypz.displayentityutils.skript.animation.AnimatorModule;
+import net.donnypz.displayentityutils.skript.framepoints.FramePointsModule;
 import net.donnypz.displayentityutils.skript.events.SimpleEvents;
+import net.donnypz.displayentityutils.skript.group.packetgroup.PacketGroupModule;
 import net.donnypz.displayentityutils.skript.misc.MiscModule;
 import net.donnypz.displayentityutils.skript.group.activegroup.ActiveGroupModule;
 import net.donnypz.displayentityutils.skript.group.spawnedgroup.SpawnedGroupModule;
 import net.donnypz.displayentityutils.skript.io.IOModule;
 import net.donnypz.displayentityutils.skript.parts.PartsModule;
+import net.donnypz.displayentityutils.skript.partfilter.PartFilterModule;
 import net.donnypz.displayentityutils.skript.player.PlayerModule;
 import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationPlayerProviderImpl;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
@@ -134,24 +137,20 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         else{
             addon = Skript.instance().registerAddon(DisplayEntityPlugin.class, "DisplayEntityUtils");
             addon.loadModules(
+                    new ActiveModule(),
                     new AnimatorModule(),
                     new FramePointsModule(),
-
                     new ActiveGroupModule(),
+                    new PacketGroupModule(),
                     new SpawnedGroupModule(),
                     new IOModule(),
                     new MiscModule(),
+                    new PartFilterModule(),
                     new PartsModule(),
                     new PlayerModule()
             );
             addon.localizer().setSourceDirectories("lang", null);
             SimpleEvents.register();
-//            try {
-//                addon.loadClasses("net.donnypz.displayentityutils.skript", "conditions", "events", "effects", "expressions", "sections");
-//                addon.setLanguageFileDirectory("lang");
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
             new SkriptTypes();
             getServer().getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Skript Syntax Enabled!", NamedTextColor.GREEN)));
         }
