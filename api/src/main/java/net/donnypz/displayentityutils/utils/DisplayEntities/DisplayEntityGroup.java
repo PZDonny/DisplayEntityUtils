@@ -227,18 +227,6 @@ public final class DisplayEntityGroup implements Serializable{
         return group;
     }
 
-
-    /**
-     * Spawns this {@link DisplayEntityGroup} at a specified location returning a {@link PacketDisplayEntityGroup} that represents this.
-     * @param spawnLocation The location where this group spawn be spawned for players
-     * @param autoShow whether this packet group should automatically handle revealing and hiding itself to players
-     * @return A {@link PacketDisplayEntityGroup} representative of this. Null if the {@link PrePacketGroupCreateEvent} is cancelled
-     */
-    public @Nullable PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation, boolean autoShow){
-        return createPacketGroup(spawnLocation, GroupSpawnedEvent.SpawnReason.CUSTOM, new GroupSpawnSettings().visibleByDefault(autoShow, null));
-    }
-
-
     /**
      * Spawns this {@link DisplayEntityGroup} at a specified location returning a {@link PacketDisplayEntityGroup} that represents this.
      * @param spawnLocation The location where this group spawn be spawned for players
@@ -248,9 +236,6 @@ public final class DisplayEntityGroup implements Serializable{
     public @Nullable PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLocation, @NotNull GroupSpawnedEvent.SpawnReason spawnReason){
         return createPacketGroup(spawnLocation, spawnReason, false);
     }
-
-
-
 
     /**
      * Spawns this {@link DisplayEntityGroup} at a specified location returning a {@link PacketDisplayEntityGroup} that represents this.
