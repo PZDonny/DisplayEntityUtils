@@ -36,7 +36,8 @@ import java.util.List;
         "`billboard` = the billboard of display entities in the group. FIXED by default",
         "`persistent` = the persistence of **all** entities in the group. True by default",
         "`visible` = whether the group should be visible. True by default",
-        "`brightness` = the brightness of display entities in the group. Use `-1 and -1` for default brightness"
+        "`brightness` = the brightness of display entities in the group. Use `-1 and -1` for default brightness",
+        "`spawnanimation` = whether the group should play its spawn animation. True by default",
 })
 @Examples({"deu spawn {_savedgroup} at {_location}",
         "deu spawn {_savedgroup} at {_location} and store the result in {_activegroup}",
@@ -47,7 +48,8 @@ import java.util.List;
         "\tbillboard: VERTICAL",
         "\tpersistent: true",
         "\tvisible: true",
-        "\tbrightness: 10 and 5 #Block and Sky, -1 and -1 to reset"
+        "\tbrightness: 10 and 5 #Block and Sky, -1 and -1 to reset",
+        "\tspawnanimation: true"
 })
 @Since("3.5.0")
 public class SecSpawnGroup extends EffectSection {
@@ -62,6 +64,7 @@ public class SecSpawnGroup extends EffectSection {
     private Expression<Boolean> persistentExpr;
     private Expression<Boolean> visibleExpr;
     private Expression<Number> brightnessExpr;
+    private Expression<Boolean> spawnAnimationExpr;
 
     private static EntryValidator VALIDATOR;
 
@@ -101,6 +104,7 @@ public class SecSpawnGroup extends EffectSection {
             this.persistentExpr = (Expression<Boolean>) container.getOptional("persistent",false);
             this.visibleExpr = (Expression<Boolean>) container.getOptional("visible",false);
             this.brightnessExpr = (Expression<Number>) container.getOptional("brightness",false);
+            this.spawnAnimationExpr = (Expression<Boolean>) container.getOptional("spawnanimation",false);
         }
 
         return true;
@@ -164,10 +168,16 @@ public class SecSpawnGroup extends EffectSection {
         }
         else isPacket = false;
 
+        if (spawnAnimationExpr != null){
+            Boolean packet = spawnAnimationExpr.getSingle(event);
+            boolean playSpawnAnim = packet != null && packet;
+            settings.playSpawnAnimation(playSpawnAnim);
+        }
+
 
         ActiveGroup<?> activeGroup;
         if (isPacket){
-            activeGroup = g.createPacketGroup(loc, GroupSpawnedEvent.SpawnReason.SKRIPT, true, settings);
+            activeGroup = g.createPacketGroup(loc, GroupSpawnedEvent.SpawnReason.SKRIPT, settings);
         }
         else{
             activeGroup = g.spawn(loc, GroupSpawnedEvent.SpawnReason.SKRIPT, settings);
