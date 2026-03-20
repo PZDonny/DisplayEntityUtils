@@ -1,11 +1,10 @@
 package net.donnypz.displayentityutils.skript.parts;
 
 import net.donnypz.displayentityutils.skript.SkriptUtil;
-import net.donnypz.displayentityutils.skript.parts.conditions.CondInteractionHasCommands;
-import net.donnypz.displayentityutils.skript.parts.conditions.CondInteractionIsResponsive;
-import net.donnypz.displayentityutils.skript.parts.conditions.CondPartIsDisplayPart;
-import net.donnypz.displayentityutils.skript.parts.conditions.CondPartIsMaster;
+import net.donnypz.displayentityutils.skript.parts.conditions.*;
 import net.donnypz.displayentityutils.skript.parts.effects.EffActivePartTag;
+import net.donnypz.displayentityutils.skript.parts.effects.EffTextDisplaySeeThrough;
+import net.donnypz.displayentityutils.skript.parts.effects.EffTextDisplayShadow;
 import net.donnypz.displayentityutils.skript.parts.expressions.*;
 import org.skriptlang.skript.addon.AddonModule;
 import org.skriptlang.skript.addon.SkriptAddon;
@@ -19,8 +18,12 @@ public class PartsModule implements AddonModule {
                 CondInteractionIsResponsive::register,
                 CondPartIsDisplayPart::register,
                 CondPartIsMaster::register,
+                CondTextDisplayIsShadowed::register,
+                CondTextDisplaySeeThrough::register,
 
                 EffActivePartTag::register,
+                EffTextDisplaySeeThrough::register,
+                EffTextDisplayShadow::register,
 
                 ExprActivePartEntityId::register,
                 ExprActivePartMasterFromGroup::register,
@@ -29,15 +32,18 @@ public class PartsModule implements AddonModule {
                 ExprActivePartTransLocation::register,
                 ExprActivePartType::register,
                 ExprActivePartUUID::register,
-                ExprSpawnedPartAsEntity::register,
-                ExprSpawnedPartOfEntity::register,
 
                 ExprBlockDisplayBlock::register,
                 ExprInteractionDimensions::register,
                 ExprItemDisplayItem::register,
-                ExprItemDisplayTransform::register
+                ExprItemDisplayTransform::register,
 
+                ExprSpawnedPartAsEntity::register,
+                ExprSpawnedPartOfEntity::register,
 
+                ExprTextDisplayLineWidth::register,
+                ExprTextDisplayOpacity::register,
+                ExprTextDisplayText::register
         );
     }
 
