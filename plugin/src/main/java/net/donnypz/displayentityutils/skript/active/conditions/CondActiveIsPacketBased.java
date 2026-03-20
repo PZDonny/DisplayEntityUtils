@@ -30,7 +30,7 @@ public class CondActiveIsPacketBased extends Condition {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.CONDITION,
                 SyntaxInfo.builder(CondActiveIsPacketBased.class)
-                        .addPattern("%activegroup/multipartfilter/activepart% (1¦is|2¦is(n't| not)) packet [based]")
+                        .addPattern("%activegroup/partfilter/activepart% (1¦is|2¦is(n't| not)) packet [based]")
                         .supplier(CondActiveIsPacketBased::new)
                         .build()
         );

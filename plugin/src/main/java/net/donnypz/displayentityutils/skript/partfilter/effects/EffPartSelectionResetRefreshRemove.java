@@ -30,7 +30,7 @@ public class EffPartSelectionResetRefreshRemove extends Effect {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
                 SyntaxInfo.builder(EffPartSelectionResetRefreshRemove.class)
-                        .addPattern("(1¦refresh|2¦reset|3¦remove) %multipartfilters%")
+                        .addPattern("(1¦refresh|2¦reset|3¦remove) %partfilters%")
                         .supplier(EffPartSelectionResetRefreshRemove::new)
                         .build()
         );

@@ -219,14 +219,13 @@ public class SkriptTypes {
                 })
         );
 
-        Classes.registerClass(new ClassInfo<>(MultiPartSelection.class, "multipartfilter")
-                .user("(multi( |-)?)?part( |-)?filters?")
-                .name("Multi Part Filter/Selection")
-                .description("Represents a selection of filtered parts in a Display Entity Group/Model.",
-                            "This can be either a Spawned Part Filter or a Packet Part Filter")
+        Classes.registerClass(new ClassInfo<>(MultiPartSelection.class, "partfilter")
+                .user("part( |-)?filters?")
+                .name("Part Filter")
+                .description("Represents a selection of filtered parts from an Active Group. This may be packet based.")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(MultiPartSelection.class))
-                .since("3.1.1 (multipartselection), 3.3.4 (multipartfilter)")
+                .since("3.1.1 (multipartselection), 3.3.4 (multipartfilter), 3.5.0 (partfilter)")
                 .parser(new Parser<>() {
 
                     @Override
@@ -241,62 +240,11 @@ public class SkriptTypes {
 
                     @Override
                     public String toVariableNameString(MultiPartSelection o) {
-                        return "multipartfilter w/ size: " + o.getSize();
-                    }
-                })
-        );
-
-        Classes.registerClass(new ClassInfo<>(SpawnedPartSelection.class, "partfilter")
-                .user("(spawned( |-)?)?part( |-)?filter")
-                .name("Spawned Part Filter/Selection")
-                .description("Represents a selection of filtered parts from a non-packet based Display Entity Group/Model.")
-                .examples()
-                .defaultExpression(new EventValueExpression<>(SpawnedPartSelection.class))
-                .since("2.6.2 (partselection), 3.3.4 (partfilter)")
-                .parser(new Parser<>() {
-
-                    @Override
-                    public boolean canParse(ParseContext context) {
-                        return false;
-                    }
-
-                    @Override
-                    public String toString(SpawnedPartSelection o, int flags) {
-                        return toVariableNameString(o);
-                    }
-
-                    @Override
-                    public String toVariableNameString(SpawnedPartSelection o) {
                         return "partfilter w/ size: " + o.getSize();
                     }
                 })
         );
 
-        Classes.registerClass(new ClassInfo<>(PacketPartSelection.class, "packetpartfilter")
-                .user("packet( |-)?part( |-)?filter")
-                .name("Packet Part Filter/Selection")
-                .description("Represents a selection of filtered parts from a packet-based Display Entity Group/Model.")
-                .examples()
-                .defaultExpression(new EventValueExpression<>(PacketPartSelection.class))
-                .since("3.0.0 (packetpartselection), 3.3.4 (packetpartfilter)")
-                .parser(new Parser<>() {
-
-                    @Override
-                    public boolean canParse(ParseContext context) {
-                        return false;
-                    }
-
-                    @Override
-                    public String toString(PacketPartSelection o, int flags) {
-                        return toVariableNameString(o);
-                    }
-
-                    @Override
-                    public String toVariableNameString(PacketPartSelection o) {
-                        return "packetpartfilter w/ size: " + o.getSize();
-                    }
-                })
-        );
 
         Classes.registerClass(new ClassInfo<>(DisplayAnimator.class, "displayanimator")
                 .user("(display)?animator")

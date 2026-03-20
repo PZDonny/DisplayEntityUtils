@@ -17,7 +17,7 @@ import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Glow")
-@Description("Set the glowing of an active group/part/selection")
+@Description("Set the glowing of an active group/part/filter")
 @Examples({
         "deu make {_activegroup} glow for 35 ticks",
         "deu make {_activegroup} glow for 20 ticks for {_players::*}",
@@ -34,7 +34,7 @@ public class EffActiveGlow extends Effect {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
                 SyntaxInfo.builder(EffActiveGlow.class)
-                        .addPattern("deu make %activegroups/activeparts/multipartfilters% (1¦glow[ing] [t:for %-timespan%] [p:for %-players%]|2¦unglow[ing] [p:for %-players%])")
+                        .addPattern("deu make %activegroups/activeparts/partfilters% (1¦glow[ing] [t:for %-timespan%] [p:for %-players%]|2¦unglow[ing] [p:for %-players%])")
                         .supplier(EffActiveGlow::new)
                         .build()
         );

@@ -30,7 +30,7 @@ public class ExprActiveTeleportDuration extends SimplePropertyExpression<Active,
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
                 SyntaxInfo.Expression.builder(ExprActiveTeleportDuration.class, Number.class)
-                        .addPatterns(getPatterns("deu teleport[ation][ |-]duration", "activegroups/activeparts/multipartfilters"))
+                        .addPatterns(getPatterns("deu teleport[ation][ |-]duration", "activegroups/activeparts/partfilters"))
                         .supplier(ExprActiveTeleportDuration::new)
                         .build()
         );

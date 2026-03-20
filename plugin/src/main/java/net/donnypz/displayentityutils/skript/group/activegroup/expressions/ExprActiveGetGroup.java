@@ -30,7 +30,7 @@ public class ExprActiveGetGroup extends SimplePropertyExpression<Object, ActiveG
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
                 SyntaxInfo.Expression.builder(ExprActiveGetGroup.class, ActiveGroup.class)
-                        .addPatterns(getPatterns("active[ |-]group", "activeparts/multipartfilters/entities"))
+                        .addPatterns(getPatterns("active[ |-]group", "activeparts/partfilters/entities"))
                         .supplier(ExprActiveGetGroup::new)
                         .build()
         );

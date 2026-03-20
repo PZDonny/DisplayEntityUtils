@@ -16,7 +16,7 @@ import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Active Group Parts Filter")
-@Description("Create a selection, containing the parts of a active group, which can later be filtered")
+@Description("Create a selection of parts from an active group, which can later be filtered")
 @Examples({
         "set {_partfilter} to a new part filter from {_activegroup}",
         "",

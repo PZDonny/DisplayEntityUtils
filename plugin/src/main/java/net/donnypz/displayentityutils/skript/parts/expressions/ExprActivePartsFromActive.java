@@ -28,7 +28,7 @@ public class ExprActivePartsFromActive extends PropertyExpression<Object, Active
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
                 SyntaxInfo.Expression.builder(ExprActivePartsFromActive.class, ActivePart.class)
-                        .addPatterns(getPatterns("[active] parts", "activegroups/multipartfilters"))
+                        .addPatterns(getPatterns("[active] parts", "activegroups/partfilters"))
                         .supplier(ExprActivePartsFromActive::new)
                         .build()
         );

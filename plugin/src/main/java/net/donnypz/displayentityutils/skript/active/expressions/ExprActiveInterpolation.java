@@ -38,7 +38,7 @@ public class ExprActiveInterpolation extends SimplePropertyExpression<Active, Nu
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
                 SyntaxInfo.Expression.builder(ExprActiveInterpolation.class, Number.class)
-                        .addPatterns(getPatterns("deu interpolation (:duration|delay)", "activegroups/activeparts/multipartfilters"))
+                        .addPatterns(getPatterns("deu interpolation (:duration|delay)", "activegroups/activeparts/partfilters"))
                         .supplier(ExprActiveInterpolation::new)
                         .build()
         );

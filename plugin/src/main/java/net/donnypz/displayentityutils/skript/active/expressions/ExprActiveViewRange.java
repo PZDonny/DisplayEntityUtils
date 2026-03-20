@@ -33,7 +33,7 @@ public class ExprActiveViewRange extends SimplePropertyExpression<Active, Number
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
                 SyntaxInfo.Expression.builder(ExprActiveViewRange.class, Number.class)
-                        .addPatterns(getPatterns("deu view range [multiplier]", "activegroups/activeparts/multipartfilters"))
+                        .addPatterns(getPatterns("deu view range [multiplier]", "activegroups/activeparts/partfilters"))
                         .supplier(ExprActiveViewRange::new)
                         .build()
         );

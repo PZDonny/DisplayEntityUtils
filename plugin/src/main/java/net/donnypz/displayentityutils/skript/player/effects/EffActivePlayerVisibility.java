@@ -32,7 +32,7 @@ public class EffActivePlayerVisibility extends Effect {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
                 SyntaxInfo.builder(EffActivePlayerVisibility.class)
-                        .addPattern("deu (1¦(show|reveal)|2¦hide) %activegroups/activeparts/multipartfilters% (to|from) %players%")
+                        .addPattern("deu (1¦(show|reveal)|2¦hide) %activegroups/activeparts/partfilters% (to|from) %players%")
                         .supplier(EffActivePlayerVisibility::new)
                         .build()
         );

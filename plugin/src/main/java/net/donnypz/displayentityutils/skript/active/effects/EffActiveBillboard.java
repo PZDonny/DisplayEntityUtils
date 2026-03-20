@@ -34,7 +34,7 @@ public class EffActiveBillboard extends Effect {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
                 SyntaxInfo.builder(EffActiveBillboard.class)
-                        .addPattern("deu set %activegroups/activeparts/multipartfilters%['s] billboard to %billboard%")
+                        .addPattern("deu set %activegroups/activeparts/partfilters%['s] billboard to %billboard%")
                         .supplier(EffActiveBillboard::new)
                         .build()
         );

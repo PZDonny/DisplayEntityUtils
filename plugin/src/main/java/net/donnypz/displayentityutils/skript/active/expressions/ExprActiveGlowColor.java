@@ -32,7 +32,7 @@ public class ExprActiveGlowColor extends SimplePropertyExpression<Object, Color>
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
                 SyntaxInfo.Expression.builder(ExprActiveGlowColor.class, Color.class)
-                        .addPatterns(getPatterns("deu glow[ing] colo[u]r [override]", "activegroups/activeparts/multipartfilters"))
+                        .addPatterns(getPatterns("deu glow[ing] colo[u]r [override]", "activegroups/activeparts/partfilters"))
                         .supplier(ExprActiveGlowColor::new)
                         .build()
         );

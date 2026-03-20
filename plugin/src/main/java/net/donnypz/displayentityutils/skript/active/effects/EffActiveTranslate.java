@@ -30,7 +30,7 @@ public class EffActiveTranslate extends Effect {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
                 SyntaxInfo.builder(EffActiveTranslate.class)
-                        .addPattern("add %vector% to %activegroups/activeparts/multipartfilters%['s] translation [time:(for|over|with) [duration] %-timespan%]")
+                        .addPattern("add %vector% to %activegroups/activeparts/partfilters%['s] translation [time:(for|over|with) [duration] %-timespan%]")
                         .supplier(EffActiveTranslate::new)
                         .build()
         );

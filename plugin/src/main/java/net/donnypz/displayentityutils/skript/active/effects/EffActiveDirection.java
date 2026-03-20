@@ -15,7 +15,7 @@ import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Set Direction (Pitch, Yaw, Pivot)")
-@Description("Set the pitch and yaw of a spawned group/part/selection. Optionally pivot interactions")
+@Description("Set the pitch and yaw of an active group/part/filter. Optionally pivot interactions")
 @Examples({"deu set {_activegroup}'s yaw with interaction pivot to 35",
         "deu set {_activepart}'s pitch to -90"})
 @Since("2.6.2, 3.0.0 (Packet)")
@@ -24,7 +24,7 @@ public class EffActiveDirection extends Effect {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
                 SyntaxInfo.builder(EffActiveDirection.class)
-                        .addPattern("deu set %activegroups/activeparts/multipartfilters%['s] (1¦yaw [p:with [interaction ]pivot]|2¦pitch) to %number%")
+                        .addPattern("deu set %activegroups/activeparts/partfilters%['s] (1¦yaw [p:with [interaction ]pivot]|2¦pitch) to %number%")
                         .supplier(EffActiveDirection::new)
                         .build()
         );

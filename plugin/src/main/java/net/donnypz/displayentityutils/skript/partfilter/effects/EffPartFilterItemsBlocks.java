@@ -43,7 +43,7 @@ public class EffPartFilterItemsBlocks extends Effect {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
                 SyntaxInfo.builder(EffPartFilterItemsBlocks.class)
-                        .addPattern("deu filter %multipartfilter% with[:out] (:block|item)[s] %itemtypes%")
+                        .addPattern("deu filter %partfilter% with[:out] (:block|item)[s] %itemtypes%")
                         .supplier(EffPartFilterItemsBlocks::new)
                         .build()
         );

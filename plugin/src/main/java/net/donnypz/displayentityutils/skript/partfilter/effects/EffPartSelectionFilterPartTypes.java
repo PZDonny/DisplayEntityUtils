@@ -38,7 +38,7 @@ public class EffPartSelectionFilterPartTypes extends Effect {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
                 SyntaxInfo.builder(EffPartSelectionFilterPartTypes.class)
-                        .addPattern("deu filter %multipartfilter% with[:out] type[s] %parttypes%")
+                        .addPattern("deu filter %partfilter% with[:out] type[s] %parttypes%")
                         .supplier(EffPartSelectionFilterPartTypes::new)
                         .build()
         );
@@ -80,6 +80,6 @@ public class EffPartSelectionFilterPartTypes extends Effect {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "set part selection part types: "+selection.toString(event, debug);
+        return "set part filter part types: "+selection.toString(event, debug);
     }
 }

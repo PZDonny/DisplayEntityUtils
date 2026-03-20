@@ -42,7 +42,7 @@ public class EffPartSelectionFilterTags extends Effect {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
                 SyntaxInfo.builder(EffPartSelectionFilterTags.class)
-                        .addPattern("deu filter %multipartfilter% [in:with [part( |-)?]tag[s] %-strings%] [ex:[and ]without [part( |-)?]tag[s] %-strings%]")
+                        .addPattern("deu filter %partfilter% [in:with [part( |-)?]tag[s] %-strings%] [ex:[and ]without [part( |-)?]tag[s] %-strings%]")
                         .supplier(EffPartSelectionFilterTags::new)
                         .build()
         );
@@ -89,6 +89,6 @@ public class EffPartSelectionFilterTags extends Effect {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "add part selection tag filter: "+selection.toString(event, debug);
+        return "add/remove part filter tag(s): "+selection.toString(event, debug);
     }
 }
