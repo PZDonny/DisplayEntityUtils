@@ -502,7 +502,7 @@ public final class PlaceableGroupManager {
         DisplayEntityGroup group = DisplayGroupManager.getGroup(tag);
         if (group == null) return null;
 
-        PacketDisplayEntityGroup pg = group.createPacketGroup(spawnLocation, GroupSpawnedEvent.SpawnReason.ITEMSTACK, true, true);
+        PacketDisplayEntityGroup pg = group.createPacketGroup(spawnLocation, GroupSpawnedEvent.SpawnReason.ITEMSTACK, true);
         if (pg == null) return null;
         pg.rotateDisplays(rotation);
         pg.setPersistent(true);

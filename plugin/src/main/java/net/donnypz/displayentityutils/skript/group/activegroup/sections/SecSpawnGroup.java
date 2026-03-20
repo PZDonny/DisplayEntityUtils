@@ -76,6 +76,7 @@ public class SecSpawnGroup extends EffectSection {
                 .addEntryData(new ExpressionEntryData<>("persistent", null, true, Boolean.class))
                 .addEntryData(new ExpressionEntryData<>("visible", null, true, Boolean.class))
                 .addEntryData(new ExpressionEntryData<>("brightness", null, true, Number.class))
+                .addEntryData(new ExpressionEntryData<>("spawnanimation", null, true, Boolean.class))
                 .build();
 
         registry.register(SyntaxRegistry.SECTION,
