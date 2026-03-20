@@ -32,6 +32,7 @@ public class ActiveGroupModule implements AddonModule {
 
                 ExprActiveGetGroup::register,
                 ExprActiveGroupCreatePartFilter::register,
+                ExprActiveGroupFromPlaced::register,
                 ExprActiveGroupLocation::register,
                 ExprActiveGroupRideOffset::register,
                 ExprActiveGroupToSaved::register,

@@ -16,7 +16,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 @Examples({"set {_location} to {_spawnedgroup}'s deu location",
             "",
             "#3.4.3 and earlier",
-            "set {_location to {_packetgroup}'s true location"})
+            "set {_location} to {_packetgroup}'s true location"})
 @Since("2.6.2, 3.0.0 (Packet)")
 public class ExprActiveGroupLocation extends SimplePropertyExpression<ActiveGroup, Location> {
 
