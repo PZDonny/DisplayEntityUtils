@@ -30,7 +30,7 @@ public class CondInteractionHasCommands extends Condition {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.CONDITION,
                 SyntaxInfo.builder(CondInteractionHasCommands.class)
-                        .addPattern("%activepart/entities% (1¦has|2¦(has no|does(n't| not) have)) [click] commands")
+                        .addPattern("%activepart/entity% (1¦has|2¦(has no|does(n't| not) have)) [click] commands")
                         .supplier(CondInteractionHasCommands::new)
                         .build()
         );

@@ -32,7 +32,7 @@ public class CondInteractionIsResponsive extends Condition {
 
         registry.register(SyntaxRegistry.CONDITION,
                 SyntaxInfo.builder(CondInteractionIsResponsive.class)
-                        .addPattern("%activepart/entities% (1¦is|2¦is(n't| not)) deu responsive")
+                        .addPattern("%activepart/entity% (1¦is|2¦is(n't| not)) deu responsive")
                         .supplier(CondInteractionIsResponsive::new)
                         .build()
         );
