@@ -14,12 +14,12 @@ public class ActiveModule implements AddonModule {
         SkriptUtil.registerModules(addon.syntaxRegistry(),
                 CondActiveIsPacketBased::register,
 
-                EffActiveBillboard::register,
-                EffActiveDirection::register,
                 EffActiveGlow::register,
                 EffActiveRotate::register,
                 EffActiveTranslate::register,
 
+                ExprActiveBillboard::register,
+                ExprActiveDirection::register,
                 ExprActiveGlowColor::register,
                 ExprActiveInterpolation::register,
                 ExprActiveTeleportDuration::register,
