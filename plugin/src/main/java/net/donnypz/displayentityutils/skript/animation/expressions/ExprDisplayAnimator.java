@@ -28,7 +28,7 @@ public class ExprDisplayAnimator extends SimpleExpression<DisplayAnimator> {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
                 SyntaxInfo.Expression.builder(ExprDisplayAnimator.class, DisplayAnimator.class)
-                        .addPatterns("[a] [new] (linear|loop:loop[ing]) [display] animator using [anim[ation]] %animation%")
+                        .addPatterns("[a] [new] (linear|loop:loop[ing]) [display] animator using [anim[ation]] %deuanimation%")
                         .supplier(ExprDisplayAnimator::new)
                         .build()
         );

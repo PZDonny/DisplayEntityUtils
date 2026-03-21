@@ -29,7 +29,7 @@ public class CondHasTag extends Condition {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.CONDITION,
                 SyntaxInfo.builder(CondHasTag.class)
-                        .addPattern("%activegroup/savedgroup/animation% (1¦has|2¦(has no|does(n't| not) have)) [a] tag")
+                        .addPattern("%activegroup/savedgroup/deuanimation% (1¦has|2¦(has no|does(n't| not) have)) [a] tag")
                         .supplier(CondHasTag::new)
                         .build()
         );

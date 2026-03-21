@@ -43,7 +43,7 @@ public class EffActiveGroupPlayAnimationCamera extends Effect {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
                 SyntaxInfo.builder(EffActiveGroupPlayAnimationCamera.class)
-                        .addPattern("(start|play) [anim[ation]] camera on %activegroup% (using|with) %displayanimator/animation% [frame:[starting] (at|on) frame %-number%] for %players%" +
+                        .addPattern("(start|play) [anim[ation]] camera on %activegroup% (using|with) %displayanimator/deuanimation% [frame:[starting] (at|on) frame %-number%] for %players%" +
                                 " [sd:[and] [with] [a[n]] start[ing] transition of %-timespan%] [ed:[and] [with] [a[n]] end[ing] delay of %-timespan%]")
                         .supplier(EffActiveGroupPlayAnimationCamera::new)
                         .build()

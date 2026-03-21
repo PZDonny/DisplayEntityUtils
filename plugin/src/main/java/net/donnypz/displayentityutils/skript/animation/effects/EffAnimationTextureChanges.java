@@ -33,7 +33,7 @@ public class EffAnimationTextureChanges extends Effect {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
                 SyntaxInfo.builder(EffAnimationTextureChanges.class)
-                        .addPattern("(:dis|en)able texture change[s] for %animations%")
+                        .addPattern("(:dis|en)able texture change[s] for %deuanimations%")
                         .supplier(EffAnimationTextureChanges::new)
                         .build()
         );

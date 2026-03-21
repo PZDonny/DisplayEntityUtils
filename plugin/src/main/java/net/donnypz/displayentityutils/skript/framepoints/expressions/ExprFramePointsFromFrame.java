@@ -26,7 +26,7 @@ public class ExprFramePointsFromFrame extends PropertyExpression<SpawnedDisplayA
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
                 SyntaxInfo.Expression.builder(ExprFramePointsFromFrame.class, FramePoint.class)
-                        .addPatterns(getPatterns("anim[ation] [frame[ |-]]points", "animationframes"))
+                        .addPatterns(getPatterns("anim[ation] [frame[ |-]]points", "deuanimationframes"))
                         .supplier(ExprFramePointsFromFrame::new)
                         .build()
         );

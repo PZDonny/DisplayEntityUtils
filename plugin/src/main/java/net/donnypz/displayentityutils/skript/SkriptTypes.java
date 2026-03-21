@@ -273,8 +273,8 @@ public class SkriptTypes {
         );
 
 
-        Classes.registerClass(new ClassInfo<>(SpawnedDisplayAnimation.class, "animation")
-                .user("[deu] anim(ation)?")
+        Classes.registerClass(new ClassInfo<>(SpawnedDisplayAnimation.class, "deuanimation")
+                .user("deu( |-)?anim(ation)?")
                 .name("Animation")
                 .description("Represents an animation that can be played on an activegroup")
                 .examples()
@@ -299,8 +299,8 @@ public class SkriptTypes {
                 })
         );
 
-        Classes.registerClass(new ClassInfo<>(SpawnedDisplayAnimationFrame.class, "animationframe")
-                .user("(anim(ation)?( |-)?)?frame")
+        Classes.registerClass(new ClassInfo<>(SpawnedDisplayAnimationFrame.class, "deuanimationframe")
+                .user("deu( |-)?(anim(ation)?( |-)?)?frame")
                 .name("Animation Frame")
                 .description("Represents an Animation Frame from an Animation")
                 .examples()

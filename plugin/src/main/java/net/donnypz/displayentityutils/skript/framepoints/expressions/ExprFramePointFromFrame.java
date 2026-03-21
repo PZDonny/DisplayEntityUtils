@@ -27,7 +27,7 @@ public class ExprFramePointFromFrame extends SimpleExpression<FramePoint> {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
                 SyntaxInfo.Expression.builder(ExprFramePointFromFrame.class, FramePoint.class)
-                        .addPattern("[frame[ |-]]point with tag %string% from %animationframe%")
+                        .addPattern("[frame[ |-]]point with tag %string% from %deuanimationframe%")
                         .supplier(ExprFramePointFromFrame::new)
                         .build()
         );

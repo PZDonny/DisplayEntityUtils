@@ -30,7 +30,7 @@ public class ExprTag extends SimplePropertyExpression<Object, String> {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
                 SyntaxInfo.Expression.builder(ExprTag.class, String.class)
-                        .addPatterns(getPatterns("deu tag", "activegroups/savedgroups/animations/framepoints"))
+                        .addPatterns(getPatterns("deu tag", "activegroups/savedgroups/deuanimations/framepoints"))
                         .supplier(ExprTag::new)
                         .build()
         );

@@ -40,7 +40,7 @@ public class EffActiveGroupSetFrame extends Effect {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
                 SyntaxInfo.builder(EffActiveGroupSetFrame.class)
-                        .addPattern("show frame with id %number% on %activegroup% (with|from) [anim[ation]] %animation% " +
+                        .addPattern("show frame with id %number% on %activegroup% (with|from) [anim[ation]] %deuanimation% " +
                                 "[d:[and] with duration %-timespan% and delay %-timespan%] [f:for %-players%]")
                         .supplier(EffActiveGroupSetFrame::new)
                         .build()
