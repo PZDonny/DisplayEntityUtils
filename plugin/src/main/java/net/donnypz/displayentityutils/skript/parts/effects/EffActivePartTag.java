@@ -13,7 +13,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Add/Remove Part Tag")
 @Description("Add/Remove a part tag from an active part")
-@Examples({"add part tag \"newtag\" to {_spawnedpart}",
+@Examples({"add part tag \"newtag\" to {_activepart}",
         "remove tag \"i_dont_want_this_tag\" from {_activepart}",})
 @Since("2.6.2, 3.3.4 (Packet-Parts)")
 public class EffActivePartTag extends Effect {

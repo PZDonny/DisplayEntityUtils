@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.skript.parts;
 import net.donnypz.displayentityutils.skript.SkriptUtil;
 import net.donnypz.displayentityutils.skript.parts.conditions.*;
 import net.donnypz.displayentityutils.skript.parts.effects.EffActivePartTag;
+import net.donnypz.displayentityutils.skript.parts.effects.EffInteractionResponsive;
 import net.donnypz.displayentityutils.skript.parts.effects.EffTextDisplaySeeThrough;
 import net.donnypz.displayentityutils.skript.parts.effects.EffTextDisplayShadow;
 import net.donnypz.displayentityutils.skript.parts.expressions.*;
@@ -22,6 +23,7 @@ public class PartsModule implements AddonModule {
                 CondTextDisplaySeeThrough::register,
 
                 EffActivePartTag::register,
+                EffInteractionResponsive::register,
                 EffTextDisplaySeeThrough::register,
                 EffTextDisplayShadow::register,
 

@@ -14,23 +14,23 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Text Display Part See Through Blocks")
-@Description("Set whether a text display part should be visible through walls")
+@Name("Interaction Part's Responsiveness")
+@Description("Set whether a interaction part should be visible through walls")
 @Examples({
-        "deu make {_activepart} visible through blocks",
-        "deu stop {_activepart} from being seen through walls"})
+        "deu make {_activepart} responsive",
+        "deu stop {_activepart} from being responsive"})
 @Since("3.5.0")
-public class EffTextDisplaySeeThrough extends Effect {
+public class EffInteractionResponsive extends Effect {
 
     Expression<ActivePart> partExpr;
-    boolean hide;
+    boolean negate;
 
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
-                SyntaxInfo.builder(EffTextDisplaySeeThrough.class)
-                        .addPattern("deu make %activeparts% visible through (blocks|walls)")
-                        .addPattern("deu (stop|prevent|block) %activeparts% from being (visible|seen) through (blocks|walls)")
-                        .supplier(EffTextDisplaySeeThrough::new)
+                SyntaxInfo.builder(EffInteractionResponsive.class)
+                        .addPattern("deu make %activeparts% [interaction] responsive")
+                        .addPattern("deu (stop|prevent|block) %activeparts% from being [interaction] responsive")
+                        .supplier(EffInteractionResponsive::new)
                         .build()
         );
     }
@@ -38,7 +38,7 @@ public class EffTextDisplaySeeThrough extends Effect {
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         partExpr = (Expression<ActivePart>) expressions[0];
-        hide = matchedPattern == 1;
+        negate = matchedPattern == 1;
         return true;
     }
 
@@ -50,14 +50,14 @@ public class EffTextDisplaySeeThrough extends Effect {
         }
 
         for (ActivePart part : parts){
-            part.setTextDisplaySeeThrough(!hide);
+            part.setInteractionResponsive(!negate);
         }
 
     }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        if (!hide)
+        if (!negate)
             return "deu force " + partExpr.toString(event, debug) + " to be visible through blocks";
         return "deu prevent " + partExpr.toString(event, debug) + " from being visible through blocks";
     }
