@@ -17,8 +17,8 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Teleport Active Group")
 @Description("Teleport an Active Group to a location")
-@Examples({"deu teleport {_spawnedgroup} to player",
-        "deu teleport {_spawnedgroup} to {_location} and respect group direction"})
+@Examples({"deu teleport {_activegroup} to player",
+        "deu teleport {_activegroup} to {_location} and respect group direction"})
 @Since("2.6.2, 3.0.0 (Packet), 3.3.5 (Plural)")
 public class EffActiveGroupTeleport extends Effect {
 
