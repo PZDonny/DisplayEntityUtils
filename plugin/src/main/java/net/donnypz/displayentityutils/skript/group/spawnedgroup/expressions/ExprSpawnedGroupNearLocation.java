@@ -54,22 +54,24 @@ public class ExprSpawnedGroupNearLocation extends SimpleExpression<SpawnedDispla
         if (isAll) {
             SpawnedDisplayEntityGroup[] arr;
             if (registered){
-                Set<SpawnedDisplayEntityGroup> results = DisplayGroupManager.getNearbySpawnedGroups(loc, range);
-                arr = new SpawnedDisplayEntityGroup[results.size()];
+                Set<SpawnedDisplayEntityGroup> groups = DisplayGroupManager.getNearbySpawnedGroups(loc, range);
+                arr = new SpawnedDisplayEntityGroup[groups.size()];
                 int i = 0;
-                for (SpawnedDisplayEntityGroup group : results){
+                for (SpawnedDisplayEntityGroup group : groups){
                     arr[i] = group;
                     i++;
                 }
+                //arr = groups.toArray(SpawnedDisplayEntityGroup[]::new);
             }
             else{
-                Set<GroupResult> results = DisplayGroupManager.getOrCreateNearbySpawnedGroups(loc, range);
-                arr = new SpawnedDisplayEntityGroup[results.size()];
+                Set<SpawnedDisplayEntityGroup> groups = DisplayGroupManager.getOrCreateNearbySpawnedGroups(loc, range);
+                arr = new SpawnedDisplayEntityGroup[groups.size()];
                 int i = 0;
-                for (GroupResult r : results){
-                    arr[i] = r.group();
+                for (SpawnedDisplayEntityGroup g : groups){
+                    arr[i] = g;
                     i++;
                 }
+                //arr = groups.toArray(SpawnedDisplayEntityGroup[]::new);
             }
             return arr;
         }

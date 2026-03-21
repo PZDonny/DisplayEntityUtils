@@ -284,8 +284,8 @@ public final class DisplayGroupManager {
         }
 
         //Get Nearby Groups
-        Set<GroupResult> results = getOrCreateNearbySpawnedGroups(entity.getLocation(), radius);
-        if (results.isEmpty()){
+        Set<SpawnedDisplayEntityGroup> groups = getOrCreateNearbySpawnedGroups(entity.getLocation(), radius);
+        if (groups.isEmpty()){
             return null;
         }
         //Check if Interaction is part of group
@@ -367,12 +367,12 @@ public final class DisplayGroupManager {
         return nearest;
     }
 
-    public static @NotNull Set<GroupResult> getOrCreateNearbySpawnedGroups(@NotNull Location location, double radius){
-        Set<GroupResult> results = new HashSet<>();
+    public static @NotNull Set<SpawnedDisplayEntityGroup> getOrCreateNearbySpawnedGroups(@NotNull Location location, double radius){
+        Set<SpawnedDisplayEntityGroup> results = new HashSet<>();
         for (BlockDisplay display : location.getNearbyEntitiesByType(BlockDisplay.class, radius)) {
             GroupResult result = getOrCreateSpawnedGroup(display);
             if (result == null) continue;
-            results.add(result);
+            results.add(result.group());
         }
         return results;
     }
