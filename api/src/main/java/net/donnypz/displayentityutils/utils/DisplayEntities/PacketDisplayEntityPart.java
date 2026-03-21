@@ -943,6 +943,11 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
+    public @Nullable Display.Billboard getBillboard() {
+        return attributeContainer.getAttribute(DisplayAttributes.BILLBOARD);
+    }
+
+    @Override
     public float getDisplayCullHeight() {
         return attributeContainer.getAttributeOrDefault(DisplayAttributes.Culling.HEIGHT, 1f);
     }

@@ -191,6 +191,12 @@ public abstract class ActivePart implements Active{
     }
 
     /**
+     * Get the billboard of this part if it's type is a Display entity
+     * @return a {@link Display.Billboard} or null
+     */
+    public abstract @Nullable Display.Billboard getBillboard();
+
+    /**
      * Get the culling height of this part if it's type is a Display entity
      * @return a float, 1 if not a display entity
      */

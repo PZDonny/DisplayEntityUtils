@@ -685,6 +685,16 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
+    public @Nullable Display.Billboard getBillboard() {
+        if (!isDisplay()) return null;
+        Entity entity = getEntity();
+        if (entity instanceof Display display) {
+            return display.getBillboard();
+        }
+        return null;
+    }
+
+    @Override
     public float getDisplayCullHeight() {
         if (!isDisplay()) return -1;
         Entity entity = getEntity();
