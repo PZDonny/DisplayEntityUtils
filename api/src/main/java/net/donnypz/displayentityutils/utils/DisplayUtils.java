@@ -167,12 +167,12 @@ public final class DisplayUtils {
     }
 
     /**
-     * Get the location where an {@link PacketDisplayEntityPart} display entity is translated based off of its {@link Transformation}'s translation alone.<br>
+     * Get the location where an {@link ActivePart} of a display type is translated based off of its {@link Transformation}'s translation alone.<br>
      * This may not be a perfect representation of where the model's location actually is, due to the shape of models varying (e.g.: Stone Block vs Stone Pressure Plate)
      * @param part The entity to get the location from
      * @return the location where the part is translated at. Null if the part is an interaction entity or if the transformation/location of the entity is unset
      */
-    public static @Nullable Location getFixedModelLocation(@NotNull PacketDisplayEntityPart part){
+    public static @Nullable Location getFixedModelLocation(@NotNull ActivePart part){
         if (!part.isDisplay()){
             return null;
         }
@@ -186,7 +186,7 @@ public final class DisplayUtils {
     }
 
     /**
-     * Get the location where an {@link ActivePart} display entity is translated based off of its {@link Transformation} and pitch and yaw.<br>
+     * Get the location where an {@link ActivePart} of a display type is translated based off of its {@link Transformation} and pitch and yaw.<br>
      * This may not be a perfect representation of where the model's location actually is, due to the shape of models varying (e.g.: Stone Block vs Stone Pressure Plate)
      * @param part The entity to get the location from
      * @return the location where the part is translated at. Null if the part is not a display
