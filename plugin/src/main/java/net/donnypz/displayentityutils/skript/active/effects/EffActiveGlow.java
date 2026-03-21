@@ -21,7 +21,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 @Examples({
         "deu make {_activegroup} glow for 35 ticks",
         "deu make {_activegroup} glow for 20 ticks for {_players::*}",
-        "deu make {_activeart} unglow for {_player}",
+        "deu make {_activepart} unglow for {_player}",
         "",
         "#Before 3.0.0",
         "make {_activegroup} glow for 35 ticks",
