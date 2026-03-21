@@ -279,7 +279,7 @@ public class SkriptTypes {
                 .description("Represents an animation that can be played on an activegroup")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(SpawnedDisplayAnimation.class))
-                .since("3.3.1")
+                .since("3.3.1 (animation), 3.5.0 (deuanimation)")
                 .parser(new Parser<>() {
 
                     @Override
@@ -305,7 +305,7 @@ public class SkriptTypes {
                 .description("Represents an Animation Frame from an Animation")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(SpawnedDisplayAnimationFrame.class))
-                .since("3.3.1")
+                .since("3.3.1 (animationframe), 3.5.0 (deuanimationframe)")
                 .parser(new Parser<>() {
 
                     @Override
