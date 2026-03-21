@@ -100,13 +100,13 @@ public class DisplayEntitySelector extends RelativePointSelector<RelativePoint> 
     }
 
     public static void deselect(Player player){
-        DEUUser user = DEUUser.getUser(player);
-        if (user == null) {
-            //send error
-            return;
-        }
+        DEUUser user = DEUUser.getOrCreateUser(player);
         if (user.getSelectedGroup() != null){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can do this with non-group entities", NamedTextColor.RED)));
+            return;
+        }
+        if (user.getSelectedPartSelection() == null){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You do not have an entity selected", NamedTextColor.RED)));
             return;
         }
         user.deselectPartSelection();
