@@ -8,7 +8,6 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import net.donnypz.displayentityutils.skript.group.activegroup.effects.EffActiveGroupPersistence;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -25,9 +24,9 @@ public class EffPacketGroupPersistentUpdate extends Effect {
 
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
-                SyntaxInfo.builder(EffActiveGroupPersistence.class)
+                SyntaxInfo.builder(EffPacketGroupPersistentUpdate.class)
                         .addPattern("(update|confirm) persistent [packet group] %packetgroups%")
-                        .supplier(EffActiveGroupPersistence::new)
+                        .supplier(EffPacketGroupPersistentUpdate::new)
                         .build()
         );
     }
