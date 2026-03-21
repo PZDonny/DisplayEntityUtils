@@ -1313,4 +1313,21 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     public boolean isSpawned(){
         return masterPart != null && masterPart.isValid();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        SpawnedDisplayEntityGroup that = (SpawnedDisplayEntityGroup) o;
+        return creationTime == that.creationTime
+                && isVisibleByDefault == that.isVisibleByDefault
+                && isPersistent == that.isPersistent
+                && persistenceOverride == that.persistenceOverride
+                && Objects.equals(partUUIDRandom, that.partUUIDRandom)
+                && Objects.equals(partSelections, that.partSelections);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(partUUIDRandom, partSelections, creationTime, isVisibleByDefault, isPersistent, persistenceOverride);
+    }
 }

@@ -1081,4 +1081,47 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
             return CURRENT.incrementAndGet();
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ActiveGroup<?> group)) return false;
+        return ID == group.ID
+                && Float.compare(scaleMultiplier, group.scaleMultiplier) == 0
+                && lastAnimatedTick == group.lastAnimatedTick
+                && Objects.equals(masterPart, group.masterPart)
+                && Objects.equals(groupParts, group.groupParts)
+                && Objects.equals(tag, group.tag)
+                && Objects.equals(followers, group.followers)
+                && Objects.equals(followerLock, group.followerLock)
+                && Objects.equals(defaultFollower, group.defaultFollower)
+                && Objects.equals(animatorLock, group.animatorLock)
+                && Objects.equals(activeAnimators, group.activeAnimators)
+                && Objects.equals(spawnAnimationTag, group.spawnAnimationTag)
+                && spawnAnimationLoadMethod == group.spawnAnimationLoadMethod
+                && spawnAnimationType == group.spawnAnimationType
+                && Objects.equals(currentMachineState, group.currentMachineState)
+                && Objects.equals(rideOffset, group.rideOffset);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                ID,
+                masterPart,
+                groupParts,
+                tag,
+                followers,
+                followerLock,
+                defaultFollower,
+                animatorLock,
+                activeAnimators,
+                spawnAnimationTag,
+                spawnAnimationLoadMethod,
+                spawnAnimationType,
+                currentMachineState,
+                scaleMultiplier,
+                rideOffset,
+                lastAnimatedTick
+        );
+    }
 }
