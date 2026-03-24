@@ -284,8 +284,8 @@ public final class DisplayGroupManager {
         }
 
         //Get Nearby Groups
-        Set<GroupResult> results = getOrCreateNearbySpawnedGroups(entity.getLocation(), radius);
-        if (results.isEmpty()){
+        Set<SpawnedDisplayEntityGroup> groups = getOrCreateNearbySpawnedGroups(entity.getLocation(), radius);
+        if (groups.isEmpty()){
             return null;
         }
         //Check if Interaction is part of group
@@ -367,12 +367,12 @@ public final class DisplayGroupManager {
         return nearest;
     }
 
-    public static @NotNull Set<GroupResult> getOrCreateNearbySpawnedGroups(@NotNull Location location, double radius){
-        Set<GroupResult> results = new HashSet<>();
+    public static @NotNull Set<SpawnedDisplayEntityGroup> getOrCreateNearbySpawnedGroups(@NotNull Location location, double radius){
+        Set<SpawnedDisplayEntityGroup> results = new HashSet<>();
         for (BlockDisplay display : location.getNearbyEntitiesByType(BlockDisplay.class, radius)) {
             GroupResult result = getOrCreateSpawnedGroup(display);
             if (result == null) continue;
-            results.add(result);
+            results.add(result.group());
         }
         return results;
     }
@@ -812,7 +812,9 @@ public final class DisplayGroupManager {
         String json = gson.toJson(cpg);
         list.add(json);
         pdc.set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
-        PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, spawnReason, true, autoShow);
+        PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, spawnReason,
+                new GroupSpawnSettings()
+                    .visibleByDefault(autoShow, null));
         pdeg.setPersistentIds(id, c);
         return pdeg;
     }
@@ -833,7 +835,7 @@ public final class DisplayGroupManager {
             id = gson.fromJson(list.getLast(), PersistentPacketGroup.class).id+1;
         }
 
-        PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, spawnReason, true, settings);
+        PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, spawnReason, settings);
         displayEntityGroup = pdeg.toDisplayEntityGroup();
         PersistentPacketGroup cpg = PersistentPacketGroup.create(id, location, displayEntityGroup, pdeg.isAutoShow(), false);
         if (cpg != null){
@@ -1043,10 +1045,10 @@ public final class DisplayGroupManager {
             DisplayEntityGroup g = getGroup();
             if (spawnLoc == null || g == null) return null;
             if (isPlaced){
-                return g.createPacketGroup(spawnLoc, GroupSpawnedEvent.SpawnReason.CHUNK_LOAD_PLACED, true, autoShow);
+                return g.createPacketGroup(spawnLoc, GroupSpawnedEvent.SpawnReason.CHUNK_LOAD_PLACED, autoShow);
             }
             else{
-                return g.createPacketGroup(spawnLoc, GroupSpawnedEvent.SpawnReason.INTERNAL, true, autoShow);
+                return g.createPacketGroup(spawnLoc, GroupSpawnedEvent.SpawnReason.INTERNAL, autoShow);
             }
         }
     }

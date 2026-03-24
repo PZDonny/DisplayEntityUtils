@@ -191,6 +191,12 @@ public abstract class ActivePart implements Active{
     }
 
     /**
+     * Get the billboard of this part if it's type is a Display entity
+     * @return a {@link Display.Billboard} or null
+     */
+    public abstract @Nullable Display.Billboard getBillboard();
+
+    /**
      * Get the culling height of this part if it's type is a Display entity
      * @return a float, 1 if not a display entity
      */
@@ -376,6 +382,18 @@ public abstract class ActivePart implements Active{
     public abstract boolean setDisplayScale(float x, float y, float z);
 
     /**
+     * Get this display entity part's interpolation duration
+     * @return the duration
+     */
+    public abstract int getInterpolationDuration();
+
+    /**
+     * Get this display entity part's interpolation delay
+     * @return the delay
+     */
+    public abstract int getInterpolationDelay();
+
+    /**
      * Rotate this display entity part by a given quaternion
      * @param rotation the rotation
      * @param worldRotation whether rotation should occur in world space, rather than local
@@ -479,6 +497,12 @@ public abstract class ActivePart implements Active{
      * @return an {@link ItemStack} or null
      */
     public abstract @Nullable ItemStack getItemDisplayItem();
+
+    /**
+     * Get the {@link ItemStack} of this part if its type is {@link SpawnedDisplayEntityPart.PartType#ITEM_DISPLAY}.
+     * @return an {@link ItemStack} or null
+     */
+    public abstract @Nullable ItemDisplay.ItemDisplayTransform getItemDisplayTransform();
 
     /**
      * Set an attribute on this part, and send the updated attribute to viewing players.

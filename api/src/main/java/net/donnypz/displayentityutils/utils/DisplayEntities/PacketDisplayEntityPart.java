@@ -370,6 +370,18 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
+    public int getInterpolationDuration() {
+        if (!isDisplay()) return -1;
+        return attributeContainer.getAttributeOrDefault(DisplayAttributes.Interpolation.DURATION, 0);
+    }
+
+    @Override
+    public int getInterpolationDelay() {
+        if (!isDisplay()) return -1;
+        return attributeContainer.getAttributeOrDefault(DisplayAttributes.Interpolation.DELAY, 0);
+    }
+
+    @Override
     public void rotateDisplay(@NotNull Quaternionf rotation, boolean worldRotation) {
         if (!isDisplay()) return;
         Vector3f translation = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.TRANSLATION, new Vector3f());
@@ -593,6 +605,12 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public @Nullable ItemStack getItemDisplayItem() {
         if (type != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) return null;
         return attributeContainer.getAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK);
+    }
+
+    @Override
+    public @Nullable ItemDisplay.ItemDisplayTransform getItemDisplayTransform() {
+        if (type != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) return null;
+        return attributeContainer.getAttribute(DisplayAttributes.ItemDisplay.ITEM_DISPLAY_TRANSFORM);
     }
 
     @Override
@@ -922,6 +940,11 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
                     .add(DisplayAttributes.Culling.WIDTH, width),
             getEntityId(),
             viewers);
+    }
+
+    @Override
+    public @Nullable Display.Billboard getBillboard() {
+        return attributeContainer.getAttribute(DisplayAttributes.BILLBOARD);
     }
 
     @Override

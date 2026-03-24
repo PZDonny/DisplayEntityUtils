@@ -15,6 +15,18 @@ import org.skriptlang.skript.lang.converter.Converters;
 
 public class SkriptTypes {
 
+    public static class FrameId{
+        int id;
+
+        public FrameId(int id){
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
+    }
+
     static{
 
         Classes.registerClass(new ClassInfo<>(ActiveGroup.class, "activegroup")
@@ -123,37 +135,11 @@ public class SkriptTypes {
                 })
         );
 
-        Classes.registerClass(new ClassInfo<>(GroupSpawnSettings.class, "groupspawnsetting")
-                .user("(group( |-)?)?spawn( |-)?settings?")
-                .name("Group Spawn Settings")
-                .description("Represents spawn settings that can be applied when spawning a saved group")
-                .examples()
-                .defaultExpression(new EventValueExpression<>(GroupSpawnSettings.class))
-                .since("2.6.2")
-                .parser(new Parser<>() {
-
-                    @Override
-                    public boolean canParse(ParseContext context) {
-                        return false;
-                    }
-
-                    @Override
-                    public String toString(GroupSpawnSettings o, int flags) {
-                        return toVariableNameString(o);
-                    }
-
-                    @Override
-                    public String toVariableNameString(GroupSpawnSettings o) {
-                        return "group spawn settings";
-                    }
-                })
-        );
-
         Classes.registerClass(new ClassInfo<>(ActivePart.class, "activepart")
                 .user("active( |-)?parts?")
                 .name("Active Part")
-                .description("Represents an individual Display/Interaction entity from a spawned Display Entity Group/Model.",
-                        "This can be either a Spawned Part or Packet Part.")
+                .description("Represents an entity from an active Display Entity Group/Model.",
+                        "\nThis can be packet-based.")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(ActivePart.class))
                 .since("3.0.0")
@@ -180,7 +166,7 @@ public class SkriptTypes {
         Classes.registerClass(new ClassInfo<>(SpawnedDisplayEntityPart.class, "spawnedpart")
                 .user("spawned( |-)?parts?")
                 .name("Spawned Part")
-                .description("Represents an individual Display/Interaction entity from a spawned Display Entity Group/Model.",
+                .description("Represents an individual entity from an active Display Entity Group/Model.",
                         "A spawned part can be used as an entity in other expressions, effects, etc.")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(SpawnedDisplayEntityPart.class))
@@ -209,7 +195,7 @@ public class SkriptTypes {
         Classes.registerClass(new ClassInfo<>(PacketDisplayEntityPart.class, "packetpart")
                 .user("packet( |-)?parts?")
                 .name("Packet Part")
-                .description("Represents an individual Display/Interaction entity from a packet group.")
+                .description("Represents an individual entity from a packet-based active group.")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(PacketDisplayEntityPart.class))
                 .since("3.0.0")
@@ -233,14 +219,13 @@ public class SkriptTypes {
                 })
         );
 
-        Classes.registerClass(new ClassInfo<>(MultiPartSelection.class, "multipartfilter")
-                .user("(multi( |-)?)?part( |-)?filters?")
-                .name("Multi Part Filter/Selection")
-                .description("Represents a selection of filtered parts in a Display Entity Group/Model.",
-                            "This can be either a Spawned Part Filter or a Packet Part Filter")
+        Classes.registerClass(new ClassInfo<>(MultiPartSelection.class, "partfilter")
+                .user("part( |-)?filters?")
+                .name("Part Filter")
+                .description("Represents a selection of filtered parts from an Active Group. This may be packet based.")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(MultiPartSelection.class))
-                .since("3.1.1 (multipartselection), 3.3.4 (multipartfilter)")
+                .since("3.1.1 (multipartselection), 3.3.4 (multipartfilter), 3.5.0 (partfilter)")
                 .parser(new Parser<>() {
 
                     @Override
@@ -255,62 +240,11 @@ public class SkriptTypes {
 
                     @Override
                     public String toVariableNameString(MultiPartSelection o) {
-                        return "multipartfilter w/ size: " + o.getSize();
-                    }
-                })
-        );
-
-        Classes.registerClass(new ClassInfo<>(SpawnedPartSelection.class, "partfilter")
-                .user("(spawned( |-)?)?part( |-)?filter")
-                .name("Spawned Part Filter/Selection")
-                .description("Represents a selection of filtered parts from a non-packet based Display Entity Group/Model.")
-                .examples()
-                .defaultExpression(new EventValueExpression<>(SpawnedPartSelection.class))
-                .since("2.6.2 (partselection), 3.3.4 (partfilter)")
-                .parser(new Parser<>() {
-
-                    @Override
-                    public boolean canParse(ParseContext context) {
-                        return false;
-                    }
-
-                    @Override
-                    public String toString(SpawnedPartSelection o, int flags) {
-                        return toVariableNameString(o);
-                    }
-
-                    @Override
-                    public String toVariableNameString(SpawnedPartSelection o) {
                         return "partfilter w/ size: " + o.getSize();
                     }
                 })
         );
 
-        Classes.registerClass(new ClassInfo<>(PacketPartSelection.class, "packetpartfilter")
-                .user("packet( |-)?part( |-)?filter")
-                .name("Packet Part Filter/Selection")
-                .description("Represents a selection of filtered parts from a packet-based Display Entity Group/Model.")
-                .examples()
-                .defaultExpression(new EventValueExpression<>(PacketPartSelection.class))
-                .since("3.0.0 (packetpartselection), 3.3.4 (packetpartfilter)")
-                .parser(new Parser<>() {
-
-                    @Override
-                    public boolean canParse(ParseContext context) {
-                        return false;
-                    }
-
-                    @Override
-                    public String toString(PacketPartSelection o, int flags) {
-                        return toVariableNameString(o);
-                    }
-
-                    @Override
-                    public String toVariableNameString(PacketPartSelection o) {
-                        return "packetpartfilter w/ size: " + o.getSize();
-                    }
-                })
-        );
 
         Classes.registerClass(new ClassInfo<>(DisplayAnimator.class, "displayanimator")
                 .user("(display)?animator")
@@ -339,13 +273,13 @@ public class SkriptTypes {
         );
 
 
-        Classes.registerClass(new ClassInfo<>(SpawnedDisplayAnimation.class, "animation")
-                .user("[deu] anim(ation)?")
+        Classes.registerClass(new ClassInfo<>(SpawnedDisplayAnimation.class, "deuanimation")
+                .user("deu( |-)?anim(ation)?")
                 .name("Animation")
                 .description("Represents an animation that can be played on an activegroup")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(SpawnedDisplayAnimation.class))
-                .since("3.3.1")
+                .since("3.3.1 (animation), 3.5.0 (deuanimation)")
                 .parser(new Parser<>() {
 
                     @Override
@@ -365,13 +299,13 @@ public class SkriptTypes {
                 })
         );
 
-        Classes.registerClass(new ClassInfo<>(SpawnedDisplayAnimationFrame.class, "animationframe")
-                .user("(anim(ation)?( |-)?)?frame")
+        Classes.registerClass(new ClassInfo<>(SpawnedDisplayAnimationFrame.class, "deuanimationframe")
+                .user("deu( |-)?(anim(ation)?( |-)?)?frame")
                 .name("Animation Frame")
                 .description("Represents an Animation Frame from an Animation")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(SpawnedDisplayAnimationFrame.class))
-                .since("3.3.1")
+                .since("3.3.1 (animationframe), 3.5.0 (deuanimationframe)")
                 .parser(new Parser<>() {
 
                     @Override
@@ -394,7 +328,7 @@ public class SkriptTypes {
         Classes.registerClass(new ClassInfo<>(FramePoint.class, "framepoint")
                 .user("frame( |-)?point")
                 .name("Frame Point")
-                .description("Represents a Frame Point from a Spawned Display Animation Frame")
+                .description("Represents a Frame Point from an Animation Frame")
                 .examples()
                 .defaultExpression(new EventValueExpression<>(FramePoint.class))
                 .since("3.2.1")
@@ -416,6 +350,33 @@ public class SkriptTypes {
                     }
                 })
         );
+
+        Classes.registerClass(new ClassInfo<>(FrameId.class, "frameid")
+                .user("frame( |-)?id")
+                .name("Frame Id")
+                .description("Represents the frame id of ab Animation Frame")
+                .examples()
+                .defaultExpression(new EventValueExpression<>(FrameId.class))
+                .since("3.5.0")
+                .parser(new Parser<>() {
+
+                    @Override
+                    public boolean canParse(ParseContext context) {
+                        return false;
+                    }
+
+                    @Override
+                    public String toString(FrameId o, int flags) {
+                        return toVariableNameString(o);
+                    }
+
+                    @Override
+                    public String toVariableNameString(FrameId o) {
+                        return String.valueOf(o.id);
+                    }
+                })
+        );
+        Converters.registerConverter(FrameId.class, Number.class, FrameId::getId);
 
 
         Classes.registerClass(new ClassInfo<>(InteractionCommand.class, "interactioncommand")
@@ -439,10 +400,11 @@ public class SkriptTypes {
 
                     @Override
                     public String toVariableNameString(InteractionCommand o) {
-                        return "interaction command: " + o.getCommand();
+                        return (o.isConsoleCommand() ? "console" : "player")+" interaction command: " + o.getCommand();
                     }
                 })
         );
+        Converters.registerConverter(InteractionCommand.class, String.class, InteractionCommand::getCommand);
 
         EnumWrapper<SpawnedDisplayEntityPart.PartType> partTypeWrapper = new EnumWrapper<>(SpawnedDisplayEntityPart.PartType.class, null, null);
         partTypeWrapper.replace("interaction", "deu_interaction");
@@ -451,6 +413,13 @@ public class SkriptTypes {
                 .user("part( | -)?type")
                 .name("Part Type")
                 .description("Represents a part's (display, interaction, etc.) type")
+                .examples(
+                        "if {_activepart}'s active part type is deu_interaction:",
+                        "\tbroadcast \"this part is an interaction!\"",
+                        "",
+                        "if {_activepart}'s active part type is text_display:",
+                        "\tbroadcast \"this part is a text display!\""
+                )
                 .since("2.6.2, 3.3.6 (Removed \"parttype_\" prefix), 3.4.0 (Mannequin)"));
 
         EnumWrapper<InteractionClickEvent.ClickType> clickTypeWrapper = new EnumWrapper<>(InteractionClickEvent.ClickType.class, "iclicktype", null);
@@ -459,13 +428,6 @@ public class SkriptTypes {
                 .name("Interaction Click Type")
                 .description("Represents a interaction click type of LEFT or RIGHT")
                 .since("2.6.2"));
-
-        EnumWrapper<DisplayAnimator.AnimationType> animationTypeWrapper = new EnumWrapper<>(DisplayAnimator.AnimationType.class, null, null);
-        Classes.registerClass(animationTypeWrapper.getClassInfo("animationtype")
-                .user("anim(ation)?( | -)?type")
-                .name("Animation Type")
-                .description("Represents an animation type, being LINEAR or LOOP")
-                .since("2.6.2, 3.3.6 (Removed \"animtype_\" prefix)"));
 
         EnumWrapper<GroupSpawnedEvent.SpawnReason> spawnReasonWrapper = new EnumWrapper<>(GroupSpawnedEvent.SpawnReason.class, "gsr", null);
         Classes.registerClass(spawnReasonWrapper.getClassInfo("groupspawnreason")

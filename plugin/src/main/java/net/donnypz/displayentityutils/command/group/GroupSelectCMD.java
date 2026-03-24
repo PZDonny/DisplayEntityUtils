@@ -58,7 +58,7 @@ class GroupSelectCMD extends PlayerSubCommand {
     }
 
     private void getSelectableGroups(Player player, double distance){
-        Set<GroupResult> groups = DisplayGroupManager.getOrCreateNearbySpawnedGroups(player.getLocation(), distance);
+        Set<SpawnedDisplayEntityGroup> groups = DisplayGroupManager.getOrCreateNearbySpawnedGroups(player.getLocation(), distance);
         if (groups.isEmpty()){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("No nearby groups found!", NamedTextColor.RED)));
             player.sendMessage(Component.text("| Move to a different location or increase your search distance.", NamedTextColor.GRAY, TextDecoration.ITALIC));
@@ -67,8 +67,7 @@ class GroupSelectCMD extends PlayerSubCommand {
         }
 
         player.sendMessage(Component.text("| Groups found! Click to select.", NamedTextColor.GREEN));
-        for (GroupResult result : groups){
-            SpawnedDisplayEntityGroup g = result.group();
+        for (SpawnedDisplayEntityGroup g: groups){
             Component groupTag = MiniMessage.miniMessage().deserialize("- Tag: " + (g.hasTag() ? "<gray>" + g.getTag() : "<red>No Tag"));
 
             Component teleport = Component.text("[TELEPORT]", NamedTextColor.AQUA)

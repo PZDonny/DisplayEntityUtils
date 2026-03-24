@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
+import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Bukkit;
@@ -28,6 +29,7 @@ public class GroupSpawnSettings {
     boolean visibleByDefault = true;
     Set<UUID> visiblePlayers = new HashSet<>();
     boolean hideInteractions = false;
+    boolean playSpawnAnimation = true;
 
     /**
      * Set the teleportation duration for all display entities that will be spawned from {@link DisplayEntityGroup#spawn(Location, GroupSpawnedEvent.SpawnReason, GroupSpawnSettings)}.
@@ -94,7 +96,7 @@ public class GroupSpawnSettings {
     }
 
     /**
-     * Determine if a {@link SpawnedDisplayEntityGroup} can have its persistence overriden when loaded by a chunk, based on config values
+     * Determine if an {@link ActiveGroup} can have its persistence overriden when loaded by a chunk, based on config values
      * @param allowPersistenceOverride
      * @return
      */
@@ -104,7 +106,7 @@ public class GroupSpawnSettings {
     }
 
     /**
-     * Determine if a {@link SpawnedDisplayEntityGroup} will be visible by default when spawned
+     * Determine if an {@link ActiveGroup} will be visible by default when spawned
      * @param visible the visibility
      * @param visiblePlayers the players that can see the group even if visibility is false
      * @return this
@@ -127,6 +129,17 @@ public class GroupSpawnSettings {
      */
     public GroupSpawnSettings hideInteractionsByDefault(boolean hideInteractions) {
         this.hideInteractions = hideInteractions;
+        return this;
+    }
+
+    /**
+     * Determine if an {@link ActiveGroup} should play its spawn animation when spawned, if it has one.
+     * See {@link ActiveGroup#setSpawnAnimation(String, DisplayAnimator.AnimationType, LoadMethod)}
+     * @param playSpawnAnimation
+     * @return this
+     */
+    public GroupSpawnSettings playSpawnAnimation(boolean playSpawnAnimation){
+        this.playSpawnAnimation = playSpawnAnimation;
         return this;
     }
 

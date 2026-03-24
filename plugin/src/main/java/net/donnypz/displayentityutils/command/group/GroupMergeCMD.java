@@ -41,16 +41,16 @@ class GroupMergeCMD extends GroupSubCommand {
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number greater than 0 for the merging distance!", NamedTextColor.RED)));
                 return;
             }
-            Set<GroupResult> results = DisplayGroupManager.getOrCreateNearbySpawnedGroups(sg.getLocation(), radius);
-            if (results.isEmpty() || results.size() == 1){
+            Set<SpawnedDisplayEntityGroup> groups = DisplayGroupManager.getOrCreateNearbySpawnedGroups(sg.getLocation(), radius);
+            if (groups.isEmpty() || groups.size() == 1){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your selected group is the only group within the set merging distance!", NamedTextColor.RED)));
                 return;
             }
-            for (GroupResult result : results){
-                if (group.equals(result.group())){
+            for (SpawnedDisplayEntityGroup g : groups){
+                if (group.equals(g)){
                     continue;
                 }
-                sg.merge(result.group());
+                sg.merge(g);
             }
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Nearby non-packet groups have been merged", NamedTextColor.GREEN)));
             sg.glowAndMarkInteractions(player, 60);

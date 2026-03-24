@@ -746,7 +746,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         float newYaw = location.getYaw();
         location = location.clone();
         location.setYaw(0);
-        PacketDisplayEntityGroup clone = group.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.CLONE, playSpawnAnimation, autoShow);
+        PacketDisplayEntityGroup clone = group.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.CLONE,
+                new GroupSpawnSettings()
+                        .visibleByDefault(autoShow, null)
+                        .playSpawnAnimation(playSpawnAnimation)
+        );
 
         //Restore pivot
         for (ActivePart part : resettedParts){

@@ -561,6 +561,20 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
+    public int getInterpolationDuration() {
+        if (!isDisplay()) return -1;
+        Display entity = (Display) getEntity();
+        return entity.getInterpolationDuration();
+    }
+
+    @Override
+    public int getInterpolationDelay() {
+        if (!isDisplay()) return -1;
+        Display entity = (Display) getEntity();
+        return entity.getInterpolationDelay();
+    }
+
+    @Override
     public void rotateDisplay(@NotNull Quaternionf rotation, boolean worldRotation) {
         if (!isDisplay()) return;
         Display display = (Display) getEntity();
@@ -668,6 +682,16 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             display.setDisplayHeight(height);
             display.setDisplayWidth(width);
         }
+    }
+
+    @Override
+    public @Nullable Display.Billboard getBillboard() {
+        if (!isDisplay()) return null;
+        Entity entity = getEntity();
+        if (entity instanceof Display display) {
+            return display.getBillboard();
+        }
+        return null;
     }
 
     @Override
@@ -978,6 +1002,14 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         ItemDisplay display = (ItemDisplay) getEntity();
         if (display == null) return null;
         return display.getItemStack();
+    }
+
+    @Override
+    public @Nullable ItemDisplay.ItemDisplayTransform getItemDisplayTransform() {
+        if (type != PartType.ITEM_DISPLAY) return null;
+        ItemDisplay display = (ItemDisplay) getEntity();
+        if (display == null) return null;
+        return display.getItemDisplayTransform();
     }
 
     @Override

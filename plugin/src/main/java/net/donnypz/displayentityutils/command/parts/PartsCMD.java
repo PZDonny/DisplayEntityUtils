@@ -17,6 +17,7 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         new PartsInfoCMD(this);
         new PartsCreateCMD(this);
         new PartsSelectCMD(this);
+        new PartsDeselectCMD(this);
         new PartsCycleCMD(this);
         new PartsGlowCMD(this);
         new PartsUnglowCMD(this);
@@ -65,9 +66,10 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/deu parts info", "Get information about your current part/selection");
             CMDUtils.sendCMD(sender, "/deu parts create <block | item | text | interaction> [-addtogroup]", "Spawn an entity at your location and automatically select it. " +
                     "\"-addtogroup\" will add the part to your selected group");
-            CMDUtils.sendCMD(sender, "/deu parts select <distance | -target>", "Select a nearby, ungrouped, Display entity. Use \"-target\" to select your targeted Interaction");
+            CMDUtils.sendCMD(sender, "/deu parts select <distance | -target>", "Select a nearby, ungrouped, Display entity. Use \"-target\" to select your targeted Interaction or Mannequin");
         }
         else if (page == 2) {
+            CMDUtils.sendCMD(sender, "/deu parts deselect", "Deselect a selected entity");
             CMDUtils.sendCMD(sender, "/deu parts cycle <first | prev | next | last> [jump]", "Cycle through parts of your selected group");
             CMDUtils.sendCMD(sender, "/deu parts addtag <part-tag> [-all]", "Add a tag to your selected part");
             CMDUtils.sendCMD(sender, "/deu parts removetag <part-tag> [-all]", "Remove a tag from your selected part");
@@ -76,18 +78,18 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
                             " \"-remove\" removes tag from scoreboard");
             CMDUtils.sendCMD(sender, "/deu parts listtags ", "List tags of the currently selected part");
             CMDUtils.sendCMD(sender, "/deu parts filtertags <part-tags>", "Filter parts by part tags, comma separated. Exclude A tag by prefixing it with \"!\"");
-            CMDUtils.sendCMD(sender, "/deu parts filtertypes <part-types>", "Filter parts by their type. Exclude ALL filtered types by prefixing with \"!\"");
         }
         else if (page == 3){
+            CMDUtils.sendCMD(sender, "/deu parts filtertypes <part-types>", "Filter parts by their type. Exclude ALL filtered types by prefixing with \"!\"");
             CMDUtils.sendCMD(sender, "/deu parts filterblocks <block-ids>", "Filter blocks of BLOCK parts. Exclude ALL filtered blocks by prefixing with \"!\"");
             CMDUtils.sendCMD(sender, "/deu parts filteritems <item-ids>", "Filter items of ITEM parts. Exclude ALL filtered items by prefixing with \"!\"");
             CMDUtils.sendCMD(sender, "/deu parts refreshfilter", "Refresh your part selection after making some type of change");
             CMDUtils.sendCMD(sender, "/deu parts resetfilter", "Reset your part selection and any filters");
             CMDUtils.sendCMD(sender, "/deu parts remove [-all]", "Despawn and remove your selected part from a group");
             CMDUtils.sendCMD(sender, "/deu parts glow [-all]", "Make your selected part glow");
-            CMDUtils.sendCMD(sender, "/deu parts unglow [-all]", "Remove the glow from your selected part");
         }
         else{
+            CMDUtils.sendCMD(sender, "/deu parts unglow [-all]", "Remove the glow from your selected part");
             CMDUtils.sendCMD(sender, "/deu parts pitch <pitch>", "Set the pitch of an ungrouped part entity");
             CMDUtils.sendCMD(sender, "/deu parts yaw <yaw>", "Set the yaw of an ungrouped part entity");
             CMDUtils.sendCMD(sender, "/deu parts move <direction> <distance> [-all]", "Change the actual location of your selected part");
