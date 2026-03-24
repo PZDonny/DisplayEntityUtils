@@ -1,11 +1,9 @@
 # DisplayEntityUtils
-[![](https://jitpack.io/v/PZDonny/DisplayEntityUtils.svg)](https://jitpack.io/#PZDonny/DisplayEntityUtils)
+[![Jitpack releases](https://jitpack.io/v/PZDonny/DisplayEntityUtils.svg)](https://jitpack.io/#PZDonny/DisplayEntityUtils)
 
-[Join the Discord Here!](https://discord.gg/k3wtdG5fRZ)
+[**Discord**](https://discord.gg/k3wtdG5fRZ) | [**NEW WIKI**](https://jay-12.gitbook.io/displayentityutils#dependencies)
 
-## [NEW WIKI](https://jay-12.gitbook.io/displayentityutils#dependencies)
-
-### DisplayEntityUtils makes handling customizable entities simpler.
+**DisplayEntityUtils makes handling customizable entities simpler.**
 
 
 ### Supported Entities
@@ -18,13 +16,13 @@
 ### Dependencies
 - **[PacketEvents](https://modrinth.com/plugin/packetevents)**
 
-### Supports BDEngine
+### BDEngine
 - **[BDEngine](block-display.com)** is a modeling and animation engine designed for display entities,
   without the need for resource packs or mods
 - The created models and animations can be transferred into your game world and reused with **DisplayEntityUtils**.
 > DISCLAIMER: I DO NOT OWN **BDEngine**! ALL ISSUES AND SUGGESTIONS RELATED TO THAT PROJECT SHOULD BE BROUGHT TO THE OWNER, [ILLYSTRAY](https://illystray.com), IN THE BDENGINE DISCORD FOUND [HERE](https://discord.com/invite/VCeHfSd6Xa)
 
-## What can DisplayEntityUtils do?
+## Features
 - Manipulate Display, Interaction, Mannequin Entities
 - Save and load BDEngine models
 - Manipulate entities in a model/group
@@ -40,17 +38,19 @@
 - And so much more!
 
 ## Showcases
-- ### Using Models as equipment
-  ![ezgif-1-873ca90c95 (1)](https://github.com/user-attachments/assets/ee189856-3459-49b8-b75c-4c18d1b43818)
+- **Models as equipment**
 
-- ### Creating Animation State Machines (DisplayControllers)
-  ![](https://github.com/user-attachments/assets/594a4ffe-89cf-4e49-aff5-2f8c43ea21ad)
-  >  
+  ![a zombie and wither skeleton wearing display entity equipment](https://github.com/user-attachments/assets/ee189856-3459-49b8-b75c-4c18d1b43818)
+
+- **Animation State Machines (DisplayControllers)**
+
+  ![A dodo bird model animating based on it's controlling entity's state](https://github.com/user-attachments/assets/594a4ffe-89cf-4e49-aff5-2f8c43ea21ad)
+  >
   > *Dodo Bird Model and Animations by [Yegor_Mechanic](https://block-display.com/author/yegor_mechanic/)*
 
-## Plugin API
+## API
 
-### API for v3.3.0+
+**API for v3.3.0+**
 ```xml
 <repositories>
   <repository>
@@ -67,19 +67,19 @@
 </dependency>
 ```
 
-### API for versions before v3.3.0
+**API for v3.3.0 and earlier**
 ```xml
 <repositories>
-  <repository>
-    <id>jitpack.io</id>
-    <url>https://jitpack.io</url>
-  </repository>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
 </repositories>
 
 <dependency>
-  <groupId>com.github.PZDonny</groupId>
-  <artifactId>DisplayEntityUtils</artifactId>
-  <version>PLUGIN-VERSION</version>
-  <scope>provided</scope>
+<groupId>com.github.PZDonny</groupId>
+<artifactId>DisplayEntityUtils</artifactId>
+<version>PLUGIN-VERSION</version>
+<scope>provided</scope>
 </dependency>
 ```
