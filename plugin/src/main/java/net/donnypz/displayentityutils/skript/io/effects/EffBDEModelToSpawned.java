@@ -58,12 +58,10 @@ public class EffBDEModelToSpawned extends Effect {
         String file = fileName.getSingle(event);
         Location loc = location.getSingle(event);
         if (file == null || loc == null){
-            Bukkit.broadcastMessage("?");
             return;
         }
         BDEModel model = BDEngineUtils.readFile(new File(PluginFolders.bdeFilesFolder, BDEngineSpawnModelCMD.fileExtension(file)));
         if (model == null){
-            Bukkit.broadcastMessage("NM");
             return;
         }
         SpawnedDisplayEntityGroup g = model.spawn(loc, GroupSpawnedEvent.SpawnReason.SKRIPT);
