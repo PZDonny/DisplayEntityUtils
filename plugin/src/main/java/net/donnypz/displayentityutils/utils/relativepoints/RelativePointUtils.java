@@ -35,7 +35,7 @@ public class RelativePointUtils {
             FramePointSelector pd = new FramePointSelector(player, spawnLoc, point, frame);
             displays.add(pd);
         }
-        setDisplays(player, displays);
+        setDisplays(player, displays, true);
     }
 
 
@@ -53,7 +53,8 @@ public class RelativePointUtils {
             player.sendMessage(Component.text("Failed to view points! The chunk does not have any persistent packet based groups!", NamedTextColor.RED));
         }
         else{
-            setDisplays(player, displays);
+            setDisplays(player, displays, false);
+            player.sendMessage(Component.text("| Left click a point to view its group's info", NamedTextColor.YELLOW));
             player.sendMessage(Component.text("| Right click a point to select its packet-based group", NamedTextColor.AQUA));
         }
     }
@@ -73,7 +74,7 @@ public class RelativePointUtils {
             player.sendMessage(Component.text("Failed to find ungrouped Display entities within the given range!", NamedTextColor.RED));
         }
         else{
-            setDisplays(player, displays);
+            setDisplays(player, displays, true);
             player.sendMessage(Component.text("| Right click a point to select an entity", NamedTextColor.AQUA));
         }
     }
@@ -99,9 +100,9 @@ public class RelativePointUtils {
         return false;
     }
 
-    private static void setDisplays(Player player, Set<RelativePointSelector<?>> selectors){
+    private static void setDisplays(Player player, Set<RelativePointSelector<?>> selectors, boolean sendClickMessage){
         relativePointSelectors.put(player.getUniqueId(), selectors);
-        player.sendMessage(Component.text("Left click a point to select it", NamedTextColor.GREEN));
+        if (sendClickMessage) player.sendMessage(Component.text("Left click a point to select it", NamedTextColor.GREEN));
         player.sendMessage(Component.text("| Run \"/deu hidepoints\" to stop viewing points", NamedTextColor.GRAY));
     }
 
