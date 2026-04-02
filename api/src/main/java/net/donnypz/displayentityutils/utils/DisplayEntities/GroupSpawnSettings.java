@@ -208,7 +208,12 @@ public class GroupSpawnSettings {
     }
 
 
-    void apply(Display display){
+    /**
+     * Apply this {@link GroupSpawnSettings} properties to a {@link Display} entity. This should generally not be used
+     * @param display a display entity
+     */
+    public void apply(Display display){
+        if (display == null) return;
     //Determine Visibility
         if (!visibleByDefault){
             display.setVisibleByDefault(false);
@@ -271,7 +276,12 @@ public class GroupSpawnSettings {
         display.setPersistent(persistentByDefault);
     }
 
-    void apply(Interaction interaction){
+    /**
+     * Apply this {@link GroupSpawnSettings} properties to an {@link Interaction} entity. This should generally not be used
+     * @param interaction an interaction entity
+     */
+    public void apply(Interaction interaction){
+        if (interaction == null) return;
         //Determine Visibility
         if (!visibleByDefault || hideInteractions){
             interaction.setVisibleByDefault(false);
@@ -295,7 +305,12 @@ public class GroupSpawnSettings {
         interaction.setPersistent(persistentByDefault);
     }
 
-    void apply(Mannequin mannequin){
+    /**
+     * Apply this {@link GroupSpawnSettings} properties to an {@link Mannequin} entity. This should generally not be used
+     * @param mannequin a mannequin entity
+     */
+    public void apply(Mannequin mannequin){
+        if (mannequin == null) return;
         //Determine Visibility
         if (!visibleByDefault){
             mannequin.setVisibleByDefault(false);

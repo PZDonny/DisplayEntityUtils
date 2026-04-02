@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.bdengine.convert.file;
 
+import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.BlockDisplay;
@@ -24,17 +25,18 @@ abstract class BDEDisplay<T extends Display> extends BDEObject{
     abstract void apply(T display);
 
     @Override
-    void spawn(Location spawnLoc, BlockDisplay parent, BDECollection parentCollection){
+    void spawn(Location spawnLoc, BlockDisplay parent, BDECollection parentCollection, GroupSpawnSettings settings){
         Display display = spawnLoc.getWorld().spawn(spawnLoc, displayClass, d -> {
             d.setBrightness(new Display.Brightness(brightness[0], brightness[1]));
+            settings.apply(d);
             d.setTransformationMatrix(transformationMatrix);
-            d.setPersistent(false);
 
             if (!parentCollection.isMaster){
                 DisplayUtils.addTags(d, parentCollection.upperCollections);
                 DisplayUtils.addTag(d, parentCollection.name);
             }
             apply(d);
+
         });
         parent.addPassenger(display);
     }

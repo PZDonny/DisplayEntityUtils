@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.bdengine.convert.file;
 
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.GroupResult;
 import org.bukkit.Location;
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-public class BDEModel extends BDECollection{
+public class BDEModel extends BDECollection {
     //Map<Integer, DisplayAnimation> animations = new TreeMap<>(); //id, anim
     String groupTag;
     //String animationPrefix;
@@ -22,11 +23,13 @@ public class BDEModel extends BDECollection{
         //this.animationPrefix = animationPrefix;
     }
 
-    public @NotNull SpawnedDisplayEntityGroup spawn(@NotNull Location spawnLoc, @NotNull GroupSpawnedEvent.SpawnReason spawnReason){
-        BlockDisplay parentDisplay = spawnLoc.getWorld().spawn(spawnLoc, BlockDisplay.class, bd -> {
-            bd.setPersistent(false);
-        });
-        super.spawn(spawnLoc, parentDisplay, null);
+    public @NotNull SpawnedDisplayEntityGroup spawn(@NotNull Location spawnLoc, @NotNull GroupSpawnedEvent.SpawnReason spawnReason) {
+        return spawn(spawnLoc, spawnReason, new GroupSpawnSettings().persistentByDefault(false));
+    }
+
+    public @NotNull SpawnedDisplayEntityGroup spawn(@NotNull Location spawnLoc, @NotNull GroupSpawnedEvent.SpawnReason spawnReason, @NotNull GroupSpawnSettings settings) {
+        BlockDisplay parentDisplay = spawnLoc.getWorld().spawn(spawnLoc, BlockDisplay.class, settings::apply);
+        super.spawn(spawnLoc, parentDisplay, null, settings);
 
         GroupResult result = DisplayGroupManager.getOrCreateSpawnedGroup(parentDisplay);
         SpawnedDisplayEntityGroup group = result.group();
@@ -35,7 +38,7 @@ public class BDEModel extends BDECollection{
         return group;
     }
 
-    public String getGroupTag(){
+    public String getGroupTag() {
         return groupTag;
     }
 
