@@ -34,7 +34,7 @@ public class GroupSpawnSettings {
     /**
      * Set the teleportation duration for all display entities that will be spawned from {@link DisplayEntityGroup#spawn(Location, GroupSpawnedEvent.SpawnReason, GroupSpawnSettings)}.
      * This has no effect on Interaction entities.
-     * @param teleportationDuration how long display entities should interpolate when teleporting, in ticks
+     * @param teleportationDuration how long display entities should interpolate when teleporting or changing their looking direction, in ticks
      * @return this
      */
     public GroupSpawnSettings setTeleportationDuration(int teleportationDuration) {
