@@ -40,7 +40,7 @@ import java.util.List;
         "`brightness` = the brightness of display entities in the group. Use `-1 and -1` for default brightness",
         "`spawnanimation` = whether the group should play its spawn animation. True by default",
         "",
-        "If a group is packet-based it's persistence cannot be set within the \nsection and must be set afterwards."
+        "If a group is packet-based it's persistence cannot be set within the section and must be set afterwards."
 })
 @Examples({
         "deu spawn bde model \"mymodel\" at {_location}",
