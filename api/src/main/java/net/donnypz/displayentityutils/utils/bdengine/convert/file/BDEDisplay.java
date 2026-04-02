@@ -1,6 +1,8 @@
 package net.donnypz.displayentityutils.utils.bdengine.convert.file;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.BlockDisplay;
@@ -24,6 +26,8 @@ abstract class BDEDisplay<T extends Display> extends BDEObject{
 
     abstract void apply(T display);
 
+    abstract PacketDisplayEntityPart createPart(Location spawnLocation);
+
     @Override
     void spawn(Location spawnLoc, BlockDisplay parent, BDECollection parentCollection, GroupSpawnSettings settings){
         Display display = spawnLoc.getWorld().spawn(spawnLoc, displayClass, d -> {
@@ -39,5 +43,21 @@ abstract class BDEDisplay<T extends Display> extends BDEObject{
 
         });
         parent.addPassenger(display);
+    }
+
+    @Override
+    void spawnPacket(Location spawnLoc, PacketDisplayEntityGroup packetGroup, BDECollection parentCollection, GroupSpawnSettings settings){
+        PacketDisplayEntityPart part = createPart(spawnLoc);
+
+        part.setBrightness(new Display.Brightness(brightness[0], brightness[1]));
+        settings.applyAttributes(part);
+        part.setTransformationMatrix(transformationMatrix);
+
+        if (!parentCollection.isMaster){
+            part.addTags(parentCollection.upperCollections);
+            part.addTag(parentCollection.name);
+        }
+
+        packetGroup.addPart(part);
     }
 }

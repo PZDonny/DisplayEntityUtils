@@ -1,12 +1,16 @@
 package net.donnypz.displayentityutils.utils.bdengine.convert.file;
 
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
+import net.donnypz.displayentityutils.events.PrePacketGroupCreateEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.GroupResult;
+import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -36,6 +40,19 @@ public class BDEModel extends BDECollection {
         new GroupSpawnedEvent(group, spawnReason).callEvent();
         //result.group().setTag(groupTag);
         return group;
+    }
+
+    public @NotNull PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLoc) {
+        return createPacketGroup(spawnLoc, new GroupSpawnSettings().persistentByDefault(false));
+    }
+
+    public @NotNull PacketDisplayEntityGroup createPacketGroup(@NotNull Location spawnLoc, @NotNull GroupSpawnSettings settings){
+        return new PacketDisplayEntityGroup(this, spawnLoc, settings);
+    }
+
+    @ApiStatus.Internal
+    public void addEntities(@NotNull PacketDisplayEntityGroup packetDisplayEntityGroup, Location spawnLocation, GroupSpawnSettings settings) {
+        super.spawnPacket(spawnLocation, packetDisplayEntityGroup, null, settings);
     }
 
     public String getGroupTag() {

@@ -163,7 +163,12 @@ public class GroupSpawnSettings {
         }
     }
 
-    boolean applyAttributes(PacketDisplayEntityPart part){
+    /**
+     * Apply this {@link GroupSpawnSettings} properties to a {@link PacketDisplayEntityPart}. This should generally not be used
+     * @param part the {@link PacketDisplayEntityPart}
+     */
+    public void applyAttributes(PacketDisplayEntityPart part){
+        if (part == null) return;
         if (part.isDisplay()){
             //Teleport Duration
             part.attributeContainer.setAttribute(DisplayAttributes.TELEPORTATION_DURATION, teleportationDuration);
@@ -204,7 +209,6 @@ public class GroupSpawnSettings {
                 }
             }
         }
-        return true;
     }
 
 

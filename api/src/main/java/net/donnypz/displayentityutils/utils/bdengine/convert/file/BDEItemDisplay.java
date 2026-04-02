@@ -2,10 +2,11 @@ package net.donnypz.displayentityutils.utils.bdengine.convert.file;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import org.bukkit.*;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -34,6 +35,19 @@ class BDEItemDisplay extends BDEDisplay<ItemDisplay> {
 
     @Override
     void apply(ItemDisplay display) {
+        display.setItemStack(getItem());
+        display.setItemDisplayTransform(transform);
+    }
+
+    @Override
+    PacketDisplayEntityPart createPart(Location spawnLocation) {
+        return new PacketAttributeContainer()
+                .setAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK, getItem())
+                .setAttribute(DisplayAttributes.ItemDisplay.ITEM_DISPLAY_TRANSFORM, transform)
+                .createPart(SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY, spawnLocation);
+    }
+
+    private ItemStack getItem(){
         Material material = Registry.MATERIAL.get(NamespacedKey.minecraft(name.toLowerCase()));
         if (material != null){
             ItemStack item = new ItemStack(material);
@@ -46,11 +60,10 @@ class BDEItemDisplay extends BDEDisplay<ItemDisplay> {
                 meta.setPlayerProfile(profile);
                 item.setItemMeta(meta);
             }
-            display.setItemStack(item);
+            return item;
         }
         else{
-            display.setItemStack(ItemStack.empty());
+            return ItemStack.empty();
         }
-        display.setItemDisplayTransform(transform);
     }
 }
