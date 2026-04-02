@@ -61,8 +61,8 @@ public class ExprActiveDirection extends SimplePropertyExpression<Active, Number
 
     @Override
     public void change(Event event, Object[] delta, Changer.ChangeMode mode){
-        Active[] active = getExpr().getArray(event);
-        if (active == null){
+        Object[] arr = getExpr().getArray(event);
+        if (arr == null){
             return;
         }
 
@@ -74,7 +74,8 @@ public class ExprActiveDirection extends SimplePropertyExpression<Active, Number
                 if (value == null) return;
                 float rotVal = value.floatValue();
 
-                for (Active a : getExpr().getArray(event)){
+                for (Object o : arr){
+                    if (!(o instanceof Active a)) continue;
                     if (pitch){
                         a.setPitch(rotVal);
                     }
@@ -84,7 +85,8 @@ public class ExprActiveDirection extends SimplePropertyExpression<Active, Number
                 }
             }
             case RESET -> {
-                for (Active a : getExpr().getArray(event)){
+                for (Object o : arr){
+                    if (!(o instanceof Active a)) continue;
                     if (pitch){
                         a.setPitch(0);
                     }
