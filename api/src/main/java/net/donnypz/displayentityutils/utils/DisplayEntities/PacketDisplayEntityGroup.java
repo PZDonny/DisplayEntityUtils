@@ -10,14 +10,13 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.holders.AsyncGroupHolder;
 import net.donnypz.displayentityutils.utils.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
+import net.donnypz.displayentityutils.utils.bdengine.convert.file.BDEModel;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
+import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
@@ -43,6 +42,32 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     String persistentGlobalId;
     boolean isPlaced;
 
+
+    @ApiStatus.Internal
+    public PacketDisplayEntityGroup(@NotNull BDEModel model, @NotNull Location spawnLoc, @NotNull GroupSpawnSettings settings){
+        updateChunkAndWorld(spawnLoc);
+        PacketDisplayEntityPart masterPart = new PacketAttributeContainer()
+                .setAttribute(DisplayAttributes.BlockDisplay.BLOCK_STATE, Material.AIR.createBlockData())
+                .createPart(SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY, spawnLoc);
+
+        masterPart.isMaster = true;
+        settings.applyAttributes(masterPart);
+        this.addPartSilent(masterPart);
+        passengerIds = new int[0];
+        model.addEntities(this, spawnLoc, settings);
+
+        if (settings.playSpawnAnimation){
+            this.playSpawnAnimation();
+        }
+        this.setAutoShow(settings);
+
+
+        if (DisplayConfig.autoCulling()){
+            float widthCullingAdder = DisplayConfig.widthCullingAdder();
+            float heightCullingAdder = DisplayConfig.heightCullingAdder();
+            this.autoCull(widthCullingAdder, heightCullingAdder);
+        }
+    }
 
     PacketDisplayEntityGroup(String tag){
         this.tag = tag;
@@ -215,6 +240,23 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         updatePassengerIds(part.getEntityId(), true);
     }
 
+    void addPartSilent(PacketDisplayEntityPart part){
+        if (groupParts.get(part.partUUID) == part) return;
+
+        if (part.partUUID == null){
+            do{
+                part.partUUID = UUID.randomUUID(); //for parts in old models that do not contain pdc data / part uuids AND new ungrouped parts
+            } while(groupParts.containsKey(part.partUUID));
+        }
+
+        if (part.isMaster) masterPart = part;
+        groupParts.put(part.partUUID, part);
+        part.group = this;
+        if (this.autoShow){
+            part.showToPlayers(getTrackingPlayers(), GroupSpawnedEvent.SpawnReason.INTERNAL);
+        }
+    }
+
     /**
      * {@inheritDoc}
      * This will create a {@link PacketDisplayEntityPart} representative of the entity
@@ -227,29 +269,12 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return part;
     }
 
-    void addPartSilent(PacketDisplayEntityPart part){
-         if (groupParts.get(part.partUUID) == part) return;
-
-         if (part.partUUID == null){
-             do{
-                 part.partUUID = UUID.randomUUID(); //for parts in old models that do not contain pdc data / part uuids AND new ungrouped parts
-             } while(groupParts.containsKey(part.partUUID));
-         }
-
-         if (part.isMaster) masterPart = part;
-         groupParts.put(part.partUUID, part);
-         part.group = this;
-         if (this.autoShow){
-             part.showToPlayers(getTrackingPlayers(), GroupSpawnedEvent.SpawnReason.INTERNAL);
-         }
-    }
-
     void updatePassengerIds(int passengerId, boolean add){
         if (passengerIds == null) return;
         int[] ids;
         if (add){
             ids = new int[passengerIds.length+1];
-            for (int i = 0; i < ids.length; i++){
+            for (int i = 0; i < passengerIds.length; i++){
                 int id = passengerIds[i];
                 if (id == passengerId) return;
                 ids[i] = id;

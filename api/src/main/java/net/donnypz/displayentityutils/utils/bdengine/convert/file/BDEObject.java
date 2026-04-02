@@ -1,5 +1,8 @@
 package net.donnypz.displayentityutils.utils.bdengine.convert.file;
 
+import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import org.bukkit.Location;
 import org.bukkit.entity.BlockDisplay;
 import org.joml.Matrix4f;
@@ -50,5 +53,7 @@ abstract class BDEObject {
 
 
 
-    abstract void spawn(Location spawnLoc, BlockDisplay parent, BDECollection parentCollection);
+    abstract void spawn(Location spawnLoc, BlockDisplay parent, BDECollection parentCollection, GroupSpawnSettings settings);
+
+    abstract void spawnPacket(Location spawnLoc, PacketDisplayEntityGroup packetGroup, BDECollection parentCollection, GroupSpawnSettings settings);
 }

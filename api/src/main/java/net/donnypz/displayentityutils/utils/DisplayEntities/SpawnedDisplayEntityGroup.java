@@ -1172,6 +1172,13 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     public PacketDisplayEntityGroup toPacket(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow, boolean persistent){
+        return toPacket(location, new GroupSpawnSettings()
+                .playSpawnAnimation(playSpawnAnimation)
+                .visibleByDefault(autoShow, null)
+                .persistentByDefault(persistent));
+    }
+
+    public PacketDisplayEntityGroup toPacket(@NotNull Location location, GroupSpawnSettings settings){
         //Reset pivot to 0 yaw
         float groupYaw = getLocation().getYaw();
         HashSet<ActivePart> resettedParts = new HashSet<>();
@@ -1186,14 +1193,12 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         location.setYaw(0);
 
         PacketDisplayEntityGroup packetGroup;
-        if (persistent){
-            packetGroup = DisplayGroupManager.addPersistentPacketGroup(location, savedGroup, autoShow, GroupSpawnedEvent.SpawnReason.INTERNAL);
+        if (settings.persistentByDefault){
+            packetGroup = DisplayGroupManager
+                    .addPersistentPacketGroup(location, savedGroup, settings, GroupSpawnedEvent.SpawnReason.INTERNAL);
         }
         else{
-            packetGroup = savedGroup.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.INTERNAL,
-                    new GroupSpawnSettings()
-                            .visibleByDefault(autoShow, null)
-                            .playSpawnAnimation(playSpawnAnimation));
+            packetGroup = savedGroup.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.INTERNAL, settings);
         }
 
         //Restore pivot

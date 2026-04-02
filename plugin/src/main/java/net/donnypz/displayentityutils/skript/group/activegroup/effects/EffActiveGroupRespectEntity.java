@@ -87,14 +87,14 @@ public class EffActiveGroupRespectEntity extends Effect {
         ActiveGroup<?>[] gs = group.getArray(event);
         Entity e = entity.getSingle(event);
         FollowType type = followType;
-        int tpDur = tpDuration == null ? 0 : tpDuration.getSingle(event).intValue();
+        int tpDur = tpDuration == null ? Integer.MIN_VALUE : tpDuration.getSingle(event).intValue();
         int despawn = despawnTimespan == null ? -1 : (int) despawnTimespan.getSingle(event).getAs(Timespan.TimePeriod.TICK);
         if (gs == null || e == null || type == null) return;
 
         for (ActiveGroup<?> g : gs){
             g.followEntityDirection(e, GroupFollowProperties.builder(type)
                     .setFlip(flip)
-                    .setTeleportationDuration(tpDur)
+                    .setTeleportationDuration(tpDur == Integer.MIN_VALUE ? g.getTeleportDuration() : tpDur)
                     .setUnregisterDelay(despawn)
                     .build());
         }

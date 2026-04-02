@@ -14,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 public final class DisplayEntityGroup implements Serializable{
     private final ArrayList<DisplayEntity> displayEntities = new ArrayList<>();

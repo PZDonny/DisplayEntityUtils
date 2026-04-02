@@ -34,7 +34,7 @@ public class GroupSpawnSettings {
     /**
      * Set the teleportation duration for all display entities that will be spawned from {@link DisplayEntityGroup#spawn(Location, GroupSpawnedEvent.SpawnReason, GroupSpawnSettings)}.
      * This has no effect on Interaction entities.
-     * @param teleportationDuration how long display entities should interpolate when teleporting, in ticks
+     * @param teleportationDuration how long display entities should interpolate when teleporting or changing their looking direction, in ticks
      * @return this
      */
     public GroupSpawnSettings setTeleportationDuration(int teleportationDuration) {
@@ -163,7 +163,12 @@ public class GroupSpawnSettings {
         }
     }
 
-    boolean applyAttributes(PacketDisplayEntityPart part){
+    /**
+     * Apply this {@link GroupSpawnSettings} properties to a {@link PacketDisplayEntityPart}. This should generally not be used
+     * @param part the {@link PacketDisplayEntityPart}
+     */
+    public void applyAttributes(PacketDisplayEntityPart part){
+        if (part == null) return;
         if (part.isDisplay()){
             //Teleport Duration
             part.attributeContainer.setAttribute(DisplayAttributes.TELEPORTATION_DURATION, teleportationDuration);
@@ -204,11 +209,15 @@ public class GroupSpawnSettings {
                 }
             }
         }
-        return true;
     }
 
 
-    void apply(Display display){
+    /**
+     * Apply this {@link GroupSpawnSettings} properties to a {@link Display} entity. This should generally not be used
+     * @param display a display entity
+     */
+    public void apply(Display display){
+        if (display == null) return;
     //Determine Visibility
         if (!visibleByDefault){
             display.setVisibleByDefault(false);
@@ -271,7 +280,12 @@ public class GroupSpawnSettings {
         display.setPersistent(persistentByDefault);
     }
 
-    void apply(Interaction interaction){
+    /**
+     * Apply this {@link GroupSpawnSettings} properties to an {@link Interaction} entity. This should generally not be used
+     * @param interaction an interaction entity
+     */
+    public void apply(Interaction interaction){
+        if (interaction == null) return;
         //Determine Visibility
         if (!visibleByDefault || hideInteractions){
             interaction.setVisibleByDefault(false);
@@ -295,7 +309,12 @@ public class GroupSpawnSettings {
         interaction.setPersistent(persistentByDefault);
     }
 
-    void apply(Mannequin mannequin){
+    /**
+     * Apply this {@link GroupSpawnSettings} properties to an {@link Mannequin} entity. This should generally not be used
+     * @param mannequin a mannequin entity
+     */
+    public void apply(Mannequin mannequin){
+        if (mannequin == null) return;
         //Determine Visibility
         if (!visibleByDefault){
             mannequin.setVisibleByDefault(false);

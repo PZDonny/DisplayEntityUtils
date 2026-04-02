@@ -1,10 +1,16 @@
 package net.donnypz.displayentityutils.utils.bdengine.convert.file;
 
 import net.donnypz.displayentityutils.utils.ConversionUtils;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
+import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
+import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.donnypz.displayentityutils.utils.packet.attributes.TextDisplayOptions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.entity.TextDisplay;
 import org.joml.Matrix4f;
 
@@ -45,5 +51,16 @@ public class BDETextDisplay extends BDEDisplay<TextDisplay>{
         display.setBackgroundColor(backgroundColor);
         display.setLineWidth(lineLength);
         display.setAlignment(alignment);
+    }
+
+    @Override
+    PacketDisplayEntityPart createPart(Location spawnLocation) {
+        return new PacketAttributeContainer()
+                .setAttribute(DisplayAttributes.TextDisplay.TEXT, text)
+                .setAttribute(DisplayAttributes.TextDisplay.TEXT_OPACITY_PERCENTAGE, textAlpha)
+                .setAttribute(DisplayAttributes.TextDisplay.BACKGROUND_COLOR, backgroundColor)
+                .setAttribute(DisplayAttributes.TextDisplay.LINE_WIDTH, lineLength)
+                .setAttribute(DisplayAttributes.TextDisplay.EXTRA_TEXT_OPTIONS, new TextDisplayOptions(false, false, false, alignment))
+                .createPart(SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY, spawnLocation);
     }
 }

@@ -23,7 +23,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
         "set {_activegroup}'s deu yaw to 73",
         "set {_activegroup}'s deu yaw with interaction pivot to 25",
         "",
-        "3.4.3 and earlier",
+        "#3.4.3 and earlier",
         "deu set {_activegroup}'s yaw with interaction pivot to 35",
         "deu set {_activepart}'s pitch to -90"})
 @Since("2.6.2, 3.0.0 (Packet)")
@@ -61,8 +61,8 @@ public class ExprActiveDirection extends SimplePropertyExpression<Active, Number
 
     @Override
     public void change(Event event, Object[] delta, Changer.ChangeMode mode){
-        Active[] active = getExpr().getArray(event);
-        if (active == null){
+        Object[] arr = getExpr().getArray(event);
+        if (arr == null){
             return;
         }
 
@@ -74,7 +74,8 @@ public class ExprActiveDirection extends SimplePropertyExpression<Active, Number
                 if (value == null) return;
                 float rotVal = value.floatValue();
 
-                for (Active a : getExpr().getArray(event)){
+                for (Object o : arr){
+                    if (!(o instanceof Active a)) continue;
                     if (pitch){
                         a.setPitch(rotVal);
                     }
@@ -84,7 +85,8 @@ public class ExprActiveDirection extends SimplePropertyExpression<Active, Number
                 }
             }
             case RESET -> {
-                for (Active a : getExpr().getArray(event)){
+                for (Object o : arr){
+                    if (!(o instanceof Active a)) continue;
                     if (pitch){
                         a.setPitch(0);
                     }

@@ -1,20 +1,20 @@
-package net.donnypz.displayentityutils.skript.group.activegroup.sections;
+package net.donnypz.displayentityutils.skript.io.sections;
 
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.config.SectionNode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.EffectSection;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.TriggerItem;
 import ch.njol.util.Kleenean;
+import net.donnypz.displayentityutils.command.bdengine.BDEngineSpawnModelCMD;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
+import net.donnypz.displayentityutils.managers.PluginFolders;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.bdengine.BDEngineUtils;
+import net.donnypz.displayentityutils.utils.bdengine.convert.file.BDEModel;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.event.Event;
@@ -25,11 +25,12 @@ import org.skriptlang.skript.lang.entry.util.ExpressionEntryData;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
+import java.io.File;
 import java.util.List;
 
 
-@Name("Spawn Group")
-@Description({"Spawn a DEU Group/Model at a location, with specified options",
+@Name("Spawn BDEngine Model from File")
+@Description({"Spawn a BDEngine Model, from a file, at a location, with specified options",
         "**Entries**",
         "`packet` = whether the group should be packet-based. False by default",
         "`teleport-duration` = the teleport-duration of display entities in the group. 0 by default",
@@ -39,25 +40,32 @@ import java.util.List;
         "`brightness` = the brightness of display entities in the group. Use `-1 and -1` for default brightness",
         "`spawnanimation` = whether the group should play its spawn animation. True by default",
         "",
-        "\"If a group is packet-based it's persistence cannot be set within the \\nsection and must be set afterwards.\""
+        "If a group is packet-based it's persistence cannot be set within the \nsection and must be set afterwards."
 })
-@Examples({"deu spawn {_savedgroup} at {_location}",
-        "deu spawn {_savedgroup} at {_location} and store the result in {_activegroup}",
+@Examples({
+        "deu spawn bde model \"mymodel\" at {_location}",
+        "deu spawn bde model \"mymodel\" at {_location} stored in {_activegroup}",
         "",
-        "deu spawn {_savedgroup} at {_location} and store the result in {_activegroup}:",
+        "deu spawn bde model \"mymodel\" at {_location} stored in {_activegroup}:",
         "\tpacket: false",
         "\tteleport-duration: 2",
         "\tbillboard: VERTICAL",
         "\tpersistent: true",
         "\tvisible: true",
         "\tbrightness: 10 and 5 #Block and Sky, -1 and -1 to reset",
-        "\tspawnanimation: true"
+        "\tspawnanimation: true",
+        "",
+        "",
+        "#3.4.3 and earlier",
+        "set {_activegroup} to bdengine model \"mymodel\" spawned at {_location}",
+        "set {_activegroup} to bde model \"model.bdengine\" spawned at {_location}"
 })
-@Since("3.5.0")
-public class SecSpawnGroup extends EffectSection {
+@Since("3.3.0, 3.5.0 (New Syntax), 3.5.1 (Section)")
+@DocumentationId("EffBDEModelToSpawned")
+public class SecSpawnBDEModel extends EffectSection {
 
-    private Expression<DisplayEntityGroup> savedGroup;
-    private Expression<Location> location;
+    private Expression<String> fileName;
+    Expression<Location> location;
     private Expression<?> store;
 
     private Expression<Boolean> packetExpr;
@@ -82,16 +90,16 @@ public class SecSpawnGroup extends EffectSection {
                 .build();
 
         registry.register(SyntaxRegistry.SECTION,
-                SyntaxInfo.builder(SecSpawnGroup.class)
-                        .addPattern("deu spawn %savedgroup% at %location% [store:[and] store[d] [it |the result] in %-objects%]")
-                        .supplier(SecSpawnGroup::new)
+                SyntaxInfo.builder(SecSpawnBDEModel.class)
+                        .addPattern("deu spawn bde[ngine] model %string% at %location% [store:[and] store[d] [it |the result] in %-objects%]")
+                        .supplier(SecSpawnBDEModel::new)
                         .build()
         );
     }
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult, @Nullable SectionNode sectionNode, @Nullable List<TriggerItem> triggerItems) {
-        this.savedGroup = (Expression<DisplayEntityGroup>) expressions[0];
+        this.fileName = (Expression<String>) expressions[0];
         this.location = (Expression<Location>) expressions[1];
         if (parseResult.hasTag("store")){
             this.store = expressions[2];
@@ -116,9 +124,9 @@ public class SecSpawnGroup extends EffectSection {
     @Nullable
     @Override
     protected TriggerItem walk(Event event) {
-        DisplayEntityGroup g = savedGroup.getSingle(event);
-        if (g == null){
-            error("Saved Group is missing");
+        String fileName = this.fileName.getSingle(event);
+        if (fileName == null){
+            error("File/Model name is missing");
             return super.walk(event, false);
         }
 
@@ -137,12 +145,6 @@ public class SecSpawnGroup extends EffectSection {
         if (billboardExpr != null){
             Display.Billboard billboard = billboardExpr.getSingle(event);
             if (billboard != null) settings.addBillboard(billboard, null);
-        }
-
-
-        if (persistentExpr != null){
-            Boolean persist = persistentExpr.getSingle(event);
-            if (persist != null) settings.persistentByDefault(persist);
         }
 
         if (visibleExpr != null){
@@ -171,19 +173,35 @@ public class SecSpawnGroup extends EffectSection {
         }
         else isPacket = false;
 
+        if (persistentExpr != null){
+            Boolean persist = persistentExpr.getSingle(event);
+            if (persist != null){
+                settings.persistentByDefault(persist);
+            }
+            else{
+                settings.persistentByDefault(!isPacket);
+            }
+        }
+
+
         if (spawnAnimationExpr != null){
-            Boolean packet = spawnAnimationExpr.getSingle(event);
-            boolean playSpawnAnim = packet != null && packet;
+            Boolean play = spawnAnimationExpr.getSingle(event);
+            boolean playSpawnAnim = play != null && play;
             settings.playSpawnAnimation(playSpawnAnim);
+        }
+
+        BDEModel model = BDEngineUtils.readFile(new File(PluginFolders.bdeFilesFolder, BDEngineSpawnModelCMD.fileExtension(fileName)));
+        if (model == null){
+            return super.walk(event, false);
         }
 
 
         ActiveGroup<?> activeGroup;
         if (isPacket){
-            activeGroup = g.createPacketGroup(loc, GroupSpawnedEvent.SpawnReason.SKRIPT, settings);
+            activeGroup = model.createPacketGroup(loc, settings);
         }
         else{
-            activeGroup = g.spawn(loc, GroupSpawnedEvent.SpawnReason.SKRIPT, settings);
+            activeGroup = model.spawn(loc, GroupSpawnedEvent.SpawnReason.SKRIPT, settings);
         }
 
         if (this.store != null){
@@ -195,6 +213,6 @@ public class SecSpawnGroup extends EffectSection {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "";
+        return "spawn bdengine model from file \""+fileName.toString(event,debug);
     }
 }

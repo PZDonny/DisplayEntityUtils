@@ -8,7 +8,6 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
-import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -18,9 +17,12 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 @Name("Active Group Ride Offset")
 @Description("Get or set the translation offset to apply to a group when its riding an entity. " +
         "This should be used before making a group ride any entities")
-@Examples({"set {_offsetvector} to {_activegroup}'s deu ride offset",
-            "",
-            "set {_activegroup}'s deu ride offset to vector(0,1,0)"})
+@Examples({
+        "#This should be set BEFORE a group rides an entity",
+        "set {_offsetvector} to {_activegroup}'s deu ride offset",
+        "",
+        "set {_activegroup}'s deu ride offset to vector(0,1,0)"
+})
 @Since("3.4.1")
 public class ExprActiveGroupRideOffset extends SimplePropertyExpression<ActiveGroup, Vector> {
 

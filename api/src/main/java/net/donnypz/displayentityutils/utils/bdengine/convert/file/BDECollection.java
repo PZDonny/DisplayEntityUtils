@@ -1,5 +1,7 @@
 package net.donnypz.displayentityutils.utils.bdengine.convert.file;
 
+import net.donnypz.displayentityutils.utils.DisplayEntities.GroupSpawnSettings;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import org.bukkit.Location;
 import org.bukkit.entity.BlockDisplay;
 
@@ -47,9 +49,16 @@ class BDECollection extends BDEObject{
     }
 
     @Override
-    void spawn(Location spawnLoc, BlockDisplay parent, BDECollection parentCollection) {
+    void spawn(Location spawnLoc, BlockDisplay parent, BDECollection parentCollection, GroupSpawnSettings settings) {
         for (BDEObject obj : children){
-            obj.spawn(spawnLoc, parent, this);
+            obj.spawn(spawnLoc, parent, this, settings);
+        }
+    }
+
+    @Override
+    void spawnPacket(Location spawnLoc, PacketDisplayEntityGroup packetGroup, BDECollection parentCollection, GroupSpawnSettings settings) {
+        for (BDEObject obj : children){
+            obj.spawnPacket(spawnLoc, packetGroup, this, settings);
         }
     }
 
