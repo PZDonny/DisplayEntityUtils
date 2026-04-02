@@ -249,7 +249,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         int[] ids;
         if (add){
             ids = new int[passengerIds.length+1];
-            for (int i = 0; i < ids.length; i++){
+            for (int i = 0; i < passengerIds.length; i++){
                 int id = passengerIds[i];
                 if (id == passengerId) return;
                 ids[i] = id;
