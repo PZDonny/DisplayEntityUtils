@@ -31,7 +31,7 @@ import java.io.File;
         "deu spawn bde model \"mymodel\" at {_location}",
         "deu spawn bde model \"mymodel\" at {_location} stored in {_newgroup}",
         "",
-        "3.4.3 and earlier",
+        "#3.4.3 and earlier",
         "set {_spawnedgroup} to bdengine model \"mymodel\" spawned at {_location}",
         "set {_spawnedgroup} to bde model \"model.bdengine\" spawned at {_location}"
 })

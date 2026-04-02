@@ -23,7 +23,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
         "set {_activegroup}'s deu yaw to 73",
         "set {_activegroup}'s deu yaw with interaction pivot to 25",
         "",
-        "3.4.3 and earlier",
+        "#3.4.3 and earlier",
         "deu set {_activegroup}'s yaw with interaction pivot to 35",
         "deu set {_activepart}'s pitch to -90"})
 @Since("2.6.2, 3.0.0 (Packet)")
