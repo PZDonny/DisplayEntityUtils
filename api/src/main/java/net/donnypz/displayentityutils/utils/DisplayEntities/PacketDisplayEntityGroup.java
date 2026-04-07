@@ -1137,10 +1137,5 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
     }
 
-    static class PassengerGroupData extends AsyncGroupHolder<UUID, PacketDisplayEntityGroup> {
-
-        Set<PacketDisplayEntityGroup> getGroups(Entity entity){
-            return getGroups(entity.getUniqueId());
-        }
-    }
+    private final static class PassengerGroupData extends AsyncGroupHolder<UUID, PacketDisplayEntityGroup> {}
 }
