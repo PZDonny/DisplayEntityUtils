@@ -41,7 +41,7 @@ public class EffActiveGroupRideEntity extends Effect {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
                 SyntaxInfo.builder(EffActiveGroupRideEntity.class)
-                        .addPattern("[deu] make %activegroup/entity% (mount|ride) %activegroup/entity% [c:using controller [with id] %-string%]")
+                        .addPattern("deu make %activegroup/entity% (mount|ride) %activegroup/entity% [c:using controller [with id] %-string%]")
                         .supplier(EffActiveGroupRideEntity::new)
                         .build()
         );
