@@ -35,10 +35,7 @@ final class ClientAnimationPlayerImpl extends ClientAnimationPlayer{
 
     @Override
     protected boolean canContinueAnimation(ActiveGroup<?> group) {
-        if (group instanceof SpawnedDisplayEntityGroup g && !g.isRegistered()){
-            return false;
-        }
-        return group.masterPart != null;
+        return group.isRegistered();
     }
 
     @Override

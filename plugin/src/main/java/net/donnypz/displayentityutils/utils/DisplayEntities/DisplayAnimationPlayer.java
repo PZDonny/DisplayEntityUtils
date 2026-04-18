@@ -28,7 +28,7 @@ final class DisplayAnimationPlayer extends AnimationPlayer{
 
     @Override
     protected boolean canContinueAnimation(ActiveGroup<?> group) {
-        return group.isActiveAnimator(animator) && ((SpawnedDisplayEntityGroup) group).isRegistered();
+        return group.isActiveAnimator(animator) && group.isRegistered();
     }
 
     @Override
