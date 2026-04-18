@@ -34,7 +34,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
     Set<SpawnedPartSelection> partSelections = new HashSet<>();
 
-    long creationTime = System.currentTimeMillis();
+    private final long creationTime;
     boolean isVisibleByDefault;
     private boolean isPersistent = DisplayConfig.defaultPersistence();
     private boolean persistenceOverride = DisplayConfig.persistenceOverride();
@@ -46,6 +46,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
     SpawnedDisplayEntityGroup(boolean isVisible) {
         this.isVisibleByDefault = isVisible;
+        this.creationTime = System.currentTimeMillis();
     }
 
     /**
@@ -59,6 +60,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         PersistentDataContainer c = masterDisplay.getPersistentDataContainer();
         if (c.has(creationTimeKey)){
             creationTime = c.get(creationTimeKey, PersistentDataType.LONG);
+        }
+        else{
+            creationTime = System.currentTimeMillis();
         }
         if (c.has(scaleKey)){
             scaleMultiplier = c.get(scaleKey, PersistentDataType.FLOAT);
@@ -1317,22 +1321,5 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     public boolean isSpawned(){
         return masterPart != null && masterPart.isValid();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        SpawnedDisplayEntityGroup that = (SpawnedDisplayEntityGroup) o;
-        return creationTime == that.creationTime
-                && isVisibleByDefault == that.isVisibleByDefault
-                && isPersistent == that.isPersistent
-                && persistenceOverride == that.persistenceOverride
-                && Objects.equals(partUUIDRandom, that.partUUIDRandom)
-                && Objects.equals(partSelections, that.partSelections);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(partUUIDRandom, partSelections, creationTime, isVisibleByDefault, isPersistent, persistenceOverride);
     }
 }
