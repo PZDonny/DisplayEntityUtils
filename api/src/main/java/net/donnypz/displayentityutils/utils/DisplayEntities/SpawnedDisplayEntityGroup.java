@@ -90,9 +90,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         DisplayGroupManager.addSpawnedGroup(masterDisplay.getLocation(), this);
 
         if (DisplayConfig.autoCulling()){
-            float widthCullingAdder = DisplayConfig.widthCullingAdder();
-            float heightCullingAdder = DisplayConfig.heightCullingAdder();
-            autoCull(widthCullingAdder, heightCullingAdder);
+            this.autoCull(false);
         }
     }
 
@@ -809,6 +807,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             translate(rideOffset, -1, -1);
         }
 
+        this.autoCull(true);
+
         updatePosition(vehicle);
         for (SpawnedDisplayEntityPart part : groupParts.values()){
             if (part.isDisplay()) continue;
@@ -877,6 +877,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                     translate(rideOffset.clone().multiply(-1), -1, -1);
                 }
             }
+            this.autoCull(false);
         }
         return vehicle;
     }
@@ -1002,9 +1003,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         mergingGroup.unregister(false, false);
 
         if (DisplayConfig.autoCulling()){
-            float widthCullingAdder = DisplayConfig.widthCullingAdder();
-            float heightCullingAdder = DisplayConfig.heightCullingAdder();
-            autoCull(widthCullingAdder, heightCullingAdder);
+            this.autoCull(true);
         }
         for (SpawnedPartSelection sel : partSelections){
             sel.refresh();

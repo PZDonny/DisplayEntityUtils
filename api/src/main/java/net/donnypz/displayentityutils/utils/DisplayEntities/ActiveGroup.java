@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
@@ -119,6 +120,21 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @return a {@link MultiPartSelection}
      */
     public abstract @NotNull MultiPartSelection<T> createPartSelection(@NotNull PartFilter partFilter);
+
+    /**
+     * Attempt to automatically set the culling bounds for all parts within this group, using config culling values.
+     * @param includeRideOffset whether the group's rideOffset should be included in calculation
+     */
+    public void autoCull(boolean includeRideOffset){
+        float widthAdder = DisplayConfig.widthCullingAdder();
+        float heightAdder = DisplayConfig.heightCullingAdder();
+        if (includeRideOffset){
+            widthAdder += (float) Math.max(Math.abs(rideOffset.getX()), Math.abs(rideOffset.getZ()));
+            heightAdder += (float) Math.abs(rideOffset.getY());
+        }
+
+        autoCull(widthAdder, heightAdder);
+    }
 
     /**
      * Attempt to automatically set the culling bounds for all parts within this group.

@@ -63,9 +63,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
 
         if (DisplayConfig.autoCulling()){
-            float widthCullingAdder = DisplayConfig.widthCullingAdder();
-            float heightCullingAdder = DisplayConfig.heightCullingAdder();
-            this.autoCull(widthCullingAdder, heightCullingAdder);
+            this.autoCull(false);
         }
     }
 
@@ -437,6 +435,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             translate(rideOffset, -1, -1);
         }
 
+        this.autoCull(true);
+
         if (runLocationUpdater){
             final UUID finalUUID = vehicle.getUniqueId();
             DisplayAPI.getScheduler().entityRunTimer(vehicle, new Scheduler.SchedulerRunnable() {
@@ -496,6 +496,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 translate(rideOffset.clone().multiply(-1), -1, -1);
             }
         }
+        this.autoCull(false);
         return vehicle;
     }
 
