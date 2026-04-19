@@ -696,11 +696,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
         if (distance == 0) return true;
         Location destination = getMasterEntity().getLocation().clone().add(direction.clone().normalize().multiply(distance));
-        GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.VANILLATRANSLATE, destination);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()){
+        if (!new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.VANILLATRANSLATE, destination).callEvent()){
             return false;
         }
+
         for (SpawnedDisplayEntityPart part : groupParts.values()){
             part.translateForce(direction, distance, durationInTicks, delayInTicks);
         }
@@ -802,16 +801,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     public boolean rideEntity(@NotNull Entity vehicle){
         Entity masterEntity = getMasterEntity();
-        GroupRideEntityEvent event = new GroupRideEntityEvent(this, vehicle);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()){
-            return false;
-        }
+        if (!new GroupRideEntityEvent(this, vehicle).callEvent()) return false;
 
-        boolean result = vehicle.addPassenger(masterEntity);
-        if (!result){
-            return false;
-        }
+        if (!vehicle.addPassenger(masterEntity)) return false;
 
         if (!rideOffset.isZero()) {
             translate(rideOffset, -1, -1);

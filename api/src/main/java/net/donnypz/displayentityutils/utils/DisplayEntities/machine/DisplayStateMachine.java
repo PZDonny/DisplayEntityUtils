@@ -63,16 +63,19 @@ public class DisplayStateMachine {
         if (!group.isSpawned()){
             return false;
         }
-        DisplayStateMachine oldStateAnimator = groupMachines.get(group);
-        if (oldStateAnimator == this){
+
+        DisplayStateMachine oldStateMachine = groupMachines.get(group);
+        if (oldStateMachine == this){
             return false;
         }
-        if (oldStateAnimator != null){
-            oldStateAnimator.removeGroup(group);
+
+        if (oldStateMachine != null){
+            oldStateMachine.removeGroup(group);
         }
 
         group.unsetMachineState();
         groupMachines.put(group, this);
+
         DisplayAPI.getScheduler().partRunTimer(group.getMasterPart(), new Scheduler.SchedulerRunnable() {
             @Override
             public void run() {
@@ -98,6 +101,7 @@ public class DisplayStateMachine {
         if (oldStateMachine == this){
             return false;
         }
+
         if (oldStateMachine != null){
             oldStateMachine.removeGroup(group);
         }
