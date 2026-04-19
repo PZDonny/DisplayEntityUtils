@@ -34,7 +34,7 @@ public abstract class AnimationPlayer {
                     int startFrameId,
                     int delay,
                     boolean playSingleFrame,
-                    boolean packetAnimationPlayer){
+                    boolean packetAnimationPlayer) {
         this.animator = animator;
         this.group = group;
         this.playSingleFrame = playSingleFrame;
@@ -45,68 +45,63 @@ public abstract class AnimationPlayer {
     AnimationPlayer(@NotNull DisplayAnimator animator,
                     @NotNull ActiveGroup<?> group,
                     boolean playSingleFrame,
-                    boolean packetAnimationPlayer){
+                    boolean packetAnimationPlayer) {
         this.animator = animator;
         this.group = group;
         this.playSingleFrame = playSingleFrame;
         this.packetAnimationPlayer = packetAnimationPlayer;
     }
 
-    protected void prepareAnimation(SpawnedDisplayAnimation animation, ActiveGroup<?> group, SpawnedDisplayAnimationFrame frame, int frameId, int delay){
+    protected void prepareAnimation(SpawnedDisplayAnimation animation, ActiveGroup<?> group, SpawnedDisplayAnimationFrame frame, int frameId, int delay) {
         group.addActiveAnimator(animator);
         MultiPartSelection<?> selection = animation.hasFilter() ? group.createPartSelection(animation.filter) : group.createPartSelection();
-        if (packetAnimationPlayer){
+        if (packetAnimationPlayer) {
             DisplayAPI
                     .getScheduler()
                     .partRunLaterAsync(group.getMasterPart(), () -> executeAnimation(null, animation, group, selection, frame, frameId, playSingleFrame),
                             Math.max(delay, 0));
-        }
-        else{
-            if (delay <= 0){
+        } else {
+            if (delay <= 0) {
                 executeAnimation(null, animation, group, selection, frame, frameId, playSingleFrame);
-            }
-            else{
+            } else {
                 DisplayAPI.getScheduler().runLater(() -> executeAnimation(null, animation, group, selection, frame, frameId, playSingleFrame), delay);
             }
         }
     }
 
-    protected void executeAnimation(Collection<Player> players, SpawnedDisplayAnimation animation, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame){
+    protected void executeAnimation(Collection<Player> players, SpawnedDisplayAnimation animation, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame) {
         if (!onStartNewFrame(group, selection)) return;
         //Check if the animation can continue playing
-        if (!canContinueAnimation(group)){
+        if (!canContinueAnimation(group)) {
             handleAnimationInterrupted(group, selection);
             return;
         }
 
-        if (animator.type == DisplayAnimator.AnimationType.LOOP){
+        if (animator.type == DisplayAnimator.AnimationType.LOOP) {
             SpawnedDisplayAnimationFrame startFrame = animation.frames.getFirst();
             SpawnedDisplayAnimationFrame lastFrame = animation.frames.getLast();
-            if (startFrame == frame){
+            if (startFrame == frame) {
                 callAnimationLoopStart(players, group);
-            }
-            else if (frame == lastFrame && startFrame.equals(frame) && !playSingleFrame && animation.frames.size() > 1){ //Skip if start and last frame are identical
+            } else if (frame == lastFrame && startFrame.equals(frame) && !playSingleFrame && animation.frames.size() > 1) { //Skip if start and last frame are identical
                 executeAnimation(players, animation, group, selection, animation.frames.getFirst(), 0, false);
                 return;
             }
         }
 
         Location groupLoc = group.getLocation();
-        if (!playSingleFrame){
+        if (!playSingleFrame) {
             callAnimationFrameStart(players, group, animation, frame, frameId);
-        }
-        else{
+        } else {
             callAnimationSetFrame(players, group, animation, frame);
         }
 
-        if (players != null){
+        if (players != null) {
             frame.playEffects(players, group);
-        }
-        else{
+        } else {
             frame.playEffects(group, animator, true);
         }
 
-        if ((!packetAnimationPlayer && groupLoc.isChunkLoaded()) || players != null || group.hasTrackingPlayers()){
+        if ((!packetAnimationPlayer && groupLoc.isChunkLoaded()) || players != null || group.hasTrackingPlayers()) {
             animateInteractions(players, groupLoc, frame, group, selection, animation);
             animateDisplays(players, frame, group, selection, animation);
         }
@@ -114,30 +109,29 @@ public abstract class AnimationPlayer {
         if (players == null) group.setLastAnimatedTick();
 
 
-        if (playSingleFrame){
+        if (playSingleFrame) {
             handleAnimationInterrupted(group, selection);
             return;
         }
 
         //Play Next Frame
-        if (frame != animation.frames.getLast()){
+        if (frame != animation.frames.getLast()) {
             prevFrame = frame;
-            int delay = frame.duration+frame.delay;
-            if (frame.duration <= 0 && frame.delay <= 0){
+            int delay = frame.duration + frame.delay;
+            if (frame.duration <= 0 && frame.delay <= 0) {
                 delay++;
             }
-            if (frame.duration > 0){
+            if (frame.duration > 0) {
                 useScheduler(() -> {
                     callAnimationFrameEnd(players, group, animation, frame, frameId);
                 }, frame.duration);
-            }
-            else{
+            } else {
                 callAnimationFrameEnd(players, group, animation, frame, frameId);
             }
 
             useScheduler(() -> {
-                SpawnedDisplayAnimationFrame nextFrame = animation.frames.get(frameId+1);
-                executeAnimation(players, animation, group, selection, nextFrame, frameId+1, false);
+                SpawnedDisplayAnimationFrame nextFrame = animation.frames.get(frameId + 1);
+                executeAnimation(players, animation, group, selection, nextFrame, frameId + 1, false);
             }, delay);
         }
 
@@ -149,8 +143,7 @@ public abstract class AnimationPlayer {
                         callAnimationComplete(players, group, animation);
                         handleAnimationComplete(group, selection);
                     }, frame.duration);
-                }
-                else {
+                } else {
                     callAnimationComplete(players, group, animation);
                     handleAnimationComplete(group, selection);
                 }
@@ -163,33 +156,32 @@ public abstract class AnimationPlayer {
                     useScheduler(() -> {
                         executeAnimation(players, animation, group, selection, firstFrame, 0, false);
                     }, frame.duration);
-                }
-                else {
+                } else {
                     executeAnimation(players, animation, group, selection, animation.frames.getFirst(), 0, false);
                 }
             }
         }
     }
 
-    void animateInteractions(Collection<Player> players, Location groupLoc, SpawnedDisplayAnimationFrame frame, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimation animation){
-        if (!group.isActiveAnimator(animator)){
+    void animateInteractions(Collection<Player> players, Location groupLoc, SpawnedDisplayAnimationFrame frame, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimation animation) {
+        if (!group.isActiveAnimator(animator)) {
             return;
         }
-        for (Map.Entry<UUID, Vector3f> entry : frame.interactionTransformations.entrySet()){
+        for (Map.Entry<UUID, Vector3f> entry : frame.interactionTransformations.entrySet()) {
             UUID partUUID = entry.getKey();
 
             Vector3f transform = entry.getValue();
-            if (transform == null){
+            if (transform == null) {
                 continue;
             }
 
             ActivePart part = group.getPart(partUUID);
-            if (part == null || !selection.contains(part)){
+            if (part == null || !selection.contains(part)) {
                 continue;
             }
 
             Vector currentVector = part.getNonDisplayTranslation();
-            if (currentVector == null){
+            if (currentVector == null) {
                 continue;
             }
 
@@ -197,95 +189,89 @@ public abstract class AnimationPlayer {
             float height = part.getInteractionHeight();
             float width = part.getInteractionWidth();
             float yawAtCreation = InteractionTransformation.invalidDirectionValue;
-            if (transform instanceof InteractionTransformation t && t.vector != null){
+            if (transform instanceof InteractionTransformation t && t.vector != null) {
                 v = t.vector.clone();
-                if (t.height != -1 && t.width != -1){
+                if (t.height != -1 && t.width != -1) {
                     height = t.height;
                     width = t.width;
-                    if (group.getScaleMultiplier() != 1 && animation.groupScaleRespect()){
-                        height*=group.getScaleMultiplier();
-                        width*=group.getScaleMultiplier();
+                    if (group.getScaleMultiplier() != 1 && animation.groupScaleRespect()) {
+                        height *= group.getScaleMultiplier();
+                        width *= group.getScaleMultiplier();
                     }
                     yawAtCreation = t.groupYawAtCreation;
                 }
-            }
-
-            else{
+            } else {
                 v = Vector.fromJOML(transform);
             }
 
-            if (group.getScaleMultiplier() != 1 && animation.groupScaleRespect()){
+            if (group.getScaleMultiplier() != 1 && animation.groupScaleRespect()) {
                 v.multiply(group.getScaleMultiplier());
             }
 
-            if (yawAtCreation != InteractionTransformation.invalidDirectionValue){ //Pivot
+            if (yawAtCreation != InteractionTransformation.invalidDirectionValue) { //Pivot
                 v.rotateAroundY(Math.toRadians(yawAtCreation - groupLoc.getYaw()));
             }
 
             if (!currentVector.equals(v)) {
                 Vector moveVector = currentVector.subtract(v);
-                if (players == null){
+                if (players == null) {
                     part.translate(moveVector, frame.duration, 0);
-                }
-                else {
+                } else {
                     PacketUtils.translateNonDisplay(players, part, moveVector, (float) moveVector.length(), frame.duration, 0);
                 }
             }
 
-            if (!packetAnimationPlayer){
+            if (!packetAnimationPlayer) {
                 SpawnedDisplayEntityPart sp = (SpawnedDisplayEntityPart) part;
                 DisplayUtils.scaleInteraction((Interaction) sp.getEntity(), height, width, frame.duration, 0);
-            }
-            else{
-                if (players == null){
+            } else {
+                if (players == null) {
                     DisplayAttributeMap map = new DisplayAttributeMap()
                             .add(DisplayAttributes.Interaction.HEIGHT, height)
                             .add(DisplayAttributes.Interaction.WIDTH, width);
-                    if (part instanceof PacketDisplayEntityPart pp){
+                    if (part instanceof PacketDisplayEntityPart pp) {
                         pp.setAttributesSilent(map);
                     }
 
-                    for (Player player : part.getTrackingPlayers()){
+                    for (Player player : part.getTrackingPlayers()) {
                         boolean scaleInteractions = group.isPlayerInteractionScaleMultiplier(player);
                         float scaleMultiplier = scaleInteractions ? group.getPlayerScaleMultiplier(player) : 1;
-                        PacketUtils.scaleInteraction(player, part, height*scaleMultiplier, width*scaleMultiplier, frame.duration, 0);
+                        PacketUtils.scaleInteraction(player, part, height * scaleMultiplier, width * scaleMultiplier, frame.duration, 0);
                     }
-                }
-                else{
-                    for (Player player : players){
+                } else {
+                    for (Player player : players) {
                         boolean scaleInteractions = group.isPlayerInteractionScaleMultiplier(player);
                         float scaleMultiplier = scaleInteractions ? group.getPlayerScaleMultiplier(player) : 1;
-                        PacketUtils.scaleInteraction(player, part, height*scaleMultiplier, width*scaleMultiplier, frame.duration, 0);
+                        PacketUtils.scaleInteraction(player, part, height * scaleMultiplier, width * scaleMultiplier, frame.duration, 0);
                     }
                 }
             }
         }
     }
 
-    private void animateDisplays(Collection<Player> players, SpawnedDisplayAnimationFrame frame, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimation animation){
-        if (!group.isActiveAnimator(animator)){
+    private void animateDisplays(Collection<Player> players, SpawnedDisplayAnimationFrame frame, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimation animation) {
+        if (!group.isActiveAnimator(animator)) {
             return;
         }
-        if (selection.selectedParts.size() >= frame.displayTransformations.size()){
-            for (Map.Entry<UUID, DisplayTransformation> entry : frame.displayTransformations.entrySet()){
+        if (selection.selectedParts.size() >= frame.displayTransformations.size()) {
+            for (Map.Entry<UUID, DisplayTransformation> entry : frame.displayTransformations.entrySet()) {
                 UUID partUUID = entry.getKey();
                 DisplayTransformation transformation = entry.getValue();
-                if (transformation == null){ //Part does not change transformation
+                if (transformation == null) { //Part does not change transformation
                     continue;
                 }
 
                 ActivePart part = group.getPart(partUUID);
-                if (part == null || !selection.contains(part)){
+                if (part == null || !selection.contains(part)) {
                     continue;
                 }
 
                 animateDisplay(players, part, transformation, group, animation, frame);
             }
-        }
-        else{
-            for (ActivePart part : selection.selectedParts){
+        } else {
+            for (ActivePart part : selection.selectedParts) {
                 DisplayTransformation transformation = frame.displayTransformations.get(part.getPartUUID());
-                if (transformation == null){ //Part does not change transformation
+                if (transformation == null) { //Part does not change transformation
                     continue;
                 }
                 animateDisplay(players, part, transformation, group, animation, frame);
@@ -293,14 +279,13 @@ public abstract class AnimationPlayer {
         }
     }
 
-    private void animateDisplay(Collection<Player> players, ActivePart part, DisplayTransformation transformation, ActiveGroup<?> group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame){
+    private void animateDisplay(Collection<Player> players, ActivePart part, DisplayTransformation transformation, ActiveGroup<?> group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame) {
         //Prevents jittering in some cases
         boolean applyDataOnly;
-        if (!packetAnimationPlayer){
+        if (!packetAnimationPlayer) {
             applyDataOnly = transformation.isSimilar(part.getTransformation());
             applyDisplayTransformation(part, frame, animation, group, transformation, applyDataOnly);
-        }
-        else{
+        } else {
             DisplayTransformation last = prevFrame != null ? prevFrame.displayTransformations.get(part.getPartUUID()) : null;
             applyDataOnly = last != null && transformation.isSimilar(last);
             applyDisplayTransformationWithPackets(players, part, frame, animation, group, transformation, applyDataOnly);
@@ -308,14 +293,12 @@ public abstract class AnimationPlayer {
     }
 
 
-
-    private void useScheduler(Runnable runnable, int delay){
-        if (packetAnimationPlayer){
+    private void useScheduler(Runnable runnable, int delay) {
+        if (packetAnimationPlayer) {
             DisplayAPI.getScheduler().partRunLaterAsync(group.getMasterPart(), () -> {
                 runnable.run();
             }, delay);
-        }
-        else{
+        } else {
             DisplayAPI.getScheduler().partRunLater(group.getMasterPart(), () -> {
                 runnable.run();
             }, delay);
@@ -323,114 +306,106 @@ public abstract class AnimationPlayer {
 
     }
 
-    private void callAnimationLoopStart(Collection<Player> players, ActiveGroup<?> group){
-        if (packetAnimationPlayer){
+    private void callAnimationLoopStart(Collection<Player> players, ActiveGroup<?> group) {
+        if (packetAnimationPlayer) {
             new PacketAnimationLoopStartEvent(group, animator, players).callEvent();
-        }
-        else{
+        } else {
             new AnimationLoopStartEvent((SpawnedDisplayEntityGroup) group, animator).callEvent();
         }
     }
 
-    private void callAnimationFrameStart(Collection<Player> players, ActiveGroup<?> group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame, int frameId){
-        if (packetAnimationPlayer){
+    private void callAnimationFrameStart(Collection<Player> players, ActiveGroup<?> group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame, int frameId) {
+        if (packetAnimationPlayer) {
             new PacketAnimationFrameStartEvent(group, animator, animation, frame, frameId, players).callEvent();
-        }
-        else{
+        } else {
             new AnimationFrameStartEvent((SpawnedDisplayEntityGroup) group, animator, animation, frameId, frame).callEvent();
         }
     }
 
-    private void callAnimationSetFrame(Collection<Player> players, ActiveGroup<?> group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame){
-        if (packetAnimationPlayer){
+    private void callAnimationSetFrame(Collection<Player> players, ActiveGroup<?> group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame) {
+        if (packetAnimationPlayer) {
             new PacketAnimationSetFrameEvent(group, animator, animation, frame, players).callEvent();
-        }
-        else{
+        } else {
             new AnimationSetFrameEvent((SpawnedDisplayEntityGroup) group, animator, animation, frame).callEvent();
         }
     }
 
-    private void callAnimationFrameEnd(Collection<Player> players, ActiveGroup<?> group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame, int frameId){
-        if (packetAnimationPlayer){
+    private void callAnimationFrameEnd(Collection<Player> players, ActiveGroup<?> group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame, int frameId) {
+        if (packetAnimationPlayer) {
             new PacketAnimationFrameEndEvent(group, animator, animation, frame, frameId, players).callEvent();
-        }
-        else{
+        } else {
             new AnimationFrameEndEvent((SpawnedDisplayEntityGroup) group, animator, animation, frameId, frame).callEvent();
         }
     }
 
-    private void callAnimationComplete(Collection<Player> players, ActiveGroup<?> group, SpawnedDisplayAnimation animation){
-        if (packetAnimationPlayer){
+    private void callAnimationComplete(Collection<Player> players, ActiveGroup<?> group, SpawnedDisplayAnimation animation) {
+        if (packetAnimationPlayer) {
             new PacketAnimationCompleteEvent(group, animator, animation, players).callEvent();
-        }
-        else{
+        } else {
             new AnimationCompleteEvent((SpawnedDisplayEntityGroup) group, animator, animation).callEvent();
         }
     }
 
-    private void applyDisplayTransformationWithPackets(Collection<Player> players, ActivePart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, ActiveGroup<?> group, DisplayTransformation transformation, boolean applyDataOnly){
-        if (applyDataOnly){
-            if (animation.allowsTextureChanges()){
-                transformation.applyData(part);
+    private void applyDisplayTransformationWithPackets(Collection<Player> players, ActivePart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, ActiveGroup<?> group, DisplayTransformation transformation, boolean applyDataOnly) {
+        if (!applyDataOnly) {
+            DisplayAttributeMap map = new DisplayAttributeMap();
+
+            //Do this manually, since you have to send one large packet and don't want to send multiple
+            if (frame.duration > 0) {
+                map.add(DisplayAttributes.Interpolation.DELAY, 0);
+            } else {
+                map.add(DisplayAttributes.Interpolation.DELAY, -1);
             }
-            return;
-        }
-        DisplayAttributeMap map = new DisplayAttributeMap();
+            map.add(DisplayAttributes.Interpolation.DURATION, frame.duration);
 
-        //Do this manually, since you have to send one large packet and don't want to send multiple
-        if (frame.duration > 0) {
-            map.add(DisplayAttributes.Interpolation.DELAY, 0);
-        }
-        else {
-            map.add(DisplayAttributes.Interpolation.DELAY, -1);
-        }
-        map.add(DisplayAttributes.Interpolation.DURATION, frame.duration);
+            Vector3f translationVector = new Vector3f(transformation.getTranslation());
 
-        Vector3f translationVector = new Vector3f(transformation.getTranslation());
-        if (group.isRiding()) translationVector.add(group.getRideOffset3f());
+            if (group.isRiding()) translationVector.add(group.getRideOffset3f());
 
-        float groupScaleMultiplier = group.getScaleMultiplier();
-        if (animation.respectGroupScale){
-            Vector3f scaleVector = new Vector3f(transformation.getScale());
-            if (group.getScaleMultiplier() != 1){
-                translationVector.mul(groupScaleMultiplier);
-                scaleVector.mul(groupScaleMultiplier);
-            }
-            addFollowerDisplayPivot(group, part, translationVector);
+            float groupScaleMultiplier = group.getScaleMultiplier();
 
-            Transformation respectTransform = new DisplayTransformation(translationVector, transformation.getLeftRotation(), scaleVector, transformation.getRightRotation());
-            map.addTransformation(respectTransform);
-        }
-        else{
-            addFollowerDisplayPivot(group, part, translationVector);
-            Transformation offsetTransformation = new DisplayTransformation(translationVector, transformation.getLeftRotation(), transformation.getScale(), transformation.getRightRotation());
-            map.addTransformation(offsetTransformation);
-        }
+            final DisplayTransformation finalTransformation;
 
-        if (!group.isActiveAnimator(animator)) return;
+            if (animation.respectGroupScale) {
+                Vector3f scaleVector = new Vector3f(transformation.getScale());
+                if (group.getScaleMultiplier() != 1) {
+                    translationVector.mul(groupScaleMultiplier);
+                    scaleVector.mul(groupScaleMultiplier);
+                }
+                addFollowerDisplayPivot(group, part, translationVector);
 
-        int entityId = part.getEntityId();
-        if (players == null){
-            if (part instanceof PacketDisplayEntityPart ppart) {
-                ppart.setAttributesSilent(map);
+                finalTransformation = new DisplayTransformation(translationVector, transformation.getLeftRotation(), scaleVector, transformation.getRightRotation());
+            } else {
+                addFollowerDisplayPivot(group, part, translationVector);
+                finalTransformation = new DisplayTransformation(translationVector, transformation.getLeftRotation(), transformation.getScale(), transformation.getRightRotation());
             }
 
-            for (Player p : part.getTrackingPlayers()){
-                sendDisplayAttributes(p, entityId, map, transformation);
-            }
-        }
-        else{
-            for (Player p : players){
-                sendDisplayAttributes(p, entityId, map, transformation);
+            map.addTransformation(finalTransformation);
+
+            if (!group.isActiveAnimator(animator)) return;
+
+            int entityId = part.getEntityId();
+            if (players == null) {
+                if (part instanceof PacketDisplayEntityPart ppart) {
+                    ppart.setAttributesSilent(map);
+                }
+
+                for (Player p : part.getTrackingPlayers()) {
+                    sendDisplayAttributes(p, entityId, map, finalTransformation);
+                }
+            } else {
+                for (Player p : players) {
+                    sendDisplayAttributes(p, entityId, map, finalTransformation);
+                }
             }
         }
 
-        if (animation.allowsTextureChanges()){
+        if (animation.allowsTextureChanges()) {
             transformation.applyData(part);
         }
     }
 
-    private void sendDisplayAttributes(Player player, int entityId, DisplayAttributeMap map, Transformation transformation){
+    private void sendDisplayAttributes(Player player, int entityId, DisplayAttributeMap map, Transformation transformation) {
         float playerScaleMultiplier = group.getPlayerScaleMultiplier(player);
 
         new PacketAttributeContainer()
@@ -442,12 +417,12 @@ public abstract class AnimationPlayer {
                 .sendAttributes(player, entityId);
     }
 
-    private void applyDisplayTransformation(ActivePart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, ActiveGroup<?> group, DisplayTransformation transformation, boolean applyDataOnly){
+    private void applyDisplayTransformation(ActivePart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, ActiveGroup<?> group, DisplayTransformation transformation, boolean applyDataOnly) {
         SpawnedDisplayEntityPart sp = (SpawnedDisplayEntityPart) part;
         Display display = (Display) sp.getEntity();
         if (!display.isValid()) return;
-        if (applyDataOnly){
-            if (animation.allowsTextureChanges()){
+        if (applyDataOnly) {
+            if (animation.allowsTextureChanges()) {
                 transformation.applyData(display);
             }
             return;
@@ -455,19 +430,18 @@ public abstract class AnimationPlayer {
 
         if (frame.duration > 0) {
             display.setInterpolationDelay(0);
-        }
-        else {
+        } else {
             display.setInterpolationDelay(-1);
         }
         display.setInterpolationDuration(frame.duration);
 
         Vector3f translationVector = new Vector3f(transformation.getTranslation());
-        if (group.isRiding()){
+        if (group.isRiding()) {
             translationVector.add(group.getRideOffset3f());
         }
-        if (animation.respectGroupScale){
+        if (animation.respectGroupScale) {
             Vector3f scaleVector = new Vector3f(transformation.getScale());
-            if (group.getScaleMultiplier() != 1){
+            if (group.getScaleMultiplier() != 1) {
                 translationVector.mul(group.getScaleMultiplier());
                 scaleVector.mul(group.getScaleMultiplier());
             }
@@ -475,23 +449,22 @@ public abstract class AnimationPlayer {
 
             Transformation respectTransform = new DisplayTransformation(translationVector, transformation.getLeftRotation(), scaleVector, transformation.getRightRotation());
             display.setTransformation(respectTransform);
-        }
-        else{
+        } else {
             addFollowerDisplayPivot(group, part, translationVector);
 
             Transformation offsetTransformation = new DisplayTransformation(translationVector, transformation.getLeftRotation(), transformation.getScale(), transformation.getRightRotation());
             display.setTransformation(offsetTransformation);
         }
 
-        if (animation.allowsTextureChanges()){
+        if (animation.allowsTextureChanges()) {
             transformation.applyData(display);
         }
     }
 
-    private void addFollowerDisplayPivot(ActiveGroup<?> group, ActivePart part, Vector3f translationVector){
-        synchronized (group.followerLock){
-            for (GroupEntityFollower follower : group.followers){
-                if (!follower.hasSetDisplayPivotData()){
+    private void addFollowerDisplayPivot(ActiveGroup<?> group, ActivePart part, Vector3f translationVector) {
+        synchronized (group.followerLock) {
+            for (GroupEntityFollower follower : group.followers) {
+                if (!follower.hasSetDisplayPivotData()) {
                     continue;
                 }
                 follower.laterManualPivot(part, translationVector);
