@@ -33,6 +33,24 @@
                         <configuration>
                             <finalName>displayentityutils-${project.version}</finalName>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.mongodb</pattern>
+                                    <shadedPattern>net.donnypz.displayentityutils.mongodb</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.zaxxer</pattern>
+                                    <shadedPattern>net.donnypz.displayentityutils.hikaricp</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.bstats</pattern>
+                                    <shadedPattern>net.donnypz.displayentityutils.bstats</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.jeff_media.customblockdata</pattern>
+                                    <shadedPattern>net.donnypz.displayentityutils.customblockdata</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
