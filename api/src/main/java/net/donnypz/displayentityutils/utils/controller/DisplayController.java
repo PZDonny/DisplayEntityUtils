@@ -299,8 +299,10 @@ public class DisplayController {
 
         Location spawnLoc = entity.getLocation();
         ActiveGroup<?> activeGroup = isPacketBased ?
-                group.createPacketGroup(spawnLoc, GroupSpawnedEvent.SpawnReason.DISPLAY_CONTROLLER, true)
-                        .setAutoShow(groupVisibleByDefault)
+                group.createPacketGroup(spawnLoc, GroupSpawnedEvent.SpawnReason.DISPLAY_CONTROLLER,
+                        new GroupSpawnSettings().visibleByDefault(groupVisibleByDefault, null)
+                                .playSpawnAnimation(true)
+                                .persistentByDefault(false))
                 :
                 group.spawn(spawnLoc, GroupSpawnedEvent.SpawnReason.DISPLAY_CONTROLLER, new GroupSpawnSettings()
                     .persistentByDefault(persistGroup)
@@ -339,6 +341,7 @@ public class DisplayController {
         else{
             isDisguised = false;
         }
+
         if (isDisguised){
             if (!activeGroup.rideEntity(entity)){
                 return false;
