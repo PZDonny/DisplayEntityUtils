@@ -55,6 +55,7 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         new GroupBillboardCMD(this);
         new GroupViewRangeCMD(this);
         new GroupRideCMD(this);
+        new GroupRideDespawnCMD(this);
         new GroupSafeDismountCMD(this);
         new GroupDismountCMD(this);
         new GroupWorldEditCMD(this);
@@ -131,6 +132,7 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/deu group glow", "Make all parts in this group glow");
             CMDUtils.sendCMD(sender, "/deu group unglow", "Remove the glowing effect from all parts in this group");
             CMDUtils.sendCMD(sender, "/deu group ride <-target | player-name | entity-uuid> [group-tag] [storage] [controller-id]", "Make a group ride an entity. Values in brackets [] are optional");
+            CMDUtils.sendCMD(sender, "/deu group ridedespawn <-target | player-name | entity-uuid> [group-tag] [storage] [controller-id]", "Make a group ride an entity, despawning the group after the ridden entity despawns/disconnects. The group will not be persistent. Values in brackets [] are optional");
         }
         else if (page == 6){
             CMDUtils.sendCMD(sender, "/deu group safedismount <-target | -selected | player-name | entity-uuid>", "Safely dismount a group from an entity");
