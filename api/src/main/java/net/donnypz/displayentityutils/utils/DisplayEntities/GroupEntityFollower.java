@@ -119,6 +119,8 @@ class GroupEntityFollower {
                     finalFollowType = group.defaultFollower.properties.followType();
                 }
 
+                if (finalFollowType == null) return;
+
                 if (group.defaultFollower != null && !isDefaultFollower){ //Stop part follow if default follower can't follow
                     if (!group.defaultFollower.properties.shouldPropertiesApply(group)){
                         return;
