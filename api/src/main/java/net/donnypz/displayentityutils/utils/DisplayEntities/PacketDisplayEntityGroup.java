@@ -612,6 +612,18 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
     }
 
+    /**
+     * Resend this {@link PacketDisplayEntityGroup}'s location to viewers of the group, refreshing its position.
+     */
+    public void resendLocation(){
+        Location groupLoc = getLocation();
+        if (groupLoc == null) return;
+        for (Player p : this.getTrackingPlayers()){
+            if (p == null) continue;
+            masterPart.teleportUnsetPassengers(groupLoc, p);
+        }
+    }
+
     @Override
     public void teleportMove(@NotNull Vector direction, double distance, int durationInTicks) {
         Location destination = getLocation().add(direction.clone().normalize().multiply(distance));
