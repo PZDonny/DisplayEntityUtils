@@ -35,7 +35,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     private static final ConcurrentHashMap<String, WorldData> allPacketGroups = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<UUID, PassengerGroupData> groupVehicles = new ConcurrentHashMap<>();
     int[] passengerIds;
-    UUID vehicleUUID;
+    volatile UUID vehicleUUID;
     boolean autoShow;
     Predicate<Player> autoShowCondition;
     int persistentLocalId = -1;
@@ -420,6 +420,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             return false;
         }
         if (vehicle.getUniqueId() == vehicleUUID) return true;
+        removeAsPassenger(vehicleUUID, true); //remove old vehicle
         vehicleUUID = vehicle.getUniqueId();
 
         WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, true));
@@ -443,7 +444,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 @Override
                 public void run() {
                     if (masterPart == null){
-                        vehicleUUID = null;
+                        removeAsPassenger(vehicleUUID, true);
                         cancel();
                         return;
                     }
@@ -451,14 +452,17 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                         cancel();
                         return;
                     }
+
                     Entity entity = Bukkit.getEntity(vehicleUUID);
                     if (entity == null){
                         if (!DisplayControllerManager.isControllerEntity(vehicleUUID)){
+                            removeAsPassenger(vehicleUUID, true);
                             cancel();
                         }
                         return;
                     }
                     if (entity.isDead()){
+                        removeAsPassenger(vehicleUUID, true);
                         cancel();
                         return;
                     }
@@ -469,7 +473,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return true;
     }
 
-    private void removeAsPassenger(UUID entityUUID){
+    private void removeAsPassenger(UUID entityUUID, boolean removeVehicleUUID){
         if (vehicleUUID == null) return;
         PassengerGroupData data = groupVehicles.get(vehicleUUID);
         if (data == null) return;
@@ -477,6 +481,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         if (data.isEmpty()){
             groupVehicles.remove(vehicleUUID);
         }
+        if (removeVehicleUUID) vehicleUUID = null;
     }
 
     /**
@@ -486,17 +491,17 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     @Override
     public @Nullable Entity dismount(){
         Entity vehicle = getVehicle();
-        removeAsPassenger(vehicleUUID);
-        if (vehicle == null) return null;
-        vehicleUUID = null;
-        dismount(getTrackingPlayers());
+        removeAsPassenger(vehicleUUID, true);
+        if (vehicle != null){
+            dismount(getTrackingPlayers(), vehicle);
 
-        if (!vehicle.isDead()){
-            if (!rideOffset.isZero()){
-                translate(rideOffset.clone().multiply(-1), -1, -1);
+            if (!vehicle.isDead()){
+                if (!rideOffset.isZero()){
+                    translate(rideOffset.clone().multiply(-1), -1, -1);
+                }
             }
+            this.autoCull(false);
         }
-        this.autoCull(false);
         return vehicle;
     }
 
@@ -518,7 +523,15 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * <br>This method must be called sync
      */
     public void dismount(@NotNull Collection<Player> players){
-        Entity vehicle = getVehicle();
+        dismount(players, getVehicle());
+    }
+
+    /**
+     * Dismount this group from an entity for given players
+     * @param players the players to receive the dismount
+     * <br>This method must be called sync
+     */
+    private void dismount(@NotNull Collection<Player> players, Entity vehicle){
         if (vehicle == null) return;
         WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(vehicle.getEntityId(), getPassengerArray(vehicle, false));
         for (Player p : players){
