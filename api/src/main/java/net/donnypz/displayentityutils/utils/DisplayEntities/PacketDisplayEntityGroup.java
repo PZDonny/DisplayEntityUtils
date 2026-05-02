@@ -466,7 +466,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                         cancel();
                         return;
                     }
-                    updateChunkAndWorld(entity.getLocation());
+                    Location newLoc = entity.getLocation();
+                    Location currentLoc = getLocation();
+                    newLoc.setPitch(currentLoc.getPitch());
+                    newLoc.setYaw(currentLoc.getYaw());
+                    updateChunkAndWorld(newLoc);
                 }
             }, 0, 20);
         }
