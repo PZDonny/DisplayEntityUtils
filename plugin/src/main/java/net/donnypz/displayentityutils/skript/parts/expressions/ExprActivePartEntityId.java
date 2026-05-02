@@ -5,7 +5,6 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import net.donnypz.displayentityutils.skript.parts.effects.EffActivePartTag;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
@@ -21,7 +20,7 @@ public class ExprActivePartEntityId extends SimplePropertyExpression<ActivePart,
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
                 SyntaxInfo.Expression.builder(ExprActivePartEntityId.class, Integer.class)
-                        .addPatterns(getPatterns("[deu] entity id", "activeparts"))
+                        .addPatterns(getPatterns("deu entity id", "activeparts"))
                         .supplier(ExprActivePartEntityId::new)
                         .build()
         );
