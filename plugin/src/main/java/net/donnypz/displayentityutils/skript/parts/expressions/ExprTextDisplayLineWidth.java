@@ -22,13 +22,13 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 @Examples({"if {_activepart}'s part type is text_display:",
         "\tset {_activepart}'s deu text line width to 50"
 })
-@Since("3.5.0")
-public class ExprTextDisplayLineWidth extends SimplePropertyExpression<ActivePart, Number> {
+@Since("3.5.0, 3.5.2 (Text Displays Entities)")
+public class ExprTextDisplayLineWidth extends SimplePropertyExpression<Object, Number> {
 
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
                 SyntaxInfo.Expression.builder(ExprTextDisplayLineWidth.class, Number.class)
-                        .addPatterns(getPatterns("deu text [display] line width", "activeparts"))
+                        .addPatterns(getPatterns("deu text [display] line width", "activeparts/displays"))
                         .supplier(ExprTextDisplayLineWidth::new)
                         .build()
         );
@@ -47,8 +47,14 @@ public class ExprTextDisplayLineWidth extends SimplePropertyExpression<ActivePar
 
     @Override
     @Nullable
-    public Number convert(ActivePart part) {
-        return part.getTextDisplayLineWidth();
+    public Number convert(Object obj) {
+        if (obj instanceof ActivePart part){
+            return part.getTextDisplayLineWidth();
+        }
+        else if (obj instanceof TextDisplay td){
+            return td.getLineWidth();
+        }
+        return null;
     }
 
     @Override
@@ -70,6 +76,9 @@ public class ExprTextDisplayLineWidth extends SimplePropertyExpression<ActivePar
         for (Object o : getExpr().getArray(event)){
             if (o instanceof ActivePart part) {
                 part.setTextDisplayLineWidth(width);
+            }
+            else if (o instanceof TextDisplay td){
+                td.setLineWidth(width);
             }
         }
     }
