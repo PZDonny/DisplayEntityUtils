@@ -503,38 +503,80 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
     @Override
     public boolean teleport(@NotNull Location location, boolean respectGroupDirection){
+        return teleport(location, respectGroupDirection, false);
+    }
+
+    /**
+     * Change the true location of this group.
+     * @param location The location to teleport this group
+     * @param respectGroupDirection Whether to respect this group's pitch and yaw or the location's pitch and yaw
+     * @param force forcefully teleport this group, loading its chunk
+     * @return true if the teleport was successful
+     */
+    public boolean teleport(@NotNull Location location, boolean respectGroupDirection, boolean force){
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORT, location);
         Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()){
-            return false;
-        }
+        if (event.isCancelled()) return false;
 
-        teleportWithoutEvent(location, respectGroupDirection);
+        teleportWithoutEvent(location, respectGroupDirection, force);
         return true;
     }
 
-    private void teleportWithoutEvent(Location location, boolean respectGroupDirection){
+    private void teleportWithoutEvent(Location location, boolean respectGroupDirection, boolean forceChunkLoading){
         Entity master = getMasterEntity();
         Location oldMasterLoc = master.getLocation().clone();
+        boolean sameWorld = location.getWorld().getName().equals(oldMasterLoc.getWorld().getName());
+        Chunk chunk = forceChunkLoading ? oldMasterLoc.getChunk() : null;
+
+        if (forceChunkLoading){
+            chunk.addPluginChunkTicket(DisplayAPI.getPlugin());
+        }
+
         if (respectGroupDirection){
             location.setPitch(oldMasterLoc.getPitch());
             location.setYaw(oldMasterLoc.getYaw());
         }
 
         Location lastLoc = master.getLocation();
+        if (!sameWorld){
+            for (SpawnedDisplayEntityPart part : groupParts.values()){
+                if (part == masterPart) continue;
+                Entity e = part.getEntity();
+                if (e == null) continue;
+
+                master.removePassenger(e);
+                FoliaUtils.teleport(e, location);
+            }
+        }
+
         FoliaUtils.teleport(master, location, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+
         DisplayGroupManager.updateSpawnedGroup(lastLoc, location, this);
 
-        for (SpawnedDisplayEntityPart part : this.getParts()){
-            part.getEntity().setRotation(location.getYaw(), location.getPitch());
+        for (SpawnedDisplayEntityPart part : groupParts.values()){
+            Entity partEntity = part.getEntity();
+            if (partEntity == null){
+                continue;
+            }
+
+
+            partEntity.setRotation(location.getYaw(), location.getPitch());
 
         //Non-Display TP
             if (!part.isDisplay()){
-                Entity entity = part.getEntity();
-                Vector vector = oldMasterLoc.toVector().subtract(entity.getLocation().toVector());
+                Vector vector = oldMasterLoc.toVector().subtract(partEntity.getLocation().toVector());
                 Location tpLocation = location.clone().subtract(vector);
                 FoliaUtils.teleport(part.getEntity(), tpLocation, TeleportFlag.EntityState.RETAIN_PASSENGERS);
             }
+
+            if (!sameWorld){
+                if (part == masterPart) continue;
+                master.addPassenger(partEntity);
+            }
+        }
+
+        if (forceChunkLoading){
+            chunk.removePluginChunkTicket(DisplayAPI.getPlugin());
         }
     }
 

@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
+import io.papermc.paper.entity.TeleportFlag;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -11,6 +12,7 @@ import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.version.VersionUtils;
+import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -197,7 +199,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             return;
         }
         Entity e = getEntity();
-        if (e != null) e.teleport(location);
+        if (e != null) FoliaUtils.teleport(e, location, TeleportFlag.EntityState.RETAIN_PASSENGERS);
     }
 
     @Override

@@ -8,23 +8,36 @@ import net.donnypz.displayentityutils.listeners.ListenerUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
+import net.ess3.api.IUser;
+import net.ess3.api.events.teleport.PreTeleportEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.jetbrains.annotations.ApiStatus;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.UUID;
 
 @ApiStatus.Internal
 public final class DEUEntityListener implements Listener {
+
+    private static final HashMap<UUID, HashSet<SpawnedDisplayEntityGroup>> passengerGroups = new HashMap<>();
 
     //============Mythic====================
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -98,24 +111,87 @@ public final class DEUEntityListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onTeleport(EntityTeleportEvent e){
+    public void onTeleportMonitor(EntityTeleportEvent e){
         Entity entity = e.getEntity();
-        applyState(e.getEntity(), MachineState.StateType.TELEPORT);
+        applyState(entity, MachineState.StateType.TELEPORT);
 
-        Location fromLoc = e.getFrom();
-        Location toLoc = e.getTo();
-
-        ActiveGroup<?> controllerGroup = DisplayControllerManager.getControllerGroup(entity.getUniqueId());
-        if (controllerGroup instanceof PacketDisplayEntityGroup pg){
-            pg.teleport(toLoc, true);
+        if (!e.getTo().getWorld().equals(e.getFrom().getWorld())){
+            SpawnedDisplayEntityPart.getPart(entity); //refresh entity ids
         }
 
-        if (!fromLoc.getWorld().equals(toLoc.getWorld())){
-            for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getPassengerGroups(entity)){
-                pg.hide(); //Hide for players in prev world
-            }
+    }
+
+    private void storeGroups(Player player){
+        passengerGroups.computeIfAbsent(player.getUniqueId(), key -> new HashSet<>());
+        HashSet<SpawnedDisplayEntityGroup> groupsSet = passengerGroups.get(player.getUniqueId());
+
+        for (SpawnedDisplayEntityGroup group : DisplayUtils.getGroupPassengers(player)){
+            group.dismount();
+            groupsSet.add(group);
         }
     }
+
+
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onTeleport(PlayerTeleportEvent e){
+        Location fromLoc = e.getFrom();
+        Location toLoc = e.getTo();
+        if (!fromLoc.getWorld().equals(toLoc.getWorld())){
+            storeGroups(e.getPlayer());
+        }
+    }
+
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onTPAcrossWorlds(PlayerChangedWorldEvent e){
+        Player player = e.getPlayer();
+        HashSet<SpawnedDisplayEntityGroup> groups = passengerGroups.remove(player.getUniqueId());
+        if (groups == null){
+            return;
+        }
+
+        Location location = player.getLocation();
+        for (SpawnedDisplayEntityGroup group : groups) {
+            group.teleport(location, true, true);
+            group.rideEntity(player);
+        }
+    }
+
+    //Essentials---------------------------
+    @EventHandler
+    public void onEssentialsPreTP(PreTeleportEvent e){
+        IUser user = e.getTeleportee();
+        UUID userUUID = user.getUUID();
+        Player player = Bukkit.getPlayer(userUUID);
+        if (player == null) return;
+
+        storeGroups(player);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onEssentialsPreTPCancelled(PreTeleportEvent e){
+        if (e.isCancelled()){
+            passengerGroups.remove(e.getTeleportee().getUUID());
+        }
+    }
+
+    //Eseentials Same World
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onTeleportMonitor(PlayerTeleportEvent e){
+        if (!e.getTo().getWorld().equals(e.getFrom().getWorld())) return; //different worlds
+        Player player = e.getPlayer();
+        HashSet<SpawnedDisplayEntityGroup> groups = passengerGroups.remove(player.getUniqueId());
+        if (groups == null) return;
+
+        for (SpawnedDisplayEntityGroup group : groups){
+            group.teleport(e.getTo(), true, true);
+            group.rideEntity(player);
+        }
+    }
+    //-------------------------------------
+
+
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDeath(EntityDeathEvent e){
