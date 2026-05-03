@@ -101,7 +101,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (part != null && part.group != group){
             part.remove(false);
         }
-        partsById.put(getEntityId(), this);
+        ActivePartRegistry.register(this);
 
         this.entityUUID = entity.getUniqueId();
 
@@ -251,7 +251,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (entity == nonStaleEntity) return;
         if (!nonStaleEntity.getUniqueId().equals(entityUUID)) return;
         entity = nonStaleEntity;
-        refreshEntityId(nonStaleEntity.getEntityId());
+        ActivePartRegistry.updateEntityId(this, nonStaleEntity.getEntityId());
     }
 
     /**
@@ -270,7 +270,23 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     public static @Nullable SpawnedDisplayEntityPart getPart(@NotNull Entity entity){
         if (!DisplayUtils.isPartEntity(entity)) return null;
-        return (SpawnedDisplayEntityPart) getPart(entity.getEntityId());
+        SpawnedDisplayEntityPart part = getPart(entity.getUniqueId());
+        if (part != null){
+            int entityId = entity.getEntityId();
+            if (part.getEntityId() != entityId){
+                ActivePartRegistry.updateEntityId(part, entityId);
+            }
+        }
+        return part;
+    }
+
+    /**
+     * Get the {@link SpawnedDisplayEntityPart} of an entity, during this play session, with its UUID. Use {@link #create(Entity)} if the part is not grouped.
+     * @param entityUUID the part entity's UUID
+     * @return a {@link SpawnedDisplayEntityPart} or null if not created during play session
+     */
+    public static @Nullable SpawnedDisplayEntityPart getPart(@NotNull UUID entityUUID){
+        return ActivePartRegistry.getPart(entityUUID);
     }
 
 
@@ -1379,8 +1395,8 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                 entity.remove();
             }
         }
-        this.entity = null;
         this.unregister();
+        this.entity = null;
         return entity;
     }
 }

@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ActivePart implements Active{
-    protected static final ConcurrentHashMap<Integer, ActivePart> partsById = new ConcurrentHashMap<>();
+
     protected SpawnedDisplayEntityPart.PartType type;
     protected UUID partUUID;
     private int entityId;
@@ -43,12 +43,12 @@ public abstract class ActivePart implements Active{
     protected ActivePart(int entityId, boolean autoMap){
         this.entityId = entityId;
         if (autoMap) {
-            partsById.put(entityId, this);
+            ActivePartRegistry.register(this);
         }
     }
 
     protected synchronized void unregister(){
-        partsById.remove(entityId);
+        ActivePartRegistry.unregister(this);
         valid = false;
     }
 
@@ -66,7 +66,7 @@ public abstract class ActivePart implements Active{
      * @return an {@link ActivePart} or null
      */
     public static @Nullable ActivePart getPart(int entityId){
-        return partsById.get(entityId);
+        return ActivePartRegistry.getPart(entityId);
     }
 
     public boolean isAnimatingForPlayers(){
@@ -113,10 +113,8 @@ public abstract class ActivePart implements Active{
         return entityId;
     }
 
-    protected synchronized void refreshEntityId(int newEntityId){
-        partsById.remove(entityId);
-        entityId = newEntityId;
-        partsById.put(newEntityId, this);
+    void setEntityId(int entityId){
+        this.entityId = entityId;
     }
 
 
