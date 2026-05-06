@@ -43,30 +43,29 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     private final boolean isSingle;
 
     SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Entity entity, Random random){
-        super(entity.getEntityId(), false);
-        this.group = group;
-        this.entity = entity;
-        this.type = PartType.getType(entity);
-
+        this(group, entity);
         applyData(random, entity);
-        if (isMaster()){
-            group.masterPart = this;
-        }
+        if (isMaster()) group.masterPart = this;
+        partTags.addAll(DisplayUtils.getTags(entity));
+
         if (VersionUtils.IS_1_21_9 && entity instanceof Mannequin m){
             DisplayUtils.prepareMannequin(m);
         }
-        partTags.addAll(DisplayUtils.getTags(entity));
-        isSingle = false;
     }
 
     SpawnedDisplayEntityPart(Entity entity){
-        super(entity.getEntityId(), true);
+        this(null, entity);
+        this.partUUID = UUID.randomUUID();
+    }
+
+    private SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Entity entity){
+        super(entity.getEntityId(), false);
         if (PartType.getType(entity) == null) throw new IllegalArgumentException("Entity is not a valid part type entity");
         this.type = PartType.getType(entity);
+        this.group = group;
         this.entity = entity;
         this.entityUUID = entity.getUniqueId();
-        this.partUUID = UUID.randomUUID();
-        this.isSingle = true;
+        this.isSingle = group == null;
     }
 
     /**
