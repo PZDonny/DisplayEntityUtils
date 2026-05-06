@@ -8,7 +8,10 @@ import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,6 +33,18 @@ public class GroupSpawnSettings {
     Set<UUID> visiblePlayers = new HashSet<>();
     boolean hideInteractions = false;
     boolean playSpawnAnimation = true;
+    BlockReplacement blockReplacement;
+    ItemReplacement itemReplacement;
+
+    public GroupSpawnSettings setBlockReplacement(BlockReplacement blockReplacement){
+        this.blockReplacement = blockReplacement;
+        return this;
+    }
+
+    public GroupSpawnSettings setItemReplacement(ItemReplacement itemReplacement){
+        this.itemReplacement = itemReplacement;
+        return this;
+    }
 
     /**
      * Set the teleportation duration for all display entities that will be spawned from {@link DisplayEntityGroup#spawn(Location, GroupSpawnedEvent.SpawnReason, GroupSpawnSettings)}.
@@ -208,6 +223,22 @@ public class GroupSpawnSettings {
                     }
                 }
             }
+
+            switch (part.type){
+                case BLOCK_DISPLAY -> {
+                    BlockData blockData = part.getBlockDisplayBlock();
+                    if (blockReplacement == null || !blockReplacement.hasReplacement(blockData)) return;
+                    part.setBlockDisplayBlock(blockReplacement.getReplacement(blockData));
+                }
+                case ITEM_DISPLAY -> {
+                    ItemStack item = part.getItemDisplayItem();
+                    if (item == null) return;
+                    Material material = item.getType();
+                    if (itemReplacement == null || !itemReplacement.hasReplacement(material)) return;
+                    part.setItemDisplayItem(itemReplacement.getReplacement(material));
+                }
+                default -> {}
+            }
         }
     }
 
@@ -278,6 +309,20 @@ public class GroupSpawnSettings {
             }
         }
         display.setPersistent(persistentByDefault);
+
+        switch (display){
+            case BlockDisplay bd -> {
+                BlockData blockData = bd.getBlock();
+                if (blockReplacement == null || !blockReplacement.hasReplacement(blockData)) return;
+                bd.setBlock(blockReplacement.getReplacement(blockData));
+            }
+            case ItemDisplay id -> {
+                Material material = id.getItemStack().getType();
+                if (itemReplacement == null || !itemReplacement.hasReplacement(material)) return;
+                id.setItemStack(itemReplacement.getReplacement(material));
+            }
+            default -> {}
+        }
     }
 
     /**
@@ -355,6 +400,60 @@ public class GroupSpawnSettings {
             if (player != null && player.isOnline()){
                 player.showEntity(DisplayAPI.getPlugin(), entity);
             }
+        }
+    }
+
+    protected abstract static sealed class Replacement<T, V, SELF extends Replacement<T, V, SELF>> permits BlockReplacement, ItemReplacement{
+        Map<T, V> replaceMap = new HashMap<>();
+
+        /**
+         * Replace an object with another given object
+         * @param toReplace the object to replace
+         * @param replaceWIth the object to replace it with
+         * @return this
+         */
+        public SELF replace(T toReplace, V replaceWIth){
+            replaceMap.put(toReplace, replaceWIth);
+            return self();
+        }
+
+        /**
+         * Get whether a given object has a value to replace it with
+         * @param toReplace the object to be replaced
+         * @return a boolean
+         */
+        public boolean hasReplacement(T toReplace){
+            return replaceMap.containsKey(toReplace);
+        }
+
+        /**
+         * Get the object that will replace the given object.
+         * The returned value can be null.
+         */
+        public V getReplacement(T toReplace){
+            return replaceMap.get(toReplace);
+        }
+
+        protected abstract SELF self();
+    }
+
+    /**
+     * Holds blocks types to be replaced when spawning a group using {@link GroupSpawnSettings}
+     */
+    public static final class BlockReplacement extends Replacement<BlockData, BlockData, BlockReplacement>{
+        @Override
+        protected BlockReplacement self() {
+            return this;
+        }
+    }
+
+    /**
+     * Holds item types to be replaced when spawning a group using {@link GroupSpawnSettings}
+     */
+    public static final class ItemReplacement extends Replacement<Material, ItemStack, ItemReplacement>{
+        @Override
+        protected ItemReplacement self() {
+            return this;
         }
     }
 }
