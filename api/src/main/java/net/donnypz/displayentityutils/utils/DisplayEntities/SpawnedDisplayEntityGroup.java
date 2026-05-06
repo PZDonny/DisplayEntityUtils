@@ -1086,16 +1086,14 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
 
     @Override
-    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation){
-        return DisplayAnimator.play(this, animation, DisplayAnimator.AnimationType.LINEAR);
+    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation, boolean allowDataChange){
+        return DisplayAnimator.play(this, animation, DisplayAnimator.AnimationType.LINEAR, allowDataChange);
     }
 
 
     @Override
-    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation){
-        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
-        animator.play(this, 0);
-        return animator;
+    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation, boolean allowDataChange){
+        return DisplayAnimator.play(this, animation, DisplayAnimator.AnimationType.LOOP, allowDataChange);
     }
 
     /**

@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DisplayAnimator {
     final SpawnedDisplayAnimation animation;
     final AnimationType type;
+    final boolean allowDataChanges;
     private final ConcurrentHashMap<UUID, Set<ClientAnimationPlayer>> clientPlayers = new ConcurrentHashMap<>();
     private final Object clientPlayerLock = new Object();
     private static final int DEFAULT_START_DELAY = 0;
@@ -22,13 +23,25 @@ public class DisplayAnimator {
 
     /**
      * Create a display animator that manages playing and stopping animations for {@link ActiveGroup}s.
-     * A single instance CAN be used for multiple groups. For managing animation states, see {@link DisplayStateMachine}
+     * A single instance <b>CAN</b> be used for multiple groups. For managing animation states, see {@link DisplayStateMachine}
      * @param animation the animation
      * @param type the animation play type
      */
     public DisplayAnimator(@NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType type){
+        this(animation, type, true);
+    }
+
+    /**
+     * Create a display animator that manages playing and stopping animations for {@link ActiveGroup}s.
+     * A single instance <b>CAN</b> be used for multiple groups. For managing animation states, see {@link DisplayStateMachine}
+     * @param animation the animation
+     * @param type the animation play type
+     * @param allowDataChanges whether block/item display textures and text display text should change based on animation frame data
+     */
+    public DisplayAnimator(@NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType type, boolean allowDataChanges){
         this.animation = animation;
         this.type = type;
+        this.allowDataChanges = allowDataChanges;
     }
 
     /**
@@ -39,7 +52,19 @@ public class DisplayAnimator {
      * @return the {@link DisplayAnimator} used to control the animation
      */
     public static DisplayAnimator play(@NotNull SpawnedDisplayEntityGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
-        DisplayAnimator animator = new DisplayAnimator(animation, animationType);
+        return play(group, animation, animationType, true);
+    }
+
+    /**
+     * Plays an animation once for a {@link SpawnedDisplayEntityGroup}.
+     * @param group The group to play the animation
+     * @param animation The animation to play
+     * @param animationType the animation type
+     * @param allowDataChanges whether block/item display textures and text display text should change based on animation frame data
+     * @return the {@link DisplayAnimator} used to control the animation
+     */
+    public static DisplayAnimator play(@NotNull SpawnedDisplayEntityGroup group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType, boolean allowDataChanges){
+        DisplayAnimator animator = new DisplayAnimator(animation, animationType, allowDataChanges);
         animator.play(group, 0);
         return animator;
     }
@@ -53,7 +78,20 @@ public class DisplayAnimator {
      * @return the {@link DisplayAnimator} used to control the animation
      */
     public static DisplayAnimator play(@NotNull Player player, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
-        return play(List.of(player), group, animation, animationType);
+        return play(List.of(player), group, animation, animationType, true);
+    }
+
+    /**
+     * Plays an animation once for a {@link ActiveGroup} for a specified player.
+     * @param player the player to play the animation for
+     * @param group the group
+     * @param animation the animation to be played
+     * @param animationType the animation type
+     * @param allowDataChanges whether block/item display textures and text display text should change based on animation frame data
+     * @return the {@link DisplayAnimator} used to control the animation
+     */
+    public static DisplayAnimator play(@NotNull Player player, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType, boolean allowDataChanges){
+        return play(List.of(player), group, animation, animationType, allowDataChanges);
     }
 
     /**
@@ -62,10 +100,11 @@ public class DisplayAnimator {
      * @param group the group
      * @param animation the animation to be played
      * @param animationType the animation type
+     * @param allowDataChanges whether block/item display textures and text display text should change based on animation frame data
      * @return the {@link DisplayAnimator} used to control the animation
      */
-    public static DisplayAnimator play(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
-        DisplayAnimator animator = new DisplayAnimator(animation, animationType);
+    public static DisplayAnimator play(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType, boolean allowDataChanges){
+        DisplayAnimator animator = new DisplayAnimator(animation, animationType, allowDataChanges);
         animator.play(players, group, 0);
         return animator;
     }
@@ -78,6 +117,18 @@ public class DisplayAnimator {
      * @return the {@link DisplayAnimator} used to play the animation
      */
     public static DisplayAnimator playUsingPackets(@NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType){
+        return playUsingPackets(group, animation, animationType, true);
+    }
+
+    /**
+     * Plays an animation once for a {@link ActiveGroup} without the use of a {@link DisplayAnimator} instance.
+     * To control an animation, pausing/playing/looping, create a new {@link DisplayAnimator}.
+     * @param group The group to play the animation
+     * @param animation The animation to play
+     * @param allowDataChanges whether block/item display textures and text display text should change based on animation frame data
+     * @return the {@link DisplayAnimator} used to play the animation
+     */
+    public static DisplayAnimator playUsingPackets(@NotNull ActiveGroup<?> group, @NotNull SpawnedDisplayAnimation animation, @NotNull AnimationType animationType, boolean allowDataChanges){
         DisplayAnimator animator = new DisplayAnimator(animation, animationType);
         animator.playUsingPackets(group, 0);
         return animator;
@@ -415,7 +466,6 @@ public class DisplayAnimator {
         return group.isActiveAnimator(this);
     }
 
-
     /**
      * Get the {@link SpawnedDisplayAnimation} that this animator uses on groups
      * @return a {@link SpawnedDisplayAnimation}
@@ -430,6 +480,14 @@ public class DisplayAnimator {
      */
     public @NotNull AnimationType getAnimationType(){
         return type;
+    }
+
+    /**
+     * Get whether this animator allows block/item display textures and text display text to change based on animation frame data
+     * @return a boolean
+     */
+    public boolean allowDataChanges(){
+        return allowDataChanges;
     }
 
 

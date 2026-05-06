@@ -400,13 +400,14 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return true;
     }
 
-
-    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation) {
-        return DisplayAnimator.playUsingPackets(this, animation, DisplayAnimator.AnimationType.LINEAR);
+    @Override
+    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation, boolean allowDataChanges) {
+        return DisplayAnimator.playUsingPackets(this, animation, DisplayAnimator.AnimationType.LINEAR, allowDataChanges);
     }
 
-    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation) {
-        return DisplayAnimator.playUsingPackets(this, animation, DisplayAnimator.AnimationType.LOOP);
+    @Override
+    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation, boolean allowDataChanges) {
+        return DisplayAnimator.playUsingPackets(this, animation, DisplayAnimator.AnimationType.LOOP, allowDataChanges);
     }
 
 

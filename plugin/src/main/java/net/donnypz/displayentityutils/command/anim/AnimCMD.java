@@ -118,10 +118,11 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/deu anim toggletexturechanges", "Toggle whether your selected animation can change block display blocks, item display items, and text display text");
             CMDUtils.sendCMD(sender, "/deu anim showframe <frame-id>", "Displays a frame on your selected group");
             CMDUtils.sendCMD(sender, "/deu anim previewframe <frame-id>", "Preview a frame on your selected group, without changing group entity data");
-            CMDUtils.sendCMD(sender, "/deu anim play [-loop] [-packet] [-camera]", "Play your selected animation on your selected group." +
+            CMDUtils.sendCMD(sender, "/deu anim play [-loop] [-packet] [-camera] [-nodata]", "Play your selected animation on your selected group." +
                     " \n\"-loop\" will make the animation loop." +
                     " \n\"-packet\" will play the animation using packets." +
-                    " \n\"-camera\" will set your view to the animation's camera, if present");
+                    " \n\"-camera\" will set your view to the animation's camera, if present" +
+                    " \n\"-nodata\" will disable texture changes for item/block displays and text display text changes");
             CMDUtils.sendCMD(sender, "/deu anim listanims", "List the animations actively playing for a group");
 
         }

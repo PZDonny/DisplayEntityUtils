@@ -799,7 +799,17 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param animation the animation this group should play
      * @return the {@link DisplayAnimator} that will control the playing of the given animation
      */
-    public abstract @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation);
+    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation){
+        return animate(animation, true);
+    }
+
+    /**
+     * Make a group perform an animation
+     * @param animation the animation this group should play
+     * @param allowDataChanges whether block/item display textures and text display text should change based on animation frame data
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
+     */
+    public abstract @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation, boolean allowDataChanges);
 
 
     /**
@@ -807,7 +817,17 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param animation the animation this group should play
      * @return the {@link DisplayAnimator} that will control the playing of the given animation
      */
-    public abstract @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation);
+    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation){
+        return animateLooping(animation, true);
+    }
+
+    /**
+     * Make a group perform a looping animation.
+     * @param animation the animation this group should play
+     * @param allowDataChanges whether block/item display textures and text display text should change based on animation frame data
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
+     */
+    public abstract @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation, boolean allowDataChanges);
 
     /**
      * Manually stop an animation from playing on this group

@@ -400,7 +400,7 @@ public abstract class AnimationPlayer {
             }
         }
 
-        if (animation.allowsTextureChanges()) {
+        if (animator.allowDataChanges) {
             transformation.applyData(part);
         }
     }
@@ -422,7 +422,7 @@ public abstract class AnimationPlayer {
         Display display = (Display) sp.getEntity();
         if (!display.isValid()) return;
         if (applyDataOnly) {
-            if (animation.allowsTextureChanges()) {
+            if (animator.allowDataChanges) {
                 transformation.applyData(display);
             }
             return;
@@ -456,7 +456,7 @@ public abstract class AnimationPlayer {
             display.setTransformation(offsetTransformation);
         }
 
-        if (animation.allowsTextureChanges()) {
+        if (animator.allowDataChanges) {
             transformation.applyData(display);
         }
     }
