@@ -22,7 +22,7 @@ import java.util.Collection;
 
 @Name("Play Animation")
 @Description("Play an animation on an active group with a display animator")
-@Examples({"play animation on {_spawnedgroup} using {_displayanimator}",
+@Examples({"play animation on {_activegroup} using {_displayanimator}",
         "",
         "#3.0.0 or later",
         "start packet animation on {_packetgroup} with {_displayanimator} starting at frame 3",
