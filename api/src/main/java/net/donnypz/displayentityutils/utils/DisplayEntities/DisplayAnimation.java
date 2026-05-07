@@ -70,14 +70,6 @@ public final class DisplayAnimation implements Serializable {
         frames.remove(frame);
     }
 
-    /**
-     * Get if this animation allows for texture changes to block/item displays and text display text
-     * @return a boolean
-     */
-    public boolean allowsTextureChanges(){
-        return dataChanges;
-    }
-
     @ApiStatus.Internal
     public void adaptOldSounds(){
         for (DisplayAnimationFrame frame: frames){

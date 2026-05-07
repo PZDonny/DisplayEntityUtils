@@ -26,7 +26,6 @@ public class AnimatorModule implements AddonModule {
                 EffActiveGroupStopAllAnimations::register,
                 EffActiveGroupStopAnimation::register,
                 EffActiveGroupStopAnimationCamera::register,
-                EffAnimationTextureChanges::register,
                 EffPlayerStopAllPacketAnimations::register,
 
                 ExprAnimatorAnimation::register,

@@ -43,7 +43,6 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
         new AnimAddParticleCMD(this);
         new AnimReverseCMD(this);
         new AnimScaleRespectCMD(this);
-        new AnimTextureChangesCMD(this);
         new AnimSetTagCMD(this);
         new AnimSetFrameTagCMD(this);
         new AnimPreviewPlayCMD(this);
@@ -115,7 +114,6 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
         }
         else if (page == 5){
             CMDUtils.sendCMD(sender, "/deu anim togglescalerespect", "Toggle whether your selected animation should respect the group's scale");
-            CMDUtils.sendCMD(sender, "/deu anim toggletexturechanges", "Toggle whether your selected animation can change block display blocks, item display items, and text display text");
             CMDUtils.sendCMD(sender, "/deu anim showframe <frame-id>", "Displays a frame on your selected group");
             CMDUtils.sendCMD(sender, "/deu anim previewframe <frame-id>", "Preview a frame on your selected group, without changing group entity data");
             CMDUtils.sendCMD(sender, "/deu anim play [-loop] [-packet] [-camera] [-nodata]", "Play your selected animation on your selected group." +
