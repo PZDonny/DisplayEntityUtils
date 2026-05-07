@@ -25,6 +25,7 @@ public class MachineState {
     int causeDelay = -1;
     float maxRange;
     boolean isSkillState = false;
+    boolean animationDataChanges;
 
     /**
      * Create a machine state for an {@link DisplayStateMachine}, determining which animation should be played when this state is active
@@ -36,8 +37,8 @@ public class MachineState {
      * @param transitionLock whether this state should lock transitions to another state before this one's animation finishes
      * @apiNote Having the animation type as {@link DisplayAnimator.AnimationType#LOOP} will force the transitionLock to false, regardless of the value set.
      */
-    public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull StateType stateType, @NotNull List<String> animationTags, @Nullable LoadMethod loadMethod, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock){
-        this(stateMachine, stateType.getStateID(), animationTags, loadMethod, animationType, transitionLock);
+    public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull StateType stateType, @NotNull List<String> animationTags, @Nullable LoadMethod loadMethod, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock, boolean animationDataChanges){
+        this(stateMachine, stateType.getStateID(), animationTags, loadMethod, animationType, transitionLock, animationDataChanges);
     }
 
     /**
@@ -50,15 +51,16 @@ public class MachineState {
      * @param transitionLock whether this state should lock transitions to another state before this one's animation finishes
      * @apiNote Having the animation type as {@link DisplayAnimator.AnimationType#LOOP} will force the transitionLock to false, regardless of the value set.
      */
-    public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull String stateID, @NotNull List<String> animationTags, @Nullable LoadMethod loadMethod, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock){
+    public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull String stateID, @NotNull List<String> animationTags, @Nullable LoadMethod loadMethod, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock, boolean animationDataChanges){
         this.stateMachine = stateMachine;
         this.stateID = stateID;
+        this.animationDataChanges = animationDataChanges;
         this.transitionLock = animationType != DisplayAnimator.AnimationType.LOOP && transitionLock;
         for (String tag : animationTags){
             if (loadMethod != null){
                 SpawnedDisplayAnimation animation = DisplayAnimationManager.getSpawnedDisplayAnimation(tag, loadMethod);
                 if (animation != null){
-                    this.animators.add(new DisplayAnimator(animation, animationType));
+                    this.animators.add(new DisplayAnimator(animation, animationType, animationDataChanges));
                 }
             }
             else{
@@ -67,7 +69,7 @@ public class MachineState {
                     animationlessStates.put(this, new AnimatorData(tag, animationType));
                 }
                 else{
-                    this.animators.add(new DisplayAnimator(animation, animationType));
+                    this.animators.add(new DisplayAnimator(animation, animationType, animationDataChanges));
                 }
             }
         }
@@ -82,8 +84,8 @@ public class MachineState {
      * @param transitionLock whether this state should lock transitions to another state before this one's animation finishes
      * @apiNote Having the animation type as {@link DisplayAnimator.AnimationType#LOOP} will force the transitionLock to false, regardless of the value set.
      */
-    public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull StateType stateType, @NotNull List<SpawnedDisplayAnimation> animations, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock){
-        this(stateMachine, stateType.getStateID(), animations, animationType, transitionLock);
+    public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull StateType stateType, @NotNull List<SpawnedDisplayAnimation> animations, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock, boolean animationDataChanges){
+        this(stateMachine, stateType.getStateID(), animations, animationType, transitionLock, animationDataChanges);
     }
 
     /**
@@ -95,13 +97,14 @@ public class MachineState {
      * @param transitionLock whether this state should lock transitions to another state before this one's animation finishes
      * @apiNote Having the animation type as {@link DisplayAnimator.AnimationType#LOOP} will force the transitionLock to false, regardless of the value set.
      */
-    public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull String stateID, @NotNull List<SpawnedDisplayAnimation> animations, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock){
+    public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull String stateID, @NotNull List<SpawnedDisplayAnimation> animations, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock, boolean animationDataChanges){
         this.stateMachine = stateMachine;
         this.stateID = stateID;
-        for (SpawnedDisplayAnimation anim : animations){
-            animators.add(new DisplayAnimator(anim, animationType));
-        }
         this.transitionLock = animationType != DisplayAnimator.AnimationType.LOOP && transitionLock;
+        this.animationDataChanges = animationDataChanges;
+        for (SpawnedDisplayAnimation anim : animations){
+            animators.add(new DisplayAnimator(anim, animationType, animationDataChanges));
+        }
     }
 
 
@@ -160,6 +163,14 @@ public class MachineState {
      */
     public boolean isSkillState() {
         return isSkillState;
+    }
+
+    /**
+     * Get whether this {@link MachineState}'s animators allows block/item display textures and text display text to change based on animation frame data
+     * @return a boolean
+     */
+    public boolean allowDataChanges(){
+        return animationDataChanges;
     }
 
     /**

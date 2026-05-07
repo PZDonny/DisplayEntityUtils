@@ -40,6 +40,7 @@ public class DisplayController {
     Vector rideOffset = new Vector();
     boolean groupVisibleByDefault;
     boolean isPacketBased;
+    boolean allowAnimationDataChanges;
 
     public DisplayController(@NotNull String controllerID) {
         this.controllerID = controllerID;

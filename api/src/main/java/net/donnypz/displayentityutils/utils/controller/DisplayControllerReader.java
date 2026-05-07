@@ -19,6 +19,13 @@ import java.util.Map;
 
 class DisplayControllerReader {
 
+    private static final String MYTHIC_MOBS_SECT = "mythicMobs";
+    private static final String GROUP_SECT = "group";
+    private static final String GROUP_PROPERTIES_SECT = "groupProperties";
+    private static final String DEFAULT_FOLLOW_PROPERTIES_SECT = "defaultFollowProperties";
+    private static final String PART_FOLLOW_PROPERTIES_SECT = "partFollowProperties";
+    private static final String STATES_SECT = "states";
+
     static DisplayController read(YamlConfiguration config, String fileName, boolean fromFile){
         try{
             String controllerID = config.getString("controllerID");
@@ -33,65 +40,70 @@ class DisplayControllerReader {
                 controller.configController = true;
             }
 
-            //Set Mythic Mobs
-            ConfigurationSection mythicSect = config.getConfigurationSection("mythicMobs");
+            //----=Set Mythic Mobs=----
+            ConfigurationSection mythicSect = config.getConfigurationSection(MYTHIC_MOBS_SECT);
             List<String> mobs = mythicSect.getStringList("mobs");
             controller.setMythicMobs(mobs);
 
-            //Group Properties
-            ConfigurationSection createdGroupSect = mythicSect.getConfigurationSection("group");
-            String groupTag = createdGroupSect.getString("tag");
-            controller.isPacketBased = createdGroupSect.getBoolean("packetBased", false);
-            boolean flip;
-
-            ConfigurationSection groupProp = config.getConfigurationSection("groupProperties");
-            if (groupProp != null){
-                //before added vector offset
-                if (groupProp.contains("verticalOffset")){
-                    controller.rideOffset = new Vector(0, groupProp.getDouble("verticalOffset"), 0);
-                    Bukkit.getLogger().warning("\"verticalOffset\" is outdated but will still function for display controller: "+fileName+". " +
-                            "See new examplecontroller on GitHub for new \"offset\"'s formatting in any direction.");
-                }
-                else if (groupProp.contains("offset")){
-                    ConfigurationSection offsetSect = groupProp.getConfigurationSection("offset");
-                    double x = offsetSect.getDouble("x");
-                    double y = offsetSect.getDouble("y");
-                    double z = offsetSect.getDouble("z");
-                    controller.rideOffset = new Vector(x,y,z);
-                }
-
-                controller.groupVisibleByDefault = groupProp.getBoolean("visibleByDefault", true);
-                flip = groupProp.getBoolean("flip", false);
-            }
-            else{
-                flip = false;
-                Bukkit.getLogger().warning("Missing section \"groupProperties\" for outdated display controller: "+fileName+".");
-            }
-
-            //LoadMethod
-            try{ //Set with Config
-                LoadMethod method = LoadMethod.valueOf(createdGroupSect.getString("storage").toUpperCase());
+            //----=Group=-----
+            ConfigurationSection groupSect = mythicSect.getConfigurationSection(GROUP_SECT);
+            String groupTag = groupSect.getString("tag");
+            try{ //Try to set LoadMethod
+                LoadMethod method = LoadMethod.valueOf(groupSect.getString("storage").toUpperCase());
                 controller.setDisplayEntityGroup(groupTag, method);
             }
-            //Mark Null Loader
-            catch(IllegalArgumentException e){ //Set with API Event
+            catch(IllegalArgumentException e){ //Mark as Null Loader, must be set with API Event
                 if (controller.group == null){
                     DisplayController.grouplessControllers.put(controller, groupTag);
                 }
             }
+            controller.isPacketBased = groupSect.getBoolean("packetBased", false);
+            controller.allowAnimationDataChanges = groupSect.getBoolean("allowAnimationDataChanges", true);
 
-            ConfigurationSection defaultPropsSection = config.getConfigurationSection("defaultFollowProperties");
+
+            //----Group Properties=----
+            ConfigurationSection groupPropSect = config.getConfigurationSection(GROUP_PROPERTIES_SECT);
+            boolean flip;
+            if (groupPropSect == null){
+                flip = false;
+                Bukkit.getLogger().warning("Missing section \"groupProperties\" in display controller: "+fileName+".");
+            }
+            else{
+                //before vector offset was added
+                if (groupPropSect.contains("verticalOffset")){
+                    controller.rideOffset = new Vector(0, groupPropSect.getDouble("verticalOffset"), 0);
+                    Bukkit.getLogger().warning("\"verticalOffset\" is outdated but will still function for display controller: "+fileName+". " +
+                            "See new examplecontroller on GitHub for new \"offset\"'s formatting in any direction.");
+                }
+                else if (groupPropSect.contains("offset")){
+                    ConfigurationSection offsetSect = groupPropSect.getConfigurationSection("offset");
+                    double x = offsetSect.getDouble("x", 0);
+                    double y = offsetSect.getDouble("y", 0);
+                    double z = offsetSect.getDouble("z", 0);
+                    controller.rideOffset = new Vector(x,y,z);
+                }
+
+                controller.groupVisibleByDefault = groupPropSect.getBoolean("visibleByDefault", true);
+                flip = groupPropSect.getBoolean("flip", false);
+            }
+
+            //----=Default Follow Properties=----
+            if (!config.contains(DEFAULT_FOLLOW_PROPERTIES_SECT)) {
+                printMissingSection(DEFAULT_FOLLOW_PROPERTIES_SECT, fileName, true);
+                return null;
+            }
+            ConfigurationSection defaultPropsSection = config.getConfigurationSection(DEFAULT_FOLLOW_PROPERTIES_SECT);
             int deathDespawnDelay = defaultPropsSection.getInt("deathDespawnDelay");
 
             HashSet<String> propertiesToRemove = new HashSet<>(controller.followProperties.keySet());
 
-            //Default Follow Properties
+
             configureDefaultProperties(controller, defaultPropsSection, deathDespawnDelay, flip);
             propertiesToRemove.remove(null);
 
 
             //Part Follow Properties
-            List<Map<?, ?>> partFollowMaps = config.getMapList("partFollowProperties");
+            List<Map<?, ?>> partFollowMaps = config.getMapList(PART_FOLLOW_PROPERTIES_SECT);
             if (!partFollowMaps.isEmpty()){
                 for (Map<?, ?> map : partFollowMaps){
                     String followPropertyID = (String) map.get("id");
@@ -108,7 +120,7 @@ class DisplayControllerReader {
             }
 
             //Animation States
-            ConfigurationSection stateSect = config.getConfigurationSection("states");
+            ConfigurationSection stateSect = config.getConfigurationSection(STATES_SECT);
             if (stateSect != null){
                 DisplayStateMachine machine = new DisplayStateMachine(controllerID);
                 for (MachineState.StateType stateType : MachineState.StateType.values()){
@@ -131,6 +143,16 @@ class DisplayControllerReader {
             Bukkit.getLogger().severe("Misconfigured Display Controller: "+fileName);
             e.printStackTrace();
             return null;
+        }
+    }
+
+    private static void printMissingSection(String section, String fileName, boolean severe){
+        String message = "Missing DisplayController section, \""+section+"\" in "+fileName;
+        if (severe){
+            Bukkit.getLogger().severe(message);
+        }
+        else{
+            Bukkit.getLogger().warning(message);
         }
     }
 
@@ -247,7 +269,9 @@ class DisplayControllerReader {
         }
 
         boolean lock = section.getBoolean("lockTransition");
-        MachineState state = new MachineState(machine, stateType.getStateID(), animations, loadMethod, animType, lock);
+        boolean animDataChangeOverride = section.getBoolean("animationDataChangesOverride", controller.allowAnimationDataChanges);
+
+        MachineState state = new MachineState(machine, stateType.getStateID(), animations, loadMethod, animType, lock, animDataChangeOverride);
         if (!state.hasDisplayAnimators() && !state.isNullLoader()){
             if (!controller.controllerID.equalsIgnoreCase("example")){
                 Bukkit.getLogger().warning("Failed to add state, \""+stateType.getStateID()+"\". No animations found: ["+machine.getId()+"]");
