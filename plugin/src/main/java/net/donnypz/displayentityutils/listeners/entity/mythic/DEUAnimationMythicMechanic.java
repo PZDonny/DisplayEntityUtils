@@ -50,8 +50,13 @@ class DEUAnimationMythicMechanic implements ITargetedEntitySkill {
         try{
             dataChanges = config.getBoolean("d");
         }
-        catch(IllegalArgumentException e){
-            dataChanges = true;
+        catch(IllegalArgumentException e1){
+            try{
+                dataChanges = config.getBoolean("datachanges");
+            }
+            catch(IllegalArgumentException e2){
+                dataChanges = true;
+            }
         }
 
         state = new MachineState(controller.getStateMachine(), id, List.of(animTag), loadMethod, type, true, dataChanges);
