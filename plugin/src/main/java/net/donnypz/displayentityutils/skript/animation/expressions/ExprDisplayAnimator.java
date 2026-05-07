@@ -17,18 +17,25 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Create Display Animator")
 @Description("Create a display animator to play animations on an active group")
-@Examples({"set {_animator} to a new linear display animator using {_animation}",
-        "set {_loopanimator} to a loop animator using {_animation}"})
-@Since("2.6.2")
+@Examples({
+        "set {_animator} to a new linear display animator using {_animation}",
+        "set {_loopanimator} to a loop animator using {_animation}",
+        "",
+        "#3.5.2 and later",
+        "#Play an animation and ONLY update transformation, not textures/text/data",
+        "set {_animator} to a linear animator using {_animation} without data changes"
+})
+@Since("2.6.2, 3.5.2 (Data Changes)")
 public class ExprDisplayAnimator extends SimpleExpression<DisplayAnimator> {
 
     private boolean loop;
+    private boolean dataChanges;
     private Expression<SpawnedDisplayAnimation> animation;
 
-    public static void register(SyntaxRegistry registry){
+    public static void register(SyntaxRegistry registry) {
         registry.register(SyntaxRegistry.EXPRESSION,
                 SyntaxInfo.Expression.builder(ExprDisplayAnimator.class, DisplayAnimator.class)
-                        .addPatterns("[a] [new] (linear|loop:loop[ing]) [display] animator using [anim[ation]] %deuanimation%")
+                        .addPatterns("[a] [new] (linear|loop:loop[ing]) [display] animator using [anim[ation]] %deuanimation% [d:without (data|texture) change[s]]")
                         .supplier(ExprDisplayAnimator::new)
                         .build()
         );
@@ -38,10 +45,10 @@ public class ExprDisplayAnimator extends SimpleExpression<DisplayAnimator> {
     protected DisplayAnimator[] get(Event event) {
         DisplayAnimator.AnimationType type = loop ? DisplayAnimator.AnimationType.LOOP : DisplayAnimator.AnimationType.LINEAR;
         SpawnedDisplayAnimation anim = animation.getSingle(event);
-        if (anim == null){
+        if (anim == null) {
             return null;
         }
-        return new DisplayAnimator[]{new DisplayAnimator(anim, type)};
+        return new DisplayAnimator[]{new DisplayAnimator(anim, type, dataChanges)};
     }
 
     @Override
@@ -56,12 +63,13 @@ public class ExprDisplayAnimator extends SimpleExpression<DisplayAnimator> {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return (loop ? "loop" : "") + " display animator "+animation.toString(event, debug);
+        return (loop ? "loop" : "") + " display animator " + animation.toString(event, debug) + (!dataChanges ? "w/o data changes" : "");
     }
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
         loop = parseResult.hasTag("loop");
+        dataChanges = !parseResult.hasTag("d");
         animation = (Expression<SpawnedDisplayAnimation>) expressions[0];
         return true;
     }
