@@ -1,11 +1,2 @@
 jdk:
-  - openjdk21
-
-before_install:
-  - rm -rf ~/.m2/repository/net/kyori
-  - rm -rf ~/.m2/repository/org/apache/maven
-  - rm -rf ~/.m2/repository/com/google/code/findbugs
-  - rm -rf ~/.m2/repository/org/codehaus/plexus
-
-install:
-  - mvn clean install -U -DskipTests
+  - openjdk25
