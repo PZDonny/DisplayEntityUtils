@@ -30,7 +30,7 @@ public final class VersionUtils {
             }
             return false;
         }
-        else if (getProtocolVersion(player) < 771){ //1.21.6
+        else if (IS_1_21_6){
             if (!serverHasDialogs()){
                 if (sendErrorMessage){
                     player.sendMessage(DisplayAPI.pluginPrefix
