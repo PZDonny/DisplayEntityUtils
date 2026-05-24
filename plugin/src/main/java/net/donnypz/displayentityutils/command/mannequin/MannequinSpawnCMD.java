@@ -2,11 +2,10 @@ package net.donnypz.displayentityutils.command.mannequin;
 
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.command.CMDUtils;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.managers.DEUUser;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
@@ -41,23 +40,6 @@ class MannequinSpawnCMD extends PlayerSubCommand {
 
         player.sendMessage(DisplayAPI.pluginPrefix
                 .append(MiniMessage.miniMessage().deserialize("<green>A new mannequin has been spawned at your location!")));
-
-
-        if (args.length >= 3 && args[2].equalsIgnoreCase("-g")){
-            ActiveGroup<?> group = DEUUser.getOrCreateUser(player).getSelectedGroup();
-            if (group == null) {
-                player.sendMessage(Component.text("- You must have a group selected to add the mannequin to a group", NamedTextColor.YELLOW));
-                return;
-            }
-
-            ActivePart part = group.addEntity(mannequin);
-            if (part == null){
-                player.sendMessage(Component.text("- Failed to add the mannequin to your selected group", NamedTextColor.YELLOW));
-                return;
-            }
-            ((MultiPartSelection<?>) DisplayGroupManager.getPartSelection(player)).refresh();
-
-            player.sendMessage(Component.text("- The mannequin has been added to your selected group", NamedTextColor.GRAY));
-        }
+        CMDUtils.tryAddEntityToGroup(player, mannequin, args, 2);
     }
 }

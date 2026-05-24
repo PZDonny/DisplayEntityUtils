@@ -22,6 +22,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
 
     public InteractionCMD(){
         super(Permission.HELP, new InteractionHelpCMD());
+        new InteractionSpawnCMD(this);
         new InteractionAddCMD(this);
         new InteractionListCMD(this);
         new InteractionHeightCMD(this);
@@ -29,8 +30,6 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
         new InteractionScaleCMD(this);
         new InteractionPivotCMD(this);
         new InteractionResponsiveCMD(this);
-        new InteractionAddToGroupCMD(this);
-        new InteractionSpawnHereCMD(this);
         new InteractionInfoCMD(this);
     }
 
@@ -53,16 +52,15 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
     static void interactionHelp(CommandSender sender, int page){
         sender.sendMessage(DisplayAPI.pluginPrefixLong);
         if (page == 1){
-            sender.sendMessage(Component.text("Where applicable, these commands prioritize the interaction entity you're looking at over the one you may have selected", NamedTextColor.AQUA));
+            sender.sendMessage(Component.text("Where applicable, these commands prioritize the interaction entity you're looking at over the one you may have selected", NamedTextColor.YELLOW));
             CMDUtils.sendCMD(sender, "/deu interaction help", "Get help for interactions");
+            CMDUtils.sendCMD(sender, "/deu interaction spawn <height> <width> [-g]", "Spawn an interaction entity at your location.\nUse \"-g\" to add it to your selected group");
             CMDUtils.sendCMD(sender, "/deu interaction info", "Get info about an interaction entity, targeted or selected");
-            CMDUtils.sendCMD(sender, "/deu interaction addtogroup <height> <width> [-here]", "Create an interaction entity part for a group, at the group's location. Use \"-here\" to spawn it at your location");
-            CMDUtils.sendCMD(sender, "/deu interaction spawnhere <height> <width>", "Create an interaction entity at your location");
             CMDUtils.sendCMD(sender, "/deu interaction height <height>", "Set the height of an interaction");
             CMDUtils.sendCMD(sender, "/deu interaction width <width>", "Set the width of an interaction");
+            CMDUtils.sendCMD(sender, "/deu interaction scale <height> <width> [tick-duration] [tick-delay]", "Scale an interaction entity, optionally over a period of time");
         }
         else{
-            CMDUtils.sendCMD(sender, "/deu interaction scale <height> <width> [tick-duration] [tick-delay]", "Scale an interaction entity, optionally over a period of time");
             CMDUtils.sendCMD(sender, "/deu interaction addcmd <player | console> <left | right | both> <command>", "Add a command to an interaction");
             CMDUtils.sendCMD(sender, "/deu interaction listcmds", "List all commands stored on an interaction");
             CMDUtils.sendCMD(sender, "/deu interaction pivot <angle> [-all]", " Pivot an interaction around it's group's");
