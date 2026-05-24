@@ -83,7 +83,7 @@ public class ConversionUtils {
             worldName = "overworld";
         }
         else{
-            worldName = w.getName();
+            worldName = w.getKey().toString();
         }
         return worldName;
     }

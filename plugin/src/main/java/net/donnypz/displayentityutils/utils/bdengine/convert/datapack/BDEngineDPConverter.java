@@ -152,6 +152,11 @@ public class BDEngineDPConverter {
             }
 
             DisplayAPI.getScheduler().run(() -> createdGroup.unregister(true, true));
+
+            try{
+                zipFile.close();
+            }
+            catch(IOException ignored){}
         }, delay+5);
     }
 
@@ -223,9 +228,8 @@ public class BDEngineDPConverter {
                                  ZipFile zipFile,
                                  Player player,
                                  SpawnedDisplayAnimationFrame frame){
-        try{
-            InputStream stream = zipFile.getInputStream(zipEntry);
-            BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+        try(InputStream stream = zipFile.getInputStream(zipEntry);
+            BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
             String line;
             while ((line = br.readLine()) != null){
                 if (line.startsWith("#") || line.isEmpty()){
@@ -253,17 +257,10 @@ public class BDEngineDPConverter {
                         try{
                             DatapackEntitySpawned.prepareAnimationMaster(projectName);
                         }
-                        catch(NumberFormatException e){
-                            br.close();
-                            zipFile.close();
+                        catch(NumberFormatException | ArrayIndexOutOfBoundsException e){
                             player.sendMessage(Component.text("Animation conversion failed! Read console", NamedTextColor.RED));
-                            throw new RuntimeException("Failed to read command from zip entry: Invalid timestamp value");
-                        }
-                        catch(ArrayIndexOutOfBoundsException e){
-                            br.close();
-                            zipFile.close();
-                            player.sendMessage(Component.text("Animation conversion failed! Read console", NamedTextColor.RED));
-                            throw new RuntimeException("Failed to read command from zip entry: Wrong game version downloaded");
+                            String message = e instanceof NumberFormatException ? "Invalid timestamp value" : "Wrong game version downloaded";
+                            throw new RuntimeException("Failed to read command from zip entry: "+message, e);
                         }
                     }
 
@@ -307,17 +304,12 @@ public class BDEngineDPConverter {
                 World w = spawnLoc.getWorld();
                 String worldName = ConversionUtils.getExecuteCommandWorldName(w);
 
-                Bukkit.dispatchCommand(silentSender, "execute positioned "+coordinates+" in "+worldName+" run "+line);
+                Bukkit.dispatchCommand(silentSender, "execute at "+player.getName()+" positioned "+coordinates+" in "+worldName+" run "+line);
             }
-            br.close();
         }
         catch (IOException e){
             player.sendMessage(Component.text("Animation conversion failed! Read console"));
-            try{
-                zipFile.close();
-            }
-            catch(IOException ignored){}
-            throw new RuntimeException("Failed to execute command from ZipEntry: "+zipEntry.getName());
+            throw new RuntimeException("Failed to execute command from ZipEntry: "+zipEntry.getName(), e);
         }
     }
 
