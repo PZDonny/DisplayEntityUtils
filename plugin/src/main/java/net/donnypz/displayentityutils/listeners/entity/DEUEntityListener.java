@@ -13,14 +13,13 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayState
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
-import net.ess3.api.IUser;
-import net.ess3.api.events.teleport.PreTeleportEvent;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
+import org.bukkit.GameMode;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mannequin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -58,12 +57,15 @@ public final class DEUEntityListener implements Listener {
         applyState(e.getEntity(), MachineState.StateType.DAMAGED);
     }
 
-    //Disable non-display entity damage, if in a group
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onMannequinDamaged(EntityDamageByEntityEvent e){
-        if (DisplayUtils.isInGroup(e.getEntity())) {
-            e.setCancelled(true);
-        }
+    //Disable Mannequin Damage, if invulnerable
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onDamage(EntityDamageByEntityEvent e){
+        if (!VersionUtils.canSpawnMannequins()) return;
+        if (!(e.getDamager() instanceof Player p)) return;
+        if (!(e.getEntity() instanceof Mannequin m)) return;
+        if (!DisplayUtils.isInGroup(m)) return;
+
+        if (p.getGameMode() == GameMode.CREATIVE && m.isInvulnerable()) e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
