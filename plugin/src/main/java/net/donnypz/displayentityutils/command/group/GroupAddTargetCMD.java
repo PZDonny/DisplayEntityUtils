@@ -5,16 +5,10 @@ import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedPartSelection;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Interaction;
-import org.bukkit.entity.Mannequin;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,8 +45,7 @@ class GroupAddTargetCMD extends PlayerSubCommand {
         }
         else {
             group.addEntity(entity);
-            SpawnedPartSelection sel = (SpawnedPartSelection) DisplayGroupManager.getPartSelection(player);
-            sel.refresh();
+            ((MultiPartSelection<?>) DisplayGroupManager.getPartSelection(player)).refresh();
         }
         player.sendMessage(Component.text("Added entity to your selected group!", NamedTextColor.GREEN));
     }

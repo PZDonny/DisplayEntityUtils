@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DEUUser;
+import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
@@ -54,6 +55,7 @@ class MannequinSpawnCMD extends PlayerSubCommand {
                 player.sendMessage(Component.text("- Failed to add the mannequin to your selected group", NamedTextColor.YELLOW));
                 return;
             }
+            ((MultiPartSelection<?>) DisplayGroupManager.getPartSelection(player)).refresh();
 
             player.sendMessage(Component.text("- The mannequin has been added to your selected group", NamedTextColor.GRAY));
         }

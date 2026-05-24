@@ -47,8 +47,7 @@ class InteractionAddToGroupCMD extends GroupSubCommand {
         }
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("| The interaction has been added to your group!", NamedTextColor.YELLOW)));
-        MultiPartSelection<?> sel = (MultiPartSelection<?>) DisplayGroupManager.getPartSelection(player);
-        sel.refresh();
+        ((MultiPartSelection<?>) DisplayGroupManager.getPartSelection(player)).refresh();
     }
 
     static Interaction spawnInteraction(Player player, Location spawnLoc, String[] args){
