@@ -214,9 +214,7 @@ public final class DisplayEntityGroup implements Serializable{
         DisplayGroupManager.addSpawnedGroup(location, group);
 
         if (DisplayConfig.autoCulling()){
-            float widthCullingAdder = DisplayConfig.widthCullingAdder();
-            float heightCullingAdder = DisplayConfig.heightCullingAdder();
-            group.autoCull(widthCullingAdder, heightCullingAdder);
+            group.autoCull(false);
         }
 
         new GroupSpawnedEvent(group, spawnReason).callEvent();
@@ -303,9 +301,7 @@ public final class DisplayEntityGroup implements Serializable{
 
 
         if (DisplayConfig.autoCulling()){
-            float widthCullingAdder = DisplayConfig.widthCullingAdder();
-            float heightCullingAdder = DisplayConfig.heightCullingAdder();
-            packetGroup.autoCull(widthCullingAdder, heightCullingAdder);
+            packetGroup.autoCull(false);
         }
 
         if (spawnReason == GroupSpawnedEvent.SpawnReason.CHUNK_LOAD_PLACED || spawnReason == GroupSpawnedEvent.SpawnReason.ITEMSTACK){

@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
@@ -119,6 +120,21 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @return a {@link MultiPartSelection}
      */
     public abstract @NotNull MultiPartSelection<T> createPartSelection(@NotNull PartFilter partFilter);
+
+    /**
+     * Attempt to automatically set the culling bounds for all parts within this group, using config culling values.
+     * @param includeRideOffset whether the group's rideOffset should be included in calculation
+     */
+    public void autoCull(boolean includeRideOffset){
+        float widthAdder = DisplayConfig.widthCullingAdder();
+        float heightAdder = DisplayConfig.heightCullingAdder();
+        if (includeRideOffset){
+            widthAdder += (float) Math.max(Math.abs(rideOffset.getX()), Math.abs(rideOffset.getZ()));
+            heightAdder += (float) Math.abs(rideOffset.getY());
+        }
+
+        autoCull(widthAdder, heightAdder);
+    }
 
     /**
      * Attempt to automatically set the culling bounds for all parts within this group.
@@ -783,7 +799,17 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param animation the animation this group should play
      * @return the {@link DisplayAnimator} that will control the playing of the given animation
      */
-    public abstract @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation);
+    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation){
+        return animate(animation, true);
+    }
+
+    /**
+     * Make a group perform an animation
+     * @param animation the animation this group should play
+     * @param allowDataChanges whether block/item display textures and text display text should change based on animation frame data
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
+     */
+    public abstract @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation, boolean allowDataChanges);
 
 
     /**
@@ -791,7 +817,17 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param animation the animation this group should play
      * @return the {@link DisplayAnimator} that will control the playing of the given animation
      */
-    public abstract @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation);
+    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation){
+        return animateLooping(animation, true);
+    }
+
+    /**
+     * Make a group perform a looping animation.
+     * @param animation the animation this group should play
+     * @param allowDataChanges whether block/item display textures and text display text should change based on animation frame data
+     * @return the {@link DisplayAnimator} that will control the playing of the given animation
+     */
+    public abstract @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation, boolean allowDataChanges);
 
     /**
      * Manually stop an animation from playing on this group
@@ -1084,44 +1120,13 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof ActiveGroup<?> group)) return false;
-        return ID == group.ID
-                && Float.compare(scaleMultiplier, group.scaleMultiplier) == 0
-                && lastAnimatedTick == group.lastAnimatedTick
-                && Objects.equals(masterPart, group.masterPart)
-                && Objects.equals(groupParts, group.groupParts)
-                && Objects.equals(tag, group.tag)
-                && Objects.equals(followers, group.followers)
-                && Objects.equals(followerLock, group.followerLock)
-                && Objects.equals(defaultFollower, group.defaultFollower)
-                && Objects.equals(animatorLock, group.animatorLock)
-                && Objects.equals(activeAnimators, group.activeAnimators)
-                && Objects.equals(spawnAnimationTag, group.spawnAnimationTag)
-                && spawnAnimationLoadMethod == group.spawnAnimationLoadMethod
-                && spawnAnimationType == group.spawnAnimationType
-                && Objects.equals(currentMachineState, group.currentMachineState)
-                && Objects.equals(rideOffset, group.rideOffset);
+        if (this == o) return true;
+        if (!(o instanceof ActiveGroup<?> other)) return false;
+        return ID == other.ID;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-                ID,
-                masterPart,
-                groupParts,
-                tag,
-                followers,
-                followerLock,
-                defaultFollower,
-                animatorLock,
-                activeAnimators,
-                spawnAnimationTag,
-                spawnAnimationLoadMethod,
-                spawnAnimationType,
-                currentMachineState,
-                scaleMultiplier,
-                rideOffset,
-                lastAnimatedTick
-        );
+        return Integer.hashCode(ID);
     }
 }

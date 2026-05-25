@@ -38,23 +38,6 @@ public final class SpawnedDisplayAnimation{
         this.animationTag = animationTag;
     }
 
-    /**
-     * Get if this animation allows for texture changes to block/item displays, text display text
-     * @return a boolean
-     */
-    public boolean allowsTextureChanges(){
-        return dataChanges;
-    }
-
-    /**
-     * Set whether this animation should allow texture changes to block/item displays and text display text
-     * @param textureChanges
-     * @return this
-     */
-    public SpawnedDisplayAnimation allowTextureChanges(boolean textureChanges){
-        this.dataChanges = textureChanges;
-        return this;
-    }
 
     /**
      * Set the filter this animation should use when animating
@@ -346,6 +329,7 @@ public final class SpawnedDisplayAnimation{
             newFrame.interactionTransformations = new HashMap<>(frame.interactionTransformations);
             reversed.addFrame(newFrame);
         }
+        reversed.dataChanges = this.dataChanges;
         reversed.animationTag = this.animationTag;
         if (this.filter != null){
             reversed.filter = this.filter.clone();

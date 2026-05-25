@@ -20,9 +20,10 @@ import java.util.List;
 class AnimPlayCMD extends PlayerSubCommand {
     AnimPlayCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("play", parentSubCommand, Permission.ANIM_PLAY);
-        setTabComplete(2, List.of("-loop", "-packet", "-camera"));
-        setTabComplete(3, List.of("-loop", "-packet", "-camera"));
-        setTabComplete(4, List.of("-loop", "-packet", "-camera"));
+        setTabComplete(2, List.of("-loop", "-packet", "-camera", "-nodata"));
+        setTabComplete(3, List.of("-loop", "-packet", "-camera", "-nodata"));
+        setTabComplete(4, List.of("-loop", "-packet", "-camera", "-nodata"));
+        setTabComplete(5, List.of("-loop", "-packet", "-camera", "-nodata"));
     }
 
     @Override
@@ -51,6 +52,7 @@ class AnimPlayCMD extends PlayerSubCommand {
         DisplayAnimator.AnimationType animationType = DisplayAnimator.AnimationType.LINEAR;
         boolean packet = false;
         boolean camera = false;
+        boolean dataChange = true;
         Component optionResult = Component.empty();
         for (int i = 2; i < args.length; i++){
             String arg = args[i];
@@ -66,22 +68,25 @@ class AnimPlayCMD extends PlayerSubCommand {
                 camera = true;
                 optionResult.append(Component.text(" (CAMERA VIEW)", NamedTextColor.AQUA));
             }
+            else if (arg.equalsIgnoreCase("-nodata")){
+                dataChange = false;
+            }
         }
 
         if (animationType == DisplayAnimator.AnimationType.LOOP){
             if (packet){
-                DisplayAnimator.playUsingPackets(group, anim, DisplayAnimator.AnimationType.LOOP);
+                DisplayAnimator.playUsingPackets(group, anim, DisplayAnimator.AnimationType.LOOP, dataChange);
             }
             else{
-                group.animateLooping(anim);
+                group.animateLooping(anim, dataChange);
             }
         }
         else{
             if (packet){
-                DisplayAnimator.playUsingPackets(group, anim, DisplayAnimator.AnimationType.LINEAR);
+                DisplayAnimator.playUsingPackets(group, anim, DisplayAnimator.AnimationType.LINEAR, dataChange);
             }
             else{
-                group.animate(anim);
+                group.animate(anim, dataChange);
             }
         }
         if (camera){

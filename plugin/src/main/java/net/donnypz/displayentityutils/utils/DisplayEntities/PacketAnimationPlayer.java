@@ -27,10 +27,7 @@ final class PacketAnimationPlayer extends AnimationPlayer{
 
     @Override
     protected boolean canContinueAnimation(ActiveGroup<?> group) {
-        if (group instanceof SpawnedDisplayEntityGroup g && !g.isRegistered()){
-            return false;
-        }
-        return group.isActiveAnimator(animator);
+        return group.isActiveAnimator(animator) && group.isRegistered();
     }
 
     @Override

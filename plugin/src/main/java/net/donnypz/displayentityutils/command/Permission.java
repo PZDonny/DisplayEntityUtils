@@ -90,6 +90,7 @@ public enum Permission {
     INTERACTION_SPAWN("deu.interaction.spawn"),
     INTERACTION_INFO("deu.interaction.info"),
 
+    MANNEQUIN_SPAWN("deu.mannequin.spawn"),
     MANNEQUIN_SKIN("deu.mannequin.skin"),
     MANNEQUIN_NAME("deu.mannequin.name"),
     MANNEQUIN_NAME_VISIBLE("deu.mannequin.namevisible"),

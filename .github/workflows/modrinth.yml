@@ -15,8 +15,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 21
-          distribution: temurin
+          java-version: '25'
+          distribution: 'temurin'
           cache: maven
 
       - name: Set version from release tag
@@ -35,9 +35,8 @@ jobs:
           changelog: ${{ github.event.release.body }}
           loaders: |-
             paper
-            spigot
-            bukkit
           game-versions: |-
             1.20.x
             1.21.x
+            26.1.x
           files: plugin/target/displayentityutils-${{ github.event.release.tag_name }}.jar

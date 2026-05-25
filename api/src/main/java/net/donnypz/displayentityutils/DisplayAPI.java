@@ -45,6 +45,7 @@ public final class DisplayAPI {
     static boolean isSkriptInstalled;
     static boolean isWorldEditInstalled;
     static boolean isPAPIInstalled;
+    static boolean isEssentialsInstalled;
 
     private static final String legacyPartTagPrefix = "deu.parttag_";
 
@@ -196,6 +197,14 @@ public final class DisplayAPI {
      */
     public static boolean isPAPIInstalled() {
         return isPAPIInstalled;
+    }
+
+    /**
+     * Get whether EssentialsX is installed on this server
+     * @return true if EssentialsX is present
+     */
+    public static boolean isEssentialsInstalled() {
+        return isEssentialsInstalled;
     }
 
     public static DisplayStorage getStorage(@NotNull LoadMethod method){

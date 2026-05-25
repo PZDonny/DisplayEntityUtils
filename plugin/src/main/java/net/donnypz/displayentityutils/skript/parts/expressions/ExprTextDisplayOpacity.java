@@ -22,13 +22,13 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 @Examples({"if {_activepart}'s part type is text_display:",
         "\tset {_activepart}'s deu opacity to 105"
 })
-@Since("3.5.0")
-public class ExprTextDisplayOpacity extends SimplePropertyExpression<ActivePart, Number> {
+@Since("3.5.0, 3.5.2 (Text Displays Entities)")
+public class ExprTextDisplayOpacity extends SimplePropertyExpression<Object, Number> {
 
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
                 SyntaxInfo.Expression.builder(ExprTextDisplayOpacity.class, Number.class)
-                        .addPatterns(getPatterns("deu [text] [display] opacity", "activeparts"))
+                        .addPatterns(getPatterns("deu [text] [display] opacity", "activeparts/displays"))
                         .supplier(ExprTextDisplayOpacity::new)
                         .build()
         );
@@ -47,8 +47,14 @@ public class ExprTextDisplayOpacity extends SimplePropertyExpression<ActivePart,
 
     @Override
     @Nullable
-    public Number convert(ActivePart part) {
-        return part.getTextDisplayTextOpacity();
+    public Number convert(Object obj) {
+        if (obj instanceof ActivePart part){
+            return part.getTextDisplayTextOpacity();
+        }
+        else if (obj instanceof TextDisplay td){
+            return td.getTextOpacity();
+        }
+        return null;
     }
 
     @Override
@@ -72,7 +78,7 @@ public class ExprTextDisplayOpacity extends SimplePropertyExpression<ActivePart,
 
     @Override
     public void change(Event event, Object[] delta, Changer.ChangeMode mode) {
-        ActivePart[] parts = getExpr().getArray(event);
+        Object[] parts = getExpr().getArray(event);
         int change = delta == null ? 255 : ((Number) delta[0]).intValue();
         switch (mode) {
             case REMOVE_ALL:
@@ -80,23 +86,33 @@ public class ExprTextDisplayOpacity extends SimplePropertyExpression<ActivePart,
                 change = -change;
                 //$FALL-THROUGH$
             case ADD:
-                for (ActivePart part : parts) {
-                    byte value = convertToSigned(Math.clamp(convertToUnsigned(part.getTextDisplayTextOpacity()) + change, 0, 255));
-                    part.setTextDisplayTextOpacity(value);
+                for (Object obj : parts) {
+                    if (obj instanceof ActivePart part){
+                        byte value = convertToSigned(Math.clamp(convertToUnsigned(part.getTextDisplayTextOpacity()) + change, 0, 255));
+                        part.setTextDisplayTextOpacity(value);
+                    }
+                    else if (obj instanceof TextDisplay td){
+                        byte value = convertToSigned(Math.clamp(convertToUnsigned(td.getTextOpacity()) + change, 0, 255));
+                        td.setTextOpacity(value);
+                    }
                 }
                 break;
             case DELETE:
             case RESET:
             case SET:
                 change = convertToSigned(Math.clamp(change, -128, 255));
-                for (ActivePart active : parts) {
-                    active.setTextDisplayTextOpacity((byte) change);
+                for (Object obj : parts) {
+                    if (obj instanceof ActivePart part){
+                        part.setTextDisplayTextOpacity((byte) change);
+                    }
+                    else if (obj instanceof TextDisplay td){
+                        td.setTextOpacity((byte) change);
+                    }
                 }
                 break;
         }
     }
 
-    //------From Skript's ExprTextDisplayOpacity------
     private static int convertToUnsigned(byte value) {
         return value < 0 ? 256 + value : value;
     }

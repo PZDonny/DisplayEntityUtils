@@ -25,6 +25,8 @@ mythicMobs:
     storage: LOCAL
     #Determine if the group should be packet based
     packetBased: true
+    #Whether played animation should be able to change the texture of this group
+    allowAnimationDataChanges: true
 
 
 #-----------------Group Properties-------------------
@@ -132,6 +134,8 @@ states:
     storage: LOCAL
     animationType: LINEAR
     lockTransition: true
+    #The value that should be used for this animation state, regardless of what "group.allowAnimationDataChanges"'s is
+    animationDataChangesOverride: true
 
   idle:
     animations: ["idle_animation"]

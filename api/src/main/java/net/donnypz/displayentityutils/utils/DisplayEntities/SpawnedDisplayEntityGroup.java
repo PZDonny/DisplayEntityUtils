@@ -34,7 +34,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
     Set<SpawnedPartSelection> partSelections = new HashSet<>();
 
-    long creationTime = System.currentTimeMillis();
+    private final long creationTime;
     boolean isVisibleByDefault;
     private boolean isPersistent = DisplayConfig.defaultPersistence();
     private boolean persistenceOverride = DisplayConfig.persistenceOverride();
@@ -46,6 +46,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
     SpawnedDisplayEntityGroup(boolean isVisible) {
         this.isVisibleByDefault = isVisible;
+        this.creationTime = System.currentTimeMillis();
     }
 
     /**
@@ -59,6 +60,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         PersistentDataContainer c = masterDisplay.getPersistentDataContainer();
         if (c.has(creationTimeKey)){
             creationTime = c.get(creationTimeKey, PersistentDataType.LONG);
+        }
+        else{
+            creationTime = System.currentTimeMillis();
         }
         if (c.has(scaleKey)){
             scaleMultiplier = c.get(scaleKey, PersistentDataType.FLOAT);
@@ -86,9 +90,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         DisplayGroupManager.addSpawnedGroup(masterDisplay.getLocation(), this);
 
         if (DisplayConfig.autoCulling()){
-            float widthCullingAdder = DisplayConfig.widthCullingAdder();
-            float heightCullingAdder = DisplayConfig.heightCullingAdder();
-            autoCull(widthCullingAdder, heightCullingAdder);
+            this.autoCull(false);
         }
     }
 
@@ -501,38 +503,80 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
     @Override
     public boolean teleport(@NotNull Location location, boolean respectGroupDirection){
+        return teleport(location, respectGroupDirection, false);
+    }
+
+    /**
+     * Change the true location of this group.
+     * @param location The location to teleport this group
+     * @param respectGroupDirection Whether to respect this group's pitch and yaw or the location's pitch and yaw
+     * @param force forcefully teleport this group, loading its chunk
+     * @return true if the teleport was successful
+     */
+    public boolean teleport(@NotNull Location location, boolean respectGroupDirection, boolean force){
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORT, location);
         Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()){
-            return false;
-        }
+        if (event.isCancelled()) return false;
 
-        teleportWithoutEvent(location, respectGroupDirection);
+        teleportWithoutEvent(location, respectGroupDirection, force);
         return true;
     }
 
-    private void teleportWithoutEvent(Location location, boolean respectGroupDirection){
+    private void teleportWithoutEvent(Location location, boolean respectGroupDirection, boolean forceChunkLoading){
         Entity master = getMasterEntity();
         Location oldMasterLoc = master.getLocation().clone();
+        boolean sameWorld = location.getWorld().getName().equals(oldMasterLoc.getWorld().getName());
+        Chunk chunk = forceChunkLoading ? oldMasterLoc.getChunk() : null;
+
+        if (forceChunkLoading){
+            chunk.addPluginChunkTicket(DisplayAPI.getPlugin());
+        }
+
         if (respectGroupDirection){
             location.setPitch(oldMasterLoc.getPitch());
             location.setYaw(oldMasterLoc.getYaw());
         }
 
         Location lastLoc = master.getLocation();
+        if (!sameWorld){
+            for (SpawnedDisplayEntityPart part : groupParts.values()){
+                if (part == masterPart) continue;
+                Entity e = part.getEntity();
+                if (e == null) continue;
+
+                master.removePassenger(e);
+                FoliaUtils.teleport(e, location);
+            }
+        }
+
         FoliaUtils.teleport(master, location, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+
         DisplayGroupManager.updateSpawnedGroup(lastLoc, location, this);
 
-        for (SpawnedDisplayEntityPart part : this.getParts()){
-            part.getEntity().setRotation(location.getYaw(), location.getPitch());
+        for (SpawnedDisplayEntityPart part : groupParts.values()){
+            Entity partEntity = part.getEntity();
+            if (partEntity == null){
+                continue;
+            }
+
+
+            partEntity.setRotation(location.getYaw(), location.getPitch());
 
         //Non-Display TP
             if (!part.isDisplay()){
-                Entity entity = part.getEntity();
-                Vector vector = oldMasterLoc.toVector().subtract(entity.getLocation().toVector());
+                Vector vector = oldMasterLoc.toVector().subtract(partEntity.getLocation().toVector());
                 Location tpLocation = location.clone().subtract(vector);
                 FoliaUtils.teleport(part.getEntity(), tpLocation, TeleportFlag.EntityState.RETAIN_PASSENGERS);
             }
+
+            if (!sameWorld){
+                if (part == masterPart) continue;
+                master.addPassenger(partEntity);
+            }
+        }
+
+        if (forceChunkLoading){
+            chunk.removePluginChunkTicket(DisplayAPI.getPlugin());
         }
     }
 
@@ -692,11 +736,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
         if (distance == 0) return true;
         Location destination = getMasterEntity().getLocation().clone().add(direction.clone().normalize().multiply(distance));
-        GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.VANILLATRANSLATE, destination);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()){
+        if (!new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.VANILLATRANSLATE, destination).callEvent()){
             return false;
         }
+
         for (SpawnedDisplayEntityPart part : groupParts.values()){
             part.translateForce(direction, distance, durationInTicks, delayInTicks);
         }
@@ -798,20 +841,15 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     public boolean rideEntity(@NotNull Entity vehicle){
         Entity masterEntity = getMasterEntity();
-        GroupRideEntityEvent event = new GroupRideEntityEvent(this, vehicle);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()){
-            return false;
-        }
+        if (!new GroupRideEntityEvent(this, vehicle).callEvent()) return false;
 
-        boolean result = vehicle.addPassenger(masterEntity);
-        if (!result){
-            return false;
-        }
+        if (!vehicle.addPassenger(masterEntity)) return false;
 
         if (!rideOffset.isZero()) {
             translate(rideOffset, -1, -1);
         }
+
+        this.autoCull(true);
 
         updatePosition(vehicle);
         for (SpawnedDisplayEntityPart part : groupParts.values()){
@@ -881,6 +919,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                     translate(rideOffset.clone().multiply(-1), -1, -1);
                 }
             }
+            this.autoCull(false);
         }
         return vehicle;
     }
@@ -1006,9 +1045,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         mergingGroup.unregister(false, false);
 
         if (DisplayConfig.autoCulling()){
-            float widthCullingAdder = DisplayConfig.widthCullingAdder();
-            float heightCullingAdder = DisplayConfig.heightCullingAdder();
-            autoCull(widthCullingAdder, heightCullingAdder);
+            this.autoCull(true);
         }
         for (SpawnedPartSelection sel : partSelections){
             sel.refresh();
@@ -1049,16 +1086,14 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
 
     @Override
-    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation){
-        return DisplayAnimator.play(this, animation, DisplayAnimator.AnimationType.LINEAR);
+    public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation, boolean allowDataChange){
+        return DisplayAnimator.play(this, animation, DisplayAnimator.AnimationType.LINEAR, allowDataChange);
     }
 
 
     @Override
-    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation){
-        DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LOOP);
-        animator.play(this, 0);
-        return animator;
+    public @NotNull DisplayAnimator animateLooping(@NotNull SpawnedDisplayAnimation animation, boolean allowDataChange){
+        return DisplayAnimator.play(this, animation, DisplayAnimator.AnimationType.LOOP, allowDataChange);
     }
 
     /**
@@ -1317,22 +1352,5 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     public boolean isSpawned(){
         return masterPart != null && masterPart.isValid();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        SpawnedDisplayEntityGroup that = (SpawnedDisplayEntityGroup) o;
-        return creationTime == that.creationTime
-                && isVisibleByDefault == that.isVisibleByDefault
-                && isPersistent == that.isPersistent
-                && persistenceOverride == that.persistenceOverride
-                && Objects.equals(partUUIDRandom, that.partUUIDRandom)
-                && Objects.equals(partSelections, that.partSelections);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(partUUIDRandom, partSelections, creationTime, isVisibleByDefault, isPersistent, persistenceOverride);
     }
 }

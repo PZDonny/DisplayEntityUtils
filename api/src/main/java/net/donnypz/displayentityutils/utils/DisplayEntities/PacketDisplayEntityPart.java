@@ -1176,6 +1176,20 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         }
     }
 
+    void teleportUnsetPassengers(@NotNull Location location, @NotNull Player player){
+        packetLocation = new PacketLocation(location);
+        if (isMaster && group != null){
+            group.unsetPassengers(player);
+            DisplayAPI.getScheduler().runAsync(() -> {
+                PacketUtils.teleport(player, getEntityId(), location);
+                group.setPassengers(player);
+            });
+        }
+        else{
+            PacketUtils.teleport(player, getEntityId(), location);
+        }
+    }
+
     /**
      * Get the location of this packet-based entity.
      * @return a {@link Location} or null if not set

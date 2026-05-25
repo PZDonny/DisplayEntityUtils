@@ -9,6 +9,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
@@ -19,17 +20,17 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 @Examples({
         "deu make {_activepart} visible through blocks",
         "deu stop {_activepart} from being seen through walls"})
-@Since("3.5.0")
+@Since("3.5.0, 3.5.2 (Text Displays Entities)")
 public class EffTextDisplaySeeThrough extends Effect {
 
-    Expression<ActivePart> partExpr;
+    Expression<?> partExpr;
     boolean hide;
 
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
                 SyntaxInfo.builder(EffTextDisplaySeeThrough.class)
-                        .addPattern("deu make %activeparts% visible through (blocks|walls)")
-                        .addPattern("deu (stop|prevent|block) %activeparts% from being (visible|seen) through (blocks|walls)")
+                        .addPattern("deu make %activeparts/displays% visible through (blocks|walls)")
+                        .addPattern("deu (stop|prevent|block) %activeparts/displays% from being (visible|seen) through (blocks|walls)")
                         .supplier(EffTextDisplaySeeThrough::new)
                         .build()
         );
@@ -37,22 +38,26 @@ public class EffTextDisplaySeeThrough extends Effect {
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        partExpr = (Expression<ActivePart>) expressions[0];
+        partExpr = expressions[0];
         hide = matchedPattern == 1;
         return true;
     }
 
     @Override
     protected void execute(Event event) {
-        ActivePart[] parts = partExpr.getArray(event);
+        Object[] parts = partExpr.getArray(event);
         if (parts == null){
             return;
         }
 
-        for (ActivePart part : parts){
-            part.setTextDisplaySeeThrough(!hide);
+        for (Object o : parts){
+            if (o instanceof ActivePart p){
+                p.setTextDisplaySeeThrough(!hide);
+            }
+            else if (o instanceof TextDisplay td){
+                td.setSeeThrough(!hide);
+            }
         }
-
     }
 
     @Override

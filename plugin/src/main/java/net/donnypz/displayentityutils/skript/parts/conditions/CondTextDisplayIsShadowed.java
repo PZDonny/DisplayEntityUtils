@@ -9,6 +9,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
@@ -18,15 +19,15 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 @Description("Check if an text display part's text has shadows")
 @Examples({"if {_activepart} has deu text shadows:",
         "\tbroadcast \"This text display part has text shadow!\""})
-@Since("3.5.0")
+@Since("3.5.0, 3.5.2 (Text Displays Entities)")
 public class CondTextDisplayIsShadowed extends Condition {
 
-    Expression<ActivePart> partExpr;
+    Expression<?> partExpr;
 
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.CONDITION,
                 SyntaxInfo.builder(CondTextDisplayIsShadowed.class)
-                        .addPattern("%activepart% (1¦(is|has)|2¦is(n't| not)) deu [text] [drop] shadow[ed|s]")
+                        .addPattern("%activepart/displays% (1¦(is|has)|2¦is(n't| not)) deu [text] [drop] shadow[ed|s]")
                         .supplier(CondTextDisplayIsShadowed::new)
                         .build()
         );
@@ -34,9 +35,12 @@ public class CondTextDisplayIsShadowed extends Condition {
 
     @Override
     public boolean check(Event event) {
-        ActivePart part = partExpr.getSingle(event);
-        if (part != null){
-            return part.isTextDisplayShadowed();
+        Object obj = partExpr.getSingle(event);
+        if (obj instanceof ActivePart p){
+            return p.isTextDisplayShadowed();
+        }
+        else if (obj instanceof TextDisplay td){
+            return td.isShadowed();
         }
         return isNegated();
     }
@@ -49,7 +53,7 @@ public class CondTextDisplayIsShadowed extends Condition {
     @SuppressWarnings("unchecked")
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        this.partExpr = (Expression<ActivePart>) expressions[0];
+        this.partExpr = expressions[0];
         setNegated(parseResult.mark == 2);
         return true;
     }

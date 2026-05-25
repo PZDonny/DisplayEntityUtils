@@ -8,15 +8,19 @@ import net.donnypz.displayentityutils.listeners.ListenerUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
-import org.bukkit.Location;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
+import org.bukkit.GameMode;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mannequin;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -25,6 +29,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
 public final class DEUEntityListener implements Listener {
+
 
     //============Mythic====================
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -45,12 +50,15 @@ public final class DEUEntityListener implements Listener {
         applyState(e.getEntity(), MachineState.StateType.DAMAGED);
     }
 
-    //Disable non-display entity damage, if in a group
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onMannequinDamaged(EntityDamageByEntityEvent e){
-        if (DisplayUtils.isInGroup(e.getEntity())) {
-            e.setCancelled(true);
-        }
+    //Disable Mannequin Damage, if invulnerable
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onDamage(EntityDamageByEntityEvent e){
+        if (!VersionUtils.canSpawnMannequins()) return;
+        if (!(e.getDamager() instanceof Player p)) return;
+        if (!(e.getEntity() instanceof Mannequin m)) return;
+        if (!DisplayUtils.isInGroup(m)) return;
+
+        if (p.getGameMode() == GameMode.CREATIVE && m.isInvulnerable()) e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -98,24 +106,17 @@ public final class DEUEntityListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onTeleport(EntityTeleportEvent e){
+    public void onTeleportMonitor(EntityTeleportEvent e){
         Entity entity = e.getEntity();
-        applyState(e.getEntity(), MachineState.StateType.TELEPORT);
+        applyState(entity, MachineState.StateType.TELEPORT);
 
-        Location fromLoc = e.getFrom();
-        Location toLoc = e.getTo();
-
-        ActiveGroup<?> controllerGroup = DisplayControllerManager.getControllerGroup(entity.getUniqueId());
-        if (controllerGroup instanceof PacketDisplayEntityGroup pg){
-            pg.teleport(toLoc, true);
+        if (!e.getTo().getWorld().equals(e.getFrom().getWorld())){
+            SpawnedDisplayEntityPart.getPart(entity); //refresh entity ids
         }
 
-        if (!fromLoc.getWorld().equals(toLoc.getWorld())){
-            for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getPassengerGroups(entity)){
-                pg.hide(); //Hide for players in prev world
-            }
-        }
     }
+
+
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDeath(EntityDeathEvent e){

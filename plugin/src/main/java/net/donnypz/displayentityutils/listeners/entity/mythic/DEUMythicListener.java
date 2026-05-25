@@ -23,9 +23,7 @@ public final class DEUMythicListener implements Listener {
         Entity entity = e.getEntity();
         String mobID = e.getMobType().getInternalName();
         DisplayController controller = DisplayControllerManager.getControllerOfMythicMob(mobID);
-        if (controller == null){
-            return;
-        }
+        if (controller == null) return;
 
         boolean persist = e.getMob().getDespawnMode().getSavesToDisk();
         String disg = e.getMobType().getConfig().getString("Disguise");

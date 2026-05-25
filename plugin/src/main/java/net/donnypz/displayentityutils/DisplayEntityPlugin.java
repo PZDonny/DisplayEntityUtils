@@ -12,6 +12,7 @@ import net.donnypz.displayentityutils.listeners.entity.DEUInteractionListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUMannequinEditorListener;
 import net.donnypz.displayentityutils.listeners.entity.mythic.DEUMythicListener;
 import net.donnypz.displayentityutils.listeners.player.*;
+import net.donnypz.displayentityutils.listeners.player.essentials.DEUEssentialsListener;
 import net.donnypz.displayentityutils.managers.LocalManager;
 import net.donnypz.displayentityutils.managers.MYSQLManager;
 import net.donnypz.displayentityutils.managers.MongoManager;
@@ -123,6 +124,10 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         DisplayAPI.isViaVerInstalled = Bukkit.getPluginManager().isPluginEnabled("ViaVersion");
         DisplayAPI.isWorldEditInstalled = Bukkit.getPluginManager().isPluginEnabled("WorldEdit");
         DisplayAPI.isPAPIInstalled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
+        DisplayAPI.isEssentialsInstalled = Bukkit.getPluginManager().isPluginEnabled("Essentials");
+        if (DisplayAPI.isEssentialsInstalled){
+            Bukkit.getPluginManager().registerEvents(new DEUEssentialsListener(), this);
+        }
 
         //Skript
         DisplayAPI.isSkriptInstalled = Bukkit.getPluginManager().isPluginEnabled("Skript");
@@ -166,6 +171,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new DEUPlayerWorldListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerPlaceBlockListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerDigListener(), this);
+        Bukkit.getPluginManager().registerEvents(new DEUPlayerTeleportListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUInteractionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUMannequinEditorListener(), this);
     }

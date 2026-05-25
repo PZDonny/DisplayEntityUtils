@@ -21,9 +21,6 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 @Description("Unregister an active group, making the group unusable. Packet based groups do not require forced chunk loading, and will always despawn.")
 @Examples({
         "deu unregister {_activegroup}",
-        "",
-        "#3.4.3 and earlier",
-        "deu unregister {_activegroup}",
         "deu unregister {_activegroup} and despawn",
         "deu unregister {_activegroup} and despawn with forced chunk loading",
         "",

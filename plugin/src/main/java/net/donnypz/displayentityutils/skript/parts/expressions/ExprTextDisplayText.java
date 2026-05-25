@@ -8,15 +8,11 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
-import ch.njol.skript.util.Utils;
-import ch.njol.skript.util.chat.BungeeConverter;
-import ch.njol.skript.util.chat.ChatMessages;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
@@ -30,15 +26,13 @@ import java.util.Arrays;
         "if {_activepart}'s part type is text_display:",
         "\tset {_activepart}'s deu text to \"&aMy New Text\""
 })
-@Since("3.5.0")
-public class ExprTextDisplayText extends SimplePropertyExpression<ActivePart, String> {
-
-    private static final BungeeComponentSerializer SERIALIZER = BungeeComponentSerializer.get();
+@Since("3.5.0, 3.5.2 (Text Displays Entities)")
+public class ExprTextDisplayText extends SimplePropertyExpression<Object, Component> {
 
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
-                SyntaxInfo.Expression.builder(ExprTextDisplayText.class, String.class)
-                        .addPatterns(getPatterns("deu text [display] [text]", "activeparts"))
+                SyntaxInfo.Expression.builder(ExprTextDisplayText.class, Component.class)
+                        .addPatterns(getPatterns("deu text [display] [text]", "activeparts/displays"))
                         .supplier(ExprTextDisplayText::new)
                         .build()
         );
@@ -51,15 +45,20 @@ public class ExprTextDisplayText extends SimplePropertyExpression<ActivePart, St
     }
 
     @Override
-    public Class<String> getReturnType() {
-        return String.class;
+    public Class<Component> getReturnType() {
+        return Component.class;
     }
 
     @Override
     @Nullable
-    public String convert(ActivePart part) {
-        Component comp = part.getTextDisplayText();
-        return comp != null ? Utils.replaceChatStyles(LegacyComponentSerializer.legacySection().serialize(comp)) : null;
+    public Component convert(Object obj) {
+        if (obj instanceof TextDisplay td){
+            return td.text();
+        }
+        else if (obj instanceof ActivePart p){
+            return p.getTextDisplayText();
+        }
+        return null;
     }
 
     @Override
@@ -74,29 +73,34 @@ public class ExprTextDisplayText extends SimplePropertyExpression<ActivePart, St
 
     @Override
     public void change(Event event, Object[] delta, Changer.ChangeMode mode){
-        String value = delta == null ? null : String.join("\n", Arrays.copyOf(delta, delta.length, String[].class));
-        final Component finalComp;
-        if (SERIALIZER != null && value != null) {
-            finalComp = SERIALIZER.deserialize(BungeeConverter.convert(ChatMessages.parseToArray(value)));
-        }
-        else{
-            finalComp = null;
-        }
-        if (finalComp == null) return;
+        Component component = delta == null ? Component.empty() : joinByNewLine(Arrays.copyOf(delta, delta.length, Component[].class));
 
         for (Object object : getExpr().getArray(event)) {
             if (object instanceof ActivePart ap){
-                ap.setTextDisplayText(finalComp);
+                ap.setTextDisplayText(component);
+            }
+            else if (object instanceof TextDisplay td){
+                td.text(component);
             }
         }
     }
 
     @Override
     public Class<?>[] acceptChange(final Changer.ChangeMode mode) {
-        if (mode == Changer.ChangeMode.RESET) return CollectionUtils.array();
-        if (mode == Changer.ChangeMode.SET) {
-            return CollectionUtils.array(String[].class);
+        return switch (mode) {
+            case RESET -> CollectionUtils.array();
+            case SET -> CollectionUtils.array(Component[].class);
+            default -> null;
+        };
+    }
+
+    //from Skript's TextComponentUtils
+    private Component joinByNewLine(Component... components) {
+        // we want formatting from the first to apply to the next, so append this way
+        Component combined = components[0];
+        for (int i = 1; i < components.length; i++) {
+            combined = combined.appendNewline().append(components[i]);
         }
-        return null;
+        return combined.compact();
     }
 }

@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
+import io.papermc.paper.entity.TeleportFlag;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -11,6 +12,7 @@ import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.version.VersionUtils;
+import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -41,30 +43,29 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     private final boolean isSingle;
 
     SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Entity entity, Random random){
-        super(entity.getEntityId(), false);
-        this.group = group;
-        this.entity = entity;
-        this.type = PartType.getType(entity);
-
+        this(group, entity);
         applyData(random, entity);
-        if (isMaster()){
-            group.masterPart = this;
-        }
+        if (isMaster()) group.masterPart = this;
+        partTags.addAll(DisplayUtils.getTags(entity));
+
         if (VersionUtils.IS_1_21_9 && entity instanceof Mannequin m){
             DisplayUtils.prepareMannequin(m);
         }
-        partTags.addAll(DisplayUtils.getTags(entity));
-        isSingle = false;
     }
 
     SpawnedDisplayEntityPart(Entity entity){
-        super(entity.getEntityId(), true);
+        this(null, entity);
+        this.partUUID = UUID.randomUUID();
+    }
+
+    private SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Entity entity){
+        super(entity.getEntityId(), false);
         if (PartType.getType(entity) == null) throw new IllegalArgumentException("Entity is not a valid part type entity");
         this.type = PartType.getType(entity);
+        this.group = group;
         this.entity = entity;
         this.entityUUID = entity.getUniqueId();
-        this.partUUID = UUID.randomUUID();
-        this.isSingle = true;
+        this.isSingle = group == null;
     }
 
     /**
@@ -101,7 +102,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (part != null && part.group != group){
             part.remove(false);
         }
-        partsById.put(getEntityId(), this);
+        ActivePartRegistry.register(this);
 
         this.entityUUID = entity.getUniqueId();
 
@@ -197,7 +198,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             return;
         }
         Entity e = getEntity();
-        if (e != null) e.teleport(location);
+        if (e != null) FoliaUtils.teleport(e, location, TeleportFlag.EntityState.RETAIN_PASSENGERS);
     }
 
     @Override
@@ -251,7 +252,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (entity == nonStaleEntity) return;
         if (!nonStaleEntity.getUniqueId().equals(entityUUID)) return;
         entity = nonStaleEntity;
-        refreshEntityId(nonStaleEntity.getEntityId());
+        ActivePartRegistry.updateEntityId(this, nonStaleEntity.getEntityId());
     }
 
     /**
@@ -270,7 +271,23 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      */
     public static @Nullable SpawnedDisplayEntityPart getPart(@NotNull Entity entity){
         if (!DisplayUtils.isPartEntity(entity)) return null;
-        return (SpawnedDisplayEntityPart) getPart(entity.getEntityId());
+        SpawnedDisplayEntityPart part = getPart(entity.getUniqueId());
+        if (part != null){
+            int entityId = entity.getEntityId();
+            if (part.getEntityId() != entityId){
+                ActivePartRegistry.updateEntityId(part, entityId);
+            }
+        }
+        return part;
+    }
+
+    /**
+     * Get the {@link SpawnedDisplayEntityPart} of an entity, during this play session, with its UUID. Use {@link #create(Entity)} if the part is not grouped.
+     * @param entityUUID the part entity's UUID
+     * @return a {@link SpawnedDisplayEntityPart} or null if not created during play session
+     */
+    public static @Nullable SpawnedDisplayEntityPart getPart(@NotNull UUID entityUUID){
+        return ActivePartRegistry.getPart(entityUUID);
     }
 
 
@@ -1379,8 +1396,8 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                 entity.remove();
             }
         }
-        this.entity = null;
         this.unregister();
+        this.entity = null;
         return entity;
     }
 }

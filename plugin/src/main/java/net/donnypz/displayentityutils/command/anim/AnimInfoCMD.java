@@ -39,7 +39,6 @@ class AnimInfoCMD extends PlayerSubCommand {
         player.sendMessage(MiniMessage.miniMessage().deserialize("Total Frames: <yellow>"+animation.getFrames().size()));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Total Duration: <yellow>"+animation.getDuration()+" ticks"));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Respect Scale: <yellow>"+animation.groupScaleRespect()));
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Allows Texture Changes: <yellow>"+animation.allowsTextureChanges()));
 
         if (!animation.hasFilter()) {
             player.sendMessage(MiniMessage.miniMessage().deserialize("<white>Animation Part Filter: <red>NOT SET"));

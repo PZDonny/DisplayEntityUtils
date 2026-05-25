@@ -126,7 +126,7 @@ class GroupRideCMD extends ConsoleUsableSubCommand {
         }
     }
 
-    private void sendFail(CommandSender sender){
+    static void sendFail(CommandSender sender){
         sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to mount your group on the entity!", NamedTextColor.RED)));
         sender.sendMessage(Component.text("| If the group is both persistent and packet-based, this will always fail", NamedTextColor.GRAY, TextDecoration.ITALIC));
         sender.sendMessage(Component.text("| This can fail for other unknown reasons, or if the riding was cancelled by another plugin", NamedTextColor.GRAY, TextDecoration.ITALIC));

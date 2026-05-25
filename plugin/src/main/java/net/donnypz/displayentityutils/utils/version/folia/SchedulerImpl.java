@@ -77,7 +77,7 @@ public class SchedulerImpl implements Scheduler{
         Task task;
         if (FoliaUtils.isFolia()){
             task = new Task(Bukkit.getGlobalRegionScheduler()
-                    .runAtFixedRate(DisplayAPI.getPlugin(), t -> runnable.run(), Math.max(delay, 1), Math.max(delay, 1)));
+                    .runAtFixedRate(DisplayAPI.getPlugin(), t -> runnable.run(), Math.max(delay, 1), Math.max(period, 1)));
         }
         else{
             task = new Task(Bukkit.getScheduler().runTaskTimer(DisplayAPI.getPlugin(), runnable, delay, period));
@@ -91,7 +91,7 @@ public class SchedulerImpl implements Scheduler{
         Task task;
         if (FoliaUtils.isFolia()){
             task = new Task(Bukkit.getGlobalRegionScheduler()
-                    .runAtFixedRate(DisplayAPI.getPlugin(), t -> runnable.run(), Math.max(delay, 1), Math.max(delay, 1)));
+                    .runAtFixedRate(DisplayAPI.getPlugin(), t -> runnable.run(), Math.max(delay, 1), Math.max(period, 1)));
         }
         else{
             task = new Task(Bukkit.getScheduler().runTaskTimerAsynchronously(DisplayAPI.getPlugin(), runnable, delay, period));
@@ -163,7 +163,7 @@ public class SchedulerImpl implements Scheduler{
         Task task;
         if (FoliaUtils.isFolia()){
             task = new Task(entity.getScheduler()
-                    .runAtFixedRate(DisplayAPI.getPlugin(), t -> runnable.run(), null, Math.max(delay, 1), Math.max(delay, 1)));
+                    .runAtFixedRate(DisplayAPI.getPlugin(), t -> runnable.run(), null, Math.max(delay, 1), Math.max(period, 1)));
         }
         else{
             task = new Task(Bukkit.getScheduler().runTaskTimer(DisplayAPI.getPlugin(), runnable, delay, period));
@@ -177,7 +177,7 @@ public class SchedulerImpl implements Scheduler{
         Task task;
         if (FoliaUtils.isFolia()){
             task = new Task(entity.getScheduler()
-                    .runAtFixedRate(DisplayAPI.getPlugin(), t -> runnable.run(), null, Math.max(delay, 1), Math.max(delay, 1)));
+                    .runAtFixedRate(DisplayAPI.getPlugin(), t -> runnable.run(), null, Math.max(delay, 1), Math.max(period, 1)));
         }
         else{
             task = new Task(Bukkit.getScheduler().runTaskTimerAsynchronously(DisplayAPI.getPlugin(), runnable, delay, period));
