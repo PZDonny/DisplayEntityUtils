@@ -841,7 +841,7 @@ public final class DisplayUtils {
     /**
      * Check if a tag is valid and can be used
      * @param tag the tag
-     * @return a boolean
+     * @return false if the tag is blank, contains commas, starts with an "!", or contains spaces
      */
     public static boolean isValidTag(@NotNull String tag){
         return !tag.isBlank() && !tag.contains(",") && !tag.startsWith("!") && tag.contains(" ");
