@@ -288,13 +288,13 @@ public class BDEngineDPConverter {
 
                 //Animation Sound
                 if (line.startsWith("playsound")){
-                    DEUSound sound = getSound(line);
+                    DEUSound sound = DEUSound.fromCommand(line);
                     if (sound != null){
                         bufferedSounds.add(sound);
                     }
                 }
                 else if (line.startsWith("execute") && line.contains("playsound")){
-                    DEUSound sound = getSound("."+line.split(" playsound ")[1]);
+                    DEUSound sound = DEUSound.fromCommand(line);
                     if (sound != null){
                         bufferedSounds.add(sound);
                     }
@@ -326,27 +326,5 @@ public class BDEngineDPConverter {
             Location cameraLoc = spawnLoc.clone().add(x, y, z);
             cameraLoc.getWorld().spawnParticle(Particle.DRAGON_BREATH, cameraLoc, 1, 0,0,0,0);
         } catch(IndexOutOfBoundsException e){}
-    }
-
-
-    DEUSound getSound(String line){
-        String[] strings = line.split(" ");
-        String soundStr = strings[1];
-
-        float volume = -1;
-        float pitch = -1;
-        try{
-            volume = Float.parseFloat(strings[7]);
-            pitch = Float.parseFloat(strings[8]);
-        }
-        catch(IllegalArgumentException | IndexOutOfBoundsException e){
-            if (volume == -1){
-                volume = 1;
-            }
-            if (pitch == -1){
-                pitch = 1;
-            }
-        }
-        return new DEUSound(soundStr, volume, pitch, 0);
     }
 }

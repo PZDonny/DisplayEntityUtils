@@ -57,6 +57,36 @@ public class DEUSound implements Externalizable, Cloneable { //i have no clue wh
         this.existsInGameVersion = sound.existsInGameVersion;
     }
 
+    /**
+     * Create a {@link DEUSound} from a "playsound" or "execute... run playsound" command.
+     * @param command the command
+     * @return a {@link DEUSound} or null
+     */
+    public static @Nullable DEUSound fromCommand(@NotNull String command){
+        if (command.startsWith("execute") && command.contains("playsound")){
+            command = "."+command.split(" playsound ")[1]; //"." added so indexes are consistent
+        }
+        else if (!command.startsWith("playsound")){
+            return null;
+        }
+
+        String[] strings = command.split(" ");
+        String soundStr = strings[1];
+
+        float volume = getSoundValue(strings, 7);
+        float pitch = getSoundValue(strings, 8);
+        return new DEUSound(soundStr, volume, pitch, 0);
+    }
+
+    private static float getSoundValue(String[] args, int index){
+        try{
+            return args.length >= index+1 ? Float.parseFloat(args[index]) : 1;
+        }
+        catch(IndexOutOfBoundsException e){
+            return 1;
+        }
+    }
+
     public void playSound(@NotNull Location location, @NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator){
         if (delay == 0){
             playSound(location);
