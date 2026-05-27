@@ -8,26 +8,29 @@ import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
-@ApiStatus.Internal
 public final class DEUPlayerConnectionListener implements Listener {
 
     private static final String GITHUB_API_URL = "https://api.github.com/repos/PZDonny/DisplayEntityUtils/releases/latest";
     private static final String LATEST_VERSION_URL = "https://github.com/PZDonny/DisplayEntityUtils/releases/latest";
+
+    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(15))
+            .build();
+
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e){
@@ -38,23 +41,14 @@ public final class DEUPlayerConnectionListener implements Listener {
         DisplayAPI.getScheduler().runAsync(() -> {
             String currentVersion = DisplayAPI.getPlugin().getPluginMeta().getVersion();
             String latestVersion;
+
             try{
                 latestVersion = getLatest();
+                compareVersions(player, currentVersion, latestVersion);
             }
-            catch(Exception ex){
-                latestVersion = null;
-            }
-            if (latestVersion == null){
+            catch(IOException | InterruptedException ex){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Could not perform version check.", NamedTextColor.RED)));
-                player.sendMessage(Component.text("| GitHub has issues or your server has no internet connection", NamedTextColor.GRAY));
-                return;
-            }
-
-            if (!compareVersions(player, currentVersion, latestVersion)){
-                player.sendMessage(DisplayAPI.pluginPrefix
-                        .append(Component.text("New version available!", NamedTextColor.GREEN))
-                        .append(Component.text(" [DOWNLOAD v"+latestVersion+"]", NamedTextColor.GREEN))
-                        .clickEvent(ClickEvent.openUrl(LATEST_VERSION_URL)));
+                player.sendMessage(Component.text("| GitHub is experiencing issue or your server has no internet connection", NamedTextColor.GRAY));
             }
         });
 
@@ -71,75 +65,81 @@ public final class DEUPlayerConnectionListener implements Listener {
         RelativePointUtils.removeRelativePoints(player);
     }
 
-    private String getLatest() throws IOException, InterruptedException, URISyntaxException {
+    private String getLatest() throws IOException, InterruptedException {
         HttpRequest getRequest = HttpRequest.newBuilder()
                 .timeout(Duration.ofSeconds(15))
-                .uri(new URI(GITHUB_API_URL))
+                .uri(URI.create(GITHUB_API_URL))
                 .GET()
                 .build();
 
-        try (HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(15)).build()) {
-            HttpResponse<String> response = httpClient.send(getRequest, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200){
-                JsonObject obj = JsonParser.parseString(response.body()).getAsJsonObject();
-                return obj.get("tag_name").getAsString();
-            }
+        HttpResponse<String> response = HTTP_CLIENT.send(getRequest, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new IOException("GitHub API error: " + response.statusCode() + " - " + response.body());
         }
-        return null;
+
+        JsonObject obj = JsonParser.parseString(response.body()).getAsJsonObject();
+        if (!obj.has("tag_name")) {
+            throw new IOException("Invalid GitHub response: missing tag_name");
+        }
+        return obj.get("tag_name").getAsString();
     }
 
-    //-1 = v1 is prev ver
-    //0 = same ver
-    //1 = v1 is dev version
-    static boolean compareVersions(Player player, String v1, String v2) {
-        int vPart1 = 0;
-        int vPart2 = 0;
+    void compareVersions(Player player, String current, String latest){
+        String cleanCurrent = current.replaceAll("[^0-9.]", "");
 
-        // loop until both String are processed
-        for (int i1 = 0, i2 = 0; (i1 < v1.length() || i2 < v2.length());) {
+        boolean isDevVersion = !current.equals(cleanCurrent);
 
-            //Get Version Number 1 Section
-            while (i1 < v1.length() && v1.charAt(i1) != '.') {
-                char c = v1.charAt(i1);
-                if (Character.isDigit(c)){
-                    vPart1 = vPart1 * 10
-                            + (c - '0');
+        String[] a = cleanCurrent.split("\\.");
+        String[] b = latest.split("\\.");
+
+        int length = Math.max(a.length, b.length);
+
+        for (int i = 0; i < length; i++){
+            int num1 = i < a.length ? Integer.parseInt(a[i]) : 0;
+            int num2 = i < b.length ? Integer.parseInt(b[i]) : 0;
+
+            if (num2 > num1){ //behind
+                if (isDevVersion){
+                    sendNewVersionAvailableOnDev(player, latest);
                 }
                 else{
-                    devVersion(player);
-                    return true;
+                    sendNewVersionAvailable(player, latest);
                 }
-                i1++;
+                return;
             }
-
-            //Get Version Number 2 Section
-            while (i2 < v2.length() && v2.charAt(i2) != '.') {
-                char c = v2.charAt(i2);
-                if (Character.isDigit(c)){
-                    vPart2 = vPart2 * 10
-                            + (c - '0');
-                }
-                else{
-                    devVersion(player);
-                    return true;
-                }
-                i2++;
-            }
-
-            if (vPart1 > vPart2) //V1 newer than V2
-                return true;
-            if (vPart2 > vPart1) //V2 newer than V1
-                return false;
-
-            //Reset
-            vPart1 = vPart2 = 0;
-            i1++;
-            i2++;
         }
-        return true; //Same Ver
+
+        String cleanLatest = latest.replaceAll("[^0-9.]", "");
+        if (!cleanCurrent.equals(cleanLatest)){
+            sendLatestOnDev(player, latest);
+        }
     }
 
-    private static void devVersion(Player player){
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You are using a dev plugin version, a new version may be available.", NamedTextColor.LIGHT_PURPLE)));
+    private void sendNewVersionAvailable(Player player, String latestVersion){
+        player.sendMessage(DisplayAPI.pluginPrefix
+                .append(Component.text("New version available!", NamedTextColor.GREEN))
+                .append(Component.text(" [DOWNLOAD v"+latestVersion+"]", NamedTextColor.GREEN))
+                .clickEvent(ClickEvent.openUrl(LATEST_VERSION_URL)));
+    }
+
+    private void sendNewVersionAvailableOnDev(Player player, String latestVersion){
+        player.sendMessage(DisplayAPI.pluginPrefixLong);
+        player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>| <light_purple>You are using a dev/pre-release plugin version. Unexpected issues may occur."));
+        player.sendMessage(MiniMessage
+                .miniMessage()
+                .deserialize("<gray>| <green>New Version available!:")
+                .append(Component.text(" [DOWNLOAD v"+latestVersion+"]", NamedTextColor.GREEN))
+                .clickEvent(ClickEvent.openUrl(LATEST_VERSION_URL)));
+    }
+
+    private void sendLatestOnDev(Player player, String latestVersion){
+        player.sendMessage(DisplayAPI.pluginPrefixLong);
+        player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>| <light_purple>You are using a dev/pre-release plugin version. Unexpected issues may occur."));
+        player.sendMessage(MiniMessage
+                .miniMessage()
+                .deserialize("<gray>| <yellow>Latest release:")
+                .append(Component.text(" [DOWNLOAD v"+latestVersion+"]", NamedTextColor.GREEN))
+                .clickEvent(ClickEvent.openUrl(LATEST_VERSION_URL)));
     }
 }
