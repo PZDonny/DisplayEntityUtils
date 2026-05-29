@@ -78,7 +78,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         registerListeners();
         initializeNamespacedKeys();
         initializeBStats();
-        DisplayAPI.checkFolia();
+        checkFolia();
         getServer().getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
     }
 
@@ -86,6 +86,15 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     public void onDisable() {
         MYSQLManager.closeConnection();
         MongoManager.closeConnection();
+    }
+
+    void checkFolia(){
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            DisplayAPI.isFolia = true;
+        } catch (ClassNotFoundException e) {
+            DisplayAPI.isFolia = false;
+        }
     }
 
 
