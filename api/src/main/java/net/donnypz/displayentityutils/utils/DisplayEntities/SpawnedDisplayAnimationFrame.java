@@ -451,6 +451,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
             cloned.displayTransformations = new HashMap<>(this.displayTransformations);
             cloned.interactionTransformations = new HashMap<>(this.interactionTransformations);
             cloned.framePoints = new HashMap<>(this.framePoints);
+            cloned.camera = this.camera == null ? null : new AnimationCamera(this.camera);
 
             return cloned;
         } catch (CloneNotSupportedException e) {
@@ -460,19 +461,25 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SpawnedDisplayAnimationFrame other)) return false;
-
-        return delay == other.delay &&
-                duration == other.duration &&
-                Objects.equals(tag, other.tag) &&
-                Objects.equals(displayTransformations, other.displayTransformations) &&
-                Objects.equals(interactionTransformations, other.interactionTransformations) &&
-                Objects.equals(framePoints, other.framePoints);
+        if (!(o instanceof SpawnedDisplayAnimationFrame that)) return false;
+        return delay == that.delay
+                && duration == that.duration
+                && Objects.equals(displayTransformations, that.displayTransformations)
+                && Objects.equals(interactionTransformations, that.interactionTransformations)
+                && Objects.equals(camera, that.camera) && Objects.equals(tag, that.tag)
+                && Objects.equals(framePoints, that.framePoints);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(delay, duration, tag, displayTransformations, interactionTransformations, framePoints);
+        return Objects.hash(
+                displayTransformations,
+                interactionTransformations,
+                camera,
+                delay,
+                duration,
+                tag,
+                framePoints
+        );
     }
 }
