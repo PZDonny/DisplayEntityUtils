@@ -48,6 +48,7 @@ class AnimPreviewPlayCMD extends PlayerSubCommand {
         }
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Previewing animation!", NamedTextColor.AQUA)));
+        player.sendMessage(Component.text("| Only you can see the animation being played", NamedTextColor.GRAY));
 
         DisplayAnimator.play(player, group, anim, DisplayAnimator.AnimationType.LINEAR);
         if (args.length >= 3 && args[2].equalsIgnoreCase("-camera")){
