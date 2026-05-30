@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 public class AnimationCamera implements Serializable {
     double x, y, z;
@@ -67,5 +68,16 @@ public class AnimationCamera implements Serializable {
 
     public float getPitch() {
         return pitch;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof AnimationCamera that)) return false;
+        return Double.compare(x, that.x) == 0 && Double.compare(y, that.y) == 0 && Double.compare(z, that.z) == 0 && Float.compare(yaw, that.yaw) == 0 && Float.compare(pitch, that.pitch) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z, yaw, pitch);
     }
 }
