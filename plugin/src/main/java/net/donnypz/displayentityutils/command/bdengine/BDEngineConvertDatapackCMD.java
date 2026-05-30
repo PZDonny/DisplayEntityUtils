@@ -40,7 +40,7 @@ class BDEngineConvertDatapackCMD extends PlayerSubCommand {
                 animPrefix,
                 saveGroups,
                 true,
-                false
+                true
         );
     }
 }
