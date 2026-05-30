@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.utils.bdengine.convert.datapack;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.listeners.bdengine.DatapackEntitySpawned;
+import net.donnypz.displayentityutils.listeners.bdengine.BDEngineConversionListener;
 import net.donnypz.displayentityutils.managers.*;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
@@ -130,7 +130,7 @@ public class BDEngineDPConverter extends BDECommandConverter {
     }
 
     private void saveAndConvert(){
-        SpawnedDisplayEntityGroup createdGroup = DatapackEntitySpawned.getProjectGroup(masterEntityUUID);
+        SpawnedDisplayEntityGroup createdGroup = BDEngineConversionListener.removeCreatedGroup(masterEntityUUID);
         if (createdGroup == null){
             super.sendMessage(Component.text("Failed to find model/group created from datapack!", NamedTextColor.RED));
             super.sendMessage(Component.text("| The datapack may have been generated for a different game version or of an older BDEngine format", NamedTextColor.GRAY, TextDecoration.ITALIC));
@@ -138,7 +138,6 @@ public class BDEngineDPConverter extends BDECommandConverter {
         }
 
         createdGroup.setTag(super.getGroupSaveTag());
-        DatapackEntitySpawned.finalizeAnimationPreparation(masterEntityUUID);
         createdGroup.seedPartUUIDs(SpawnedDisplayEntityGroup.DEFAULT_PART_UUID_SEED);
 
         super.sendMessage(Component.empty());

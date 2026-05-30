@@ -6,7 +6,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.listeners.autogroup.DEULoadingListeners;
-import net.donnypz.displayentityutils.listeners.bdengine.DatapackEntitySpawned;
+import net.donnypz.displayentityutils.listeners.bdengine.BDEngineConversionListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUInteractionListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUMannequinEditorListener;
@@ -175,7 +175,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     private void registerListeners(){
         Bukkit.getPluginManager().registerEvents(this, this);
         Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
-        Bukkit.getPluginManager().registerEvents(new DatapackEntitySpawned(), this);
+        Bukkit.getPluginManager().registerEvents(new BDEngineConversionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUEntityListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerChatListener(), this);
