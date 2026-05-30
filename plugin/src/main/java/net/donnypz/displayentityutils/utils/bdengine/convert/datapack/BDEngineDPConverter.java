@@ -133,8 +133,7 @@ public class BDEngineDPConverter extends BDECommandConverter {
         SpawnedDisplayEntityGroup createdGroup = DatapackEntitySpawned.getProjectGroup(masterEntityUUID);
         if (createdGroup == null){
             super.sendMessage(Component.text("Failed to find model/group created from datapack!", NamedTextColor.RED));
-            super.sendMessage(Component.text("| The datapack may be a legacy one (Before BDEngine v1.13). Try using /deu bdengine convertdpleg", NamedTextColor.GRAY, TextDecoration.ITALIC));
-            super.sendMessage(Component.text("| The datapack may have been generated for a different game version", NamedTextColor.GRAY, TextDecoration.ITALIC));
+            super.sendMessage(Component.text("| The datapack may have been generated for a different game version or of an older BDEngine format", NamedTextColor.GRAY, TextDecoration.ITALIC));
             return;
         }
 

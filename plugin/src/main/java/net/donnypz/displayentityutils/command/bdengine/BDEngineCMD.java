@@ -11,7 +11,6 @@ public final class BDEngineCMD extends ConsoleUsableSubCommand {
     public BDEngineCMD(){
         super(Permission.HELP, new BDEngineHelpCMD());
         new BDEngineConvertDatapackCMD(this);
-        new BDEngineConvertLegacyDatapackCMD(this);
         new BDEngineImportModelCMD(this);
         new BDEngineSpawnModelCMD(this);
     }
@@ -40,9 +39,7 @@ public final class BDEngineCMD extends ConsoleUsableSubCommand {
         CMDUtils.sendCMD(sender, "/deu bdengine spawnmodel <file-name>", "Spawn a model from a BDEngine file located in the plugin's \"bdenginefiles\" folder");
         CMDUtils.sendCMD(sender, "/deu bdengine importmodel <model-id>", "Import a model directly from BDEngine's Catalog into your game world");
         CMDUtils.sendCMD(sender, "/deu bdengine convertdp <datapack-name> <group-tag-to-set> <anim-tag-prefix-to-set>",
-                "Convert a datapack from BDEngine into group and animation files usable for DisplayEntityUtils");
-        CMDUtils.sendCMD(sender, "/deu bdengine convertdpleg <datapack-name> <group-tag-to-set> <anim-tag-to-set>",
-                "Convert an old datapack from BDEngine, before BDEngine v1.13 (Dec. 8th 2024), into group and animation files usable for DisplayEntityUtils");
+                "Convert BDEngine datapack into group and animation formats this plugin uses");
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>--------------------------"));
     }
 }
