@@ -3,104 +3,73 @@ package net.donnypz.displayentityutils.listeners.bdengine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.bdengine.convert.datapack.BDEngineDPConverter;
-import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
-import org.jetbrains.annotations.ApiStatus;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
-@ApiStatus.Internal
 public final class DatapackEntitySpawned implements Listener {
-    private static final HashMap<Object, SpawnedDisplayEntityGroup> groups = new HashMap<>();
-    private static final HashSet<Object> incomingAnimationValue = new HashSet<>();
+    private static final HashMap<Object, SpawnedDisplayEntityGroup> pendingGroups = new HashMap<>();
+    private static final HashSet<Object> incomingConversions = new HashSet<>();
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onSpawn(EntitySpawnEvent e){
-        if (!(e.getEntity() instanceof Display display)){
-            return;
-        }
+        if (!(e.getEntity() instanceof Display display)) return;
 
-        for (Object projectName : incomingAnimationValue){
-            applyToEntity(display, projectName);
-        }
+        applyToEntity(display);
     }
 
-
-    public static SpawnedDisplayEntityGroup getProjectGroup(String projectName){
-        return groups.get(projectName);
+    public static SpawnedDisplayEntityGroup getProjectGroup(UUID masterEntityUUID){
+        return pendingGroups.get(masterEntityUUID);
     }
 
     public static SpawnedDisplayEntityGroup getTimestampGroup(long timestamp){
-        return groups.get(timestamp);
+        return pendingGroups.get(timestamp);
     }
-
 
     public static void prepareAnimationMaster(Object projectValue){
-        incomingAnimationValue.add(projectValue);
+        incomingConversions.add(projectValue);
     }
 
-
-    private static void applyToEntity(Display display, Object projectValue){
+    private static void applyToEntity(Display display){
+        UUID rootUUID;
         for (String tag : display.getScoreboardTags()){
-            if (tag.contains(String.valueOf(projectValue))){
-                SpawnedDisplayEntityGroup group = groups.get(projectValue);
-                if (group == null){
-                    storeGroupAnimation(projectValue, display);
+            if (tag.startsWith(BDEngineDPConverter.CONVERSION_SCOREBOARD_PREFIX)){
+                String uuidStr = tag.substring(BDEngineDPConverter.CONVERSION_SCOREBOARD_PREFIX.length());
+                rootUUID = UUID.fromString(uuidStr);
+                SpawnedDisplayEntityGroup g = pendingGroups.get(rootUUID);
+                for (Entity e : display.getPassengers()){
+                    g.addEntity(e);
                 }
-
-
-                else {
-                    Location groupLoc = group.getLocation();
-                    if (groupLoc != null){
-                        if (groupLoc.distanceSquared(display.getLocation()) > 0.25){ //0.5^2, display can't be part of group
-                            return;
-                        }
-                    }
-
-                    //LEGACY ANIMATIONS
-                    //Add parts that aren't grouped/animated later to the group, so the animation can be used
-                    //for other display entities, not created through the animator, (or spawned later, after conversion)
-                    //DisplayEntityGroups created outside the animator spawn ungrouped parts last,
-                    //while the animator spawns them after the MAIN master part
-                    if (tag.contains(projectValue +"_")) {
-                        display.addScoreboardTag(BDEngineDPConverter.UNGROUPED_ADD_LATER_TAG);
-                    }
-                    group.addDisplayEntity(display);
-                }
+                display.remove();
                 return;
             }
         }
     }
 
-    private static void storeGroupAnimation(Object projectValue, Display master){
-        if (groups.containsKey(projectValue)){
+
+    public static void createNewGroup(Display master){
+        if (pendingGroups.containsKey(master.getUniqueId())){
             throw new RuntimeException("Failed to successfully convert animation, conversion may already be in progress?");
         }
-        groups.put(projectValue, new SpawnedDisplayEntityGroup(master));
+        pendingGroups.put(master.getUniqueId(), new SpawnedDisplayEntityGroup(master));
     }
 
-
-    @ApiStatus.Internal
     public static void finalizeAnimationPreparation(Object projectValue){
-        SpawnedDisplayEntityGroup group = groups.get(projectValue);
-        finalize(group);
+        SpawnedDisplayEntityGroup group = pendingGroups.get(projectValue);
+        //finalize(group);
 
-        groups.remove(projectValue);
-        incomingAnimationValue.remove(projectValue);
+        pendingGroups.remove(projectValue);
+        incomingConversions.remove(projectValue);
     }
 
 
     private static void finalize(SpawnedDisplayEntityGroup group){
         if (group != null){
-            List<Entity> laterParts = new ArrayList<>();
             Entity masterPart = group.getMasterPart().getEntity();
             for (SpawnedDisplayEntityPart part : group.getDisplayParts()){
                 if (part.isMaster()){
@@ -111,17 +80,11 @@ public final class DatapackEntitySpawned implements Listener {
                 if (display.getScoreboardTags().contains(BDEngineDPConverter.CONVERT_DELETE_SUB_PARENT_TAG)){
                     part.remove(true);
                 }
-                else if (display.getScoreboardTags().contains(BDEngineDPConverter.UNGROUPED_ADD_LATER_TAG)){
-                    laterParts.add(part.remove(false));
-                }
                 else{
                     masterPart.addPassenger(display);
                 }
             }
 
-            for (Entity partEntity : laterParts){
-                group.addEntity(partEntity);
-            }
         }
     }
 }

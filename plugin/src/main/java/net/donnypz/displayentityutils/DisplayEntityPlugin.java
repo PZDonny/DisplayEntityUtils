@@ -33,6 +33,7 @@ import net.donnypz.displayentityutils.skript.player.PlayerModule;
 import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationPlayerProviderImpl;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
+import net.donnypz.displayentityutils.utils.bdengine.convert.common.BDEConversionHandlerImpl;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerUtils;
 import net.donnypz.displayentityutils.utils.version.folia.SchedulerImpl;
 import net.kyori.adventure.text.Component;
@@ -69,6 +70,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         DisplayAPI.MONGODB_STORAGE = new MongoManager();
         DisplayAPI.MYSQL_STORAGE = new MYSQLManager();
         DisplayAPI.ANIMATION_PLAYER_SERVICE = new AnimationPlayerProviderImpl();
+        DisplayAPI.BDE_CONVERSION_HANDLER = new BDEConversionHandlerImpl();
         DisplayAPI.SCHEDULER = new SchedulerImpl();
 
         getConfig().options().copyDefaults(true);

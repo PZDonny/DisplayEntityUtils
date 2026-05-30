@@ -29,9 +29,18 @@ class BDEngineConvertDatapackCMD extends PlayerSubCommand {
         String datapackName = args[2];
         String groupTag = args[3];
         String animPrefix = args[4];
+        boolean saveGroups = !groupTag.equals("-");
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Attempting to convert datapack...", NamedTextColor.AQUA)));
         player.sendMessage(Component.text(" | DO NOT LEAVE THIS AREA UNTIL COMPLETION!", NamedTextColor.YELLOW));
         player.sendMessage(Component.text(" | Conversion times may vary.", NamedTextColor.YELLOW));
-        new BDEngineDPConverter(player, datapackName, groupTag, animPrefix);
+        new BDEngineDPConverter(
+                datapackName,
+                player,
+                !saveGroups ? "" : groupTag,
+                animPrefix,
+                saveGroups,
+                true,
+                false
+        );
     }
 }

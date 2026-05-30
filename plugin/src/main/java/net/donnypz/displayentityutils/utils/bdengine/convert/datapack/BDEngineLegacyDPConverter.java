@@ -13,6 +13,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +30,8 @@ import java.util.zip.ZipFile;
 
 @ApiStatus.Internal
 public class BDEngineLegacyDPConverter {
+
+    private static final CommandSender silentSender = Bukkit.createCommandSender(feedback -> {});
 
     @ApiStatus.Internal
     public static void saveDatapackAnimation(@NotNull Player player, @NotNull String datapackName, @NotNull String groupSaveTag, @NotNull String animationSaveTag){
@@ -244,7 +247,7 @@ public class BDEngineLegacyDPConverter {
                     continue;
                 }
 
-                Bukkit.dispatchCommand(BDEngineDPConverter.silentSender, line);
+                Bukkit.dispatchCommand(silentSender, line);
 
             }
             br.close();
