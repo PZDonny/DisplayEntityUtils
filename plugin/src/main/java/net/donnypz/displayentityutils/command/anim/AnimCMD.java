@@ -41,6 +41,7 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
         new AnimAddSoundCMD(this);
         new AnimRemoveSoundCMD(this);
         new AnimAddParticleCMD(this);
+        new AnimAddDefaultParticleCMD(this);
         new AnimReverseCMD(this);
         new AnimScaleRespectCMD(this);
         new AnimSetTagCMD(this);
@@ -109,19 +110,19 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/deu anim movepoint", "Move a frame point to your location, relative to your selected group");
             CMDUtils.sendCMD(sender, "/deu anim addsound <sound> <volume> <pitch>", "Add a sound to play at a frame point");
             CMDUtils.sendCMD(sender, "/deu anim removesound <sound | -all>", "Remove a sound from a frame point");
-            CMDUtils.sendCMD(sender, "/deu anim addparticle", "Add a particle to play at a frame point");
-            CMDUtils.sendCMD(sender, "/deu anim reverse", "Reverse the order of frames in your selected animation");
         }
         else if (page == 5){
+            CMDUtils.sendCMD(sender, "/deu anim addparticle", "Add a particle to play at a frame point");
+            CMDUtils.sendCMD(sender, "/deu anim adddefaultparticle <frame-ids | frame-tag>", "Add a particle to play at a frame's default frame point (group origin)");
             CMDUtils.sendCMD(sender, "/deu anim togglescalerespect", "Toggle whether your selected animation should respect the group's scale");
             CMDUtils.sendCMD(sender, "/deu anim showframe <frame-id>", "Displays a frame on your selected group");
             CMDUtils.sendCMD(sender, "/deu anim previewframe <frame-id>", "Preview a frame on your selected group, without changing group entity data");
+            CMDUtils.sendCMD(sender, "/deu anim reverse", "Reverse the order of frames in your selected animation");
             CMDUtils.sendCMD(sender, "/deu anim play [-loop] [-packet] [-camera] [-nodata]", "Play your selected animation on your selected group." +
                     " \n\"-loop\" will make the animation loop." +
                     " \n\"-packet\" will play the animation using packets." +
                     " \n\"-camera\" will set your view to the animation's camera, if present" +
                     " \n\"-nodata\" will disable texture changes for item/block displays and text display text changes");
-            CMDUtils.sendCMD(sender, "/deu anim listanims", "List the animations actively playing for a group");
 
         }
         else{

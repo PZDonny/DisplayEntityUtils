@@ -3,26 +3,34 @@ package net.donnypz.displayentityutils.utils.dialogs.animationparticles;
 import io.papermc.paper.registry.data.dialog.action.DialogActionCallback;
 import io.papermc.paper.registry.data.dialog.input.DialogInput;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
+import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 
+import java.util.Collection;
 import java.util.List;
 
 class EntityEffectParticleDialog extends ParticleDialog {
 
     private static final String COLOR = "deu_particle_builder_entity_effect_color";
 
-    EntityEffectParticleDialog() {
+    EntityEffectParticleDialog(Collection<FramePoint> framePoints) {
         super(Component.text("Dust Option Animation Particle"), List.of(
                 DialogInput
                         .text(COLOR, Component.text("Color (Minecraft Color or Hex)"))
-                        .build()));
+                        .build()),
+                framePoints);
     }
 
     @Override
-    protected DialogActionCallback buildConfirmCallback() {
+    ParticleDialog create(Collection<FramePoint> framePoints) {
+        return new EntityEffectParticleDialog(framePoints);
+    }
+
+    @Override
+    protected DialogActionCallback buildConfirmCallback(Collection<FramePoint> framePoints) {
         return (view, audience) -> {
             String colorString = view.getText(COLOR);
             Color color = ConversionUtils.getColorFromText(colorString);
@@ -30,7 +38,7 @@ class EntityEffectParticleDialog extends ParticleDialog {
                 audience.sendMessage(Component.text("Failed to read the given color: "+colorString, NamedTextColor.RED));
                 return;
             }
-            this.buildParticle(view, audience, Particle.ENTITY_EFFECT, color);
+            this.buildParticle(view, audience, Particle.ENTITY_EFFECT, color, framePoints);
         };
     }
 }
