@@ -106,23 +106,23 @@ public abstract class ParticleDialog {
                 .initial(1.0f)
                 .build());
         inputs.add(DialogInput
-                .numberRange(EXTRA, Component.text("Extra"), 0.0f, 100.0f)
-                .step(1.0f)
+                .numberRange(EXTRA, Component.text("Extra"), 0.0f, 15.0f)
+                .step(0.1f)
                 .initial(0.0f)
                 .build());
         inputs.add(DialogInput
-                .numberRange(X_OFFSET, Component.text("Delta X (Offset)"), 0.0f, 100.0f)
-                .step(0.5f)
+                .numberRange(X_OFFSET, Component.text("Delta X (Offset)"), 0.0f, 15.0f)
+                .step(0.1f)
                 .initial(0.0f)
                 .build());
         inputs.add(DialogInput
-                .numberRange(Y_OFFSET, Component.text("Delta Y (Offset)"), 0.0f, 100.0f)
-                .step(0.5f)
+                .numberRange(Y_OFFSET, Component.text("Delta Y (Offset)"), 0.0f, 15.0f)
+                .step(0.1f)
                 .initial(0.0f)
                 .build());
         inputs.add(DialogInput
-                .numberRange(Z_OFFSET, Component.text("Delta Z (Offset)"), 0.0f, 100.0f)
-                .step(0.5f)
+                .numberRange(Z_OFFSET, Component.text("Delta Z (Offset)"), 0.0f, 15.0f)
+                .step(0.1f)
                 .initial(0.0f)
                 .build());
         return inputs;
