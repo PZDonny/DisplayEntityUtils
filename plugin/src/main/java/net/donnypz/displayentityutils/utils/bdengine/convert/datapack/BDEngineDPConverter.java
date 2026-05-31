@@ -1,16 +1,14 @@
 package net.donnypz.displayentityutils.utils.bdengine.convert.datapack;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.listeners.bdengine.BDEngineConversionListener;
+import net.donnypz.displayentityutils.events.BDEDatapackConvertEvent;
 import net.donnypz.displayentityutils.managers.*;
-import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.bdengine.convert.common.BDECommandConverter;
 import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.*;
 import org.bukkit.command.CommandException;
 import org.bukkit.entity.Player;
@@ -31,6 +29,8 @@ public class BDEngineDPConverter extends BDECommandConverter {
 
     static final String FUNCTION_FOLDER = VersionUtils.IS_1_21 ? "function" : "functions";
     private static final String CREATE_MODEL_PATH = "/create.mcfunction";
+
+    private final String datapackName;
     private final LinkedHashMap<String, ArrayList<ZipEntry>> animations = new LinkedHashMap<>();
     private final ZipFile zipFile;
 
@@ -48,6 +48,7 @@ public class BDEngineDPConverter extends BDECommandConverter {
         if (!datapackName.endsWith(".zip")){
             datapackName = datapackName+".zip";
         }
+        this.datapackName = datapackName;
 
         ZipFile zip;
         try{
@@ -104,11 +105,21 @@ public class BDEngineDPConverter extends BDECommandConverter {
     }
 
     @Override
-    protected void onConversionCompleted(){
+    protected void onConversionCompleted(DisplayEntityGroup savedGroup, SpawnedDisplayEntityGroup group){
         try{
             zipFile.close();
         }
         catch(IOException ignored){}
+        new BDEDatapackConvertEvent(
+                datapackName,
+                player,
+                conversionId,
+                savedGroup,
+                group,
+                convertedAnimations,
+                saveGroup,
+                saveAnimations
+        ).callEvent();
     }
 
     @Override

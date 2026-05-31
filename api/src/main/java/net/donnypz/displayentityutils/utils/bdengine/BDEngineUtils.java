@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils.bdengine;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.events.BDEDatapackConvertEvent;
 import net.donnypz.displayentityutils.utils.bdengine.convert.api.BDEResult;
 import net.donnypz.displayentityutils.utils.bdengine.convert.file.BDEModel;
 import net.donnypz.displayentityutils.utils.bdengine.convert.file.BDEngineReader;
@@ -67,6 +68,7 @@ public final class BDEngineUtils {
 
     /**
      * Convert a BDEngine datapack project into a group/model & animation format, usable for DisplayEntityUtils.
+     * <br>The {@link BDEDatapackConvertEvent} will be called after successful conversion completion.
      * <br><b>This method should be run synchronously.</b>
      * @param datapackName        the name of the datapack to be converted
      * @param spawnLocation       where the conversion should take place. This should be in a loaded chunk
@@ -88,6 +90,7 @@ public final class BDEngineUtils {
 
     /**
      * Convert a BDEngine datapack project into a group/model & animation format, usable for DisplayEntityUtils.
+     * <br>The {@link BDEDatapackConvertEvent} will be called after successful conversion completion.
      * <br><b>This method should be run synchronously.</b>
      * @param datapackName        the name of the datapack to be converted
      * @param player              the player involved in the conversion. typically supplied when using conversion commands
@@ -109,6 +112,7 @@ public final class BDEngineUtils {
 
     /**
      * Convert a BDEngine datapack project into a group/model & animation format, usable for DisplayEntityUtils.
+     * <br>The {@link BDEDatapackConvertEvent} will be called after successful conversion completion.
      * <br><b>This method should be run synchronously.</b>
      * @param datapackName        the name of the datapack to be converted
      * @param conversionId        the id used to reference this conversion later through events.

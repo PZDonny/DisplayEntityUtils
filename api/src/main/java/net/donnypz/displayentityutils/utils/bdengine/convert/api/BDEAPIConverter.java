@@ -1,6 +1,9 @@
 package net.donnypz.displayentityutils.utils.bdengine.convert.api;
 
+import net.donnypz.displayentityutils.events.BDEAPIConvertEvent;
+import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.bdengine.convert.common.BDECommandConverter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
@@ -39,7 +42,17 @@ class BDEAPIConverter extends BDECommandConverter {
     }
 
     @Override
-    protected void onConversionCompleted() {}
+    protected void onConversionCompleted(DisplayEntityGroup savedGroup, SpawnedDisplayEntityGroup group) {
+        new BDEAPIConvertEvent(
+                player,
+                conversionId,
+                savedGroup,
+                group,
+                convertedAnimations,
+                saveGroup,
+                saveAnimations
+        ).callEvent();
+    }
 
     @Override
     protected Collection<String> getAnimationNames() {

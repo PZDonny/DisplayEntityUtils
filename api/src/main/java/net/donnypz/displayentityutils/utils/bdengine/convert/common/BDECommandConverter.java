@@ -111,15 +111,17 @@ public abstract class BDECommandConverter {
             delay+=getAnimationWaitDelay(animName);
         }
 
-        //Despawn group after animation conversions
+        //Cleanup and save after animation conversions
         DisplayAPI.getScheduler().runLater(() -> {
+            DisplayEntityGroup savedGroup = createdGroup.toDisplayEntityGroup();
             if (saveGroup){
-                DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.LOCAL, createdGroup.toDisplayEntityGroup(), player);
+                DisplayGroupManager.saveDisplayEntityGroup(LoadMethod.LOCAL, savedGroup, player);
                 this.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Group Tag: <yellow>"+createdGroup.getTag()));
             }
             else{
                 this.sendMessage(Component.text("| The group was not saved.", NamedTextColor.GRAY));
             }
+
 
             if (despawnAfter){
                 DisplayAPI.getScheduler().run(() -> createdGroup.unregister(true, true));
@@ -132,12 +134,12 @@ public abstract class BDECommandConverter {
                     createdGroup.unregister(true, true);
                 }
             }
-            onConversionCompleted();
+            onConversionCompleted(savedGroup, despawnAfter ? null : createdGroup);
 
         }, delay+2);
     }
 
-    protected abstract void onConversionCompleted();
+    protected abstract void onConversionCompleted(DisplayEntityGroup savedGroup, SpawnedDisplayEntityGroup group);
 
     protected void processAnimation(SpawnedDisplayEntityGroup createdGroup, String animationName) {
         DisplayAPI.getScheduler().partRunTimer(createdGroup.getMasterPart(), new Scheduler.SchedulerRunnable() {
