@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.listeners.bdengine;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.bdengine.convert.common.BDECommandConverter;
 import net.donnypz.displayentityutils.utils.bdengine.convert.datapack.BDEngineDPConverter;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
@@ -45,8 +46,13 @@ public final class BDEngineConversionListener implements Listener {
         pendingGroups.put(master.getUniqueId(), new SpawnedDisplayEntityGroup(master));
     }
 
-    public static SpawnedDisplayEntityGroup removeCreatedGroup(UUID masterEntityUUID){
-        return pendingGroups.remove(masterEntityUUID);
+    public static SpawnedDisplayEntityGroup removeCreatedGroup(BDECommandConverter converter){
+        SpawnedDisplayEntityGroup group = pendingGroups.remove(converter.getMasterEntityUUID());
+        if (group != null){
+            group.setTag(converter.getGroupSaveTag());
+            group.seedPartUUIDs(SpawnedDisplayEntityGroup.DEFAULT_PART_UUID_SEED);
+        }
+        return group;
     }
 
 }
