@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticle;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -20,24 +21,31 @@ import java.io.Serializable;
 import java.util.*;
 
 public class FramePoint extends RelativePoint implements Serializable {
+    public static final String DEFAULT_FRAME_POINT_TAG = "@DEU_DEFAULT_FP";
 
     Set<AnimationParticle> particles = new HashSet<>();
     Map<String, DEUSound> sounds = new HashMap<>();
+    private final boolean isDefault; //false by default
 
     @Serial
     private static final long serialVersionUID = 99L;
 
     public FramePoint(@NotNull String pointTag, @NotNull ActiveGroup<?> group, @NotNull Location location) {
         super(pointTag, group, location);
+        this.isDefault = false;
     }
 
     FramePoint(@NotNull String pointTag, @NotNull Vector vector, float initialYaw, float initialPitch) {
         super(pointTag, vector, initialYaw, initialPitch);
+        this.isDefault = false;
     }
 
-    FramePoint(@NotNull String pointTag, @NotNull Vector3f vector, float initialYaw, float initialPitch) {
+
+    FramePoint(@NotNull String pointTag, @NotNull Vector3f vector, float initialYaw, float initialPitch, boolean isDefault) {
         super(pointTag, vector, initialYaw, initialPitch);
+        this.isDefault = isDefault;
     }
+
 
     public FramePoint(@NotNull FramePoint point) {
         super(point);
@@ -47,6 +55,40 @@ public class FramePoint extends RelativePoint implements Serializable {
         for (Map.Entry<String, DEUSound> entry : point.sounds.entrySet()){
             this.sounds.put(entry.getKey(), entry.getValue().clone());
         }
+        this.isDefault = point.isDefault;
+    }
+
+    static FramePoint createDefault(){
+        return new FramePoint(DEFAULT_FRAME_POINT_TAG, new Vector3f(), 0, 0, true);
+    }
+
+    /**
+     * Set the tag of this {@link FramePoint}
+     * @param pointTag the tag
+     * @return this
+     * @throws IllegalStateException if the point is an animation frame's default frame point
+     * @throws IllegalArgumentException if the tag is invalid, per {@link DisplayUtils#isValidTag(String)}
+     */
+    @Override
+    public FramePoint setTag(@Nullable String pointTag){
+        if (isDefault){
+            throw new IllegalStateException("Cannot set the point tag of an animation frame's default frame point");
+        }
+        super.setTag(pointTag);
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @throws IllegalStateException if the point is an animation frame's default frame point
+     */
+    @Override
+    public @NotNull FramePoint setLocation(@NotNull ActiveGroup<?> group, @NotNull Location location){
+        if (isDefault){
+            throw new IllegalStateException("Cannot set the location of an animation frame's default frame point");
+        }
+        super.setLocation(group, location);
+        return this;
     }
 
     /**

@@ -57,10 +57,14 @@ public abstract class RelativePoint implements Serializable {
 
     /**
      * Set the tag of this {@link RelativePoint}
-     * @param pointTag
+     * @param pointTag the tag
      * @return this
+     * @throws IllegalArgumentException if the tag is invalid, per {@link DisplayUtils#isValidTag(String)}
      */
-    public RelativePoint setTag(String pointTag){
+    public RelativePoint setTag(@Nullable String pointTag){
+        if (pointTag != null && !DisplayUtils.isValidTag(tag)){
+            throw new IllegalArgumentException("Invalid tag");
+        }
         this.tag = pointTag;
         return this;
     }
