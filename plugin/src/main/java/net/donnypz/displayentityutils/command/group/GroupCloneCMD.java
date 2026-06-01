@@ -4,10 +4,10 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 class GroupCloneCMD extends GroupSubCommand {
     GroupCloneCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("clone", parentSubCommand, Permission.GROUP_CLONE, 0, false);
+        addFlag("-here");
     }
 
     @Override
@@ -22,10 +23,13 @@ class GroupCloneCMD extends GroupSubCommand {
 
     @Override
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
-        clone(player, group.clone(group.getLocation()));
+        Location cloneLoc = getOptionalArguments(player, args).hasFlag("-here")
+                ? player.getLocation()
+                : group.getLocation();
+        clone(player, group.clone(cloneLoc));
     }
 
-    static void clone(Player p, ActiveGroup<?> clonedGroup){
+    private void clone(Player p, ActiveGroup<?> clonedGroup){
         if (clonedGroup == null){
             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to clone your selected group!", NamedTextColor.RED)));
         }
