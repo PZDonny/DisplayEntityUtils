@@ -13,12 +13,12 @@ import org.jetbrains.annotations.NotNull;
 class GroupHidePersistentPacketGroupsCMD extends PlayerSubCommand {
     GroupHidePersistentPacketGroupsCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("hidepacketgroups", parentSubCommand, Permission.GROUP_CHUNK_PACKET_GROUP_VISIBILITY);
-        setTabComplete(2, "-self");
+        addFlag("-self");
     }
 
     @Override
     public void execute(Player player, String[] args) {
-        boolean hideForSelf = args.length > 2 && args[2].equalsIgnoreCase("-self");
+        boolean hideForSelf = getOptionalArguments(player, args).hasFlag("-self");
 
         for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(player.getChunk())){
             if (pg.isPersistent()){

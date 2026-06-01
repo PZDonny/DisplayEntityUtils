@@ -90,7 +90,7 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
     static void groupHelp(CommandSender sender, int page){
         sender.sendMessage(DisplayAPI.pluginPrefixLong);
         if (page <= 1){
-            CMDUtils.sendCMD(sender, "/deu group help <page-number>", "Get help for groups");
+            CMDUtils.sendCMD(sender, "/deu group help [page-number]", "Get help for groups");
             CMDUtils.sendCMD(sender, "/deu group list <storage> [page-number]", "List all saved display entity groups/models");
             CMDUtils.sendCMD(sender, "/deu group select <distance>", "Select from nearby groups within the given distance");
             CMDUtils.sendCMD(sender, "/deu group selectnearest <distance>", "Select the nearest group within the given distance");

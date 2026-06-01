@@ -16,7 +16,7 @@ class GroupYawCMD extends GroupSubCommand {
     GroupYawCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("yaw", parentSubCommand, Permission.GROUP_TRANSFORM, 3, true);
         setTabComplete(2, "<yaw>");
-        setTabComplete(3, "-pivot");
+        addFlag("-pivot");
     }
 
     @Override
@@ -33,12 +33,7 @@ class GroupYawCMD extends GroupSubCommand {
 
         try{
             float yaw = Float.parseFloat(args[2]);
-            boolean pivot = false;
-            if (args.length > 3){
-                if (args[3].equalsIgnoreCase("-pivot")){
-                    pivot = true;
-                }
-            }
+            boolean pivot = getOptionalArguments(player, args).hasFlag("-pivot");
             double oldYaw = group.getLocation().getYaw();
             group.setYaw(yaw, pivot);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Yaw set!", NamedTextColor.GREEN)));

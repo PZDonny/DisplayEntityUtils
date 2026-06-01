@@ -25,7 +25,7 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
     GroupDismountCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("dismount", parentSubCommand, Permission.GROUP_DISMOUNT);
         setTabComplete(2, List.of("-target", "-selected", "player-name", "entity-uuid"));
-        setTabComplete(3, "-despawn");
+        addFlag("-despawn");
     }
 
     @Override
@@ -41,7 +41,7 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
             return;
         }
 
-        boolean despawn = args.length == 4 && args[3].equalsIgnoreCase("-despawn");
+        boolean despawn = getOptionalArguments(sender, args).hasFlag("-despawn");
 
         String type = args[2];
         if (type.equalsIgnoreCase("-selected")){

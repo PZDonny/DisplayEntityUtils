@@ -5,7 +5,6 @@ import net.donnypz.displayentityutils.command.ConsoleUsableSubCommand;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
@@ -17,21 +16,19 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class GroupDespawnAtCMD extends ConsoleUsableSubCommand {
     GroupDespawnAtCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("despawnat", parentSubCommand, Permission.GROUP_DESPAWN);
-        setTabComplete(2, "<x | ~>");
-        setTabComplete(3, "<y | ~>");
-        setTabComplete(4, "<z | ~>");
+        setTabComplete(2, List.of("<x>", "~"));
+        setTabComplete(3, List.of("<y>", "~"));
+        setTabComplete(4, List.of("<z>", "~"));
         setTabComplete(5, "<distance>");
-        setTabComplete(6, List.of("-world <world_name>", "-packet <include | only>", "-force"));
-        setTabComplete(7, List.of("-world <world_name>", "-packet <include | only>", "-force"));
-        setTabComplete(8, List.of("-world <world_name>", "-packet <include | only>", "-force"));
-        setTabComplete(9, List.of("-world <world_name>", "-packet <include | only>", "-force"));
+        addFlag("-force");
+        addOption("-world", "<world_name>");
+        addOption("-packet", List.of("include", "only"));
     }
 
     @Override
@@ -46,10 +43,12 @@ public class GroupDespawnAtCMD extends ConsoleUsableSubCommand {
             double z = getCoordinate(sender, args[4], 'z');
             double distance = Double.parseDouble(args[5]);
 
-            OptionalArgs optionalArgs = new OptionalArgs(sender, args);
-            if (!optionalArgs.valid) return;
+            OptionalArguments optionalArgs = getOptionalArguments(sender, args);
+            if (!optionalArgs.isValidOptions()) return;
+
             World w;
-            if (optionalArgs.worldName == null){
+            String worldName = optionalArgs.getOption("-world");
+            if (worldName.isEmpty()){
                 if (sender instanceof Player player){
                     w = player.getWorld();
                 }
@@ -60,7 +59,7 @@ public class GroupDespawnAtCMD extends ConsoleUsableSubCommand {
                 }
             }
             else{
-                w = Bukkit.getWorld(optionalArgs.worldName);
+                w = Bukkit.getWorld(worldName);
             }
 
             if (w == null){
@@ -70,19 +69,22 @@ public class GroupDespawnAtCMD extends ConsoleUsableSubCommand {
 
             Location searchLocation = new Location(w, x, y, z);
             boolean hasGroups = false;
-            if (optionalArgs.packetIncluded){
+            String packetOption = optionalArgs.getOption("-packet");
+
+            if (packetOption.equals("included") || packetOption.equals("only")){
                 Set<PacketDisplayEntityGroup> groups = PacketDisplayEntityGroup.getNearbyGroups(searchLocation, distance);
                 hasGroups = !groups.isEmpty();
                 if (hasGroups) groups.forEach(PacketDisplayEntityGroup::unregister);
             }
 
-            if (!optionalArgs.packetOnly){
+            if (!packetOption.equals("only")){
                 Set<SpawnedDisplayEntityGroup> groups = DisplayGroupManager.getNearbySpawnedGroups(searchLocation, distance);
                 if (!groups.isEmpty()){
                     hasGroups = true;
-                    groups.forEach(sg -> sg.unregister(true, optionalArgs.force));
+                    groups.forEach(sg -> sg.unregister(true, optionalArgs.hasFlag("-force")));
                 }
             }
+
             if (!hasGroups){
                 sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("There are no groups within the given range", NamedTextColor.RED)));
                 return;
@@ -111,79 +113,6 @@ public class GroupDespawnAtCMD extends ConsoleUsableSubCommand {
         }
         else{
             return Double.parseDouble(userInput);
-        }
-    }
-
-    static class OptionalArgs{
-        boolean valid = true;
-        String worldName = null;
-        boolean packetOnly = false;
-        boolean packetIncluded = false;
-        boolean force = false;
-
-        OptionalArgs(CommandSender sender, String[] args){
-
-
-            for (int i = 6; i < args.length; i++) {
-                String arg = args[i];
-
-                switch (arg.toLowerCase()) {
-                    case "-packet" -> {
-                        if (packetOnly || packetIncluded) {
-                            sender.sendMessage(Component.text(
-                                    "-packet was specified multiple times.",
-                                    NamedTextColor.RED));
-                            return;
-                        }
-                        if (i + 1 >= args.length) {
-                            sender.sendMessage(Component.text(
-                                    "You must specify 'include' or 'only' after -packet.",
-                                    NamedTextColor.RED));
-                            valid = false;
-                            return;
-                        }
-
-                        String mode = args[++i].toLowerCase();
-
-                        switch (mode) {
-                            case "include" -> packetIncluded = true;
-                            case "only" -> packetOnly = true;
-                            default -> {
-                                sender.sendMessage(Component.text(
-                                        "Packet mode must be 'include' or 'only'.",
-                                        NamedTextColor.RED));
-                                return;
-                            }
-                        }
-                    }
-                    case "-force" -> force = true;
-
-                    case "-world" -> {
-                        if (worldName != null) {
-                            sender.sendMessage(Component.text(
-                                    "-world was specified multiple times.",
-                                    NamedTextColor.RED));
-                            return;
-                        }
-
-                        if (i + 1 >= args.length) {
-                            sender.sendMessage(Component.text(
-                                    "You must specify a world after -world.",
-                                    NamedTextColor.RED));
-                            return;
-                        }
-
-                        worldName = args[++i];
-                    }
-
-                    default -> {
-                        sender.sendMessage(Component.text(
-                                "Unknown option: " + arg,
-                                NamedTextColor.RED));
-                        return;
-                    }
-                }
-            }
         }
     }
 }

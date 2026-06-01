@@ -26,7 +26,7 @@ public class GroupSpawnCMD extends PlayerSubCommand {
         super("spawn", parentSubCommand, Permission.GROUP_SPAWN);
         setTabComplete(2, "<group-tag>");
         setTabComplete(3, TabSuggestion.STORAGES);
-        setTabComplete(4, "-packet");
+        addFlag("-packet");
     }
 
     @Override
@@ -37,7 +37,8 @@ public class GroupSpawnCMD extends PlayerSubCommand {
         }
         String tag = args[2];
         String storage = args[3];
-        boolean isPacket = args.length > 4 && args[4].equalsIgnoreCase("-packet");
+
+        boolean isPacket = getOptionalArguments(player, args).hasFlag("-packet");
         spawnGroup(player, player.getLocation(), tag, storage, isPacket);
     }
 

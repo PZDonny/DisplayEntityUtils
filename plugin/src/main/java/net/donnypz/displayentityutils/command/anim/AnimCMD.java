@@ -80,7 +80,7 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
             sender.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Convert animations from <yellow>block-display.com <aqua>with " +
                     "\"/deu bdengine convertanim\""));
             sender.sendMessage(Component.text("Commands allowing multiple <frame-ids> are comma separated", NamedTextColor.GRAY));
-            CMDUtils.sendCMD(sender,"/deu anim help <page-number>", "Get help for animations");
+            CMDUtils.sendCMD(sender,"/deu anim help [page-number]", "Get help for animations");
             CMDUtils.sendCMD(sender, "/deu anim list <storage> [page-number]", "List all saved animations");
             CMDUtils.sendCMD(sender, "/deu anim select <anim-tag> <storage>", "Select a saved animation");
             CMDUtils.sendCMD(sender, "/deu anim selectjson <file-name>", "Select a JSON saved animation");
