@@ -378,7 +378,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param limited whether the effects should only be played to players who can see the group
      */
     public void playEffects(@NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, boolean limited){
-        if (defaultFramePoint != null) defaultFramePoint.showParticles(group, animator, limited);
+        if (defaultFramePoint != null) defaultFramePoint.playEffects(group, animator, limited);
         for (FramePoint point : framePoints.values()){
             point.playEffects(group, animator, limited);
         }
@@ -391,7 +391,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param group the group to play these effects for
      */
     public void playEffects(@NotNull Player player, @NotNull ActiveGroup<?> group){
-        if (defaultFramePoint != null) defaultFramePoint.showParticles(group, player);
+        if (defaultFramePoint != null) defaultFramePoint.playEffects(group, player);
         for (FramePoint point : framePoints.values()){
             point.playEffects(group, player);
         }
@@ -403,7 +403,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param group the group to play these effects for
      */
     public void playEffects(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group){
-        if (defaultFramePoint != null) defaultFramePoint.showParticles(group, players);
+        if (defaultFramePoint != null) defaultFramePoint.playEffects(group, players);
         for (FramePoint point : framePoints.values()){
             point.playEffects(group, players);
         }
