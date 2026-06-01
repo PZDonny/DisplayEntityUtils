@@ -69,12 +69,9 @@ public abstract class DEUSubCommand {
     }
 
     protected @NotNull OptionalArguments getOptionalArguments(CommandSender sender, String[] args){
-        if (tabCompleteSuggestions.isEmpty()){
-            OptionalArguments oArgs = new OptionalArguments();
-            oArgs.isValid = false;
-            return oArgs;
-        }
-        int startIndex = tabCompleteSuggestions.sequencedKeySet().getLast()+1;
+        int startIndex = tabCompleteSuggestions.isEmpty()
+                ? 0
+                : tabCompleteSuggestions.sequencedKeySet().getLast() + 1;
         return getOptionalArguments(sender, args, startIndex);
     }
 
@@ -94,7 +91,7 @@ public abstract class DEUSubCommand {
                     sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text(
                             String.format("Incorrect Usage! \"%s\" expects %s.", arg, expected),
                             NamedTextColor.RED)));
-                    oArgs.isValid = false;
+                    oArgs.isValidOptions = false;
                     return oArgs;
                 }
                 oArgs.options.put(arg, args[++i]);
@@ -107,7 +104,7 @@ public abstract class DEUSubCommand {
     protected static class OptionalArguments{
         Set<String> flags = new HashSet<>();
         Map<String, String> options = new HashMap<>();
-        boolean isValid = true;
+        boolean isValidOptions = true;
 
         private OptionalArguments(){}
 
@@ -119,8 +116,8 @@ public abstract class DEUSubCommand {
             return option.startsWith("-") ? options.getOrDefault(option, "") : options.getOrDefault("-"+option, "");
         }
 
-        public boolean isValid() {
-            return isValid;
+        public boolean isValidOptions() {
+            return isValidOptions;
         }
     }
 
