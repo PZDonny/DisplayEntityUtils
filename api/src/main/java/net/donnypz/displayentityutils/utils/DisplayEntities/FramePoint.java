@@ -538,7 +538,7 @@ public class FramePoint extends RelativePoint implements Serializable {
         player.sendMessage(Component.empty());
 
         //Sounds
-        DEUSound.sendInfo(sounds.values(), player, null, null);
+        DEUSound.sendInfo(sounds.values(), player, null, this::removeSound);
 
         if (!tag.equals(DEFAULT_FRAME_POINT_TAG)) player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>RIGHT</yellow> <aqua>click to preview effects"));
     }

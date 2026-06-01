@@ -241,7 +241,7 @@ public class DEUSound implements Externalizable, Cloneable { //i have no clue wh
 
         if (clickRemovalAction != null){
             hoverComp = hoverComp.append(Component.newline())
-                    .append(Component.text("Click to remove this sound", NamedTextColor.YELLOW));
+                    .append(Component.text("Click to remove this sound", NamedTextColor.RED));
             msgComp = msgComp.clickEvent(ClickEvent.callback(a -> {
                 clickRemovalAction.accept(this);
                 a.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Sound Removed!", NamedTextColor.YELLOW)));
