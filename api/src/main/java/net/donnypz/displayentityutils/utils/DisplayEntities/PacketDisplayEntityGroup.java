@@ -103,6 +103,28 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return data != null ? data.getGroups(chunkKey) : Collections.emptySet();
     }
 
+    public static @NotNull Set<PacketDisplayEntityGroup> getNearbyGroups(@NotNull Location location, double radius){
+        WorldData data = allPacketGroups.get(location.getWorld().getName());
+        if (data == null) return Collections.emptySet();
+
+        Set<PacketDisplayEntityGroup> groups = new HashSet<>();
+        double radiusSquared = radius*radius;
+
+        Set<Long> nearbyChunks = WorldUtils.getNearbyChunkKeys(location, radius);
+
+        for (Long chunkKey : nearbyChunks){
+            for (PacketDisplayEntityGroup group : data.getGroups(chunkKey)){
+                Location groupLoc = group.getLocation();
+                if (groupLoc == null || location.distanceSquared(groupLoc) > radiusSquared){
+                    continue;
+                }
+                groups.add(group);
+            }
+        }
+        return groups;
+    }
+
+
     public static boolean hasPassengerGroups(@NotNull Entity entity) {
         return hasPassengerGroups(entity.getUniqueId());
     }
