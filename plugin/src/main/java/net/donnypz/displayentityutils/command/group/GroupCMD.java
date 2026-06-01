@@ -91,7 +91,7 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         sender.sendMessage(DisplayAPI.pluginPrefixLong);
         if (page <= 1){
             CMDUtils.sendCMD(sender, "/deu group help <page-number>", "Get help for groups");
-            CMDUtils.sendCMD(sender, "/deu anim list <storage> [page-number]", "List all saved display entity groups/models");
+            CMDUtils.sendCMD(sender, "/deu group list <storage> [page-number]", "List all saved display entity groups/models");
             CMDUtils.sendCMD(sender, "/deu group select <distance>", "Select from nearby groups within the given distance");
             CMDUtils.sendCMD(sender, "/deu group selectnearest <distance>", "Select the nearest group within the given distance");
             CMDUtils.sendCMD(sender, "/deu group selectplaced", "Select a group placed by a player's held item");
