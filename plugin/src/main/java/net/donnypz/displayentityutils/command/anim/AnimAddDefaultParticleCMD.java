@@ -20,7 +20,7 @@ import java.util.List;
 class AnimAddDefaultParticleCMD extends PlayerSubCommand {
     AnimAddDefaultParticleCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("adddefaultparticle", parentSubCommand, Permission.ANIM_ADD_PARTICLE);
-        setTabComplete(2, List.of("<frame-ids>", "<frame-tag>"));
+        setTabComplete(2, List.of("<frame-ids>", "<frame-tag>", "-all"));
     }
 
     @Override

@@ -26,7 +26,7 @@ class AnimAddDefaultSoundCMD extends PlayerSubCommand {
         setTabComplete(3, "<volume>");
         setTabComplete(4, "<pitch>");
         setTabComplete(5, "<delay-in-ticks>");
-        setTabComplete(6, List.of("<frame-ids>", "<frame-tag>"));
+        setTabComplete(6, List.of("<frame-ids>", "<frame-tag>", "-all"));
     }
 
     @Override
@@ -39,7 +39,7 @@ class AnimAddDefaultSoundCMD extends PlayerSubCommand {
         }
 
         if (args.length < 6) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu anim adddefaultsound <sound> <volume> <pitch> <delay-in-ticks> <frame-ids | frame-tag>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /deu anim adddefaultsound <sound> <volume> <pitch> <delay-in-ticks> <frame-ids | frame-tag | -all>", NamedTextColor.RED));
             return;
         }
 

@@ -101,7 +101,7 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/deu anim frameinfo <frame-id>", "List information about a frame in your animation");
             CMDUtils.sendCMD(sender, "/deu anim removeframe <frame-id>", "Remove a frame from your selected animation");
             CMDUtils.sendCMD(sender, "/deu anim overwriteframe <frame-id>", "Overwrite the transformation data of a frame");
-            CMDUtils.sendCMD(sender, "/deu anim editframe <frame-ids | frame-tag> <tick-delay> <tick-duration>", "Edit properties of a frame");
+            CMDUtils.sendCMD(sender, "/deu anim editframe <frame-ids | frame-tag | -all> <tick-delay> <tick-duration>", "Edit properties of a frame");
             CMDUtils.sendCMD(sender, "/deu anim editallframes <tick-delay> <tick-duration>", "Edit properties of all frames");
             CMDUtils.sendCMD(sender, "/deu anim addpoint <frame-id> <point-tag>", "Add a point relative to a group and your location for a frame)");
             CMDUtils.sendCMD(sender, "/deu anim showpoints <frame-id> [-default]", "Show the frame points of a frame. Use \"-default\" to view a frame's default point info");
@@ -109,15 +109,15 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
         else if (page == 4){
             CMDUtils.sendUnsafeCMD(sender, "/deu anim drawpos <1 | 2 | 3>", "Set where frame points should be drawn between. Set 3 when drawing arcs");
             CMDUtils.sendUnsafeCMD(sender, "/deu anim drawpoints <straight | arc> <point-tag> <start-frame> <end-frame> [points-per-frame]", "Draw a straight/arc'd line of frame points between frames");
-            CMDUtils.sendCMD(sender, "/deu anim copypoint <frame-ids | frame-tag>", "Copy a selected frame point to other frames");
+            CMDUtils.sendCMD(sender, "/deu anim copypoint <frame-ids | frame-tag | -all>", "Copy a selected frame point to other frames");
             CMDUtils.sendCMD(sender, "/deu anim movepoint", "Move a frame point to your location, relative to your selected group");
             CMDUtils.sendCMD(sender, "/deu anim addsound <sound> <volume> <pitch>", "Add a sound to play at a frame point");
-            CMDUtils.sendCMD(sender, "/deu anim adddefaultsound <sound> <volume> <pitch> <frame-ids | frame-tag>", "Add a sound to play at a frame's default frame point (group origin)");
+            CMDUtils.sendCMD(sender, "/deu anim adddefaultsound <sound> <volume> <pitch> <frame-ids | frame-tag | -all>", "Add a sound to play at a frame's default frame point (group origin)");
             CMDUtils.sendCMD(sender, "/deu anim removesound <sound | -all>", "Remove a sound from a frame point");
         }
         else if (page == 5){
             CMDUtils.sendCMD(sender, "/deu anim addparticle", "Add a particle to play at a frame point");
-            CMDUtils.sendCMD(sender, "/deu anim adddefaultparticle <frame-ids | frame-tag>", "Add a particle to play at a frame's default frame point (group origin)");
+            CMDUtils.sendCMD(sender, "/deu anim adddefaultparticle <frame-ids | frame-tag | -all>", "Add a particle to play at a frame's default frame point (group origin)");
             CMDUtils.sendCMD(sender, "/deu anim togglescalerespect", "Toggle whether your selected animation should respect the group's scale");
             CMDUtils.sendCMD(sender, "/deu anim showframe <frame-id>", "Displays a frame on your selected group");
             CMDUtils.sendCMD(sender, "/deu anim previewframe <frame-id>", "Preview a frame on your selected group, without changing group entity data");

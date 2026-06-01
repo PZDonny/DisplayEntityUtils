@@ -69,12 +69,18 @@ public class DEUCommandUtils {
             int index = Integer.parseInt(arg);
             return Set.of(animation.getFrame(index));
         }
-
-
         catch(NumberFormatException ignored){}
         catch(IndexOutOfBoundsException e){ //Single Frame ID Out of Bounds
             sender.sendMessage(Component.text("Invalid Frame ID(s) or Frame Tag", NamedTextColor.RED));
             throw new IllegalArgumentException();
+        }
+
+        if (arg.equalsIgnoreCase("-all")){
+            if (!animation.hasFrames()){
+                sender.sendMessage(Component.text("Your selected animation has no frames!", NamedTextColor.RED));
+                throw new IllegalArgumentException();
+            }
+            return animation.getFrames();
         }
 
         //Multiple Frame IDs
@@ -87,6 +93,7 @@ public class DEUCommandUtils {
                 }
                 catch(IndexOutOfBoundsException ignored1){}
             }
+            if (frames.isEmpty()) sender.sendMessage(Component.text("Your selected animation has no frames!", NamedTextColor.RED));
             return frames;
         }
         //Single Frame Tag
@@ -102,6 +109,7 @@ public class DEUCommandUtils {
                     frames.add(frame);
                 }
             }
+            if (frames.isEmpty()) sender.sendMessage(Component.text("Your selected animation has no frames!", NamedTextColor.RED));
             return frames;
         }
     }
