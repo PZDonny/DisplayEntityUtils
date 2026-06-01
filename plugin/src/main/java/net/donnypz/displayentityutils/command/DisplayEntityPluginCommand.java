@@ -176,14 +176,14 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         player.sendMessage(Component.text("/deu parts select <distance | -target>", NamedTextColor.GRAY));
     }
 
-    public static void invalidTag(Player player, String tag){
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to add tag: "+tag, NamedTextColor.RED)));
-        invalidTagRestrictions(player);
+    public static void invalidTag(CommandSender sender, String tag){
+        sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to add tag: "+tag, NamedTextColor.RED)));
+        invalidTagRestrictions(sender);
     }
 
-    public static void invalidTagRestrictions(Player player){
-        player.sendMessage(Component.text("| Valid tags do not start with an \"!\" and do not contain commas.", NamedTextColor.GRAY, TextDecoration.ITALIC));
-        player.sendMessage(Component.text("| The tag may also already exist or be set", NamedTextColor.GRAY, TextDecoration.ITALIC));
+    public static void invalidTagRestrictions(CommandSender sender){
+        sender.sendMessage(Component.text("| Valid tags do not start with an \"!\" and do not contain commas.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+        sender.sendMessage(Component.text("| The tag may also already exist or be set", NamedTextColor.GRAY, TextDecoration.ITALIC));
     }
 
     public static void invalidStorage(CommandSender sender){

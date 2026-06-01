@@ -44,7 +44,7 @@ class AnimEditFrameCMD extends PlayerSubCommand {
             return;
         }
         try {
-            Collection<SpawnedDisplayAnimationFrame> frames = DEUCommandUtils.getFrames(args[2], anim);
+            Collection<SpawnedDisplayAnimationFrame> frames = DEUCommandUtils.getFrames(player, args[2], anim);
             int delay = Integer.parseInt(args[3]);
             int duration = Integer.parseInt(args[4]);
             if (delay < 0 || duration < 0) {
@@ -61,8 +61,6 @@ class AnimEditFrameCMD extends PlayerSubCommand {
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid value entered! Enter whole numbers >= 0", NamedTextColor.RED));
         }
-        catch (IllegalArgumentException e){
-            player.sendMessage(Component.text("Invalid Frame ID(s) or Frame Tag", NamedTextColor.RED));
-        }
+        catch (IllegalArgumentException e){}
     }
 }

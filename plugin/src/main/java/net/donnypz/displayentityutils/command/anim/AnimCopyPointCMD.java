@@ -54,7 +54,7 @@ class AnimCopyPointCMD extends PlayerSubCommand {
 
         try {
             String arg = args[2];
-            Collection<SpawnedDisplayAnimationFrame> frames = DEUCommandUtils.getFrames(arg, anim);
+            Collection<SpawnedDisplayAnimationFrame> frames = DEUCommandUtils.getFrames(player, arg, anim);
 
             for (SpawnedDisplayAnimationFrame frame : frames){
                 frame.addFramePoint(new FramePoint(framePoint));
@@ -75,8 +75,6 @@ class AnimCopyPointCMD extends PlayerSubCommand {
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid value entered! Enter whole numbers >= 0", NamedTextColor.RED));
         }
-        catch (IllegalArgumentException e){
-            player.sendMessage(Component.text("Invalid Frame ID(s) or Frame Tag", NamedTextColor.RED));
-        }
+        catch (IllegalArgumentException e){}
     }
 }

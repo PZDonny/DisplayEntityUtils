@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.command;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
@@ -18,6 +19,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.RayTraceResult;
@@ -53,7 +55,15 @@ public class DEUCommandUtils {
         return arr;
     }
 
-    public static Collection<SpawnedDisplayAnimationFrame> getFrames(String arg, SpawnedDisplayAnimation animation) throws IllegalArgumentException{
+    /**
+     * Get the frames provided by a user, either comma separated or by a frame tag. Automatically sends error messages
+     * @param sender the sender
+     * @param arg the user-input
+     * @param animation the animation
+     * @return a collection of frames
+     * @throws IllegalArgumentException on failure
+     */
+    public static Collection<SpawnedDisplayAnimationFrame> getFrames(CommandSender sender, String arg, SpawnedDisplayAnimation animation) throws IllegalArgumentException{
         //Single Frame ID in arg
         try{
             int index = Integer.parseInt(arg);
@@ -63,7 +73,8 @@ public class DEUCommandUtils {
 
         catch(NumberFormatException ignored){}
         catch(IndexOutOfBoundsException e){ //Single Frame ID Out of Bounds
-            throw new IllegalArgumentException(e);
+            sender.sendMessage(Component.text("Invalid Frame ID(s) or Frame Tag", NamedTextColor.RED));
+            throw new IllegalArgumentException();
         }
 
         //Multiple Frame IDs
@@ -81,6 +92,7 @@ public class DEUCommandUtils {
         //Single Frame Tag
         catch (IllegalArgumentException ex){
             if (!DisplayUtils.isValidTag(arg)){
+                DisplayEntityPluginCommand.invalidTag(sender, arg);
                 throw ex;
             }
 

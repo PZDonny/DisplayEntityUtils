@@ -31,16 +31,19 @@ class AnimAddDefaultParticleCMD extends PlayerSubCommand {
             return;
         }
 
-        Collection<FramePoint> framePoints = DEUCommandUtils.getFrames(args[2], anim)
-                .stream()
-                .map(SpawnedDisplayAnimationFrame::getDefaultFramePoint)
-                .toList();
+        try{
+            Collection<FramePoint> framePoints = DEUCommandUtils.getFrames(player, args[2], anim)
+                    .stream()
+                    .map(SpawnedDisplayAnimationFrame::getDefaultFramePoint)
+                    .toList();
 
-        if (VersionUtils.canViewDialogs(player, false)){
-            AnimationParticleSelectDialog.sendDialog(player, framePoints);
-        }
-        else{
-            new AnimationParticleBuilder(player, framePoints);
-        }
+            if (VersionUtils.canViewDialogs(player, false)){
+                AnimationParticleSelectDialog.sendDialog(player, framePoints);
+            }
+            else{
+                new AnimationParticleBuilder(player, framePoints);
+            }
+        }catch(IllegalArgumentException e){}
+
     }
 }
