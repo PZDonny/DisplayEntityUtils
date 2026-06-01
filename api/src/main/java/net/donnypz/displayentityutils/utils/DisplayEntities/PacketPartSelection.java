@@ -79,6 +79,7 @@ public class PacketPartSelection extends MultiPartSelection<PacketDisplayEntityP
      */
     @Override
     public void remove() {
+        if (!isValid()) return;
         reset(false);
         group = null;
     }

@@ -39,7 +39,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     private SpawnedDisplayEntityGroup group;
     private Entity entity;
-    private UUID entityUUID;
+    final UUID entityUUID;
     private final boolean isSingle;
 
     SpawnedDisplayEntityPart(SpawnedDisplayEntityGroup group, Entity entity, Random random){
@@ -103,8 +103,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
             part.remove(false);
         }
         ActivePartRegistry.register(this);
-
-        this.entityUUID = entity.getUniqueId();
 
         setPartUUID(random);
         group.groupParts.put(partUUID, this);
@@ -1369,6 +1367,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @return Returns the part's entity.
      */
     public Entity remove(boolean kill) {
+        if (!isValid()) return getEntity();
         this.removeFromGroup();
         return groupUnregisterRemove(kill);
     }
@@ -1390,13 +1389,15 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     Entity groupUnregisterRemove(boolean despawn){
         this.group = null;
+
         Entity entity = getEntity();
+        this.unregister();
+
         if (despawn && entity != null) {
             if (!entity.isDead()){
                 entity.remove();
             }
         }
-        this.unregister();
         this.entity = null;
         return entity;
     }
