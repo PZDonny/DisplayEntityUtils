@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticle;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
@@ -8,6 +9,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -372,12 +374,52 @@ public class FramePoint extends RelativePoint implements Serializable {
 
     /**
      * Add a {@link DEUSound} to play at this frame point
-     * @param sound
+     * @param sound the sound
      * @return this
      */
     public FramePoint addSound(@NotNull DEUSound sound){
         sounds.put(sound.soundName, sound);
         return this;
+    }
+
+    /**
+     * Remove all {@link AnimationParticle}s from this frame point
+     * @return this
+     */
+    public FramePoint removeAllParticles(){
+        particles.clear();
+        return this;
+    }
+
+
+    /**
+     * Remove {@link AnimationParticle}s that would be played at this point during an animation frame.
+     * <b>This removes all instances of the given particle</b>
+     * @param particle the particle
+     * @return true if an instance of the particle was removed
+     */
+    public boolean removeParticle(@NotNull Particle particle){
+        Iterator<AnimationParticle> iterator = particles.iterator();
+        boolean hasInstance = false;
+        while (iterator.hasNext()){
+            AnimationParticle p = iterator.next();
+            if (p.getParticle() == particle){
+                hasInstance = true;
+                iterator.remove();
+            }
+        }
+        return hasInstance;
+    }
+
+
+
+    /**
+     * Remove an {@link AnimationParticle} that would be played at this point during an animation frame.
+     * @param particle the particle
+     * @return true if the particle was contained and removed
+     */
+    public boolean removeParticle(@NotNull AnimationParticle particle){
+        return particles.remove(particle);
     }
 
     /**
@@ -391,7 +433,7 @@ public class FramePoint extends RelativePoint implements Serializable {
 
     /**
      * Remove a {@link DEUSound} that would be played at this point during an animation frame
-     * @param sound
+     * @param sound the sound
      * @return true if the sound was removed
      */
     public boolean removeSound(@NotNull DEUSound sound){
