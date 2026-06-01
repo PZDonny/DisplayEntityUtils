@@ -31,7 +31,11 @@ class GroupHidePersistentPacketGroupsCMD extends PlayerSubCommand {
                 }
             }
         }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Hiding all persistent packet-based groups in this chunk.", NamedTextColor.YELLOW)));
-        if (hideForSelf) player.sendMessage(Component.text("For only you, the groups are only hidden until you are re-sent this chunk"));
+
+        String self = hideForSelf ? " (For self)" : "";
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Hiding all persistent packet-based groups in this chunk."+self, NamedTextColor.YELLOW)));
+        if (hideForSelf){
+            player.sendMessage(Component.text("| The groups will only be hidden until you are re-sent this chunk", NamedTextColor.GRAY));
+        }
     }
 }

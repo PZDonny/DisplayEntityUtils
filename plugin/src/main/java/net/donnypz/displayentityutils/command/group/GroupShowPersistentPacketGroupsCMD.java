@@ -31,7 +31,11 @@ class GroupShowPersistentPacketGroupsCMD extends PlayerSubCommand {
                 }
             }
         }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Showing all persistent, packet-based groups in this chunk.", NamedTextColor.GREEN)));
-        if (showForSelf) player.sendMessage(Component.text("For only you, and if the groups are hidden for others, the groups are only revealed until you are re-sent this chunk"));
+
+        String self = showForSelf ? " (For self)" : "";
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Showing all persistent, packet-based groups in this chunk."+self, NamedTextColor.GREEN)));
+        if (showForSelf){
+            player.sendMessage(Component.text("| If the chunks in this group are hidden by default, the groups will be hidden again once you re-sent this chunk", NamedTextColor.GRAY));
+        }
     }
 }
