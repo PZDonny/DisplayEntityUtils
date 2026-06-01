@@ -256,10 +256,7 @@ public class DEUSound implements Externalizable, Cloneable { //i have no clue wh
     public static void sendInfo(Collection<DEUSound> sounds, Player player, String soundListTitle, Consumer<DEUSound> clickRemovalAction){
         if (soundListTitle == null) soundListTitle = "Sounds";
         player.sendMessage(MiniMessage.miniMessage().deserialize(soundListTitle+": <yellow>"+sounds.size()));
-        if (sounds.isEmpty()){
-            player.sendMessage(Component.text("| NONE", NamedTextColor.GRAY));
-        }
-        else{
+        if (!sounds.isEmpty()){
             for (DEUSound sound : sounds){
                 sound.sendInfo(player, clickRemovalAction);
             }

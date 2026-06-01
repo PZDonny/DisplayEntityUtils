@@ -502,17 +502,30 @@ public class FramePoint extends RelativePoint implements Serializable {
 
         //Particles
         player.sendMessage(MiniMessage.miniMessage().deserialize("Particles: <yellow>"+particles.size()));
-        if (particles.isEmpty()){
-            player.sendMessage(Component.text("| NONE", NamedTextColor.GRAY));
-        }
-        else{
+        if (!particles.isEmpty()){
             player.sendMessage(Component.text("Click a particle to edit it", NamedTextColor.AQUA));
             for (AnimationParticle particle : particles){
-                player.sendMessage(Component.text("- "+particle.getParticleName(), NamedTextColor.LIGHT_PURPLE)
-                                .clickEvent(ClickEvent.callback(click -> {
-                                    particle.sendInfo((Player) click);
-                                }))
-                        .hoverEvent(HoverEvent.showText(Component.text("Click to edit", NamedTextColor.YELLOW))));
+                Component c1 = Component.text("- "+particle.getParticleName(), NamedTextColor.LIGHT_PURPLE)
+                        .clickEvent(ClickEvent.callback(click -> {
+                            particle.sendInfo((Player) click);
+                        }))
+                        .hoverEvent(HoverEvent.showText(Component.text("Click to edit", NamedTextColor.YELLOW)
+                                .appendNewline()
+                                .append(particle.getInfoComponent())));
+
+                Component c2 = Component.text("[REMOVE]", NamedTextColor.RED)
+                        .hoverEvent(HoverEvent.showText(Component.text("Click to remove this particle", NamedTextColor.RED)))
+                        .clickEvent(ClickEvent.callback(click -> {
+                            if (removeParticle(particle)) {
+                                player.sendMessage(DisplayAPI.pluginPrefix
+                                        .append(Component.text("Particle Removed!", NamedTextColor.YELLOW)));
+                            }
+                            else{
+                                player.sendMessage(DisplayAPI.pluginPrefix
+                                        .append(Component.text("That particle has already been removed!", NamedTextColor.RED)));
+                            }
+                        }));
+                player.sendMessage(c1.appendSpace().append(c2));
             }
         }
 

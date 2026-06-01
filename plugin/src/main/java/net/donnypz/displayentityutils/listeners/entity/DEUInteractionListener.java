@@ -81,7 +81,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
                 player.sendMessage(Component.empty());
                 player.sendMessage(Component.text("-------=Point Info=-------", NamedTextColor.AQUA, TextDecoration.BOLD));
                 pointDisplay.sendInfo(player);
-                player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Sneak+Right Click</gray> <red>to DELETE"));
+                player.sendMessage(Component.text("Sneak+Right Click to DELETE", NamedTextColor.RED));
                 player.sendMessage(Component.text("| Run \"/deu hidepoints\" to stop viewing points", NamedTextColor.GRAY));
                 RelativePointUtils.selectRelativePoint(player, pointDisplay);
                 return;
