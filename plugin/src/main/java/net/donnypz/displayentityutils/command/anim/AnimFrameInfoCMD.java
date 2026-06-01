@@ -65,7 +65,6 @@ class AnimFrameInfoCMD extends PlayerSubCommand {
                     return;
                 }
                 player.sendMessage(Component.empty());
-                player.playSound(player, Sound.ENTITY_ITEM_FRAME_PLACE, 1, 2);
                 RelativePointUtils.spawnFramePointDisplays(group, player, frame);
             }));
 

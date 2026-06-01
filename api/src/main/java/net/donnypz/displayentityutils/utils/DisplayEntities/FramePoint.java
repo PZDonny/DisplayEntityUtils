@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -498,7 +499,12 @@ public class FramePoint extends RelativePoint implements Serializable {
 
     @ApiStatus.Internal
     public void sendInfo(Player player){
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Tag: <yellow>"+tag));
+        if (tag.equals(DEFAULT_FRAME_POINT_TAG)) {
+            player.sendMessage(Component.text("| Default Point", NamedTextColor.YELLOW, TextDecoration.ITALIC));
+        }
+        else{
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Tag: <yellow>"+tag));
+        }
 
         //Particles
         player.sendMessage(MiniMessage.miniMessage().deserialize("Particles: <yellow>"+particles.size()));
@@ -534,7 +540,7 @@ public class FramePoint extends RelativePoint implements Serializable {
         //Sounds
         DEUSound.sendInfo(sounds.values(), player, null, null);
 
-        player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>RIGHT</yellow> <aqua>click to preview effects"));
+        if (!tag.equals(DEFAULT_FRAME_POINT_TAG)) player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>RIGHT</yellow> <aqua>click to preview effects"));
     }
 
 }
