@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 @ApiStatus.Internal
@@ -78,8 +79,50 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         cmd = cmd.subCommands.get(subCommand);
         if (cmd == null) return List.of();
 
-        String current = args[args.length-1];
-        DEUSubCommand.TabSuggestion indexSuggestions = cmd.tabCompleteSuggestions.get(args.length-1);
+
+        int requiredArgs = cmd.tabCompleteSuggestions.isEmpty()
+                ? 0
+                : cmd.tabCompleteSuggestions.sequencedKeySet().getLast() + 1;
+
+        int currentIndex = args.length-1;
+
+        String current = args[currentIndex];
+
+        //Optional Flags/Options
+        if (currentIndex >= requiredArgs) {
+            HashSet<String> used = new HashSet<>();
+            for (String arg : args) {
+                if (cmd.flags.contains(arg.toLowerCase())) {
+                    used.add(arg);
+                }
+
+                if (cmd.options.containsKey(arg.toLowerCase())) {
+                    used.add(arg);
+                }
+            }
+
+            //Show Option Placeholders
+            int previousIndex = currentIndex-1;
+            String previous = args[previousIndex];
+            if (previousIndex != requiredArgs-1 && cmd.options.containsKey(previous.toLowerCase())){
+                return cmd.options.get(previous);
+            }
+
+            //Show available options/flags
+            List<String> suggestions = new ArrayList<>();
+            for (String s : cmd.flags){
+                if (current.toLowerCase().equals(s)) return List.of();
+                if (!used.contains(s)) suggestions.add(s);
+            }
+
+            for (String s : cmd.options.keySet()){
+                if (current.toLowerCase().equals(s)) return List.of();
+                if (!used.contains(s)) suggestions.add(s);
+            }
+            return suggestions;
+        }
+
+        DEUSubCommand.TabSuggestion indexSuggestions = cmd.tabCompleteSuggestions.get(currentIndex);
         if (indexSuggestions == null) return List.of();
 
         List<String> tabCompletes = indexSuggestions.suggestions;
@@ -88,6 +131,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         if (!indexSuggestions.suggestUsingCurrentString){
             return tabCompletes;
         }
+
         List<String> list = new ArrayList<>();
         for (String s : tabCompletes){
             if (s.toLowerCase().startsWith(current.toLowerCase())){
@@ -132,14 +176,14 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         player.sendMessage(Component.text("/deu parts select <distance | -target>", NamedTextColor.GRAY));
     }
 
-    public static void invalidTag(Player player, String tag){
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to add tag: "+tag, NamedTextColor.RED)));
-        invalidTagRestrictions(player);
+    public static void invalidTag(CommandSender sender, String tag){
+        sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to add tag: "+tag, NamedTextColor.RED)));
+        invalidTagRestrictions(sender);
     }
 
-    public static void invalidTagRestrictions(Player player){
-        player.sendMessage(Component.text("| Valid tags do not start with an \"!\" and do not contain commas.", NamedTextColor.GRAY, TextDecoration.ITALIC));
-        player.sendMessage(Component.text("| The tag may also already exist or be set", NamedTextColor.GRAY, TextDecoration.ITALIC));
+    public static void invalidTagRestrictions(CommandSender sender){
+        sender.sendMessage(Component.text("| Valid tags do not start with an \"!\" and do not contain commas.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+        sender.sendMessage(Component.text("| The tag may also already exist or be set", NamedTextColor.GRAY, TextDecoration.ITALIC));
     }
 
     public static void invalidStorage(CommandSender sender){

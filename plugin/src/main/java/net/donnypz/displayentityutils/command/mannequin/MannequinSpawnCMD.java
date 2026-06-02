@@ -16,12 +16,10 @@ import org.bukkit.entity.Mannequin;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 class MannequinSpawnCMD extends PlayerSubCommand {
     MannequinSpawnCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("spawn", parentSubCommand, Permission.MANNEQUIN_SPAWN);
-        setTabComplete(2, List.of("-g"));
+        addFlag("-g");
     }
 
     protected void sendIncorrectUsage(@NotNull Player player) {
@@ -40,6 +38,6 @@ class MannequinSpawnCMD extends PlayerSubCommand {
 
         player.sendMessage(DisplayAPI.pluginPrefix
                 .append(MiniMessage.miniMessage().deserialize("<green>A new mannequin has been spawned at your location!")));
-        CMDUtils.tryAddEntityToGroup(player, mannequin, args, 2);
+        CMDUtils.tryAddEntityToGroup(player, args, mannequin, this, "-g");
     }
 }

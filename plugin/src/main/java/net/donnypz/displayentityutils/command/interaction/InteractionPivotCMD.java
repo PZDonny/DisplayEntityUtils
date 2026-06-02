@@ -17,7 +17,7 @@ class InteractionPivotCMD extends PlayerSubCommand {
     InteractionPivotCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("pivot", parentSubCommand, Permission.INTERACTION_PIVOT);
         setTabComplete(2, "<angle>");
-        setTabComplete(3, "-all");
+        addFlag("-all");
     }
 
     @Override
@@ -54,7 +54,7 @@ class InteractionPivotCMD extends PlayerSubCommand {
 
 
         MultiPartSelection<?> selection = (MultiPartSelection<?>) sel;
-        boolean isAll = args.length >= 4 && args[3].equalsIgnoreCase("-all");
+        boolean isAll = getOptionalArguments(player, args).hasFlag("-all");
         if (isAll){
             for (ActivePart p : selection.getSelectedParts()){
                 if (p.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){

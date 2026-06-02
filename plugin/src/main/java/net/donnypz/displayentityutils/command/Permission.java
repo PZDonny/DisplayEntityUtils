@@ -124,7 +124,6 @@ public enum Permission {
     ANIM_ADD_PARTICLE("deu.anim.addparticle"),
     ANIM_REVERSE("deu.anim.reverse"),
     ANIM_TOGGLE_SCALE("deu.anim.scale"),
-    ANIM_TOGGLE_TEXTURE_CHANGES("deu.anim.texturechanges"),
     ANIM_SET_TAG("deu.anim.settag"),
     ANIM_SET_FRAME_TAG("deu.anim.setframetag"),
     ANIM_PLAY("deu.anim.play"),
@@ -133,7 +132,8 @@ public enum Permission {
     ANIM_PREVIEW("deu.anim.preview"),
 
     BDENGINE_CONVERT_DATAPACK("deu.bdengine.convertdp"),
-    BDENGINE_SPAWN_MODEL("deu.bdengine.spawnmodel");
+    BDENGINE_SPAWN_MODEL("deu.bdengine.spawnmodel"),
+    BDENGINE_IMPORT("deu.bdengine.import");
 
 
     private final String permission;

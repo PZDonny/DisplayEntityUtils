@@ -14,12 +14,12 @@ import org.jetbrains.annotations.NotNull;
 class GroupShowPersistentPacketGroupsCMD extends PlayerSubCommand {
     GroupShowPersistentPacketGroupsCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("showpacketgroups", parentSubCommand, Permission.GROUP_CHUNK_PACKET_GROUP_VISIBILITY);
-        setTabComplete(2, "-self");
+        addFlag("-self");
     }
 
     @Override
     public void execute(Player player, String[] args) {
-        boolean showForSelf = args.length > 2 && args[2].equalsIgnoreCase("-self");
+        boolean showForSelf = getOptionalArguments(player, args).hasFlag("-self");
 
         for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(player.getChunk())){
             if (pg.isPersistent()){
@@ -31,7 +31,11 @@ class GroupShowPersistentPacketGroupsCMD extends PlayerSubCommand {
                 }
             }
         }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Showing all persistent, packet-based groups in this chunk.", NamedTextColor.GREEN)));
-        if (showForSelf) player.sendMessage(Component.text("For only you, and if the groups are hidden for others, the groups are only revealed until you are re-sent this chunk"));
+
+        String self = showForSelf ? " (For self)" : "";
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Showing all persistent, packet-based groups in this chunk."+self, NamedTextColor.GREEN)));
+        if (showForSelf){
+            player.sendMessage(Component.text("| If the chunks in this group are hidden by default, the groups will be hidden again once you re-sent this chunk", NamedTextColor.GRAY));
+        }
     }
 }

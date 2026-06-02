@@ -170,6 +170,28 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
 
     protected abstract void initalize();
 
+    @ApiStatus.Internal
+    public Component getInfoComponent(){
+        Component comp = Component.empty();
+        comp = comp.appendNewline();
+        comp = comp.append(Component.text("Particle Info:", NamedTextColor.AQUA));
+        comp = comp.appendNewline();
+        comp = comp.append(Component.text("| Count: "+count, NamedTextColor.GREEN));
+        comp = comp.appendNewline();
+        comp = comp.append(Component.text("| Extra: "+extra, NamedTextColor.GREEN));
+        comp = comp.appendNewline();
+        comp = comp.append(Component.text("| Delay: "+delayInTicks, NamedTextColor.GREEN));
+        comp = comp.appendNewline();
+        comp = comp.append(Component.text(getOffsetsString(), NamedTextColor.GREEN));
+
+        Component unique = getUniqueInfo();
+        if (unique != null){
+            comp = comp.appendNewline();
+            comp = comp.append(unique);
+        }
+        return comp;
+    }
+
     public void sendInfo(Player player){
         player.sendMessage(Component.empty());
         player.sendMessage(Component.text("Particle Info:", NamedTextColor.AQUA));
@@ -178,14 +200,16 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
         sendEditMSG(player, "| Count: "+count,  AnimationParticleBuilder.Step.COUNT);
         sendEditMSG(player, "| Extra: "+extra,  AnimationParticleBuilder.Step.EXTRA);
         sendEditMSG(player, "| Delay: "+delayInTicks, AnimationParticleBuilder.Step.DELAY);
-
-        String xyzOffset = xOffset+", "+yOffset+", "+zOffset;
-        sendEditMSG(player, "| Offsets: "+xyzOffset, AnimationParticleBuilder.Step.OFFSETS);
+        sendEditMSG(player, getOffsetsString(), AnimationParticleBuilder.Step.OFFSETS);
 
         Component unique = getUniqueInfo();
         if (unique != null){
             player.sendMessage(unique);
         }
+    }
+
+    private String getOffsetsString(){
+        return String.format("| Offsets: %s, %s, %s", xOffset, yOffset, zOffset);
     }
 
     private void sendEditMSG(Player player, String info, AnimationParticleBuilder.Step step){

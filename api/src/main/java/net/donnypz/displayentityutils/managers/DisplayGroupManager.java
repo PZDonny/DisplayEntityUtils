@@ -11,6 +11,7 @@ import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.GroupResult;
+import net.donnypz.displayentityutils.utils.WorldUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -168,7 +169,7 @@ public final class DisplayGroupManager {
         if (holder == null) return Collections.emptySet();
 
         Set<SpawnedDisplayEntityGroup> groups = new HashSet<>();
-        Set<Chunk> chunks = getNearbyChunks(location, radius);
+        Set<Chunk> chunks = WorldUtils.getNearbyChunks(location, radius);
         double radiusSquared = radius*radius;
         for (Chunk c : chunks){
             for (SpawnedDisplayEntityGroup group : holder.getGroups(c.getChunkKey())){
@@ -189,7 +190,7 @@ public final class DisplayGroupManager {
 
         SpawnedDisplayEntityGroup nearest = null;
         double lastDistSq = Double.MAX_VALUE;
-        Set<Chunk> chunks = getNearbyChunks(location, radius);
+        Set<Chunk> chunks = WorldUtils.getNearbyChunks(location, radius);
         double radiusSquared = radius*radius;
 
         for (Chunk c : chunks){
@@ -213,30 +214,6 @@ public final class DisplayGroupManager {
             }
         }
         return nearest;
-    }
-
-    private static Set<Chunk> getNearbyChunks(Location loc, double radiusInBlocks) {
-        World world = loc.getWorld();
-
-        double minX = loc.getX() - radiusInBlocks;
-        double maxX = loc.getX() + radiusInBlocks;
-        double minZ = loc.getZ() - radiusInBlocks;
-        double maxZ = loc.getZ() + radiusInBlocks;
-
-        int minChunkX = (int) minX >> 4;
-        int maxChunkX = (int) maxX >> 4;
-        int minChunkZ = (int) minZ >> 4;
-        int maxChunkZ = (int) maxZ >> 4;
-
-        Set<Chunk> chunks = new HashSet<>();
-
-        for (int cx = minChunkX; cx <= maxChunkX; cx++) {
-            for (int cz = minChunkZ; cz <= maxChunkZ; cz++) {
-                chunks.add(world.getChunkAt(cx, cz));
-            }
-        }
-
-        return chunks;
     }
 
     /**

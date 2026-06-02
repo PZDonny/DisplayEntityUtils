@@ -36,6 +36,7 @@ public class RelativePointUtils {
             displays.add(pd);
         }
         setDisplays(player, displays, true);
+        player.playSound(player, Sound.ENTITY_ITEM_FRAME_PLACE, 1, 2);
     }
 
 

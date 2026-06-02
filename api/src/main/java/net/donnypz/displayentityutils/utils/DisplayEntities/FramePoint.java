@@ -1,12 +1,16 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticle;
+import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -20,24 +24,31 @@ import java.io.Serializable;
 import java.util.*;
 
 public class FramePoint extends RelativePoint implements Serializable {
+    public static final String DEFAULT_FRAME_POINT_TAG = "@DEU_DEFAULT_FP";
 
     Set<AnimationParticle> particles = new HashSet<>();
     Map<String, DEUSound> sounds = new HashMap<>();
+    private final boolean isDefault; //false by default
 
     @Serial
     private static final long serialVersionUID = 99L;
 
     public FramePoint(@NotNull String pointTag, @NotNull ActiveGroup<?> group, @NotNull Location location) {
         super(pointTag, group, location);
+        this.isDefault = false;
     }
 
     FramePoint(@NotNull String pointTag, @NotNull Vector vector, float initialYaw, float initialPitch) {
         super(pointTag, vector, initialYaw, initialPitch);
+        this.isDefault = false;
     }
 
-    FramePoint(@NotNull String pointTag, @NotNull Vector3f vector, float initialYaw, float initialPitch) {
+
+    FramePoint(@NotNull String pointTag, @NotNull Vector3f vector, float initialYaw, float initialPitch, boolean isDefault) {
         super(pointTag, vector, initialYaw, initialPitch);
+        this.isDefault = isDefault;
     }
+
 
     public FramePoint(@NotNull FramePoint point) {
         super(point);
@@ -47,6 +58,40 @@ public class FramePoint extends RelativePoint implements Serializable {
         for (Map.Entry<String, DEUSound> entry : point.sounds.entrySet()){
             this.sounds.put(entry.getKey(), entry.getValue().clone());
         }
+        this.isDefault = point.isDefault;
+    }
+
+    static FramePoint createDefault(){
+        return new FramePoint(DEFAULT_FRAME_POINT_TAG, new Vector3f(), 0, 0, true);
+    }
+
+    /**
+     * Set the tag of this {@link FramePoint}
+     * @param pointTag the tag
+     * @return this
+     * @throws IllegalStateException if the point is an animation frame's default frame point
+     * @throws IllegalArgumentException if the tag is invalid, per {@link DisplayUtils#isValidTag(String)}
+     */
+    @Override
+    public FramePoint setTag(@Nullable String pointTag){
+        if (isDefault){
+            throw new IllegalStateException("Cannot set the point tag of an animation frame's default frame point");
+        }
+        super.setTag(pointTag);
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @throws IllegalStateException if the point is an animation frame's default frame point
+     */
+    @Override
+    public @NotNull FramePoint setLocation(@NotNull ActiveGroup<?> group, @NotNull Location location){
+        if (isDefault){
+            throw new IllegalStateException("Cannot set the location of an animation frame's default frame point");
+        }
+        super.setLocation(group, location);
+        return this;
     }
 
     /**
@@ -330,12 +375,52 @@ public class FramePoint extends RelativePoint implements Serializable {
 
     /**
      * Add a {@link DEUSound} to play at this frame point
-     * @param sound
+     * @param sound the sound
      * @return this
      */
     public FramePoint addSound(@NotNull DEUSound sound){
         sounds.put(sound.soundName, sound);
         return this;
+    }
+
+    /**
+     * Remove all {@link AnimationParticle}s from this frame point
+     * @return this
+     */
+    public FramePoint removeAllParticles(){
+        particles.clear();
+        return this;
+    }
+
+
+    /**
+     * Remove {@link AnimationParticle}s that would be played at this point during an animation frame.
+     * <b>This removes all instances of the given particle</b>
+     * @param particle the particle
+     * @return true if an instance of the particle was removed
+     */
+    public boolean removeParticle(@NotNull Particle particle){
+        Iterator<AnimationParticle> iterator = particles.iterator();
+        boolean hasInstance = false;
+        while (iterator.hasNext()){
+            AnimationParticle p = iterator.next();
+            if (p.getParticle() == particle){
+                hasInstance = true;
+                iterator.remove();
+            }
+        }
+        return hasInstance;
+    }
+
+
+
+    /**
+     * Remove an {@link AnimationParticle} that would be played at this point during an animation frame.
+     * @param particle the particle
+     * @return true if the particle was contained and removed
+     */
+    public boolean removeParticle(@NotNull AnimationParticle particle){
+        return particles.remove(particle);
     }
 
     /**
@@ -349,7 +434,7 @@ public class FramePoint extends RelativePoint implements Serializable {
 
     /**
      * Remove a {@link DEUSound} that would be played at this point during an animation frame
-     * @param sound
+     * @param sound the sound
      * @return true if the sound was removed
      */
     public boolean removeSound(@NotNull DEUSound sound){
@@ -414,30 +499,48 @@ public class FramePoint extends RelativePoint implements Serializable {
 
     @ApiStatus.Internal
     public void sendInfo(Player player){
-        player.sendMessage(MiniMessage.miniMessage().deserialize("Tag: <yellow>"+tag));
+        if (tag.equals(DEFAULT_FRAME_POINT_TAG)) {
+            player.sendMessage(Component.text("| Default Point", NamedTextColor.YELLOW, TextDecoration.ITALIC));
+        }
+        else{
+            player.sendMessage(MiniMessage.miniMessage().deserialize("Tag: <yellow>"+tag));
+        }
 
         //Particles
         player.sendMessage(MiniMessage.miniMessage().deserialize("Particles: <yellow>"+particles.size()));
-        if (particles.isEmpty()){
-            player.sendMessage(Component.text("| NONE", NamedTextColor.GRAY));
-        }
-        else{
+        if (!particles.isEmpty()){
             player.sendMessage(Component.text("Click a particle to edit it", NamedTextColor.AQUA));
             for (AnimationParticle particle : particles){
-                player.sendMessage(Component.text("- "+particle.getParticleName(), NamedTextColor.LIGHT_PURPLE)
-                                .clickEvent(ClickEvent.callback(click -> {
-                                    particle.sendInfo((Player) click);
-                                }))
-                        .hoverEvent(HoverEvent.showText(Component.text("Click to edit", NamedTextColor.YELLOW))));
+                Component c1 = Component.text("- "+particle.getParticleName(), NamedTextColor.LIGHT_PURPLE)
+                        .clickEvent(ClickEvent.callback(click -> {
+                            particle.sendInfo((Player) click);
+                        }))
+                        .hoverEvent(HoverEvent.showText(Component.text("Click to edit", NamedTextColor.YELLOW)
+                                .appendNewline()
+                                .append(particle.getInfoComponent())));
+
+                Component c2 = Component.text("[REMOVE]", NamedTextColor.RED)
+                        .hoverEvent(HoverEvent.showText(Component.text("Click to remove this particle", NamedTextColor.RED)))
+                        .clickEvent(ClickEvent.callback(click -> {
+                            if (removeParticle(particle)) {
+                                player.sendMessage(DisplayAPI.pluginPrefix
+                                        .append(Component.text("Particle Removed!", NamedTextColor.YELLOW)));
+                            }
+                            else{
+                                player.sendMessage(DisplayAPI.pluginPrefix
+                                        .append(Component.text("That particle has already been removed!", NamedTextColor.RED)));
+                            }
+                        }));
+                player.sendMessage(c1.appendSpace().append(c2));
             }
         }
 
         player.sendMessage(Component.empty());
 
         //Sounds
-        DEUSound.sendInfo(sounds.values(), player, null, null);
+        DEUSound.sendInfo(sounds.values(), player, null, this::removeSound);
 
-        player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>RIGHT</yellow> <aqua>click to preview effects"));
+        if (!tag.equals(DEFAULT_FRAME_POINT_TAG)) player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>RIGHT</yellow> <aqua>click to preview effects"));
     }
 
 }

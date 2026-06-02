@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 class AnimUseFilterCMD extends PlayerSubCommand {
     AnimUseFilterCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("usefilter", parentSubCommand, Permission.ANIM_USE_FILTER);
-        setTabComplete(2, "-trim");
+        addFlag("-trim");
     }
 
     @Override
@@ -43,7 +43,7 @@ class AnimUseFilterCMD extends PlayerSubCommand {
             return;
         }
 
-        boolean trim = args.length > 0 && args[2].equalsIgnoreCase("-trim");
+        boolean trim = getOptionalArguments(player, args).hasFlag("-trim");
         anim.setFilter((MultiPartSelection<?>) selection, trim);
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your selected animation will use your part section's filter", NamedTextColor.GREEN)));

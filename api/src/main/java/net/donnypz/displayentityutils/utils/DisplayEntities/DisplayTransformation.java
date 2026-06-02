@@ -178,6 +178,12 @@ class DisplayTransformation extends Transformation{
         return isSimilar(((Display) ((SpawnedDisplayEntityPart) part).getEntity()).getTransformation());
     }
 
+    /**
+     * Check if this is equal to another {@link DisplayTransformation}, per {@link Object#equals(Object)}.<br>
+     * If comparing a {@link DisplayTransformation} with a {@link Transformation}, use {@link #isSimilar(Transformation)}.
+     * @param obj the reference object with which to compare.
+     * @return a boolean
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -201,6 +207,11 @@ class DisplayTransformation extends Transformation{
         }
 
         return Objects.equals(data, other.data);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), type, data);
     }
 
     Transformation toTransformation(){

@@ -21,7 +21,7 @@ public class GroupSpawnJSONCMD extends PlayerSubCommand {
     GroupSpawnJSONCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("spawnjson", parentSubCommand, Permission.GROUP_SPAWN);
         setTabComplete(2, "<file-name>");
-        setTabComplete(3, "-packet");
+        addFlag("-packet");
     }
 
     @Override
@@ -31,7 +31,7 @@ public class GroupSpawnJSONCMD extends PlayerSubCommand {
             return;
         }
         String tag = args[2];
-        boolean isPacket = args.length > 3 && args[3].equalsIgnoreCase("-packet");
+        boolean isPacket = getOptionalArguments(player, args).hasFlag("-packet");
         spawnGroup(player, tag, isPacket);
     }
 

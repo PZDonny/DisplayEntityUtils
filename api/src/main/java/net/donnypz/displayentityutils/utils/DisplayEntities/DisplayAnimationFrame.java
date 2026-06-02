@@ -22,6 +22,7 @@ public final class DisplayAnimationFrame implements Serializable {
     HashMap<UUID, SerialTransformation> displayTransformations = new HashMap<>();
     HashMap<UUID, Vector3f> interactionTranslations = new HashMap<>();
     AnimationCamera camera;
+    FramePoint defaultFramePoint;
     int delay;
     int duration;
 
@@ -72,6 +73,7 @@ public final class DisplayAnimationFrame implements Serializable {
         if (camera != null){
             frame.camera = new AnimationCamera(camera);
         }
+        frame.defaultFramePoint = defaultFramePoint != null ? new FramePoint(defaultFramePoint) : null;
 
         //Old Sound Maps
         if (startSounds != null || endSounds != null){
@@ -106,7 +108,7 @@ public final class DisplayAnimationFrame implements Serializable {
         if (frameStartParticles != null){
             for (AnimationParticle particle : frameStartParticles){
                 String pointTag = OLD_ANIM_PARTICLE+animationParticle;
-                FramePoint point = new FramePoint(pointTag, particle.getVector(), particle.getGroupYawAtCreation(), particle.getGroupPitchAtCreation());
+                FramePoint point = new FramePoint(pointTag, particle.getVector(), particle.getGroupYawAtCreation(), particle.getGroupPitchAtCreation(), false);
                 point.addParticle(particle);
                 frame.addFramePoint(point);
                 animationParticle++;
@@ -117,7 +119,7 @@ public final class DisplayAnimationFrame implements Serializable {
         if (frameEndParticles != null){
             for (AnimationParticle particle : frameEndParticles){
                 String pointTag = OLD_ANIM_PARTICLE+animationParticle;
-                FramePoint point = new FramePoint(pointTag, particle.getVector(), particle.getGroupYawAtCreation(), particle.getGroupPitchAtCreation());
+                FramePoint point = new FramePoint(pointTag, particle.getVector(), particle.getGroupYawAtCreation(), particle.getGroupPitchAtCreation(), false);
                 particle.setDelayInTicks(duration);
                 point.addParticle(particle);
                 frame.addFramePoint(point);
@@ -163,6 +165,14 @@ public final class DisplayAnimationFrame implements Serializable {
 
     public @NotNull Set<AnimationParticle> getFrameEndParticles() {
         return frameEndParticles == null ? new HashSet<>() : new HashSet<>(frameEndParticles);
+    }
+
+    /**
+     * Get a copy of this frame's default frame point
+     * @return a {@link FramePoint} or null
+     */
+    public @Nullable FramePoint getDefaultFramePoint(){
+        return defaultFramePoint == null ? null : new FramePoint(defaultFramePoint);
     }
 
     public @NotNull Set<FramePoint> getFramePoints(){

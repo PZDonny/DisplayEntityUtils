@@ -30,15 +30,6 @@ public final class VersionUtils {
             }
             return false;
         }
-        else if (IS_1_21_6){
-            if (!serverHasDialogs()){
-                if (sendErrorMessage){
-                    player.sendMessage(DisplayAPI.pluginPrefix
-                            .append(Component.text("You can only view Dialog Menus when playing on version 1.21.6 or higher!", NamedTextColor.RED)));
-                }
-            }
-            return false;
-        }
         return true;
     }
 

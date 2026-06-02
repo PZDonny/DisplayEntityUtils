@@ -6,7 +6,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.listeners.autogroup.DEULoadingListeners;
-import net.donnypz.displayentityutils.listeners.bdengine.DatapackEntitySpawned;
+import net.donnypz.displayentityutils.listeners.bdengine.BDEngineConversionListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUInteractionListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUMannequinEditorListener;
@@ -33,6 +33,7 @@ import net.donnypz.displayentityutils.skript.player.PlayerModule;
 import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationPlayerProviderImpl;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
+import net.donnypz.displayentityutils.utils.bdengine.convert.common.BDEConversionHandlerImpl;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerUtils;
 import net.donnypz.displayentityutils.utils.version.folia.SchedulerImpl;
 import net.kyori.adventure.text.Component;
@@ -69,6 +70,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         DisplayAPI.MONGODB_STORAGE = new MongoManager();
         DisplayAPI.MYSQL_STORAGE = new MYSQLManager();
         DisplayAPI.ANIMATION_PLAYER_SERVICE = new AnimationPlayerProviderImpl();
+        DisplayAPI.BDE_CONVERSION_HANDLER = new BDEConversionHandlerImpl();
         DisplayAPI.SCHEDULER = new SchedulerImpl();
 
         getConfig().options().copyDefaults(true);
@@ -78,7 +80,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         registerListeners();
         initializeNamespacedKeys();
         initializeBStats();
-        DisplayAPI.checkFolia();
+        checkFolia();
         getServer().getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
     }
 
@@ -86,6 +88,15 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     public void onDisable() {
         MYSQLManager.closeConnection();
         MongoManager.closeConnection();
+    }
+
+    void checkFolia(){
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            DisplayAPI.isFolia = true;
+        } catch (ClassNotFoundException e) {
+            DisplayAPI.isFolia = false;
+        }
     }
 
 
@@ -164,7 +175,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     private void registerListeners(){
         Bukkit.getPluginManager().registerEvents(this, this);
         Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
-        Bukkit.getPluginManager().registerEvents(new DatapackEntitySpawned(), this);
+        Bukkit.getPluginManager().registerEvents(new BDEngineConversionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUEntityListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerChatListener(), this);

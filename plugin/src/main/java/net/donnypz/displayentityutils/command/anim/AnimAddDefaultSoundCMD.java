@@ -1,0 +1,73 @@
+package net.donnypz.displayentityutils.command.anim;
+
+import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.command.DEUSubCommand;
+import net.donnypz.displayentityutils.command.Permission;
+import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.DEUSound;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
+import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
+import java.util.List;
+
+class AnimAddDefaultSoundCMD extends PlayerSubCommand {
+    AnimAddDefaultSoundCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("adddefaultsound", parentSubCommand, Permission.ANIM_ADD_SOUND);
+        setTabComplete(2, "<sound>");
+        setTabComplete(3, "<volume>");
+        setTabComplete(4, "<pitch>");
+        setTabComplete(5, "<delay-in-ticks>");
+        setTabComplete(6, List.of("<frame-ids>", "<frame-tag>", "-all"));
+    }
+
+    @Override
+    public void execute(Player player, String[] args) {
+
+        SpawnedDisplayAnimation anim = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
+        if (anim == null) {
+            AnimCMD.noAnimationSelection(player);
+            return;
+        }
+
+        if (args.length < 6) {
+            player.sendMessage(Component.text("Incorrect Usage! /deu anim adddefaultsound <sound> <volume> <pitch> <delay-in-ticks> <frame-ids | frame-tag | -all>", NamedTextColor.RED));
+            return;
+        }
+
+        try {
+            String soundStr = args[2];
+            float volume = Float.parseFloat(args[3]);
+            float pitch = Float.parseFloat(args[4]);
+            int delayInTicks = Integer.parseInt(args[5]);
+
+
+            Collection<SpawnedDisplayAnimationFrame> frames = DEUCommandUtils.getFrames(player, args[6], anim);
+            for (SpawnedDisplayAnimationFrame frame : frames){
+                frame.getDefaultFramePoint().addSound(new DEUSound(soundStr, volume, pitch, delayInTicks));
+            }
+
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Sound Added to "+frames.size()+" frames' default frame points", NamedTextColor.GREEN)));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("| Sound: <yellow>"+soundStr));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("| Volume: <yellow>"+volume));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("| Pitch: <yellow>"+pitch));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("| Delay: <yellow>"+delayInTicks));
+
+            if (VersionUtils.getSound(args[2]) == null){
+                player.sendMessage(Component.text("| The provided sound is not a vanilla Minecraft sound, or does not exist in this game version!", NamedTextColor.GRAY));
+            }
+        } catch (NumberFormatException | IndexOutOfBoundsException e) {
+            player.sendMessage(Component.text("Invalid number entered! Enter a number >= 0", NamedTextColor.RED));
+            player.sendMessage(Component.text("| Delay must be a whole number", NamedTextColor.GRAY));
+        }
+        catch (IllegalArgumentException e){}
+    }
+}

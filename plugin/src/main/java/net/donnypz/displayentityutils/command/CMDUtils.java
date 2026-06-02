@@ -37,9 +37,9 @@ public final class CMDUtils {
         sender.sendMessage(msg);
     }
 
-    public static void tryAddEntityToGroup(Player player, Entity entity, String[] args, int groupArg){
+    public static void tryAddEntityToGroup(Player player, String[] args, Entity entity, DEUSubCommand subCommand, String flag){
         String entityTypeName = entity.getType().getKey().getKey();
-        if (args.length >= groupArg+1 && args[groupArg].equalsIgnoreCase("-g")){
+        if (subCommand.getOptionalArguments(player, args).hasFlag(flag)){
             ActiveGroup<?> group = DEUUser.getOrCreateUser(player).getSelectedGroup();
             if (group == null) {
                 player.sendMessage(Component.text("- You must have a group selected to add the "+entityTypeName+" to a group", NamedTextColor.YELLOW));

@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils;
 import net.donnypz.displayentityutils.managers.DisplayStorage;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationPlayer;
+import net.donnypz.displayentityutils.utils.bdengine.convert.common.BDEConversionHandler;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -53,8 +54,9 @@ public final class DisplayAPI {
     static DisplayStorage MYSQL_STORAGE;
     static DisplayStorage MONGODB_STORAGE;
     static AnimationPlayer.AnimationPlayerProvider ANIMATION_PLAYER_SERVICE;
+    static BDEConversionHandler BDE_CONVERSION_HANDLER;
     static Scheduler SCHEDULER;
-    private static boolean isFolia;
+    static boolean isFolia;
 
     private DisplayAPI(){}
 
@@ -64,6 +66,10 @@ public final class DisplayAPI {
 
     public static @NotNull AnimationPlayer.AnimationPlayerProvider getAnimationPlayerService(){
         return ANIMATION_PLAYER_SERVICE;
+    }
+
+    public static @NotNull BDEConversionHandler getBDEConversionHandler(){
+        return BDE_CONVERSION_HANDLER;
     }
 
     public static @NotNull NamespacedKey getPartUUIDKey() {
@@ -234,15 +240,6 @@ public final class DisplayAPI {
 
     public static boolean isFolia(){
         return isFolia;
-    }
-
-    static void checkFolia(){
-        try {
-            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-            isFolia = true;
-        } catch (ClassNotFoundException e) {
-            isFolia = false;
-        }
     }
 
 }

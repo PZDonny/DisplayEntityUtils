@@ -135,8 +135,8 @@ public class DEUUser {
      */
     public void setSelectedPartSelection(@NotNull ActivePartSelection<?> selection, boolean setGroup) {
         deselectPartSelection();
-        if (selection instanceof MultiPartSelection<?> newSel && setGroup){
-            selectedGroup = newSel.getGroup();
+        if (selection instanceof MultiPartSelection<?> multiSel && setGroup){
+            selectedGroup = multiSel.getGroup();
         }
         selectedPartSelection = selection;
     }
@@ -186,6 +186,7 @@ public class DEUUser {
     public void deselectPartSelection(){
         if (selectedPartSelection != null){
             selectedPartSelection.remove();
+
             selectedPartSelection = null;
         }
         selectedGroup = null;

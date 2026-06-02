@@ -3,11 +3,13 @@ package net.donnypz.displayentityutils.utils.dialogs.animationparticles;
 import io.papermc.paper.registry.data.dialog.action.DialogActionCallback;
 import io.papermc.paper.registry.data.dialog.input.DialogInput;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
+import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 
+import java.util.Collection;
 import java.util.List;
 
 class DustTransitionParticleDialog extends ParticleDialog {
@@ -16,7 +18,7 @@ class DustTransitionParticleDialog extends ParticleDialog {
     private static final String END_COLOR = "deu_particle_builder_dust_color_2";
     private static final String SIZE = "deu_particle_builder_dust_size";
 
-    DustTransitionParticleDialog() {
+    DustTransitionParticleDialog(Collection<FramePoint> framePoints) {
         super(Component.text("Dust Transition Animation Particle"), List.of(
                 DialogInput
                         .text(START_COLOR, Component.text("Start Color (Minecraft Color or Hex)"))
@@ -28,11 +30,17 @@ class DustTransitionParticleDialog extends ParticleDialog {
                         .numberRange(SIZE, Component.text("Size"), 0.0f, 100.0f)
                         .step(0.5f)
                         .initial(0.0f)
-                        .build()));
+                        .build()),
+                framePoints);
     }
 
     @Override
-    protected DialogActionCallback buildConfirmCallback() {
+    ParticleDialog create(Collection<FramePoint> framePoints) {
+        return new DustTransitionParticleDialog(framePoints);
+    }
+
+    @Override
+    protected DialogActionCallback buildConfirmCallback(Collection<FramePoint> framePoints) {
         return (view, audience) -> {
             float size = view.getFloat(SIZE);
 
@@ -49,7 +57,7 @@ class DustTransitionParticleDialog extends ParticleDialog {
                 audience.sendMessage(Component.text("Failed to read the given end color: "+color2String, NamedTextColor.RED));
                 return;
             }
-            this.buildParticle(view, audience, Particle.DUST_COLOR_TRANSITION, new Particle.DustTransition(color1, color2, size));
+            this.buildParticle(view, audience, Particle.DUST_COLOR_TRANSITION, new Particle.DustTransition(color1, color2, size), framePoints);
         };
     }
 }

@@ -13,12 +13,12 @@ import org.jetbrains.annotations.NotNull;
 class GroupHidePersistentPacketGroupsCMD extends PlayerSubCommand {
     GroupHidePersistentPacketGroupsCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("hidepacketgroups", parentSubCommand, Permission.GROUP_CHUNK_PACKET_GROUP_VISIBILITY);
-        setTabComplete(2, "-self");
+        addFlag("-self");
     }
 
     @Override
     public void execute(Player player, String[] args) {
-        boolean hideForSelf = args.length > 2 && args[2].equalsIgnoreCase("-self");
+        boolean hideForSelf = getOptionalArguments(player, args).hasFlag("-self");
 
         for (PacketDisplayEntityGroup pg : PacketDisplayEntityGroup.getGroups(player.getChunk())){
             if (pg.isPersistent()){
@@ -31,7 +31,11 @@ class GroupHidePersistentPacketGroupsCMD extends PlayerSubCommand {
                 }
             }
         }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Hiding all persistent packet-based groups in this chunk.", NamedTextColor.YELLOW)));
-        if (hideForSelf) player.sendMessage(Component.text("For only you, the groups are only hidden until you are re-sent this chunk"));
+
+        String self = hideForSelf ? " (For self)" : "";
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Hiding all persistent packet-based groups in this chunk."+self, NamedTextColor.YELLOW)));
+        if (hideForSelf){
+            player.sendMessage(Component.text("| The groups will only be hidden until you are re-sent this chunk", NamedTextColor.GRAY));
+        }
     }
 }

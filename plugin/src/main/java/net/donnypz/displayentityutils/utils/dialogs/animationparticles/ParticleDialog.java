@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public abstract class ParticleDialog {
@@ -44,12 +45,14 @@ public abstract class ParticleDialog {
                         .append(Component.text("Animation Particle creation cancelled!", NamedTextColor.RED)));
             }, CALLBACK_OPTIONS))
             .build();
+    private final Component dialogTitle;
 
-    ParticleDialog(Component dialogTitle, @Nullable List<DialogInput> additionalInputs){
+    ParticleDialog(Component dialogTitle, @Nullable List<DialogInput> additionalInputs, Collection<FramePoint> points){
+        this.dialogTitle = dialogTitle;
         this.dialog = Dialog.create(builder -> {
             builder.empty()
-                    .type(buildDialogType(buildConfirmCallback()))
-                    .base(DialogBase.builder(dialogTitle)
+                    .type(buildDialogType(buildConfirmCallback(points)))
+                    .base(DialogBase.builder(this.dialogTitle)
                             .inputs(getInputs(additionalInputs))
                             .build());
         });
@@ -59,22 +62,39 @@ public abstract class ParticleDialog {
         player.showDialog(dialog);
     }
 
-    protected void buildParticle(DialogResponseView view, Audience audience, Particle particle, Object data){
+    abstract ParticleDialog create(Collection<FramePoint> framePoints);
+
+    protected void buildParticle(DialogResponseView view, Audience audience, Particle particle, Object data, Collection<FramePoint> points){
         int count = Math.round(view.getFloat(COUNT));
         double extra = (double) view.getFloat(EXTRA);
         double xOffset = (double) view.getFloat(X_OFFSET);
         double yOffset = (double) view.getFloat(Y_OFFSET);
         double zOffset = (double) view.getFloat(Z_OFFSET);
         Player p = (Player) audience;
-        FramePointSelector display = (FramePointSelector) RelativePointUtils.getRelativePointSelector(p);
-        FramePoint framePoint = display.getRelativePoint();
-        AnimationParticleBuilder builder = AnimationParticleBuilder.create(framePoint, particle, count, xOffset, yOffset, zOffset, extra, data);
-        builder.build();
+        AnimationParticleBuilder builder;
+        if (points == null){
+            FramePointSelector display = (FramePointSelector) RelativePointUtils.getRelativePointSelector(p);
+            FramePoint framePoint = display.getRelativePoint();
+            builder = AnimationParticleBuilder.create(framePoint, particle, count, xOffset, yOffset, zOffset, extra, data);
+        }
+        else{
+            builder = AnimationParticleBuilder.create(points, particle, count, xOffset, yOffset, zOffset, extra, data);
+        }
+
+        try{
+            builder.build();
+            p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Animation Particle created for frame(s)!", NamedTextColor.GREEN)));
+        }
+        catch(RuntimeException ex){
+            p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to create animation particle! See console.", NamedTextColor.RED)));
+            ex.printStackTrace();
+        }
+
         builder.remove();
-        p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Animation Particle creation successful!", NamedTextColor.GREEN)));
+
     }
 
-    protected abstract DialogActionCallback buildConfirmCallback();
+    protected abstract DialogActionCallback buildConfirmCallback(Collection<FramePoint> points);
 
 
     private List<DialogInput> getInputs(@Nullable List<DialogInput> additionalInputs){
@@ -86,23 +106,23 @@ public abstract class ParticleDialog {
                 .initial(1.0f)
                 .build());
         inputs.add(DialogInput
-                .numberRange(EXTRA, Component.text("Extra"), 0.0f, 100.0f)
-                .step(1.0f)
+                .numberRange(EXTRA, Component.text("Extra"), 0.0f, 15.0f)
+                .step(0.1f)
                 .initial(0.0f)
                 .build());
         inputs.add(DialogInput
-                .numberRange(X_OFFSET, Component.text("Delta X (Offset)"), 0.0f, 100.0f)
-                .step(0.5f)
+                .numberRange(X_OFFSET, Component.text("Delta X (Offset)"), 0.0f, 15.0f)
+                .step(0.1f)
                 .initial(0.0f)
                 .build());
         inputs.add(DialogInput
-                .numberRange(Y_OFFSET, Component.text("Delta Y (Offset)"), 0.0f, 100.0f)
-                .step(0.5f)
+                .numberRange(Y_OFFSET, Component.text("Delta Y (Offset)"), 0.0f, 15.0f)
+                .step(0.1f)
                 .initial(0.0f)
                 .build());
         inputs.add(DialogInput
-                .numberRange(Z_OFFSET, Component.text("Delta Z (Offset)"), 0.0f, 100.0f)
-                .step(0.5f)
+                .numberRange(Z_OFFSET, Component.text("Delta Z (Offset)"), 0.0f, 15.0f)
+                .step(0.1f)
                 .initial(0.0f)
                 .build());
         return inputs;

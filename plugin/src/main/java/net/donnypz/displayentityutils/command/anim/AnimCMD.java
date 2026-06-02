@@ -30,8 +30,8 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
         new AnimRemoveFrameCMD(this);
         new AnimOverwriteFrameCMD(this);
         new AnimEditFrameCMD(this);
-        new AnimEditAllFramesCMD(this);
         new AnimAddPointCMD(this);
+        new AnimShowPointsCMD(this);
         new AnimDrawPointsCMD(this);
         new AnimDrawPosCMD(this);
         new AnimCopyPointCMD(this);
@@ -39,8 +39,10 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
         new AnimShowFrameCMD(this);
         new AnimPreviewFrameCMD(this);
         new AnimAddSoundCMD(this);
+        new AnimAddDefaultSoundCMD(this);
         new AnimRemoveSoundCMD(this);
         new AnimAddParticleCMD(this);
+        new AnimAddDefaultParticleCMD(this);
         new AnimReverseCMD(this);
         new AnimScaleRespectCMD(this);
         new AnimSetTagCMD(this);
@@ -79,7 +81,7 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
             sender.sendMessage(MiniMessage.miniMessage().deserialize("<aqua>Convert animations from <yellow>block-display.com <aqua>with " +
                     "\"/deu bdengine convertanim\""));
             sender.sendMessage(Component.text("Commands allowing multiple <frame-ids> are comma separated", NamedTextColor.GRAY));
-            CMDUtils.sendCMD(sender,"/deu anim help <page-number>", "Get help for animations");
+            CMDUtils.sendCMD(sender,"/deu anim help [page-number]", "Get help for animations");
             CMDUtils.sendCMD(sender, "/deu anim list <storage> [page-number]", "List all saved animations");
             CMDUtils.sendCMD(sender, "/deu anim select <anim-tag> <storage>", "Select a saved animation");
             CMDUtils.sendCMD(sender, "/deu anim selectjson <file-name>", "Select a JSON saved animation");
@@ -98,35 +100,35 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
             CMDUtils.sendCMD(sender, "/deu anim frameinfo <frame-id>", "List information about a frame in your animation");
             CMDUtils.sendCMD(sender, "/deu anim removeframe <frame-id>", "Remove a frame from your selected animation");
             CMDUtils.sendCMD(sender, "/deu anim overwriteframe <frame-id>", "Overwrite the transformation data of a frame");
-            CMDUtils.sendCMD(sender, "/deu anim editframe <frame-ids | frame-tag> <tick-delay> <tick-duration>", "Edit properties of a frame");
-            CMDUtils.sendCMD(sender, "/deu anim editallframes <tick-delay> <tick-duration>", "Edit properties of all frames");
+            CMDUtils.sendCMD(sender, "/deu anim editframe <frame-ids | frame-tag | -all> <tick-delay> <tick-duration>", "Edit properties of a frame");
             CMDUtils.sendCMD(sender, "/deu anim addpoint <frame-id> <point-tag>", "Add a point relative to a group and your location for a frame)");
+            CMDUtils.sendCMD(sender, "/deu anim showpoints <frame-id> [-default]", "Show the frame points of a frame. Use \"-default\" to view a frame's default point info");
             CMDUtils.sendUnsafeCMD(sender, "/deu anim drawpos <1 | 2 | 3>", "Set where frame points should be drawn between. Set 3 when drawing arcs");
         }
         else if (page == 4){
             CMDUtils.sendUnsafeCMD(sender, "/deu anim drawpoints <straight | arc> <point-tag> <start-frame> <end-frame> [points-per-frame]", "Draw a straight/arc'd line of frame points between frames");
-            CMDUtils.sendCMD(sender, "/deu anim copypoint <frame-ids | frame-tag>", "Copy a selected frame point to other frames");
+            CMDUtils.sendCMD(sender, "/deu anim copypoint <frame-ids | frame-tag | -all>", "Copy a selected frame point to other frames");
             CMDUtils.sendCMD(sender, "/deu anim movepoint", "Move a frame point to your location, relative to your selected group");
             CMDUtils.sendCMD(sender, "/deu anim addsound <sound> <volume> <pitch>", "Add a sound to play at a frame point");
+            CMDUtils.sendCMD(sender, "/deu anim adddefaultsound <sound> <volume> <pitch> <frame-ids | frame-tag | -all>", "Add a sound to play at a frame's default frame point (group origin)");
             CMDUtils.sendCMD(sender, "/deu anim removesound <sound | -all>", "Remove a sound from a frame point");
             CMDUtils.sendCMD(sender, "/deu anim addparticle", "Add a particle to play at a frame point");
-            CMDUtils.sendCMD(sender, "/deu anim reverse", "Reverse the order of frames in your selected animation");
         }
         else if (page == 5){
+            CMDUtils.sendCMD(sender, "/deu anim adddefaultparticle <frame-ids | frame-tag | -all>", "Add a particle to play at a frame's default frame point (group origin)");
             CMDUtils.sendCMD(sender, "/deu anim togglescalerespect", "Toggle whether your selected animation should respect the group's scale");
             CMDUtils.sendCMD(sender, "/deu anim showframe <frame-id>", "Displays a frame on your selected group");
             CMDUtils.sendCMD(sender, "/deu anim previewframe <frame-id>", "Preview a frame on your selected group, without changing group entity data");
+            CMDUtils.sendCMD(sender, "/deu anim reverse", "Reverse the order of frames in your selected animation");
             CMDUtils.sendCMD(sender, "/deu anim play [-loop] [-packet] [-camera] [-nodata]", "Play your selected animation on your selected group." +
                     " \n\"-loop\" will make the animation loop." +
                     " \n\"-packet\" will play the animation using packets." +
                     " \n\"-camera\" will set your view to the animation's camera, if present" +
                     " \n\"-nodata\" will disable texture changes for item/block displays and text display text changes");
-            CMDUtils.sendCMD(sender, "/deu anim listanims", "List the animations actively playing for a group");
-
-        }
-        else{
             CMDUtils.sendCMD(sender, "/deu anim previewplay [-camera]", "Preview your selected animation on your selected group, without changing group entity data." +
                     " \n\"-camera\" will set your view to the animation's camera, if present");
+        }
+        else{
             CMDUtils.sendCMD(sender, "/deu anim restore", "Restore your selected group to its previous state before previewing frames/animations");
             CMDUtils.sendCMD(sender, "/deu anim stop", "Stop an animation playing on a group");
             CMDUtils.sendCMD(sender, "/deu anim save <storage>", "Save your selected animation and any changes made");

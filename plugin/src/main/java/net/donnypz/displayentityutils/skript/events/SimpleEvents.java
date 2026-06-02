@@ -289,8 +289,24 @@ public class SimpleEvents extends SimpleEvent {
             EventValues.registerEventValue(GroupRideEntityEvent.class, SpawnedDisplayEntityGroup.class, GroupRideEntityEvent::getGroup);
             EventValues.registerEventValue(GroupRideEntityEvent.class, Entity.class, GroupRideEntityEvent::getEntity);
 
+            //BDEAPIConvert
+            Skript.registerEvent("BDEngine API Converted", SimpleEvents.class, BDEAPIConvertEvent.class, "bde (api|import) converted")
+                    .description("Called when an imported BDEngine project is converted to a format usable by this plugin")
+                    .since("3.5.3");
+            EventValues.registerEventValue(BDEAPIConvertEvent.class, DisplayEntityGroup.class, BDEAPIConvertEvent::getGroup);
+            EventValues.registerEventValue(BDEAPIConvertEvent.class, SpawnedDisplayEntityGroup.class, BDEAPIConvertEvent::getSpawnedGroup);
+            EventValues.registerEventValue(BDEAPIConvertEvent.class, Player.class, BDEAPIConvertEvent::getPlayer);
+            EventValues.registerEventValue(BDEAPIConvertEvent.class, SpawnedDisplayAnimation[].class, e -> e.getAnimations().toArray(new SpawnedDisplayAnimation[0]));
+
+            //BDEDatapackConvert
+            Skript.registerEvent("BDEngine Datapack Converted", SimpleEvents.class, BDEDatapackConvertEvent.class, "bde datapack converted")
+                    .description("Called when a BDEngine datapack is converted to a format usable by this plugin")
+                    .since("3.5.3");
+            EventValues.registerEventValue(BDEDatapackConvertEvent.class, DisplayEntityGroup.class, BDEDatapackConvertEvent::getGroup);
+            EventValues.registerEventValue(BDEDatapackConvertEvent.class, SpawnedDisplayEntityGroup.class, BDEDatapackConvertEvent::getSpawnedGroup);
+            EventValues.registerEventValue(BDEDatapackConvertEvent.class, Player.class, BDEDatapackConvertEvent::getPlayer);
+            EventValues.registerEventValue(BDEDatapackConvertEvent.class, SpawnedDisplayAnimation[].class, e -> e.getAnimations().toArray(new SpawnedDisplayAnimation[0]));
+
         }
     }
-
-
 }

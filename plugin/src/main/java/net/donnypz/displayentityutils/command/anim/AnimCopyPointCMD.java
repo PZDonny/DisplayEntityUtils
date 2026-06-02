@@ -23,7 +23,7 @@ import java.util.List;
 class AnimCopyPointCMD extends PlayerSubCommand {
     AnimCopyPointCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("copypoint", parentSubCommand, Permission.ANIM_COPY_FRAME_POINT);
-        setTabComplete(2, List.of("<frame-ids>", "<frame-tag>"));
+        setTabComplete(2, List.of("<frame-ids>", "<frame-tag>", "-all"));
     }
 
     @Override
@@ -42,7 +42,7 @@ class AnimCopyPointCMD extends PlayerSubCommand {
         FramePoint framePoint = display.getRelativePoint();
 
         if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu anim copypoint <frame-ids | frame-tag>", NamedTextColor.RED));
+            player.sendMessage(Component.text("Incorrect Usage! /deu anim copypoint <frame-ids | frame-tag | -all>", NamedTextColor.RED));
             player.sendMessage(Component.text("| Enter a frame-tag, a single frame-id, or multiple comma separated ids.", NamedTextColor.GRAY));
             return;
         }
@@ -54,7 +54,7 @@ class AnimCopyPointCMD extends PlayerSubCommand {
 
         try {
             String arg = args[2];
-            Collection<SpawnedDisplayAnimationFrame> frames = DEUCommandUtils.getFrames(arg, anim);
+            Collection<SpawnedDisplayAnimationFrame> frames = DEUCommandUtils.getFrames(player, arg, anim);
 
             for (SpawnedDisplayAnimationFrame frame : frames){
                 frame.addFramePoint(new FramePoint(framePoint));
@@ -75,8 +75,6 @@ class AnimCopyPointCMD extends PlayerSubCommand {
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid value entered! Enter whole numbers >= 0", NamedTextColor.RED));
         }
-        catch (IllegalArgumentException e){
-            player.sendMessage(Component.text("Invalid Frame ID(s) or Frame Tag", NamedTextColor.RED));
-        }
+        catch (IllegalArgumentException e){}
     }
 }

@@ -15,12 +15,14 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Constructor;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 @ApiStatus.Internal
 public class AnimationParticleBuilder extends ParticleBuilder{
     Player player;
-    FramePoint framePoint;
+    Collection<FramePoint> framePoints;
     Step step;
     int delayInTicks = 0;
     AnimationParticle editParticle = null;
@@ -38,11 +40,21 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     private static final Component delayMSG = prefix.append(Component.text("Enter the amount of delay (in ticks) before the particle should be shown", NamedTextColor.YELLOW));
     private static final Component separatedMSG = Component.text("All values should be entered separated by spaces.", NamedTextColor.GRAY, TextDecoration.ITALIC);
 
+
+    @ApiStatus.Internal
+    public AnimationParticleBuilder(@NotNull Player player, @NotNull Collection<FramePoint> framePoints){
+        super(Particle.FLAME);
+        this.player = player;
+        this.framePoints = new HashSet<>(framePoints);
+        DEUUser.getOrCreateUser(player).setAnimationParticleBuilder(this);
+        advanceStep(Step.PARTICLE);
+    }
+
     @ApiStatus.Internal
     public AnimationParticleBuilder(@NotNull Player player, @NotNull FramePoint framePoint){
         super(Particle.FLAME);
         this.player = player;
-        this.framePoint = framePoint;
+        this.framePoints = List.of(framePoint);
         DEUUser.getOrCreateUser(player).setAnimationParticleBuilder(this);
         advanceStep(Step.PARTICLE);
     }
@@ -57,13 +69,22 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     }
 
     private AnimationParticleBuilder(FramePoint framePoint, Particle particle){
+        this(List.of(framePoint), particle);
+    }
+
+    private AnimationParticleBuilder(Collection<FramePoint> framePoints, Particle particle){
         super(particle);
-        this.framePoint = framePoint;
+        this.framePoints = new HashSet<>(framePoints);
     }
 
     @ApiStatus.Internal
     public static AnimationParticleBuilder create(@NotNull FramePoint framePoint, @NotNull Particle particle, int count, double xOffset, double yOffset, double zOffset, double extra, Object data){
-        AnimationParticleBuilder builder = new AnimationParticleBuilder(framePoint, particle);
+        return create(List.of(framePoint), particle, count, xOffset, yOffset, zOffset, extra, data);
+    }
+
+    @ApiStatus.Internal
+    public static AnimationParticleBuilder create(@NotNull Collection<FramePoint> framePoints, @NotNull Particle particle, int count, double xOffset, double yOffset, double zOffset, double extra, Object data){
+        AnimationParticleBuilder builder = new AnimationParticleBuilder(framePoints, particle);
         builder
                 .count(count)
                 .extra(extra)
@@ -180,23 +201,18 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     @ApiStatus.Internal
     public void remove(){
         editParticle = null;
-        framePoint = null;
+        if (framePoints != null) framePoints.clear();
+        framePoints = null;
         player = null;
     }
 
     public AnimationParticle build(){
-        Class<? extends AnimationParticle> clazz = getAnimationParticleClass(particle());
-        try {
-            Constructor<? extends AnimationParticle> constructor = clazz.getConstructor(AnimationParticleBuilder.class, Object.class);
-
-            AnimationParticle animParticle = constructor.newInstance(this, data());
-            animParticle.setDelayInTicks(delayInTicks);
-            framePoint.addParticle(animParticle);
-            return animParticle;
-
-        } catch (Exception e) {
-            throw new RuntimeException("Could not create particle: " + clazz.getSimpleName(), e);
+        AnimationParticle animParticle = getAnimationParticle();
+        for (FramePoint fp : framePoints){
+            fp.addParticle(animParticle.clone());
         }
+        return animParticle;
+
     }
 
     public static Class<? extends AnimationParticle> getAnimationParticleClass(@NotNull String particleName){
@@ -206,6 +222,31 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         catch(IllegalArgumentException e){
             return null;
         }
+    }
+
+    AnimationParticle getAnimationParticle(){
+        if (isBlockDataParticle()){
+            return new BlockAnimationParticle(this, data());
+        }
+        else if (isItemParticle()){
+            return new ItemStackAnimationParticle(this, data());
+        }
+        else if (isDustOptionParticle()){
+            return new DustOptionAnimationParticle(this, data());
+        }
+        else if (isDustTransitionParticle()) {
+            return new DustTransitionAnimationParticle(this, data());
+        }
+        else if (particle() == VersionUtils.getEntityEffectParticle()) {
+            return new EntityEffectAnimationParticle(this, data());
+        }
+        else if (particle() == Particle.FLASH) {
+            return new FlashAnimationParticle(this, data());
+        }
+        else {
+            return new GeneralAnimationParticle(this, particle());
+        }
+
     }
 
     public static Class<? extends AnimationParticle> getAnimationParticleClass(@NotNull Particle particle){

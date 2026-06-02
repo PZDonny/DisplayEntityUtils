@@ -36,7 +36,7 @@ class AnimSelectCMD extends PlayerSubCommand {
     static void getAnimation(Player p, String tag, String storage){
         if (storage.equals("all")){
             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Attempting to select animation from all storage locations", NamedTextColor.YELLOW)));
-            GroupSpawnCMD.attemptAll(p, tag, LoadMethod.LOCAL, false);
+            GroupSpawnCMD.attemptAll(p, p.getLocation(), tag, LoadMethod.LOCAL, false);
             return;
         }
 

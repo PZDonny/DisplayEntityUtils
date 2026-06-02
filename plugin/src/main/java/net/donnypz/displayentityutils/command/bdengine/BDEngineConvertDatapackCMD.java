@@ -4,7 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.utils.bdengine.convert.datapack.BDEngineDPConverter;
+import net.donnypz.displayentityutils.utils.bdengine.BDEngineUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -22,16 +22,26 @@ class BDEngineConvertDatapackCMD extends PlayerSubCommand {
     public void execute(Player player, String[] args) {
         if (args.length < 5) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu bdengine convertdp <datapack-name> <group-tag-to-set> <anim-tag-prefix-to-set>", NamedTextColor.RED)));
-            player.sendMessage(Component.text("Use \"-\" for the group tag if you do not want to save the group", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("Use \"-\" for a tag if you do not want to save the group/animation(s)", NamedTextColor.GRAY));
             return;
         }
 
         String datapackName = args[2];
         String groupTag = args[3];
         String animPrefix = args[4];
+        boolean saveGroups = !groupTag.equals("-");
+        boolean saveAnimations = !animPrefix.equals("-");
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Attempting to convert datapack...", NamedTextColor.AQUA)));
         player.sendMessage(Component.text(" | DO NOT LEAVE THIS AREA UNTIL COMPLETION!", NamedTextColor.YELLOW));
         player.sendMessage(Component.text(" | Conversion times may vary.", NamedTextColor.YELLOW));
-        new BDEngineDPConverter(player, datapackName, groupTag, animPrefix);
+        BDEngineUtils.convertDatapack(
+                datapackName,
+                player,
+                !saveGroups ? "" : groupTag,
+                !saveAnimations ? "" : animPrefix,
+                saveGroups,
+                saveAnimations,
+                true
+        );
     }
 }

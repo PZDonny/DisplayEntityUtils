@@ -20,7 +20,7 @@ import java.util.List;
 class AnimPreviewPlayCMD extends PlayerSubCommand {
     AnimPreviewPlayCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("previewplay", parentSubCommand, Permission.ANIM_PREVIEW);
-        setTabComplete(2, List.of("-camera"));
+        addFlag("-camera");
     }
 
     @Override
@@ -48,9 +48,10 @@ class AnimPreviewPlayCMD extends PlayerSubCommand {
         }
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Previewing animation!", NamedTextColor.AQUA)));
+        player.sendMessage(Component.text("| Only you can see the animation being played", NamedTextColor.GRAY));
 
         DisplayAnimator.play(player, group, anim, DisplayAnimator.AnimationType.LINEAR);
-        if (args.length >= 3 && args[2].equalsIgnoreCase("-camera")){
+        if (getOptionalArguments(player, args).hasFlag("-camera")){
             DisplayAnimator.playCamera(player, group, anim, DisplayAnimator.AnimationType.LINEAR);
             player.sendMessage(Component.text("| Previewing with camera", NamedTextColor.GRAY));
         }

@@ -1,8 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
@@ -16,6 +14,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
     HashMap<UUID, DisplayTransformation> displayTransformations = new HashMap<>(); //Part UUIDS
     HashMap<UUID, Vector3f>  interactionTransformations = new HashMap<>(); //Part UUIDS
     AnimationCamera camera;
+    FramePoint defaultFramePoint;
 
     int delay;
     int duration;
@@ -247,12 +246,22 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
         return !framePoints.isEmpty();
     }
 
+    /**
+     * Get the default frame point of this frame
+     * @return a {@link FramePoint}
+     */
+    public @NotNull FramePoint getDefaultFramePoint(){
+        if (this.defaultFramePoint == null) this.defaultFramePoint = FramePoint.createDefault();
+        return defaultFramePoint;
+    }
+
 
     /**
      * Play the sounds assigned to a {@link FramePoint} contained in this frame, at a specified location
      * @param location the location to play the sound
      */
     public void playSounds(@NotNull Location location){
+        if (defaultFramePoint != null) defaultFramePoint.playSounds(location);
         for (FramePoint framePoint : framePoints.values()){
             framePoint.playSounds(location);
         }
@@ -273,6 +282,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param limited whether the effects should only be played to players who can see the group
      */
     public void playSounds(@NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, boolean limited){
+        if (defaultFramePoint != null) defaultFramePoint.playSounds(group, animator, limited);
         for (FramePoint framePoint : framePoints.values()){
             framePoint.playSounds(group, animator, limited);
         }
@@ -284,6 +294,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param group the relative group
      */
     public void playSounds(@NotNull Player player, @NotNull ActiveGroup<?> group){
+        if (defaultFramePoint != null) defaultFramePoint.playSounds(group, player);
         for (FramePoint framePoint : framePoints.values()){
             framePoint.playSounds(group, player);
         }
@@ -295,6 +306,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param group the relative group
      */
     public void playSounds(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group){
+        if (defaultFramePoint != null) defaultFramePoint.playSounds(group, players);
         for (FramePoint framePoint : framePoints.values()){
             framePoint.playSounds(group, players);
         }
@@ -306,6 +318,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param location the location to display the particles
      */
     public void showParticles(@NotNull Location location){
+        if (defaultFramePoint != null) defaultFramePoint.showParticles(location);
         for (FramePoint framePoint : framePoints.values()){
             framePoint.showParticles(location);
         }
@@ -327,6 +340,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param limited whether the effects should only be played to players who can see the group
      */
     public void showParticles(@NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, boolean limited){
+        if (defaultFramePoint != null) defaultFramePoint.showParticles(group, animator, limited);
         for (FramePoint framePoint : framePoints.values()){
             framePoint.showParticles(group, animator, limited);
         }
@@ -334,10 +348,11 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
 
     /**
      * Show the particles that will be displayed at the start of this frame
-     * @param player
+     * @param player the player who should see the particles
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
      */
     public void showParticles(@NotNull Player player, @NotNull ActiveGroup<?> group){
+        if (defaultFramePoint != null) defaultFramePoint.showParticles(group, player);
         for (FramePoint framePoint : framePoints.values()){
             framePoint.showParticles(group, player);
         }
@@ -345,24 +360,13 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
 
     /**
      * Show the particles that will be displayed at the start of this frame
-     * @param players
+     * @param players the players who should see the particles
      * @param group the group that the particles will spawn around, respecting the group's yaw and pitch
      */
     public void showParticles(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group){
+        if (defaultFramePoint != null) defaultFramePoint.showParticles(group, players);
         for (FramePoint framePoint : framePoints.values()){
             framePoint.showParticles(group, players);
-        }
-    }
-
-
-    private void executeCommands(Location location, List<String> commands){
-        if (location == null || !location.isChunkLoaded() || commands.isEmpty()) {
-            return;
-        }
-        String coordinates = ConversionUtils.getCoordinateString(location);
-        String worldName = ConversionUtils.getExecuteCommandWorldName(location.getWorld());
-        for (String s : commands){
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute positioned "+coordinates+" in "+worldName+" run "+s);
         }
     }
 
@@ -374,6 +378,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param limited whether the effects should only be played to players who can see the group
      */
     public void playEffects(@NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator, boolean limited){
+        if (defaultFramePoint != null) defaultFramePoint.playEffects(group, animator, limited);
         for (FramePoint point : framePoints.values()){
             point.playEffects(group, animator, limited);
         }
@@ -386,6 +391,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param group the group to play these effects for
      */
     public void playEffects(@NotNull Player player, @NotNull ActiveGroup<?> group){
+        if (defaultFramePoint != null) defaultFramePoint.playEffects(group, player);
         for (FramePoint point : framePoints.values()){
             point.playEffects(group, player);
         }
@@ -397,6 +403,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
      * @param group the group to play these effects for
      */
     public void playEffects(@NotNull Collection<Player> players, @NotNull ActiveGroup<?> group){
+        if (defaultFramePoint != null) defaultFramePoint.playEffects(group, players);
         for (FramePoint point : framePoints.values()){
             point.playEffects(group, players);
         }
@@ -440,6 +447,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
         if (camera != null){
             frame.setCamera(new AnimationCamera(camera));
         }
+        frame.defaultFramePoint = defaultFramePoint != null ? new FramePoint(defaultFramePoint) : null;
         return frame;
     }
 
@@ -451,6 +459,7 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
             cloned.displayTransformations = new HashMap<>(this.displayTransformations);
             cloned.interactionTransformations = new HashMap<>(this.interactionTransformations);
             cloned.framePoints = new HashMap<>(this.framePoints);
+            cloned.camera = this.camera == null ? null : new AnimationCamera(this.camera);
 
             return cloned;
         } catch (CloneNotSupportedException e) {
@@ -460,19 +469,25 @@ public final class SpawnedDisplayAnimationFrame implements Cloneable{
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SpawnedDisplayAnimationFrame other)) return false;
-
-        return delay == other.delay &&
-                duration == other.duration &&
-                Objects.equals(tag, other.tag) &&
-                Objects.equals(displayTransformations, other.displayTransformations) &&
-                Objects.equals(interactionTransformations, other.interactionTransformations) &&
-                Objects.equals(framePoints, other.framePoints);
+        if (!(o instanceof SpawnedDisplayAnimationFrame that)) return false;
+        return delay == that.delay
+                && duration == that.duration
+                && Objects.equals(displayTransformations, that.displayTransformations)
+                && Objects.equals(interactionTransformations, that.interactionTransformations)
+                && Objects.equals(camera, that.camera) && Objects.equals(tag, that.tag)
+                && Objects.equals(framePoints, that.framePoints);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(delay, duration, tag, displayTransformations, interactionTransformations, framePoints);
+        return Objects.hash(
+                displayTransformations,
+                interactionTransformations,
+                camera,
+                delay,
+                duration,
+                tag,
+                framePoints
+        );
     }
 }

@@ -18,7 +18,7 @@ class InteractionSpawnCMD extends PlayerSubCommand {
         super("spawn", parentSubCommand, Permission.INTERACTION_SPAWN);
         setTabComplete(2, "<height>");
         setTabComplete(3, "<width>");
-        setTabComplete(4, "-g");
+        addFlag("-g");
     }
 
     @Override
@@ -29,7 +29,7 @@ class InteractionSpawnCMD extends PlayerSubCommand {
         }
 
         Interaction interaction = spawnInteraction(player, player.getLocation(), args);
-        CMDUtils.tryAddEntityToGroup(player, interaction, args, 4);
+        CMDUtils.tryAddEntityToGroup(player, args, interaction, this, "-g");
     }
 
     private Interaction spawnInteraction(Player player, Location spawnLoc, String[] args){

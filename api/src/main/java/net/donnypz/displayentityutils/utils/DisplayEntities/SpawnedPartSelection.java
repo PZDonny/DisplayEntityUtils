@@ -1,7 +1,5 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.ItemDisplay;
@@ -76,7 +74,7 @@ public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDispla
      */
     @Override
     public void remove(){
-        if (group == null) return;
+        if (!isValid()) return;
         ((SpawnedDisplayEntityGroup) group).removePartSelection(this);
         removeSilent();
     }
