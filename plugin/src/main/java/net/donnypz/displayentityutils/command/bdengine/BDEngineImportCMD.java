@@ -54,8 +54,8 @@ class BDEngineImportCMD extends PlayerSubCommand {
                             !saveAnimations ? "" : animPrefix,
                             saveGroups,
                             saveAnimations,
-                            false);
-                    player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Attempted to spawn model at your location!", NamedTextColor.GREEN)));
+                            true);
+                    player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Attempting to import project at your location!", NamedTextColor.GREEN)));
                 });
             }
             catch(NumberFormatException e){
