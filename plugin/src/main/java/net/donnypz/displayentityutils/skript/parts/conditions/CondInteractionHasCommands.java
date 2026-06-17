@@ -9,7 +9,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.InteractionUtils;
 import org.bukkit.entity.Interaction;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -44,7 +44,7 @@ public class CondInteractionHasCommands extends Condition {
                 return p.getInteractionCommands().isEmpty() == isNegated();
             }
             case Interaction interaction -> {
-                return DisplayUtils.getInteractionCommands(interaction).isEmpty() == isNegated();
+                return InteractionUtils.getInteractionCommands(interaction).isEmpty() == isNegated();
             }
             case null, default -> {
                 return isNegated();

@@ -6,11 +6,8 @@ import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
-import net.donnypz.displayentityutils.utils.ConversionUtils;
-import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.donnypz.displayentityutils.utils.FollowType;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
@@ -470,7 +467,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                     //Reset Scale then multiply by newScaleMultiplier
                     float newHeight = (i.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier;
                     float newWidth = (i.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier;
-                    DisplayUtils.scaleInteraction(i, newHeight, newWidth, durationInTicks, 0);
+                    InteractionUtils.scaleInteraction(i, newHeight, newWidth, durationInTicks, 0);
 
                     //Reset Translation then multiply by newScaleMultiplier
                     Vector translationVector = DisplayUtils.getNonDisplayTranslation(i);

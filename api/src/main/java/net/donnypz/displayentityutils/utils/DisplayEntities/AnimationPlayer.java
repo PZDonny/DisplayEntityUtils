@@ -2,7 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.*;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.InteractionUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
@@ -223,7 +223,7 @@ public abstract class AnimationPlayer {
 
             if (!packetAnimationPlayer) {
                 SpawnedDisplayEntityPart sp = (SpawnedDisplayEntityPart) part;
-                DisplayUtils.scaleInteraction((Interaction) sp.getEntity(), height, width, frame.duration, 0);
+                InteractionUtils.scaleInteraction((Interaction) sp.getEntity(), height, width, frame.duration, 0);
             } else {
                 if (players == null) {
                     DisplayAttributeMap map = new DisplayAttributeMap()

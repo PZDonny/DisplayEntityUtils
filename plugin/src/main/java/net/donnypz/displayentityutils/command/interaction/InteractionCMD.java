@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
+import net.donnypz.displayentityutils.utils.InteractionUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -123,11 +124,11 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
 
         void scale(float height, float width, int duration, int delay){
             if (interaction != null){
-                DisplayUtils.scaleInteraction(interaction, height, width, duration, delay);
+                InteractionUtils.scaleInteraction(interaction, height, width, duration, delay);
             }
             else{
                 if (interactionPart instanceof SpawnedDisplayEntityPart sp){
-                    DisplayUtils.scaleInteraction((Interaction) sp.getEntity(), height, width, duration, delay);
+                    InteractionUtils.scaleInteraction((Interaction) sp.getEntity(), height, width, duration, delay);
                 }
                 else if (interactionPart instanceof PacketDisplayEntityPart pp){
                     PacketUtils.scaleInteraction(pp, height, width, duration, delay);
@@ -180,7 +181,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
 
         void addInteractionCommand(String command, boolean left, boolean console){
             if (interaction != null){
-                DisplayUtils.addInteractionCommand(interaction, command, left, console);
+                InteractionUtils.addInteractionCommand(interaction, command, left, console);
             }
             else{
                 interactionPart.addInteractionCommand(command, left, console);
@@ -190,7 +191,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
 
         void removeInteractionCommand(InteractionCommand command){
             if (interaction != null){
-                DisplayUtils.removeInteractionCommand(interaction, command);
+                InteractionUtils.removeInteractionCommand(interaction, command);
             }
             else{
                 interactionPart.removeInteractionCommand(command);
@@ -200,7 +201,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
 
         List<String> getInteractionCommands(){
             if (interaction != null){
-                return DisplayUtils.getInteractionCommands(interaction);
+                return InteractionUtils.getInteractionCommands(interaction);
             }
             else{
                 return interactionPart.getInteractionCommands();
@@ -209,7 +210,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
 
         List<InteractionCommand> getInteractionCommandsWithData(){
             if (interaction != null){
-                return DisplayUtils.getInteractionCommandsWithData(interaction);
+                return InteractionUtils.getInteractionCommandsWithData(interaction);
             }
             else{
                 return interactionPart.getInteractionCommandsWithData();

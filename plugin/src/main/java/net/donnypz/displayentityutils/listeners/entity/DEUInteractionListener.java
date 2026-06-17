@@ -15,8 +15,8 @@ import net.donnypz.displayentityutils.events.PreInteractionClickEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
+import net.donnypz.displayentityutils.utils.InteractionUtils;
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointSelector;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
@@ -24,7 +24,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Interaction;
@@ -149,7 +148,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
             return;
         }
 
-        List<InteractionCommand> commands = DisplayUtils.getInteractionCommandsWithData(interaction);
+        List<InteractionCommand> commands = InteractionUtils.getInteractionCommandsWithData(interaction);
         InteractionClickEvent event = new InteractionClickEvent(player, interaction, clickType, commands);
 
         if (!event.callEvent()){
