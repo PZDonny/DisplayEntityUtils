@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 class DisplayControllerReader {
 
@@ -26,11 +27,15 @@ class DisplayControllerReader {
     private static final String PART_FOLLOW_PROPERTIES_SECT = "partFollowProperties";
     private static final String STATES_SECT = "states";
 
-    static DisplayController read(YamlConfiguration config, String fileName, boolean fromFile){
+    static DisplayController read(YamlConfiguration config,
+                                  String fileName,
+                                  boolean fromFile,
+                                  Logger logger,
+                                  boolean register){
         try{
             String controllerID = config.getString("controllerID");
             if (controllerID == null){
-                Bukkit.getLogger().severe("Missing \"controllerID\" for display controller: "+fileName);
+                logger.severe("Missing \"controllerID\" for display controller: "+fileName);
                 return null;
             }
 
@@ -66,14 +71,14 @@ class DisplayControllerReader {
             boolean flip;
             if (groupPropSect == null){
                 flip = false;
-                Bukkit.getLogger().warning("Missing section \"groupProperties\" in display controller: "+fileName+".");
+                logger.warning("Missing section \"groupProperties\" in display controller: "+fileName+".");
             }
             else{
                 //before vector offset was added
                 if (groupPropSect.contains("verticalOffset")){
                     controller.rideOffset = new Vector(0, groupPropSect.getDouble("verticalOffset"), 0);
-                    Bukkit.getLogger().warning("\"verticalOffset\" is outdated but will still function for display controller: "+fileName+". " +
-                            "See new examplecontroller on GitHub for new \"offset\"'s formatting in any direction.");
+                    logger.warning("\"verticalOffset\" is outdated but will still function for display controller: "+fileName+". " +
+                            "See updated \"examplecontroller\" on GitHub for new \"offset\"'s formatting, in any direction.");
                 }
                 else if (groupPropSect.contains("offset")){
                     ConfigurationSection offsetSect = groupPropSect.getConfigurationSection("offset");
@@ -89,7 +94,7 @@ class DisplayControllerReader {
 
             //----=Default Follow Properties=----
             if (!config.contains(DEFAULT_FOLLOW_PROPERTIES_SECT)) {
-                printMissingSection(DEFAULT_FOLLOW_PROPERTIES_SECT, fileName, true);
+                printMissingSection(DEFAULT_FOLLOW_PROPERTIES_SECT, fileName, true, logger);
                 return null;
             }
             ConfigurationSection defaultPropsSection = config.getConfigurationSection(DEFAULT_FOLLOW_PROPERTIES_SECT);
@@ -98,7 +103,7 @@ class DisplayControllerReader {
             HashSet<String> propertiesToRemove = new HashSet<>(controller.followProperties.keySet());
 
 
-            configureDefaultProperties(controller, defaultPropsSection, deathDespawnDelay, flip);
+            configureDefaultProperties(controller, defaultPropsSection, deathDespawnDelay, flip, logger);
             propertiesToRemove.remove(null);
 
 
@@ -107,7 +112,7 @@ class DisplayControllerReader {
             if (!partFollowMaps.isEmpty()){
                 for (Map<?, ?> map : partFollowMaps){
                     String followPropertyID = (String) map.get("id");
-                    GroupFollowProperties props = configurePartProperties(controller, followPropertyID, (Map<String, Object>) map, deathDespawnDelay, flip);
+                    GroupFollowProperties props = configurePartProperties(controller, followPropertyID, (Map<String, Object>) map, deathDespawnDelay, flip, logger);
                     if (props != null){
                         propertiesToRemove.remove(followPropertyID);
                     }
@@ -125,42 +130,51 @@ class DisplayControllerReader {
                 DisplayStateMachine machine = new DisplayStateMachine(controllerID);
                 for (MachineState.StateType stateType : MachineState.StateType.values()){
                     if (stateSect.contains(stateType.getStateID())){
-                        addState(controller, machine, stateType, stateSect.getConfigurationSection(stateType.getStateID()));
+                        addState(controller, machine, stateType, stateSect.getConfigurationSection(stateType.getStateID()), logger);
                     }
                 }
                 controller.setStateMachine(machine);
             }
 
             if (!controller.isMarkedNull()){
-                controller.register();
+                if (register) controller.register();
             }
             else{
-                Bukkit.getLogger().info("Null Group/Animation Display Controller must be handled through API: "+fileName);
+                logger.info("Null Group/Animation Display Controller must be handled through API: "+fileName);
             }
             return controller;
         }
         catch(Exception e){
-            Bukkit.getLogger().severe("Misconfigured Display Controller: "+fileName);
+            logger.severe("Misconfigured Display Controller: "+fileName);
             e.printStackTrace();
             return null;
         }
     }
 
-    private static void printMissingSection(String section, String fileName, boolean severe){
+    private static void printMissingSection(String section, String fileName, boolean severe, Logger logger){
         String message = "Missing DisplayController section, \""+section+"\" in "+fileName;
         if (severe){
-            Bukkit.getLogger().severe(message);
+            logger.severe(message);
         }
         else{
-            Bukkit.getLogger().warning(message);
+            logger.warning(message);
         }
     }
 
-    private static GroupFollowProperties configureDefaultProperties(DisplayController controller, ConfigurationSection section, int deathDespawnDelay, boolean flip){
-        FollowType followType = null;
+    private static FollowType getFollowType(String followTypeInput, Logger logger){
+        if (followTypeInput.equalsIgnoreCase("NONE")) return null;
+
         try{
-            followType = FollowType.valueOf(section.getString("followType"));
-        } catch(IllegalArgumentException followingDisabled){}
+            return FollowType.valueOf(followTypeInput);
+        }
+        catch(IllegalArgumentException e){
+            logger.warning("Invalid Follow Type for default properties: "+followTypeInput);
+            throw e;
+        }
+    }
+
+    private static GroupFollowProperties configureDefaultProperties(DisplayController controller, ConfigurationSection section, int deathDespawnDelay, boolean flip, Logger logger){
+        FollowType followType = getFollowType(section.getString("followType"), logger);
 
         int teleportationDuration = section.getInt("teleportationDuration");
         boolean pivotInteractions = section.getBoolean("pivotInteractions");
@@ -194,17 +208,14 @@ class DisplayControllerReader {
         return followProperties;
     }
 
-    private static GroupFollowProperties configurePartProperties(DisplayController controller, String id, Map<String, Object> map, int deathDespawnDelay, boolean flip){
+    private static GroupFollowProperties configurePartProperties(DisplayController controller, String id, Map<String, Object> map, int deathDespawnDelay, boolean flip, Logger logger){
         List<String> partTags = (List<String>) map.get("partTags");
         if (partTags.isEmpty()){
             Bukkit.getConsoleSender().sendMessage(Component.text("Failed to find part tags for part follow property. It will be skipped: "+id, NamedTextColor.YELLOW));
             return null;
         }
 
-        FollowType followType = null;
-        try{
-            followType = FollowType.valueOf((String) map.get("followType"));
-        } catch(IllegalArgumentException followingDisabled){}
+        FollowType followType = getFollowType((String) map.get("followType"), logger);
 
         int teleportationDuration = (int) map.get("teleportationDuration");
         boolean pivotInteractions = (boolean) map.get("pivotInteractions");
@@ -251,7 +262,7 @@ class DisplayControllerReader {
     }
 
 
-    private static void addState(DisplayController controller, DisplayStateMachine machine, MachineState.StateType stateType, ConfigurationSection section){
+    private static void addState(DisplayController controller, DisplayStateMachine machine, MachineState.StateType stateType, ConfigurationSection section, Logger logger){
         List<String> animations = section.getStringList("animations");
         //Get Load Method
         LoadMethod loadMethod = null;
@@ -274,7 +285,7 @@ class DisplayControllerReader {
         MachineState state = new MachineState(machine, stateType.getStateID(), animations, loadMethod, animType, lock, animDataChangeOverride);
         if (!state.hasDisplayAnimators() && !state.isNullLoader()){
             if (!controller.controllerID.equalsIgnoreCase("example")){
-                Bukkit.getLogger().warning("Failed to add state, \""+stateType.getStateID()+"\". No animations found: ["+machine.getId()+"]");
+                logger.warning("Failed to add state, \""+stateType.getStateID()+"\". No animations found: ["+machine.getId()+"]");
             }
             return;
         }

@@ -379,7 +379,7 @@ public class DisplayController {
      * @return a {@link DisplayController} or null
      */
     public static @Nullable DisplayController read(@NotNull File file){
-        return DisplayControllerReader.read(YamlConfiguration.loadConfiguration(file), file.getName(), true);
+        return DisplayControllerReader.read(YamlConfiguration.loadConfiguration(file), file.getName(), true, Bukkit.getLogger(), true);
     }
 
 
@@ -395,7 +395,7 @@ public class DisplayController {
             return null;
         }
         InputStreamReader reader = new InputStreamReader(controllerStream);
-        return DisplayControllerReader.read(YamlConfiguration.loadConfiguration(reader), resourcePath+" | FROM RESOURCES ("+plugin.getName()+")", false);
+        return DisplayControllerReader.read(YamlConfiguration.loadConfiguration(reader), resourcePath+" | FROM RESOURCES ("+plugin.getName()+")", false, Bukkit.getLogger(), true);
     }
 
     /**
@@ -405,6 +405,6 @@ public class DisplayController {
      */
     public static @Nullable DisplayController read(@NotNull InputStream stream){
         InputStreamReader reader = new InputStreamReader(stream);
-        return DisplayControllerReader.read(YamlConfiguration.loadConfiguration(reader), "Unknown controller from an InputStream...", false);
+        return DisplayControllerReader.read(YamlConfiguration.loadConfiguration(reader), "Unknown controller from an InputStream...", false, Bukkit.getLogger(), true);
     }
 }

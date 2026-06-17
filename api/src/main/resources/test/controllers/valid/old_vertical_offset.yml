@@ -1,0 +1,197 @@
+#---------------------------------------------------
+# Refer to the wiki to understand DisplayControllers
+# https://github.com/PZDonny/DisplayEntityUtils/wiki
+#---------------------------------------------------
+
+#The UNIQUE identifier for this controller
+controllerID: "example"
+
+#--------------------Mythic Mobs--------------------
+#Spawn a group/model that will ride the listed MythicMobs
+#
+#NOTE: If planning to use this controller through the API or Skript, without MythicMobs,
+#simply set "mythicMobs" to []
+#----------------------------------------------------
+mythicMobs:
+  mobs: ["ExampleMythicMob", "ExampleMythicMob2"]
+
+  #------------------Created  Group--------------------
+  # Set the group that will be created and
+  # used when a MythicMob is summoned
+  #----------------------------------------------------
+  group:
+    tag: "group-tag"
+    #Storages: LOCAL, MYSQL, MONGODB, NULL (Handled through API with NullGroupLoaderEvent)
+    storage: LOCAL
+    #Determine if the group should be packet based
+    packetBased: true
+    #Whether played animation should be able to change the texture of this group
+    allowAnimationDataChanges: true
+
+
+#-----------------Group Properties-------------------
+# Set the properties that will be applied to a group
+# that uses this controller
+#----------------------------------------------------
+groupProperties:
+  #Reverses this group's follow property directions
+  #This is useful if your group was oriented in the opposite direction than intended
+  flip: false
+  #The ride offset that should be applied to the group when riding an entity, from the ridden position
+  verticalOffset: 2
+  #Determine if the group should be visible by default when spawned
+  visibleByDefault: true
+
+#------------------Follow Properties------------------
+#Determine how the parts in a group will respect the looking direction of an entity
+#----------------------------------------------------
+defaultFollowProperties:
+  #Controls how the group will orient itself in respect to the mythic mob direction:
+  #Types: PITCH_AND_YAW, PITCH, YAW, BODY, NONE (disables)
+  followType: PITCH_AND_YAW
+
+  #"deathDespawnDelay" can be set to -1 to disable removal of a group, after an entity's death.
+  #The delay is measured in ticks and the value is the same for the default follow properties and part follow properties.
+  #How long in ticks the group should be despawned after the death of a ridden entity
+  deathDespawnDelay: 20
+
+  #"teleportDuration" controls how smoothly the group will respect the entity's looking direction
+  #The duration is measured in ticks.
+  teleportationDuration: 2
+
+  #Determine if interaction entities should horizontally pivot while following an entity's yaw
+  pivotInteractions: false
+
+  #Adjust displays to have a more predictable pitch rotation (when using PITCH_AND_YAW or PITCH follow types)
+  #
+  #This is useful especially when a model is shown as "attached" to an entity's head and
+  #is expected to stay attached
+  adjustDisplays:
+    enabled: false
+
+    #The local up/down offset distance percentage (Ex: The offset from the top of a player's head)
+    yDisplayAdjustPercentage: 100
+
+    #The local forward/backwards offset distance percentage
+    zDisplayAdjustPercentage: 100
+
+  #Determine whether certain animation states will enable/disable this follow property
+  #If a state disables this property, the parts in the property will use the stop following
+  #If a state filter is not required, this section can be removed
+  stateFilter:
+    states: ["state1", "state2"]
+    #If true, the listed states WILL NOT use this follow property if they are the active state
+    #If false, the listed states WILL use this follow property if they are the active state
+    blacklist: true
+
+#Follow Properties that parts with the listed tags will respect
+#If setting follow properties for parts with certain tags is not desired, the section below can be omitted
+partFollowProperties:
+  - id: "part_follow_prop_head"
+    partTags: ["head"]
+    followType: PITCH_AND_YAW
+    teleportationDuration: 2
+    pivotInteractions: false
+    adjustDisplays:
+      enabled: false
+      yDisplayAdjustPercentage: 100
+      zDisplayAdjustPercentage: 100
+    #If a state disables this part follow property,
+    #the parts in the property will use the defaultFollowProperty's settings
+    stateFilter:
+      states: []
+      blacklist: true
+  - id: "part_follow_prop_body"
+    partTags: ["body"]
+    followType: BODY
+    teleportationDuration: 2
+    pivotInteractions: true
+    stateFilter:
+      states: []
+      blacklist: true
+
+#------------------Animation States------------------
+# Set what animation should play based on the actions
+# of the entity this controller's group is
+# associated with
+#----------------------------------------------------
+states:
+
+  #This state is only triggered for associated Mythic Mobs
+  spawn:
+    #Multiple animations will be picked at random
+    animations: ["spawn_animation_1", "spawn_animation_2"]
+    #Storages: LOCAL, MYSQL, MONGODB, NULL (Handled through API with NullAnimationLoaderEvent)
+    storage: LOCAL
+    animationType: LINEAR
+    lockTransition: true
+
+  death:
+    animations: ["death_animation_1", "death_animation_2"]
+    storage: LOCAL
+    animationType: LINEAR
+    lockTransition: true
+    #The value that should be used for this animation state, regardless of what "group.allowAnimationDataChanges"'s is
+    animationDataChangesOverride: true
+
+  idle:
+    animations: ["idle_animation"]
+    storage: LOCAL
+    animationType: LOOP
+    lockTransition: false
+
+  walk:
+    animations: ["walk_animation"]
+    storage: LOCAL
+    animationType: LOOP
+    lockTransition: false
+
+  swimming:
+    animations: ["swim_animation"]
+    storage: LOCAL
+    animationType: LOOP
+    lockTransition: false
+
+  jump:
+    animations: ["jump_animation"]
+    storage: LOCAL
+    animationType: LOOP
+    lockTransition: true
+
+  falling:
+    animations: ["falling_animation"]
+    storage: LOCAL
+    animationType: LOOP
+    lockTransition: false
+
+  melee:
+    animations: ["melee_animation"]
+    storage: LOCAL
+    animationType: LINEAR
+    lockTransition: true
+
+    #The delay in ticks until the damage should be applied on the melee victim
+    #Setting this value to 0 will deal damage regularly, without any delay
+    damageDelay: 0
+
+    #The distance the victim must be from the attacker for the damage to apply, after the delay.
+    #This does nothing if "damageDelay" is 0
+    maxRange: 2
+
+  shoot_bow:
+    animations: ["shoot_bow_animation"]
+    storage: LOCAL
+    animationType: LINEAR
+    lockTransition: true
+
+  damaged:
+    animations: ["damaged_animation"]
+    storage: LOCAL
+    animationType: LINEAR
+    lockTransition: true
+
+  teleport:
+    animations: ["teleport_animation"]
+    storage: LOCAL
+    animationType: LINEAR
+    lockTransition: false
