@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 public class AnimShowPointsCMD extends PlayerSubCommand {
 
     AnimShowPointsCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("showpoint", parentSubCommand, Permission.ANIM_FRAME_INFO);
+        super("showpoints", parentSubCommand, Permission.ANIM_FRAME_INFO);
         setTabComplete(2, "<frame-id>");
         addFlag("-default");
     }
