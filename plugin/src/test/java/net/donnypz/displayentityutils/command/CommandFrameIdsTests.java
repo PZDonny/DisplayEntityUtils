@@ -1,3 +1,5 @@
+package net.donnypz.displayentityutils.command;
+
 import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -20,6 +22,7 @@ public class CommandFrameIdsTests {
     @ParameterizedTest
     @ValueSource(strings = {
             "",
+            " ",
             "1.1",
             "1.1,2.5",
             "1-2",

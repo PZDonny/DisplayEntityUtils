@@ -1,4 +1,5 @@
-import net.donnypz.displayentityutils.utils.DisplayUtils;
+package net.donnypz.displayentityutils.utils;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
