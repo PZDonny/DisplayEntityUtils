@@ -13,6 +13,7 @@ import java.util.*;
 public abstract class DEUSubCommand {
     private final Permission permission;
     protected final TreeMap<Integer, TabSuggestion> tabCompleteSuggestions = new TreeMap<>();
+    private int minimumArgs;
     protected final Set<String> flags = new TreeSet<>();
     protected final TreeMap<String, List<String>> options = new TreeMap<>();
     protected final TreeMap<String, DEUSubCommand> subCommands = new TreeMap<>();
@@ -40,12 +41,16 @@ public abstract class DEUSubCommand {
 
     protected boolean hasMinimumArguments(CommandSender sender, String[] args){
         if (tabCompleteSuggestions.isEmpty()) return true;
-        if (args.length < tabCompleteSuggestions.lastKey()+1){
-            sender.sendMessage(DisplayAPI.pluginPrefix
-                    .append(Component.text("Incorrect Usage! "+getCommandUsage(), NamedTextColor.RED)));
+        if (args.length < minimumArgs){
+            incorrectUsage(sender);
             return false;
         }
         return true;
+    }
+
+    protected void incorrectUsage(CommandSender sender){
+        sender.sendMessage(DisplayAPI.pluginPrefix
+                .append(Component.text("Incorrect Usage! "+getCommandUsage(), NamedTextColor.RED)));
     }
 
 
@@ -102,17 +107,30 @@ public abstract class DEUSubCommand {
     }
 
     protected TabSuggestion setTabComplete(int index, String suggestion){
-        return setTabComplete(index, List.of(suggestion));
+        TabSuggestion s = new TabSuggestion(List.of(suggestion));
+        setTabComplete(index, s, true);
+        return s;
+    }
+
+    protected TabSuggestion setOptionalTabComplete(int index, String suggestion){
+        TabSuggestion s = new TabSuggestion(List.of(suggestion));
+        setTabComplete(index, s, false);
+        return s;
     }
 
     protected TabSuggestion setTabComplete(int index, List<String> suggestions){
         TabSuggestion suggestion = new TabSuggestion(suggestions);
-        tabCompleteSuggestions.put(index, new TabSuggestion(suggestions));
+        setTabComplete(index, suggestion, true);
         return suggestion;
     }
 
     protected void setTabComplete(int index, TabSuggestion suggestion){
-        tabCompleteSuggestions.put(index, suggestion);
+        setTabComplete(index, suggestion, true);
+    }
+
+    private void setTabComplete(int index, TabSuggestion tabSuggestion, boolean updateMinimum){
+        tabCompleteSuggestions.put(index, tabSuggestion);
+        if (updateMinimum) minimumArgs = index+1;
     }
 
     protected void addFlag(@NotNull String flag){
