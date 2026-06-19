@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupCloneCMD extends GroupSubCommand {
     GroupCloneCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("clone", parentSubCommand, Permission.GROUP_CLONE, 0, false);
+        super("clone", parentSubCommand, Permission.GROUP_CLONE, false);
         addFlag("-here");
     }
 

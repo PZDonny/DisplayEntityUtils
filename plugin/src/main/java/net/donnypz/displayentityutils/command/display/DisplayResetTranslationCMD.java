@@ -18,7 +18,7 @@ import org.joml.Vector3f;
 
 class DisplayResetTranslationCMD extends PartsSubCommand {
     DisplayResetTranslationCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("resettranslation", parentSubCommand, Permission.DISPLAY_TRANSLATE, 2, 2);
+        super("resettranslation", parentSubCommand, Permission.DISPLAY_TRANSLATE, true);
     }
 
     @Override

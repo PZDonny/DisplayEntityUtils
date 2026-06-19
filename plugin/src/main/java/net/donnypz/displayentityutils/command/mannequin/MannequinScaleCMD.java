@@ -14,14 +14,12 @@ import org.jetbrains.annotations.Nullable;
 
 class MannequinScaleCMD extends PartsSubCommand {
     MannequinScaleCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("scale", parentSubCommand, Permission.MANNEQUIN_SCALE, 3, 3);
+        super("scale", parentSubCommand, Permission.MANNEQUIN_SCALE, true);
         setTabComplete(2, "<scale>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage /deu mannequin scale <scale> [-all]", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {

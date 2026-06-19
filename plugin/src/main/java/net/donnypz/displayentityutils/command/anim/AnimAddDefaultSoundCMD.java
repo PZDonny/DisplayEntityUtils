@@ -38,10 +38,7 @@ class AnimAddDefaultSoundCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 6) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu anim adddefaultsound <sound> <volume> <pitch> <delay-in-ticks> <frame-ids | frame-tag | -all>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         try {
             String soundStr = args[2];

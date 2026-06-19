@@ -31,10 +31,8 @@ public class GroupSpawnCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 4) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu group spawn <group-tag> <storage> [-packet]", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
+
         String tag = args[2];
         String storage = args[3];
 

@@ -1,26 +1,21 @@
 package net.donnypz.displayentityutils.command.mannequin;
 
-import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.mannequin.ui.MannequinEquipmentGUI;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 class MannequinEquipmentCMD extends PartsSubCommand {
     MannequinEquipmentCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("equipment", parentSubCommand, Permission.MANNEQUIN_SET_EQUIPMENT, 2, 0);
+        super("equipment", parentSubCommand, Permission.MANNEQUIN_SET_EQUIPMENT);
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /deu mannequin equipment", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {

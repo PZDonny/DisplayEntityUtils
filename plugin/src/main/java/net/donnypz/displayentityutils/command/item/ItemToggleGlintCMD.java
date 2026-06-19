@@ -17,37 +17,26 @@ import java.util.List;
 
 class ItemToggleGlintCMD extends PartsSubCommand {
     ItemToggleGlintCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("toggleglint", parentSubCommand, Permission.ITEM_TOGGLE_GLINT, 2, 2);
-        setTabComplete(3, List.of("on", "off"));
+        super("toggleglint", parentSubCommand, Permission.ITEM_TOGGLE_GLINT, false);
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /deu item toggleglint [-all <on | off>]", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
-        if (args.length < 4){
-            sendIncorrectUsage(player);
-            return false;
-        }
 
         boolean status;
-        String s = args[3];
-        if (s.equalsIgnoreCase("on")){
+        OptionalArguments oArgs = getOptionalArguments(player, args);
+        if (oArgs.getOption("-all").equals("on")){
             status = true;
             player.sendMessage(DisplayAPI.pluginPrefix
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled glint for ALL selected item displays ON")));
         }
-        else if (s.equalsIgnoreCase("off")){
+        else{
             status = false;
             player.sendMessage(DisplayAPI.pluginPrefix
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled glint for ALL selected item displays <red>OFF")));
-        }
-        else{
-            sendIncorrectUsage(player);
-            return false;
         }
 
         for (ActivePart part : selection.getSelectedParts()){

@@ -25,10 +25,8 @@ public class BDEngineSpawnModelCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 3) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu bdengine spawnmodel <file-name>", NamedTextColor.RED)));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
+
         String fileName = args[2];
         Location spawnLoc = player.getLocation();
         BDEModel model = BDEngineUtils.readFile(new File(PluginFolders.bdeFilesFolder, "/"+fileExtension(fileName)));

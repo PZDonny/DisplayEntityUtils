@@ -12,14 +12,12 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupSetTagCMD extends GroupSubCommand {
     GroupSetTagCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("settag", parentSubCommand, Permission.GROUP_SETTAG, 3, true);
+        super("settag", parentSubCommand, Permission.GROUP_SETTAG, true);
         setTabComplete(2, "<group-tag>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /deu group settag <group-tag>", NamedTextColor.RED));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {

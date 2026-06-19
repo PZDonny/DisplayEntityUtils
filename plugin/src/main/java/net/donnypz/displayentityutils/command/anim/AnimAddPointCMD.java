@@ -44,11 +44,11 @@ class AnimAddPointCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 4) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu anim addpoint <frame-id> <point-tag>", NamedTextColor.RED));
+        if (!hasMinimumArguments(player, args)){
             player.sendMessage(Component.text("| \"point-tag\" is the tag you want to represent the new point", NamedTextColor.GRAY));
             return;
         }
+
         try {
             int id = Integer.parseInt(args[2]);
             String pointTag = args[3];

@@ -14,17 +14,15 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupMoveCMD extends GroupSubCommand {
     GroupMoveCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("move", parentSubCommand, Permission.GROUP_TRANSFORM, 4, false);
+        super("move", parentSubCommand, Permission.GROUP_TRANSFORM, false);
         setTabComplete(2, TabSuggestion.DIRECTIONS);
         setTabComplete(3, "<distance>");
-        setTabComplete(4, "[tick-duration]");
+        setOptionalTabComplete(4, "[tick-duration]");
     }
 
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("/deu group move <direction> <distance> [tick-duration]", NamedTextColor.RED));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {

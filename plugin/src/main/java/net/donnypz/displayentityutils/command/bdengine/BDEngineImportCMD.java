@@ -27,8 +27,7 @@ class BDEngineImportCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 5) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu bdengine import <project-id> <group-tag-to-set> <anim-prefix-to-set>", NamedTextColor.RED)));
+        if (!hasMinimumArguments(player, args)) {
             player.sendMessage(Component.text("Use \"-\" for a tag if you do not want to save the group/animation(s)", NamedTextColor.GRAY));
             return;
         }

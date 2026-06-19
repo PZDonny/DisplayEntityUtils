@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 class PartsMoveCMD extends PartsSubCommand {
 
     public PartsMoveCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("move", parentSubCommand, Permission.PARTS_TRANSFORM, 4, 4);
+        super("move", parentSubCommand, Permission.PARTS_TRANSFORM, true);
         setTabComplete(2, TabSuggestion.DIRECTIONS);
         setTabComplete(3, "<distance>");
     }
@@ -35,9 +35,7 @@ class PartsMoveCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /deu parts move <direction> <distance>", NamedTextColor.RED));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {

@@ -45,6 +45,8 @@ class AnimShowFrameCMD extends GroupSubCommand {
             return;
         }
 
+        if (!hasMinimumArguments(player, args)) return;
+
         List<SpawnedDisplayAnimationFrame> frames = anim.getFrames();
         if (frames.isEmpty()) {
             AnimCMD.hasNoFrames(player);

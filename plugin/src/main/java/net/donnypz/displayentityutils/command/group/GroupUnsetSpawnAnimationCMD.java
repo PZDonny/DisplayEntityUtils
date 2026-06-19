@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupUnsetSpawnAnimationCMD extends GroupSubCommand {
     GroupUnsetSpawnAnimationCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("unsetspawnanim", parentSubCommand, Permission.GROUP_SET_SPAWN_ANIM, 0, true);
+        super("unsetspawnanim", parentSubCommand, Permission.GROUP_SET_SPAWN_ANIM, true);
     }
 
     @Override

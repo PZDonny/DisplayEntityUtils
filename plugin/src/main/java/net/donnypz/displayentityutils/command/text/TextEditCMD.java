@@ -13,7 +13,8 @@ import org.jetbrains.annotations.Nullable;
 class TextEditCMD extends PartsSubCommand {
 
     public TextEditCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("edit", parentSubCommand, Permission.TEXT_EDIT, 0, 0);
+        super("edit", parentSubCommand, Permission.TEXT_EDIT);
+        addFlag("-&");
     }
 
     @Override
@@ -28,9 +29,9 @@ class TextEditCMD extends PartsSubCommand {
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY)) return false;
 
-        boolean legacy = args.length >= 3 && args[2].equals("-&");
+        boolean isLegacy = getOptionalArguments(player, args).hasFlag("-&");
         if (VersionUtils.canViewDialogs(player, true)){
-            TextDisplayDialog.sendDialog(player, selectedPart, !legacy);
+            TextDisplayDialog.sendDialog(player, selectedPart, !isLegacy);
         }
         return false;
     }

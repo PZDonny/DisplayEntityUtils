@@ -16,37 +16,26 @@ import java.util.List;
 
 class TextSeeThroughCMD extends PartsSubCommand {
     TextSeeThroughCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("seethrough", parentSubCommand, Permission.TEXT_TOGGLE_SEE_THROUGH, 0, 2);
-        setTabComplete(3, List.of("on", "off"));
+        super("seethrough", parentSubCommand, Permission.TEXT_TOGGLE_SEE_THROUGH, false);
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /deu text seethrough -all <on | off>", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
-        if (args.length < 4){
-            sendIncorrectUsage(player);
-            return false;
-        }
 
         boolean status;
-        String s = args[3];
-        if (s.equalsIgnoreCase("on")){
+        OptionalArguments oArgs = getOptionalArguments(player, args);
+        if (oArgs.getOption("-all").equals("on")){
             status = true;
             player.sendMessage(DisplayAPI.pluginPrefix
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled see through for ALL selected text displays ON")));
         }
-        else if (s.equalsIgnoreCase("off")){
+        else {
             status = false;
             player.sendMessage(DisplayAPI.pluginPrefix
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled see through for ALL selected text displays <red>OFF")));
-        }
-        else{
-            sendIncorrectUsage(player);
-            return false;
         }
 
         for (ActivePart part : selection.getSelectedParts()){

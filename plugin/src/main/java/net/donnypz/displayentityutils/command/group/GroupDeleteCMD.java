@@ -21,10 +21,7 @@ class GroupDeleteCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 4) {
-            player.sendMessage(Component.text("/deu group delete <anim-tag> <storage>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         String tag = args[2];
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<gray>Attempting to delete display entity group <white>(Tagged: "+tag+")")));

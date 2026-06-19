@@ -21,10 +21,7 @@ class AnimDeleteCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 4) {
-            player.sendMessage(Component.text("/deu anim delete <anim-tag> <storage>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         String tag = args[2];
 

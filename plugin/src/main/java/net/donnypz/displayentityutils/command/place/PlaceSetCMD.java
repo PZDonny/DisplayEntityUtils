@@ -21,10 +21,7 @@ class PlaceSetCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 3) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage /deu place set <group-tag>", NamedTextColor.RED)));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         ItemStack heldItem = player.getInventory().getItemInMainHand();
         if (!PlaceableGroupManager.isValidItem(heldItem)){

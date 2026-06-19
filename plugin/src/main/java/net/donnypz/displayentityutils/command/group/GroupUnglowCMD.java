@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupUnglowCMD extends GroupSubCommand {
     GroupUnglowCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("unglow", parentSubCommand, Permission.GROUP_GLOW, 0, true);
+        super("unglow", parentSubCommand, Permission.GROUP_GLOW, true);
     }
 
 

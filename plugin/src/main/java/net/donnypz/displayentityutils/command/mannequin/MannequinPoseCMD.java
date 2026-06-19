@@ -19,14 +19,12 @@ import org.jetbrains.annotations.Nullable;
 
 class MannequinPoseCMD extends PartsSubCommand {
     MannequinPoseCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("pose", parentSubCommand, Permission.MANNEQUIN_POSE, 3, 3);
+        super("pose", parentSubCommand, Permission.MANNEQUIN_POSE, true);
         setTabComplete(2, TabSuggestion.MANNEQUIN_POSES);
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage /deu mannequin pose <pose> [-all]", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {

@@ -27,11 +27,7 @@ class AnimDrawPointsCMD extends PlayerSubCommand {
         setTabComplete(3, "<point-tag>");
         setTabComplete(4, "<start-frame>");
         setTabComplete(5, "<end-frame>");
-        setTabComplete(6, "[points-per-frame]");
-    }
-
-    private void incorrectUsage(Player player){
-        player.sendMessage(Component.text("Incorrect Usage! /deu anim drawpoints <straight | arc> <point-tag> <start-frame> <end-frame> [points-per-frame]", NamedTextColor.RED));
+        setOptionalTabComplete(6, "[points-per-frame]");
     }
 
     @Override
@@ -61,10 +57,7 @@ class AnimDrawPointsCMD extends PlayerSubCommand {
 
         DEUUser user = DEUUser.getOrCreateUser(player);
 
-        if (args.length < 6){
-            incorrectUsage(player);
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         String type = args[2];
         String tag = args[3];
@@ -84,7 +77,7 @@ class AnimDrawPointsCMD extends PlayerSubCommand {
             isLinear = false;
         }
         else{
-            incorrectUsage(player);
+            super.incorrectUsage(player);
             return;
         }
 

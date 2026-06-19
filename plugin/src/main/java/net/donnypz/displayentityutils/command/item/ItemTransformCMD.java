@@ -14,14 +14,12 @@ import org.jetbrains.annotations.Nullable;
 
 class ItemTransformCMD extends PartsSubCommand {
     ItemTransformCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("transform", parentSubCommand, Permission.ITEM_TRANSFORM, 3, 3);
+        super("transform", parentSubCommand, Permission.ITEM_TRANSFORM, true);
         setTabComplete(2, TabSuggestion.ITEM_DISPLAY_TRANSFORMS);
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /deu item transform <transform-type> [-all]", NamedTextColor.RED));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {

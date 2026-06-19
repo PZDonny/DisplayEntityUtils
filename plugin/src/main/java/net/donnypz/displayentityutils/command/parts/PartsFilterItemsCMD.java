@@ -40,10 +40,7 @@ class PartsFilterItemsCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3){
-            player.sendMessage(Component.text("/deu parts filteritems <items-ids>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         player.sendMessage(Component.empty());
 

@@ -15,14 +15,12 @@ import org.jetbrains.annotations.Nullable;
 
 class MannequinSkinCMD extends PartsSubCommand {
     MannequinSkinCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("skin", parentSubCommand, Permission.MANNEQUIN_SKIN, 3, 3);
+        super("skin", parentSubCommand, Permission.MANNEQUIN_SKIN, true);
         setTabComplete(2, "<player-name>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage /deu mannequin skin <name> [-all]", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {

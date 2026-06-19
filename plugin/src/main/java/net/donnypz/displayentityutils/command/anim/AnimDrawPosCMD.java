@@ -28,10 +28,7 @@ class AnimDrawPosCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 3){
-            incorrectUsage(player);
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         DEUUser user = DEUUser.getOrCreateUser(player);
         try{
@@ -43,15 +40,11 @@ class AnimDrawPosCMD extends PlayerSubCommand {
         }
         catch(NumberFormatException e) {
             if (!args[2].equalsIgnoreCase("show")) {
-                incorrectUsage(player);
+                super.incorrectUsage(player);
                 return;
             }
             showPointPos(user, player);
         }
-    }
-
-    private void incorrectUsage(Player player){
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu anim drawpos <1 | 2 | 3 | show>", NamedTextColor.RED)));
     }
 
     private void showPointPos(DEUUser user, Player player){

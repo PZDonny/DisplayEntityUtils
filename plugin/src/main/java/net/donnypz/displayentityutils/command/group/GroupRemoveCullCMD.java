@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupRemoveCullCMD extends GroupSubCommand {
     GroupRemoveCullCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("removecull", parentSubCommand, Permission.GROUP_CULLING, 0, true);
+        super("removecull", parentSubCommand, Permission.GROUP_CULLING, true);
     }
 
     @Override

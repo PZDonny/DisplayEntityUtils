@@ -23,9 +23,6 @@ class AnimInfoCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_INFO)){
-            return;
-        }
         SpawnedDisplayAnimation animation = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
         if (animation == null) {
             AnimCMD.noAnimationSelection(player);

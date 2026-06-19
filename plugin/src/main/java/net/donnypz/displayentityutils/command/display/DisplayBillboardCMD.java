@@ -14,15 +14,12 @@ import org.jetbrains.annotations.Nullable;
 
 class DisplayBillboardCMD extends PartsSubCommand {
     DisplayBillboardCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("billboard", parentSubCommand, Permission.DISPLAY_BILLBOARD, 3, 3);
+        super("billboard", parentSubCommand, Permission.DISPLAY_BILLBOARD, true);
         setTabComplete(2, TabSuggestion.BILLBOARDS);
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid billboard type!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/deu display billboard <fixed | vertical | horizontal | center> [-all]", NamedTextColor.GRAY));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {

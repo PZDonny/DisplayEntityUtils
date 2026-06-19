@@ -15,14 +15,12 @@ import org.jetbrains.annotations.Nullable;
 class TextFontCMD extends PartsSubCommand {
 
     public TextFontCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("font", parentSubCommand, Permission.TEXT_SET_FONT, 3, 3);
+        super("font", parentSubCommand, Permission.TEXT_SET_FONT, true);
         setTabComplete(2, TabSuggestion.TEXT_DISPLAY_FONTS);
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu text font <default | alt | uniform | illageralt> [-all]", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {

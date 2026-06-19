@@ -22,10 +22,6 @@ class MannequinSpawnCMD extends PlayerSubCommand {
         addFlag("-g");
     }
 
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /deu mannequin spawn [-g]", NamedTextColor.RED)));
-    }
-
     @Override
     public void execute(Player player, String[] args) {
         Location location = player.getLocation();

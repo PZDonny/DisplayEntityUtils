@@ -17,14 +17,12 @@ import java.util.List;
 
 class ItemSetCMD extends PartsSubCommand {
     ItemSetCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("set", parentSubCommand, Permission.ITEM_SET,3, 3);
+        super("set", parentSubCommand, Permission.ITEM_SET, true);
         setTabComplete(2, List.of("-held", "<item-id>"));
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /deu parts setitem <\"-held\" | item-id> [-all]", NamedTextColor.RED));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {

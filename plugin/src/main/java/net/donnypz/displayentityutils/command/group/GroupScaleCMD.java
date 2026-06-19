@@ -14,15 +14,13 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupScaleCMD extends GroupSubCommand {
     GroupScaleCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("scale", parentSubCommand, Permission.GROUP_TRANSFORM, 4, true);
+        super("scale", parentSubCommand, Permission.GROUP_TRANSFORM, true);
         setTabComplete(2, "<scale-multiplier>");
         setTabComplete(3, "<tick-duration>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("/deu group scale <scale-multiplier> <tick-duration>", NamedTextColor.RED));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {

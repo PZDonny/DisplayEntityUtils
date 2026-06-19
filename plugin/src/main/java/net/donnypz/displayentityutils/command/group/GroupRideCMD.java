@@ -30,17 +30,14 @@ class GroupRideCMD extends ConsoleUsableSubCommand {
     GroupRideCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("ride", parentSubCommand, Permission.GROUP_RIDE);
         setTabComplete(2, List.of("-target", "player-name | entity-uuid"));
-        setTabComplete(3, "[group-tag]");
-        setTabComplete(4, "[storage]");
-        setTabComplete(5, "[controller-id]");
+        setOptionalTabComplete(3, "[group-tag]");
+        setOptionalTabComplete(4, "[storage]");
+        setOptionalTabComplete(5, "[controller-id]");
     }
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (args.length == 2){
-            sender.sendMessage(Component.text("Incorrect Usage! /deu group ride <-target | player-name | entity-uuid> [group-tag] [storage] [controller-id]", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(sender, args)) return;
 
         Entity vehicle = getVehicle(sender, args[2]);
         if (vehicle == null){

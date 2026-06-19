@@ -16,14 +16,11 @@ import java.util.List;
 
 class MannequinToggleNameVisibilityCMD extends PartsSubCommand {
     MannequinToggleNameVisibilityCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("togglenamevisibility", parentSubCommand, Permission.MANNEQUIN_NAME_VISIBLE, 2, 2);
-        setTabComplete(3, List.of("on", "off"));
+        super("togglenamevisibility", parentSubCommand, Permission.MANNEQUIN_NAME_VISIBLE, false);
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /deu mannequin togglenamevisibility [-all <on | off>]", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
@@ -33,20 +30,16 @@ class MannequinToggleNameVisibilityCMD extends PartsSubCommand {
         }
 
         boolean status;
-        String s = args[3];
-        if (s.equalsIgnoreCase("on")){
+        OptionalArguments oArgs = getOptionalArguments(player, args);
+        if (oArgs.getOption("-all").equals("on")){
             status = true;
             player.sendMessage(DisplayAPI.pluginPrefix
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled name visibility for ALL selected mannequins ON")));
         }
-        else if (s.equalsIgnoreCase("off")){
+        else {
             status = false;
             player.sendMessage(DisplayAPI.pluginPrefix
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled name visibility for ALL selected mannequins <red>OFF")));
-        }
-        else{
-            sendIncorrectUsage(player);
-            return false;
         }
 
         for (ActivePart part : selection.getSelectedParts()){

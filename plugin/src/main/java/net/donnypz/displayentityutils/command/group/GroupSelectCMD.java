@@ -37,11 +37,7 @@ class GroupSelectCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 3) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number for the distance to search for groups", NamedTextColor.RED)));
-            player.sendMessage(Component.text("/deu group select <distance>", NamedTextColor.GRAY));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         try{
             double distance = Double.parseDouble(args[2]);

@@ -37,10 +37,8 @@ class AnimRemoveSoundCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu anim removesound <sound | -all>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
+
         try {
             String soundName = args[2];
             boolean isRemoveAll = soundName.equalsIgnoreCase("-all");

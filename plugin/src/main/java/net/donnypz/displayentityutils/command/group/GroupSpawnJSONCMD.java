@@ -26,10 +26,7 @@ public class GroupSpawnJSONCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu group spawnjson <file-name> [-packet]", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
         String tag = args[2];
         boolean isPacket = getOptionalArguments(player, args).hasFlag("-packet");
         spawnGroup(player, tag, isPacket);

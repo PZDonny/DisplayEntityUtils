@@ -12,6 +12,10 @@ public abstract class GroupSubCommand extends PlayerSubCommand{
     boolean requireGroupSelection;
     boolean refreshIfPersistentPacket;
 
+    public GroupSubCommand(@NotNull String commandName, @NotNull DEUSubCommand parentSubCommand, @NotNull Permission permission, boolean refreshIfPersistentPacket) {
+        this(commandName, parentSubCommand, permission, -1, refreshIfPersistentPacket);
+    }
+
     public GroupSubCommand(@NotNull String commandName, @NotNull DEUSubCommand parentSubCommand, @NotNull Permission permission, int minimumArgs, boolean refreshIfPersistentPacket) {
         super(commandName, parentSubCommand, permission);
         this.minimumArgs = minimumArgs;
@@ -27,6 +31,7 @@ public abstract class GroupSubCommand extends PlayerSubCommand{
             return;
         }
 
+        if (minimumArgs == -1 && !hasMinimumArguments(player, args)) return;
         if (args.length < minimumArgs){
             sendIncorrectUsage(player);
             return;

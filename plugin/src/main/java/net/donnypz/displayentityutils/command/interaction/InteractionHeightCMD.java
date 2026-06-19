@@ -18,10 +18,8 @@ class InteractionHeightCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /deu interaction height <height>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
+        
         setInteractionDimensions(player, args, "height");
     }
 

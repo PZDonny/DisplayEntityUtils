@@ -15,15 +15,12 @@ import org.jetbrains.annotations.Nullable;
 
 class DisplayGlowColorCMD extends PartsSubCommand {
     DisplayGlowColorCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("glowcolor", parentSubCommand, Permission.DISPLAY_GLOW_COLOR, 3, 3);
+        super("glowcolor", parentSubCommand, Permission.DISPLAY_GLOW_COLOR, true);
         setTabComplete(2, TabSuggestion.COLORS);
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid color!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/deu display glowcolor <color | hex-code> [-all]", NamedTextColor.GRAY));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
@@ -51,7 +48,6 @@ class DisplayGlowColorCMD extends PartsSubCommand {
         Color c = ConversionUtils.getColorFromText(arg);
         if (c == null){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid color!", NamedTextColor.RED)));
-            player.sendMessage(Component.text("/deu display glowcolor <color | hex-code> [-all]", NamedTextColor.GRAY));
         }
         return c;
     }

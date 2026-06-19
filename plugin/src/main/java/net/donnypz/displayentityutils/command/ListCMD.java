@@ -27,7 +27,7 @@ public class ListCMD extends ConsoleUsableSubCommand {
         this.pageNumberIndex = minLength;
         this.listsGroups = listsGroups;
         setTabComplete(storageIndex, TabSuggestion.STORAGES);
-        setTabComplete(pageNumberIndex, "[page-number]");
+        setOptionalTabComplete(pageNumberIndex, "[page-number]");
     }
 
     @Override

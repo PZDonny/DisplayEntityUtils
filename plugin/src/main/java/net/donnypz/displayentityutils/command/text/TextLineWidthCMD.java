@@ -13,14 +13,12 @@ import org.jetbrains.annotations.Nullable;
 
 class TextLineWidthCMD extends PartsSubCommand {
     TextLineWidthCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("linewidth", parentSubCommand, Permission.TEXT_SET_LINE_WIDTH, 3, 3);
+        super("linewidth", parentSubCommand, Permission.TEXT_SET_LINE_WIDTH, true);
         setTabComplete(2, "<width>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu text linewidth <width> [-all]", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {

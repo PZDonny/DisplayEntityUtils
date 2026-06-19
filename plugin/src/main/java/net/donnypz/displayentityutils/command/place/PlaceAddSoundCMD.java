@@ -25,9 +25,6 @@ class PlaceAddSoundCMD extends PlayerSubCommand {
         setTabComplete(5, "<pitch>");
     }
 
-    private void incorrectUsage(Player player){
-        player.sendMessage(Component.text("Incorrect Usage! /deu anim addsound <place | break> <sound> <volume> <pitch>", NamedTextColor.RED));
-    }
 
     @Override
     public void execute(Player player, String[] args) {
@@ -35,10 +32,7 @@ class PlaceAddSoundCMD extends PlayerSubCommand {
         ItemStack heldItem = PlaceCMD.getHeldItem(player, true);
         if (heldItem == null) return;
 
-        if (args.length < 6) {
-            incorrectUsage(player);
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
         try {
             String isPlaceStr = args[2];
             boolean isPlace;
@@ -49,7 +43,7 @@ class PlaceAddSoundCMD extends PlayerSubCommand {
                 isPlace = false;
             }
             else{
-                incorrectUsage(player);
+                super.incorrectUsage(player);
                 return;
             }
 

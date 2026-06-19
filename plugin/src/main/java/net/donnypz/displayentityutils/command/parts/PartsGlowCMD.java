@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 class PartsGlowCMD extends PartsSubCommand {
     PartsGlowCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("glow", parentSubCommand, Permission.PARTS_GLOW, 2, 2);
+        super("glow", parentSubCommand, Permission.PARTS_GLOW, true);
     }
 
     @Override

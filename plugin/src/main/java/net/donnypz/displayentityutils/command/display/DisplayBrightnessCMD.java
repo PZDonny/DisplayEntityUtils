@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 class DisplayBrightnessCMD extends PartsSubCommand {
     DisplayBrightnessCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("brightness", parentSubCommand, Permission.DISPLAY_BRIGHTNESS, 4, 4);
+        super("brightness", parentSubCommand, Permission.DISPLAY_BRIGHTNESS, true);
         setTabComplete(2, "<block>");
         setTabComplete(3, "<sky>");
     }

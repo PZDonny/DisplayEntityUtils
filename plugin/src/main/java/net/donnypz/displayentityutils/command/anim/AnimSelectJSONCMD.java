@@ -25,10 +25,8 @@ class AnimSelectJSONCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu anim selectjson <file-name>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
+
         String fileName = args[2];
         getAnimation(player, fileName);
     }

@@ -10,17 +10,30 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 public abstract class PartsSubCommand extends PlayerSubCommand {
     int minimumArgs;
-    int allArgumentIndex;
-    boolean requireGroupSelection;
+    boolean requireGroupSelection = false;
 
-    public PartsSubCommand(@NotNull String commandName, @NotNull DEUSubCommand parentSubCommand, @NotNull Permission permission, int minimumArgs, int allArgumentIndex) {
+    public PartsSubCommand(@NotNull String commandName, @NotNull DEUSubCommand parentSubCommand, @NotNull Permission permission) {
+        super(commandName, parentSubCommand, permission);
+        this.minimumArgs = -1;
+    }
+
+    public PartsSubCommand(@NotNull String commandName, @NotNull DEUSubCommand parentSubCommand, @NotNull Permission permission, boolean allIsFlag) {
+        this(commandName, parentSubCommand, permission, -1, allIsFlag);
+    }
+
+    public PartsSubCommand(@NotNull String commandName, @NotNull DEUSubCommand parentSubCommand, @NotNull Permission permission, int minimumArgs, boolean allIsFlag) {
         super(commandName, parentSubCommand, permission);
         this.minimumArgs = minimumArgs;
-        this.allArgumentIndex = allArgumentIndex;
-        setTabComplete(allArgumentIndex, "-all");
-        this.requireGroupSelection = false;
+        if (allIsFlag){
+            addFlag("-all");
+        }
+        else{
+            addOption("-all", List.of("on", "off"));
+        }
     }
 
     @Override
@@ -36,6 +49,7 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
             return;
         }
 
+        if (minimumArgs == -1 && !hasMinimumArguments(player, args)) return;
         if (args.length < minimumArgs){
             sendIncorrectUsage(player);
             return;
@@ -47,7 +61,10 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
         }
 
         boolean updatePacket;
-        if (args.length >= allArgumentIndex +1 && args[allArgumentIndex].equalsIgnoreCase("-all")){
+        OptionalArguments oArgs = getOptionalArguments(player, args);
+        if (!oArgs.isValidOptions()) return;
+
+        if (oArgs.hasFlag("-all") || !oArgs.getOption("-all").isBlank()){
             if (PartsCMD.isUnwantedSingleSelectionAll(player, selection)){
                 return;
             }

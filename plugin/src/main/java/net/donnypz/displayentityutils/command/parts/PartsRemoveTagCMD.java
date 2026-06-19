@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 class PartsRemoveTagCMD extends PartsSubCommand {
     PartsRemoveTagCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("removetag", parentSubCommand, Permission.PARTS_TAG, 3, 3);
+        super("removetag", parentSubCommand, Permission.PARTS_TAG, true);
         setTabComplete(2, "<part-tag>");
     }
 

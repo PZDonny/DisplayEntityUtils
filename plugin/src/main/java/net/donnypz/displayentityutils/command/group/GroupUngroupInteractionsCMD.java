@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupUngroupInteractionsCMD extends GroupSubCommand {
     GroupUngroupInteractionsCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("ungroupinteractions", parentSubCommand, Permission.GROUP_UNGROUP_INTERACTIONS, 0, true);
+        super("ungroupinteractions", parentSubCommand, Permission.GROUP_UNGROUP_INTERACTIONS, true);
     }
 
     @Override

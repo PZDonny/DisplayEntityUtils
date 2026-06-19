@@ -7,17 +7,18 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 class GroupAutoCullCMD extends GroupSubCommand {
     GroupAutoCullCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("autocull", parentSubCommand, Permission.GROUP_CULLING, 0, false);
+        super("autocull", parentSubCommand, Permission.GROUP_CULLING, false);
     }
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
-    protected void execute(@NotNull Player player, @NotNull ActiveGroup<?> group, @NotNull String[] args) {
+    protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Added culling bounds to your selected group!", NamedTextColor.GREEN)));
         group.autoCull(true);
     }

@@ -30,16 +30,7 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (args.length < 3) {
-            if (!(sender instanceof Player)){
-                sender.sendMessage(Component.text("Incorrect Console Usage! /deu group dismount <player-name | entity-uuid> [-despawn]", NamedTextColor.RED));
-                return;
-            }
-            else{
-                sender.sendMessage(Component.text("Incorrect Usage! /deu group dismount <-target | -selected | player-name | entity-uuid> [-despawn]", NamedTextColor.RED));
-            }
-            return;
-        }
+        if (!hasMinimumArguments(sender, args)) return;
 
         boolean despawn = getOptionalArguments(sender, args).hasFlag("-despawn");
 

@@ -32,10 +32,7 @@ class PartsPitchCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /deu parts pitch <pitch>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         if (!selection.hasSelectedPart()){
             PartsCMD.invalidPartSelection(player);

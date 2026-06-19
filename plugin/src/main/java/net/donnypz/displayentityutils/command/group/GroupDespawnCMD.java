@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupDespawnCMD extends GroupSubCommand {
     GroupDespawnCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("despawn", parentSubCommand, Permission.GROUP_DESPAWN, 0, false);
+        super("despawn", parentSubCommand, Permission.GROUP_DESPAWN, false);
     }
 
     @Override

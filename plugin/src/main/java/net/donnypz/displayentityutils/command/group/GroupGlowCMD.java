@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupGlowCMD extends GroupSubCommand {
     GroupGlowCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("glow", parentSubCommand, Permission.GROUP_GLOW, 0, true);
+        super("glow", parentSubCommand, Permission.GROUP_GLOW, true);
     }
 
     @Override

@@ -39,11 +39,8 @@ class AnimAddFrameAfterCMD extends PlayerSubCommand {
             AnimCMD.noAnimationSelection(player);
             return;
         }
-        if (args.length < 5) {
-            player.sendMessage(Component.text("/deu anim addframeafter <frame-id> <tick-delay> <tick-duration>", NamedTextColor.RED));
-            player.sendMessage(Component.text("First frame is 0, Second frame is 1, and so on...", NamedTextColor.GRAY));
-            return;
-        }
+
+        if (!hasMinimumArguments(player, args)) return;
 
         List<SpawnedDisplayAnimationFrame> frames = anim.getFrames();
         if (frames.isEmpty()) {

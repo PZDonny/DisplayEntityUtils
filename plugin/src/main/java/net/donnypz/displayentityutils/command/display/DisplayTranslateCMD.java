@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 class DisplayTranslateCMD extends PartsSubCommand {
     DisplayTranslateCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("translate", parentSubCommand, Permission.DISPLAY_TRANSLATE, 5, 5);
+        super("translate", parentSubCommand, Permission.DISPLAY_TRANSLATE, true);
         setTabComplete(2, TabSuggestion.DIRECTIONS);
         setTabComplete(3, "<distance>");
         setTabComplete(4, "<tick-duration>");
@@ -33,9 +33,7 @@ class DisplayTranslateCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("/deu display translate <direction> <distance> <tick-duration> [-all]", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {

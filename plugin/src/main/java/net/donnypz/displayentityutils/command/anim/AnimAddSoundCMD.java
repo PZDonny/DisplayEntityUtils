@@ -41,10 +41,8 @@ class AnimAddSoundCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 6) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu anim addsound <sound> <volume> <pitch> <delay-in-ticks>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
+
         try {
             String soundStr = args[2];
             float volume = Float.parseFloat(args[3]);

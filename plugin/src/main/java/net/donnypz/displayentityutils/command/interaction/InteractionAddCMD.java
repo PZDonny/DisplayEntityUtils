@@ -24,10 +24,8 @@ class InteractionAddCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 5){
-            player.sendMessage(Component.text("/deu interaction addcmd <player | console> <left | right | both> <command>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
+
         String executor = args[2].toLowerCase();
         boolean isConsole;
         if (executor.equals("console")){

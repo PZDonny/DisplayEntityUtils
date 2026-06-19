@@ -36,10 +36,7 @@ class AnimFrameInfoCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu anim frameinfo <frame-id>", NamedTextColor.RED)));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         try {
             int id = Integer.parseInt(args[2]);

@@ -17,15 +17,12 @@ import java.util.Set;
 
 class GroupMergeCMD extends GroupSubCommand {
     GroupMergeCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("merge", parentSubCommand, Permission.GROUP_MERGE, 3, false);
+        super("merge", parentSubCommand, Permission.GROUP_MERGE, false);
         setTabComplete(2, "<distance>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number for the distance from your group to attempt to merge other groups", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/deu group merge <distance>", NamedTextColor.GRAY));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {

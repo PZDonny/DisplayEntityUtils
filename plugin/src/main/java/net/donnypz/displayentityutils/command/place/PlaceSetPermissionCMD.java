@@ -20,10 +20,7 @@ class PlaceSetPermissionCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 3) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage /deu place setpermission <permission>", NamedTextColor.RED)));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         ItemStack heldItem = PlaceCMD.getHeldItem(player, true);
         if (heldItem == null) return;

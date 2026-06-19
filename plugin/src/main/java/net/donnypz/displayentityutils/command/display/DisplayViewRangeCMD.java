@@ -13,14 +13,12 @@ import org.jetbrains.annotations.Nullable;
 
 class DisplayViewRangeCMD extends PartsSubCommand {
     DisplayViewRangeCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("viewrange", parentSubCommand, Permission.DISPLAY_VIEW_RANGE, 3, 3);
+        super("viewrange", parentSubCommand, Permission.DISPLAY_VIEW_RANGE, true);
         setTabComplete(2, "<view-range-multiplier>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /deu display viewrange <view-range-multiplier> [-all]", NamedTextColor.RED));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
