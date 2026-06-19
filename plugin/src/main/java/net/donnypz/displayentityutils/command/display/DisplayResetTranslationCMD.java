@@ -37,10 +37,15 @@ class DisplayResetTranslationCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
-        if (!DisplayCMD.isDisplay(player, selectedPart)) return false;
+        if (isNotDisplay(player, selectedPart)) return false;
         Vector3f translation = selectedPart.getTransformation().getTranslation().negate();
         selectedPart.translate(Vector.fromJOML(translation), translation.length(), 0, 0);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Reset selected display part's translation!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Reset selected display's translation!", NamedTextColor.GREEN)));
         return true;
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Reset the translation of your selected display";
     }
 }

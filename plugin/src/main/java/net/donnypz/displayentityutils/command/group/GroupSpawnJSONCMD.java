@@ -20,6 +20,7 @@ import java.io.File;
 public class GroupSpawnJSONCMD extends PlayerSubCommand {
     GroupSpawnJSONCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("spawnjson", parentSubCommand, Permission.GROUP_SPAWN);
+        setUnsafe();
         setTabComplete(2, "<file-name>");
         addFlag("-packet");
     }
@@ -49,5 +50,10 @@ public class GroupSpawnJSONCMD extends PlayerSubCommand {
             group.spawn(spawnLoc, GroupSpawnedEvent.SpawnReason.COMMAND);
             p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Spawned a display entity group at your location! <white>(Tagged: "+tag+")")));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Save your selected group as a JSON file. Spawning groups from JSON files will always be slower";
     }
 }

@@ -48,4 +48,9 @@ class PartsAdaptTagsCMD extends PartsSubCommand {
         return true;
     }
 
+    @Override
+    protected String getDescription() {
+        return "Adapt scoreboard tags to tags usable by DisplayEntityUtils. Applied to selected parts."+
+                " \"-remove\" removes tag from scoreboard";
+    }
 }

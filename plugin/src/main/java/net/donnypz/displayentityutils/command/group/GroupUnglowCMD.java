@@ -24,4 +24,9 @@ class GroupUnglowCMD extends GroupSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Unglowing selected group!")));
         group.unglow();
     }
+
+    @Override
+    protected String getDescription() {
+        return "Remove the glowing effect from all parts in this group";
+    }
 }

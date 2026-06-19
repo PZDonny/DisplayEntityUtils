@@ -50,4 +50,9 @@ class PartsSelectCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("Invalid input! Enter a positive number for the distance, or -target to select a targeted Interaction/Mannequin entity", NamedTextColor.RED));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Select a nearby, ungrouped, Display entity. Use \"-target\" to select a targeted Interaction or Mannequin";
+    }
 }

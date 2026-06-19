@@ -71,4 +71,9 @@ public class AnimShowPointsCMD extends PlayerSubCommand {
 
 
     }
+
+    @Override
+    protected String getDescription() {
+        return "Show the frame points of a frame. Use \"-default\" to view a frame's default point info";
+    }
 }

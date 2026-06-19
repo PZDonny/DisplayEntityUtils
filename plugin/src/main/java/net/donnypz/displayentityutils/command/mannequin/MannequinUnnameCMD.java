@@ -37,4 +37,9 @@ class MannequinUnnameCMD extends PartsSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your selected mannequin's name has been removed!", NamedTextColor.YELLOW)));
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Remove your selected mannequin's name";
+    }
 }

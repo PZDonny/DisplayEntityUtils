@@ -35,7 +35,7 @@ class DisplayViewRangeCMD extends PartsSubCommand {
         Float viewRange = getViewRange(player, args[2]);
         if (viewRange == null) return false;
         selectedPart.setViewRange(viewRange);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("View range multiplier updated for your selected part!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("View range multiplier updated for your selected display!", NamedTextColor.GREEN)));
         player.sendMessage(Component.text("New View Range: "+viewRange, NamedTextColor.GRAY));
         return true;
     }
@@ -48,5 +48,10 @@ class DisplayViewRangeCMD extends PartsSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number!", NamedTextColor.RED)));
         }
         return null;
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set the view range multiplier for your selected display";
     }
 }

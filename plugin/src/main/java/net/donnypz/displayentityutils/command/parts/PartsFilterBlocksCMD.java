@@ -97,4 +97,8 @@ class PartsFilterBlocksCMD extends PlayerSubCommand {
         }
     }
 
+    @Override
+    protected String getDescription() {
+        return "Filter blocks of BLOCK parts. Exclude ALL filtered blocks by prefixing with \"!\"";
+    }
 }

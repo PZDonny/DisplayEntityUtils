@@ -46,4 +46,9 @@ class AnimAddDefaultParticleCMD extends PlayerSubCommand {
         }catch(IllegalArgumentException e){}
 
     }
+
+    @Override
+    protected String getDescription() {
+        return "Add a particle to play at a frame's default frame point (group origin)";
+    }
 }

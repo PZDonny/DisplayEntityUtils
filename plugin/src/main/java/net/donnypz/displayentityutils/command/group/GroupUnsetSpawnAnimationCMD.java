@@ -27,4 +27,9 @@ class GroupUnsetSpawnAnimationCMD extends GroupSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully unset your group's spawn/load animation!", NamedTextColor.GREEN)));
         group.unsetSpawnAnimation();
     }
+
+    @Override
+    protected String getDescription() {
+        return "Remove the spawn animation that's set on your selected group";
+    }
 }

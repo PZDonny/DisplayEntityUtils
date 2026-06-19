@@ -164,4 +164,9 @@ class GroupRideCMD extends ConsoleUsableSubCommand {
 
         return vehicle;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Make a group ride an entity. Values in brackets [] are optional";
+    }
 }

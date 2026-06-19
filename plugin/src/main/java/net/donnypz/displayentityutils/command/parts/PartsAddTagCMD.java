@@ -47,4 +47,9 @@ class PartsAddTagCMD extends PartsSubCommand {
             return false;
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Add a tag to your selected part";
+    }
 }

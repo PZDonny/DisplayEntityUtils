@@ -76,4 +76,9 @@ class AnimCopyPointCMD extends PlayerSubCommand {
         }
         catch (IllegalArgumentException e){}
     }
+
+    @Override
+    protected String getDescription() {
+        return "Copy a selected frame point to other frames";
+    }
 }

@@ -56,4 +56,9 @@ class GroupMergeCMD extends GroupSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the merging distance!", NamedTextColor.RED)));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Merge groups near your selected group";
+    }
 }

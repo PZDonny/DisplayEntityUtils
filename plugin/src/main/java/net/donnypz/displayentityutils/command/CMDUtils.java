@@ -16,23 +16,35 @@ import org.bukkit.entity.Player;
 public final class CMDUtils {
 
     private static final Component UNSAFE = Component.text("[UNSAFE] ", NamedTextColor.RED);
+    private static final TextColor COMMAND_COLOR = TextColor.color(230, 230, 230);
 
-    public static void sendCMD(CommandSender sender, String command){
-        sendCMD(sender, command, null);
+    public static void sendCMD(CommandSender sender, DEUSubCommand deuSubCommand){
+        Component msg = Component.text(deuSubCommand.getShortCommandUsage(), COMMAND_COLOR);
+        String description = deuSubCommand.getDescription();
+        msg = msg.hoverEvent(HoverEvent.showText(
+                Component.text(deuSubCommand.getCommandUsage(), NamedTextColor.YELLOW)
+                        .appendNewline()
+                        .append(Component.text(description, NamedTextColor.AQUA))));
+        if (deuSubCommand.isUnsafe()) msg = UNSAFE.append(msg);
+        sender.sendMessage(msg);
     }
 
     public static void sendCMD(CommandSender sender, String command, String description){
-        Component msg = Component.text(command, TextColor.color(230, 230, 230));
+        Component msg = Component.text(command, COMMAND_COLOR);
         if (description != null){
             msg = msg.hoverEvent(HoverEvent.showText(Component.text(description, NamedTextColor.AQUA)));
         }
         sender.sendMessage(msg);
     }
 
-    public static void sendUnsafeCMD(CommandSender sender, String command, String description){
-        Component msg = UNSAFE.append(Component.text(command, TextColor.color(230, 230, 230)));
+    public static void sendCMD(CommandSender sender, String command, String description, String extraInfo){
+        Component msg = Component.text(command, COMMAND_COLOR);
         if (description != null){
-            msg = msg.hoverEvent(HoverEvent.showText(Component.text(description, NamedTextColor.AQUA)));
+            msg = msg.hoverEvent(HoverEvent.showText(
+                    Component.text(description, NamedTextColor.AQUA)
+                            .appendNewline()
+                            .appendNewline()
+                            .append(Component.text(extraInfo, NamedTextColor.YELLOW))));
         }
         sender.sendMessage(msg);
     }

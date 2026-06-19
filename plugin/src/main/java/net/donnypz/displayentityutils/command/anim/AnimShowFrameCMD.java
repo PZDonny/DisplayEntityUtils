@@ -68,4 +68,9 @@ class AnimShowFrameCMD extends GroupSubCommand {
             player.sendMessage(Component.text("Invalid ID! ID's must be >= 0", NamedTextColor.RED));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Displays a frame on your selected group";
+    }
 }

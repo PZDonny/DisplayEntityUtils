@@ -55,4 +55,9 @@ class GroupTranslateCMD extends GroupSubCommand {
             }
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return"Changes your selected group's translation, use \"move\" instead if this group uses animations";
+    }
 }

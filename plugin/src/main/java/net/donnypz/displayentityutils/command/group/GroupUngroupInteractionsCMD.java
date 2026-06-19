@@ -27,4 +27,9 @@ class GroupUngroupInteractionsCMD extends GroupSubCommand {
         group.removeInteractions();
         ((MultiPartSelection<?>) DisplayGroupManager.getPartSelection(player)).refresh();
     }
+
+    @Override
+    protected String getDescription() {
+        return "Remove all interactions from your group";
+    }
 }

@@ -35,4 +35,9 @@ class TextEditCMD extends PartsSubCommand {
         }
         return false;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Open a dialog menu to edit all text display properties. Add the \"-&\" parameter to format the text with \"&\"";
+    }
 }

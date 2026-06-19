@@ -48,4 +48,9 @@ class AnimDeleteCMD extends PlayerSubCommand {
             }
         });
     }
+
+    @Override
+    protected String getDescription() {
+        return "Delete a saved animation";
+    }
 }

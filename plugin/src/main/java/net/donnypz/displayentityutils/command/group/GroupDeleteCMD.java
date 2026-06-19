@@ -47,4 +47,9 @@ class GroupDeleteCMD extends PlayerSubCommand {
             }
         });
     }
+
+    @Override
+    protected String getDescription() {
+        return "Delete a saved group from a storage location";
+    }
 }

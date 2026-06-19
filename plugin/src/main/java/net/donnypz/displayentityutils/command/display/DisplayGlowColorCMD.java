@@ -28,7 +28,7 @@ class DisplayGlowColorCMD extends PartsSubCommand {
         if (color == null) return false;
         selection.setGlowColor(color);
         selection.glow(player, 60);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Glow color set for selected display entity part(s) in your selection!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Glow color set for all selected displays in your selection!", NamedTextColor.GREEN)));
         return true;
     }
 
@@ -50,5 +50,10 @@ class DisplayGlowColorCMD extends PartsSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid color!", NamedTextColor.RED)));
         }
         return c;
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set your selected display's glow color";
     }
 }

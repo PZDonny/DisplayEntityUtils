@@ -17,4 +17,9 @@ class PartsDeselectCMD extends PlayerSubCommand {
     public void execute(Player player, String[] args) {
         DisplayEntitySelector.deselect(player);
     }
+
+    @Override
+    protected String getDescription() {
+        return "Deselect a selected entity";
+    }
 }

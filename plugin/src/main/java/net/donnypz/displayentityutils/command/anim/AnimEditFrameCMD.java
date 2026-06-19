@@ -61,4 +61,9 @@ class AnimEditFrameCMD extends PlayerSubCommand {
         }
         catch (IllegalArgumentException e){}
     }
+
+    @Override
+    protected String getDescription() {
+        return "Edit properties of a frame";
+    }
 }

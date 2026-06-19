@@ -40,4 +40,9 @@ class PartsYawCMD extends PartsSubCommand {
             return false;
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set the yaw of an ungrouped part entity";
+    }
 }

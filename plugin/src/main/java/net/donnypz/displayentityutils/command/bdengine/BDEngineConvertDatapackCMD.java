@@ -43,4 +43,9 @@ class BDEngineConvertDatapackCMD extends PlayerSubCommand {
                 true
         );
     }
+
+    @Override
+    protected String getDescription() {
+        return "Convert BDEngine datapack into group and animation formats this plugin uses";
+    }
 }

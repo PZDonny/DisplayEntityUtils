@@ -78,4 +78,9 @@ public class GroupInfoCMD extends PlayerSubCommand {
         player.sendMessage(MiniMessage.miniMessage().deserialize("Spawn Animation Storage: "+animLoadMethod));
         DEUCommandUtils.sendGlowColor(player, group.getGlowColor());
     }
+
+    @Override
+    protected String getDescription() {
+        return "List information about your selected group";
+    }
 }

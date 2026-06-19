@@ -94,4 +94,8 @@ class GroupSafeDismountCMD extends ConsoleUsableSubCommand {
         sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Dismounted all groups riding the entity!", NamedTextColor.GREEN)));
     }
 
+    @Override
+    protected String getDescription() {
+        return "Safely dismount a group from an entity";
+    }
 }

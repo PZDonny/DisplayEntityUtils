@@ -125,4 +125,9 @@ class GroupRideDespawnCMD extends ConsoleUsableSubCommand {
             }
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Make a group ride an entity, despawning the group after the ridden entity despawns/disconnects. The group will not be persistent. Values in brackets [] are optional";
+    }
 }

@@ -47,4 +47,9 @@ class AnimListActiveCMD extends PlayerSubCommand {
                             }))));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "List active animations, currently playing on a selected group";
+    }
 }

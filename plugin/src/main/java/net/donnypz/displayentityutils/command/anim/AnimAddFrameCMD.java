@@ -66,4 +66,9 @@ class AnimAddFrameCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("Invalid value entered for delay or duration! Enter a whole number >= 0", NamedTextColor.RED));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Add a frame to your selected animation";
+    }
 }

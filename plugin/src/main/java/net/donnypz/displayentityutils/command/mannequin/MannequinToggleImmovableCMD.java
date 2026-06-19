@@ -65,4 +65,9 @@ class MannequinToggleImmovableCMD extends PartsSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled immovability of selected mannequin "+status)));
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Toggle the immovability of an mannequin";
+    }
 }

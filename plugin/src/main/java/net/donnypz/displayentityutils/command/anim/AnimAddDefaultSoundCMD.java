@@ -67,4 +67,9 @@ class AnimAddDefaultSoundCMD extends PlayerSubCommand {
         }
         catch (IllegalArgumentException e){}
     }
+
+    @Override
+    protected String getDescription() {
+        return "Add a sound to play at a frame's default frame point (group origin)";
+    }
 }

@@ -35,4 +35,9 @@ class MannequinNameCMD extends PartsSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set mannequin name!", NamedTextColor.GREEN)));
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set your selected mannequin's name";
+    }
 }

@@ -49,4 +49,9 @@ class InteractionSpawnCMD extends PlayerSubCommand {
             return null;
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Spawn an interaction entity at your location.\nUse \"-g\" to add it to your selected group";
+    }
 }

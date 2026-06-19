@@ -58,4 +58,9 @@ class ItemToggleGlintCMD extends PartsSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled glint of selected item display "+status)));
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Toggle the enchantment glint of an item display's item";
+    }
 }

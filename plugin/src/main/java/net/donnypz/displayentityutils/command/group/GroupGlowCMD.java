@@ -21,4 +21,9 @@ class GroupGlowCMD extends GroupSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Glowing selected group!")));
         group.glow();
     }
+
+    @Override
+    protected String getDescription() {
+        return "Make all parts in this group glow";
+    }
 }

@@ -65,4 +65,9 @@ class AnimAddSoundCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("| Delay must be a whole number", NamedTextColor.GRAY));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Add a sound to play at a frame point";
+    }
 }

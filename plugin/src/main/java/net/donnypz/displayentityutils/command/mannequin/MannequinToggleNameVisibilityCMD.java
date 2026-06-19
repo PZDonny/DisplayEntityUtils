@@ -58,4 +58,9 @@ class MannequinToggleNameVisibilityCMD extends PartsSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled name visibility of selected mannequin "+status)));
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Toggle the gravity of an mannequin";
+    }
 }

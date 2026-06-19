@@ -35,4 +35,9 @@ class PlaceSetCMD extends PlayerSubCommand {
                 .apply(heldItem);
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Assigned a group to your held block <white>(Tag: "+groupTag+")")));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Assign a group to your held block, which will be spawned when the block is placed";
+    }
 }

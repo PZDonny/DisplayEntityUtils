@@ -35,4 +35,9 @@ class AnimReverseCMD extends PlayerSubCommand {
         anim.reverse();
         player.sendMessage(Component.text("The animation has been reversed!", NamedTextColor.GREEN));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Reverse the order of frames in your selected animation";
+    }
 }

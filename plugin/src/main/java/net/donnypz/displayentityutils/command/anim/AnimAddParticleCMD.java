@@ -40,4 +40,9 @@ class AnimAddParticleCMD extends PlayerSubCommand {
             new AnimationParticleBuilder(player, display.getRelativePoint());
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Add a particle to play at a frame point";
+    }
 }

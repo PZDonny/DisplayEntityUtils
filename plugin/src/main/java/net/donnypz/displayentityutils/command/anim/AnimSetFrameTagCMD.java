@@ -72,4 +72,9 @@ class AnimSetFrameTagCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("Invalid ID(s) entered! Value(s) must be >= 0", NamedTextColor.RED));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set the tag to identify a frame";
+    }
 }

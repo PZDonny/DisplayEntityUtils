@@ -41,4 +41,9 @@ class GroupDespawnCMD extends GroupSubCommand {
         DisplayGroupManager.deselectGroup(player);
         DisplayEntityPluginCommand.hideRelativePoints(player);
     }
+
+    @Override
+    protected String getDescription() {
+        return "Despawn your selected group";
+    }
 }

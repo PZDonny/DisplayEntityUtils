@@ -25,4 +25,9 @@ class GroupSetTagCMD extends GroupSubCommand {
         group.setTag(tag);
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Tagged your selected group! <white>(Tagged: "+tag+")")));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set this group's tag, or identifier";
+    }
 }

@@ -71,4 +71,9 @@ class PartsFilterTagsCMD extends PlayerSubCommand {
             partSelection.glow(player, 30);
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Filter parts by part tags, comma separated. Exclude A tag by prefixing it with \"!\"";
+    }
 }

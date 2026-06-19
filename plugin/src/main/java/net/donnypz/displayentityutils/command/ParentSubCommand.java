@@ -1,6 +1,8 @@
 package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,23 +33,29 @@ public abstract class ParentSubCommand extends ConsoleUsableSubCommand{
     }
 
     void help(CommandSender sender, int page){
+        final int PAGE_LIMIT = 7;
         if (commands == null) commands = subCommands.sequencedKeySet().toArray(new String[0]);
-        int maxPageCount = (int) Math.ceil(subCommands.size() / 7.0);
+        int maxPageCount = (int) Math.ceil(subCommands.size() / (double) PAGE_LIMIT);
         page = Math.min(Math.max(page, 1), maxPageCount);
-        int max = Math.min(page*7, commands.length-1);
+        int max = Math.min(page*PAGE_LIMIT, commands.length-1);
 
+        sender.sendMessage(Component.empty());
         sender.sendMessage(DisplayAPI.pluginPrefixLong);
-        for (int i = max-7; i <= max; i++){
+        for (int i = max-PAGE_LIMIT; i < max; i++){
             String cmdName = commands[i];
             DEUSubCommand subCmd = subCommands.get(cmdName);
-            CMDUtils.sendCMD(sender, subCmd.getShortCommandUsage());
-            //CMDUtils.sendCMD(sender, subCmd.getShortCommandUsage(), subCmd.getDescription());
+            CMDUtils.sendCMD(sender, subCmd);
         }
+        sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
     }
+
+    @Override
+    public String getDescription(){return "";}
 
     class HelpCMD extends ConsoleUsableSubCommand{
         HelpCMD(@NotNull DEUSubCommand parentSubCommand) {
             super("help", parentSubCommand, Permission.HELP);
+            setOptionalTabComplete(2, "[page-number]");
         }
 
         @Override
@@ -63,6 +71,11 @@ public abstract class ParentSubCommand extends ConsoleUsableSubCommand{
                     help(sender, 1);
                 }
             }
+        }
+
+        @Override
+        protected String getDescription() {
+            return "View all commands in this category";
         }
     }
 }

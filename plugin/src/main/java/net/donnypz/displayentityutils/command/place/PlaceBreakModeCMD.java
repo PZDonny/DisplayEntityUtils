@@ -29,4 +29,9 @@ class PlaceBreakModeCMD extends PlayerSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You have entered break-mode and can break any placed groups", NamedTextColor.GREEN)));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Enter/Exit break-mode allowing you to break any placed group";
+    }
 }

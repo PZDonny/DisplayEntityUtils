@@ -60,4 +60,9 @@ class GroupSaveCMD extends PlayerSubCommand {
             }
         });
     }
+
+    @Override
+    protected String getDescription() {
+        return "Save your selected group";
+    }
 }

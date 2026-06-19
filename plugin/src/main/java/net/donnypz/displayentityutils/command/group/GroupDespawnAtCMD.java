@@ -113,4 +113,17 @@ public class GroupDespawnAtCMD extends ConsoleUsableSubCommand {
             return Double.parseDouble(userInput);
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return """
+                Despawn groups within a given distance from a location\
+                
+                "-world <world_name>" will despawn groups in the provided world\
+                
+                "-packet <include | only>" will optionally include packet-based groups or only look for packet-based groups when despawning\
+                
+                "-force" will force the location's chunk to load, if unloaded. Unneeded if only packet groups are searched for
+                """;
+    }
 }

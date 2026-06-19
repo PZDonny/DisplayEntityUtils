@@ -43,4 +43,9 @@ class GroupWorldEditCMD extends PlayerSubCommand {
         g.glow(player, 60);
         if (removeBlocks) player.sendMessage(Component.text("| Selected blocks have been removed!", NamedTextColor.YELLOW, TextDecoration.ITALIC));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Convert your WorldEdit selection to a display group, with its origin at the lowest center block of the selection (Requires WorldEdit). \nUse \"-removeblocks\" to set all selected blocks to air";
+    }
 }

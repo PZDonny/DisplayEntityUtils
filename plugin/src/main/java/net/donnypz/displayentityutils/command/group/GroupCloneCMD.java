@@ -40,4 +40,9 @@ class GroupCloneCMD extends GroupSubCommand {
             clonedGroup.glowAndMarkInteractions(p, 80);
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Spawn a cloned group at your selected group's location \n\"-here\" clones the group at your location";
+    }
 }

@@ -37,4 +37,9 @@ class GroupMoveHereCMD extends GroupSubCommand {
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Moved your selected group to your location!", NamedTextColor.GREEN)));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Change your selected group's actual location to your location";
+    }
 }

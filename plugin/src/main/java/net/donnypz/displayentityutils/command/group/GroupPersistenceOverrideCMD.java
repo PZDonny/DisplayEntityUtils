@@ -48,4 +48,10 @@ class GroupPersistenceOverrideCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("| \"automaticGroupDetection.persistenceOverride.enabled\" is false in the plugin's config", NamedTextColor.GRAY));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Toggle if your group's persistence can be overriden when loaded by a chunk, " +
+        "only if \"persistenceOverride\" is enabled in the config";
+    }
 }

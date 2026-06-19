@@ -30,4 +30,9 @@ class PlaceTogglePlayerFacingCMD extends PlayerSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your held item's group will respect the player's facing direction", NamedTextColor.GREEN)));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Toggle whether the placed group will respect the player's facing direction. True by default";
+    }
 }

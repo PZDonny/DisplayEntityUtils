@@ -51,4 +51,9 @@ public class TextSetCMD extends PartsSubCommand {
         }
         return builder.toString().replace("\\n", "\n");
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set this text for your selected text display";
+    }
 }

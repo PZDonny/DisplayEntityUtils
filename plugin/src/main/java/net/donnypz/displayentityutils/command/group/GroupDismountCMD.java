@@ -95,4 +95,9 @@ class GroupDismountCMD extends ConsoleUsableSubCommand {
             group.stopFollowingEntity();
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Dismount a group from an entity, with optional despawning";
+    }
 }

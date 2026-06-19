@@ -81,4 +81,9 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid distance! The distance must be a positive number.", NamedTextColor.RED)));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Select the nearest group within the given distance";
+    }
 }

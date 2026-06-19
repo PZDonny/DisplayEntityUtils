@@ -32,4 +32,9 @@ class InteractionResponsiveCMD extends PlayerSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Toggled Interaction Responsiveness to ")
                 .append(result)));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Toggle the hit sound of an interaction entity";
+    }
 }

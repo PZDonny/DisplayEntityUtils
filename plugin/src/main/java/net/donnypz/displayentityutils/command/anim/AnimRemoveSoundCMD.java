@@ -62,4 +62,9 @@ class AnimRemoveSoundCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("Invalid value entered for frame-id! Enter a whole number >= 0", NamedTextColor.RED));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Remove a sound from a frame point";
+    }
 }

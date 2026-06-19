@@ -59,4 +59,9 @@ class TextFontCMD extends PartsSubCommand {
             }
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set the text font for your selected text display";
+    }
 }

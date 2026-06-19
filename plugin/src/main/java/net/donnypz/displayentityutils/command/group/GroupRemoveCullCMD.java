@@ -22,4 +22,9 @@ class GroupRemoveCullCMD extends GroupSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Removed culling bounds from your selected group!", NamedTextColor.YELLOW)));
         group.removeCulling();
     }
+
+    @Override
+    protected String getDescription() {
+        return "Remove the culling bounds for every part in your selected group";
+    }
 }

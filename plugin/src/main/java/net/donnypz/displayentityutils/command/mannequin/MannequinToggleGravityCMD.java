@@ -62,4 +62,9 @@ class MannequinToggleGravityCMD extends PartsSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled gravity of selected mannequin "+status)));
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Toggle the gravity of an mannequin";
+    }
 }

@@ -38,4 +38,9 @@ class GroupShowPersistentPacketGroupsCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("| If the chunks in this group are hidden by default, the groups will be hidden again once you re-sent this chunk", NamedTextColor.GRAY));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Show all persistent packet-based groups in your current chunk. \n\"-self\" shows the group only for you";
+    }
 }

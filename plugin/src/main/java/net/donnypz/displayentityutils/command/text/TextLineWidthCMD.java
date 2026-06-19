@@ -60,4 +60,9 @@ class TextLineWidthCMD extends PartsSubCommand {
             return -1;
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set the line width of your selected text display";
+    }
 }

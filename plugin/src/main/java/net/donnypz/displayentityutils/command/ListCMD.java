@@ -16,34 +16,35 @@ import java.util.List;
 
 public class ListCMD extends ConsoleUsableSubCommand {
     Component incorrectUsageMessage;
-    int minLength, storageIndex, pageNumberIndex;
+    int minLength;
+    private final int STORAGE_INDEX = 2;
+    private final int PAGE_NUMBER_INDEX = 3;
     boolean listsGroups;
 
     public ListCMD(Component incorrectUsageMessage, int minLength, boolean listsGroups) {
-        super(listsGroups ? Permission.LIST_GROUPS : Permission.LIST_ANIMATIONS);
+        super(
+                listsGroups ? "group list" : "anim list",
+                listsGroups ? Permission.LIST_GROUPS : Permission.LIST_ANIMATIONS
+        );
+        super.usage = null;
         this.incorrectUsageMessage = incorrectUsageMessage;
         this.minLength = minLength;
-        this.storageIndex = minLength - 1;
-        this.pageNumberIndex = minLength;
         this.listsGroups = listsGroups;
-        setTabComplete(storageIndex, TabSuggestion.STORAGES);
-        setOptionalTabComplete(pageNumberIndex, "[page-number]");
+        setTabComplete(STORAGE_INDEX, TabSuggestion.STORAGES);
+        setOptionalTabComplete(PAGE_NUMBER_INDEX, "[page-number]");
     }
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (args.length < minLength) {
-            sender.sendMessage(incorrectUsageMessage);
-            return;
-        }
-        list(sender, storageIndex, pageNumberIndex, args);
+        if (!hasMinimumArguments(sender, args)) return;
+        list(sender, args);
     }
 
-    public void list(CommandSender sender, int storageIndex, int pageNumberIndex, String[] args) {
+    public void list(CommandSender sender, String[] args) {
         DisplayAPI.getScheduler().runAsync(() -> {
             LoadMethod loadMethod;
             try {
-                loadMethod = LoadMethod.valueOf(args[storageIndex].toUpperCase());
+                loadMethod = LoadMethod.valueOf(args[STORAGE_INDEX].toUpperCase());
             } catch (IllegalArgumentException e) {
                 DisplayEntityPluginCommand.invalidStorage(sender);
                 return;
@@ -68,7 +69,7 @@ public class ListCMD extends ConsoleUsableSubCommand {
             int pageNumber = 1;
             if (args.length > minLength) {
                 try {
-                    pageNumber = Math.max(1, Integer.parseInt(args[pageNumberIndex]));
+                    pageNumber = Math.max(1, Integer.parseInt(args[PAGE_NUMBER_INDEX]));
                 } catch (NumberFormatException ignored) {
                 }
             }
@@ -96,5 +97,11 @@ public class ListCMD extends ConsoleUsableSubCommand {
                                 NamedTextColor.GREEN))
                 ).clickEvent(ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND,
                         "/deu " + (listsGroups ? "group spawn " : "anim select ") + tag + " " + loadMethod.name()));
+    }
+
+    @Override
+    protected String getDescription() {
+        return listsGroups ? "List all saved display entity groups/models"
+                : "List all saved animations";
     }
 }

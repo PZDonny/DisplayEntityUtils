@@ -59,4 +59,9 @@ class MannequinPoseCMD extends PartsSubCommand {
             return false;
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Change your selected mannequin's pose";
+    }
 }

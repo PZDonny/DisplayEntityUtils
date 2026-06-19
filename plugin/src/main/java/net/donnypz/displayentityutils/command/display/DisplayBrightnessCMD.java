@@ -87,5 +87,10 @@ class DisplayBrightnessCMD extends PartsSubCommand {
         }
     }
 
+    @Override
+    protected String getDescription() {
+        return "Set your selected display's brightness. Enter values between 0-15. \n-1 resets";
+    }
+
     private record BrightnessResult(Display.Brightness brightness, boolean correctNumbers){}
 }

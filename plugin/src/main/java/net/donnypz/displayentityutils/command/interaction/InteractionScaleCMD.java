@@ -62,4 +62,9 @@ class InteractionScaleCMD extends PlayerSubCommand {
         player.sendMessage(Component.text("| Width: "+width, NamedTextColor.GRAY));
         player.sendMessage(Component.text("| Delay: "+delay, NamedTextColor.GRAY));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Scale an interaction entity, optionally over a period of time";
+    }
 }

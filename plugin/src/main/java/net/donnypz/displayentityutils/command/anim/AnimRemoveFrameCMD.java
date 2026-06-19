@@ -49,4 +49,9 @@ class AnimRemoveFrameCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("Invalid ID! ID's must be 0 or larger", NamedTextColor.RED));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Remove a frame from your selected animation";
+    }
 }

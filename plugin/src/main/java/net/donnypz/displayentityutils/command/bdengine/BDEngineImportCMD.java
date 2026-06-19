@@ -69,4 +69,9 @@ class BDEngineImportCMD extends PlayerSubCommand {
             }
         });
     }
+
+    @Override
+    protected String getDescription() {
+        return "Import and convert a BDEngine project's model and animations into your game world";
+    }
 }

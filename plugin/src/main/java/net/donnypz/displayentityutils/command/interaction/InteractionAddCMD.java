@@ -83,4 +83,9 @@ class InteractionAddCMD extends PlayerSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Command Added! <yellow>(ID: "+cmdID+" | "+command+")")));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Add a command to an interaction";
+    }
 }

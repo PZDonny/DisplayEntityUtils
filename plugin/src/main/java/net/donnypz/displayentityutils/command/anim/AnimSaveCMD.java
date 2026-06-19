@@ -61,4 +61,9 @@ class AnimSaveCMD extends PlayerSubCommand {
         });
 
     }
+
+    @Override
+    protected String getDescription() {
+        return "Save your selected animation and any changes made";
+    }
 }

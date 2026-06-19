@@ -70,4 +70,9 @@ class TextBackgroundCMD extends PartsSubCommand {
             return null;
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set the background color of a text display, and the opacity";
+    }
 }

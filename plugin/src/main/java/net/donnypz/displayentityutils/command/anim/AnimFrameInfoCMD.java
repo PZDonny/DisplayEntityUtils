@@ -71,4 +71,9 @@ class AnimFrameInfoCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("Invalid frame ID! Enter whole numbers >= 0", NamedTextColor.RED));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "List information about a frame in your animation";
+    }
 }

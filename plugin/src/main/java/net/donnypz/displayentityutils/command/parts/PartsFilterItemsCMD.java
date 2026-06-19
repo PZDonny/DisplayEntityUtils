@@ -97,4 +97,8 @@ class PartsFilterItemsCMD extends PlayerSubCommand {
         }
     }
 
+    @Override
+    protected String getDescription() {
+        return "Filter items of ITEM parts. Exclude ALL filtered items by prefixing with \"!\"";
+    }
 }

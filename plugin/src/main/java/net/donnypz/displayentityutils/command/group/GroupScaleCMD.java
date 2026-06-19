@@ -50,4 +50,9 @@ class GroupScaleCMD extends GroupSubCommand {
             }
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Scale your selected group with a given multiplier";
+    }
 }

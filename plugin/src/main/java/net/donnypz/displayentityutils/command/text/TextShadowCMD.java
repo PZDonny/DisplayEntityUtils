@@ -56,4 +56,9 @@ class TextShadowCMD extends PartsSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled shadow for your selected text display "+status)));
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Toggle shadows visibility in your selected text display";
+    }
 }

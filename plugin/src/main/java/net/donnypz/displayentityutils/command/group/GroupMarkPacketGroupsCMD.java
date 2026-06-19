@@ -16,4 +16,9 @@ class GroupMarkPacketGroupsCMD extends PlayerSubCommand {
     public void execute(Player player, String[] args) {
         RelativePointUtils.spawnPacketGroupPoints(player.getChunk(), player);
     }
+
+    @Override
+    protected String getDescription() {
+        return "Create markers for all packet groups stored in your current chunk";
+    }
 }

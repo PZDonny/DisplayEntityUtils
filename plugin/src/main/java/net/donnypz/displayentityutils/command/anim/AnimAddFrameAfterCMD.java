@@ -72,4 +72,9 @@ class AnimAddFrameAfterCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("Invalid value entered! Enter whole numbers >= 0", NamedTextColor.RED));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Add a frame after another frame to your selected animation";
+    }
 }

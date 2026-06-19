@@ -19,7 +19,7 @@ class InteractionHeightCMD extends PlayerSubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (!hasMinimumArguments(player, args)) return;
-        
+
         setInteractionDimensions(player, args, "height");
     }
 
@@ -42,5 +42,10 @@ class InteractionHeightCMD extends PlayerSubCommand {
         catch(NumberFormatException e) {
             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid " + dim + ", enter a number!", NamedTextColor.RED)));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set the height of an interaction";
     }
 }

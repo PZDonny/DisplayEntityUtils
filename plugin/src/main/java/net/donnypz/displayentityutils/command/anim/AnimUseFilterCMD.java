@@ -51,4 +51,9 @@ class AnimUseFilterCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("Trimmed redundant data (IRREVERSIBLE)", NamedTextColor.GRAY));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Apply your part filter/selection to an animation. Optionally, and irreversibly remove data of unfiltered parts";
+    }
 }

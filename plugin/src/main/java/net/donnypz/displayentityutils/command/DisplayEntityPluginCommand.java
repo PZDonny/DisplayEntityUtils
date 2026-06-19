@@ -261,21 +261,55 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         if (page == 1){
             sender.sendMessage(Component.text("v"+DisplayAPI.getVersion(), NamedTextColor.GRAY));
             CMDUtils.sendCMD(sender, "/deu help <page-number>", "Display the plugin's help commands");
+            CMDUtils.sendCMD(sender,
+                    "/deu bdengine",
+                    "Commands for Importing/Converting models & animations from BDEngine",
+                    "<aqua>Use <yellow>\"block-display.com\" (BDEngine) <aqua>to create convertible models and animations");
             CMDUtils.sendCMD(sender, "/deu group", "Display Entity Models/Groups related commands");
-            CMDUtils.sendCMD(sender, "/deu parts", "Commands related to the parts (individual display entities) of a Display Entity Model/Group");
-            CMDUtils.sendCMD(sender, "/deu display", "Commands related to display entities");
-            CMDUtils.sendCMD(sender, "/deu item", "Commands related to specifically Item Displays");
-            CMDUtils.sendCMD(sender, "/deu text", "Commands related to specifically Text Displays");
-            CMDUtils.sendCMD(sender, "/deu interaction", "Commands related to Interaction entities");
-            CMDUtils.sendCMD(sender, "/deu mannequin", "Commands related to Mannequin entities");
+            CMDUtils.sendCMD(sender,
+                    "/deu parts",
+                    "Commands related to the parts (individual display entities) of a Display Entity Model/Group",
+                    """
+                            | \\"parts\\" are each entity in a group/model
+                            
+                            | Add tags to parts to identify each part in a group
+                            
+                            | Commands with \\"-all\\" will apply the command to all parts in your selection/filter where valid. By default, all of your selected group's parts are your in selection
+                            """);
+            CMDUtils.sendCMD(sender,
+                    "/deu display",
+                    "Commands related to display entities",
+                    "| Commands with \"-all\" will apply to all selected displays in a group");
+            CMDUtils.sendCMD(sender,
+                    "/deu item",
+                    "Commands related to specifically Item Displays",
+                    "| Commands with \"-all\" will apply the command to all selected item displays in a group");
+            CMDUtils.sendCMD(sender,
+                    "/deu text",
+                    "Commands related to specifically Text Displays",
+                    "| Commands with \"-all\" will apply the command to all selected text displays in a group");
+            CMDUtils.sendCMD(sender,
+                    "/deu interaction",
+                    "Commands related to Interaction entities",
+                    """
+                            | Commands with "-all" will apply the command to all selected interaction in a group
+                            
+                            | Where applicable, Interaction commands will prioritize the interaction entity you're looking at over the one you may have selected
+                            """);
         }
         else{
+            CMDUtils.sendCMD(sender,
+                    "/deu mannequin",
+                    "Commands related to Mannequin entities",
+                    "| Commands with \"-all\" will apply the command to all selected mannequins in a group");
             CMDUtils.sendCMD(sender, "/deu place", "Assign a Display Entity Model/Group to an block that will spawn when placed");
-            CMDUtils.sendCMD(sender, "/deu anim", "Animation related commands");
+            CMDUtils.sendCMD(sender,
+                    "/deu anim",
+                    "Animation related commands",
+                    "| Commands allowing multiple <frame-ids> are comma separated");
             CMDUtils.sendCMD(sender, "/deu listgroups <storage> [page-number]", "List all saved Display Entity Models/Groups");
             CMDUtils.sendCMD(sender, "/deu listanims <storage> [page-number]", "List all saved animations");
             CMDUtils.sendCMD(sender, "/deu hidepoints", "Hide any visible points (frame points, persistent packet group points, etc.)");
-            CMDUtils.sendCMD(sender, "/deu bdengine", "Import/Convert models from BDEngine");
             CMDUtils.sendCMD(sender, "/deu reload <config | controllers>", "Reload the plugin's config or Display Controllers." +
                     " To reload Local, MySQL or MongoDB config save options, the server must be restarted");
         }

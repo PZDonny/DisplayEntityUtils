@@ -53,4 +53,8 @@ class ItemTransformCMD extends PartsSubCommand {
         }
     }
 
+    @Override
+    protected String getDescription() {
+        return "Change the item display transform of a item display part";
+    }
 }

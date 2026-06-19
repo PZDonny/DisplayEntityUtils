@@ -51,4 +51,9 @@ class MannequinPivotCMD extends PartsSubCommand {
             return false;
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Pivot a mannequin around its group's location";
+    }
 }

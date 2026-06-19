@@ -42,4 +42,9 @@ class MannequinSkinCMD extends PartsSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set mannequin skin!", NamedTextColor.GREEN)));
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set your selected mannequin's skin";
+    }
 }

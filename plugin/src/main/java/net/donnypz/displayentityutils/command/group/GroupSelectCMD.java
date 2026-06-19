@@ -135,4 +135,9 @@ class GroupSelectCMD extends PlayerSubCommand {
         }
         GroupCMD.groupToPacketInfo(player);
     }
+
+    @Override
+    protected String getDescription() {
+        return "Select from nearby groups within the given distance";
+    }
 }

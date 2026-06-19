@@ -52,4 +52,9 @@ class DisplaySetBlockCMD extends PartsSubCommand {
     private void setBlock(ActivePart part, BlockData blockData){
         part.setBlockDisplayBlock(blockData);
     }
+
+    @Override
+    protected String getDescription() {
+        return "Change the block of a block display";
+    }
 }

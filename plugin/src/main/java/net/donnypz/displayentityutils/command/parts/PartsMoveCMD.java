@@ -98,4 +98,9 @@ class PartsMoveCMD extends PartsSubCommand {
         }
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Change the actual location of your selected part";
+    }
 }

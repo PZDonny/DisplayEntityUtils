@@ -63,4 +63,9 @@ class AnimSelectCMD extends PlayerSubCommand {
         p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Selected animation! <white>(Tagged: "+anim.getAnimationTag()+")")));
         DisplayEntityPluginCommand.hideRelativePoints(p);
     }
+
+    @Override
+    protected String getDescription() {
+        return "Select a saved animation";
+    }
 }

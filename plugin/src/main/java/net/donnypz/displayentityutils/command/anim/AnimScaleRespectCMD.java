@@ -28,4 +28,9 @@ class AnimScaleRespectCMD extends PlayerSubCommand {
         player.sendMessage(Component.text("Animation scale respect toggled to: ", NamedTextColor.GREEN)
                 .append(Component.text(scaleRespect, NamedTextColor.YELLOW)));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Toggle whether your selected animation should respect the group's scale";
+    }
 }

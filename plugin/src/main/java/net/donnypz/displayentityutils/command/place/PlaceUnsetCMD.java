@@ -23,4 +23,9 @@ class PlaceUnsetCMD extends PlayerSubCommand {
         PlaceableGroupManager.unassign(heldItem);
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Your held item no longer has an assigned group")));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Unassign a group from your held block";
+    }
 }

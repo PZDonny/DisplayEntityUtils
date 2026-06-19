@@ -38,4 +38,9 @@ class PartsRemoveTagCMD extends PartsSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Removing part tag from selected part! <white>(Removed Tag: "+tag+")")));
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Remove a tag from your selected part";
+    }
 }

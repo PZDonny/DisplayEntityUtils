@@ -86,4 +86,17 @@ public class GroupSpawnAtCMD extends ConsoleUsableSubCommand {
             return Double.parseDouble(userInput);
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return """
+                Spawn a saved display entity group/model from a storage location at a specified location. \
+                
+                "-world <world_name>" will spawn the group in the provided world\
+                
+                "-packet" will spawn the group/model using packets\
+                
+                "-force" will force the location's chunk to load, if unloaded. Unneeded if spawned using packets
+                """;
+    }
 }

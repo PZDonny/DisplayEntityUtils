@@ -41,4 +41,9 @@ public class BDEngineSpawnModelCMD extends PlayerSubCommand {
     public static String fileExtension(String fileName){
         return fileName.endsWith(".bdengine") ? fileName : fileName+".bdengine";
     }
+
+    @Override
+    protected String getDescription() {
+        return "Spawn a model from a BDEngine file located in the plugin's \"bdenginefiles\" folder";
+    }
 }

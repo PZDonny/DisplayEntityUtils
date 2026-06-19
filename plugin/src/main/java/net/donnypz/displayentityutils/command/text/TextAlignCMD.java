@@ -56,4 +56,9 @@ class TextAlignCMD extends PartsSubCommand {
             return null;
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set your selected text display's text alignment";
+    }
 }

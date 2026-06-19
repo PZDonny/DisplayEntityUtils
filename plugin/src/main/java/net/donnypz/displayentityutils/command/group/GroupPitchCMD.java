@@ -39,4 +39,9 @@ class GroupPitchCMD extends GroupSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Please enter a valid number!", NamedTextColor.RED)));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set your selected group's pitch";
+    }
 }

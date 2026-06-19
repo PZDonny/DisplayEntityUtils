@@ -12,7 +12,7 @@ import org.bukkit.command.CommandSender;
 
 class ReloadCMD extends ConsoleUsableSubCommand {
     ReloadCMD() {
-        super(Permission.RELOAD);
+        super("reload", Permission.RELOAD);
     }
 
     @Override
@@ -36,5 +36,10 @@ class ReloadCMD extends ConsoleUsableSubCommand {
             sender.sendMessage(Component.text("Incorrect Usage! /deu reload <config | controllers>", NamedTextColor.RED));
         }
 
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Reload the plugin's config or display controllers";
     }
 }

@@ -49,4 +49,9 @@ class AnimMovePointCMD extends PlayerSubCommand {
         rp.setLocation(group, pLoc);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Moved the frame point to your location")));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Move a frame point to your location, relative to your selected group";
+    }
 }

@@ -32,4 +32,9 @@ class PartsUnglowCMD extends PartsSubCommand {
         selectedPart.unglow();
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Remove the glow from your selected part";
+    }
 }

@@ -51,4 +51,9 @@ class PartsPitchCMD extends PlayerSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the pitch!", NamedTextColor.RED)));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set the pitch of an ungrouped part entity";
+    }
 }

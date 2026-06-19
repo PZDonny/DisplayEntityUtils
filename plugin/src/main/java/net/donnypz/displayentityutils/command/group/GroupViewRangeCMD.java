@@ -32,4 +32,9 @@ class GroupViewRangeCMD extends GroupSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number!", NamedTextColor.RED)));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set the view range multiplier for your selected group";
+    }
 }

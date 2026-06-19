@@ -55,4 +55,9 @@ class TextSeeThroughCMD extends PartsSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled see through for your selected text display "+status)));
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Toggle see through setting of your selected text display";
+    }
 }

@@ -68,4 +68,9 @@ class TextOpacityCMD extends PartsSubCommand {
             return null;
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set the text opacity for your selected text display";
+    }
 }

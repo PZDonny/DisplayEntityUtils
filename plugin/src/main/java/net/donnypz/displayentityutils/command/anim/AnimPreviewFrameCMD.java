@@ -66,4 +66,9 @@ class AnimPreviewFrameCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("Invalid ID! ID's must be >= 0", NamedTextColor.RED));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Preview a frame on your selected group, without changing group entity data";
+    }
 }

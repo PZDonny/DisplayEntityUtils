@@ -22,4 +22,9 @@ class GroupAutoCullCMD extends GroupSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Added culling bounds to your selected group!", NamedTextColor.GREEN)));
         group.autoCull(true);
     }
+
+    @Override
+    protected String getDescription() {
+        return "Calculate and set culling bounds for every display part in your selected group";
+    }
 }

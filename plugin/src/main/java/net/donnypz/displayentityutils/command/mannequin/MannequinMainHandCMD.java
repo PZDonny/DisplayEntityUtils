@@ -57,4 +57,9 @@ class MannequinMainHandCMD extends PartsSubCommand {
             return false;
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set your selected mannequin's main hand";
+    }
 }

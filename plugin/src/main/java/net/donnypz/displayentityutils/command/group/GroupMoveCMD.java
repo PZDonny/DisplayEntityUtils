@@ -68,4 +68,9 @@ class GroupMoveCMD extends GroupSubCommand {
             }
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Change the actual location of your selected group, with an optional duration";
+    }
 }

@@ -28,4 +28,9 @@ class MannequinEquipmentCMD extends PartsSubCommand {
         MannequinEquipmentGUI.edit(player, selectedPart);
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Open a GUI to edit your selected mannequin's equipment";
+    }
 }

@@ -23,6 +23,7 @@ import java.util.List;
 class AnimDrawPosCMD extends PlayerSubCommand {
     AnimDrawPosCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("drawpos", parentSubCommand, Permission.ANIM_DRAW_FRAME_POINTS);
+        setUnsafe();
         setTabComplete(2, List.of("1", "2", "3", "show"));
     }
 
@@ -90,5 +91,10 @@ class AnimDrawPosCMD extends PlayerSubCommand {
                 }
             }, 0, 2);
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set where frame points should be drawn between. Set 3 when drawing arcs";
     }
 }

@@ -30,4 +30,9 @@ class AnimSetTagCMD extends PlayerSubCommand {
         anim.setAnimationTag(tag);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Animation tag set to \"" + tag + "\"", NamedTextColor.GREEN)));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set the tag to identify this animation";
+    }
 }

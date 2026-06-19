@@ -62,4 +62,9 @@ class GroupSetSpawnAnimationCMD extends GroupSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid animation type!", NamedTextColor.RED)));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set an animation to play when this group is spawned/loaded";
+    }
 }

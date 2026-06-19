@@ -69,4 +69,9 @@ class InteractionPivotCMD extends PlayerSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Pivoting Interaction around group", NamedTextColor.GREEN)));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Pivot an interaction around its group's location";
+    }
 }

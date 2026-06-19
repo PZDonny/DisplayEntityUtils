@@ -113,4 +113,8 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
         }
     }
 
+    @Override
+    protected String getDescription() {
+        return "Filter parts by their type. Exclude ALL filtered types by prefixing with \"!\"";
+    }
 }

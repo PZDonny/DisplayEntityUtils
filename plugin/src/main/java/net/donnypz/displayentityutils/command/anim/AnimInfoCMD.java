@@ -83,4 +83,9 @@ class AnimInfoCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("- "+type.getKey().asMinimalString(), NamedTextColor.YELLOW));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "List information about your selected animation";
+    }
 }

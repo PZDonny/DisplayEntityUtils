@@ -17,12 +17,10 @@ public abstract class DEUSubCommand {
     protected final Set<String> flags = new TreeSet<>();
     protected final TreeMap<String, List<String>> options = new TreeMap<>();
     protected final TreeMap<String, DEUSubCommand> subCommands = new TreeMap<>();
-    private String shortUsage;
-    private String usage;
+    private final String shortUsage;
+    protected String usage;
+    private boolean unsafe;
 
-    DEUSubCommand(@NotNull Permission permission){
-        this.permission = permission;
-    }
 
     DEUSubCommand(@NotNull String commandName, @NotNull Permission permission){
         this.permission = permission;
@@ -36,6 +34,14 @@ public abstract class DEUSubCommand {
         shortUsage = parentSubCommand.usage +
                 " " +
                 commandName;
+    }
+
+    protected void setUnsafe(){
+        this.unsafe = true;
+    }
+
+    public boolean isUnsafe(){
+        return this.unsafe;
     }
 
     protected boolean hasMinimumArguments(CommandSender sender, String[] args){
@@ -66,7 +72,7 @@ public abstract class DEUSubCommand {
         return usage;
     }
 
-    //protected abstract String getDescription();
+    protected abstract String getDescription();
 
     private void buildUsage(){
         StringBuilder sb = new StringBuilder(shortUsage);

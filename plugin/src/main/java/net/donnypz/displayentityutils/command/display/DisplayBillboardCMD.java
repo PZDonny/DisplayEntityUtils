@@ -26,14 +26,14 @@ class DisplayBillboardCMD extends PartsSubCommand {
         Display.Billboard billboard = getBillboard(player, args[2]);
         if (billboard == null) return false;
         selection.setBillboard(billboard);
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Billboard set for selected display entity part(s) in your selection!", NamedTextColor.GREEN)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Billboard set for all selected displays in your selection!", NamedTextColor.GREEN)));
         return true;
     }
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (!selectedPart.isDisplay()) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Only display entities can have a billboard applied!", NamedTextColor.RED)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Only displays can have a billboard applied!", NamedTextColor.RED)));
         }
         else{
             Display.Billboard billboard = getBillboard(player, args[2]);
@@ -52,5 +52,10 @@ class DisplayBillboardCMD extends PartsSubCommand {
             sendIncorrectUsage(player);
             return null;
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set the billboard of your selected display";
     }
 }

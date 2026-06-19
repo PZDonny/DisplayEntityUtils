@@ -35,4 +35,9 @@ class MannequinBelowNameCMD extends PartsSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set text below mannequin name!", NamedTextColor.GREEN)));
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set the text below your selected mannequin's name";
+    }
 }

@@ -30,4 +30,9 @@ class AnimStopCMD extends PlayerSubCommand {
         DisplayAnimator.stopCameraView(player);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Stopping all animations played on your selected group!", NamedTextColor.YELLOW)));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Stop an animation playing on a group";
+    }
 }

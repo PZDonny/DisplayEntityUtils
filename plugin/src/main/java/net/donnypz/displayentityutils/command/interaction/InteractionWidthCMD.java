@@ -19,4 +19,9 @@ class InteractionWidthCMD extends PlayerSubCommand {
         if (!hasMinimumArguments(player, args)) return;
         InteractionHeightCMD.setInteractionDimensions(player, args, "width");
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set the width of an interaction";
+    }
 }

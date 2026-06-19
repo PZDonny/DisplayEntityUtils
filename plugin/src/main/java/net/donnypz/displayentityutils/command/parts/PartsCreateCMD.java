@@ -175,4 +175,10 @@ class PartsCreateCMD extends PlayerSubCommand {
         }
         return part;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Spawn an entity at your location and automatically select it. " +
+                "\"-addtogroup\" will add the part to your selected group";
+    }
 }

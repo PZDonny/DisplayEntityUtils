@@ -155,4 +155,8 @@ class PartsCycleCMD extends PlayerSubCommand {
 
     }
 
+    @Override
+    protected String getDescription() {
+        return "Cycle through part entities in your selected group";
+    }
 }

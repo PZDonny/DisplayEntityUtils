@@ -50,4 +50,9 @@ class ItemSetCMD extends PartsSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set item of selected item display!", NamedTextColor.GREEN)));
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Change the item of a item display part";
+    }
 }

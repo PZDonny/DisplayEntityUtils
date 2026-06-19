@@ -34,25 +34,6 @@ public final class InteractionCMD extends ParentSubCommand {
         new InteractionInfoCMD(this);
     }
 
-    static void interactionHelp(CommandSender sender, int page){
-        sender.sendMessage(DisplayAPI.pluginPrefixLong);
-        if (page == 1){
-            sender.sendMessage(Component.text("Where applicable, these commands prioritize the interaction entity you're looking at over the one you may have selected", NamedTextColor.YELLOW));
-            CMDUtils.sendCMD(sender, "/deu interaction help", "Get help for interactions");
-            CMDUtils.sendCMD(sender, "/deu interaction spawn <height> <width> [-g]", "Spawn an interaction entity at your location.\nUse \"-g\" to add it to your selected group");
-            CMDUtils.sendCMD(sender, "/deu interaction info", "Get info about an interaction entity, targeted or selected");
-            CMDUtils.sendCMD(sender, "/deu interaction height <height>", "Set the height of an interaction");
-            CMDUtils.sendCMD(sender, "/deu interaction width <width>", "Set the width of an interaction");
-            CMDUtils.sendCMD(sender, "/deu interaction scale <height> <width> [tick-duration] [tick-delay]", "Scale an interaction entity, optionally over a period of time");
-        }
-        else{
-            CMDUtils.sendCMD(sender, "/deu interaction addcmd <player | console> <left | right | both> <command>", "Add a command to an interaction");
-            CMDUtils.sendCMD(sender, "/deu interaction listcmds", "List all commands stored on an interaction");
-            CMDUtils.sendCMD(sender, "/deu interaction pivot <angle> [-all]", " Pivot an interaction around it's group's");
-            CMDUtils.sendCMD(sender, "/deu interaction responsive", "Toggle the hit sound of an interaction entity");
-        }
-        sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
-    }
 
     static SelectedInteraction getInteraction(Player player, boolean checkTargeted){
         Entity entity = player.getTargetEntity(5);

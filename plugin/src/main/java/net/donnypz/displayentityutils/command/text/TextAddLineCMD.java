@@ -39,4 +39,9 @@ class TextAddLineCMD extends PartsSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Added line to text display!", NamedTextColor.GREEN)));
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Add a line of text to your selected text display";
+    }
 }

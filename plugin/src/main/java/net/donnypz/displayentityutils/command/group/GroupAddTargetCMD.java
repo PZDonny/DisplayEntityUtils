@@ -49,4 +49,9 @@ class GroupAddTargetCMD extends PlayerSubCommand {
         }
         player.sendMessage(Component.text("Added entity to your selected group!", NamedTextColor.GREEN));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Add a targeted interaction entity to your group";
+    }
 }

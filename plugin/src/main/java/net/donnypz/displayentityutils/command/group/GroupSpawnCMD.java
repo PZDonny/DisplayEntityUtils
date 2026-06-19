@@ -155,4 +155,9 @@ public class GroupSpawnCMD extends PlayerSubCommand {
             }
         });
     }
+
+    @Override
+    protected String getDescription() {
+        return "Spawn a saved display entity group/model from a storage location. \"-packet\" will spawn the group/model using packets";
+    }
 }

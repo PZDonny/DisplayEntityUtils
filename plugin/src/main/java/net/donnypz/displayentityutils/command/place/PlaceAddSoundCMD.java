@@ -63,4 +63,9 @@ class PlaceAddSoundCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("Invalid number entered! Enter numbers >= 0", NamedTextColor.RED));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Add a sound to play when the block is placed or broken";
+    }
 }

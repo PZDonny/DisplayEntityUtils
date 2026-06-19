@@ -69,4 +69,9 @@ class AnimAddPointCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("Invalid Frame ID! Enter a number >= 0", NamedTextColor.RED));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Add a point relative to a group and your location for a frame";
+    }
 }

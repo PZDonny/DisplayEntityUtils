@@ -23,6 +23,7 @@ import java.util.List;
 class AnimDrawPointsCMD extends PlayerSubCommand {
     AnimDrawPointsCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("drawpoints", parentSubCommand, Permission.ANIM_DRAW_FRAME_POINTS);
+        setUnsafe();
         setTabComplete(2, List.of("straight", "arc"));
         setTabComplete(3, "<point-tag>");
         setTabComplete(4, "<start-frame>");
@@ -144,5 +145,10 @@ class AnimDrawPointsCMD extends PlayerSubCommand {
         player.sendMessage(Component.text("| Use command \"/deu anim drawpos\"", NamedTextColor.YELLOW));
         player.sendMessage(Component.text("| Straight: Requires Pos 1 and Pos 2 to be set", NamedTextColor.GRAY));
         player.sendMessage(Component.text("| Arc: Requires Pos 1, Pos 2, and Pos 3 to be set", NamedTextColor.GRAY));
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Draw a straight/arched line of frame points between frames";
     }
 }

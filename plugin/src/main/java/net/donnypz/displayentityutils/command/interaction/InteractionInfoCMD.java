@@ -34,4 +34,9 @@ class InteractionInfoCMD extends PlayerSubCommand {
         player.sendMessage(MiniMessage.miniMessage().deserialize("Responsive: "+(interaction.isResponsive() ? "<green>ENABLED" : "<red>DISABLED")));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: <yellow>"+groupTag));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Get info about an interaction entity, targeted or selected";
+    }
 }

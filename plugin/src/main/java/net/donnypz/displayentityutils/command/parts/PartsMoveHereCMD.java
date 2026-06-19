@@ -57,4 +57,9 @@ class PartsMoveHereCMD extends PartsSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Moved your selected part to your location!", NamedTextColor.GREEN)));
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Change your selected part's actual location to your location";
+    }
 }

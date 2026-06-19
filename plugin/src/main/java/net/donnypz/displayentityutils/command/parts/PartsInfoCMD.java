@@ -199,4 +199,9 @@ class PartsInfoCMD extends PlayerSubCommand {
             }
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Get information about your current part/selection";
+    }
 }

@@ -36,4 +36,9 @@ class MannequinSpawnCMD extends PlayerSubCommand {
                 .append(MiniMessage.miniMessage().deserialize("<green>A new mannequin has been spawned at your location!")));
         CMDUtils.tryAddEntityToGroup(player, args, mannequin, this, "-g");
     }
+
+    @Override
+    protected String getDescription() {
+        return "Spawn a mannequin at your location.\nUse \"-g\" to add it to your selected group";
+    }
 }

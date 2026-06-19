@@ -32,4 +32,9 @@ class PartsGlowCMD extends PartsSubCommand {
         selectedPart.glow();
         return true;
     }
+
+    @Override
+    protected String getDescription() {
+        return "Make your selected part glow";
+    }
 }

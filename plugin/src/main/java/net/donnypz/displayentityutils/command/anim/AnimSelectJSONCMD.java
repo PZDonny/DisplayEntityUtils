@@ -20,6 +20,7 @@ import java.io.File;
 class AnimSelectJSONCMD extends PlayerSubCommand {
     AnimSelectJSONCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("selectjson", parentSubCommand, Permission.ANIM_SELECT);
+        setUnsafe();
         setTabComplete(2, "<file-name>");
     }
 
@@ -45,5 +46,10 @@ class AnimSelectJSONCMD extends PlayerSubCommand {
         p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Selected animation! <white>(Tagged: "+anim.getAnimationTag()+")")));
 
         DisplayEntityPluginCommand.hideRelativePoints(p);
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Select a JSON saved animation";
     }
 }

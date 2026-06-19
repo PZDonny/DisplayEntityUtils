@@ -87,4 +87,9 @@ class PartsRemoveCMD extends PartsSubCommand {
             }
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Despawn and remove your selected part from a group";
+    }
 }

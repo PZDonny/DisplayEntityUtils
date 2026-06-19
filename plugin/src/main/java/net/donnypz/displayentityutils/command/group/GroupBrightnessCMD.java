@@ -47,4 +47,9 @@ class GroupBrightnessCMD extends GroupSubCommand {
             player.sendMessage(Component.text("Values of -1 for both block and sky will reset the brightness"));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Set your selected group's brightness. Enter values between 0-15. -1 resets";
+    }
 }
