@@ -38,7 +38,7 @@ class PartsCreateCMD extends PlayerSubCommand {
     PartsCreateCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("create", parentSubCommand, Permission.PARTS_CREATE);
         setTabComplete(2, TabSuggestion.PART_TYPES);
-        setTabComplete(3, "-addtogroup");
+        addFlag("-addtogroup");
     }
 
     @Override
@@ -48,15 +48,12 @@ class PartsCreateCMD extends PlayerSubCommand {
             return;
         }
 
-        boolean addToGroup;
-        if (args.length >= 4){
-            addToGroup = args[3].equalsIgnoreCase("-addtogroup");
-            if (addToGroup && DisplayGroupManager.getSelectedGroup(player) == null){
-                DisplayEntityPluginCommand.noGroupSelection(player);
-            }
-        }
-        else{
-            addToGroup = false;
+        OptionalArguments optionalArgs = getOptionalArguments(player, args);
+
+        boolean addToGroup = optionalArgs.hasFlag("-addtogroup");
+        if (addToGroup && DisplayGroupManager.getSelectedGroup(player) == null){
+            DisplayEntityPluginCommand.noGroupSelection(player);
+            return;
         }
 
         Location loc = player.getLocation();
