@@ -119,9 +119,9 @@ public abstract class ActivePart implements Active{
 
 
     /**
-     * Add a tag to this part. The tag will not be added if it starts with an "!" or is blank
+     * Add a tag to this part.
      * @param partTag The part tag to add to this part
-     * @return true if the tag was added successfully
+     * @return true if the tag was added successfully and it is valid per {@link DisplayUtils#isValidTag(String)}
      */
     public abstract boolean addTag(@NotNull String partTag);
 

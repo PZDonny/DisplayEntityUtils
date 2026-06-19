@@ -194,14 +194,12 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
     abstract Material getItemType(T part);
 
     /**
-     * Adds a part tag to the parts in this selection. The tag will not be added if it starts with an "!" or is blank
+     * Adds a part tag to the parts in this selection.
      * @param partTag The part tag to give the parts in this selection
-     * @return true if the tag was successfully added
+     * @return true if the tag was successfully added and it is valid per {@link DisplayUtils#isValidTag(String)}
      */
     public boolean addTag(@NotNull String partTag){
-        if (!DisplayUtils.isValidTag(partTag)){
-            return false;
-        }
+        if (!DisplayUtils.isValidTag(partTag)) return false;
         for (T part : selectedParts){
             part.addTag(partTag);
         }

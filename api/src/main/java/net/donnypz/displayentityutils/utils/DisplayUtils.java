@@ -23,13 +23,11 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public final class DisplayUtils {
 
-    private static final ListPersistentDataType<String, String> tagPDCType = PersistentDataType.LIST.strings();
+    private static final ListPersistentDataType<String, String> LIST_PDC_TYPE = PersistentDataType.LIST.strings();
     private DisplayUtils(){}
 
     public static boolean isPartEntity(Entity entity){ // don't add notnull annotation
@@ -605,12 +603,13 @@ public final class DisplayUtils {
     }
 
     /**
-     * Add a part tag to a part entity. The tag will not be added if it starts with an "!" or is blank
+     * Add a part tag to a part entity.
      * @param entity The entity to add a tag to
      * @param partTag The tag to add to this part
-     * @return true if the tag was added successfully
+     * @return true if the tag was added successfully and the tag is valid per {@link DisplayUtils#isValidTag(String)}
      */
     public static boolean addTag(@NotNull Entity entity, @NotNull String partTag){
+        if (!isValidTag(partTag)) return false;
         return addToPDCList(entity, partTag, DisplayAPI.getPartPDCTagKey());
     }
 
@@ -618,30 +617,46 @@ public final class DisplayUtils {
      * Add part tags to a part entity
      * @param entity The entity to add a tag to
      * @param partTags The tags to add to this part
+     * @return a set of invalid tags that could not be added, per {@link DisplayUtils#isValidTag(String)}
      */
-    public static void addTags(@NotNull Entity entity, @NotNull List<String> partTags){
-        addManyToPDCList(entity, partTags, DisplayAPI.getPartPDCTagKey());
+    public static Set<String> addTags(@NotNull Entity entity, @NotNull List<String> partTags){
+        NamespacedKey key = DisplayAPI.getPartPDCTagKey();
+        if (partTags.isEmpty()){
+            return Collections.unmodifiableSet(new HashSet<>());
+        }
+        PersistentDataContainer container = entity.getPersistentDataContainer();
+        List<String> existing = container.has(key) ?
+                new ArrayList<>(container.get(key, LIST_PDC_TYPE)) :
+                new ArrayList<>();
+        Set<String> invalid = new HashSet<>();
+
+        for (String tag : partTags){
+            if (existing.contains(tag)) continue;
+            if (isValidTag(tag)) {
+                existing.add(tag);
+            }
+            else{
+                invalid.add(tag);
+            }
+        }
+        container.set(key, LIST_PDC_TYPE, existing);
+        return invalid;
     }
 
     static boolean addToPDCList(@NotNull Entity entity, @NotNull String element, NamespacedKey key){
-        boolean isGroupTag = DisplayAPI.getGroupTagKey() == key;
         PersistentDataContainer container = entity.getPersistentDataContainer();
-        List<String> tags;
+        List<String> existing;
         if (!container.has(key)){
-            tags = new ArrayList<>();
+            existing = new ArrayList<>();
         }
         else{
-            tags = new ArrayList<>(container.get(key, tagPDCType));
+            existing = new ArrayList<>(container.get(key, LIST_PDC_TYPE));
         }
 
-        if (!tags.contains(element) && (!isGroupTag && isValidTag(element))){
-            tags.add(element);
-            container.set(key, tagPDCType, tags);
-            return true;
-        }
-        else{
-            return false;
-        }
+        if (existing.contains(element)) return false;
+        existing.add(element);
+        container.set(key, LIST_PDC_TYPE, existing);
+        return true;
     }
 
     static void addManyToPDCList(@NotNull Entity entity, @NotNull List<String> elements, NamespacedKey key){
@@ -655,14 +670,14 @@ public final class DisplayUtils {
             existing = new ArrayList<>();
         }
         else{
-            existing = new ArrayList<>(container.get(key, tagPDCType));
+            existing = new ArrayList<>(container.get(key, LIST_PDC_TYPE));
         }
         for (String element : elements){
-            if (!existing.contains(element) && (!isGroupTag && isValidTag(element))) {
+            if (!existing.contains(element)) {
                 existing.add(element);
             }
         }
-        container.set(key, tagPDCType, existing);
+        container.set(key, LIST_PDC_TYPE, existing);
     }
 
     /**
@@ -695,13 +710,13 @@ public final class DisplayUtils {
             return;
         }
         PersistentDataContainer container = entity.getPersistentDataContainer();
-        if (!container.has(key, tagPDCType)){
+        if (!container.has(key, LIST_PDC_TYPE)){
             return;
         }
 
-        List<String> tags = container.get(key, tagPDCType);
+        List<String> tags = container.get(key, LIST_PDC_TYPE);
         tags.remove(element);
-        container.set(key, tagPDCType, tags);
+        container.set(key, LIST_PDC_TYPE, tags);
     }
 
     static void removeManyFromPDCList(@NotNull Entity entity, List<String> elements, NamespacedKey key){
@@ -709,14 +724,14 @@ public final class DisplayUtils {
             return;
         }
         PersistentDataContainer container = entity.getPersistentDataContainer();
-        if (!container.has(key, tagPDCType)){
+        if (!container.has(key, LIST_PDC_TYPE)){
             return;
         }
 
-        List<String> existing = container.get(key, tagPDCType);
+        List<String> existing = container.get(key, LIST_PDC_TYPE);
 
         existing.removeAll(elements);
-        container.set(key, tagPDCType, existing);
+        container.set(key, LIST_PDC_TYPE, existing);
     }
 
 
@@ -730,10 +745,10 @@ public final class DisplayUtils {
 
     static @NotNull List<String> getPDCList(@NotNull Entity entity, NamespacedKey key){
         PersistentDataContainer container = entity.getPersistentDataContainer();
-        if (!container.has(key, tagPDCType)){
+        if (!container.has(key, LIST_PDC_TYPE)){
             return new ArrayList<>();
         }
-        return container.get(key, tagPDCType);
+        return container.get(key, LIST_PDC_TYPE);
     }
 
 
@@ -744,10 +759,10 @@ public final class DisplayUtils {
      */
     public static boolean hasPartTag(@NotNull Entity entity, @NotNull String tag){
         PersistentDataContainer container = entity.getPersistentDataContainer();
-        if (!container.has(DisplayAPI.getPartPDCTagKey(), tagPDCType)){
+        if (!container.has(DisplayAPI.getPartPDCTagKey(), LIST_PDC_TYPE)){
             return false;
         }
-        List<String> pdcTags = container.get(DisplayAPI.getPartPDCTagKey(), tagPDCType);
+        List<String> pdcTags = container.get(DisplayAPI.getPartPDCTagKey(), LIST_PDC_TYPE);
         return pdcTags != null && pdcTags.contains(tag);
     }
 
