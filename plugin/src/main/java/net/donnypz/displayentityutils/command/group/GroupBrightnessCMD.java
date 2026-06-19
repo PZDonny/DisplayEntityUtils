@@ -2,9 +2,7 @@ package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Display;
@@ -16,7 +14,7 @@ class GroupBrightnessCMD extends GroupSubCommand {
     GroupBrightnessCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("brightness", parentSubCommand, Permission.GROUP_BRIGHTNESS, 4, true);
         setTabComplete(2, "<block>");
-        setTabComplete(2, "<sky>");
+        setTabComplete(3, "<sky>");
     }
 
     @Override
@@ -48,5 +46,10 @@ class GroupBrightnessCMD extends GroupSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Brightness values can only be whole numbers 0-15!", NamedTextColor.RED)));
             player.sendMessage(Component.text("Values of -1 for both block and sky will reset the brightness"));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set your selected group's brightness. Enter values between 0-15. -1 resets";
     }
 }

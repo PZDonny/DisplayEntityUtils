@@ -29,4 +29,9 @@ class PlaceUnsetPermissionCMD extends PlayerSubCommand {
         PlaceableGroupManager.setPlacePermission(heldItem, null);
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Removed the set permission to your held item's group.")));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Remove the permission required to place the group";
+    }
 }

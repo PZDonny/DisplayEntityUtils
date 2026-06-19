@@ -43,4 +43,9 @@ class GroupPersistCMD extends PlayerSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Persistence: ", NamedTextColor.WHITE)).append(persist));
 
     }
+
+    @Override
+    protected String getDescription() {
+        return "Toggle if your group should persist after a server shutdown";
+    }
 }

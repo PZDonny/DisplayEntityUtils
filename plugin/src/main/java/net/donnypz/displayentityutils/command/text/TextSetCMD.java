@@ -16,14 +16,12 @@ import org.jetbrains.annotations.Nullable;
 public class TextSetCMD extends PartsSubCommand {
 
     public TextSetCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("set", parentSubCommand, Permission.TEXT_SET_TEXT, 3, 0);
+        super("set", parentSubCommand, Permission.TEXT_SET_TEXT);
         setTabComplete(2, "<text>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /deu text set <text>", NamedTextColor.RED));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
@@ -52,5 +50,10 @@ public class TextSetCMD extends PartsSubCommand {
             }
         }
         return builder.toString().replace("\\n", "\n");
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set this text for your selected text display";
     }
 }

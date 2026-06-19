@@ -38,4 +38,9 @@ class GroupHidePersistentPacketGroupsCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("| The groups will only be hidden until you are re-sent this chunk", NamedTextColor.GRAY));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Hide all persistent packet-based groups in your current chunk. \n\"-self\" hides the group only for you";
+    }
 }

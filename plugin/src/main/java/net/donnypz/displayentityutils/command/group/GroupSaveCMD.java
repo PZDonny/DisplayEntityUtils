@@ -23,10 +23,7 @@ class GroupSaveCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage /deu group save <storage>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         ActiveGroup<?> group = DisplayGroupManager.getSelectedGroup(player);
         if (group == null) {
@@ -62,5 +59,10 @@ class GroupSaveCMD extends PlayerSubCommand {
                 }
             }
         });
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Save your selected group";
     }
 }

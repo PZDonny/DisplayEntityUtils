@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
+import net.donnypz.displayentityutils.utils.InteractionUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,10 +19,10 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public final class InteractionCMD extends ConsoleUsableSubCommand {
+public final class InteractionCMD extends ParentSubCommand {
 
     public InteractionCMD(){
-        super(Permission.HELP, new InteractionHelpCMD());
+        super("interaction");
         new InteractionSpawnCMD(this);
         new InteractionAddCMD(this);
         new InteractionListCMD(this);
@@ -33,41 +34,6 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
         new InteractionInfoCMD(this);
     }
 
-    @Override
-    public void execute(CommandSender sender, String[] args) {
-        if (args.length < 2){
-            interactionHelp(sender, 1);
-            return;
-        }
-        String arg = args[1];
-        DEUSubCommand subCommand = subCommands.get(arg);
-        if (subCommand == null){
-            interactionHelp(sender, 1);
-        }
-        else{
-            DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
-        }
-    }
-
-    static void interactionHelp(CommandSender sender, int page){
-        sender.sendMessage(DisplayAPI.pluginPrefixLong);
-        if (page == 1){
-            sender.sendMessage(Component.text("Where applicable, these commands prioritize the interaction entity you're looking at over the one you may have selected", NamedTextColor.YELLOW));
-            CMDUtils.sendCMD(sender, "/deu interaction help", "Get help for interactions");
-            CMDUtils.sendCMD(sender, "/deu interaction spawn <height> <width> [-g]", "Spawn an interaction entity at your location.\nUse \"-g\" to add it to your selected group");
-            CMDUtils.sendCMD(sender, "/deu interaction info", "Get info about an interaction entity, targeted or selected");
-            CMDUtils.sendCMD(sender, "/deu interaction height <height>", "Set the height of an interaction");
-            CMDUtils.sendCMD(sender, "/deu interaction width <width>", "Set the width of an interaction");
-            CMDUtils.sendCMD(sender, "/deu interaction scale <height> <width> [tick-duration] [tick-delay]", "Scale an interaction entity, optionally over a period of time");
-        }
-        else{
-            CMDUtils.sendCMD(sender, "/deu interaction addcmd <player | console> <left | right | both> <command>", "Add a command to an interaction");
-            CMDUtils.sendCMD(sender, "/deu interaction listcmds", "List all commands stored on an interaction");
-            CMDUtils.sendCMD(sender, "/deu interaction pivot <angle> [-all]", " Pivot an interaction around it's group's");
-            CMDUtils.sendCMD(sender, "/deu interaction responsive", "Toggle the hit sound of an interaction entity");
-        }
-        sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray><bold>----------</bold><yellow>Page "+page+"<gray><bold>----------"));
-    }
 
     static SelectedInteraction getInteraction(Player player, boolean checkTargeted){
         Entity entity = player.getTargetEntity(5);
@@ -123,11 +89,11 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
 
         void scale(float height, float width, int duration, int delay){
             if (interaction != null){
-                DisplayUtils.scaleInteraction(interaction, height, width, duration, delay);
+                InteractionUtils.scaleInteraction(interaction, height, width, duration, delay);
             }
             else{
                 if (interactionPart instanceof SpawnedDisplayEntityPart sp){
-                    DisplayUtils.scaleInteraction((Interaction) sp.getEntity(), height, width, duration, delay);
+                    InteractionUtils.scaleInteraction((Interaction) sp.getEntity(), height, width, duration, delay);
                 }
                 else if (interactionPart instanceof PacketDisplayEntityPart pp){
                     PacketUtils.scaleInteraction(pp, height, width, duration, delay);
@@ -180,7 +146,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
 
         void addInteractionCommand(String command, boolean left, boolean console){
             if (interaction != null){
-                DisplayUtils.addInteractionCommand(interaction, command, left, console);
+                InteractionUtils.addInteractionCommand(interaction, command, left, console);
             }
             else{
                 interactionPart.addInteractionCommand(command, left, console);
@@ -190,7 +156,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
 
         void removeInteractionCommand(InteractionCommand command){
             if (interaction != null){
-                DisplayUtils.removeInteractionCommand(interaction, command);
+                InteractionUtils.removeInteractionCommand(interaction, command);
             }
             else{
                 interactionPart.removeInteractionCommand(command);
@@ -200,7 +166,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
 
         List<String> getInteractionCommands(){
             if (interaction != null){
-                return DisplayUtils.getInteractionCommands(interaction);
+                return InteractionUtils.getInteractionCommands(interaction);
             }
             else{
                 return interactionPart.getInteractionCommands();
@@ -209,7 +175,7 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
 
         List<InteractionCommand> getInteractionCommandsWithData(){
             if (interaction != null){
-                return DisplayUtils.getInteractionCommandsWithData(interaction);
+                return InteractionUtils.getInteractionCommandsWithData(interaction);
             }
             else{
                 return interactionPart.getInteractionCommandsWithData();

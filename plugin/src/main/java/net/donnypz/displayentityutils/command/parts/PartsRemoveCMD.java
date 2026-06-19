@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 class PartsRemoveCMD extends PartsSubCommand {
     PartsRemoveCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("remove", parentSubCommand, Permission.PARTS_REMOVE, 2, 3);
+        super("remove", parentSubCommand, Permission.PARTS_REMOVE, true);
     }
 
     @Override
@@ -35,7 +35,7 @@ class PartsRemoveCMD extends PartsSubCommand {
             }
         }
 
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Despawned all selected parts!", NamedTextColor.YELLOW)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Removed all selected parts!", NamedTextColor.YELLOW)));
         removeGroupIfEmpty(player, group);
         return true;
     }
@@ -53,7 +53,7 @@ class PartsRemoveCMD extends PartsSubCommand {
             pp.remove();
         }
 
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Despawned your selected part!", NamedTextColor.YELLOW)));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Removed your selected part!", NamedTextColor.YELLOW)));
         removePartSelectionIfEmpty(player, selection);
         removeGroupIfEmpty(player, group);
         return true;
@@ -86,5 +86,10 @@ class PartsRemoveCMD extends PartsSubCommand {
                 }
             }
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Despawn and remove your selected part from a group";
     }
 }

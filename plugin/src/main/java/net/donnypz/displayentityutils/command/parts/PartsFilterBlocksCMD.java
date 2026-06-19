@@ -40,10 +40,7 @@ class PartsFilterBlocksCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3){
-            player.sendMessage(Component.text("/deu parts filterblocks <block-ids>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         player.sendMessage(Component.empty());
 
@@ -100,4 +97,8 @@ class PartsFilterBlocksCMD extends PlayerSubCommand {
         }
     }
 
+    @Override
+    protected String getDescription() {
+        return "Filter blocks of BLOCK parts. Exclude ALL filtered blocks by prefixing with \"!\"";
+    }
 }

@@ -16,14 +16,12 @@ import org.jetbrains.annotations.Nullable;
 class TextAddLineCMD extends PartsSubCommand {
 
     public TextAddLineCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("addline", parentSubCommand, Permission.TEXT_SET_TEXT, 3, 0);
+        super("addline", parentSubCommand, Permission.TEXT_SET_TEXT);
         setTabComplete(2, "<text>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /deu text addline <text>", NamedTextColor.RED));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
@@ -40,5 +38,10 @@ class TextAddLineCMD extends PartsSubCommand {
         selectedPart.setTextDisplayText(comp.font(font));
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Added line to text display!", NamedTextColor.GREEN)));
         return true;
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Add a line of text to your selected text display";
     }
 }

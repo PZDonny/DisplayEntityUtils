@@ -59,4 +59,9 @@ class PlaceInfoCMD extends PlayerSubCommand {
                     }
                 : null);
     }
+
+    @Override
+    protected String getDescription() {
+        return "Get placeable group information for your held block";
+    }
 }

@@ -14,15 +14,13 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupYawCMD extends GroupSubCommand {
     GroupYawCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("yaw", parentSubCommand, Permission.GROUP_TRANSFORM, 3, true);
+        super("yaw", parentSubCommand, Permission.GROUP_TRANSFORM, true);
         setTabComplete(2, "<yaw>");
         addFlag("-pivot");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /deu group yaw <yaw> [-pivot]", NamedTextColor.RED));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
@@ -42,5 +40,10 @@ class GroupYawCMD extends GroupSubCommand {
         catch(NumberFormatException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Please enter a valid number!", NamedTextColor.RED)));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set your selected group's yaw, \"-pivot\" pivots interaction entities around the group";
     }
 }

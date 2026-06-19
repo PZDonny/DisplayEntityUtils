@@ -36,4 +36,9 @@ class AnimRestoreCMD extends PlayerSubCommand {
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Restored group transformations, removing animation preview changes", NamedTextColor.GREEN)));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Restore your selected group to its previous state before previewing frames/animations";
+    }
 }

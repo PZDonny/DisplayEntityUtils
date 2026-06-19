@@ -14,15 +14,13 @@ import org.jetbrains.annotations.Nullable;
 
 class TextAlignCMD extends PartsSubCommand {
     TextAlignCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("align", parentSubCommand, Permission.TEXT_SET_ALIGNMENT, 3, 3);
+        super("align", parentSubCommand, Permission.TEXT_SET_ALIGNMENT, true);
         setTabComplete(2, TabSuggestion.TEXT_DISPLAY_ALIGN);
     }
 
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu text align <left| right | center> [-all]", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
@@ -57,5 +55,10 @@ class TextAlignCMD extends PartsSubCommand {
             player.sendMessage(Component.text("Valid alignments are \"left\", \"right\" and \"center\"", NamedTextColor.GRAY));
             return null;
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set your selected text display's text alignment";
     }
 }

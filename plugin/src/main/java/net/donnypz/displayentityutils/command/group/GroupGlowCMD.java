@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupGlowCMD extends GroupSubCommand {
     GroupGlowCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("glow", parentSubCommand, Permission.GROUP_GLOW, 0, true);
+        super("glow", parentSubCommand, Permission.GROUP_GLOW, true);
     }
 
     @Override
@@ -20,5 +20,10 @@ class GroupGlowCMD extends GroupSubCommand {
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Glowing selected group!")));
         group.glow();
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Make all parts in this group glow";
     }
 }

@@ -20,15 +20,14 @@ import java.io.File;
 class AnimSelectJSONCMD extends PlayerSubCommand {
     AnimSelectJSONCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("selectjson", parentSubCommand, Permission.ANIM_SELECT);
+        setUnsafe();
         setTabComplete(2, "<file-name>");
     }
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu anim selectjson <file-name>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
+
         String fileName = args[2];
         getAnimation(player, fileName);
     }
@@ -47,5 +46,10 @@ class AnimSelectJSONCMD extends PlayerSubCommand {
         p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Selected animation! <white>(Tagged: "+anim.getAnimationTag()+")")));
 
         DisplayEntityPluginCommand.hideRelativePoints(p);
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Select a JSON saved animation";
     }
 }

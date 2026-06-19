@@ -15,15 +15,13 @@ import org.jetbrains.annotations.Nullable;
 
 class TextBackgroundCMD extends PartsSubCommand {
     TextBackgroundCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("background", parentSubCommand, Permission.TEXT_BACKGROUND, 4, 4);
+        super("background", parentSubCommand, Permission.TEXT_BACKGROUND, true);
         setTabComplete(2, TabSuggestion.COLORS);
         setTabComplete(3, "<0-1>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu text background <color | hex-code> <0-1> [-all]", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
@@ -71,5 +69,10 @@ class TextBackgroundCMD extends PartsSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid opacity, enter a value between 0 and 1!", NamedTextColor.RED)));
             return null;
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set the background color of a text display, and the opacity";
     }
 }

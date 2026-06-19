@@ -32,10 +32,7 @@ class PartsPitchCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3){
-            player.sendMessage(Component.text("Incorrect Usage! /deu parts pitch <pitch>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         if (!selection.hasSelectedPart()){
             PartsCMD.invalidPartSelection(player);
@@ -53,5 +50,10 @@ class PartsPitchCMD extends PlayerSubCommand {
         catch(NumberFormatException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the pitch!", NamedTextColor.RED)));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set the pitch of an ungrouped part entity";
     }
 }

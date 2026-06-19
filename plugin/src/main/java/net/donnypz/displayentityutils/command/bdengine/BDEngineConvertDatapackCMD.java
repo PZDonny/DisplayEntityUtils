@@ -20,8 +20,7 @@ class BDEngineConvertDatapackCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 5) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu bdengine convertdp <datapack-name> <group-tag-to-set> <anim-tag-prefix-to-set>", NamedTextColor.RED)));
+        if (!hasMinimumArguments(player, args)) {
             player.sendMessage(Component.text("Use \"-\" for a tag if you do not want to save the group/animation(s)", NamedTextColor.GRAY));
             return;
         }
@@ -43,5 +42,10 @@ class BDEngineConvertDatapackCMD extends PlayerSubCommand {
                 saveAnimations,
                 true
         );
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Convert BDEngine datapack into group and animation formats this plugin uses";
     }
 }

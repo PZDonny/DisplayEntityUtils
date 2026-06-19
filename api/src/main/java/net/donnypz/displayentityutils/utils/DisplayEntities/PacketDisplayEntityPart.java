@@ -10,10 +10,7 @@ import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
-import net.donnypz.displayentityutils.utils.Direction;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.donnypz.displayentityutils.utils.InteractionCommand;
-import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.*;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
@@ -886,18 +883,18 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     private NamespacedKey getInteractionCMDKey(boolean isLeftClick, boolean isConsole){
         if (isLeftClick){
             if (isConsole){
-                return DisplayUtils.leftClickConsole;
+                return InteractionUtils.leftClickConsole;
             }
             else{
-                return DisplayUtils.leftClickPlayer;
+                return InteractionUtils.leftClickPlayer;
             }
         }
         else{
             if (isConsole){
-                return DisplayUtils.rightClickConsole;
+                return InteractionUtils.rightClickConsole;
             }
             else{
-                return DisplayUtils.rightClickPlayer;
+                return InteractionUtils.rightClickPlayer;
             }
         }
     }
@@ -916,17 +913,17 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public @NotNull List<InteractionCommand> getInteractionCommandsWithData() {
         if (interactionCommands == null || type != SpawnedDisplayEntityPart.PartType.INTERACTION) return List.of();
         List<InteractionCommand> list = new ArrayList<>();
-        for (String s : interactionCommands.getOrDefault(DisplayUtils.leftClickConsole, List.of())){
-            list.add(new InteractionCommand(s, true, true, DisplayUtils.leftClickConsole));
+        for (String s : interactionCommands.getOrDefault(InteractionUtils.leftClickConsole, List.of())){
+            list.add(new InteractionCommand(s, true, true, InteractionUtils.leftClickConsole));
         }
-        for (String s : interactionCommands.getOrDefault(DisplayUtils.leftClickPlayer, List.of())){
-            list.add(new InteractionCommand(s, true, false, DisplayUtils.leftClickPlayer));
+        for (String s : interactionCommands.getOrDefault(InteractionUtils.leftClickPlayer, List.of())){
+            list.add(new InteractionCommand(s, true, false, InteractionUtils.leftClickPlayer));
         }
-        for (String s : interactionCommands.getOrDefault(DisplayUtils.rightClickConsole, List.of())){
-            list.add(new InteractionCommand(s, false, true, DisplayUtils.rightClickConsole));
+        for (String s : interactionCommands.getOrDefault(InteractionUtils.rightClickConsole, List.of())){
+            list.add(new InteractionCommand(s, false, true, InteractionUtils.rightClickConsole));
         }
-        for (String s : interactionCommands.getOrDefault(DisplayUtils.rightClickPlayer, List.of())){
-            list.add(new InteractionCommand(s, false, false, DisplayUtils.rightClickPlayer));
+        for (String s : interactionCommands.getOrDefault(InteractionUtils.rightClickPlayer, List.of())){
+            list.add(new InteractionCommand(s, false, false, InteractionUtils.rightClickPlayer));
         }
         return list;
     }
@@ -1121,7 +1118,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     private void pivot(float yaw, float pitch, float angleInDegrees){
         if (group == null || isDisplay()) return;
         Location groupLoc = group.getLocation();
-        Location pivotedLoc = DisplayUtils.getPivotLocation(getLocation(), groupLoc, angleInDegrees);
+        Location pivotedLoc = WorldUtils.getPivotLocation(getLocation(), groupLoc, angleInDegrees);
         packetLocation.setCoordinates(pivotedLoc);
 
 
@@ -1305,28 +1302,28 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     public List<String> getLeftConsoleInteractionCommands(){
         if (interactionCommands != null){
-            return interactionCommands.get(DisplayUtils.leftClickConsole);
+            return interactionCommands.get(InteractionUtils.leftClickConsole);
         }
         return List.of();
     }
 
     public List<String> getLeftPlayerInteractionCommands(){
         if (interactionCommands != null){
-            return interactionCommands.get(DisplayUtils.leftClickPlayer);
+            return interactionCommands.get(InteractionUtils.leftClickPlayer);
         }
         return List.of();
     }
 
     public List<String> getRightConsoleInteractionCommands(){
         if (interactionCommands != null){
-            return interactionCommands.get(DisplayUtils.rightClickConsole);
+            return interactionCommands.get(InteractionUtils.rightClickConsole);
         }
         return List.of();
     }
 
     public List<String> getRightPlayerInteractionCommands(){
         if (interactionCommands != null){
-            return interactionCommands.get(DisplayUtils.rightClickPlayer);
+            return interactionCommands.get(InteractionUtils.rightClickPlayer);
         }
         return List.of();
     }
@@ -1394,7 +1391,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         }
 
         PacketLocation(Location location, Vector3f vector){
-            this(vector == null ? location : DisplayUtils.getPivotLocation(Vector.fromJOML(vector), location, location.getYaw()));
+            this(vector == null ? location : WorldUtils.getPivotLocation(Vector.fromJOML(vector), location, location.getYaw()));
         }
 
         PacketLocation setRotation(float yaw, float pitch){

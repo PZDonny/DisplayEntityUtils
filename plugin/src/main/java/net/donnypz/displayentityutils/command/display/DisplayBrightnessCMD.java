@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 class DisplayBrightnessCMD extends PartsSubCommand {
     DisplayBrightnessCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("brightness", parentSubCommand, Permission.DISPLAY_BRIGHTNESS, 4, 4);
+        super("brightness", parentSubCommand, Permission.DISPLAY_BRIGHTNESS, true);
         setTabComplete(2, "<block>");
         setTabComplete(3, "<sky>");
     }
@@ -85,6 +85,11 @@ class DisplayBrightnessCMD extends PartsSubCommand {
         catch(IllegalArgumentException e){
             return new BrightnessResult(null, false);
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set your selected display's brightness. Enter values between 0-15. \n-1 resets";
     }
 
     private record BrightnessResult(Display.Brightness brightness, boolean correctNumbers){}

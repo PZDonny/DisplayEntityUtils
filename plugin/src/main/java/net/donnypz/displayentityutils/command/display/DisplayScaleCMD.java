@@ -16,7 +16,7 @@ import java.util.List;
 class DisplayScaleCMD extends PartsSubCommand {
 
     DisplayScaleCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("scale", parentSubCommand, Permission.DISPLAY_TRANSFORM, 4, 4);
+        super("scale", parentSubCommand, Permission.DISPLAY_TRANSFORM, true);
         setTabComplete(2, List.of("x", "y", "z", "-all"));
         setTabComplete(3, "<scale>");
     }
@@ -29,7 +29,7 @@ class DisplayScaleCMD extends PartsSubCommand {
             }
             try {
                 if (applyScaleChange(getDimension(args), getScale(args), selectedPart, player)) {
-                    player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Scale updated for selected display parts!", NamedTextColor.GREEN)));
+                    player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Scale updated for selected displays!", NamedTextColor.GREEN)));
                 }
             } catch (NumberFormatException e) {
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the scale!", NamedTextColor.RED)));
@@ -57,9 +57,7 @@ class DisplayScaleCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /deu display scale <x | y | z | -all> <scale> [-all]", NamedTextColor.RED));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     private String getDimension(String[] args){
         return args[2].toLowerCase();
@@ -89,5 +87,10 @@ class DisplayScaleCMD extends PartsSubCommand {
             }
         }
         return true;
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Change the scale of your selected display, by axis";
     }
 }

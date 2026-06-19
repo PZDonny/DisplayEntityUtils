@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 public class AnimShowPointsCMD extends PlayerSubCommand {
 
     AnimShowPointsCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("showpoint", parentSubCommand, Permission.ANIM_FRAME_INFO);
+        super("showpoints", parentSubCommand, Permission.ANIM_FRAME_INFO);
         setTabComplete(2, "<frame-id>");
         addFlag("-default");
     }
@@ -43,10 +43,7 @@ public class AnimShowPointsCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu anim showpoints <frame-id>", NamedTextColor.RED)));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         try {
             int id = Integer.parseInt(args[2]);
@@ -73,5 +70,10 @@ public class AnimShowPointsCMD extends PlayerSubCommand {
         }
 
 
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Show the frame points of a frame. Use \"-default\" to view a frame's default point info";
     }
 }

@@ -23,10 +23,7 @@ class InteractionSpawnCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 4){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu interaction spawn <height> <width> [-g]", NamedTextColor.RED)));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         Interaction interaction = spawnInteraction(player, player.getLocation(), args);
         CMDUtils.tryAddEntityToGroup(player, args, interaction, this, "-g");
@@ -51,5 +48,10 @@ class InteractionSpawnCMD extends PlayerSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter valid numbers!", NamedTextColor.RED)));
             return null;
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Spawn an interaction entity at your location.\nUse \"-g\" to add it to your selected group";
     }
 }

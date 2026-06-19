@@ -35,10 +35,7 @@ class PartsFilterTagsCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3){
-            player.sendMessage(Component.text("/deu parts filtertags <part-tags>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         player.sendMessage(Component.empty());
         PartFilter builder = new PartFilter();
@@ -73,5 +70,10 @@ class PartsFilterTagsCMD extends PlayerSubCommand {
         else{
             partSelection.glow(player, 30);
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Filter parts by part tags, comma separated. Exclude A tag by prefixing it with \"!\"";
     }
 }

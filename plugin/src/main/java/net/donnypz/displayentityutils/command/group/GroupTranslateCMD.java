@@ -16,16 +16,14 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupTranslateCMD extends GroupSubCommand {
     GroupTranslateCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("translate", parentSubCommand, Permission.GROUP_TRANSFORM, 5, true);
+        super("translate", parentSubCommand, Permission.GROUP_TRANSFORM, true);
         setTabComplete(2, TabSuggestion.DIRECTIONS);
         setTabComplete(3, "<distance>");
         setTabComplete(4, "<tick-duration>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("/deu group translate <direction> <distance> <tick-duration>", NamedTextColor.RED));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
@@ -56,5 +54,10 @@ class GroupTranslateCMD extends GroupSubCommand {
                 DisplayEntityPluginCommand.invalidDirection(player);
             }
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return"Changes your selected group's translation, use \"move\" instead if this group uses animations";
     }
 }

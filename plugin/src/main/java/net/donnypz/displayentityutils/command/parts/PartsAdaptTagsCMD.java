@@ -11,8 +11,8 @@ import org.jetbrains.annotations.Nullable;
 
 class PartsAdaptTagsCMD extends PartsSubCommand {
     PartsAdaptTagsCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("adapttags", parentSubCommand, Permission.PARTS_TAG, 2, 0);
-        setTabComplete(2, "-remove");
+        super("adapttags", parentSubCommand, Permission.PARTS_TAG);
+        addFlag("-remove");
     }
 
     @Override
@@ -30,13 +30,8 @@ class PartsAdaptTagsCMD extends PartsSubCommand {
             return false;
         }
 
-        boolean removeFromSB;
-        if (args.length < 3){
-            removeFromSB = false;
-        }
-        else{
-            removeFromSB = args[2].equalsIgnoreCase("-remove");
-        }
+        OptionalArguments oArgs = getOptionalArguments(player, args);
+        boolean removeFromSB = oArgs.hasFlag("-remove");
 
         if (!selection.isValid()){ //Adapt for all parts
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid part selection! Please try again!", NamedTextColor.RED)));
@@ -53,4 +48,9 @@ class PartsAdaptTagsCMD extends PartsSubCommand {
         return true;
     }
 
+    @Override
+    protected String getDescription() {
+        return "Adapt scoreboard tags to tags usable by DisplayEntityUtils. Applied to selected parts."+
+                " \"-remove\" removes tag from scoreboard";
+    }
 }

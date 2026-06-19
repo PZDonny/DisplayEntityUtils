@@ -23,15 +23,13 @@ import java.util.List;
 class AnimDrawPosCMD extends PlayerSubCommand {
     AnimDrawPosCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("drawpos", parentSubCommand, Permission.ANIM_DRAW_FRAME_POINTS);
+        setUnsafe();
         setTabComplete(2, List.of("1", "2", "3", "show"));
     }
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 3){
-            incorrectUsage(player);
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         DEUUser user = DEUUser.getOrCreateUser(player);
         try{
@@ -43,15 +41,11 @@ class AnimDrawPosCMD extends PlayerSubCommand {
         }
         catch(NumberFormatException e) {
             if (!args[2].equalsIgnoreCase("show")) {
-                incorrectUsage(player);
+                super.incorrectUsage(player);
                 return;
             }
             showPointPos(user, player);
         }
-    }
-
-    private void incorrectUsage(Player player){
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu anim drawpos <1 | 2 | 3 | show>", NamedTextColor.RED)));
     }
 
     private void showPointPos(DEUUser user, Player player){
@@ -97,5 +91,10 @@ class AnimDrawPosCMD extends PlayerSubCommand {
                 }
             }, 0, 2);
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set where frame points should be drawn between. Set 3 when drawing arcs";
     }
 }

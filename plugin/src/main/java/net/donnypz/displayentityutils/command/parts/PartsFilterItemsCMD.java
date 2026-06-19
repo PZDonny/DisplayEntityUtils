@@ -40,10 +40,7 @@ class PartsFilterItemsCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3){
-            player.sendMessage(Component.text("/deu parts filteritems <items-ids>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         player.sendMessage(Component.empty());
 
@@ -100,4 +97,8 @@ class PartsFilterItemsCMD extends PlayerSubCommand {
         }
     }
 
+    @Override
+    protected String getDescription() {
+        return "Filter items of ITEM parts. Exclude ALL filtered items by prefixing with \"!\"";
+    }
 }

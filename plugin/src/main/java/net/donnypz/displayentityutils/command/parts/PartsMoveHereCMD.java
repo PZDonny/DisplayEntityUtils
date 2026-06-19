@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 class PartsMoveHereCMD extends PartsSubCommand {
 
     public PartsMoveHereCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("movehere", parentSubCommand, Permission.PARTS_TRANSFORM, 2, 2);
+        super("movehere", parentSubCommand, Permission.PARTS_TRANSFORM, true);
     }
 
     @Override
@@ -27,9 +27,7 @@ class PartsMoveHereCMD extends PartsSubCommand {
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /deu parts movehere [-all]", NamedTextColor.RED));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
@@ -58,5 +56,10 @@ class PartsMoveHereCMD extends PartsSubCommand {
         selectedPart.teleport(loc);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Moved your selected part to your location!", NamedTextColor.GREEN)));
         return true;
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Change your selected part's actual location to your location";
     }
 }

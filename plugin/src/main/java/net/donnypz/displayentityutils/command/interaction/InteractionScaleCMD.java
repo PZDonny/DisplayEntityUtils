@@ -14,16 +14,13 @@ class InteractionScaleCMD extends PlayerSubCommand {
         super("scale", parentSubCommand, Permission.INTERACTION_DIMENSION);
         setTabComplete(2, "<height>");
         setTabComplete(3, "<width>");
-        setTabComplete(4, "[tick-duration]");
-        setTabComplete(5, "[tick-delay]");
+        setOptionalTabComplete(4, "[tick-duration]");
+        setOptionalTabComplete(5, "[tick-delay]");
     }
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 4){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu interaction scale <height> <width> [tick-duration] [tick-delay]", NamedTextColor.RED)));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         InteractionCMD.SelectedInteraction interaction = InteractionCMD.getInteraction(player, true);
         if (interaction == null){
@@ -64,5 +61,10 @@ class InteractionScaleCMD extends PlayerSubCommand {
         player.sendMessage(Component.text("| Height: "+height, NamedTextColor.GRAY));
         player.sendMessage(Component.text("| Width: "+width, NamedTextColor.GRAY));
         player.sendMessage(Component.text("| Delay: "+delay, NamedTextColor.GRAY));
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Scale an interaction entity, optionally over a period of time";
     }
 }

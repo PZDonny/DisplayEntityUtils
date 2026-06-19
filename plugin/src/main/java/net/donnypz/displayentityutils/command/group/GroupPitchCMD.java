@@ -14,14 +14,12 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupPitchCMD extends GroupSubCommand {
     GroupPitchCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("pitch", parentSubCommand, Permission.GROUP_TRANSFORM, 3, true);
+        super("pitch", parentSubCommand, Permission.GROUP_TRANSFORM, true);
         setTabComplete(2, "<pitch>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu group pitch <pitch>", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
@@ -40,5 +38,10 @@ class GroupPitchCMD extends GroupSubCommand {
         catch(NumberFormatException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Please enter a valid number!", NamedTextColor.RED)));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set your selected group's pitch";
     }
 }

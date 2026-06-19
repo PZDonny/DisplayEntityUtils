@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 class HidePointsCMD extends PlayerSubCommand {
     HidePointsCMD() {
-        super(Permission.HELP);
+        super("hidepoints", Permission.HELP);
     }
 
     @Override
@@ -20,5 +20,10 @@ class HidePointsCMD extends PlayerSubCommand {
         }
         RelativePointUtils.removeRelativePoints(player);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Removed all visible points!", NamedTextColor.GREEN)));
+    }
+
+    @Override
+    protected String getDescription() {
+        return "";
     }
 }

@@ -38,10 +38,7 @@ class InteractionPivotCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu interaction pivot <angle> [-all]", NamedTextColor.RED)));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         double angle;
         try{
@@ -71,5 +68,10 @@ class InteractionPivotCMD extends PlayerSubCommand {
             interaction.pivot(selection.getGroup().getLocation(), angle);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Pivoting Interaction around group", NamedTextColor.GREEN)));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Pivot an interaction around its group's location";
     }
 }

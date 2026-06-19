@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 class AnimSaveJsonCMD extends PlayerSubCommand {
     AnimSaveJsonCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("savejson", parentSubCommand, Permission.ANIM_SAVE);
+        setUnsafe();
     }
 
     @Override
@@ -37,5 +38,10 @@ class AnimSaveJsonCMD extends PlayerSubCommand {
         DisplayAPI.getScheduler().runAsync(() -> {
             DisplayAnimationManager.saveDisplayAnimationJson(anim, player);
         });
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Save your selected animation and any changes made as a JSON file. Selecting animations from JSON files will always be slower";
     }
 }

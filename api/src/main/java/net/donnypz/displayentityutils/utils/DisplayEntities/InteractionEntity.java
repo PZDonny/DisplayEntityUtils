@@ -2,6 +2,8 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.InteractionUtils;
+import net.donnypz.displayentityutils.utils.WorldUtils;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.Location;
@@ -71,7 +73,7 @@ final class InteractionEntity implements Serializable {
     }
 
     Interaction createEntity(Location origin, GroupSpawnSettings settings){
-        Location spawnLoc = DisplayUtils.getPivotLocation(
+        Location spawnLoc = WorldUtils.getPivotLocation(
                 vector,
                 origin,
                 origin.getYaw());
@@ -110,7 +112,7 @@ final class InteractionEntity implements Serializable {
                 .setAttribute(DisplayAttributes.Interaction.HEIGHT, height)
                 .setAttribute(DisplayAttributes.Interaction.RESPONSIVE, isResponsive);
 
-        Location spawnLoc = DisplayUtils.getPivotLocation(
+        Location spawnLoc = WorldUtils.getPivotLocation(
                 vector,
                 origin,
                 origin.getYaw());
@@ -138,10 +140,10 @@ final class InteractionEntity implements Serializable {
 
     private HashMap<NamespacedKey, List<String>> getInteractionCommands(PersistentDataContainer pdc){
         HashMap<NamespacedKey, List<String>> commands = new HashMap<>();
-        commands.put(DisplayUtils.leftClickConsole, DisplayEntity.getListFromPDC(pdc, DisplayUtils.leftClickConsole));
-        commands.put(DisplayUtils.leftClickPlayer, DisplayEntity.getListFromPDC(pdc, DisplayUtils.leftClickPlayer));
-        commands.put(DisplayUtils.rightClickConsole, DisplayEntity.getListFromPDC(pdc, DisplayUtils.rightClickConsole));
-        commands.put(DisplayUtils.rightClickPlayer, DisplayEntity.getListFromPDC(pdc, DisplayUtils.rightClickPlayer));
+        commands.put(InteractionUtils.leftClickConsole, DisplayEntity.getListFromPDC(pdc, InteractionUtils.leftClickConsole));
+        commands.put(InteractionUtils.leftClickPlayer, DisplayEntity.getListFromPDC(pdc, InteractionUtils.leftClickPlayer));
+        commands.put(InteractionUtils.rightClickConsole, DisplayEntity.getListFromPDC(pdc, InteractionUtils.rightClickConsole));
+        commands.put(InteractionUtils.rightClickPlayer, DisplayEntity.getListFromPDC(pdc, InteractionUtils.rightClickPlayer));
         return commands;
     }
 

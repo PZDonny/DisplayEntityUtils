@@ -17,18 +17,14 @@ import java.util.List;
 
 class GroupSetSpawnAnimationCMD extends GroupSubCommand {
     GroupSetSpawnAnimationCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("setspawnanim", parentSubCommand, Permission.GROUP_SET_SPAWN_ANIM, 5, true);
+        super("setspawnanim", parentSubCommand, Permission.GROUP_SET_SPAWN_ANIM, true);
         setTabComplete(2, "<anim-tag>");
         setTabComplete(3, TabSuggestion.STORAGES);
         setTabComplete(4, List.of("linear", "loop"));
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /deu group setspawnanim <animation-tag> <storage> <linear | loop>", NamedTextColor.RED));
-        player.sendMessage(Component.text("Valid storage methods are local, mongodb, or mysql", NamedTextColor.GRAY));
-        sendAnimationTypes(player);
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
@@ -63,13 +59,12 @@ class GroupSetSpawnAnimationCMD extends GroupSubCommand {
                     })));
         }
         catch(IllegalArgumentException e){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid Animation type!", NamedTextColor.RED)));
-            sendAnimationTypes(player);
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid animation type!", NamedTextColor.RED)));
         }
     }
 
-    private void sendAnimationTypes(Player player){
-        player.sendMessage(Component.text("- LINEAR: Plays an animation one time then stops", NamedTextColor.GRAY));
-        player.sendMessage(Component.text("- LOOP: Plays an animation infinitely until manually stopped", NamedTextColor.GRAY));
+    @Override
+    protected String getDescription() {
+        return "Set an animation to play when this group is spawned/loaded";
     }
 }

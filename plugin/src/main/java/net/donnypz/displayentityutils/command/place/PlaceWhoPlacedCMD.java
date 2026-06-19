@@ -46,4 +46,9 @@ class PlaceWhoPlacedCMD extends PlayerSubCommand {
                     ));
         });
     }
+
+    @Override
+    protected String getDescription() {
+        return "Get the name and UUID of the player who placed a group";
+    }
 }

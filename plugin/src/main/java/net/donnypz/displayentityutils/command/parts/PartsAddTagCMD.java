@@ -15,14 +15,12 @@ import org.jetbrains.annotations.Nullable;
 
 class PartsAddTagCMD extends PartsSubCommand {
     PartsAddTagCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("addtag", parentSubCommand, Permission.PARTS_TAG, 3, 3);
+        super("addtag", parentSubCommand, Permission.PARTS_TAG, true);
         setTabComplete(2,"<part-tag>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Provide a part tag! /deu parts addtag <part-tag> [-all]", NamedTextColor.RED));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
@@ -48,5 +46,10 @@ class PartsAddTagCMD extends PartsSubCommand {
             DisplayEntityPluginCommand.invalidTag(player, tag);
             return false;
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Add a tag to your selected part";
     }
 }

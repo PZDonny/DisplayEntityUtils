@@ -21,10 +21,7 @@ class PlaceSetCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 3) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage /deu place set <group-tag>", NamedTextColor.RED)));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         ItemStack heldItem = player.getInventory().getItemInMainHand();
         if (!PlaceableGroupManager.isValidItem(heldItem)){
@@ -37,5 +34,10 @@ class PlaceSetCMD extends PlayerSubCommand {
         new PlaceableGroupData(groupTag)
                 .apply(heldItem);
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Assigned a group to your held block <white>(Tag: "+groupTag+")")));
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Assign a group to your held block, which will be spawned when the block is placed";
     }
 }

@@ -37,4 +37,8 @@ class GroupBillboardCMD extends GroupSubCommand {
         }
     }
 
+    @Override
+    protected String getDescription() {
+        return "Set the billboard of all display parts in this group";
+    }
 }

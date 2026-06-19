@@ -33,4 +33,9 @@ class PartsResetFilterCMD extends PlayerSubCommand {
         ((MultiPartSelection<?>) sel).reset(true);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Part Selection Filter Reset!", NamedTextColor.YELLOW)));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Reset your part selection and any filters";
+    }
 }

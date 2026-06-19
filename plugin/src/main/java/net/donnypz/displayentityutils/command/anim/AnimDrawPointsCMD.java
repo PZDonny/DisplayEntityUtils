@@ -23,15 +23,12 @@ import java.util.List;
 class AnimDrawPointsCMD extends PlayerSubCommand {
     AnimDrawPointsCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("drawpoints", parentSubCommand, Permission.ANIM_DRAW_FRAME_POINTS);
+        setUnsafe();
         setTabComplete(2, List.of("straight", "arc"));
         setTabComplete(3, "<point-tag>");
         setTabComplete(4, "<start-frame>");
         setTabComplete(5, "<end-frame>");
-        setTabComplete(6, "[points-per-frame]");
-    }
-
-    private void incorrectUsage(Player player){
-        player.sendMessage(Component.text("Incorrect Usage! /deu anim drawpoints <straight | arc> <point-tag> <start-frame> <end-frame> [points-per-frame]", NamedTextColor.RED));
+        setOptionalTabComplete(6, "[points-per-frame]");
     }
 
     @Override
@@ -61,10 +58,7 @@ class AnimDrawPointsCMD extends PlayerSubCommand {
 
         DEUUser user = DEUUser.getOrCreateUser(player);
 
-        if (args.length < 6){
-            incorrectUsage(player);
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         String type = args[2];
         String tag = args[3];
@@ -84,7 +78,7 @@ class AnimDrawPointsCMD extends PlayerSubCommand {
             isLinear = false;
         }
         else{
-            incorrectUsage(player);
+            super.incorrectUsage(player);
             return;
         }
 
@@ -151,5 +145,10 @@ class AnimDrawPointsCMD extends PlayerSubCommand {
         player.sendMessage(Component.text("| Use command \"/deu anim drawpos\"", NamedTextColor.YELLOW));
         player.sendMessage(Component.text("| Straight: Requires Pos 1 and Pos 2 to be set", NamedTextColor.GRAY));
         player.sendMessage(Component.text("| Arc: Requires Pos 1, Pos 2, and Pos 3 to be set", NamedTextColor.GRAY));
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Draw a straight/arched line of frame points between frames";
     }
 }

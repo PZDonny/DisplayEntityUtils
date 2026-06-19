@@ -24,15 +24,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Mannequin;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
-@ApiStatus.Internal
 public class DisplayEntityPluginCommand implements TabExecutor {
 
     private final HashMap<String, DEUSubCommand> subCommands = new HashMap<>();
@@ -47,8 +42,9 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                 Component.text("Incorrect Usage! /deu listanims <storage> [page-number]", NamedTextColor.RED),
                 2,
                 false));
-
         subCommands.put("hidepoints", new HidePointsCMD());
+
+
         subCommands.put("group", new GroupCMD());
         subCommands.put("parts", new PartsCMD());
         subCommands.put("display", new DisplayCMD());
@@ -63,6 +59,10 @@ public class DisplayEntityPluginCommand implements TabExecutor {
 
     }
 
+    public DEUSubCommand getCommand(@NotNull String command){
+        return subCommands.get(command);
+    }
+
     public List<String> getFirstArgTabComplete(String current){
         List<String> list = new ArrayList<>();
         for (String s : subCommands.keySet()){
@@ -73,7 +73,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         return list;
     }
 
-    private List<String> getTabComplete(String commandType, String subCommand, String[] args){
+    private List<String> getTabComplete(CommandSender sender, String commandType, String subCommand, String[] args){
         DEUSubCommand cmd = subCommands.get(commandType);
         if (cmd == null) return List.of();
         cmd = cmd.subCommands.get(subCommand);
@@ -88,7 +88,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
 
         String current = args[currentIndex];
 
-        //Optional Flags/Options
+        //Flags/Options
         if (currentIndex >= requiredArgs) {
             HashSet<String> used = new HashSet<>();
             for (String arg : args) {
@@ -110,36 +110,27 @@ public class DisplayEntityPluginCommand implements TabExecutor {
 
             //Show available options/flags
             List<String> suggestions = new ArrayList<>();
-            for (String s : cmd.flags){
-                if (current.toLowerCase().equals(s)) return List.of();
-                if (!used.contains(s)) suggestions.add(s);
-            }
-
-            for (String s : cmd.options.keySet()){
-                if (current.toLowerCase().equals(s)) return List.of();
-                if (!used.contains(s)) suggestions.add(s);
-            }
+            if (!suggestFromOptionalArgs(current, cmd.flags, suggestions, used)) return List.of();
+            if (!suggestFromOptionalArgs(current, cmd.options.keySet(), suggestions, used)) return List.of();
             return suggestions;
         }
 
         DEUSubCommand.TabSuggestion indexSuggestions = cmd.tabCompleteSuggestions.get(currentIndex);
         if (indexSuggestions == null) return List.of();
 
-        List<String> tabCompletes = indexSuggestions.suggestions;
-        if (tabCompletes == null) return List.of();
+        return indexSuggestions.getTabComplete(current, sender);
+    }
 
-        if (!indexSuggestions.suggestUsingCurrentString){
-            return tabCompletes;
+    private boolean suggestFromOptionalArgs(String current,
+                                         Collection<String> optionalArgs,
+                                         List<String> suggestions,
+                                         HashSet<String> used
+    ){
+        for (String arg : optionalArgs){
+            if (current.toLowerCase().equals(arg)) return false;
+            if (!used.contains(arg) && arg.startsWith(current.toLowerCase())) suggestions.add(arg);
         }
-
-        List<String> list = new ArrayList<>();
-        for (String s : tabCompletes){
-            if (s.toLowerCase().startsWith(current.toLowerCase())){
-                list.add(s);
-            }
-        }
-
-        return list.isEmpty() ? tabCompletes : list;
+        return true;
     }
 
     private List<String> getTabComplete(String subcommand, String current){
@@ -213,23 +204,15 @@ public class DisplayEntityPluginCommand implements TabExecutor {
             return true;
         }
 
-        int pageNum;
+        int pageNum = 1;
         String arg = args[0];
         if (arg.equalsIgnoreCase("help")){
             if (args.length >= 2){
                 try{
                     pageNum = Integer.parseInt(args[1]);
                 }
-                catch(IllegalArgumentException e){
-                    pageNum = 1;
-                }
+                catch(IllegalArgumentException e){}
             }
-            else{
-                pageNum = 1;
-            }
-        }
-        else{
-            pageNum = 1;
         }
 
 
@@ -278,21 +261,55 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         if (page == 1){
             sender.sendMessage(Component.text("v"+DisplayAPI.getVersion(), NamedTextColor.GRAY));
             CMDUtils.sendCMD(sender, "/deu help <page-number>", "Display the plugin's help commands");
+            CMDUtils.sendCMD(sender,
+                    "/deu bdengine",
+                    "Commands for Importing/Converting models & animations from BDEngine",
+                    "<aqua>Use <yellow>\"block-display.com\" (BDEngine) <aqua>to create convertible models and animations");
             CMDUtils.sendCMD(sender, "/deu group", "Display Entity Models/Groups related commands");
-            CMDUtils.sendCMD(sender, "/deu parts", "Commands related to the parts (individual display entities) of a Display Entity Model/Group");
-            CMDUtils.sendCMD(sender, "/deu display", "Commands related to display entities");
-            CMDUtils.sendCMD(sender, "/deu item", "Commands related to specifically Item Displays");
-            CMDUtils.sendCMD(sender, "/deu text", "Commands related to specifically Text Displays");
-            CMDUtils.sendCMD(sender, "/deu interaction", "Commands related to Interaction entities");
-            CMDUtils.sendCMD(sender, "/deu mannequin", "Commands related to Mannequin entities");
+            CMDUtils.sendCMD(sender,
+                    "/deu parts",
+                    "Commands related to the parts (individual display entities) of a Display Entity Model/Group",
+                    """
+                            | \\"parts\\" are each entity in a group/model
+                            
+                            | Add tags to parts to identify each part in a group
+                            
+                            | Commands with \\"-all\\" will apply the command to all parts in your selection/filter where valid. By default, all of your selected group's parts are your in selection
+                            """);
+            CMDUtils.sendCMD(sender,
+                    "/deu display",
+                    "Commands related to display entities",
+                    "| Commands with \"-all\" will apply to all selected displays in a group");
+            CMDUtils.sendCMD(sender,
+                    "/deu item",
+                    "Commands related to specifically Item Displays",
+                    "| Commands with \"-all\" will apply the command to all selected item displays in a group");
+            CMDUtils.sendCMD(sender,
+                    "/deu text",
+                    "Commands related to specifically Text Displays",
+                    "| Commands with \"-all\" will apply the command to all selected text displays in a group");
+            CMDUtils.sendCMD(sender,
+                    "/deu interaction",
+                    "Commands related to Interaction entities",
+                    """
+                            | Commands with "-all" will apply the command to all selected interaction in a group
+                            
+                            | Where applicable, Interaction commands will prioritize the interaction entity you're looking at over the one you may have selected
+                            """);
         }
         else{
+            CMDUtils.sendCMD(sender,
+                    "/deu mannequin",
+                    "Commands related to Mannequin entities",
+                    "| Commands with \"-all\" will apply the command to all selected mannequins in a group");
             CMDUtils.sendCMD(sender, "/deu place", "Assign a Display Entity Model/Group to an block that will spawn when placed");
-            CMDUtils.sendCMD(sender, "/deu anim", "Animation related commands");
+            CMDUtils.sendCMD(sender,
+                    "/deu anim",
+                    "Animation related commands",
+                    "| Commands allowing multiple <frame-ids> are comma separated");
             CMDUtils.sendCMD(sender, "/deu listgroups <storage> [page-number]", "List all saved Display Entity Models/Groups");
             CMDUtils.sendCMD(sender, "/deu listanims <storage> [page-number]", "List all saved animations");
             CMDUtils.sendCMD(sender, "/deu hidepoints", "Hide any visible points (frame points, persistent packet group points, etc.)");
-            CMDUtils.sendCMD(sender, "/deu bdengine", "Import/Convert models from BDEngine");
             CMDUtils.sendCMD(sender, "/deu reload <config | controllers>", "Reload the plugin's config or Display Controllers." +
                     " To reload Local, MySQL or MongoDB config save options, the server must be restarted");
         }
@@ -324,7 +341,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
             }
         }
         else{
-            return getTabComplete(args[0], args[1], args);
+            return getTabComplete(sender, args[0], args[1], args);
         }
         return suggestions;
     }

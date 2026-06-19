@@ -52,4 +52,9 @@ class InteractionListCMD extends PlayerSubCommand {
             player.sendMessage(preInfo.append(command).append(remove));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "List all commands stored on an interaction";
+    }
 }

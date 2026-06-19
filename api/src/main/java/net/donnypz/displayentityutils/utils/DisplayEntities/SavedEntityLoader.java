@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.WorldUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
@@ -17,7 +18,7 @@ import java.io.IOException;
 class SavedEntityLoader {
 
     static Mannequin spawnMannequin(Location origin, GroupSpawnSettings settings, MannequinEntity mannequinEntity){
-        Location spawnLoc = DisplayUtils.getPivotLocation(
+        Location spawnLoc = WorldUtils.getPivotLocation(
                 mannequinEntity.vector,
                 origin,
                 origin.getYaw());

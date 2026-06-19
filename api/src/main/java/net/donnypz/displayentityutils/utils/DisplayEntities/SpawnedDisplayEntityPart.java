@@ -4,10 +4,7 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import io.papermc.paper.entity.TeleportFlag;
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.utils.Direction;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.donnypz.displayentityutils.utils.InteractionCommand;
-import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.*;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
@@ -1293,24 +1290,24 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     @Override
     public void addInteractionCommand(@NotNull String command, boolean isLeftClick, boolean isConsole) {
-        if (type == PartType.INTERACTION) DisplayUtils.addInteractionCommand((Interaction) getEntity(), command, isLeftClick, isConsole);
+        if (type == PartType.INTERACTION) InteractionUtils.addInteractionCommand((Interaction) getEntity(), command, isLeftClick, isConsole);
     }
 
     @Override
     public void removeInteractionCommand(@NotNull InteractionCommand command) {
-        if (type == PartType.INTERACTION) DisplayUtils.removeInteractionCommand((Interaction) getEntity(), command);
+        if (type == PartType.INTERACTION) InteractionUtils.removeInteractionCommand((Interaction) getEntity(), command);
     }
 
     @Override
     public @NotNull List<String> getInteractionCommands() {
         if (type != PartType.INTERACTION) return List.of();
-        return DisplayUtils.getInteractionCommands((Interaction) getEntity());
+        return InteractionUtils.getInteractionCommands((Interaction) getEntity());
     }
 
     @Override
     public @NotNull List<InteractionCommand> getInteractionCommandsWithData() {
         if (type != PartType.INTERACTION) return List.of();
-        return DisplayUtils.getInteractionCommandsWithData((Interaction) getEntity());
+        return InteractionUtils.getInteractionCommandsWithData((Interaction) getEntity());
     }
 
     @Override

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 class PartsRemoveTagCMD extends PartsSubCommand {
     PartsRemoveTagCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("removetag", parentSubCommand, Permission.PARTS_TAG, 3, 3);
+        super("removetag", parentSubCommand, Permission.PARTS_TAG, true);
         setTabComplete(2, "<part-tag>");
     }
 
@@ -37,5 +37,10 @@ class PartsRemoveTagCMD extends PartsSubCommand {
         selection.getSelectedPart().removeTag(tag);
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Removing part tag from selected part! <white>(Removed Tag: "+tag+")")));
         return true;
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Remove a tag from your selected part";
     }
 }

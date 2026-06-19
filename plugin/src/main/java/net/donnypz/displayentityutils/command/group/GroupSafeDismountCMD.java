@@ -28,16 +28,7 @@ class GroupSafeDismountCMD extends ConsoleUsableSubCommand {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (args.length < 3) {
-            if (!(sender instanceof Player)){
-                sender.sendMessage(Component.text("Incorrect Console Usage! /deu group safedismount <player-name | entity-uuid>", NamedTextColor.RED));
-                return;
-            }
-            else{
-                sender.sendMessage(Component.text("Incorrect Usage! /deu group safedismount <-target | -selected | player-name | entity-uuid>", NamedTextColor.RED));
-            }
-            return;
-        }
+        if (!hasMinimumArguments(sender, args)) return;
 
         String type = args[2];
         boolean hadAI;
@@ -103,4 +94,8 @@ class GroupSafeDismountCMD extends ConsoleUsableSubCommand {
         sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Dismounted all groups riding the entity!", NamedTextColor.GREEN)));
     }
 
+    @Override
+    protected String getDescription() {
+        return "Safely dismount a group from an entity";
+    }
 }

@@ -23,24 +23,16 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public final class DisplayUtils {
 
-    public static final NamespacedKey leftClickConsole = new NamespacedKey(DisplayAPI.getPlugin(), "lcc");
-    public static final NamespacedKey leftClickPlayer = new NamespacedKey(DisplayAPI.getPlugin(), "lcp");
-    public static final NamespacedKey rightClickConsole = new NamespacedKey(DisplayAPI.getPlugin(), "rcc");
-    public static final NamespacedKey rightClickPlayer = new NamespacedKey(DisplayAPI.getPlugin(), "rcp");
-
-    private static final ListPersistentDataType<String, String> tagPDCType = PersistentDataType.LIST.strings();
+    private static final ListPersistentDataType<String, String> LIST_PDC_TYPE = PersistentDataType.LIST.strings();
     private DisplayUtils(){}
 
     public static boolean isPartEntity(Entity entity){ // don't add notnull annotation
         return SpawnedDisplayEntityPart.PartType.getType(entity) != null;
     }
-
 
     public static @NotNull List<Entity> getUngroupedPartEntities(@NotNull Location location, double distance){
         List<Entity> parts = new ArrayList<>();
@@ -170,7 +162,7 @@ public final class DisplayUtils {
      * Get the location where an {@link ActivePart} of a display type is translated based off of its {@link Transformation}'s translation alone.<br>
      * This may not be a perfect representation of where the model's location actually is, due to the shape of models varying (e.g.: Stone Block vs Stone Pressure Plate)
      * @param part The entity to get the location from
-     * @return the location where the part is translated at. Null if the part is an interaction entity or if the transformation/location of the entity is unset
+     * @return the location where the part is translated at. Null if the part is not a display entity or if the transformation/location of the entity is unset
      */
     public static @Nullable Location getFixedModelLocation(@NotNull ActivePart part){
         if (!part.isDisplay()){
@@ -189,7 +181,7 @@ public final class DisplayUtils {
      * Get the location where an {@link ActivePart} of a display type is translated based off of its {@link Transformation} and pitch and yaw.<br>
      * This may not be a perfect representation of where the model's location actually is, due to the shape of models varying (e.g.: Stone Block vs Stone Pressure Plate)
      * @param part The entity to get the location from
-     * @return the location where the part is translated at. Null if the part is not a display
+     * @return the location where the part is translated at. Null if the part is not a display entity
      */
     public static @Nullable Location getModelLocation(@NotNull ActivePart part){
         if (!part.isDisplay()){
@@ -302,22 +294,10 @@ public final class DisplayUtils {
         return new float[]{width, height};
     }
 
-    /**
-     * Gets the center location of an Interaction entity
-     * @param interaction The interaction entity get the center of
-     * @return The interaction's center location
-     */
-    public static Location getInteractionCenter(@NotNull Interaction interaction){
-        Location loc = interaction.getLocation().clone();
-        double yCenter = interaction.getInteractionHeight()/2;
-        loc.add(0, yCenter, 0);
-        return loc;
-    }
-
 
     /**
      * Get the translation vector from the entity's group's master part to the entity's location
-     * @param entity the interaction
+     * @param entity the non-display entity
      * @return a vector or null if the entity is not in a group
      */
     public static @Nullable Vector getNonDisplayTranslation(@NotNull Entity entity){
@@ -330,7 +310,7 @@ public final class DisplayUtils {
 
     /**
      * Get the translation vector from a location to the entity's location
-     * @param entity the entity
+     * @param entity the non-display entity
      * @param referenceLocation the reference location
      * @return a vector
      */
@@ -572,7 +552,7 @@ public final class DisplayUtils {
     /**
      * Pivot an entity around a location
      * @param entity the entity
-     * @param center the location the entity should pivot around
+     * @param center the location to pivot around
      * @param angleInDegrees the pivot angle in degrees
      */
     public static void pivot(@NotNull Entity entity, @NotNull Location center, double angleInDegrees){
@@ -582,75 +562,6 @@ public final class DisplayUtils {
                 .transform(translationVector);
         Location newLoc = center.clone().subtract(Vector.fromJOML(translationVector));
         FoliaUtils.teleport(entity, newLoc);
-    }
-
-    /**
-     * Get the location an interaction entity would be pivoted to after using {@link DisplayUtils#pivot(Entity, Location, double)}
-     * @param offsetLocation the interaction entity's location
-     * @param origin the location the interaction should pivot around
-     * @param angleInDegrees the pivot angle in degrees
-     * @return a Location
-     */
-    public static @NotNull Location getPivotLocation(@NotNull Location offsetLocation, @NotNull Location origin, double angleInDegrees){
-        Vector translationVector = origin.clone().subtract(offsetLocation).toVector();
-        return getPivotLocation(translationVector, origin, angleInDegrees);
-    }
-
-    /**
-     * Get the location an interaction entity would be pivoted to after using {@link DisplayUtils#pivot(Entity, Location, double)}
-     * @param translationVector the translation offset for an interaction entity from a center location
-     * @param origin the location the interaction should pivot around
-     * @param angleInDegrees the pivot angle in degrees
-     * @return a Location
-     */
-    public static @NotNull Location getPivotLocation(@NotNull Vector translationVector, @NotNull Location origin, double angleInDegrees){
-        return getPivotLocation(translationVector.toVector3f(), origin, angleInDegrees);
-    }
-
-    /**
-     * Get the location an interaction entity would be pivoted to after using {@link DisplayUtils#pivot(Entity, Location, double)}
-     * @param translationVector the translation offset for an interaction entity from a center location
-     * @param origin the location the interaction should pivot around
-     * @param angleInDegrees the pivot angle in degrees
-     * @return a Location
-     */
-    public static @NotNull Location getPivotLocation(@NotNull Vector3f translationVector, @NotNull Location origin, double angleInDegrees){
-        Vector3f v = new Vector3f(translationVector);
-        v.rotateY((float) Math.toRadians(-angleInDegrees));
-        return origin.clone().subtract(Vector.fromJOML(v));
-    }
-
-    /**
-     * Scale an Interaction entity over a period of time
-     * @param interaction the interaction entity
-     * @param newHeight the height to set
-     * @param newWidth the width to set
-     * @param durationInTicks how long the scaling should take
-     * @param delayInTicks how long before the scaling should start
-     */
-    public static void scaleInteraction(@NotNull Interaction interaction, float newHeight, float newWidth, int durationInTicks, int delayInTicks){
-        if (durationInTicks <= 0 && delayInTicks <= 0){
-            interaction.setInteractionHeight(newHeight);
-            interaction.setInteractionWidth(newWidth);
-            return;
-        }
-        float heightChange = (interaction.getInteractionHeight()-newHeight)/durationInTicks;
-        float widthChange = (interaction.getInteractionWidth()-newWidth)/durationInTicks;
-        DisplayAPI.getScheduler().entityRunTimer(interaction, new Scheduler.SchedulerRunnable() {
-            int timeRan = 0;
-            @Override
-            public void run() {
-                if (timeRan == durationInTicks){
-                    interaction.setInteractionHeight(newHeight);
-                    interaction.setInteractionWidth(newWidth);
-                    cancel();
-                    return;
-                }
-                interaction.setInteractionWidth(interaction.getInteractionWidth()-widthChange);
-                interaction.setInteractionHeight(interaction.getInteractionHeight()-heightChange);
-                timeRan++;
-            }
-        }, delayInTicks, 1);
     }
 
     /**
@@ -692,97 +603,13 @@ public final class DisplayUtils {
     }
 
     /**
-     * Gets the set commands of an interaction entity with the interaction command prefix.
-     * @param interaction
-     * @return List of commands stored on this interaction entity
-     */
-    public static @NotNull List<String> getInteractionCommands(@NotNull Interaction interaction){
-        List<String> commands = new ArrayList<>();
-        commands.addAll(getInteractionLeftConsoleCommands(interaction));
-        commands.addAll(getInteractionLeftPlayerCommands(interaction));
-        commands.addAll(getInteractionRightConsoleCommands(interaction));
-        commands.addAll(getInteractionRightPlayerCommands(interaction));
-        return commands;
-    }
-
-    /**
-     * Gets the set commands of an interaction entity, without any prefix set by this plugin.
-     * @param interaction
-     * @return List of commands stored on this interaction entity as {@link InteractionCommand}
-     */
-    public static @NotNull List<InteractionCommand> getInteractionCommandsWithData(@NotNull Interaction interaction){
-        List<InteractionCommand> cmd = new ArrayList<>();
-        for (String s : getInteractionLeftConsoleCommands(interaction)){
-            cmd.add(new InteractionCommand(s, true, true, leftClickConsole));
-        }
-        for (String s : getInteractionLeftPlayerCommands(interaction)){
-            cmd.add(new InteractionCommand(s, true, false, leftClickPlayer));
-        }
-        for (String s : getInteractionRightConsoleCommands(interaction)){
-            cmd.add(new InteractionCommand(s, false, true, rightClickConsole));
-        }
-        for (String s : getInteractionRightPlayerCommands(interaction)){
-            cmd.add(new InteractionCommand(s, false, false, rightClickPlayer));
-        }
-        return cmd;
-    }
-
-    public static @NotNull List<String> getInteractionLeftConsoleCommands(@NotNull Interaction interaction){
-        return getPDCList(interaction, leftClickConsole);
-    }
-
-    public static @NotNull List<String> getInteractionLeftPlayerCommands(@NotNull Interaction interaction){
-        return getPDCList(interaction, leftClickPlayer);
-    }
-
-    public static @NotNull List<String> getInteractionRightConsoleCommands(@NotNull Interaction interaction){
-        return getPDCList(interaction, rightClickConsole);
-    }
-
-    public static @NotNull List<String> getInteractionRightPlayerCommands(@NotNull Interaction interaction){
-        return getPDCList(interaction, rightClickPlayer);
-    }
-
-    /**
-     * Adds a command to an Interaction entity to execute when clicked
-     * @param interaction The entity to assign the command to
-     * @param command The command to assign
-     * @param isLeftClick whether the command is executed on left click
-     * @param isConsole whether the command should be executed by console or the clicker
-     */
-    @ApiStatus.Internal
-    public static void addInteractionCommand(@NotNull Interaction interaction, @NotNull String command, boolean isLeftClick, boolean isConsole){
-        if (command.isBlank()){
-            return;
-        }
-        NamespacedKey key;
-        if (!isLeftClick){
-            key = isConsole ? rightClickConsole : rightClickPlayer;
-        }
-        else{
-            key = isConsole ? leftClickConsole : leftClickPlayer;
-        }
-        addToPDCList(interaction, command, key);
-    }
-
-    /**
-     * Remove a command from interaction entity
-     * @param interaction The entity to assign the command to
-     * @param command The command to remove
-     */
-    public static void removeInteractionCommand(@NotNull Interaction interaction, @NotNull InteractionCommand command){
-        String cmd = command.command;
-        NamespacedKey key = command.key;
-        removeFromPDCList(interaction, cmd, key);
-    }
-
-    /**
-     * Add a part tag to a part entity. The tag will not be added if it starts with an "!" or is blank
+     * Add a part tag to a part entity.
      * @param entity The entity to add a tag to
      * @param partTag The tag to add to this part
-     * @return true if the tag was added successfully
+     * @return true if the tag was added successfully and the tag is valid per {@link DisplayUtils#isValidTag(String)}
      */
     public static boolean addTag(@NotNull Entity entity, @NotNull String partTag){
+        if (!isValidTag(partTag)) return false;
         return addToPDCList(entity, partTag, DisplayAPI.getPartPDCTagKey());
     }
 
@@ -790,30 +617,46 @@ public final class DisplayUtils {
      * Add part tags to a part entity
      * @param entity The entity to add a tag to
      * @param partTags The tags to add to this part
+     * @return a set of invalid tags that could not be added, per {@link DisplayUtils#isValidTag(String)}
      */
-    public static void addTags(@NotNull Entity entity, @NotNull List<String> partTags){
-        addManyToPDCList(entity, partTags, DisplayAPI.getPartPDCTagKey());
+    public static Set<String> addTags(@NotNull Entity entity, @NotNull List<String> partTags){
+        NamespacedKey key = DisplayAPI.getPartPDCTagKey();
+        if (partTags.isEmpty()){
+            return Collections.unmodifiableSet(new HashSet<>());
+        }
+        PersistentDataContainer container = entity.getPersistentDataContainer();
+        List<String> existing = container.has(key) ?
+                new ArrayList<>(container.get(key, LIST_PDC_TYPE)) :
+                new ArrayList<>();
+        Set<String> invalid = new HashSet<>();
+
+        for (String tag : partTags){
+            if (existing.contains(tag)) continue;
+            if (isValidTag(tag)) {
+                existing.add(tag);
+            }
+            else{
+                invalid.add(tag);
+            }
+        }
+        container.set(key, LIST_PDC_TYPE, existing);
+        return invalid;
     }
 
     static boolean addToPDCList(@NotNull Entity entity, @NotNull String element, NamespacedKey key){
-        boolean isGroupTag = DisplayAPI.getGroupTagKey() == key;
         PersistentDataContainer container = entity.getPersistentDataContainer();
-        List<String> tags;
+        List<String> existing;
         if (!container.has(key)){
-            tags = new ArrayList<>();
+            existing = new ArrayList<>();
         }
         else{
-            tags = new ArrayList<>(container.get(key, tagPDCType));
+            existing = new ArrayList<>(container.get(key, LIST_PDC_TYPE));
         }
 
-        if (!tags.contains(element) && (!isGroupTag && isValidTag(element))){
-            tags.add(element);
-            container.set(key, tagPDCType, tags);
-            return true;
-        }
-        else{
-            return false;
-        }
+        if (existing.contains(element)) return false;
+        existing.add(element);
+        container.set(key, LIST_PDC_TYPE, existing);
+        return true;
     }
 
     static void addManyToPDCList(@NotNull Entity entity, @NotNull List<String> elements, NamespacedKey key){
@@ -827,29 +670,27 @@ public final class DisplayUtils {
             existing = new ArrayList<>();
         }
         else{
-            existing = new ArrayList<>(container.get(key, tagPDCType));
+            existing = new ArrayList<>(container.get(key, LIST_PDC_TYPE));
         }
         for (String element : elements){
-            if (!existing.contains(element) && (!isGroupTag && isValidTag(element))) {
+            if (!existing.contains(element)) {
                 existing.add(element);
             }
         }
-        container.set(key, tagPDCType, existing);
+        container.set(key, LIST_PDC_TYPE, existing);
     }
-
 
     /**
      * Check if a tag is valid and can be used
      * @param tag the tag
-     * @return false if the tag is blank, contains commas, starts with an "!", or contains spaces
+     * @return true if the tag contains only letters, numbers, or underscores
      */
     public static boolean isValidTag(@NotNull String tag){
-        return !tag.isBlank() && !tag.contains(",") && !tag.startsWith("!") && !tag.contains(" ");
+        return tag.matches("[a-zA-Z0-9_]+");
     }
 
-
     /**
-     * Remove a tag from this SpawnedDisplayEntityPart
+     * Remove a part tag from an entity
      * @param tag the tag to remove from this part
      */
     public static void removeTag(@NotNull Entity entity, @NotNull String tag){
@@ -857,7 +698,7 @@ public final class DisplayUtils {
     }
 
     /**
-     * Remove a tag from this SpawnedDisplayEntityPart
+     * Remove part tags from an entity
      * @param tags the tags to remove from this part
      */
     public static void removeTags(@NotNull Entity entity, @NotNull List<String> tags){
@@ -869,13 +710,13 @@ public final class DisplayUtils {
             return;
         }
         PersistentDataContainer container = entity.getPersistentDataContainer();
-        if (!container.has(key, tagPDCType)){
+        if (!container.has(key, LIST_PDC_TYPE)){
             return;
         }
 
-        List<String> tags = container.get(key, tagPDCType);
+        List<String> tags = container.get(key, LIST_PDC_TYPE);
         tags.remove(element);
-        container.set(key, tagPDCType, tags);
+        container.set(key, LIST_PDC_TYPE, tags);
     }
 
     static void removeManyFromPDCList(@NotNull Entity entity, List<String> elements, NamespacedKey key){
@@ -883,19 +724,19 @@ public final class DisplayUtils {
             return;
         }
         PersistentDataContainer container = entity.getPersistentDataContainer();
-        if (!container.has(key, tagPDCType)){
+        if (!container.has(key, LIST_PDC_TYPE)){
             return;
         }
 
-        List<String> existing = container.get(key, tagPDCType);
+        List<String> existing = container.get(key, LIST_PDC_TYPE);
 
         existing.removeAll(elements);
-        container.set(key, tagPDCType, existing);
+        container.set(key, LIST_PDC_TYPE, existing);
     }
 
 
     /**
-     * Gets the part tags of this SpawnedDisplayEntityPart
+     * Gets the part tags belonging to an entity
      * @return The part's part tags.
      */
     public static @NotNull List<String> getTags(@NotNull Entity entity){
@@ -904,10 +745,10 @@ public final class DisplayUtils {
 
     static @NotNull List<String> getPDCList(@NotNull Entity entity, NamespacedKey key){
         PersistentDataContainer container = entity.getPersistentDataContainer();
-        if (!container.has(key, tagPDCType)){
+        if (!container.has(key, LIST_PDC_TYPE)){
             return new ArrayList<>();
         }
-        return container.get(key, tagPDCType);
+        return container.get(key, LIST_PDC_TYPE);
     }
 
 
@@ -918,10 +759,10 @@ public final class DisplayUtils {
      */
     public static boolean hasPartTag(@NotNull Entity entity, @NotNull String tag){
         PersistentDataContainer container = entity.getPersistentDataContainer();
-        if (!container.has(DisplayAPI.getPartPDCTagKey(), tagPDCType)){
+        if (!container.has(DisplayAPI.getPartPDCTagKey(), LIST_PDC_TYPE)){
             return false;
         }
-        List<String> pdcTags = container.get(DisplayAPI.getPartPDCTagKey(), tagPDCType);
+        List<String> pdcTags = container.get(DisplayAPI.getPartPDCTagKey(), LIST_PDC_TYPE);
         return pdcTags != null && pdcTags.contains(tag);
     }
 

@@ -41,10 +41,8 @@ class AnimAddSoundCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 6) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu anim addsound <sound> <volume> <pitch> <delay-in-ticks>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
+
         try {
             String soundStr = args[2];
             float volume = Float.parseFloat(args[3]);
@@ -66,5 +64,10 @@ class AnimAddSoundCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("Invalid number entered! Enter a number >= 0", NamedTextColor.RED));
             player.sendMessage(Component.text("| Delay must be a whole number", NamedTextColor.GRAY));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Add a sound to play at a frame point";
     }
 }

@@ -28,11 +28,7 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 3) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number for the distance to search for the nearest group", NamedTextColor.RED)));
-            player.sendMessage(Component.text("/deu group selectnearest <distance>", NamedTextColor.GRAY));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         try {
             double searchDistance = Double.parseDouble(args[2]);
@@ -84,5 +80,10 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
         } catch (NumberFormatException e) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid distance! The distance must be a positive number.", NamedTextColor.RED)));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Select the nearest group within the given distance";
     }
 }

@@ -13,14 +13,12 @@ import org.jetbrains.annotations.Nullable;
 
 class TextOpacityCMD extends PartsSubCommand {
     TextOpacityCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("opacity", parentSubCommand, Permission.TEXT_OPACITY, 3, 3);
+        super("opacity", parentSubCommand, Permission.TEXT_OPACITY, true);
         setTabComplete(2, "<0-1>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu text opacity <0-1> [-all]", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
@@ -69,5 +67,10 @@ class TextOpacityCMD extends PartsSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid opacity, enter a value between 0 and 1!", NamedTextColor.RED)));
             return null;
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set the text opacity for your selected text display";
     }
 }

@@ -62,4 +62,10 @@ class AnimPreviewPlayCMD extends PlayerSubCommand {
             }
         }, anim.getDuration());
     }
+
+    @Override
+    protected String getDescription() {
+        return "Preview your selected animation on your selected group, without changing group entity data." +
+                " \n\"-camera\" will set your view to the animation's camera, if present";
+    }
 }

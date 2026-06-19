@@ -13,14 +13,12 @@ import org.jetbrains.annotations.Nullable;
 class PartsYawCMD extends PartsSubCommand {
 
     PartsYawCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("yaw", parentSubCommand, Permission.PARTS_TRANSFORM, 3, 0);
+        super("yaw", parentSubCommand, Permission.PARTS_TRANSFORM);
         setTabComplete(2, "<yaw>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /deu parts yaw <yaw>", NamedTextColor.RED));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
@@ -41,5 +39,10 @@ class PartsYawCMD extends PartsSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the yaw!", NamedTextColor.RED)));
             return false;
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set the yaw of an ungrouped part entity";
     }
 }

@@ -20,10 +20,7 @@ class PlaceSetPermissionCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 3) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage /deu place setpermission <permission>", NamedTextColor.RED)));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         ItemStack heldItem = PlaceCMD.getHeldItem(player, true);
         if (heldItem == null) return;
@@ -31,5 +28,10 @@ class PlaceSetPermissionCMD extends PlayerSubCommand {
         String permission = args[2];
         PlaceableGroupManager.setPlacePermission(heldItem, permission);
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Set the permission to place your held item's assigned group <white>(Permission: "+permission+")")));
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set the permission required to place the group";
     }
 }

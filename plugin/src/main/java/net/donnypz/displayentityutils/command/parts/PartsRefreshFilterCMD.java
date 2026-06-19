@@ -33,4 +33,9 @@ class PartsRefreshFilterCMD extends PlayerSubCommand {
         ((MultiPartSelection<?>) sel).refresh();
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Part Selection Filter Refreshed!", NamedTextColor.GREEN)));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Refresh your part selection after making some type of change";
+    }
 }

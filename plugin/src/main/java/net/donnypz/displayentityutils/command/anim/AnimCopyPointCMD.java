@@ -41,8 +41,7 @@ class AnimCopyPointCMD extends PlayerSubCommand {
         }
         FramePoint framePoint = display.getRelativePoint();
 
-        if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu anim copypoint <frame-ids | frame-tag | -all>", NamedTextColor.RED));
+        if (!hasMinimumArguments(player, args)){
             player.sendMessage(Component.text("| Enter a frame-tag, a single frame-id, or multiple comma separated ids.", NamedTextColor.GRAY));
             return;
         }
@@ -76,5 +75,10 @@ class AnimCopyPointCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("Invalid value entered! Enter whole numbers >= 0", NamedTextColor.RED));
         }
         catch (IllegalArgumentException e){}
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Copy a selected frame point to other frames";
     }
 }

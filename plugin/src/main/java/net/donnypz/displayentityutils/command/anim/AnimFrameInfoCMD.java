@@ -36,10 +36,7 @@ class AnimFrameInfoCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu anim frameinfo <frame-id>", NamedTextColor.RED)));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         try {
             int id = Integer.parseInt(args[2]);
@@ -73,5 +70,10 @@ class AnimFrameInfoCMD extends PlayerSubCommand {
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid frame ID! Enter whole numbers >= 0", NamedTextColor.RED));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "List information about a frame in your animation";
     }
 }

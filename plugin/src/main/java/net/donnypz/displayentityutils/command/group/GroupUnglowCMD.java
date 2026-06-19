@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupUnglowCMD extends GroupSubCommand {
     GroupUnglowCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("unglow", parentSubCommand, Permission.GROUP_GLOW, 0, true);
+        super("unglow", parentSubCommand, Permission.GROUP_GLOW, true);
     }
 
 
@@ -23,5 +23,10 @@ class GroupUnglowCMD extends GroupSubCommand {
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<yellow>Unglowing selected group!")));
         group.unglow();
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Remove the glowing effect from all parts in this group";
     }
 }

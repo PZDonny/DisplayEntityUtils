@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupDespawnCMD extends GroupSubCommand {
     GroupDespawnCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("despawn", parentSubCommand, Permission.GROUP_DESPAWN, 0, false);
+        super("despawn", parentSubCommand, Permission.GROUP_DESPAWN, false);
     }
 
     @Override
@@ -40,5 +40,10 @@ class GroupDespawnCMD extends GroupSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Despawned your selected display entity group!", NamedTextColor.GRAY)));
         DisplayGroupManager.deselectGroup(player);
         DisplayEntityPluginCommand.hideRelativePoints(player);
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Despawn your selected group";
     }
 }

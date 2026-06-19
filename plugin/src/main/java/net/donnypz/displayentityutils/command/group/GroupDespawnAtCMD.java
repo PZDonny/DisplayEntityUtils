@@ -22,9 +22,9 @@ import java.util.Set;
 public class GroupDespawnAtCMD extends ConsoleUsableSubCommand {
     GroupDespawnAtCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("despawnat", parentSubCommand, Permission.GROUP_DESPAWN);
-        setTabComplete(2, List.of("<x>", "~"));
-        setTabComplete(3, List.of("<y>", "~"));
-        setTabComplete(4, List.of("<z>", "~"));
+        setTabComplete(2, TabSuggestion.X_COORDINATE);
+        setTabComplete(3, TabSuggestion.Y_COORDINATE);
+        setTabComplete(4, TabSuggestion.Z_COORDINATE);
         setTabComplete(5, "<distance>");
         addFlag("-force");
         addOption("-world", "<world_name>");
@@ -33,10 +33,8 @@ public class GroupDespawnAtCMD extends ConsoleUsableSubCommand {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (args.length < 6) {
-            sender.sendMessage(Component.text("Incorrect Usage! /deu group despawnat <x> <y> <z> <distance> [-world <world-name>] [-packet <include | only>] [-force]", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(sender, args)) return;
+
         try{
             double x = getCoordinate(sender, args[2], 'x');
             double y = getCoordinate(sender, args[3], 'y');
@@ -114,5 +112,18 @@ public class GroupDespawnAtCMD extends ConsoleUsableSubCommand {
         else{
             return Double.parseDouble(userInput);
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return """
+                Despawn groups within a given distance from a location\
+                
+                "-world <world_name>" will despawn groups in the provided world\
+                
+                "-packet <include | only>" will optionally include packet-based groups or only look for packet-based groups when despawning\
+                
+                "-force" will force the location's chunk to load, if unloaded. Unneeded if only packet groups are searched for
+                """;
     }
 }

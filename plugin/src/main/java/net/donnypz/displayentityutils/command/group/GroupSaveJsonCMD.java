@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 class GroupSaveJsonCMD extends PlayerSubCommand {
     GroupSaveJsonCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("savejson", parentSubCommand, Permission.GROUP_SAVE);
+        setUnsafe();
     }
 
     @Override
@@ -37,5 +38,10 @@ class GroupSaveJsonCMD extends PlayerSubCommand {
         DisplayAPI.getScheduler().runAsync(() -> {
             DisplayGroupManager.saveDisplayEntityGroupJson(displayGroup, player);
         });
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Spawn a JSON saved display entity group/model from a local storage. \"-packet\" will spawn the group/model using packets";
     }
 }

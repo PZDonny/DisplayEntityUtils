@@ -31,4 +31,9 @@ class GroupDeselectCMD extends PlayerSubCommand {
         RelativePointUtils.deselectRelativePoint(player);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Group selection cleared!", NamedTextColor.GREEN)));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Clear your group selection";
+    }
 }

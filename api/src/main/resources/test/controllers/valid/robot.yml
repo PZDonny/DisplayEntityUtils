@@ -1,0 +1,70 @@
+controllerID: "robot"
+
+mythicMobs:
+  mobs: ["Robot"]
+  group:
+    tag: "robot"
+    storage: LOCAL
+    packetBased: true
+
+groupProperties:
+  flip: true
+  offset:
+    x: 0
+    y: -2
+    z: 0
+  visibleByDefault: true
+
+defaultFollowProperties:
+  followType: BODY
+  deathDespawnDelay: 20
+  teleportationDuration: 2
+  pivotInteractions: false
+  adjustDisplays:
+    enabled: false
+    yDisplayAdjustPercentage: 100
+    zDisplayAdjustPercentage: 100
+
+  stateFilter:
+    states: []
+    blacklist: true
+
+partFollowProperties:
+  - id: "part_follow_prop_head"
+    partTags: ["head"]
+    followType: PITCH_AND_YAW
+    teleportationDuration: 2
+    pivotInteractions: false
+    adjustDisplays:
+      enabled: false
+      yDisplayAdjustPercentage: 100
+      zDisplayAdjustPercentage: 100
+    stateFilter:
+      states: []
+      blacklist: true
+
+states:
+  spawn:
+    animations: ["robot_activate"]
+    storage: LOCAL
+    animationType: LINEAR
+    lockTransition: true
+
+  death:
+    animations: ["robot_die"]
+    storage: LOCAL
+    animationType: LINEAR
+    lockTransition: true
+    animationDataChangesOverride: true
+
+  idle:
+    animations: ["robot_work"]
+    storage: LOCAL
+    animationType: LOOP
+    lockTransition: false
+
+  walk:
+    animations: ["robot_walk"]
+    storage: LOCAL
+    animationType: LOOP
+    lockTransition: false

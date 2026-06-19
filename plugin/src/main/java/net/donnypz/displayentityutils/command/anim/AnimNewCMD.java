@@ -25,4 +25,9 @@ class AnimNewCMD extends PlayerSubCommand {
         player.sendMessage(Component.text(" - Before animating, if you want your display entity group to retain it's pose, you must save it's current pose " +
                 "as a single frame animation", NamedTextColor.GRAY));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Manually create a new animation, rather than creating an animation through BDEngine";
+    }
 }

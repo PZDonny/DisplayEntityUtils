@@ -16,42 +16,30 @@ import java.util.List;
 
 class MannequinToggleGravityCMD extends PartsSubCommand {
     MannequinToggleGravityCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("togglegravity", parentSubCommand, Permission.MANNEQUIN_GRAVITY, 2, 2);
-        setTabComplete(3, List.of("on", "off"));
+        super("togglegravity", parentSubCommand, Permission.MANNEQUIN_GRAVITY, false);
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /deu mannequin togglegravity [-all <on | off>]", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
-        if (args.length < 4){
-            sendIncorrectUsage(player);
-            return false;
-        }
-
         if (group != null){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot change the gravity of mannequins in a group!", NamedTextColor.RED)));
             return false;
         }
 
         boolean status;
-        String s = args[3];
-        if (s.equalsIgnoreCase("on")){
+        OptionalArguments oArgs = getOptionalArguments(player, args);
+        if (oArgs.getOption("-all").equals("on")){
             status = true;
             player.sendMessage(DisplayAPI.pluginPrefix
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled gravity for ALL selected mannequins ON")));
         }
-        else if (s.equalsIgnoreCase("off")){
+        else {
             status = false;
             player.sendMessage(DisplayAPI.pluginPrefix
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled gravity for ALL selected mannequins <red>OFF")));
-        }
-        else{
-            sendIncorrectUsage(player);
-            return false;
         }
 
         for (ActivePart part : selection.getSelectedParts()){
@@ -73,5 +61,10 @@ class MannequinToggleGravityCMD extends PartsSubCommand {
         String status = selectedPart.hasMannequinGravity() ? "<green>ON" : "<red>OFF";
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled gravity of selected mannequin "+status)));
         return true;
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Toggle the gravity of an mannequin";
     }
 }

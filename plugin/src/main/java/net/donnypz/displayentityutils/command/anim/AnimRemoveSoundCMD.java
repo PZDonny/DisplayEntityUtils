@@ -37,10 +37,8 @@ class AnimRemoveSoundCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu anim removesound <sound | -all>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
+
         try {
             String soundName = args[2];
             boolean isRemoveAll = soundName.equalsIgnoreCase("-all");
@@ -63,5 +61,10 @@ class AnimRemoveSoundCMD extends PlayerSubCommand {
         catch (NumberFormatException | IndexOutOfBoundsException e) {
             player.sendMessage(Component.text("Invalid value entered for frame-id! Enter a whole number >= 0", NamedTextColor.RED));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Remove a sound from a frame point";
     }
 }

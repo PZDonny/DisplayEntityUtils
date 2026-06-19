@@ -39,10 +39,7 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3){
-            player.sendMessage(Component.text("/deu parts filtertype <part-types>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         player.sendMessage(Component.empty());
 
@@ -116,4 +113,8 @@ class PartsFilterTypesCMD extends PlayerSubCommand {
         }
     }
 
+    @Override
+    protected String getDescription() {
+        return "Filter parts by their type. Exclude ALL filtered types by prefixing with \"!\"";
+    }
 }

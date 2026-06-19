@@ -43,11 +43,7 @@ class AnimPreviewFrameCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3) {
-            player.sendMessage(Component.text("/deu anim previewframe <frame-id>", NamedTextColor.RED));
-            player.sendMessage(Component.text("First frame is 0, Second frame is 1, and so on...", NamedTextColor.GRAY));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
         List<SpawnedDisplayAnimationFrame> frames = anim.getFrames();
         if (frames.isEmpty()) {
             AnimCMD.hasNoFrames(player);
@@ -69,5 +65,10 @@ class AnimPreviewFrameCMD extends PlayerSubCommand {
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid ID! ID's must be >= 0", NamedTextColor.RED));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Preview a frame on your selected group, without changing group entity data";
     }
 }

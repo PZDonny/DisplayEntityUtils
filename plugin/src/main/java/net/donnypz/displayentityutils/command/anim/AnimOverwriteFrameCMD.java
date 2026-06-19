@@ -37,10 +37,8 @@ class AnimOverwriteFrameCMD extends PlayerSubCommand {
             AnimCMD.noAnimationSelection(player);
             return;
         }
-        if (args.length < 5) {
-            player.sendMessage(Component.text("/deu anim overwriteframe <frame-id> <tick-delay> <tick-duration>", NamedTextColor.RED));
-            return;
-        }
+
+        if (!hasMinimumArguments(player, args)) return;
         try {
             int id = Integer.parseInt(args[2]);
             int delay = Integer.parseInt(args[3]);
@@ -65,5 +63,10 @@ class AnimOverwriteFrameCMD extends PlayerSubCommand {
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid value entered! Enter whole numbers >= 0", NamedTextColor.RED));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Overwrite the transformation data of a frame";
     }
 }

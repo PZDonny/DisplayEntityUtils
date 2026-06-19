@@ -19,10 +19,7 @@ class AnimSetTagCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 3) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu anim settag <anim-tag>", NamedTextColor.RED)));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         SpawnedDisplayAnimation anim = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
         if (anim == null) {
@@ -32,5 +29,10 @@ class AnimSetTagCMD extends PlayerSubCommand {
         String tag = args[2];
         anim.setAnimationTag(tag);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Animation tag set to \"" + tag + "\"", NamedTextColor.GREEN)));
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set the tag to identify this animation";
     }
 }

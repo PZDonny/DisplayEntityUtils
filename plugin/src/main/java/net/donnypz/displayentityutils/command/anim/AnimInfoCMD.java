@@ -23,9 +23,6 @@ class AnimInfoCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (!DisplayEntityPluginCommand.hasPermission(player, Permission.ANIM_INFO)){
-            return;
-        }
         SpawnedDisplayAnimation animation = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
         if (animation == null) {
             AnimCMD.noAnimationSelection(player);
@@ -85,5 +82,10 @@ class AnimInfoCMD extends PlayerSubCommand {
         for (Material type : filter.getItemTypes()){
             player.sendMessage(Component.text("- "+type.getKey().asMinimalString(), NamedTextColor.YELLOW));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "List information about your selected animation";
     }
 }

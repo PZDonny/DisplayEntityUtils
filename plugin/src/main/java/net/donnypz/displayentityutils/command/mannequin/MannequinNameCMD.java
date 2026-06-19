@@ -15,14 +15,12 @@ import org.jetbrains.annotations.Nullable;
 
 class MannequinNameCMD extends PartsSubCommand {
     MannequinNameCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("name", parentSubCommand, Permission.MANNEQUIN_NAME, 3, 0);
+        super("name", parentSubCommand, Permission.MANNEQUIN_NAME);
         setTabComplete(2, "<name>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage /deu mannequin name <name>", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
@@ -36,5 +34,10 @@ class MannequinNameCMD extends PartsSubCommand {
         selectedPart.setCustomName(LegacyComponentSerializer.legacyAmpersand().deserialize(name));
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set mannequin name!", NamedTextColor.GREEN)));
         return true;
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set your selected mannequin's name";
     }
 }

@@ -13,14 +13,12 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupViewRangeCMD extends GroupSubCommand {
     GroupViewRangeCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("viewrange", parentSubCommand, Permission.GROUP_VIEWRANGE, 3, true);
+        super("viewrange", parentSubCommand, Permission.GROUP_VIEWRANGE,true);
         setTabComplete(2, "<view-range-multiplier>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage! /deu group viewrange <view-range-multiplier>", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
@@ -33,5 +31,10 @@ class GroupViewRangeCMD extends GroupSubCommand {
         catch(NumberFormatException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number!", NamedTextColor.RED)));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set the view range multiplier for your selected group";
     }
 }

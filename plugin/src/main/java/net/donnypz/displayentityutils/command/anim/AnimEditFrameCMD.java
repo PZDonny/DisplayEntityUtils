@@ -32,10 +32,8 @@ class AnimEditFrameCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 5) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu anim editframe <frame-ids | frame-tag | -all> <tick-delay> <tick-duration>", NamedTextColor.RED));
+        if (!hasMinimumArguments(player, args)) {
             player.sendMessage(Component.text("| Enter a frame-tag, a single frame-id, or multiple comma separated ids.", NamedTextColor.GRAY));
-            player.sendMessage(Component.text("| First frame is 0, Second frame is 1, and so on...", NamedTextColor.GRAY));
             return;
         }
 
@@ -62,5 +60,10 @@ class AnimEditFrameCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("Invalid value entered! Enter whole numbers >= 0", NamedTextColor.RED));
         }
         catch (IllegalArgumentException e){}
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Edit properties of a frame";
     }
 }

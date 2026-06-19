@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupUnsetSpawnAnimationCMD extends GroupSubCommand {
     GroupUnsetSpawnAnimationCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("unsetspawnanim", parentSubCommand, Permission.GROUP_SET_SPAWN_ANIM, 0, true);
+        super("unsetspawnanim", parentSubCommand, Permission.GROUP_SET_SPAWN_ANIM, true);
     }
 
     @Override
@@ -26,5 +26,10 @@ class GroupUnsetSpawnAnimationCMD extends GroupSubCommand {
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully unset your group's spawn/load animation!", NamedTextColor.GREEN)));
         group.unsetSpawnAnimation();
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Remove the spawn animation that's set on your selected group";
     }
 }

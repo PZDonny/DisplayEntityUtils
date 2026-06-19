@@ -13,14 +13,12 @@ import org.jetbrains.annotations.Nullable;
 
 class MannequinPivotCMD extends PartsSubCommand {
     MannequinPivotCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("pivot", parentSubCommand, Permission.MANNEQUIN_PIVOT, 3, 3);
+        super("pivot", parentSubCommand, Permission.MANNEQUIN_PIVOT, true);
         setTabComplete(2, "<angle>");
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage /deu mannequin pivot <angle> [-all]", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
@@ -52,5 +50,10 @@ class MannequinPivotCMD extends PartsSubCommand {
             sendIncorrectUsage(player);
             return false;
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Pivot a mannequin around its group's location";
     }
 }

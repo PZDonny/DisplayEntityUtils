@@ -26,11 +26,9 @@ class AnimRemoveFrameCMD extends PlayerSubCommand {
             AnimCMD.noAnimationSelection(player);
             return;
         }
-        if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu anim removeframe <frame-id>", NamedTextColor.RED));
-            player.sendMessage(Component.text("First frame is 0, Second frame is 1, and so on...", NamedTextColor.GRAY));
-            return;
-        }
+
+        if (!hasMinimumArguments(player, args)) return;
+
         List<SpawnedDisplayAnimationFrame> frames = anim.getFrames();
         if (frames.isEmpty()) {
             AnimCMD.hasNoFrames(player);
@@ -50,5 +48,10 @@ class AnimRemoveFrameCMD extends PlayerSubCommand {
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid ID! ID's must be 0 or larger", NamedTextColor.RED));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Remove a frame from your selected animation";
     }
 }

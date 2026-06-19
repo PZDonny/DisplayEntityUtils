@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupCloneCMD extends GroupSubCommand {
     GroupCloneCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("clone", parentSubCommand, Permission.GROUP_CLONE, 0, false);
+        super("clone", parentSubCommand, Permission.GROUP_CLONE, false);
         addFlag("-here");
     }
 
@@ -39,5 +39,10 @@ class GroupCloneCMD extends GroupSubCommand {
             DisplayGroupManager.setSelectedGroup(p, clonedGroup);
             clonedGroup.glowAndMarkInteractions(p, 80);
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Spawn a cloned group at your selected group's location \n\"-here\" clones the group at your location";
     }
 }

@@ -30,4 +30,10 @@ class PlaceToggleDropItemCMD extends PlayerSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your held item's group will drop the item used to place it", NamedTextColor.GREEN)));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return"Toggle whether the placed group will drop the item used to place it, when broken. " +
+                "The item never drops for players in creative. True by default";
+    }
 }

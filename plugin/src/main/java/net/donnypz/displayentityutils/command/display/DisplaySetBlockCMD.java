@@ -17,14 +17,12 @@ import java.util.List;
 
 class DisplaySetBlockCMD extends PartsSubCommand {
     DisplaySetBlockCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("setblock", parentSubCommand, Permission.DISPLAY_SET_BLOCK, 3, 3);
+        super("setblock", parentSubCommand, Permission.DISPLAY_SET_BLOCK, true);
         setTabComplete(2, List.of("-held", "-target", "<block-id>"));
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(Component.text("Incorrect Usage! /deu display setblock <\"-held\" | \"-target\" | block-id> [-all]", NamedTextColor.RED));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
@@ -53,5 +51,10 @@ class DisplaySetBlockCMD extends PartsSubCommand {
 
     private void setBlock(ActivePart part, BlockData blockData){
         part.setBlockDisplayBlock(blockData);
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Change the block of a block display";
     }
 }

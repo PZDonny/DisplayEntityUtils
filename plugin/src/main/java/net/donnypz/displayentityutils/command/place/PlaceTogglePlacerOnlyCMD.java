@@ -30,4 +30,9 @@ class PlaceTogglePlacerOnlyCMD extends PlayerSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your held item's group can only be broken by the player who placed it", NamedTextColor.GREEN)));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Toggle whether only the player who placed a group can break it. True by default";
+    }
 }

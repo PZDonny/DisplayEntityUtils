@@ -16,14 +16,12 @@ import java.util.List;
 
 class MannequinMainHandCMD extends PartsSubCommand {
     MannequinMainHandCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("mainhand", parentSubCommand, Permission.MANNEQUIN_POSE, 3, 3);
+        super("mainhand", parentSubCommand, Permission.MANNEQUIN_POSE, true);
         setTabComplete(2, List.of("left", "right"));
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect Usage /deu mannequin mainhand <left | right> [-all]", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
@@ -58,5 +56,10 @@ class MannequinMainHandCMD extends PartsSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid Main Hand!", NamedTextColor.RED)));
             return false;
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set your selected mannequin's main hand";
     }
 }

@@ -27,4 +27,9 @@ class AnimUnfilterCMD extends PlayerSubCommand {
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your selected animation no longer has a part filter", NamedTextColor.YELLOW)));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Remove your part filter/selection from an animation";
+    }
 }

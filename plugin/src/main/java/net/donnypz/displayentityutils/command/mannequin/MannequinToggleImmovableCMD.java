@@ -16,21 +16,14 @@ import java.util.List;
 
 class MannequinToggleImmovableCMD extends PartsSubCommand {
     MannequinToggleImmovableCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("toggleimmovable", parentSubCommand, Permission.MANNEQUIN_IMMOVABLE, 2, 2);
-        setTabComplete(3, List.of("on", "off"));
+        super("toggleimmovable", parentSubCommand, Permission.MANNEQUIN_IMMOVABLE, false);
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /deu mannequin toggleimmovable [-all <on | off>]", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
-        if (args.length < 4){
-            sendIncorrectUsage(player);
-            return false;
-        }
 
         if (group != null){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot change the immovability of mannequins in a group!", NamedTextColor.RED)));
@@ -38,20 +31,17 @@ class MannequinToggleImmovableCMD extends PartsSubCommand {
         }
 
         boolean status;
-        String s = args[3];
-        if (s.equalsIgnoreCase("on")){
+        OptionalArguments oArgs = getOptionalArguments(player, args);
+        if (!oArgs.isValidOptions()) return false;
+        if (oArgs.getOption("-all").equals("on")){
             status = true;
             player.sendMessage(DisplayAPI.pluginPrefix
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled immovability for ALL selected mannequins ON")));
         }
-        else if (s.equalsIgnoreCase("off")){
+        else {
             status = false;
             player.sendMessage(DisplayAPI.pluginPrefix
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled immovability for ALL selected mannequins <red>OFF")));
-        }
-        else{
-            sendIncorrectUsage(player);
-            return false;
         }
 
         for (ActivePart part : selection.getSelectedParts()){
@@ -74,5 +64,10 @@ class MannequinToggleImmovableCMD extends PartsSubCommand {
         String status = selectedPart.isMannequinImmovable() ? "<green>ON" : "<red>OFF";
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled immovability of selected mannequin "+status)));
         return true;
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Toggle the immovability of an mannequin";
     }
 }

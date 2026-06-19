@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupUngroupInteractionsCMD extends GroupSubCommand {
     GroupUngroupInteractionsCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("ungroupinteractions", parentSubCommand, Permission.GROUP_UNGROUP_INTERACTIONS, 0, true);
+        super("ungroupinteractions", parentSubCommand, Permission.GROUP_UNGROUP_INTERACTIONS, true);
     }
 
     @Override
@@ -26,5 +26,10 @@ class GroupUngroupInteractionsCMD extends GroupSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Removed any interactions entities attached to the display entity group", NamedTextColor.RED)));
         group.removeInteractions();
         ((MultiPartSelection<?>) DisplayGroupManager.getPartSelection(player)).refresh();
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Remove all interactions from your group";
     }
 }

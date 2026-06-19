@@ -22,10 +22,6 @@ class MannequinSpawnCMD extends PlayerSubCommand {
         addFlag("-g");
     }
 
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /deu mannequin spawn [-g]", NamedTextColor.RED)));
-    }
-
     @Override
     public void execute(Player player, String[] args) {
         Location location = player.getLocation();
@@ -39,5 +35,10 @@ class MannequinSpawnCMD extends PlayerSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix
                 .append(MiniMessage.miniMessage().deserialize("<green>A new mannequin has been spawned at your location!")));
         CMDUtils.tryAddEntityToGroup(player, args, mannequin, this, "-g");
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Spawn a mannequin at your location.\nUse \"-g\" to add it to your selected group";
     }
 }

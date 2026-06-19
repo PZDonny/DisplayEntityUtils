@@ -23,7 +23,7 @@ class PartsCycleCMD extends PlayerSubCommand {
     PartsCycleCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("cycle", parentSubCommand, Permission.PARTS_CYCLE);
         setTabComplete(2, List.of("first", "prev", "next", "last"));
-        setTabComplete(3, "[jump]");
+        setOptionalTabComplete(3, "[jump]");
     }
 
     @Override
@@ -34,10 +34,7 @@ class PartsCycleCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3){
-            player.sendMessage(Component.text("/deu parts cycle <first | prev | next | last> [jump]", NamedTextColor.GRAY));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         ActivePartSelection<?> sel = DisplayGroupManager.getPartSelection(player);
         MultiPartSelection<?> partSelection;
@@ -158,4 +155,8 @@ class PartsCycleCMD extends PlayerSubCommand {
 
     }
 
+    @Override
+    protected String getDescription() {
+        return "Cycle through part entities in your selected group";
+    }
 }

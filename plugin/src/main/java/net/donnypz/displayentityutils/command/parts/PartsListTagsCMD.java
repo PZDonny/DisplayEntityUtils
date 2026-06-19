@@ -46,4 +46,9 @@ class PartsListTagsCMD extends PlayerSubCommand {
             }
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "List tags of the currently selected part";
+    }
 }

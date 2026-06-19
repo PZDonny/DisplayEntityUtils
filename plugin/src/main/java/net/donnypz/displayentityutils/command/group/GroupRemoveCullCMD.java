@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 class GroupRemoveCullCMD extends GroupSubCommand {
     GroupRemoveCullCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("removecull", parentSubCommand, Permission.GROUP_CULLING, 0, true);
+        super("removecull", parentSubCommand, Permission.GROUP_CULLING, true);
     }
 
     @Override
@@ -21,5 +21,10 @@ class GroupRemoveCullCMD extends GroupSubCommand {
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Removed culling bounds from your selected group!", NamedTextColor.YELLOW)));
         group.removeCulling();
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Remove the culling bounds for every part in your selected group";
     }
 }

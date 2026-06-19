@@ -33,4 +33,9 @@ class PlaceGetItemCMD extends PlayerSubCommand {
         player.give(itemStack);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You have been given the item to place the group", NamedTextColor.GREEN)));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Get the item used to placed a group";
+    }
 }

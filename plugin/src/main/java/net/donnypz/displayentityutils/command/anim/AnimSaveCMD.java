@@ -28,10 +28,7 @@ class AnimSaveCMD extends PlayerSubCommand {
             return;
         }
 
-        if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage /deu anim save <storage>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
 
         if (animation.getAnimationTag() == null){
@@ -63,5 +60,10 @@ class AnimSaveCMD extends PlayerSubCommand {
             }
         });
 
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Save your selected animation and any changes made";
     }
 }

@@ -235,6 +235,8 @@ public class SchedulerImpl implements Scheduler{
             }
         };
         if (part instanceof SpawnedDisplayEntityPart sp){
+            Entity e = sp.getEntity();
+            if (e == null) runLaterAsync(runnable, delay);
             task = entityRunLaterAsync(sp.getEntity(), runnable, delay);
         }
         else{

@@ -39,11 +39,8 @@ class AnimAddFrameAfterCMD extends PlayerSubCommand {
             AnimCMD.noAnimationSelection(player);
             return;
         }
-        if (args.length < 5) {
-            player.sendMessage(Component.text("/deu anim addframeafter <frame-id> <tick-delay> <tick-duration>", NamedTextColor.RED));
-            player.sendMessage(Component.text("First frame is 0, Second frame is 1, and so on...", NamedTextColor.GRAY));
-            return;
-        }
+
+        if (!hasMinimumArguments(player, args)) return;
 
         List<SpawnedDisplayAnimationFrame> frames = anim.getFrames();
         if (frames.isEmpty()) {
@@ -74,5 +71,10 @@ class AnimAddFrameAfterCMD extends PlayerSubCommand {
         catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid value entered! Enter whole numbers >= 0", NamedTextColor.RED));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Add a frame after another frame to your selected animation";
     }
 }

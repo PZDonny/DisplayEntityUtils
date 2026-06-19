@@ -45,6 +45,8 @@ class AnimShowFrameCMD extends GroupSubCommand {
             return;
         }
 
+        if (!hasMinimumArguments(player, args)) return;
+
         List<SpawnedDisplayAnimationFrame> frames = anim.getFrames();
         if (frames.isEmpty()) {
             AnimCMD.hasNoFrames(player);
@@ -65,5 +67,10 @@ class AnimShowFrameCMD extends GroupSubCommand {
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid ID! ID's must be >= 0", NamedTextColor.RED));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Displays a frame on your selected group";
     }
 }

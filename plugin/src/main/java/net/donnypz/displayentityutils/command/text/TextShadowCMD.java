@@ -16,37 +16,26 @@ import java.util.List;
 
 class TextShadowCMD extends PartsSubCommand {
     TextShadowCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("shadow", parentSubCommand, Permission.TEXT_TOGGLE_SHADOW, 0, 2);
-        setTabComplete(3, List.of("on", "off"));
+        super("shadow", parentSubCommand, Permission.TEXT_TOGGLE_SHADOW, false);
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect ALL usage! /deu text shadow -all <on | off>", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
-        if (args.length < 4){
-            sendIncorrectUsage(player);
-            return false;
-        }
 
         boolean status;
-        String s = args[3];
-        if (s.equalsIgnoreCase("on")){
+        OptionalArguments oArgs = getOptionalArguments(player, args);
+        if (oArgs.getOption("-all").equals("on")){
             status = true;
             player.sendMessage(DisplayAPI.pluginPrefix
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled shadowed for ALL selected text displays ON")));
         }
-        else if (s.equalsIgnoreCase("off")){
+        else{
             status = false;
             player.sendMessage(DisplayAPI.pluginPrefix
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled shadowed for ALL selected text displays <red>OFF")));
-        }
-        else{
-            sendIncorrectUsage(player);
-            return false;
         }
 
         for (ActivePart part : selection.getSelectedParts()){
@@ -66,5 +55,10 @@ class TextShadowCMD extends PartsSubCommand {
         String status = selectedPart.isTextDisplayShadowed() ? "<green>ON" : "<red>OFF";
         player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Toggled shadow for your selected text display "+status)));
         return true;
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Toggle shadows visibility in your selected text display";
     }
 }

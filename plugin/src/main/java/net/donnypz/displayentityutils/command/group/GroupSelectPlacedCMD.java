@@ -39,4 +39,9 @@ class GroupSelectPlacedCMD extends PlayerSubCommand {
         int selectDuration = 50;
         group.glowAndMarkInteractions(player, selectDuration);
     }
+
+    @Override
+    protected String getDescription() {
+        return "Select a group placed by a player's held item";
+    }
 }

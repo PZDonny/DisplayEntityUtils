@@ -20,16 +20,14 @@ import java.io.File;
 public class GroupSpawnJSONCMD extends PlayerSubCommand {
     GroupSpawnJSONCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("spawnjson", parentSubCommand, Permission.GROUP_SPAWN);
+        setUnsafe();
         setTabComplete(2, "<file-name>");
         addFlag("-packet");
     }
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 3) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu group spawnjson <file-name> [-packet]", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
         String tag = args[2];
         boolean isPacket = getOptionalArguments(player, args).hasFlag("-packet");
         spawnGroup(player, tag, isPacket);
@@ -52,5 +50,10 @@ public class GroupSpawnJSONCMD extends PlayerSubCommand {
             group.spawn(spawnLoc, GroupSpawnedEvent.SpawnReason.COMMAND);
             p.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Spawned a display entity group at your location! <white>(Tagged: "+tag+")")));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Save your selected group as a JSON file. Spawning groups from JSON files will always be slower";
     }
 }

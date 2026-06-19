@@ -37,10 +37,9 @@ class AnimAddFrameCMD extends PlayerSubCommand {
             AnimCMD.noAnimationSelection(player);
             return;
         }
-        if (args.length < 4) {
-            player.sendMessage(Component.text("/deu anim addframe <tick-delay> <tick-duration>", NamedTextColor.RED));
-            return;
-        }
+
+        if (!hasMinimumArguments(player, args)) return;
+
         try {
             int delay = Integer.parseInt(args[2]);
             int duration = Integer.parseInt(args[3]);
@@ -66,5 +65,10 @@ class AnimAddFrameCMD extends PlayerSubCommand {
         } catch (NumberFormatException e) {
             player.sendMessage(Component.text("Invalid value entered for delay or duration! Enter a whole number >= 0", NamedTextColor.RED));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Add a frame to your selected animation";
     }
 }

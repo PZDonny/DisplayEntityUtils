@@ -20,10 +20,7 @@ class GroupGlowColorCMD extends GroupSubCommand {
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid color!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/deu group glowcolor <color | hex-code>", NamedTextColor.GRAY));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected void execute(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull String[] args) {
@@ -37,4 +34,8 @@ class GroupGlowColorCMD extends GroupSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Glow color set for display entity group!", NamedTextColor.GREEN)));
     }
 
+    @Override
+    protected String getDescription() {
+        return "Set the glow color for all parts in this group";
+    }
 }

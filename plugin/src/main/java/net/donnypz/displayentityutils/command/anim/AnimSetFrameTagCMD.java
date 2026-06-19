@@ -26,10 +26,7 @@ class AnimSetFrameTagCMD extends PlayerSubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        if (args.length < 4) {
-            player.sendMessage(Component.text("Incorrect Usage! /deu anim setframetag <frame-ids> <frame-tag>", NamedTextColor.RED));
-            return;
-        }
+        if (!hasMinimumArguments(player, args)) return;
 
         SpawnedDisplayAnimation anim = DisplayAnimationManager.getSelectedSpawnedAnimation(player);
         if (anim == null) {
@@ -74,5 +71,10 @@ class AnimSetFrameTagCMD extends PlayerSubCommand {
         catch (IllegalArgumentException e) {
             player.sendMessage(Component.text("Invalid ID(s) entered! Value(s) must be >= 0", NamedTextColor.RED));
         }
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Set the tag to identify a frame";
     }
 }

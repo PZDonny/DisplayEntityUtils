@@ -13,13 +13,11 @@ import org.jetbrains.annotations.Nullable;
 
 class MannequinUnnameCMD extends PartsSubCommand {
     MannequinUnnameCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("unname", parentSubCommand, Permission.MANNEQUIN_NAME, 2, 2);
+        super("unname", parentSubCommand, Permission.MANNEQUIN_NAME, true);
     }
 
     @Override
-    protected void sendIncorrectUsage(@NotNull Player player) {
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Incorrect usage! /deu mannequin unname [-all]", NamedTextColor.RED)));
-    }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
@@ -38,5 +36,10 @@ class MannequinUnnameCMD extends PartsSubCommand {
         selectedPart.setCustomName(null);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your selected mannequin's name has been removed!", NamedTextColor.YELLOW)));
         return true;
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Remove your selected mannequin's name";
     }
 }

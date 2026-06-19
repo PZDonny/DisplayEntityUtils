@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 class PartsGlowCMD extends PartsSubCommand {
     PartsGlowCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("glow", parentSubCommand, Permission.PARTS_GLOW, 2, 2);
+        super("glow", parentSubCommand, Permission.PARTS_GLOW, true);
     }
 
     @Override
@@ -31,5 +31,10 @@ class PartsGlowCMD extends PartsSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Glowing applied to your selected part!", NamedTextColor.GREEN)));
         selectedPart.glow();
         return true;
+    }
+
+    @Override
+    protected String getDescription() {
+        return "Make your selected part glow";
     }
 }

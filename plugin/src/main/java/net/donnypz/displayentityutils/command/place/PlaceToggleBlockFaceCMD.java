@@ -30,4 +30,9 @@ class PlaceToggleBlockFaceCMD extends PlayerSubCommand {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Your held item's group will respect the block face its placed on", NamedTextColor.GREEN)));
         }
     }
+
+    @Override
+    protected String getDescription() {
+        return "Toggle whether the placed group will respect the block face it is placed on. True by default";
+    }
 }

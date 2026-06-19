@@ -86,4 +86,13 @@ class AnimPlayCMD extends PlayerSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Playing Animation!", NamedTextColor.GREEN))
                 .append(optionResultComp));
     }
+
+    @Override
+    protected String getDescription() {
+        return "Play your selected animation on your selected group." +
+                " \n\"-loop\" will make the animation loop." +
+                " \n\"-packet\" will play the animation using packets." +
+                " \n\"-camera\" will set your view to the animation's camera, if present" +
+                " \n\"-nodata\" will disable texture changes for item/block displays and text display text changes";
+    }
 }
