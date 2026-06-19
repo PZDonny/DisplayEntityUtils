@@ -9,11 +9,11 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public final class DisplayCMD extends ConsoleUsableSubCommand {
+public final class DisplayCMD extends ParentSubCommand {
 
 
     public DisplayCMD(){
-        super("display", Permission.HELP, new DisplayHelpCMD());
+        super("display");
         new DisplayGlowColorCMD(this);
         new DisplayBrightnessCMD(this);
         new DisplayViewRangeCMD(this);
@@ -22,22 +22,6 @@ public final class DisplayCMD extends ConsoleUsableSubCommand {
         new DisplayResetTranslationCMD(this);
         new DisplayScaleCMD(this);
         new DisplaySetBlockCMD(this);
-    }
-
-    @Override
-    public void execute(CommandSender sender, String[] args) {
-        if (args.length < 2){
-            help(sender, 1);
-            return;
-        }
-        String arg = args[1];
-        DEUSubCommand subCommand = subCommands.get(arg);
-        if (subCommand == null){
-            help(sender, 1);
-        }
-        else{
-            DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
-        }
     }
 
     static void help(CommandSender sender, int page){

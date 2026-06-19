@@ -10,9 +10,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class PlaceCMD extends ConsoleUsableSubCommand {
+public class PlaceCMD extends ParentSubCommand {
     public PlaceCMD() {
-        super("place", Permission.HELP, new PlaceHelpCMD());
+        super("place");
         new PlaceSetCMD(this);
         new PlaceUnsetCMD(this);
         new PlaceSetPermissionCMD(this);
@@ -26,22 +26,6 @@ public class PlaceCMD extends ConsoleUsableSubCommand {
         new PlaceWhoPlacedCMD(this);
         new PlaceGetItemCMD(this);
         new PlaceBreakModeCMD(this);
-    }
-
-    @Override
-    public void execute(CommandSender sender, String[] args) {
-        if (args.length < 2){
-            help(sender, 1);
-            return;
-        }
-        String arg = args[1];
-        DEUSubCommand subCommand = subCommands.get(arg);
-        if (subCommand == null){
-            help(sender, 1);
-        }
-        else{
-            DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
-        }
     }
 
     static void help(CommandSender sender, int page){

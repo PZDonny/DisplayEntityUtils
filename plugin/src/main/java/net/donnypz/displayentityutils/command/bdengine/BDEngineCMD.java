@@ -6,29 +6,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 
-public final class BDEngineCMD extends ConsoleUsableSubCommand {
+public final class BDEngineCMD extends ParentSubCommand{
 
     public BDEngineCMD(){
-        super("bdengine", Permission.HELP, new BDEngineHelpCMD());
+        super("bdengine");
         new BDEngineConvertDatapackCMD(this);
         new BDEngineImportCMD(this);
         new BDEngineSpawnModelCMD(this);
-    }
-
-    @Override
-    public void execute(CommandSender sender, String[] args) {
-        if (args.length < 2){
-            help(sender, 1);
-            return;
-        }
-        String arg = args[1];
-        DEUSubCommand subCommand = subCommands.get(arg);
-        if (subCommand == null){
-            help(sender, 1);
-        }
-        else{
-            DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
-        }
     }
 
     static void help(CommandSender sender, int page){

@@ -8,10 +8,10 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public final class AnimCMD extends ConsoleUsableSubCommand {
+public final class AnimCMD extends ParentSubCommand {
 
     public AnimCMD(){
-        super("anim", Permission.HELP, new AnimHelpCMD());
+        super("anim");
         this.subCommands.put("list", new ListCMD(
                 Component.text("Incorrect Usage! /deu anim list <storage> [page-number]", NamedTextColor.RED),
                 3,
@@ -53,25 +53,6 @@ public final class AnimCMD extends ConsoleUsableSubCommand {
         new AnimRestoreCMD(this);
         new AnimSelectCMD(this);
         new AnimSelectJSONCMD(this);
-    }
-
-    @Override
-    public void execute(CommandSender sender, String[] args) {
-        if (args.length < 2){
-            animationHelp(sender, 1);
-            return;
-        }
-        String arg = args[1];
-        DEUSubCommand subCommand = subCommands.get(arg);
-        if (subCommand == null){
-            if (!DisplayEntityPluginCommand.hasPermission(sender, Permission.HELP)){
-                return;
-            }
-            animationHelp(sender, 1);
-        }
-        else{
-            DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
-        }
     }
 
     static void animationHelp(CommandSender sender, int page){

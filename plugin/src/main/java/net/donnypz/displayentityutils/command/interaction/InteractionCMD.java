@@ -19,10 +19,10 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public final class InteractionCMD extends ConsoleUsableSubCommand {
+public final class InteractionCMD extends ParentSubCommand {
 
     public InteractionCMD(){
-        super("interaction", Permission.HELP, new InteractionHelpCMD());
+        super("interaction");
         new InteractionSpawnCMD(this);
         new InteractionAddCMD(this);
         new InteractionListCMD(this);
@@ -32,22 +32,6 @@ public final class InteractionCMD extends ConsoleUsableSubCommand {
         new InteractionPivotCMD(this);
         new InteractionResponsiveCMD(this);
         new InteractionInfoCMD(this);
-    }
-
-    @Override
-    public void execute(CommandSender sender, String[] args) {
-        if (args.length < 2){
-            interactionHelp(sender, 1);
-            return;
-        }
-        String arg = args[1];
-        DEUSubCommand subCommand = subCommands.get(arg);
-        if (subCommand == null){
-            interactionHelp(sender, 1);
-        }
-        else{
-            DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
-        }
     }
 
     static void interactionHelp(CommandSender sender, int page){

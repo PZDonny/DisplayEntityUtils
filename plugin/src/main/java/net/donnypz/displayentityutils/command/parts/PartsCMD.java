@@ -10,10 +10,10 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public final class PartsCMD extends ConsoleUsableSubCommand {
+public final class PartsCMD extends ParentSubCommand {
 
     public PartsCMD(){
-        super("parts", Permission.HELP, new PartsHelpCMD());
+        super("parts");
         new PartsInfoCMD(this);
         new PartsCreateCMD(this);
         new PartsSelectCMD(this);
@@ -36,22 +36,6 @@ public final class PartsCMD extends ConsoleUsableSubCommand {
         new PartsYawCMD(this);
         new PartsMoveHereCMD(this);
         new PartsMoveCMD(this);
-    }
-
-    @Override
-    public void execute(CommandSender sender, String[] args) {
-        if (args.length < 2){
-            partsHelp(sender, 1);
-            return;
-        }
-        String arg = args[1];
-        DEUSubCommand subCommand = subCommands.get(arg);
-        if (subCommand == null){
-            partsHelp(sender, 1);
-        }
-        else{
-            DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
-        }
     }
 
     static void partsHelp(CommandSender sender, int page){

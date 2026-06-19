@@ -2,15 +2,14 @@ package net.donnypz.displayentityutils.command.mannequin;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
-import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 
-public class MannequinCMD extends ConsoleUsableSubCommand {
+public class MannequinCMD extends ParentSubCommand {
     public MannequinCMD() {
-        super("mannequin", Permission.HELP, new MannequinHelpCMD());
+        super("mannequin");
         new MannequinSpawnCMD(this);
         new MannequinNameCMD(this);
         new MannequinUnnameCMD(this);
@@ -24,26 +23,6 @@ public class MannequinCMD extends ConsoleUsableSubCommand {
         new MannequinToggleImmovableCMD(this);
         new MannequinMainHandCMD(this);
         new MannequinEquipmentCMD(this);
-    }
-
-    @Override
-    public void execute(CommandSender sender, String[] args) {
-        if (args.length < 2){
-            help(sender, 1);
-            return;
-        }
-        String arg = args[1];
-        DEUSubCommand subCommand = subCommands.get(arg);
-        if (subCommand == null){
-            help(sender, 1);
-        }
-        else{
-            if (!VersionUtils.IS_1_21_9){
-                sender.sendMessage(Component.text("Your server version does not support Mannequin entities!", NamedTextColor.RED));
-                return;
-            }
-            DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
-        }
     }
 
     static void help(CommandSender sender, int page){

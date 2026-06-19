@@ -42,8 +42,9 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                 Component.text("Incorrect Usage! /deu listanims <storage> [page-number]", NamedTextColor.RED),
                 2,
                 false));
-
         subCommands.put("hidepoints", new HidePointsCMD());
+
+
         subCommands.put("group", new GroupCMD());
         subCommands.put("parts", new PartsCMD());
         subCommands.put("display", new DisplayCMD());
@@ -203,23 +204,15 @@ public class DisplayEntityPluginCommand implements TabExecutor {
             return true;
         }
 
-        int pageNum;
+        int pageNum = 1;
         String arg = args[0];
         if (arg.equalsIgnoreCase("help")){
             if (args.length >= 2){
                 try{
                     pageNum = Integer.parseInt(args[1]);
                 }
-                catch(IllegalArgumentException e){
-                    pageNum = 1;
-                }
+                catch(IllegalArgumentException e){}
             }
-            else{
-                pageNum = 1;
-            }
-        }
-        else{
-            pageNum = 1;
         }
 
 

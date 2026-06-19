@@ -5,10 +5,10 @@ import net.donnypz.displayentityutils.command.*;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 
-public final class TextCMD extends ConsoleUsableSubCommand {
+public final class TextCMD extends ParentSubCommand {
 
     public TextCMD(){
-        super("text", Permission.HELP, new TextHelpCMD());
+        super("text");
         new TextEditCMD(this);
         new TextSetCMD(this);
         new TextAddLineCMD(this);
@@ -19,22 +19,6 @@ public final class TextCMD extends ConsoleUsableSubCommand {
         new TextLineWidthCMD(this);
         new TextBackgroundCMD(this);
         new TextOpacityCMD(this);
-    }
-
-    @Override
-    public void execute(CommandSender sender, String[] args) {
-        if (args.length < 2){
-            help(sender, 1);
-            return;
-        }
-        String arg = args[1];
-        DEUSubCommand subCommand = subCommands.get(arg);
-        if (subCommand == null){
-            help(sender, 1);
-        }
-        else{
-            DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
-        }
     }
 
     static void help(CommandSender sender, int page){

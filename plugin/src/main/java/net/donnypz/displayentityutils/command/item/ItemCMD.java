@@ -7,30 +7,14 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 
-public final class ItemCMD extends ConsoleUsableSubCommand {
+public final class ItemCMD extends ParentSubCommand {
 
 
     public ItemCMD(){
-        super("item", Permission.HELP, new ItemHelpCMD());
+        super("item");
         new ItemSetCMD(this);
         new ItemToggleGlintCMD(this);
         new ItemTransformCMD(this);
-    }
-
-    @Override
-    public void execute(CommandSender sender, String[] args) {
-        if (args.length < 2){
-            help(sender, 1);
-            return;
-        }
-        String arg = args[1];
-        DEUSubCommand subCommand = subCommands.get(arg);
-        if (subCommand == null){
-            help(sender, 1);
-        }
-        else{
-            DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
-        }
     }
 
     static void help(CommandSender sender, int page){

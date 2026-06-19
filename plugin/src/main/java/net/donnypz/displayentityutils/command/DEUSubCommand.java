@@ -24,9 +24,8 @@ public abstract class DEUSubCommand {
         this.permission = permission;
     }
 
-    DEUSubCommand(@NotNull String commandName, @NotNull Permission permission, @NotNull DEUSubCommand helpSubCommand){
+    DEUSubCommand(@NotNull String commandName, @NotNull Permission permission){
         this.permission = permission;
-        subCommands.put("help", helpSubCommand);
         shortUsage = "/deu "+commandName;
         usage = shortUsage;
     }
@@ -66,6 +65,8 @@ public abstract class DEUSubCommand {
         if (usage == null) buildUsage();
         return usage;
     }
+
+    //protected abstract String getDescription();
 
     private void buildUsage(){
         StringBuilder sb = new StringBuilder(shortUsage);

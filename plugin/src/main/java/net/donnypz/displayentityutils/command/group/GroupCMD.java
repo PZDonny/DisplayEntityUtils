@@ -9,10 +9,10 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public final class GroupCMD extends ConsoleUsableSubCommand {
+public final class GroupCMD extends ParentSubCommand{
 
     public GroupCMD(){
-        super("group", Permission.HELP, new GroupHelpCMD());
+        super("group");
         this.subCommands.put("list", new ListCMD(
                 Component.text("Incorrect Usage! /deu group list <storage> [page-number]", NamedTextColor.RED),
                 3,
@@ -62,23 +62,6 @@ public final class GroupCMD extends ConsoleUsableSubCommand {
         new GroupWorldEditCMD(this);
         new GroupAutoCullCMD(this);
         new GroupRemoveCullCMD(this);
-    }
-
-
-    @Override
-    public void execute(CommandSender sender, String[] args) {
-        if (args.length < 2){
-            groupHelp(sender, 1);
-            return;
-        }
-        String arg = args[1];
-        DEUSubCommand subCommand = subCommands.get(arg);
-        if (subCommand == null){
-            groupHelp(sender, 1);
-        }
-        else{
-            DisplayEntityPluginCommand.executeCommand(subCommand, sender, args);
-        }
     }
 
     static void groupToPacketInfo(Player player){
