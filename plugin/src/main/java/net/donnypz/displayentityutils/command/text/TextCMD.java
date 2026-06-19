@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 public final class TextCMD extends ConsoleUsableSubCommand {
 
     public TextCMD(){
-        super(Permission.HELP, new TextHelpCMD());
+        super("text", Permission.HELP, new TextHelpCMD());
         new TextEditCMD(this);
         new TextSetCMD(this);
         new TextAddLineCMD(this);

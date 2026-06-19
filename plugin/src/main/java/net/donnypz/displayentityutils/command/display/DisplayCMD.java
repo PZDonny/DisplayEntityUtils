@@ -13,7 +13,7 @@ public final class DisplayCMD extends ConsoleUsableSubCommand {
 
 
     public DisplayCMD(){
-        super(Permission.HELP, new DisplayHelpCMD());
+        super("display", Permission.HELP, new DisplayHelpCMD());
         new DisplayGlowColorCMD(this);
         new DisplayBrightnessCMD(this);
         new DisplayViewRangeCMD(this);

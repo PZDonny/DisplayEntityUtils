@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 public final class GroupCMD extends ConsoleUsableSubCommand {
 
     public GroupCMD(){
-        super(Permission.HELP, new GroupHelpCMD());
+        super("group", Permission.HELP, new GroupHelpCMD());
         this.subCommands.put("list", new ListCMD(
                 Component.text("Incorrect Usage! /deu group list <storage> [page-number]", NamedTextColor.RED),
                 3,

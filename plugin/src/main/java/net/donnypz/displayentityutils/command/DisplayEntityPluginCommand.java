@@ -24,15 +24,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Mannequin;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
-@ApiStatus.Internal
 public class DisplayEntityPluginCommand implements TabExecutor {
 
     private final HashMap<String, DEUSubCommand> subCommands = new HashMap<>();
@@ -63,6 +58,10 @@ public class DisplayEntityPluginCommand implements TabExecutor {
 
     }
 
+    public DEUSubCommand getCommand(@NotNull String command){
+        return subCommands.get(command);
+    }
+
     public List<String> getFirstArgTabComplete(String current){
         List<String> list = new ArrayList<>();
         for (String s : subCommands.keySet()){
@@ -73,7 +72,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         return list;
     }
 
-    private List<String> getTabComplete(String commandType, String subCommand, String[] args){
+    private List<String> getTabComplete(CommandSender sender, String commandType, String subCommand, String[] args){
         DEUSubCommand cmd = subCommands.get(commandType);
         if (cmd == null) return List.of();
         cmd = cmd.subCommands.get(subCommand);
@@ -88,7 +87,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
 
         String current = args[currentIndex];
 
-        //Optional Flags/Options
+        //Flags/Options
         if (currentIndex >= requiredArgs) {
             HashSet<String> used = new HashSet<>();
             for (String arg : args) {
@@ -110,36 +109,27 @@ public class DisplayEntityPluginCommand implements TabExecutor {
 
             //Show available options/flags
             List<String> suggestions = new ArrayList<>();
-            for (String s : cmd.flags){
-                if (current.toLowerCase().equals(s)) return List.of();
-                if (!used.contains(s)) suggestions.add(s);
-            }
-
-            for (String s : cmd.options.keySet()){
-                if (current.toLowerCase().equals(s)) return List.of();
-                if (!used.contains(s)) suggestions.add(s);
-            }
+            if (!suggestFromOptionalArgs(current, cmd.flags, suggestions, used)) return List.of();
+            if (!suggestFromOptionalArgs(current, cmd.options.keySet(), suggestions, used)) return List.of();
             return suggestions;
         }
 
         DEUSubCommand.TabSuggestion indexSuggestions = cmd.tabCompleteSuggestions.get(currentIndex);
         if (indexSuggestions == null) return List.of();
 
-        List<String> tabCompletes = indexSuggestions.suggestions;
-        if (tabCompletes == null) return List.of();
+        return indexSuggestions.getTabComplete(current, sender);
+    }
 
-        if (!indexSuggestions.suggestUsingCurrentString){
-            return tabCompletes;
+    private boolean suggestFromOptionalArgs(String current,
+                                         Collection<String> optionalArgs,
+                                         List<String> suggestions,
+                                         HashSet<String> used
+    ){
+        for (String arg : optionalArgs){
+            if (current.toLowerCase().equals(arg)) return false;
+            if (!used.contains(arg) && arg.startsWith(current.toLowerCase())) suggestions.add(arg);
         }
-
-        List<String> list = new ArrayList<>();
-        for (String s : tabCompletes){
-            if (s.toLowerCase().startsWith(current.toLowerCase())){
-                list.add(s);
-            }
-        }
-
-        return list.isEmpty() ? tabCompletes : list;
+        return true;
     }
 
     private List<String> getTabComplete(String subcommand, String current){
@@ -324,7 +314,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
             }
         }
         else{
-            return getTabComplete(args[0], args[1], args);
+            return getTabComplete(sender, args[0], args[1], args);
         }
         return suggestions;
     }

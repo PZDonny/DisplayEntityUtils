@@ -10,7 +10,7 @@ import org.bukkit.command.CommandSender;
 
 public class MannequinCMD extends ConsoleUsableSubCommand {
     public MannequinCMD() {
-        super(Permission.HELP, new MannequinHelpCMD());
+        super("mannequin", Permission.HELP, new MannequinHelpCMD());
         new MannequinSpawnCMD(this);
         new MannequinNameCMD(this);
         new MannequinUnnameCMD(this);

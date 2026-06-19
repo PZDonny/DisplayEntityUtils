@@ -11,7 +11,7 @@ public final class ItemCMD extends ConsoleUsableSubCommand {
 
 
     public ItemCMD(){
-        super(Permission.HELP, new ItemHelpCMD());
+        super("item", Permission.HELP, new ItemHelpCMD());
         new ItemSetCMD(this);
         new ItemToggleGlintCMD(this);
         new ItemTransformCMD(this);

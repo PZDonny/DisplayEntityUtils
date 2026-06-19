@@ -5,10 +5,7 @@ import net.donnypz.displayentityutils.utils.Direction;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.ItemDisplay;
-import org.bukkit.entity.Pose;
-import org.bukkit.entity.TextDisplay;
+import org.bukkit.entity.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -16,22 +13,92 @@ import java.util.*;
 public abstract class DEUSubCommand {
     private final Permission permission;
     protected final TreeMap<Integer, TabSuggestion> tabCompleteSuggestions = new TreeMap<>();
-    protected final Set<String> flags = new HashSet<>();
-    protected final HashMap<String, List<String>> options = new HashMap<>();
-    protected final HashMap<String, DEUSubCommand> subCommands = new HashMap<>();
+    protected final Set<String> flags = new TreeSet<>();
+    protected final TreeMap<String, List<String>> options = new TreeMap<>();
+    protected final TreeMap<String, DEUSubCommand> subCommands = new TreeMap<>();
+    private String shortUsage;
+    private String usage;
 
     DEUSubCommand(@NotNull Permission permission){
         this.permission = permission;
     }
 
-    DEUSubCommand(@NotNull Permission permission, @NotNull DEUSubCommand helpSubCommand){
+    DEUSubCommand(@NotNull String commandName, @NotNull Permission permission, @NotNull DEUSubCommand helpSubCommand){
         this.permission = permission;
         subCommands.put("help", helpSubCommand);
+        shortUsage = "/deu "+commandName;
+        usage = shortUsage;
     }
 
     DEUSubCommand(String commandName, @NotNull DEUSubCommand parentSubCommand, @NotNull Permission permission){
         this.permission = permission;
         parentSubCommand.subCommands.put(commandName, this);
+        shortUsage = parentSubCommand.usage +
+                " " +
+                commandName;
+    }
+
+    protected boolean hasMinimumArguments(CommandSender sender, String[] args){
+        if (tabCompleteSuggestions.isEmpty()) return true;
+        if (args.length < tabCompleteSuggestions.lastKey()+1){
+            sender.sendMessage(DisplayAPI.pluginPrefix
+                    .append(Component.text("Incorrect Usage! "+getCommandUsage(), NamedTextColor.RED)));
+            return false;
+        }
+        return true;
+    }
+
+
+    protected DEUSubCommand getCommand(@NotNull String command){
+        return subCommands.get(command);
+    }
+
+    protected String getShortCommandUsage(){
+        return shortUsage;
+    }
+
+    protected String getCommandUsage(){
+        if (usage == null) buildUsage();
+        return usage;
+    }
+
+    private void buildUsage(){
+        StringBuilder sb = new StringBuilder(shortUsage);
+
+        //Tab Completions
+        if (!tabCompleteSuggestions.isEmpty()){
+            for (TabSuggestion entry : tabCompleteSuggestions.sequencedValues()){
+                List<String> suggestions = entry.displayedSuggestions;
+
+                sb.append(" ");
+                if (suggestions.size() > 1) sb.append("<");
+                sb.append(String.join(" | ", suggestions));
+                if (suggestions.size() > 1) sb.append(">");
+            }
+        }
+
+        //Flags
+        for (String flag : flags){
+            sb.append(" [").append(flag).append("]");
+        }
+
+        //Options
+        for (Map.Entry<String, List<String>> entry : options.entrySet()){
+            String option = entry.getKey();
+            List<String> values = entry.getValue();
+
+            sb.append(" ");
+            sb.append("[").append(option);
+            if (!values.isEmpty()) {
+                sb.append(" ");
+                if (values.size() > 1) sb.append("<");
+                sb.append(String.join(" | ", values));
+                if (values.size() > 1) sb.append(">");
+            }
+            sb.append("]");
+        }
+
+        usage = sb.toString();
     }
 
     protected TabSuggestion setTabComplete(int index, String suggestion){
@@ -49,11 +116,11 @@ public abstract class DEUSubCommand {
     }
 
     protected void addFlag(@NotNull String flag){
-        flags.add(flag);
+        flags.add(flag.toLowerCase());
     }
 
     protected void addOption(@NotNull String option, @NotNull String inputPlaceholder){
-        addOption(option, List.of(inputPlaceholder));
+        addOption(option.toLowerCase(), List.of(inputPlaceholder));
     }
 
     protected void addOption(@NotNull String option, @NotNull List<String> inputPlaceholders){
@@ -78,7 +145,7 @@ public abstract class DEUSubCommand {
     protected @NotNull OptionalArguments getOptionalArguments(CommandSender sender, String[] args, int startIndex){
         OptionalArguments oArgs = new OptionalArguments();
         for (int i = startIndex; i < args.length; i++) {
-            String arg = args[i];
+            String arg = args[i].toLowerCase();
 
             if (flags.contains(arg)){
                 oArgs.flags.add(arg);
@@ -109,7 +176,7 @@ public abstract class DEUSubCommand {
         private OptionalArguments(){}
 
         public boolean hasFlag(@NotNull String flag){
-            return flags.contains(flag);
+            return flags.contains(flag.toLowerCase());
         }
 
         public @NotNull String getOption(@NotNull String option){
@@ -163,18 +230,70 @@ public abstract class DEUSubCommand {
                 "purple",
                 "orange"))
                 .suggestUsingCurrentString();
+        public static final TabSuggestion X_COORDINATE = coordinate('x');
+        public static final TabSuggestion Y_COORDINATE = coordinate('y');
+        public static final TabSuggestion Z_COORDINATE = coordinate('z');
 
 
         public boolean suggestUsingCurrentString = false;
         List<String> suggestions;
+        List<String> displayedSuggestions;
+
+        private static final String COORDINATE_SUFFIX = "_coord";
 
         TabSuggestion(List<String> suggestions){
             this.suggestions = suggestions;
+            this.displayedSuggestions = suggestions;
+        }
+
+        private static TabSuggestion coordinate(char coord){
+            List<String> list = new ArrayList<>();
+            list.add(coord+COORDINATE_SUFFIX);
+            list.add("<"+coord+">");
+            return new TabSuggestion(list)
+                    .suggestUsingCurrentString()
+                    .setDisplayedSuggestions(List.of("<"+coord+">"));
+        }
+
+        public TabSuggestion setDisplayedSuggestions(List<String> usageSuggestions){
+            this.displayedSuggestions = usageSuggestions;
+            return this;
         }
 
         public TabSuggestion suggestUsingCurrentString(){
             this.suggestUsingCurrentString = true;
             return this;
+        }
+
+        public List<String> getTabComplete(String current, CommandSender sender){
+            if (suggestions == null) return List.of();
+
+            if (!suggestUsingCurrentString){
+                return suggestions;
+            }
+
+            List<String> list = new ArrayList<>();
+            for (String s : suggestions){
+                //Autofill coordinate
+                if (s.endsWith(COORDINATE_SUFFIX) && current.isEmpty()){
+                    if (!(sender instanceof Player player)) continue;
+                    switch (s.charAt(0)){
+                        case 'x' -> {
+                            list.add(String.format("%.2f", player.getX()));
+                        }
+                        case 'y' -> {
+                            list.add(String.format("%.2f", player.getY()));
+                        }
+                        case 'z' -> {
+                            list.add(String.format("%.2f", player.getZ()));
+                        }
+                    }
+                }
+                else if (s.toLowerCase().startsWith(current.toLowerCase())){
+                    list.add(s);
+                }
+            }
+            return list.isEmpty() ? suggestions : list;
         }
     }
 }

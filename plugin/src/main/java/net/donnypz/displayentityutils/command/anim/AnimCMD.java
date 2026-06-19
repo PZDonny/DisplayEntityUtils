@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 public final class AnimCMD extends ConsoleUsableSubCommand {
 
     public AnimCMD(){
-        super(Permission.HELP, new AnimHelpCMD());
+        super("anim", Permission.HELP, new AnimHelpCMD());
         this.subCommands.put("list", new ListCMD(
                 Component.text("Incorrect Usage! /deu anim list <storage> [page-number]", NamedTextColor.RED),
                 3,

@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 public final class PartsCMD extends ConsoleUsableSubCommand {
 
     public PartsCMD(){
-        super(Permission.HELP, new PartsHelpCMD());
+        super("parts", Permission.HELP, new PartsHelpCMD());
         new PartsInfoCMD(this);
         new PartsCreateCMD(this);
         new PartsSelectCMD(this);

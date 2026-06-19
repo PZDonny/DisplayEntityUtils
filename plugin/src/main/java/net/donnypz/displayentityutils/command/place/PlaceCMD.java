@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class PlaceCMD extends ConsoleUsableSubCommand {
     public PlaceCMD() {
-        super(Permission.HELP, new PlaceHelpCMD());
+        super("place", Permission.HELP, new PlaceHelpCMD());
         new PlaceSetCMD(this);
         new PlaceUnsetCMD(this);
         new PlaceSetPermissionCMD(this);

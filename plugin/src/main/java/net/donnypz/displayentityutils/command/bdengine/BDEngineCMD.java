@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 public final class BDEngineCMD extends ConsoleUsableSubCommand {
 
     public BDEngineCMD(){
-        super(Permission.HELP, new BDEngineHelpCMD());
+        super("bdengine", Permission.HELP, new BDEngineHelpCMD());
         new BDEngineConvertDatapackCMD(this);
         new BDEngineImportCMD(this);
         new BDEngineSpawnModelCMD(this);

@@ -22,7 +22,7 @@ import java.util.List;
 public final class InteractionCMD extends ConsoleUsableSubCommand {
 
     public InteractionCMD(){
-        super(Permission.HELP, new InteractionHelpCMD());
+        super("interaction", Permission.HELP, new InteractionHelpCMD());
         new InteractionSpawnCMD(this);
         new InteractionAddCMD(this);
         new InteractionListCMD(this);

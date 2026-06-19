@@ -8,8 +8,8 @@ public abstract class PlayerSubCommand extends DEUSubCommand {
         super(permission);
     }
 
-    public PlayerSubCommand(@NotNull Permission permission, @NotNull DEUSubCommand helpSubCommand) {
-        super(permission, helpSubCommand);
+    public PlayerSubCommand(@NotNull String commandName, @NotNull Permission permission, @NotNull DEUSubCommand helpSubCommand) {
+        super(commandName, permission, helpSubCommand);
     }
 
     public PlayerSubCommand(@NotNull String commandName, @NotNull DEUSubCommand parentSubCommand, @NotNull Permission permission) {

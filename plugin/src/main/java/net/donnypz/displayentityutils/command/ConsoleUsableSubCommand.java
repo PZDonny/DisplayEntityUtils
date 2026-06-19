@@ -8,8 +8,8 @@ public abstract class ConsoleUsableSubCommand extends DEUSubCommand {
         super(permission);
     }
 
-    public ConsoleUsableSubCommand(@NotNull Permission permission, @NotNull DEUSubCommand helpSubCommand) {
-        super(permission, helpSubCommand);
+    public ConsoleUsableSubCommand(@NotNull String commandName, @NotNull Permission permission, @NotNull DEUSubCommand helpSubCommand) {
+        super(commandName, permission, helpSubCommand);
     }
 
     public ConsoleUsableSubCommand(@NotNull String commandName, @NotNull DEUSubCommand parentSubCommand, @NotNull Permission permission) {
