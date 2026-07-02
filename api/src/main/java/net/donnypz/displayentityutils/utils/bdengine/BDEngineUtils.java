@@ -30,6 +30,7 @@ public final class BDEngineUtils {
     private static final String BDENGINE_URL = "https://block-display.com/server-api/?id=";
     private static final HttpClient HTTP_CLIENT = HttpClient
             .newBuilder()
+            .followRedirects(HttpClient.Redirect.NORMAL)
             .connectTimeout(Duration.ofSeconds(TIMEOUT_TIME))
             .build();
 
@@ -57,13 +58,14 @@ public final class BDEngineUtils {
         HttpResponse<String> response = HTTP_CLIENT.send(getRequest, HttpResponse.BodyHandlers.ofString());
 
         //Check for error this way since an error returns a 200 status code regardless
+        String responseBody = response.body();
         try{
-            BDEngineError error = GSON.fromJson(response.body(), BDEngineError.class);
+            BDEngineError error = GSON.fromJson(responseBody, BDEngineError.class);
             if (error.getError() != null) throw new IOException(error.getError());
         }
         catch(JsonSyntaxException e){}
 
-        return BDEResult.create(response.body());
+        return BDEResult.create(responseBody);
     }
 
     /**
