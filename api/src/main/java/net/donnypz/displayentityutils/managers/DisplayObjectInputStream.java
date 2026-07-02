@@ -13,7 +13,7 @@ class DisplayObjectInputStream extends ObjectInputStream {
     private static final String OLD_PACKAGE = "com.pzdonny";
     private static final String NEW_PACKAGE = "net.donnypz";
     private static final String BUKKIT_SOUND_ENUM = "org.bukkit.Sound";
-    private static final String ANIMATION_SOUND = "AnimationSound";
+    private static final String ANIMATION_SOUND_CLASS = "AnimationSound";
     DisplayObjectInputStream(InputStream in) throws IOException {
         super(in);
     }
@@ -36,7 +36,7 @@ class DisplayObjectInputStream extends ObjectInputStream {
         if (name.equals(BUKKIT_SOUND_ENUM)){ //Because of old sound HashMaps using an enum
             return ObjectStreamClass.lookup(OldSound.class);
         }
-        if (name.endsWith(ANIMATION_SOUND)){
+        if (name.endsWith(ANIMATION_SOUND_CLASS)){
             return ObjectStreamClass.lookup(DEUSound.class);
         }
         return desc;
