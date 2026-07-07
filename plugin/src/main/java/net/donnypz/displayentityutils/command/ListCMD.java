@@ -95,8 +95,9 @@ public class ListCMD extends ConsoleUsableSubCommand {
                         Component.text(
                                 (listsGroups ? "Click to spawn" : "Click to select"),
                                 NamedTextColor.GREEN))
-                ).clickEvent(ClickEvent.clickEvent(ClickEvent.Action.SUGGEST_COMMAND,
-                        "/deu " + (listsGroups ? "group spawn " : "anim select ") + tag + " " + loadMethod.name()));
+                ).clickEvent(ClickEvent.suggestCommand(
+                        "/deu " + (listsGroups ? "group spawn " : "anim select ") + tag + " " + loadMethod.name())
+                );
     }
 
     @Override
