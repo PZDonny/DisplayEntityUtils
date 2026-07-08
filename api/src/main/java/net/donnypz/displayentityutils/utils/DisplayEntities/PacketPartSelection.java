@@ -92,8 +92,8 @@ public class PacketPartSelection extends MultiPartSelection<PacketDisplayEntityP
     }
 
     /**
-     * Get the location of this selection's group
-     * @return a {@link Location}
+     * Get the location of the {@link PacketDisplayEntityGroup} that belongs to parts in this selection
+     * @return a {@link Location} or null if the selection is invalid
      */
     @Override
     public @Nullable Location getLocation() {

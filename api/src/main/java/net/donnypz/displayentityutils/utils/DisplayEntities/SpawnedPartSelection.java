@@ -1,10 +1,12 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDisplayEntityPart> implements Spawned {
 
@@ -77,6 +79,15 @@ public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDispla
         if (!isValid()) return;
         ((SpawnedDisplayEntityGroup) group).removePartSelection(this);
         removeSilent();
+    }
+
+    /**
+     * Get the location of the {@link SpawnedDisplayEntityGroup} that belongs to parts in this selection
+     * @return a {@link Location} or null if the selection is invalid
+     */
+    @Override
+    public @Nullable Location getLocation() {
+        return getGroup().getLocation();
     }
 
     void removeSilent(){

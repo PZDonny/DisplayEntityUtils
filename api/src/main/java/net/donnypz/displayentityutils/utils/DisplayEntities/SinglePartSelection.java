@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.Direction;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -31,6 +32,16 @@ public final class SinglePartSelection extends ActivePartSelection<SpawnedDispla
     @Override
     public boolean isValid() {
         return selectedPart != null;
+    }
+
+    /**
+     * Get the location of the {@link SpawnedDisplayEntityPart} represented in this selection
+     * @return a {@link Location} or null if the selection is invalid
+     */
+    @Override
+    public @Nullable Location getLocation() {
+        if (!isValid()) return null;
+        return selectedPart.getLocation();
     }
 
     @Override
