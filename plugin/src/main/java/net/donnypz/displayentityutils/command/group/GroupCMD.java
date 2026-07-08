@@ -1,12 +1,9 @@
 package net.donnypz.displayentityutils.command.group;
 
-import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public final class GroupCMD extends ParentSubCommand{
@@ -38,6 +35,7 @@ public final class GroupCMD extends ParentSubCommand{
         new GroupYawCMD(this);
         new GroupPitchCMD(this);
         new GroupScaleCMD(this);
+        new GroupRotateCMD(this);
         new GroupBrightnessCMD(this);
         new GroupMoveHereCMD(this);
         new GroupMoveCMD(this);
