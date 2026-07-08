@@ -14,7 +14,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
-public class JSONAdapter_InteractionEntity implements JsonSerializer<InteractionEntity>, JsonDeserializer<InteractionEntity> {
+final class JSONAdapter_InteractionEntity implements JsonSerializer<InteractionEntity>, JsonDeserializer<InteractionEntity> {
 
     @Override
     public InteractionEntity deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext ctx) throws JsonParseException {

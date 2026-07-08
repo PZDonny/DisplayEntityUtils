@@ -3,12 +3,10 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import com.google.gson.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticle;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.reflect.Type;
 import java.util.HashSet;
 
-@ApiStatus.Internal
 final class JSONAdapter_FramePoint implements JsonDeserializer<FramePoint> {
 
     JSONAdapter_FramePoint(){}

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class JSONAdapter_MannequinEntity implements JsonSerializer<MannequinEntity>, JsonDeserializer<MannequinEntity> {
+final class JSONAdapter_MannequinEntity implements JsonSerializer<MannequinEntity>, JsonDeserializer<MannequinEntity> {
     Gson gson = new Gson();
     Map<String, Object> AIR_AS_MAP = new ItemStack(Material.AIR).serialize();
 

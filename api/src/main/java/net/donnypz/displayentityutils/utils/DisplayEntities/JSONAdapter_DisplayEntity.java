@@ -6,14 +6,12 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Base64;
 import java.util.List;
 
-@ApiStatus.Internal
 final class JSONAdapter_DisplayEntity implements JsonDeserializer<DisplayEntity>, JsonSerializer<DisplayEntity> {
 
     JSONAdapter_DisplayEntity(){}
