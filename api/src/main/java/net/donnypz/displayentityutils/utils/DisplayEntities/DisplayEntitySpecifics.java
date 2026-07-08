@@ -139,7 +139,8 @@ abstract class DisplayEntitySpecifics implements Serializable {
                 .setAttribute(DisplayAttributes.Transform.LEFT_ROTATION, transformation.getLeftRotation())
                 .setAttribute(DisplayAttributes.Transform.RIGHT_ROTATION, transformation.getRightRotation())
                 .setAttribute(DisplayAttributes.Transform.SCALE, transformation.getScale())
-                .setAttribute(DisplayAttributes.Transform.TRANSLATION, transformation.getTranslation());
+                .setAttribute(DisplayAttributes.Transform.TRANSLATION, transformation.getTranslation())
+                .setAttribute(DisplayAttributes.GLOW_COLOR_OVERRIDE, glowColorOverride != Color.WHITE.asRGB() ? Color.fromRGB(glowColorOverride) : Color.WHITE);
 
         if (brightnessBlockLight != -1 && brightnessSkyLight != -1)
             attributeContainer.setAttribute(DisplayAttributes.BRIGHTNESS, new Display.Brightness(brightnessBlockLight, brightnessSkyLight));
