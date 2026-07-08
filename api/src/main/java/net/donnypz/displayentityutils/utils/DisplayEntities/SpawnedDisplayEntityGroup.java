@@ -62,7 +62,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             creationTime = System.currentTimeMillis();
         }
         if (c.has(scaleKey)){
-            scaleMultiplier = c.get(scaleKey, PersistentDataType.FLOAT);
+            float scaleMultiplier = c.get(scaleKey, PersistentDataType.FLOAT);
+            super.setScaleMultiplier(scaleMultiplier);
         }
         if (c.has(persistenceOverrideKey)) {
             persistenceOverride = c.get(persistenceOverrideKey, PersistentDataType.BOOLEAN);
@@ -418,17 +419,15 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (newScaleMultiplier <= 0){
             throw new IllegalArgumentException("New Scale Multiplier cannot be <= 0");
         }
-        if (newScaleMultiplier == scaleMultiplier){
-            return true;
-        }
-        if (!isInLoadedChunk()){
-            return false;
-        }
-        GroupScaleEvent event = new GroupScaleEvent(this, newScaleMultiplier, this.scaleMultiplier, durationInTicks);
-        event.callEvent();
-        if (event.isCancelled()){
-            return false;
-        }
+
+        float originalScaleMultiplier = super.getScaleMultiplier();
+        if (newScaleMultiplier == originalScaleMultiplier) return true;
+
+        if (!isInLoadedChunk()) return false;
+
+
+        GroupScaleEvent event = new GroupScaleEvent(this, newScaleMultiplier, originalScaleMultiplier, durationInTicks);
+        if (!event.callEvent()) return false;
 
         for (SpawnedDisplayEntityPart part : groupParts.values()){
             //Displays
@@ -438,15 +437,15 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
                 //Reset Scale then multiply by newScaleMultiplier
                 Vector3f scale = transformation.getScale();
-                scale.x = (scale.x/scaleMultiplier)*newScaleMultiplier;
-                scale.y = (scale.y/scaleMultiplier)*newScaleMultiplier;
-                scale.z = (scale.z/scaleMultiplier)*newScaleMultiplier;
+                scale.x = (scale.x/originalScaleMultiplier)*newScaleMultiplier;
+                scale.y = (scale.y/originalScaleMultiplier)*newScaleMultiplier;
+                scale.z = (scale.z/originalScaleMultiplier)*newScaleMultiplier;
 
                 //Reset Translation then multiply by newScaleMultiplier
                 Vector3f translationVector = transformation.getTranslation();
-                translationVector.x = (translationVector.x/scaleMultiplier)*newScaleMultiplier;
-                translationVector.y = (translationVector.y/scaleMultiplier)*newScaleMultiplier;
-                translationVector.z = (translationVector.z/scaleMultiplier)*newScaleMultiplier;
+                translationVector.x = (translationVector.x/originalScaleMultiplier)*newScaleMultiplier;
+                translationVector.y = (translationVector.y/originalScaleMultiplier)*newScaleMultiplier;
+                translationVector.z = (translationVector.z/originalScaleMultiplier)*newScaleMultiplier;
 
                 //Transformation newTransform = new Transformation(translationVector, transformation.getLeftRotation(), scaleVector, transformation.getRightRotation());
                 if (!transformation.equals(d.getTransformation())){
@@ -465,8 +464,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                     Interaction i = (Interaction) part.getEntity();
 
                     //Reset Scale then multiply by newScaleMultiplier
-                    float newHeight = (i.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier;
-                    float newWidth = (i.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier;
+                    float newHeight = (i.getInteractionHeight()/originalScaleMultiplier)*newScaleMultiplier;
+                    float newWidth = (i.getInteractionWidth()/originalScaleMultiplier)*newScaleMultiplier;
                     InteractionUtils.scaleInteraction(i, newHeight, newWidth, durationInTicks, 0);
 
                     //Reset Translation then multiply by newScaleMultiplier
@@ -475,9 +474,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                         continue;
                     }
                     Vector oldVector = new Vector(translationVector.getX(), translationVector.getY(), translationVector.getZ());
-                    translationVector.setX((translationVector.getX()/scaleMultiplier)*newScaleMultiplier);
-                    translationVector.setY((translationVector.getY()/scaleMultiplier)*newScaleMultiplier);
-                    translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
+                    translationVector.setX((translationVector.getX()/originalScaleMultiplier)*newScaleMultiplier);
+                    translationVector.setY((translationVector.getY()/originalScaleMultiplier)*newScaleMultiplier);
+                    translationVector.setZ((translationVector.getZ()/originalScaleMultiplier)*newScaleMultiplier);
 
                     Vector moveVector = oldVector.subtract(translationVector);
                     part.translateForce(moveVector, (float) moveVector.length(), durationInTicks, 0);
@@ -485,7 +484,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 else if (part.type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
                     Mannequin m = (Mannequin) part.getEntity();
                     double scale = m.getAttribute(Attribute.SCALE).getBaseValue();
-                    scale = (scale/scaleMultiplier)*newScaleMultiplier;
+                    scale = (scale/originalScaleMultiplier)*newScaleMultiplier;
                     m.getAttribute(Attribute.SCALE).setBaseValue(scale);
                 }
             }
@@ -493,7 +492,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
         PersistentDataContainer pdc = getMasterEntity().getPersistentDataContainer();
         pdc.set(scaleKey, PersistentDataType.FLOAT, newScaleMultiplier);
-        scaleMultiplier = newScaleMultiplier;
+        super.setScaleMultiplier(newScaleMultiplier);
         return true;
     }
 
@@ -842,6 +841,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
         if (!vehicle.addPassenger(masterEntity)) return false;
 
+        Vector rideOffset = getRideOffset();
         if (!rideOffset.isZero()) {
             translate(rideOffset, -1, -1);
         }
@@ -912,8 +912,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         Entity masterEntity = getMasterEntity();
         if (masterEntity != null){
             if (masterEntity.leaveVehicle()){
+                Vector rideOffset = getRideOffset();
                 if (!rideOffset.isZero()){
-                    translate(rideOffset.clone().multiply(-1), -1, -1);
+                    translate(rideOffset.multiply(-1), -1, -1);
                 }
             }
             this.autoCull(false);

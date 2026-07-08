@@ -32,21 +32,26 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class ActiveGroup<T extends ActivePart> implements Active{
 
     private final int ID = IDGenerator.next();
+
     protected T masterPart;
     protected LinkedHashMap<UUID, T> groupParts = new LinkedHashMap<>();
     protected String tag;
-    final Set<GroupEntityFollower> followers = new HashSet<>();
+
     final Object followerLock = new Object();
+    final Set<GroupEntityFollower> followers = new HashSet<>();
     GroupEntityFollower defaultFollower;
+
     private final Object animatorLock = new Object();
     protected final Set<DisplayAnimator> activeAnimators = new HashSet<>();
     protected String spawnAnimationTag;
     protected LoadMethod spawnAnimationLoadMethod;
     protected DisplayAnimator.AnimationType spawnAnimationType;
+
     protected MachineState currentMachineState;
-    protected float scaleMultiplier = 1;
-    protected Vector rideOffset = new Vector();
-    int lastAnimatedTick = -1;
+
+    private volatile float scaleMultiplier = 1;
+    private volatile Vector rideOffset = new Vector();
+    private volatile int lastAnimatedTick = -1;
 
 
     /**
@@ -126,11 +131,13 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param includeRideOffset whether the group's rideOffset should be included in calculation
      */
     public void autoCull(boolean includeRideOffset){
+        Vector offset = rideOffset;
+
         float widthAdder = DisplayConfig.widthCullingAdder();
         float heightAdder = DisplayConfig.heightCullingAdder();
         if (includeRideOffset){
-            widthAdder += (float) Math.max(Math.abs(rideOffset.getX()), Math.abs(rideOffset.getZ()));
-            heightAdder += (float) Math.abs(rideOffset.getY());
+            widthAdder += (float) Math.max(Math.abs(offset.getX()), Math.abs(offset.getZ()));
+            heightAdder += (float) Math.abs(offset.getY());
         }
 
         autoCull(widthAdder, heightAdder);
@@ -585,6 +592,10 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         return scaleMultiplier;
     }
 
+    protected void setScaleMultiplier(float scaleMultiplier){
+        this.scaleMultiplier = scaleMultiplier;
+    }
+
     /**
      * Get the extra scale multiplier that will be applied to a player's view of this group
      * @param player the associated player
@@ -1018,16 +1029,16 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * Get the ride translation offset of this group
      * @return a {@link Vector}
      */
-    public synchronized @NotNull Vector getRideOffset() {
+    public @NotNull Vector getRideOffset() {
         return rideOffset.clone();
     }
 
     /**
      * Get the ride translation offset of this group
-     * @return a {@link Vector}
+     * @return a {@link Vector3f}
      */
     public @NotNull Vector3f getRideOffset3f() {
-        return getRideOffset().toVector3f();
+        return rideOffset.toVector3f();
     }
 
     /**
