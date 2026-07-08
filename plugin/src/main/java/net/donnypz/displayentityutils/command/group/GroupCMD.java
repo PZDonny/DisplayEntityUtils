@@ -3,7 +3,7 @@ package net.donnypz.displayentityutils.command.group;
 import net.donnypz.displayentityutils.command.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
 public final class GroupCMD extends ParentSubCommand{
@@ -63,6 +63,6 @@ public final class GroupCMD extends ParentSubCommand{
     }
 
     static void groupToPacketInfo(Player player){
-        player.sendMessage(Component.text("| Selected groups can become packet-based with \"/deu group topacket\"", NamedTextColor.GRAY, TextDecoration.ITALIC));
+        player.sendMessage(MiniMessage.miniMessage().deserialize("<aqua><italic>| <yellow>/deu group topacket <gray>- Make selected group packet-based"));
     }
 }
