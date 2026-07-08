@@ -254,7 +254,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
         if (refreshViewers) {
             hide();
-            if (isAutoShow()) show();
+            if (isAutoShow()) autoShow();
         }
     }
 
@@ -600,6 +600,11 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         return masterPart.isTrackedBy(player.getUniqueId());
     }
 
+    public boolean isTrackedBy(@NotNull UUID playerUUID){
+        if (masterPart == null) return false;
+        return masterPart.isTrackedBy(playerUUID);
+    }
+
     @Override
     public Collection<Player> getTrackingPlayers() {
         if (masterPart == null) return Collections.emptySet();
@@ -865,22 +870,22 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         if (oldAutoshow != autoShow) {
             this.update();
             if (autoShow) {
-                show();
+                autoShow();
             }
         }
         return this;
     }
 
-    private synchronized void show() {
+    private synchronized void autoShow() {
         Location loc = getLocation();
         if (loc == null) return;
         long chunkKey = ConversionUtils.getChunkKey(loc);
         Collection<Player> players = new ArrayList<>();
         DisplayAPI.getScheduler().run(() -> {
             for (Player p : loc.getWorld().getPlayers()) {
-                if (p.isChunkSent(chunkKey)) {
-                    players.add(p);
-                }
+                if (!p.isChunkSent(chunkKey)) continue;
+                if (autoShowCondition != null && !autoShowCondition.test(p)) continue;
+                players.add(p);
             }
             DisplayAPI.getScheduler().runAsync(() -> {
                 if (this.autoShow) {
@@ -897,22 +902,22 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         if (oldAutoshow != autoShow) {
             this.update();
             if (autoShow) {
-                show(settings);
+                autoShow(settings);
             }
         }
         return this;
     }
 
-    private synchronized void show(GroupSpawnSettings settings) {
+    private synchronized void autoShow(GroupSpawnSettings settings) {
         Location loc = getLocation();
         if (loc == null) return;
         long chunkKey = ConversionUtils.getChunkKey(loc);
         Collection<Player> players = new ArrayList<>();
         DisplayAPI.getScheduler().run(() -> {
             for (Player p : loc.getWorld().getPlayers()) {
-                if (p.isChunkSent(chunkKey)) {
-                    players.add(p);
-                }
+                if (!p.isChunkSent(chunkKey)) continue;
+                if (autoShowCondition != null && !autoShowCondition.test(p)) continue;
+                players.add(p);
             }
             DisplayAPI.getScheduler().runAsync(() -> {
                 if (this.autoShow) {
@@ -934,8 +939,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      *
      */
     public synchronized void setAutoShow(boolean autoShow, @Nullable Predicate<Player> playerCondition) {
-        setAutoShow(autoShow);
         this.autoShowCondition = playerCondition;
+        setAutoShow(autoShow);
     }
 
     /**
