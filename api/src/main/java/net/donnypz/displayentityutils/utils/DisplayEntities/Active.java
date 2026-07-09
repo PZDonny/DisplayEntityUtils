@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.Direction;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -11,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 
 public interface Active {
+
+    @Nullable Location getLocation();
 
     void setTeleportDuration(int teleportDuration);
 

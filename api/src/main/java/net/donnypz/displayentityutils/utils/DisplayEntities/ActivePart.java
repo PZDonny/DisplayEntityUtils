@@ -167,8 +167,6 @@ public abstract class ActivePart implements Active{
      */
     public abstract void teleport(@NotNull Location location);
 
-    public abstract @Nullable Location getLocation();
-
     protected abstract void cull(float width, float height);
 
     /**

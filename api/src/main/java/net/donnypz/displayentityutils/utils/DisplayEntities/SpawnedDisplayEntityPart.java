@@ -251,7 +251,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     /**
-     *  Get the last known location of this part's entity
+     * Get the last known location of this part's entity
      * @return a location
      */
     @Override

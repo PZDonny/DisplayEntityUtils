@@ -321,7 +321,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
     /**
      * Get the location of this group.
-     * @return Location of this group's master part. Null if the group is invalid
+     * @return the {@link Location} of this group's master part. Null if {{@link #isValid()}} returns false
      */
     @Override
     public Location getLocation(){

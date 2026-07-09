@@ -583,9 +583,6 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      */
     public abstract boolean isPersistent();
 
-    public abstract Location getLocation();
-
-
     /**
      * Get the name of this group's world
      */
