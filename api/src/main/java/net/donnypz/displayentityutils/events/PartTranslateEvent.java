@@ -1,12 +1,11 @@
 package net.donnypz.displayentityutils.events;
 
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Interaction;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -18,6 +17,9 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Called when an entity changes its translation through the {@link DisplayUtils#translate(Display, Vector, double, int, int)} or similar methods.
  * <br>Can be cancelled
+ * <br>
+ * <br>
+ * This method may be called async. Use {@link Bukkit#isPrimaryThread()} to check
  */
 public final class PartTranslateEvent extends Event implements Cancellable {
 
@@ -30,6 +32,7 @@ public final class PartTranslateEvent extends Event implements Cancellable {
     Transformation newTransformation;
 
     public PartTranslateEvent(@NotNull Entity entity, Location destination, Transformation oldTransformation, Transformation newTransformation){
+        super(!Bukkit.isPrimaryThread());
         this.entity = entity;
         this.destination = destination;
         this.oldTransformation = oldTransformation;

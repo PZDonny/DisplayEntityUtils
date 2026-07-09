@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.events;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -8,7 +9,10 @@ import org.bukkit.event.HandlerList;
 
 /**
  * Called when a {@link SpawnedDisplayEntityGroup} translates its parts, including both display and interaction entities.
- * Can be cancelled
+ * <br>Can be cancelled.
+ * <br>
+ * <br>
+ * This method may be called async. Use {@link Bukkit#isPrimaryThread()} to check
  */
 public class GroupTranslateEvent extends Event implements Cancellable {
 
@@ -19,11 +23,8 @@ public class GroupTranslateEvent extends Event implements Cancellable {
     Location destination;
     private boolean isCancelled;
 
-    /**
-     * Called when a {@link SpawnedDisplayEntityGroup} translates its parts, including both display and interaction entities.
-     * Can be cancelled
-     */
     public GroupTranslateEvent(SpawnedDisplayEntityGroup group, GroupTranslateEvent.GroupTranslateType type, Location destination){
+        super(!Bukkit.isPrimaryThread());
         this.spawnedDisplayEntityGroup = group;
         this.type = type;
         this.destination = destination;

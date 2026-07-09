@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.version.folia;
 
 import io.papermc.paper.entity.TeleportFlag;
 import net.donnypz.displayentityutils.DisplayAPI;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -15,7 +16,8 @@ public final class FoliaUtils {
             entity.teleportAsync(location);
         }
         else{
-            entity.teleport(location);
+            if (!Bukkit.isPrimaryThread()) entity.teleportAsync(location);
+            else entity.teleport(location);
         }
     }
 
@@ -24,7 +26,8 @@ public final class FoliaUtils {
             entity.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN, flags);
         }
         else{
-            entity.teleport(location, flags);
+            if (!Bukkit.isPrimaryThread()) entity.teleportAsync(location, flags);
+            else entity.teleport(location, flags);
         }
     }
 
