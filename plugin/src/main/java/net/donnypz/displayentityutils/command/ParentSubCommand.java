@@ -34,14 +34,21 @@ public abstract class ParentSubCommand extends ConsoleUsableSubCommand{
 
     void help(CommandSender sender, int page){
         final int PAGE_LIMIT = 7;
+        final int SUBCOMMAND_COUNT = subCommands.size();
+
         if (commands == null) commands = subCommands.sequencedKeySet().toArray(new String[0]);
-        int maxPageCount = (int) Math.ceil(subCommands.size() / (double) PAGE_LIMIT);
+
+        int maxPageCount = (int) Math.ceil(SUBCOMMAND_COUNT / (double) PAGE_LIMIT);
         page = Math.min(Math.max(page, 1), maxPageCount);
-        int max = Math.min(page*PAGE_LIMIT, commands.length-1);
+
+        int end = Math.min(page*PAGE_LIMIT, commands.length);
+        int start = Math.max(0, end-PAGE_LIMIT);
+
+
 
         sender.sendMessage(Component.empty());
         sender.sendMessage(DisplayAPI.pluginPrefixLong);
-        for (int i = max-PAGE_LIMIT; i < max; i++){
+        for (int i = start; i < end; i++){
             String cmdName = commands[i];
             DEUSubCommand subCmd = subCommands.get(cmdName);
             CMDUtils.sendCMD(sender, subCmd);
