@@ -42,6 +42,12 @@ public interface Active {
 
     void setYaw(float yaw, boolean pivot);
 
+    default void setRotation(float pitch, float yaw){
+        setRotation(pitch, yaw, false);
+    }
+
+    void setRotation(float pitch, float yaw, boolean pivot);
+
     void pivot(float angleInDegrees);
 
     default boolean translate(@NotNull Vector direction, int durationInTicks, int delayInTicks){
@@ -55,4 +61,6 @@ public interface Active {
     void hideFromPlayer(@NotNull Player player);
 
     void hideFromPlayers(@NotNull Collection<Player> players);
+
+    boolean isValid();
 }

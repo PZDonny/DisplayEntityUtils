@@ -26,12 +26,6 @@ public abstract class ActivePartSelection<T extends ActivePart> implements Activ
     public abstract void remove();
 
     /**
-     * Get whether this part selection is valid and usable
-     * @return a boolean
-     */
-    public abstract boolean isValid();
-
-    /**
      * Get whether this selection is a {@link SinglePartSelection}
      * @return a boolean
      */

@@ -637,13 +637,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
     }
 
-    @Override
-    public void setRotation(float pitch, float yaw, boolean pivot) {
-        for (PacketDisplayEntityPart part : groupParts.values()) {
-            part.setRotation(pitch, yaw, pivot);
-        }
-    }
-
     /**
      * Pivot all non-display parts in this group around the group
      *

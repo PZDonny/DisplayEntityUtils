@@ -321,6 +321,13 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
     }
 
 
+    @Override
+    public void setRotation(float pitch, float yaw, boolean pivot) {
+        for (T part : selectedParts){
+            part.setRotation(pitch, yaw, pivot);
+        }
+    }
+
     /**
      * Set the view range of all parts in this selection
      * @param viewRangeMultiplier The range to set
@@ -643,7 +650,7 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
 
     @Override
     public boolean isValid(){
-        return group != null;
+        return group != null && group.isValid();
     }
 
     /**

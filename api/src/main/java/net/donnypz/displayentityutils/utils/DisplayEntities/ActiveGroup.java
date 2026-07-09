@@ -168,6 +168,13 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         }
     }
 
+    @Override
+    public void setRotation(float pitch, float yaw, boolean pivot) {
+        for (ActivePart part : groupParts.values()) {
+            part.setRotation(pitch, yaw, pivot);
+        }
+    }
+
 
     /**
      * Change the scale of all parts in this group by the given scale multiplier
@@ -1108,9 +1115,19 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
 
     /**
      * Check if a group is currently registered and usable.
+     * @return a boolean
      */
     public boolean isRegistered(){
         return masterPart != null;
+    }
+
+    /**
+     * Get whether this group is valid. This checks {@link ActiveGroup#isRegistered()}
+     * @return a boolean
+     */
+    @Override
+    public boolean isValid(){
+        return isRegistered();
     }
 
     protected void removeScaleMultipliers(){

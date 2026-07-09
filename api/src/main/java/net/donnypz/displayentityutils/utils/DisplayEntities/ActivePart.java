@@ -56,6 +56,7 @@ public abstract class ActivePart implements Active{
      * Get whether this part is valid
      * @return a boolean
      */
+    @Override
     public boolean isValid(){
         return valid;
     }
