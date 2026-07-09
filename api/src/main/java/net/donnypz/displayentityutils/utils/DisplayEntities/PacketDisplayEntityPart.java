@@ -47,7 +47,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
 
     @ApiStatus.Internal
-    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull PacketAttributeContainer attributeContainer){
+    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType,
+                                   int entityId,
+                                   @NotNull PacketAttributeContainer attributeContainer){
         super(entityId, true);
         this.type = partType;
         this.attributeContainer = attributeContainer;
@@ -55,7 +57,10 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @ApiStatus.Internal
-    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer){
+    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType,
+                                   Location location,
+                                   int entityId,
+                                   @NotNull PacketAttributeContainer attributeContainer){
         super(entityId, true);
         this.type = partType;
         this.attributeContainer = attributeContainer;
@@ -64,7 +69,11 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @ApiStatus.Internal
-    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull String partTag){
+    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType,
+                                   Location location,
+                                   int entityId,
+                                   @NotNull PacketAttributeContainer attributeContainer,
+                                   @NotNull String partTag){
         this(partType, location, entityId, attributeContainer);
         this.partTags.add(partTag);
         this.teleport(location);
@@ -72,7 +81,11 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @ApiStatus.Internal
-    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull Set<String> partTags){
+    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType,
+                                   Location location,
+                                   int entityId,
+                                   @NotNull PacketAttributeContainer attributeContainer,
+                                   @NotNull Set<String> partTags){
         this(partType, location, entityId, attributeContainer);
         this.partTags.addAll(partTags);
         this.teleport(location);
@@ -1194,9 +1207,13 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     @Override
     public @Nullable Location getLocation(){
         if (!isMaster && group != null && isDisplay()){
-            return group.getLocation();
+            Location groupLoc = group.getLocation();
+            if (packetLocation != null && packetLocation.isValid()){
+                groupLoc.setRotation(packetLocation.yaw, packetLocation.pitch);
+            }
+            return groupLoc;
         }
-        if (packetLocation != null){
+        if (packetLocation != null && packetLocation.isValid()){
             return packetLocation.toLocation();
         }
         return null;
@@ -1409,6 +1426,10 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
         Location toLocation(){
             return new Location(Bukkit.getWorld(worldName), x, y, z, yaw, pitch);
+        }
+
+        boolean isValid(){
+            return worldName != null;
         }
     }
 }
