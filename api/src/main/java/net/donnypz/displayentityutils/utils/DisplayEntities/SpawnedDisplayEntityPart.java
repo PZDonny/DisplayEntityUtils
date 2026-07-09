@@ -519,6 +519,12 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
     }
 
+    @Override
+    public void setRotation(float pitch, float yaw, boolean pivot) {
+        setPitch(pitch);
+        setYaw(yaw, pivot);
+    }
+
     /**
      * Change the pitch of this part
      * @param pitch The pitch to set for this part
