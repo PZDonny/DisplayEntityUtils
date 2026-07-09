@@ -32,7 +32,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 
 import java.util.List;
 
@@ -128,15 +128,15 @@ public class DEUInteractionListener implements Listener, PacketListener {
     }
 
     //Right Click
-    @EventHandler(priority = EventPriority.HIGHEST)
-    private void rClick(PlayerInteractEntityEvent e){
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private void rClick(PlayerInteractAtEntityEvent e){
         if (e.getRightClicked() instanceof Interaction entity){
             determineBukkitAction(entity, e.getPlayer(), InteractionClickEvent.ClickType.RIGHT);
         }
     }
 
     //Left Click
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void lClick(EntityDamageByEntityEvent e){
         if (e.getEntity() instanceof Interaction entity){
             determineBukkitAction(entity, (Player) e.getDamager(), InteractionClickEvent.ClickType.LEFT);
