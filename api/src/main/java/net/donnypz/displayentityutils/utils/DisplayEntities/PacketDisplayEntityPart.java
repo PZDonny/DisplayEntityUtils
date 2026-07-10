@@ -1175,10 +1175,8 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             if (player == null) continue;
             if (isMaster && group != null){
                 group.unsetPassengers(player);
-                DisplayAPI.getScheduler().runAsync(() -> {
-                    PacketUtils.teleport(player, getEntityId(), location);
-                    group.setPassengers(player);
-                });
+                PacketUtils.teleport(player, getEntityId(), location);
+                group.setPassengers(player);
             }
             else{
                 PacketUtils.teleport(player, getEntityId(), location);
