@@ -315,7 +315,7 @@ public abstract class ActivePart implements Active{
      * Get the players who can visibly see / are tracking this part
      * @return a collection of players
      */
-    public abstract Collection<Player> getTrackingPlayers();
+    public abstract @NotNull Collection<Player> getTrackingPlayers();
 
 
     /**

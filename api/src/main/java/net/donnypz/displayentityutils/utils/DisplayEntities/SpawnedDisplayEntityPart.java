@@ -498,8 +498,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
-    public Collection<Player> getTrackingPlayers() {
-        return new HashSet<>(getEntity().getTrackedBy());
+    public @NotNull Collection<Player> getTrackingPlayers() {
+        Entity e = getEntity();
+        if (e == null) return Collections.EMPTY_LIST;
+        return new HashSet<>(e.getTrackedBy());
     }
 
     /**

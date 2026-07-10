@@ -973,7 +973,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public Collection<Player> getTrackingPlayers() {
+    public @NotNull Collection<Player> getTrackingPlayers() {
         HashSet<Player> players = new HashSet<>();
         for (UUID uuid : viewers){
             Player p = Bukkit.getPlayer(uuid);
