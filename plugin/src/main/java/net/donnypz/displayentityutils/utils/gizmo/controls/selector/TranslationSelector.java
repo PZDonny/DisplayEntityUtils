@@ -2,9 +2,9 @@ package net.donnypz.displayentityutils.utils.gizmo.controls.selector;
 
 import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
 
-abstract class TranslationSelector extends Selector{
+public abstract class TranslationSelector extends Selector{
 
-    public TranslationSelector(Axis axis) {
+    TranslationSelector(Axis axis) {
         super(axis);
     }
 

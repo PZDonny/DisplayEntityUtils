@@ -7,8 +7,9 @@ import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Control;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
+import net.donnypz.displayentityutils.utils.gizmo.controls.selector.RotationSelector;
 import net.donnypz.displayentityutils.utils.gizmo.controls.selector.Selector;
-import net.donnypz.displayentityutils.utils.gizmo.controls.selector.TranslationAxisSelector;
+import net.donnypz.displayentityutils.utils.gizmo.controls.selector.TranslationSelector;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -46,12 +47,15 @@ public class GizmoSessionImpl implements GizmoSession {
 
     public GizmoSessionImpl(Player player, Location spawnLocation) {
         this.playerUUID = player.getUniqueId();
-        this.selectors.add(TranslationAxisSelector.x());
-        this.selectors.add(TranslationAxisSelector.y());
-        this.selectors.add(TranslationAxisSelector.z());
-        this.selectors.add(TranslationAxisSelector.xy());
-        this.selectors.add(TranslationAxisSelector.xz());
-        this.selectors.add(TranslationAxisSelector.yz());
+        this.selectors.add(TranslationSelector.x());
+        this.selectors.add(TranslationSelector.y());
+        this.selectors.add(TranslationSelector.z());
+        this.selectors.add(TranslationSelector.xy());
+        this.selectors.add(TranslationSelector.xz());
+        this.selectors.add(TranslationSelector.yz());
+        this.selectors.add(RotationSelector.x());
+        this.selectors.add(RotationSelector.y());
+        this.selectors.add(RotationSelector.z());
 
         Location finalSpawnLoc = spawnLocation == null ? player.getLocation() : spawnLocation;
         finalSpawnLoc.setPitch(0);

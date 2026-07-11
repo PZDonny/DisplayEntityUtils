@@ -96,17 +96,13 @@ public class TranslationAxisSelector extends TranslationSelector {
                 .dot(axisDir);
 
 
-        if (distanceAlongAxis < 0 || distanceAlongAxis > axisLength)
-            return -1;
+        if (distanceAlongAxis < 0 || distanceAlongAxis > axisLength) return -1;
 
 
         Vector3f axisPoint = new Vector3f(axisStart)
                 .fma(distanceAlongAxis, axisDir);
 
-
-        if (closestPointOnRay.distance(axisPoint) > radius)
-            return -1;
-
+        if (closestPointOnRay.distance(axisPoint) > radius) return -1;
 
         return distanceAlongRay;
     }

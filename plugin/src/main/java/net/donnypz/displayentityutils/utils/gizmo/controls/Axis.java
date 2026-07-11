@@ -48,6 +48,13 @@ public enum Axis {
         return isPlane() ? null : "rotate_"+tag.substring(5);
     }
 
+    public Axis[] getRotationPlaneAxes(){
+        if (this == X) return new Axis[]{Y,Z};
+        if (this == Y) return new Axis[]{Z,X};
+        if (this == Z) return new Axis[]{X,Y};
+        return null;
+    }
+
     public String getScaleTag(){
         return isPlane() ? null : "scale_"+tag.substring(5);
     }
