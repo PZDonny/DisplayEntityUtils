@@ -29,6 +29,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ActivePart implements Active{
@@ -162,10 +163,18 @@ public abstract class ActivePart implements Active{
     public abstract boolean hasGroup();
 
     /**
-     * Teleport this part to the given location. This will fail if the part is a display entity, in a group, and is not the group's master part.
+     * Teleport this part to a location.
+     * This will fail if the part is a display entity in a group, and is not the group's master part.
      * @param location the teleport location
      */
     public abstract void teleport(@NotNull Location location);
+
+    /**
+     * Teleport this part to a location, automatically determining whether to do it async.
+     * This will fail if the part is a display entity in a group, and is not the group's master part.
+     * @param location The teleport location
+     */
+    public abstract @Nullable CompletableFuture<Boolean> teleportSafe(@NotNull Location location);
 
     protected abstract void cull(float width, float height);
 

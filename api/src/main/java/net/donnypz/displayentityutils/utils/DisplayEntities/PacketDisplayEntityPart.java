@@ -35,6 +35,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PacketDisplayEntityPart extends ActivePart implements Packeted{
@@ -1152,7 +1153,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
-     * Set the location of this packet-based entity.
+     * Set the location of this packet-based entity.<br>
      * {@inheritDoc}
      * <br>The part should be hidden first with {@link #hide()} if being teleported to a different world.
      * @param location the location
@@ -1165,6 +1166,20 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             if (player == null) continue;
             PacketUtils.teleport(player, getEntityId(), location);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <br>
+     * <br>
+     * <b> A </b>{@link PacketDisplayEntityPart} <b>will always teleport using packets, so this is effectively
+     * the same as</b> {@link #teleport(Location)}
+     * @return null
+     */
+    @Override
+    public @Nullable CompletableFuture<Boolean> teleportSafe(@NotNull Location location) {
+        teleport(location);
+        return null;
     }
 
 

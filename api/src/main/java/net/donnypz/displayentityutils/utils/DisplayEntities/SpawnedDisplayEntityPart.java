@@ -31,6 +31,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public final class SpawnedDisplayEntityPart extends ActivePart implements Spawned {
 
@@ -187,6 +188,10 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return !isSingle;
     }
 
+    /**
+     * {@inheritDoc}
+     * @param location the teleport location
+     */
     @Override
     public void teleport(@NotNull Location location) {
         if (group != null && isDisplay() && !isMaster()){
@@ -194,6 +199,23 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
         Entity e = getEntity();
         if (e != null) FoliaUtils.teleport(e, location, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param location The teleport location
+     * @return a {@link CompletableFuture} with the teleport result or null if the teleport could not be completed otherwise
+     */
+    @Override
+    public @Nullable CompletableFuture<Boolean> teleportSafe(@NotNull Location location) {
+        if (group != null && isDisplay() && !isMaster()){
+            return null;
+        }
+        Entity e = getEntity();
+        if (e == null) return null;
+        return FoliaUtils
+                .teleportSafe(e, location, TeleportFlag.EntityState.RETAIN_PASSENGERS)
+                .orElse(CompletableFuture.completedFuture(true));
     }
 
     @Override
