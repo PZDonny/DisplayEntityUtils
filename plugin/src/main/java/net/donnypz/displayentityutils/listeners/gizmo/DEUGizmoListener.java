@@ -149,7 +149,7 @@ public class DEUGizmoListener implements Listener {
         } else if (gizmo.hasActiveControl()) {
             gizmo.deselectDrag();
             GizmoTitleUtil.showSubtitle(player,
-                    MiniMessage.miniMessage().deserialize("<red>❌ <gray>Deselected axis <red>❌"));
+                    MiniMessage.miniMessage().deserialize("<red>❌ <gray>Selection cleared <red>❌"));
             player.playSound(player, Sound.BLOCK_NOTE_BLOCK_HAT, 1, 0.8f);
         }
     }
