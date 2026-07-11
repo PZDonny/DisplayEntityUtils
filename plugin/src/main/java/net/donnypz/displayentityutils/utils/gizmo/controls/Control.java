@@ -15,7 +15,7 @@ public abstract class Control {
 
     public void glow(ActiveGroup<?> gizmo) {
         gizmo
-                .getParts(axis.getTag())
+                .getParts(getTag())
                 .forEach(p -> {
                     p.setGlowColor(Color.YELLOW);
                 });
@@ -23,7 +23,7 @@ public abstract class Control {
 
     public void unglow(ActiveGroup<?> gizmo) {
         gizmo
-                .getParts(axis.getTag())
+                .getParts(getTag())
                 .forEach(p -> {
                     p.setGlowColor(axis.getBaseColor());
                 });
@@ -32,4 +32,6 @@ public abstract class Control {
     public Axis getAxis() {
         return axis;
     }
+
+    public abstract String getTag();
 }

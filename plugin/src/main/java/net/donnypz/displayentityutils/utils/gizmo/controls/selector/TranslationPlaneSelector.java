@@ -34,6 +34,11 @@ public class TranslationPlaneSelector extends Selector {
     }
 
     @Override
+    public String getTag() {
+        return axis.getTag();
+    }
+
+    @Override
     public float intersect(TranslationMode translationMode, Player player, Location gizmoLocation) {
         Location eyeLoc = player.getEyeLocation();
 

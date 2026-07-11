@@ -49,6 +49,11 @@ public abstract class TranslationDrag extends Drag {
         updateTranslationMovement(player);
     }
 
+    @Override
+    public String getTag(){
+        return axis.getTag();
+    }
+
     public abstract Vector3f[] getMovementVectors(Player player, Vector3f delta);
 
     private void updateTranslationMovement(Player player) {

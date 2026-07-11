@@ -23,6 +23,11 @@ public class TranslationAxisSelector extends TranslationSelector {
         this.localEnd = axis.getDirections()[0];
     }
 
+    @Override
+    public String getTag() {
+        return axis.getTag();
+    }
+
 
     @Override
     public float intersect(TranslationMode translationMode, Player player, Location gizmoLocation) {
