@@ -738,7 +738,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * <br>
      * <b> A </b>{@link PacketDisplayEntityGroup} <b>will always teleport using packets, so this is effectively
      * the same as</b> {@link #teleport(Location, boolean)} <b>and other similar methods</b>
-     * @return null.
+     * @return null
      */
     @Override
     public @Nullable GroupTeleportCompletableFuture teleportSafe(@NotNull Location location, boolean respectGroupDirection) {

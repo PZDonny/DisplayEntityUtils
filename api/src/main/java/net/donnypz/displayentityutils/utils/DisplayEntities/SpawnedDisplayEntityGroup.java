@@ -504,6 +504,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return teleport(location, respectGroupDirection, false);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public @NotNull GroupTeleportCompletableFuture teleportSafe(@NotNull Location location, boolean respectGroupDirection) {
         GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORT, location);

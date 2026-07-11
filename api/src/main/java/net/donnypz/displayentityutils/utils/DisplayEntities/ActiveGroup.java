@@ -198,7 +198,7 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * Teleport this group to a location, automatically determining whether to do it async.
      * @param location The location to teleport this group
      * @param respectGroupDirection Whether to respect this group's pitch and yaw or the location's pitch and yaw
-     * @return an {@link GroupTeleportCompletableFuture} or null
+     * @return a {@link GroupTeleportCompletableFuture} or null
      */
     public abstract @Nullable GroupTeleportCompletableFuture teleportSafe(@NotNull Location location, boolean respectGroupDirection);
 

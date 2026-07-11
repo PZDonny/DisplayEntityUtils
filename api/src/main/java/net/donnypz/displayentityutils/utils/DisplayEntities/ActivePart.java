@@ -173,6 +173,7 @@ public abstract class ActivePart implements Active{
      * Teleport this part to a location, automatically determining whether to do it async.
      * This will fail if the part is a display entity in a group, and is not the group's master part.
      * @param location The teleport location
+     * @return a {@link CompletableFuture} or null
      */
     public abstract @Nullable CompletableFuture<Boolean> teleportSafe(@NotNull Location location);
 
