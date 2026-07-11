@@ -265,11 +265,13 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         if (!hasPermission(sender, Permission.HELP)) {
             return;
         }
+
         sender.sendMessage(Component.empty());
         sender.sendMessage(DisplayAPI.pluginPrefixLong);
+
         if (page == 1){
             sender.sendMessage(Component.text("v"+DisplayAPI.getVersion(), NamedTextColor.GRAY));
-            CMDUtils.sendCMD(sender, "/deu help <page-number>", "Display the plugin's help commands");
+            CMDUtils.sendCMD(sender, "/deu help [page-number]", "Display the plugin's help commands");
             CMDUtils.sendCMD(sender,
                     "/deu bdengine",
                     "Commands for Importing/Converting models & animations from BDEngine",
@@ -297,6 +299,8 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                     "/deu item",
                     "Commands related to specifically Item Displays",
                     "| Commands with \"-all\" will apply the command to all selected item displays in a group");
+        }
+        else if (page == 2){
             CMDUtils.sendCMD(sender,
                     "/deu text",
                     "Commands related to specifically Text Displays",
@@ -309,8 +313,6 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                             
                             | Where applicable, Interaction commands will prioritize the interaction entity you're looking at over the one you may have selected
                             """);
-        }
-        else{
             CMDUtils.sendCMD(sender,
                     "/deu mannequin",
                     "Commands related to Mannequin entities",
@@ -322,6 +324,9 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                     "| Commands allowing multiple <frame-ids> are comma separated");
             CMDUtils.sendCMD(sender, "/deu listgroups <storage> [page-number]", "List all saved Display Entity Models/Groups");
             CMDUtils.sendCMD(sender, "/deu listanims <storage> [page-number]", "List all saved animations");
+        }
+        else{
+            page = 3;
             CMDUtils.sendCMD(sender, "/deu hidepoints", "Hide any visible points (frame points, persistent packet group points, etc.)");
             CMDUtils.sendCMD(sender, "/deu reload <config | controllers>", "Reload the plugin's config or Display Controllers." +
                     " To reload Local, MySQL or MongoDB config save options, the server must be restarted");
