@@ -9,6 +9,7 @@ import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.holders.AsyncGroupHolder;
 import net.donnypz.displayentityutils.utils.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.concurrent.GroupTeleportCompletableFuture;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.bdengine.convert.file.BDEModel;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerManager;
@@ -718,18 +719,31 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             tpLocation.setPitch(oldMasterLoc.getPitch());
             tpLocation.setYaw(oldMasterLoc.getYaw());
         }
+
         masterPart.teleportUnsetPassengers(tpLocation);
         for (PacketDisplayEntityPart part : groupParts.values()) {
             if (!part.isDisplay()) {
                 Vector vector = oldMasterLoc.toVector().subtract(part.getLocation().toVector());
                 Location interactionTpLoc = tpLocation.clone().subtract(vector);
                 part.teleport(interactionTpLoc);
-            } else {
-                part.setRotation(tpLocation.getPitch(), tpLocation.getYaw(), false);
             }
         }
         this.update();
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <br>
+     * <br>
+     * <b> A </b>{@link PacketDisplayEntityGroup} <b>will always teleport using packets, so this is effectively
+     * the same as</b> {@link #teleport(Location, boolean)} <b>and other similar methods</b>
+     * @return null.
+     */
+    @Override
+    public @Nullable GroupTeleportCompletableFuture teleportSafe(@NotNull Location location, boolean respectGroupDirection) {
+        teleport(location, respectGroupDirection);
+        return null;
     }
 
 

@@ -7,6 +7,7 @@ import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.concurrent.GroupTeleportCompletableFuture;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
@@ -24,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayEntityPart> implements Spawned {
     public static final long DEFAULT_PART_UUID_SEED = 99;
@@ -502,6 +504,15 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return teleport(location, respectGroupDirection, false);
     }
 
+    @Override
+    public @NotNull GroupTeleportCompletableFuture teleportSafe(@NotNull Location location, boolean respectGroupDirection) {
+        GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORT, location);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) return GroupTeleportCompletableFuture.cancelled();
+
+        return teleportWithoutEvent(location, respectGroupDirection, false);
+    }
+
     /**
      * Change the true location of this group.
      * @param location The location to teleport this group
@@ -518,7 +529,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return true;
     }
 
-    private void teleportWithoutEvent(Location location, boolean respectGroupDirection, boolean forceChunkLoading){
+    private GroupTeleportCompletableFuture teleportWithoutEvent(Location location,
+                                                                boolean respectGroupDirection,
+                                                                boolean forceChunkLoading){
         Entity master = getMasterEntity();
         Location oldMasterLoc = master.getLocation().clone();
         boolean sameWorld = location.getWorld().getName().equals(oldMasterLoc.getWorld().getName());
@@ -545,10 +558,13 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             }
         }
 
-        FoliaUtils.teleport(master, location, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+        CompletableFuture<Boolean> groupFuture =
+                FoliaUtils.teleportSafe(master, location, TeleportFlag.EntityState.RETAIN_PASSENGERS)
+                        .orElse(null);
 
         DisplayGroupManager.updateSpawnedGroup(lastLoc, location, this);
 
+        Collection<CompletableFuture<Boolean>> nonDisplayFutures = new ArrayList<>();
         for (SpawnedDisplayEntityPart part : groupParts.values()){
             Entity partEntity = part.getEntity();
             if (partEntity == null){
@@ -562,7 +578,12 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             if (!part.isDisplay()){
                 Vector vector = oldMasterLoc.toVector().subtract(partEntity.getLocation().toVector());
                 Location tpLocation = location.clone().subtract(vector);
-                FoliaUtils.teleport(part.getEntity(), tpLocation, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                if (groupFuture != null){
+                    CompletableFuture<Boolean> future = FoliaUtils
+                            .teleportSafe(part.getEntity(), tpLocation, TeleportFlag.EntityState.RETAIN_PASSENGERS)
+                            .orElse(null);
+                    if (future != null) nonDisplayFutures.add(future);
+                }
             }
 
             if (!sameWorld){
@@ -574,6 +595,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (forceChunkLoading){
             chunk.removePluginChunkTicket(DisplayAPI.getPlugin());
         }
+        return GroupTeleportCompletableFuture.create(groupFuture, nonDisplayFutures);
     }
 
     private static void translateEntityEventless(@NotNull Entity entity, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){

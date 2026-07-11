@@ -8,6 +8,7 @@ import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.DisplayEntities.concurrent.GroupTeleportCompletableFuture;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.FollowType;
@@ -186,12 +187,20 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     public abstract boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays);
 
     /**
-     * Change the true location of this group.
+     * Teleport this group to a location.
      * @param location The location to teleport this group
      * @param respectGroupDirection Whether to respect this group's pitch and yaw or the location's pitch and yaw
      * @return true if the teleport was successful
      */
     public abstract boolean teleport(@NotNull Location location, boolean respectGroupDirection);
+
+    /**
+     * Teleport this group to a location, automatically determining whether to do it async.
+     * @param location The location to teleport this group
+     * @param respectGroupDirection Whether to respect this group's pitch and yaw or the location's pitch and yaw
+     * @return an {@link GroupTeleportCompletableFuture} or null
+     */
+    public abstract @Nullable GroupTeleportCompletableFuture teleportSafe(@NotNull Location location, boolean respectGroupDirection);
 
 
     /**
