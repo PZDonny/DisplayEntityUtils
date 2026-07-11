@@ -75,4 +75,14 @@ public interface Scheduler {
             }
         }
     }
+
+    class EmptyTask extends Task{
+        EmptyTask(){
+            super((Object) null);
+        }
+
+        @Override
+        public void cancel(){}
+
+    }
 }
