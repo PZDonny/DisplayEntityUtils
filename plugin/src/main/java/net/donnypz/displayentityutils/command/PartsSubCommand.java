@@ -15,6 +15,8 @@ import java.util.List;
 public abstract class PartsSubCommand extends PlayerSubCommand {
     int minimumArgs;
     boolean requireGroupSelection = false;
+    boolean updateGizmoRotationOnSuccess = false;
+
 
     public PartsSubCommand(@NotNull String commandName, @NotNull DEUSubCommand parentSubCommand, @NotNull Permission permission) {
         super(commandName, parentSubCommand, permission);
@@ -43,6 +45,7 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
             DisplayEntityPluginCommand.noGroupSelection(player);
             return;
         }
+
         ActivePartSelection<?> selection = DisplayGroupManager.getPartSelection(player);
         if (selection == null){
             DisplayEntityPluginCommand.noPartSelection(player);
@@ -60,7 +63,7 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
             return;
         }
 
-        boolean updatePacket;
+        boolean success;
         OptionalArguments oArgs = getOptionalArguments(player, args);
         if (!oArgs.isValidOptions()) return;
 
@@ -68,15 +71,22 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
             if (PartsCMD.isUnwantedSingleSelectionAll(player, selection)){
                 return;
             }
-            updatePacket = executeAllPartsAction(player, group, (MultiPartSelection<?>) selection, args);
+            success = executeAllPartsAction(player, group, (MultiPartSelection<?>) selection, args);
         }
         else{
-            updatePacket = executeSinglePartAction(player, group, selection, selection.getSelectedPart(), args);
+            success = executeSinglePartAction(player, group, selection, selection.getSelectedPart(), args);
         }
 
-        if (updatePacket && group instanceof PacketDisplayEntityGroup pg && pg.getMasterPart() != null){
-            pg.update();
+        if (success){
+            if (group instanceof PacketDisplayEntityGroup pg
+                    && pg.getMasterPart() != null){
+                pg.update();
+            }
         }
+    }
+
+    protected void updateGizmoRotationOnSuccess(){
+        this.updateGizmoRotationOnSuccess = true;
     }
 
     protected abstract void sendIncorrectUsage(@NotNull Player player);

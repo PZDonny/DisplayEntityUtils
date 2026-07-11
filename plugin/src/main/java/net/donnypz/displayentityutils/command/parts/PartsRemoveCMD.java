@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
@@ -66,6 +67,7 @@ class PartsRemoveCMD extends PartsSubCommand {
         if (!(selection instanceof SinglePartSelection)){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Part selection reset! (No parts remaining)", NamedTextColor.RED)));
         }
+        GizmoCMD.deselectHideGizmo(player);
     }
 
     private void removeGroupIfEmpty(Player player, ActiveGroup<?> group){

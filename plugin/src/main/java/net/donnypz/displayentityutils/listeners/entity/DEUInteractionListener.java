@@ -13,6 +13,7 @@ import net.donnypz.displayentityutils.events.InteractionClickEvent;
 import net.donnypz.displayentityutils.events.PacketInteractionClickEvent;
 import net.donnypz.displayentityutils.events.PreInteractionClickEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
+import net.donnypz.displayentityutils.managers.GizmoManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
@@ -100,7 +101,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
             return;
         }
 
-        if (!new PacketInteractionClickEvent(player, part, clickType).callEvent()){
+        if (GizmoManager.isGizmoWand(player.getInventory().getItemInMainHand()) || !new PacketInteractionClickEvent(player, part, clickType).callEvent()){
             return;
         }
 

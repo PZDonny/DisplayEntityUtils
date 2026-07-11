@@ -39,6 +39,7 @@ public final class DisplayAPI {
     static NamespacedKey placeableGroupItemStack;
     static NamespacedKey placeableGroupPlacer;
     static NamespacedKey placeableGroupId;
+    static NamespacedKey gizmoWand;
 
     static boolean isMythicMobsInstalled;
     static boolean isLibsDisguisesInstalled;
@@ -148,6 +149,10 @@ public final class DisplayAPI {
 
     public static @NotNull NamespacedKey getPlaceableGroupPlacer() {
         return placeableGroupPlacer;
+    }
+
+    public static @NotNull NamespacedKey getGizmoWand(){
+        return gizmoWand;
     }
 
 

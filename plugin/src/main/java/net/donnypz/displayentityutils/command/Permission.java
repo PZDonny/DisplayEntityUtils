@@ -34,6 +34,8 @@ public enum Permission {
     GROUP_CULLING("deu.group.culling"),
     GROUP_WORLD_EDIT("deu.group.worldedit"),
 
+    GIZMO_USE("deu.gizmo.use"),
+
     PLACE_INFO("deu.place.info"),
     PLACE_SET_ITEM("deu.place.setitem"),
     PLACE_GET_ITEM("deu.place.getitem"),

@@ -23,6 +23,7 @@ class PartsMoveCMD extends PartsSubCommand {
         super("move", parentSubCommand, Permission.PARTS_TRANSFORM, true);
         setTabComplete(2, TabSuggestion.DIRECTIONS);
         setTabComplete(3, "<distance>");
+        super.cancelIfDraggingGizmo();
     }
 
     @Override

@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
@@ -172,6 +173,7 @@ class PartsCreateCMD extends PlayerSubCommand {
             player.sendMessage(Component.text("| The created part has been automatically selected, removing previous selections", NamedTextColor.GRAY, TextDecoration.ITALIC));
             part = SpawnedDisplayEntityPart.create(entity);
             user.setSelectedPartSelection(new SinglePartSelection((SpawnedDisplayEntityPart) part), false);
+            GizmoCMD.selectShowGizmo(player, entity.getLocation());
         }
         return part;
     }

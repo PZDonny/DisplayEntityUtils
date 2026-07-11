@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
@@ -38,6 +39,7 @@ class GroupDespawnCMD extends GroupSubCommand {
             }
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Despawned your selected display entity group!", NamedTextColor.GRAY)));
+        GizmoCMD.deselectHideGizmo(player);
         DisplayGroupManager.deselectGroup(player);
         DisplayEntityPluginCommand.hideRelativePoints(player);
     }

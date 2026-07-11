@@ -13,6 +13,7 @@ import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
 import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.gizmo.GizmoSession;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.*;
@@ -50,6 +51,8 @@ public class DEUUser {
 
     private boolean placedGroupBreakMode = false;
 
+    private GizmoSession gizmoSession;
+
 
     private DEUUser(UUID userUUID){
         this.userUUID = userUUID;
@@ -77,6 +80,15 @@ public class DEUUser {
             return users.get(uuid);
         }
     }
+
+    public @Nullable GizmoSession getGizmo(){
+        return gizmoSession;
+    }
+
+    void setGizmo(GizmoSession gizmo){
+        this.gizmoSession = gizmo;
+    }
+
 
     @ApiStatus.Internal
     public void suppressTranslation(int entityId, @NotNull Vector3f vector){
@@ -529,6 +541,7 @@ public class DEUUser {
         if (particleBuilder != null) particleBuilder.remove();
         selectedAnimation = null;
         groupScaleMultipliers.clear();
+        if (gizmoSession != null) gizmoSession.unregister();
 
         Player player = Bukkit.getPlayer(userUUID);
 

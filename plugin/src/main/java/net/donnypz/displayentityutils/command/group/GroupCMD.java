@@ -62,7 +62,4 @@ public final class GroupCMD extends ParentSubCommand{
         new GroupRemoveCullCMD(this);
     }
 
-    static void groupToPacketInfo(Player player){
-        player.sendMessage(MiniMessage.miniMessage().deserialize("<aqua><italic>| <yellow>/deu group topacket <gray>- Make selected group packet-based"));
-    }
 }

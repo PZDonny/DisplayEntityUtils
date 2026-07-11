@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.anim.AnimCMD;
 import net.donnypz.displayentityutils.command.bdengine.BDEngineCMD;
 import net.donnypz.displayentityutils.command.display.DisplayCMD;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.command.group.GroupCMD;
 import net.donnypz.displayentityutils.command.interaction.InteractionCMD;
 import net.donnypz.displayentityutils.command.item.ItemCMD;
@@ -11,7 +12,9 @@ import net.donnypz.displayentityutils.command.mannequin.MannequinCMD;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.command.place.PlaceCMD;
 import net.donnypz.displayentityutils.command.text.TextCMD;
+import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -45,6 +48,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         subCommands.put("hidepoints", new HidePointsCMD());
 
 
+        subCommands.put("gizmo", new GizmoCMD());
         subCommands.put("group", new GroupCMD());
         subCommands.put("parts", new PartsCMD());
         subCommands.put("display", new DisplayCMD());
@@ -235,11 +239,16 @@ public class DisplayEntityPluginCommand implements TabExecutor {
             c.execute(sender, args);
         }
         else if (subCommand instanceof PlayerSubCommand c){
-            if (!(sender instanceof Player p)) {
+            if (!(sender instanceof Player player)) {
                 sender.sendMessage(Component.text("You cannot use this command in the console!", NamedTextColor.RED));
                 return;
             }
-            c.execute(p, args);
+
+            GizmoSessionImpl gizmo = (GizmoSessionImpl) DEUUser.getOrCreateUser(player).getGizmo();
+            if (c.isCancelIfDraggingGizmo() && GizmoCMD.isDraggingCancel(player, gizmo)){
+                return;
+            }
+            c.execute(player, args);
         }
     }
 
@@ -265,6 +274,10 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                     "/deu bdengine",
                     "Commands for Importing/Converting models & animations from BDEngine",
                     "<aqua>Use <yellow>\"block-display.com\" (BDEngine) <aqua>to create convertible models and animations");
+            CMDUtils.sendCMD(sender, "/deu gizmo", "Gizmo commands for group and display transforms",
+                    """
+                            | Gizmo Model by: illystray
+                            """);
             CMDUtils.sendCMD(sender, "/deu group", "Display Entity Models/Groups related commands");
             CMDUtils.sendCMD(sender,
                     "/deu parts",
@@ -329,15 +342,15 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         if (args.length == 2){
             String subcmd = args[0].toLowerCase();
             String current = args[1];
-            switch (subcmd) {
-                case "interaction", "anim", "group", "parts", "display", "bdengine", "text", "item", "place", "mannequin" -> {
-                    return getTabComplete(subcmd, current);
-                }
-                case "listgroups", "listanims" -> suggestions.addAll(DEUSubCommand.TabSuggestion.STORAGES.suggestions);
-                case "reload" -> {
-                    suggestions.add("config");
-                    suggestions.add("controllers");
-                }
+            if (subcmd.equals("listgroups") || subcmd.equals("listanims")){
+                suggestions.addAll(DEUSubCommand.TabSuggestion.STORAGES.suggestions);
+            }
+            else if (subcmd.equals("reload")){
+                suggestions.add("config");
+                suggestions.add("controllers");
+            }
+            else if (subCommands.containsKey(subcmd)){
+                return getTabComplete(subcmd, current);
             }
         }
         else{

@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.GroupResult;
@@ -76,7 +77,7 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
             }, 0, 2);
 
             DisplayEntityPluginCommand.hideRelativePoints(player);
-            GroupCMD.groupToPacketInfo(player);
+            GizmoCMD.selectShowGizmo(player, group.getLocation());
         } catch (NumberFormatException e) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid distance! The distance must be a positive number.", NamedTextColor.RED)));
         }

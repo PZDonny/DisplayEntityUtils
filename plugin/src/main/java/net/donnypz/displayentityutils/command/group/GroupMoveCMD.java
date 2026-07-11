@@ -18,6 +18,7 @@ class GroupMoveCMD extends GroupSubCommand {
         setTabComplete(2, TabSuggestion.DIRECTIONS);
         setTabComplete(3, "<distance>");
         setOptionalTabComplete(4, "[tick-duration]");
+        super.cancelIfDraggingGizmo();
     }
 
 

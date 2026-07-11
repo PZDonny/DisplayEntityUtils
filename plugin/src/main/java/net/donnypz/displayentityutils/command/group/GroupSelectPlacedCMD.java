@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.PlaceableGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
@@ -38,6 +39,7 @@ class GroupSelectPlacedCMD extends PlayerSubCommand {
 
         int selectDuration = 50;
         group.glowAndMarkInteractions(player, selectDuration);
+        GizmoCMD.selectShowGizmo(player, group.getLocation());
     }
 
     @Override

@@ -15,6 +15,7 @@ class PartsMoveHereCMD extends PartsSubCommand {
 
     public PartsMoveHereCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("movehere", parentSubCommand, Permission.PARTS_TRANSFORM, true);
+        super.cancelIfDraggingGizmo();
     }
 
     @Override

@@ -6,9 +6,9 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.GroupResult;
 import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import net.kyori.adventure.text.Component;
@@ -96,6 +96,7 @@ class GroupSelectCMD extends PlayerSubCommand {
                         if (selectResult){
                             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Group selected!", NamedTextColor.GREEN)));
                             DisplayEntityPluginCommand.hideRelativePoints(player);
+                            GizmoCMD.selectShowGizmo(player, g.getLocation());
                         }
                         else{
                             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to select group! Another player already has that group selected!", NamedTextColor.RED)));
@@ -133,7 +134,6 @@ class GroupSelectCMD extends PlayerSubCommand {
                     .append(teleport);
             player.sendMessage(groupMessage);
         }
-        GroupCMD.groupToPacketInfo(player);
     }
 
     @Override

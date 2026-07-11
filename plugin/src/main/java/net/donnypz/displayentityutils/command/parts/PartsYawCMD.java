@@ -2,7 +2,7 @@ package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -33,6 +33,7 @@ class PartsYawCMD extends PartsSubCommand {
             selectedPart.setYaw(yaw, false);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Yaw set!", NamedTextColor.GREEN)));
             player.sendMessage(Component.text("| Old Yaw: "+oldYaw, NamedTextColor.GRAY));
+            GizmoCMD.updateGizmoRotationIfExists(player);
             return true;
         }
         catch(NumberFormatException e){

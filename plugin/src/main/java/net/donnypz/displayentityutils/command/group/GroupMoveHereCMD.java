@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 class GroupMoveHereCMD extends GroupSubCommand {
     GroupMoveHereCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("movehere", parentSubCommand, Permission.GROUP_TRANSFORM, 0, false);
+        super.cancelIfDraggingGizmo();
     }
 
     @Override

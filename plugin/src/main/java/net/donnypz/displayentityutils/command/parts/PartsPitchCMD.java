@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
@@ -18,6 +19,7 @@ class PartsPitchCMD extends PlayerSubCommand {
     PartsPitchCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("pitch", parentSubCommand, Permission.PARTS_TRANSFORM);
         setTabComplete(2, "<pitch>");
+        super.cancelIfDraggingGizmo();
     }
 
     @Override
@@ -46,6 +48,7 @@ class PartsPitchCMD extends PlayerSubCommand {
             part.setPitch(pitch);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Pitch set!", NamedTextColor.GREEN)));
             player.sendMessage(Component.text("| Old Pitch: "+oldPitch, NamedTextColor.GRAY));
+            GizmoCMD.updateGizmoRotationIfExists(player);
         }
         catch(NumberFormatException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the pitch!", NamedTextColor.RED)));

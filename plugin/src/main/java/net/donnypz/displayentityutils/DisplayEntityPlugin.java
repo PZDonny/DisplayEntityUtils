@@ -11,6 +11,7 @@ import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUInteractionListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUMannequinEditorListener;
 import net.donnypz.displayentityutils.listeners.entity.mythic.DEUMythicListener;
+import net.donnypz.displayentityutils.listeners.gizmo.DEUGizmoListener;
 import net.donnypz.displayentityutils.listeners.player.*;
 import net.donnypz.displayentityutils.listeners.player.essentials.DEUEssentialsListener;
 import net.donnypz.displayentityutils.managers.LocalManager;
@@ -121,6 +122,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         DisplayAPI.placeableGroupItemStack = new NamespacedKey(this, "placeablegroup_itemstack");
         DisplayAPI.placeableGroupPlacer = new NamespacedKey(this, "placeablegroup_placer");
         DisplayAPI.placeableGroupId = new NamespacedKey(this, "placeablegroup_groupid");
+        DisplayAPI.gizmoWand = new NamespacedKey(this, "gizmo_wand");
 
     }
 
@@ -177,6 +179,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
         Bukkit.getPluginManager().registerEvents(new BDEngineConversionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUEntityListener(), this);
+        Bukkit.getPluginManager().registerEvents(new DEUGizmoListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerChatListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerWorldListener(), this);
