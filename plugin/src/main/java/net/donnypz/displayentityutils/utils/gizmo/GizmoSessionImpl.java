@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Control;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
 import net.donnypz.displayentityutils.utils.gizmo.controls.selector.RotationSelector;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -110,6 +112,18 @@ public class GizmoSessionImpl implements GizmoSession {
                 .getSelectedPartSelection();
         if (sel == null) return;
         Location selLoc = sel.getLocation();
+
+        List<PacketDisplayEntityPart> scaleParts = gizmoModel
+                .getParts(List.of(Axis.X.getScaleTag(),
+                        Axis.Y.getScaleTag(),
+                        Axis.Z.getScaleTag()));
+        if (sel instanceof MultiPartSelection<?>) {
+            scaleParts.forEach(part -> part.hide());
+        }
+        else if (sel instanceof SinglePartSelection){
+            Player player = Bukkit.getPlayer(playerUUID);
+            scaleParts.forEach(part -> part.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL));
+        }
 
         switch (translationMode) {
             case TRANSLATE, TELEPORT_LOCAL -> {
@@ -302,10 +316,9 @@ public class GizmoSessionImpl implements GizmoSession {
         Location playerEyeLoc = player.getEyeLocation();
         for (Selector c : selectors) {
             float hit;
-            if (gizmoModelLocation.distanceSquared(playerEyeLoc) > Control.MAX_DISTANCE_SQUARED){
+            if (gizmoModelLocation.distanceSquared(playerEyeLoc) > Control.MAX_DISTANCE_SQUARED) {
                 hit = -1;
-            }
-            else{
+            } else {
                 hit = c.intersect(translationMode, player, gizmoModelLocation);
             }
             if (hit >= 0 && hit < closest) {
