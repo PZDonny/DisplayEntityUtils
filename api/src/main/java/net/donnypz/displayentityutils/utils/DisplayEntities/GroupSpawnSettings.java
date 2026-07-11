@@ -27,6 +27,7 @@ public class GroupSpawnSettings {
     HashMap<String, Set<UUID>> hiddenPartTags = new HashMap<>(); //Tag , Player UUIDs
     HashMap<String, Display.Brightness> brightness = new HashMap<>();
     HashMap<String, Display.Billboard> billboard = new HashMap<>();
+    HashMap<String, Boolean> glowing = new HashMap<>();
     boolean persistentByDefault = DisplayConfig.defaultPersistence();
     boolean persistenceOverride = DisplayConfig.overrideByDefault();
     boolean visibleByDefault = true;
@@ -72,14 +73,36 @@ public class GroupSpawnSettings {
 
     /**
      * Set the billboard for display entities that will be spawned from {@link DisplayEntityGroup#spawn(Location, GroupSpawnedEvent.SpawnReason, GroupSpawnSettings)}.
-     * This has no effect on Interaction entities.
+     * <br>This has no effect on non-display entities.
+     *
+     * <br><br>
+     * A null part tag will apply the set billboard to all display entities.
+     * <br>
+     * If an entity has a part tag that is being added to this, it will be prioritized over the null part tag billboard value.
      * @param billboard The billboard to set
-     * @param partTag The part tag that entities should have for the billboard to be applied. A null partTag will apply the billboard to all display entities.
-     * If an entity has a part tag that is being added to this, it will be prioritized over the null partTag billboard.
+     * @param partTag The part tag this should apply to
      * @return this
      */
     public GroupSpawnSettings addBillboard(@NotNull Display.Billboard billboard, @Nullable String partTag){
         this.billboard.put(partTag, billboard);
+        return this;
+    }
+
+    /**
+     * Set whether for display entities that will be spawned from {@link DisplayEntityGroup#spawn(Location, GroupSpawnedEvent.SpawnReason, GroupSpawnSettings)}.
+     * <br>This has no effect on non-display entities.
+     *
+     * <br><br>
+     * A null part tag will apply the set glowing value to all display entities.
+     * <br>
+     * If an entity has a part tag that is being added to this, it will be prioritized over the null part tag glowing value.
+     *
+     * @param glowing The glowing value to set
+     * @param partTag The part tag this should apply to
+     * @return this
+     */
+    public GroupSpawnSettings addGlowing(boolean glowing, @Nullable String partTag){
+        this.glowing.put(partTag, glowing);
         return this;
     }
 
@@ -216,9 +239,27 @@ public class GroupSpawnSettings {
                 for (Map.Entry<String, Display.Billboard> entry : billboard.entrySet()){
                     String tag = entry.getKey();
                     if (tag == null) continue;
-                    Display.Billboard bb = entry.getValue();
+                    Display.Billboard override = entry.getValue();
                     if (part.partTags.contains(tag)){
-                        part.attributeContainer.setAttribute(DisplayAttributes.BILLBOARD, bb);
+                        part.attributeContainer.setAttribute(DisplayAttributes.BILLBOARD, override);
+                        break;
+                    }
+                }
+            }
+
+            //Glowing
+            if (!glowing.isEmpty()){
+                Boolean b = glowing.get(null);
+                if (b != null){
+                    part.attributeContainer.setAttribute(DisplayAttributes.GLOWING, b);
+                }
+
+                for (Map.Entry<String, Boolean> entry : glowing.entrySet()){
+                    String tag = entry.getKey();
+                    if (tag == null) continue;
+                    Boolean override = entry.getValue();
+                    if (part.partTags.contains(tag)){
+                        part.attributeContainer.setAttribute(DisplayAttributes.GLOWING, override);
                         break;
                     }
                 }
@@ -283,9 +324,9 @@ public class GroupSpawnSettings {
             for (Map.Entry<String, Display.Brightness> entry : brightness.entrySet()){
                 String tag = entry.getKey();
                 if (tag == null) continue;
-                Display.Brightness br = entry.getValue();
+                Display.Brightness override = entry.getValue();
                 if (DisplayUtils.hasPartTag(display, tag)){
-                    display.setBrightness(br);
+                    display.setBrightness(override);
                     break;
                 }
             }
@@ -301,14 +342,16 @@ public class GroupSpawnSettings {
             for (Map.Entry<String, Display.Billboard> entry : billboard.entrySet()){
                 String tag = entry.getKey();
                 if (tag == null) continue;
-                Display.Billboard bb = entry.getValue();
+                Display.Billboard override = entry.getValue();
                 if (DisplayUtils.hasPartTag(display, tag)){
-                    display.setBillboard(bb);
+                    display.setBillboard(override);
                     break;
                 }
             }
         }
+
         display.setPersistent(persistentByDefault);
+        applyGlowingToEntity(display);
 
         switch (display){
             case BlockDisplay bd -> {
@@ -378,6 +421,27 @@ public class GroupSpawnSettings {
             }
             else{
                 determineVisibleByDefault(mannequin);
+            }
+        }
+        applyGlowingToEntity(mannequin);
+    }
+
+    private void applyGlowingToEntity(Entity entity){
+        //Glowing
+        if (!glowing.isEmpty()){
+            Boolean bool = glowing.get(null);
+            if (bool != null){
+                entity.setGlowing(bool);
+            }
+
+            for (Map.Entry<String, Boolean> entry : glowing.entrySet()){
+                String tag = entry.getKey();
+                if (tag == null) continue;
+                Boolean override = entry.getValue();
+                if (DisplayUtils.hasPartTag(entity, tag)){
+                    entity.setGlowing(override);
+                    break;
+                }
             }
         }
     }
