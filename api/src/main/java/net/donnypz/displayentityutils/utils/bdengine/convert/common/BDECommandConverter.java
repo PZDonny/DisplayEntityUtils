@@ -84,7 +84,11 @@ public abstract class BDECommandConverter {
         return masterEntityUUID;
     }
 
-    public String getSubMasterScoreboardTag(){
+    public String getGroupSaveTag() {
+        return groupSaveTag.isBlank() ? projectName.replace(".zip", "_auto") : groupSaveTag;
+    }
+
+    protected String getSubMasterScoreboardTag(){
         return CONVERSION_SCOREBOARD_PREFIX+masterEntityUUID;
     }
 
@@ -220,10 +224,6 @@ public abstract class BDECommandConverter {
 
     private int getAnimationWaitDelay(String animationName){
         return (getLastFrameId(animationName)+1)*2;
-    }
-
-    public String getGroupSaveTag() {
-        return groupSaveTag.isBlank() ? projectName.replace(".zip", "_auto") : groupSaveTag;
     }
 
     protected abstract SpawnedDisplayAnimationFrame executeFrameCommands(String animationName, int frameId, int lastAddedFrameId);
