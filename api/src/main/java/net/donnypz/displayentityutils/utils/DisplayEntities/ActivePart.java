@@ -231,10 +231,12 @@ public abstract class ActivePart implements Active{
                 && type != SpawnedDisplayEntityPart.PartType.INTERACTION;
     }
 
+    /**
+     * Get whether this part's type is of a display entity type
+     * @return a boolean
+     */
     public boolean isDisplay(){
-        return type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY
-                || type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY
-                || type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY;
+        return type.isDisplay();
     }
 
     /**

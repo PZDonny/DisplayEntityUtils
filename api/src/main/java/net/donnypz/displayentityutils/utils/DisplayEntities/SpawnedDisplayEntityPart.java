@@ -1356,6 +1356,16 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         MANNEQUIN;
 
         /**
+         * Get whether this {@link PartType} is of a display entity type
+         * @return a boolean
+         */
+        public boolean isDisplay(){
+            return this == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY
+                    || this == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY
+                    || this == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY;
+        }
+
+        /**
          * Get a type, respective of the given entity
          * @param entity the entity
          * @return a {@link PartType} or null if the entity does not have a type.
