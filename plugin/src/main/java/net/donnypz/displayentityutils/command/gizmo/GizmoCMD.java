@@ -61,6 +61,7 @@ public final class GizmoCMD extends ParentSubCommand {
                 .append(Component.text("[GIZMO WAND]", NamedTextColor.LIGHT_PURPLE)
                         .hoverEvent(HoverEvent.showText(Component.text("Get a Gizmo Wand", NamedTextColor.YELLOW)))
                         .clickEvent(ClickEvent.suggestCommand("/deu gizmo wand"))));
+        player.sendMessage(Component.empty());
         gizmo.updateRotation();
     }
 
