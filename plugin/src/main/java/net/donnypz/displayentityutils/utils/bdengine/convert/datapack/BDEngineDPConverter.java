@@ -42,8 +42,17 @@ public class BDEngineDPConverter extends BDECommandConverter {
                                @NotNull String animationSavePrefix,
                                boolean saveGroup,
                                boolean saveAnimations,
-                               boolean despawnAfter) {
-        super(conversionId, player, spawnLocation, groupSaveTag, animationSavePrefix, saveGroup, saveAnimations, despawnAfter);
+                               boolean despawnAfter,
+                               boolean adaptTags) {
+        super(conversionId,
+                player,
+                spawnLocation,
+                groupSaveTag,
+                animationSavePrefix,
+                saveGroup,
+                saveAnimations,
+                despawnAfter,
+                adaptTags);
 
         if (!datapackName.endsWith(".zip")){
             datapackName = datapackName+".zip";

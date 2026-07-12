@@ -20,16 +20,66 @@ class BDEAPIConverter extends BDECommandConverter {
     private final BDEResult result;
     private final BDEResultDatapack datapack;
 
-    BDEAPIConverter(@NotNull BDEResult result, @Nullable String conversionId, @NotNull Location spawnLocation, @NotNull String groupSaveTag, @NotNull String animationSavePrefix, boolean saveGroup, boolean saveAnimations, boolean despawnAfter) {
-        this(result, conversionId, null, spawnLocation, groupSaveTag, animationSavePrefix, saveGroup, saveAnimations, despawnAfter);
+    BDEAPIConverter(@NotNull BDEResult result,
+                    @Nullable String conversionId,
+                    @NotNull Location spawnLocation,
+                    @NotNull String groupSaveTag,
+                    @NotNull String animationSavePrefix,
+                    boolean saveGroup,
+                    boolean saveAnimations,
+                    boolean despawnAfter,
+                    boolean adaptTags) {
+        this(result,
+                conversionId,
+                null,
+                spawnLocation,
+                groupSaveTag,
+                animationSavePrefix,
+                saveGroup,
+                saveAnimations,
+                despawnAfter,
+                adaptTags);
     }
 
-    BDEAPIConverter(@NotNull BDEResult result, @NotNull Player player, @NotNull String groupSaveTag, @NotNull String animationSavePrefix, boolean saveGroup, boolean saveAnimations, boolean despawnAfter) {
-        this(result, null, player, player.getLocation(), groupSaveTag, animationSavePrefix, saveGroup, saveAnimations, despawnAfter);
+    BDEAPIConverter(@NotNull BDEResult result,
+                    @NotNull Player player,
+                    @NotNull String groupSaveTag,
+                    @NotNull String animationSavePrefix,
+                    boolean saveGroup,
+                    boolean saveAnimations,
+                    boolean despawnAfter,
+                    boolean adaptTags) {
+        this(result,
+                null,
+                player,
+                player.getLocation(),
+                groupSaveTag,
+                animationSavePrefix,
+                saveGroup,
+                saveAnimations,
+                despawnAfter,
+                adaptTags);
     }
 
-    BDEAPIConverter(@NotNull BDEResult result, @Nullable String conversionId, @Nullable Player player, @NotNull Location spawnLocation, @NotNull String groupSaveTag, @NotNull String animationSavePrefix, boolean saveGroup, boolean saveAnimations, boolean despawnAfter) {
-        super(conversionId, player, spawnLocation, groupSaveTag, animationSavePrefix, saveGroup, saveAnimations, despawnAfter);
+    BDEAPIConverter(@NotNull BDEResult result,
+                    @Nullable String conversionId,
+                    @Nullable Player player,
+                    @NotNull Location spawnLocation,
+                    @NotNull String groupSaveTag,
+                    @NotNull String animationSavePrefix,
+                    boolean saveGroup,
+                    boolean saveAnimations,
+                    boolean despawnAfter,
+                    boolean adaptTags) {
+        super(conversionId,
+                player,
+                spawnLocation,
+                groupSaveTag,
+                animationSavePrefix,
+                saveGroup,
+                saveAnimations,
+                despawnAfter,
+                adaptTags);
         this.result = result;
         this.datapack = result.datapack;
         spawnModel();

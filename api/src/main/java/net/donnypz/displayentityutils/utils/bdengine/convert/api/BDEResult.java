@@ -73,9 +73,24 @@ public final class BDEResult {
      * @param saveGroup           whether the created group should be saved
      * @param saveAnimations      whether created animations should be saved
      * @param despawnAfter        whether the created group should be despawned after conversion
+     * @param adaptTags           whether scoreboard tags should be converted to part tags
      */
-    public void convert(@NotNull Location spawnLocation, @NotNull String groupSaveTag, @NotNull String animationSavePrefix, boolean saveGroup, boolean saveAnimations, boolean despawnAfter) {
-        this.convert(null, null, spawnLocation, groupSaveTag, animationSavePrefix, saveGroup, saveAnimations, despawnAfter);
+    public void convert(@NotNull Location spawnLocation,
+                        @NotNull String groupSaveTag,
+                        @NotNull String animationSavePrefix,
+                        boolean saveGroup,
+                        boolean saveAnimations,
+                        boolean despawnAfter,
+                        boolean adaptTags) {
+        this.convert(null,
+                null,
+                spawnLocation,
+                groupSaveTag,
+                animationSavePrefix,
+                saveGroup,
+                saveAnimations,
+                despawnAfter,
+                adaptTags);
     }
 
     /**
@@ -88,9 +103,24 @@ public final class BDEResult {
      * @param saveGroup           whether the created group should be saved
      * @param saveAnimations      whether created animations should be saved
      * @param despawnAfter        whether the created group should be despawned after conversion
+     * @param adaptTags           whether scoreboard tags should be converted to part tags
      */
-    public void convert(@NotNull Player player, @NotNull String groupSaveTag, @NotNull String animationSavePrefix, boolean saveGroup, boolean saveAnimations, boolean despawnAfter) {
-        this.convert(null, player, player.getLocation(), groupSaveTag, animationSavePrefix, saveGroup, saveAnimations, despawnAfter);
+    public void convert(@NotNull Player player,
+                        @NotNull String groupSaveTag,
+                        @NotNull String animationSavePrefix,
+                        boolean saveGroup,
+                        boolean saveAnimations,
+                        boolean despawnAfter,
+                        boolean adaptTags) {
+        this.convert(null,
+                player,
+                player.getLocation(),
+                groupSaveTag,
+                animationSavePrefix,
+                saveGroup,
+                saveAnimations,
+                despawnAfter,
+                adaptTags);
     }
 
     /**
@@ -105,6 +135,7 @@ public final class BDEResult {
      * @param saveGroup           whether the created group should be saved
      * @param saveAnimations      whether created animations should be saved
      * @param despawnAfter        whether the created group should be despawned after conversion
+     * @param adaptTags           whether scoreboard tags should be converted to part tags
      */
     public void convert(@Nullable String conversionId,
                            @Nullable Player player,
@@ -113,7 +144,8 @@ public final class BDEResult {
                            @NotNull String animationSavePrefix,
                            boolean saveGroup,
                            boolean saveAnimations,
-                           boolean despawnAfter) {
+                           boolean despawnAfter,
+                           boolean adaptTags) {
         new BDEAPIConverter(
                 this,
                 conversionId,
@@ -123,7 +155,8 @@ public final class BDEResult {
                 animationSavePrefix,
                 saveGroup,
                 saveAnimations,
-                despawnAfter
+                despawnAfter,
+                adaptTags
         );
     }
 }

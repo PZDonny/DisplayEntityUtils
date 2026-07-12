@@ -79,6 +79,7 @@ public final class BDEngineUtils {
      * @param saveGroup           whether the created group should be saved
      * @param saveAnimations      whether created animations should be saved
      * @param despawnAfter        whether the created group should be despawned after conversion
+     * @param adaptTags           whether scoreboard tags should be converted to part tags
      */
     public static void convertDatapack(@NotNull String datapackName,
                                  @NotNull Location spawnLocation,
@@ -86,8 +87,18 @@ public final class BDEngineUtils {
                                  @NotNull String animationSavePrefix,
                                  boolean saveGroup,
                                  boolean saveAnimations,
-                                 boolean despawnAfter){
-        convertDatapack(datapackName, null, null, spawnLocation, groupSaveTag, animationSavePrefix, saveGroup, saveAnimations, despawnAfter);
+                                 boolean despawnAfter,
+                                 boolean adaptTags){
+        convertDatapack(datapackName,
+                null,
+                null,
+                spawnLocation,
+                groupSaveTag,
+                animationSavePrefix,
+                saveGroup,
+                saveAnimations,
+                despawnAfter,
+                adaptTags);
     }
 
     /**
@@ -101,6 +112,7 @@ public final class BDEngineUtils {
      * @param saveGroup           whether the created group should be saved
      * @param saveAnimations      whether created animations should be saved
      * @param despawnAfter        whether the created group should be despawned after conversion
+     * @param adaptTags           whether scoreboard tags should be converted to part tags
      */
     public static void convertDatapack(@NotNull String datapackName,
                                  @NotNull Player player,
@@ -108,8 +120,18 @@ public final class BDEngineUtils {
                                  @NotNull String animationSavePrefix,
                                  boolean saveGroup,
                                  boolean saveAnimations,
-                                 boolean despawnAfter){
-        convertDatapack(datapackName, null, player, player.getLocation(), groupSaveTag, animationSavePrefix, saveGroup, saveAnimations, despawnAfter);
+                                 boolean despawnAfter,
+                                 boolean adaptTags){
+        convertDatapack(datapackName,
+                null,
+                player,
+                player.getLocation(),
+                groupSaveTag,
+                animationSavePrefix,
+                saveGroup,
+                saveAnimations,
+                despawnAfter,
+                adaptTags);
     }
 
     /**
@@ -125,6 +147,7 @@ public final class BDEngineUtils {
      * @param saveGroup           whether the created group should be saved
      * @param saveAnimations      whether created animations should be saved
      * @param despawnAfter        whether the created group should be despawned after conversion
+     * @param adaptTags           whether scoreboard tags should be converted to part tags
      */
     public static void convertDatapack(@NotNull String datapackName,
                          @Nullable String conversionId,
@@ -134,7 +157,8 @@ public final class BDEngineUtils {
                          @NotNull String animationSavePrefix,
                          boolean saveGroup,
                          boolean saveAnimations,
-                         boolean despawnAfter){
+                         boolean despawnAfter,
+                         boolean adaptTags){
         DisplayAPI.getBDEConversionHandler().convertDatapack(
                 datapackName,
                 conversionId,
@@ -144,7 +168,8 @@ public final class BDEngineUtils {
                 animationSavePrefix,
                 saveGroup,
                 saveAnimations,
-                despawnAfter
+                despawnAfter,
+                adaptTags
         );
     }
 
@@ -153,7 +178,7 @@ public final class BDEngineUtils {
       * @param file the project file
      * @return a {@link BDEModel}
      */
-    public static BDEModel readFile(@NotNull File file) {
+    public static BDEModel readFile(@NotNull File file){
         try(FileInputStream stream = new FileInputStream(file)) {
             return readFile(stream);
         } catch (IOException ex) {

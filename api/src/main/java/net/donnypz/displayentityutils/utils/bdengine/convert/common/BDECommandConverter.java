@@ -39,6 +39,7 @@ public abstract class BDECommandConverter {
     protected final boolean saveGroup;
     protected final boolean saveAnimations;
     protected final boolean despawnAfter;
+    protected final boolean adaptTags;
 
 
     protected final HashSet<DEUSound> bufferedSounds = new HashSet<>();
@@ -55,7 +56,8 @@ public abstract class BDECommandConverter {
             @NotNull String animationSavePrefix,
             boolean saveGroup,
             boolean saveAnimations,
-            boolean despawnAfter) {
+            boolean despawnAfter,
+            boolean adaptTags) {
         this.conversionId = conversionId;
         this.player = player;
         this.SPAWN_LOCATION = spawnLocation;
@@ -68,6 +70,7 @@ public abstract class BDECommandConverter {
         this.saveGroup = saveGroup;
         this.saveAnimations = saveAnimations;
         this.despawnAfter = despawnAfter;
+        this.adaptTags = adaptTags;
 
         Display masterEntity = spawnLocation.getWorld()
                 .spawn(spawnLocation, BlockDisplay.class, bd -> {
@@ -102,6 +105,11 @@ public abstract class BDECommandConverter {
             this.sendMessage(Component.text("Failed to find model/group created from datapack!", NamedTextColor.RED));
             this.sendMessage(Component.text("| The datapack may have been generated for a different game version or of an older BDEngine format", NamedTextColor.GRAY, TextDecoration.ITALIC));
             return;
+        }
+
+        if (adaptTags){
+            createdGroup.getParts().forEach(p -> p.adaptScoreboardTags(false));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<white>- <aqua>Scoreboard tags adapted to part tags"));
         }
 
         this.sendMessage(Component.empty());

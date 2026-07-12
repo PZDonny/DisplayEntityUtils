@@ -22,9 +22,26 @@ public class BDEConversionHandlerImpl implements BDEConversionHandler{
     }
 
     @Override
-    public void convertDatapack(@NotNull String datapackName, @Nullable String conversionId, @Nullable Player player, @NotNull Location spawnLocation, @NotNull String groupSaveTag, @NotNull String animationSavePrefix, boolean saveGroup, boolean saveAnimations, boolean despawnAfter) {
-        new BDEngineDPConverter(
-                datapackName, conversionId, player, spawnLocation, groupSaveTag, animationSavePrefix, saveGroup, saveAnimations, despawnAfter);
+    public void convertDatapack(@NotNull String datapackName,
+                                @Nullable String conversionId,
+                                @Nullable Player player,
+                                @NotNull Location spawnLocation,
+                                @NotNull String groupSaveTag,
+                                @NotNull String animationSavePrefix,
+                                boolean saveGroup,
+                                boolean saveAnimations,
+                                boolean despawnAfter,
+                                boolean adaptTags) {
+        new BDEngineDPConverter(datapackName,
+                conversionId,
+                player,
+                spawnLocation,
+                groupSaveTag,
+                animationSavePrefix,
+                saveGroup,
+                saveAnimations,
+                despawnAfter,
+                adaptTags);
     }
 
 }

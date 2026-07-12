@@ -23,6 +23,8 @@ class BDEngineImportCMD extends PlayerSubCommand {
         setTabComplete(2, "<project-id>");
         setTabComplete(3, "<group-tag-to-set>");
         setTabComplete(4, "<anim-tag-prefix-to-set>");
+        addFlag(BDEngineCMD.DESPAWN_FLAG);
+        addFlag(BDEngineCMD.ADAPT_TAGS_FLAG);
     }
 
     @Override
@@ -45,6 +47,7 @@ class BDEngineImportCMD extends PlayerSubCommand {
                     throw new InterruptedException("Null Result");
                 }
 
+                OptionalArguments oArgs = getOptionalArguments(player, args);
                 DisplayAPI.getScheduler().run(() -> {
                     result.convert(null,
                             player,
@@ -53,8 +56,10 @@ class BDEngineImportCMD extends PlayerSubCommand {
                             !saveAnimations ? "" : animPrefix,
                             saveGroups,
                             saveAnimations,
-                            true);
-                    player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Attempting to import project at your location!", NamedTextColor.GREEN)));
+                            oArgs.hasFlag(BDEngineCMD.DESPAWN_FLAG),
+                            oArgs.hasFlag(BDEngineCMD.ADAPT_TAGS_FLAG)
+                    );
+                    player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Attempting to import BDEngine project...", NamedTextColor.YELLOW)));
                 });
             }
             catch(NumberFormatException e){
@@ -72,6 +77,12 @@ class BDEngineImportCMD extends PlayerSubCommand {
 
     @Override
     protected String getDescription() {
-        return "Import and convert a BDEngine project's model and animations into your game world";
+        return """
+               Import and convert a BDEngine project's model and animations into your game world
+               
+               "-despawn" will despawn the group/model after importing
+               
+               "-adapttags" will adapt scoreboard tags into part tags (tags DEU uses to identify entities/parts)
+               """;
     }
 }
