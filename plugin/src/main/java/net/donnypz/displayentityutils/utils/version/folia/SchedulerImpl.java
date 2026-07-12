@@ -38,12 +38,6 @@ public class SchedulerImpl implements Scheduler{
     public Task runLater(Runnable runnable, long delay) {
         if (isPluginDisabled()) return new EmptyTask();
         Task task;
-        SchedulerRunnable schedulerRunnable = new SchedulerRunnable() {
-            @Override
-            public void run() {
-                runnable.run();
-            }
-        };
         if (FoliaUtils.isFolia()){
             task = new Task(Bukkit.getGlobalRegionScheduler()
                     .runDelayed(DisplayAPI.getPlugin(), t -> runnable.run(), Math.max(delay, 1)));
@@ -51,7 +45,6 @@ public class SchedulerImpl implements Scheduler{
         else{
             task = new Task(Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(), runnable, delay));
         }
-        schedulerRunnable.task = task;
         return task;
     }
 
@@ -59,12 +52,6 @@ public class SchedulerImpl implements Scheduler{
     public Task runLaterAsync(Runnable runnable, long delay) {
         if (isPluginDisabled()) return new EmptyTask();
         Task task;
-        SchedulerRunnable schedulerRunnable = new SchedulerRunnable() {
-            @Override
-            public void run() {
-                runnable.run();
-            }
-        };
         if (FoliaUtils.isFolia()){
             task = new Task(Bukkit.getGlobalRegionScheduler()
                     .runDelayed(DisplayAPI.getPlugin(), t -> runnable.run(), Math.max(delay, 1)));
@@ -72,7 +59,6 @@ public class SchedulerImpl implements Scheduler{
         else{
             task = new Task(Bukkit.getScheduler().runTaskLaterAsynchronously(DisplayAPI.getPlugin(), runnable, delay));
         }
-        schedulerRunnable.task = task;
         return task;
     }
 
@@ -132,19 +118,12 @@ public class SchedulerImpl implements Scheduler{
     public Task entityRunLater(@NotNull Entity entity, Runnable runnable, long delay) {
         if (isPluginDisabled()) return new EmptyTask();
         Task task;
-        SchedulerRunnable schedulerRunnable = new SchedulerRunnable() {
-            @Override
-            public void run() {
-                runnable.run();
-            }
-        };
         if (FoliaUtils.isFolia()){
             task = new Task(entity.getScheduler().runDelayed(DisplayAPI.getPlugin(), t -> runnable.run(), null, Math.max(delay, 1)));
         }
         else{
             task = runLater(runnable, delay);
         }
-        schedulerRunnable.task = task;
         return task;
     }
 
@@ -152,19 +131,12 @@ public class SchedulerImpl implements Scheduler{
     public Task entityRunLaterAsync(@NotNull Entity entity, Runnable runnable, long delay) {
         if (!DisplayAPI.getPlugin().isEnabled()) return new EmptyTask();
         Task task;
-        SchedulerRunnable schedulerRunnable = new SchedulerRunnable() {
-            @Override
-            public void run() {
-                runnable.run();
-            }
-        };
         if (FoliaUtils.isFolia()){
             task = new Task(entity.getScheduler().runDelayed(DisplayAPI.getPlugin(), t -> runnable.run(), null, Math.max(delay, 1)));
         }
         else{
             task = runLaterAsync(runnable, delay);
         }
-        schedulerRunnable.task = task;
         return task;
     }
 
@@ -202,7 +174,9 @@ public class SchedulerImpl implements Scheduler{
     public void partRun(@NotNull ActivePart part, Runnable runnable) {
         if (isPluginDisabled()) return;
         if (part instanceof SpawnedDisplayEntityPart sp){
-            entityRun(sp.getEntity(), runnable);
+            Entity entity = sp.getEntity();
+            if (entity == null) run(runnable);
+            else entityRun(entity, runnable);
         }
         else{
             run(runnable);
@@ -213,7 +187,9 @@ public class SchedulerImpl implements Scheduler{
     public void partRunAsync(@NotNull ActivePart part, Runnable runnable) {
         if (isPluginDisabled()) return;
         if (part instanceof SpawnedDisplayEntityPart sp){
-            entityRunAsync(sp.getEntity(), runnable);
+            Entity entity = sp.getEntity();
+            if (entity == null) runAsync(runnable);
+            else entityRunAsync(entity, runnable);
         }
         else{
             runAsync(runnable);
@@ -224,19 +200,14 @@ public class SchedulerImpl implements Scheduler{
     public Task partRunLater(@NotNull ActivePart part, Runnable runnable, long delay) {
         if (isPluginDisabled()) return new EmptyTask();
         Task task;
-        SchedulerRunnable schedulerRunnable = new SchedulerRunnable() {
-            @Override
-            public void run() {
-                runnable.run();
-            }
-        };
         if (part instanceof SpawnedDisplayEntityPart sp){
-            task = entityRunLater(sp.getEntity(), runnable, delay);
+            Entity entity = sp.getEntity();
+            if (entity == null) return runLater(runnable, delay);
+            task = entityRunLater(entity, runnable, delay);
         }
         else{
             task = runLater(runnable, delay);
         }
-        schedulerRunnable.task = task;
         return task;
     }
 
@@ -244,21 +215,15 @@ public class SchedulerImpl implements Scheduler{
     public Task partRunLaterAsync(@NotNull ActivePart part, Runnable runnable, long delay) {
         if (isPluginDisabled()) return new EmptyTask();
         Task task;
-        SchedulerRunnable schedulerRunnable = new SchedulerRunnable() {
-            @Override
-            public void run() {
-                runnable.run();
-            }
-        };
+
         if (part instanceof SpawnedDisplayEntityPart sp){
-            Entity e = sp.getEntity();
-            if (e == null) runLaterAsync(runnable, delay);
-            task = entityRunLaterAsync(sp.getEntity(), runnable, delay);
+            Entity entity = sp.getEntity();
+            if (entity == null) return runLaterAsync(runnable, delay);
+            task = entityRunLaterAsync(entity, runnable, delay);
         }
         else{
             task = runLaterAsync(runnable, delay);
         }
-        schedulerRunnable.task = task;
         return task;
     }
 
@@ -266,7 +231,9 @@ public class SchedulerImpl implements Scheduler{
     public Task partRunTimer(@NotNull ActivePart part, SchedulerRunnable runnable, long delay, long period) {
         if (isPluginDisabled()) return new EmptyTask();
         if (part instanceof SpawnedDisplayEntityPart sp){
-            return entityRunTimer(sp.getEntity(), runnable, delay, period);
+            Entity entity = sp.getEntity();
+            if (entity == null) return runTimer(runnable, delay, period);
+            return entityRunTimer(entity, runnable, delay, period);
         }
         else{
             return runTimer(runnable, delay, period);
@@ -277,7 +244,9 @@ public class SchedulerImpl implements Scheduler{
     public Task partRunTimerAsync(@NotNull ActivePart part, SchedulerRunnable runnable, long delay, long period) {
         if (isPluginDisabled()) return new EmptyTask();
         if (part instanceof SpawnedDisplayEntityPart sp){
-            return entityRunTimerAsync(sp.getEntity(), runnable, delay, period);
+            Entity entity = sp.getEntity();
+            if (entity == null) return runTimerAsync(runnable, delay, period);
+            return entityRunTimerAsync(entity, runnable, delay, period);
         }
         else{
             return runTimerAsync(runnable, delay, period);
