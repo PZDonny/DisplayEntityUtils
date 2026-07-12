@@ -50,7 +50,7 @@ public abstract class TranslationDrag extends Drag {
     }
 
     @Override
-    public String getTag(){
+    public String getTag() {
         return axis.getTag();
     }
 
@@ -73,9 +73,7 @@ public abstract class TranslationDrag extends Drag {
 
     protected void applyMovement(Vector3f delta, Vector3f translateDelta) {
         applyToGizmo(delta);
-        applyToPlayerSelection(gizmo.getTranslationMode() == TranslationMode.TRANSLATE
-                ? translateDelta
-                : delta);
+        applyToPlayerSelection(delta, translateDelta);
     }
 
     protected void applyToGizmo(Vector3f delta) {
@@ -86,17 +84,18 @@ public abstract class TranslationDrag extends Drag {
         gizmo.teleport(l);
     }
 
-    protected void applyToPlayerSelection(Vector3f delta) {
+    protected void applyToPlayerSelection(Vector3f delta, Vector3f translateDelta) {
         if (!gizmo.isLinked()) return;
-        Vector bukkitDelta = Vector.fromJOML(delta);
+
 
         ActivePartSelection<?> sel = DEUUser
                 .getOrCreateUser(gizmo.getPlayerUUID())
                 .getSelectedPartSelection();
 
         if (gizmo.getTranslationMode() == TranslationMode.TRANSLATE) {
-            sel.translate(bukkitDelta, GizmoSessionImpl.SCAN_FREQUENCY, 0);
+            this.translate(delta, translateDelta, sel);
         } else {
+            Vector bukkitDelta = Vector.fromJOML(delta);
             Location tpLoc = sel.getLocation();
             tpLoc.add(bukkitDelta);
             this.teleport(tpLoc, sel);
@@ -133,6 +132,24 @@ public abstract class TranslationDrag extends Drag {
             }
         }
         return true;
+    }
+
+    private void translate(Vector3f delta, Vector3f translateDelta, ActivePartSelection<?> sel) {
+        Vector bukkitTranslateDelta = Vector.fromJOML(translateDelta);
+        Vector bukkitDelta = Vector.fromJOML(delta);
+        if (sel instanceof SinglePartSelection s) {
+            s.translate(s.getSelectedPart().isDisplay()
+                            ? bukkitTranslateDelta
+                            : bukkitDelta,
+                    GizmoSessionImpl.SCAN_FREQUENCY, 0);
+        } else if (sel instanceof MultiPartSelection<?> m) {
+            for (ActivePart p : m.getSelectedParts()) {
+                p.translate(p.isDisplay()
+                                ? bukkitTranslateDelta
+                                : bukkitDelta,
+                        GizmoSessionImpl.SCAN_FREQUENCY, 0);
+            }
+        }
     }
 
     private void teleport(Location tpLoc, ActivePartSelection<?> sel) {
