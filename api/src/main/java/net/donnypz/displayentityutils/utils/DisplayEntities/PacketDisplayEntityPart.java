@@ -1222,7 +1222,8 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (!isMaster && group != null && isDisplay()){
             Location groupLoc = group.getLocation();
             if (packetLocation != null && packetLocation.isValid()){
-                groupLoc.setRotation(packetLocation.yaw, packetLocation.pitch);
+                groupLoc.setPitch(packetLocation.pitch);
+                groupLoc.setYaw(packetLocation.yaw);
             }
             return groupLoc;
         }
