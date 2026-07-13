@@ -260,7 +260,7 @@ public final class DisplayUtils {
      * @param heightAdder the fixed value to increase the calculated height by
      * @return a float array containing the width and height, respectively
      */
-    public static float[] getAutoCullValues(SpawnedDisplayEntityPart.PartType type, @NotNull Vector3f translation, @NotNull Vector3f scale, @NotNull Quaternionf leftRotation, float widthAdder, float heightAdder){
+    public static float[] getAutoCullValues(@NotNull SpawnedDisplayEntityPart.PartType type, @NotNull Vector3f translation, @NotNull Vector3f scale, @NotNull Quaternionf leftRotation, float widthAdder, float heightAdder){
         boolean isTranslatedBelow = translation.y < 0;
         float width = Math.max(scale.x, scale.z)*2;
         float height = scale.y;
@@ -318,11 +318,11 @@ public final class DisplayUtils {
 
     /**
      * Determine whether a part's entity is in a loaded chunk
-     * @param part
+     * @param part the part
      * @return true if the part is in a loaded chunk
      */
-    public static boolean isInLoadedChunk(SpawnedDisplayEntityPart part){
-        if (part == null || part.getEntity() == null){
+    public static boolean isInLoadedChunk(@NotNull SpawnedDisplayEntityPart part){
+        if (part.getEntity() == null){
             return false;
         }
         return isInLoadedChunk(part.getEntity());
@@ -330,10 +330,10 @@ public final class DisplayUtils {
 
     /**
      * Determine whether an entity is in a loaded chunk
-     * @param entity
+     * @param entity the entity
      * @return true if the entity is in a loaded chunk
      */
-    public static boolean isInLoadedChunk(Entity entity){
+    public static boolean isInLoadedChunk(@NotNull Entity entity){
         return entity.getLocation().isChunkLoaded();
     }
 
@@ -509,7 +509,7 @@ public final class DisplayUtils {
     }
 
     /**
-     * Change the translation of a SpawnedDisplayEntityPart.
+     * Change the translation of a {@link SpawnedDisplayEntityPart}.
      * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results
      * @param part SpawnedDisplayEntityPart to translate
@@ -527,7 +527,7 @@ public final class DisplayUtils {
     }
 
     /**
-     * Change the translation of a SpawnedDisplayEntityPart.
+     * Change the translation of a {@link SpawnedDisplayEntityPart}.
      * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results
      * @param part SpawnedDisplayEntityPart to translate
@@ -772,21 +772,18 @@ public final class DisplayUtils {
      * @param tag the group tag
      * @return a boolean
      */
-    public static boolean isGroupTag(Entity entity, @NotNull String tag){
-        if (entity == null) return false;
+    public static boolean isGroupTag(@NotNull Entity entity, @NotNull String tag){
         String value = entity.getPersistentDataContainer().get(DisplayAPI.getGroupTagKey(), PersistentDataType.STRING);
-        if (value == null){
-            return false;
-        }
+        if (value == null) return false;
         return tag.equals(value);
     }
 
     /**
      * Check if an entity is part of a {@link SpawnedDisplayEntityGroup}
-     * @param entity
+     * @param entity the entity
      * @return a boolean
      */
-    public static boolean isInGroup(Entity entity){
+    public static boolean isInGroup(@NotNull Entity entity){
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
         return part != null && part.hasGroup();
     }
@@ -796,7 +793,7 @@ public final class DisplayUtils {
      * @param display the display to check
      * @return true if the entity is the master pat
      */
-    public static boolean isMaster(Display display){
+    public static boolean isMaster(@NotNull Display display){
         PersistentDataContainer container = display.getPersistentDataContainer();
         return container.has(DisplayAPI.getMasterKey(), PersistentDataType.BOOLEAN);
     }
