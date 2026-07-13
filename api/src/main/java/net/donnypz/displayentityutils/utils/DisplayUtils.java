@@ -383,20 +383,6 @@ public final class DisplayUtils {
     }
 
     /**
-     * Get the vehicle of a SpawnedDisplayEntityGroup
-     * @param group The group
-     * @return Vehicle entity of group, or null if it doesn't exist
-     */
-    public static Entity getGroupVehicle(@NotNull SpawnedDisplayEntityGroup group){
-        if (!group.isSpawned()){
-            return null;
-        }
-        return group.getMasterPart().getEntity().getVehicle();
-    }
-
-
-
-    /**
      * Change the translation of a display entity
      * @param display Display Entity to translate
      * @param direction The direction to translate the display entity
