@@ -32,7 +32,7 @@ public final class DisplayConfig {
 
 
     /**
-     * Gets the value of "mongodb.enabled" in the config
+     * Gets the value of <code>mongodb.enabled</code> in the config
      * @return whether MongoDB storage is enabled in the config
      */
     public static boolean isMongoEnabled() {
@@ -40,7 +40,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "mysql.enabled" in the config
+     * Gets the value of <code>mysql.enabled</code> in the config
      * @return whether MYSQL storage is enabled in the config
      */
     public static boolean isMYSQLEnabled() {
@@ -48,7 +48,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "localStorageEnabled" in the config
+     * Gets the value of <code>localStorageEnabled</code> in the config
      * @return whether local storage is enabled in the config
      */
     public static boolean isLocalEnabled() {
@@ -57,7 +57,7 @@ public final class DisplayConfig {
 
 
     /**
-     * Gets the value of "automaticGroupDetection.enabled" in the config
+     * Gets the value of <code>automaticGroupDetection.enabled</code> in the config
      * @return the boolean value set in config
      */
     public static boolean automaticGroupDetection() {
@@ -65,7 +65,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "defaultPersistence" in the config
+     * Gets the value of <code>defaultPersistence</code> in the config
      * @return the boolean value set in config
      */
     public static boolean defaultPersistence(){
@@ -73,7 +73,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "automaticGroupDetection.persistenceOverride.enabled" in the config
+     * Gets the value of <code>automaticGroupDetection.persistenceOverride.enabled</code> in the config
      * @return the boolean value set in config
      */
     public static boolean persistenceOverride() {
@@ -81,7 +81,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "automaticGroupDetection.persistenceOverride.persistent" in the config
+     * Gets the value of <code>automaticGroupDetection.persistenceOverride.persistent</code> in the config
      * @return the boolean value set in config
      */
     public static boolean persistenceValue() {
@@ -89,7 +89,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "automaticGroupDetection.persistenceOverride.allowOverrideByDefault" in the config
+     * Gets the value of <code>automaticGroupDetection.persistenceOverride.allowOverrideByDefault</code> in the config
      * @return the boolean value set in config
      */
     public static boolean overrideByDefault() {
@@ -98,7 +98,7 @@ public final class DisplayConfig {
 
 
     /**
-     * Gets the value of "automaticGroupDetection.maximumInteractionSearchRange" in the config
+     * Gets the value of <code>automaticGroupDetection.maximumInteractionSearchRange</code> in the config
      * @return the value set in config
      */
     public static double getMaximumInteractionSearchRange(){
@@ -106,7 +106,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "automaticGroupDetection.readSameChunks" in the config
+     * Gets the value of <code>automaticGroupDetection.readSameChunks</code> in the config
      * @return the boolean value set in config
      */
     public static boolean readSameChunks(){
@@ -114,7 +114,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "automaticGroupDetection.unregisterOnUnload" in the config
+     * Gets the value of <code>automaticGroupDetection.unregisterOnUnload</code> in the config
      * @return the boolean value set in config
      */
     public static boolean unregisterOnUnload(){
@@ -122,7 +122,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "overrideExistingSaves" in the config
+     * Gets the value of <code>overrideExistingSaves</code> in the config
      * @return the boolean value set in config
      */
     public static boolean overwritexistingSaves() {
@@ -131,7 +131,7 @@ public final class DisplayConfig {
 
 
     /**
-     * Gets the value of "autoSelectGroups" in the config
+     * Gets the value of <code>autoSelectGroups</code> in the config
      * @return the boolean value set in config
      */
     public static boolean autoSelectGroups(){
@@ -139,7 +139,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "autoCulling.enabled" in the config
+     * Gets the value of <code>autoCulling.enabled</code> in the config
      * @return the boolean value set in the config
      */
     public static boolean autoCulling(){
@@ -147,7 +147,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "autoCulling.widthCullingAdder" in the config
+     * Gets the value of <code>autoCulling.widthCullingAdder</code> in the config
      * @return the float value set in config
      */
     public static float widthCullingAdder() {
@@ -155,7 +155,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "autoCulling.heightCullingAdder" in the config
+     * Gets the value of <code>autoCulling.heightCullingAdder</code> in the config
      * @return the float value set in config
      */
     public static float heightCullingAdder() {
@@ -163,7 +163,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "cacheAnimations.enabled" in the config
+     * Gets the value of <code>cacheAnimations.enabled</code> in the config
      * @return the boolean value set in config
      */
     public static boolean cacheAnimations() {
@@ -171,7 +171,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "cacheAnimations.expireTimeInSeconds" in the config
+     * Gets the value of <code>cacheAnimations.expireTimeInSeconds</code> in the config
      * @return the boolean value set in config
      */
     public static int cacheAnimationExpiration() {
@@ -179,7 +179,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "registerCommands" in the config
+     * Gets the value of <code>registerCommands</code> in the config
      * @return the boolean value set in config
      */
     public static boolean registerCommands() {
@@ -187,7 +187,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "limitGroupSelections" in the config
+     * Gets the value of <code>limitGroupSelections</code> in the config
      * @return the boolean value set in config
      */
     public static boolean limitGroupSelections() {
@@ -195,7 +195,7 @@ public final class DisplayConfig {
     }
 
     /**
-     * Gets the value of "interactionPreviewBlock" in the config
+     * Gets the value of <code>interactionPreviewBlock</code> in the config
      * @return {@link BlockData}
      */
     public static BlockData interactionPreviewBlock() {

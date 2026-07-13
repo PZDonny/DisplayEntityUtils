@@ -1,13 +1,24 @@
 package net.donnypz.displayentityutils.managers;
 
 import net.donnypz.displayentityutils.DisplayConfig;
+import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
+import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 
 /**
- * Used to specify a storage location for saving, deletion, and retrieval of a DisplayEntityGroup of the tags of them
+ * Storage locations for saving, deleting, and retrieving a saved {@link DisplayEntityGroup} or {@link DisplayAnimation}
  */
 public enum LoadMethod{
+    /**
+     * Local Storage on the current filesystem
+     */
     LOCAL("Local"),
+    /**
+     * Storage using a MongoDB database
+     */
     MONGODB("MongoDB"),
+    /**
+     * Storage using a MYSQL database
+     */
     MYSQL("MYSQL");
 
     final String displayName;
