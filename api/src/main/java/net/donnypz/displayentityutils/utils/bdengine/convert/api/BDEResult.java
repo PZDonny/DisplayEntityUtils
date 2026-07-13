@@ -64,7 +64,7 @@ public final class BDEResult {
     }
 
     /**
-     * Convert the retrieved BDEngine project into a group/model & animation format, usable for DisplayEntityUtils.
+     * Convert the retrieved BDEngine project into a group/model and animation format, usable for DisplayEntityUtils.
      * <br>The {@link BDEAPIConvertEvent} will be called after successful conversion completion.
      * <br><b>This method should be run synchronously.</b>
      * @param spawnLocation       where the conversion should take place. This should be in a loaded chunk
@@ -94,7 +94,7 @@ public final class BDEResult {
     }
 
     /**
-     * Convert the retrieved BDEngine project into a group/model & animation format, usable for DisplayEntityUtils.
+     * Convert the retrieved BDEngine project into a group/model and animation format, usable for DisplayEntityUtils.
      * <br>The {@link BDEAPIConvertEvent} will be called after successful conversion completion.
      * <br><b>This method should be run synchronously.</b>
      * @param player              the player involved in the conversion. typically supplied when using conversion commands
@@ -124,7 +124,7 @@ public final class BDEResult {
     }
 
     /**
-     * Convert the retrieved BDEngine project into a group/model & animation format, usable for DisplayEntityUtils.
+     * Convert the retrieved BDEngine project into a group/model and animation format, usable for DisplayEntityUtils.
      * <br>The {@link BDEAPIConvertEvent} will be called after successful conversion completion.
      * <br><b>This method should be run synchronously.</b>
      * @param conversionId        the id used to reference this conversion later through events.

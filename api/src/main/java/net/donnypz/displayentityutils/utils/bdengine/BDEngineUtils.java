@@ -69,7 +69,7 @@ public final class BDEngineUtils {
     }
 
     /**
-     * Convert a BDEngine datapack project into a group/model & animation format, usable for DisplayEntityUtils.
+     * Convert a BDEngine datapack project into a group/model and animation format, usable for DisplayEntityUtils.
      * <br>The {@link BDEDatapackConvertEvent} will be called after successful conversion completion.
      * <br><b>This method should be run synchronously.</b>
      * @param datapackName        the name of the datapack to be converted
@@ -102,7 +102,7 @@ public final class BDEngineUtils {
     }
 
     /**
-     * Convert a BDEngine datapack project into a group/model & animation format, usable for DisplayEntityUtils.
+     * Convert a BDEngine datapack project into a group/model and animation format, usable for DisplayEntityUtils.
      * <br>The {@link BDEDatapackConvertEvent} will be called after successful conversion completion.
      * <br><b>This method should be run synchronously.</b>
      * @param datapackName        the name of the datapack to be converted
@@ -135,7 +135,7 @@ public final class BDEngineUtils {
     }
 
     /**
-     * Convert a BDEngine datapack project into a group/model & animation format, usable for DisplayEntityUtils.
+     * Convert a BDEngine datapack project into a group/model and animation format, usable for DisplayEntityUtils.
      * <br>The {@link BDEDatapackConvertEvent} will be called after successful conversion completion.
      * <br><b>This method should be run synchronously.</b>
      * @param datapackName        the name of the datapack to be converted
