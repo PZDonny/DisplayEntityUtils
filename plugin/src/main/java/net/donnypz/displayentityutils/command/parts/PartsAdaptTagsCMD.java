@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 class PartsAdaptTagsCMD extends PartsSubCommand {
     PartsAdaptTagsCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("adapttags", parentSubCommand, Permission.PARTS_TAG);
+        super("adapttags", parentSubCommand, Permission.PARTS_TAG, true);
         addFlag("-remove");
     }
 
@@ -20,37 +20,41 @@ class PartsAdaptTagsCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+        if (group instanceof PacketDisplayEntityGroup){
+            DisplayEntityPluginCommand.disallowPacketGroup(player);
+            return false;
+        }
+
+        boolean removeFromSB = isRemoveFromScoreboard(player, args);
+
+        for (SpawnedDisplayEntityPart part : ((SpawnedPartSelection) selection).getSelectedParts()){
+            part.adaptScoreboardTags(removeFromSB);
+        }
+
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Adapted all scoreboard tags for parts in your selection!", NamedTextColor.GREEN)));
         return false;
     }
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
-        if (selection instanceof PacketPartSelection){
-            DisplayEntityPluginCommand.disallowPacketGroup(player);
-            return false;
-        }
+        if (PartsCMD.isUnwantedPacketPart(player, selectedPart)) return false;
 
+        boolean removeFromSB = isRemoveFromScoreboard(player, args);
+
+        ((SpawnedDisplayEntityPart) selectedPart).adaptScoreboardTags(removeFromSB);
+
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Adapted all scoreboard tags for your selected part!", NamedTextColor.GREEN)));
+        return false;
+    }
+
+    private boolean isRemoveFromScoreboard(Player player, String[] args){
         OptionalArguments oArgs = getOptionalArguments(player, args);
-        boolean removeFromSB = oArgs.hasFlag("-remove");
-
-        if (!selection.isValid()){ //Adapt for all parts
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid part selection! Please try again!", NamedTextColor.RED)));
-            return false;
-        }
-        if (PartsCMD.isUnwantedSingleSelection(player, selection)){
-            return false;
-        }
-
-        for (SpawnedDisplayEntityPart part : ((SpawnedPartSelection) selection).getSelectedParts()){
-            part.adaptScoreboardTags(removeFromSB);
-        }
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Adapted all scoreboard tags in your part selection!", NamedTextColor.GREEN)));
-        return true;
+        return oArgs.hasFlag("-remove");
     }
 
     @Override
     protected String getDescription() {
-        return "Adapt scoreboard tags to tags usable by DisplayEntityUtils. Applied to selected parts."+
+        return "Adapt scoreboard tags to tags usable by DisplayEntityUtils. Applies to selected parts."+
                 " \"-remove\" removes tag from scoreboard";
     }
 }

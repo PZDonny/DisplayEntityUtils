@@ -15,7 +15,7 @@ import java.util.List;
 public abstract class PartsSubCommand extends PlayerSubCommand {
     int minimumArgs;
     boolean requireGroupSelection = false;
-    boolean updateGizmoRotationOnSuccess = false;
+    boolean requireValidSelection = true;
 
 
     public PartsSubCommand(@NotNull String commandName, @NotNull DEUSubCommand parentSubCommand, @NotNull Permission permission) {
@@ -58,12 +58,17 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
             return;
         }
 
-        if (!selection.hasSelectedPart()){
-            PartsCMD.invalidPartSelection(player);
+        if (!selection.isValid()){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid part selection! Please try again!", NamedTextColor.RED)));
             return;
         }
 
-        boolean success;
+        if (!selection.hasSelectedPart()){
+            PartsCMD.noPartSelected(player);
+            return;
+        }
+
+        boolean updatePacketGroup;
         OptionalArguments oArgs = getOptionalArguments(player, args);
         if (!oArgs.isValidOptions()) return;
 
@@ -71,13 +76,13 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
             if (PartsCMD.isUnwantedSingleSelectionAll(player, selection)){
                 return;
             }
-            success = executeAllPartsAction(player, group, (MultiPartSelection<?>) selection, args);
+            updatePacketGroup = executeAllPartsAction(player, group, (MultiPartSelection<?>) selection, args);
         }
         else{
-            success = executeSinglePartAction(player, group, selection, selection.getSelectedPart(), args);
+            updatePacketGroup = executeSinglePartAction(player, group, selection, selection.getSelectedPart(), args);
         }
 
-        if (success){
+        if (updatePacketGroup){
             if (group instanceof PacketDisplayEntityGroup pg
                     && pg.getMasterPart() != null){
                 pg.update();
@@ -85,8 +90,8 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
         }
     }
 
-    protected void updateGizmoRotationOnSuccess(){
-        this.updateGizmoRotationOnSuccess = true;
+    protected void validSelectionNotRequired(){
+        this.requireValidSelection = true;
     }
 
     protected abstract void sendIncorrectUsage(@NotNull Player player);
