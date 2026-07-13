@@ -11,7 +11,7 @@ public class GizmoMathUtil {
         if (mode == TranslationMode.TELEPORT_WORLD)
             return vec;
 
-        return DisplayUtils.pivotVector(
+        return DisplayUtils.rotateVector(
                 vec,
                 loc.getPitch(),
                 loc.getYaw()

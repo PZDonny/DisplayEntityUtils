@@ -41,11 +41,13 @@ public class AnimationCamera implements Serializable {
     public @NotNull Vector getVector(@NotNull ActiveGroup<?> group){
         Vector v = new Vector(x, y, z).multiply(group.getScaleMultiplier());
         Location groupLoc = group.getLocation();
-        return DisplayUtils.pivotVector(v, groupLoc.getPitch(), groupLoc.getYaw());
+        return DisplayUtils.rotateVector(v, groupLoc.getPitch(), groupLoc.getYaw());
     }
 
     /**
-     * Teleport an entity to the camera's represented position
+     * Teleport a {@link PacketDisplayEntityPart} to a camera's represented position
+     * @param group the group
+     * @param part the part to teleport (typically the camera entity)
      */
     public void teleport(@NotNull ActiveGroup<?> group, @NotNull PacketDisplayEntityPart part){
         part.teleport(getTeleportLocation(group));

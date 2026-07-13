@@ -89,34 +89,34 @@ public final class DisplayUtils {
     }
 
     /**
-     * Pivot a vector by a given pitch and yaw
+     * Rotate a vector by a given pitch and yaw
      * @param vector the vector
-     * @param pitch the pitch
-     * @param yaw the yaw
-     * @return a new vector with the pivot applied
+     * @param pitchChange the pitch change
+     * @param yawChange the yaw change
+     * @return a new vector with the rotation applied
      */
-    public static Vector3f pivotVector(@NotNull Vector3f vector, float pitch, float yaw){
+    public static Vector3f rotateVector(@NotNull Vector3f vector, float pitchChange, float yawChange){
         final Vector3f vectorCopy = new Vector3f(vector);
 
         //Apply Pitch
-        float pitchAsRad = (float) Math.toRadians(pitch);
+        float pitchAsRad = (float) Math.toRadians(pitchChange);
         vectorCopy.rotateX(pitchAsRad);
 
         //Apply Yaw
-        float yawAsRad = (float) Math.toRadians(yaw);
+        float yawAsRad = (float) Math.toRadians(yawChange);
         vectorCopy.rotateY(-yawAsRad);
         return vectorCopy;
     }
 
     /**
-     * Pivot a vector by a given pitch and yaw
+     * Rotate a vector by a given pitch and yaw
      * @param vector the vector
-     * @param pitchChange the pitch change
-     * @param yawChange the yaw change
-     * @return a new vector with the pivot applied
+     * @param pitchChange the pitch
+     * @param yawChange the yaw
+     * @return a new vector with the rotation applied
      */
-    public static Vector pivotVector(@NotNull Vector vector, float pitchChange, float yawChange){
-        return Vector.fromJOML(pivotVector(vector.toVector3f(), pitchChange, yawChange));
+    public static Vector rotateVector(@NotNull Vector vector, float pitchChange, float yawChange){
+        return Vector.fromJOML(rotateVector(vector.toVector3f(), pitchChange, yawChange));
     }
 
     /**
@@ -151,8 +151,8 @@ public final class DisplayUtils {
             translationVector.add(centeringVec);
         }
 
-        Vector3f pivotedVector = pivotVector(translationVector, display.getPitch(), display.getYaw());
-        translationLoc.add(Vector.fromJOML(pivotedVector));
+        Vector3f rotatedVector = rotateVector(translationVector, display.getPitch(), display.getYaw());
+        translationLoc.add(Vector.fromJOML(rotatedVector));
         return translationLoc;
     }
 
@@ -201,8 +201,8 @@ public final class DisplayUtils {
             translationVector.add(centerVec);
         }
 
-        Vector3f pivotedVector = pivotVector(translationVector, pitch, yaw);
-        translationLoc.add(Vector.fromJOML(pivotedVector));
+        Vector3f rotatedVector = rotateVector(translationVector, pitch, yaw);
+        translationLoc.add(Vector.fromJOML(rotatedVector));
         return translationLoc;
     }
 
@@ -550,15 +550,15 @@ public final class DisplayUtils {
     /**
      * Pivot an entity around a location
      * @param entity the entity
-     * @param center the location to pivot around
+     * @param pivotLocation the location to pivot around
      * @param angleInDegrees the pivot angle in degrees
      */
-    public static void pivot(@NotNull Entity entity, @NotNull Location center, double angleInDegrees){
-        Vector3f translationVector = DisplayUtils.getNonDisplayTranslation(entity, center).toVector3f();
+    public static void pivot(@NotNull Entity entity, @NotNull Location pivotLocation, double angleInDegrees){
+        Vector3f translationVector = DisplayUtils.getNonDisplayTranslation(entity, pivotLocation).toVector3f();
         new Quaternionf()
                 .rotateY((float) Math.toRadians(-angleInDegrees))
                 .transform(translationVector);
-        Location newLoc = center.clone().subtract(Vector.fromJOML(translationVector));
+        Location newLoc = pivotLocation.clone().subtract(Vector.fromJOML(translationVector));
         FoliaUtils.teleport(entity, newLoc);
     }
 
