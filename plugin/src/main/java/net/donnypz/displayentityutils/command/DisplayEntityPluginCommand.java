@@ -167,8 +167,9 @@ public class DisplayEntityPluginCommand implements TabExecutor {
 
     public static void noPartSelection(Player player){
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You have not selected any part(s)!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/deu parts cycle <first | prev | next>", NamedTextColor.GRAY));
-        player.sendMessage(Component.text("/deu parts select <distance | -target>", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("| Select a group or an individual entity", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("| /deu group selectnearest", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("| /deu parts select <distance | -target>", NamedTextColor.GRAY));
     }
 
     public static void invalidTag(CommandSender sender, String tag){
