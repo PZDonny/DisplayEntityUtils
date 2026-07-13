@@ -99,7 +99,7 @@ public abstract class RelativePoint implements Serializable {
         double pitchDiff = groupLoc.getPitch() - groupPitchAtCreation;
         double yawDiff = groupLoc.getYaw() - groupYawAtCreation;
 
-        Vector pivotVec = DisplayUtils.pivotPitchAndYaw(v, (float) pitchDiff, (float) yawDiff);
+        Vector pivotVec = DisplayUtils.pivotVector(v, (float) pitchDiff, (float) yawDiff);
         groupLoc.add(pivotVec);
         return groupLoc;
     }
@@ -111,7 +111,7 @@ public abstract class RelativePoint implements Serializable {
      */
     public @NotNull Location getLocation(@NotNull Location fromLocation){
         fromLocation = fromLocation.clone();
-        Vector pivotVec = DisplayUtils.pivotPitchAndYaw(vectorFromOrigin.clone(), fromLocation.getPitch(), fromLocation.getYaw());
+        Vector pivotVec = DisplayUtils.pivotVector(vectorFromOrigin.clone(), fromLocation.getPitch(), fromLocation.getYaw());
         fromLocation.add(pivotVec);
         return fromLocation;
     }

@@ -41,7 +41,7 @@ public class AnimationCamera implements Serializable {
     public @NotNull Vector getVector(@NotNull ActiveGroup<?> group){
         Vector v = new Vector(x, y, z).multiply(group.getScaleMultiplier());
         Location groupLoc = group.getLocation();
-        return DisplayUtils.pivotPitchAndYaw(v, groupLoc.getPitch(), groupLoc.getYaw());
+        return DisplayUtils.pivotVector(v, groupLoc.getPitch(), groupLoc.getYaw());
     }
 
     /**
