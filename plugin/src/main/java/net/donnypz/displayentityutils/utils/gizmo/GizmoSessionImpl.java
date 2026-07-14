@@ -113,18 +113,6 @@ public class GizmoSessionImpl implements GizmoSession {
         if (sel == null) return;
         Location selLoc = sel.getLocation();
 
-        List<PacketDisplayEntityPart> scaleParts = gizmoModel
-                .getParts(List.of(Axis.X.getScaleTag(),
-                        Axis.Y.getScaleTag(),
-                        Axis.Z.getScaleTag()));
-        if (sel instanceof MultiPartSelection<?>) {
-            scaleParts.forEach(part -> part.hide());
-        }
-        else if (sel instanceof SinglePartSelection){
-            Player player = Bukkit.getPlayer(playerUUID);
-            scaleParts.forEach(part -> part.showToPlayer(player, GroupSpawnedEvent.SpawnReason.INTERNAL));
-        }
-
         switch (translationMode) {
             case TRANSLATE, TELEPORT_LOCAL -> {
                 gizmoModel.setRotation(selLoc.getPitch(), selLoc.getYaw(), false);
