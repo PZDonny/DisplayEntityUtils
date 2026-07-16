@@ -118,7 +118,7 @@ public final class PacketUtils {
      * @param pitch the pitch
      */
     public static void setRotation(@NotNull Player player, int entityId, float yaw, float pitch){
-        WrapperPlayServerEntityRotation rotationPacket = new WrapperPlayServerEntityRotation(entityId, pitch, yaw, false);
+        WrapperPlayServerEntityRotation rotationPacket = new WrapperPlayServerEntityRotation(entityId, yaw, pitch, false);
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, rotationPacket);
     }
 
@@ -141,7 +141,7 @@ public final class PacketUtils {
      * @param pitch the pitch
      */
     public static void setRotation(@NotNull Collection<Player> players, int entityId, float yaw, float pitch){
-        WrapperPlayServerEntityRotation rotationPacket = new WrapperPlayServerEntityRotation(entityId, pitch, yaw, false);
+        WrapperPlayServerEntityRotation rotationPacket = new WrapperPlayServerEntityRotation(entityId, yaw, pitch, false);
         for (Player player : players){
             PacketEvents.getAPI().getPlayerManager().sendPacket(player, rotationPacket);
         }
