@@ -37,7 +37,7 @@ public class GroupTeleportCompletableFuture {
     }
 
     @ApiStatus.Internal
-    public static GroupTeleportCompletableFuture create(@NotNull CompletableFuture<Boolean> groupCompletableFuture,
+    public static GroupTeleportCompletableFuture create(@Nullable CompletableFuture<Boolean> groupCompletableFuture,
                                                         @NotNull Collection<CompletableFuture<Boolean>> nonDisplayFutures) {
         return new GroupTeleportCompletableFuture(groupCompletableFuture, nonDisplayFutures, false);
     }

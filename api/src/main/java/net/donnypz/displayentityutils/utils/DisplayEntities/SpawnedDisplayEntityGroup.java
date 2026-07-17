@@ -506,6 +506,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
     /**
      * {@inheritDoc}
+     * @return a {@link GroupTeleportCompletableFuture}
      */
     @Override
     public @NotNull GroupTeleportCompletableFuture teleportSafe(@NotNull Location location, boolean respectGroupDirection) {
