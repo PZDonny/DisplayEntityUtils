@@ -735,7 +735,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
     /**
      * Get the location of this group.
-     * @return this group's {@link Location}. Null if {{@link #isValid()}} returns false or if the location is unset
+     * @return this group's {@link Location}. Null if {@link #isValid()} returns false or if the location is unset
      */
     @Override
     public @Nullable Location getLocation() {
