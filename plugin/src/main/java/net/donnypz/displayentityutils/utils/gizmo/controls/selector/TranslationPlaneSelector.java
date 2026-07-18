@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.utils.gizmo.controls.selector;
 
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
-import net.donnypz.displayentityutils.utils.gizmo.TranslationMode;
+import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.TranslationPlaneDrag;
@@ -39,7 +39,7 @@ public class TranslationPlaneSelector extends Selector {
     }
 
     @Override
-    public float intersect(TranslationMode translationMode, Player player, Location gizmoLocation) {
+    public float intersect(GizmoSpace gizmoSpace, Player player, Location gizmoLocation) {
         Location eyeLoc = player.getEyeLocation();
 
         Vector3f rayOrigin = eyeLoc.toVector().toVector3f()
@@ -52,12 +52,12 @@ public class TranslationPlaneSelector extends Selector {
 
         Vector3f[] axes = axis.getDirections();
 
-        Vector3f axis1 = GizmoMathUtil.rotate(axes[0], translationMode, gizmoLocation)
+        Vector3f axis1 = GizmoMathUtil.rotate(axes[0], gizmoSpace, gizmoLocation)
                 .normalize();
-        Vector3f axis2 = GizmoMathUtil.rotate(axes[1], translationMode, gizmoLocation)
+        Vector3f axis2 = GizmoMathUtil.rotate(axes[1], gizmoSpace, gizmoLocation)
                 .normalize();
-        Vector3f start = GizmoMathUtil.rotate(new Vector3f(corner1), translationMode, gizmoLocation);
-        Vector3f end = GizmoMathUtil.rotate(new Vector3f(corner2), translationMode, gizmoLocation);
+        Vector3f start = GizmoMathUtil.rotate(new Vector3f(corner1), gizmoSpace, gizmoLocation);
+        Vector3f end = GizmoMathUtil.rotate(new Vector3f(corner2), gizmoSpace, gizmoLocation);
 
         Vector3f planeNormal = new Vector3f(axis1)
                 .cross(axis2)

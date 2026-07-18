@@ -27,10 +27,12 @@ public class GizmoSessionImpl implements GizmoSession {
     public static final int SCAN_FREQUENCY = 1;
 
     private final PacketDisplayEntityGroup gizmoModel;
-    private TranslationMode translationMode = TranslationMode.TRANSLATE;
+    private TranslationMode translationMode = TranslationMode.TELEPORT;
+    private GizmoSpace gizmoSpace = GizmoSpace.LOCAL;
     private final ArrayList<Selector> selectors = new ArrayList<>();
     private Selector hoveredSelector;
     private Drag activeDrag;
+    private boolean lastInteractionItemDrop;
 
     private volatile boolean visible = true;
     private boolean valid = true;
@@ -94,6 +96,14 @@ public class GizmoSessionImpl implements GizmoSession {
         gizmoModel.setYaw(yaw, false);
     }
 
+    public boolean isLastInteractionItemDrop() {
+        return lastInteractionItemDrop;
+    }
+
+    public void setLastInteractionItemDrop(boolean lastInteractionItemDrop){
+        this.lastInteractionItemDrop = lastInteractionItemDrop;
+    }
+
     @Override
     public TranslationMode getTranslationMode() {
         return translationMode;
@@ -102,6 +112,16 @@ public class GizmoSessionImpl implements GizmoSession {
     @Override
     public void setTranslationMode(@NotNull TranslationMode translationMode) {
         this.translationMode = translationMode;
+    }
+
+    @Override
+    public GizmoSpace getGizmoSpace() {
+        return gizmoSpace;
+    }
+
+    @Override
+    public void setGizmoSpace(@NotNull GizmoSpace gizmoSpace) {
+        this.gizmoSpace = gizmoSpace;
         updateRotation();
     }
 
@@ -111,11 +131,11 @@ public class GizmoSessionImpl implements GizmoSession {
         if (sel == null) return;
         Location selLoc = sel.getLocation();
 
-        switch (translationMode) {
-            case TRANSLATE, TELEPORT_LOCAL -> {
+        switch (gizmoSpace) {
+            case LOCAL -> {
                 gizmoModel.setRotation(selLoc.getPitch(), selLoc.getYaw(), false, false);
             }
-            case TELEPORT_WORLD -> {
+            case WORLD -> {
                 gizmoModel.setRotation(0, 0, false, false);
             }
         }
@@ -307,7 +327,7 @@ public class GizmoSessionImpl implements GizmoSession {
             if (gizmoModelLocation.distanceSquared(playerEyeLoc) > Control.MAX_DISTANCE_SQUARED) {
                 hit = -1;
             } else {
-                hit = c.intersect(translationMode, player, gizmoModelLocation);
+                hit = c.intersect(gizmoSpace, player, gizmoModelLocation);
             }
             if (hit >= 0 && hit < closest) {
                 closest = hit;

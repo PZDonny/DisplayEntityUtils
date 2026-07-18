@@ -4,10 +4,7 @@ import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.GizmoManager;
-import net.donnypz.displayentityutils.utils.gizmo.GizmoSession;
-import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
-import net.donnypz.displayentityutils.utils.gizmo.GizmoWand;
-import net.donnypz.displayentityutils.utils.gizmo.TranslationMode;
+import net.donnypz.displayentityutils.utils.gizmo.*;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoTitleUtil;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -20,10 +17,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 
 public class DEUGizmoListener implements Listener {
@@ -75,6 +69,13 @@ public class DEUGizmoListener implements Listener {
         Player player = e.getPlayer();
         if (!player.hasPermission(Permission.GIZMO_USE.getPermission())) return;
 
+        GizmoSessionImpl gizmo = (GizmoSessionImpl) getGizmoSession(player);
+        if (gizmo == null) return;
+        if (gizmo.isLastInteractionItemDrop()){
+            gizmo.setLastInteractionItemDrop(false);
+            return;
+        }
+
         ItemStack item = player.getInventory().getItemInMainHand();
         if (!GizmoManager.isGizmoWand(item)) return;
 
@@ -112,7 +113,21 @@ public class DEUGizmoListener implements Listener {
         switchSpace(player);
     }
 
-    private void switchSpace(Player player){
+    @EventHandler(priority = EventPriority.LOW)
+    public void onDropItem(PlayerDropItemEvent e){
+        Player player = e.getPlayer();
+        ItemStack item = e.getItemDrop().getItemStack();
+
+        if (!GizmoManager.isGizmoWand(item)) return;
+        e.setCancelled(true);
+        switchTranslationMode(player);
+
+        GizmoSessionImpl gizmo = (GizmoSessionImpl) getGizmoSession(player);
+        if (gizmo == null) return;
+        gizmo.setLastInteractionItemDrop(true);
+    }
+
+    private void switchTranslationMode(Player player){
         GizmoSessionImpl gizmo = (GizmoSessionImpl) getGizmoSession(player);
         if (gizmo == null) return;
         TranslationMode mode = gizmo.getTranslationMode();
@@ -122,6 +137,21 @@ public class DEUGizmoListener implements Listener {
 
         GizmoTitleUtil.showNewMode(player, newMode);
         gizmo.setTranslationMode(newMode);
+        player.playSound(player, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, 1, 1.2f);
+
+        gizmo.setLastInteractionItemDrop(true);
+    }
+
+    private void switchSpace(Player player){
+        GizmoSessionImpl gizmo = (GizmoSessionImpl) getGizmoSession(player);
+        if (gizmo == null) return;
+        GizmoSpace gizmoSpace = gizmo.getGizmoSpace();
+
+        int next = (gizmoSpace.ordinal()+1) % GizmoSpace.values().length;
+        GizmoSpace newSpace = GizmoSpace.values()[next];
+
+        GizmoTitleUtil.showNewSpace(player, newSpace);
+        gizmo.setGizmoSpace(newSpace);
         player.playSound(player, Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, 1, 1.2f);
     }
 

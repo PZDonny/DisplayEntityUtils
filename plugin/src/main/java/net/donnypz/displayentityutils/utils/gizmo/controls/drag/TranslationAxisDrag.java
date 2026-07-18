@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.utils.gizmo.controls.drag;
 
-import net.donnypz.displayentityutils.utils.gizmo.TranslationMode;
+import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import org.bukkit.Location;
@@ -17,7 +17,7 @@ public class TranslationAxisDrag extends TranslationDrag {
         super.currentAxesDir[0].set(super.originalAxes[0]);
 
         //Rotated Axis Dir
-        if (gizmo.getTranslationMode() != TranslationMode.TELEPORT_WORLD) {
+        if (gizmo.getGizmoSpace() == GizmoSpace.LOCAL) {
             Location gizmoModelLoc = gizmo.getGizmoModel().getLocation();
             rotation.identity()
                     .rotateY((float) Math.toRadians(-gizmoModelLoc.getYaw()))

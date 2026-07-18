@@ -2,7 +2,7 @@ package net.donnypz.displayentityutils.utils.gizmo.controls.drag;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
-import net.donnypz.displayentityutils.utils.gizmo.TranslationMode;
+import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -19,7 +19,7 @@ public class TranslationPlaneDrag extends TranslationDrag {
         super.currentAxesDir[1].set(super.originalAxes[1]);
 
         //Rotated Axis Dir
-        if (gizmo.getTranslationMode() != TranslationMode.TELEPORT_WORLD) {
+        if (gizmo.getGizmoSpace() == GizmoSpace.LOCAL) {
             Location gizmoModelLoc = gizmo.getGizmoModel().getLocation();
 
             rotation.identity()

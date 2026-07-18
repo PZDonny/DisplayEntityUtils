@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.utils.gizmo.controls.selector;
 
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
-import net.donnypz.displayentityutils.utils.gizmo.TranslationMode;
+import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoMathUtil;
@@ -36,7 +36,7 @@ public class RotationSelector extends Selector {
     }
 
     @Override
-    public float intersect(TranslationMode translationMode,
+    public float intersect(GizmoSpace gizmoSpace,
                            Player player,
                            Location gizmoLocation) {
 
@@ -53,7 +53,7 @@ public class RotationSelector extends Selector {
 
         Vector3f planeNormal = GizmoMathUtil.rotate(
                 axis.getDirections()[0],
-                translationMode,
+                gizmoSpace,
                 gizmoLocation
         ).normalize();
 
@@ -80,12 +80,12 @@ public class RotationSelector extends Selector {
         Axis[] rotPlaneAxes = axis.getRotationPlaneAxes();
         Vector3f axis1 = GizmoMathUtil.rotate(
                 rotPlaneAxes[0].getDirections()[0],
-                translationMode,
+                gizmoSpace,
                 gizmoLocation
         ).normalize();
         Vector3f axis2 = GizmoMathUtil.rotate(
                 rotPlaneAxes[1].getDirections()[0],
-                translationMode,
+                gizmoSpace,
                 gizmoLocation
         ).normalize();
 

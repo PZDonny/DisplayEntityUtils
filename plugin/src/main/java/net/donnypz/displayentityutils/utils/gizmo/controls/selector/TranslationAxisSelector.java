@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.utils.gizmo.controls.selector;
 
-import net.donnypz.displayentityutils.utils.gizmo.TranslationMode;
+import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
@@ -30,7 +30,7 @@ public class TranslationAxisSelector extends TranslationSelector {
 
 
     @Override
-    public float intersect(TranslationMode translationMode, Player player, Location gizmoLocation) {
+    public float intersect(GizmoSpace gizmoSpace, Player player, Location gizmoLocation) {
         Location eyeLoc = player.getEyeLocation();
 
 
@@ -45,13 +45,13 @@ public class TranslationAxisSelector extends TranslationSelector {
 
         Vector3f axisStart = GizmoMathUtil.rotate(
                 new Vector3f(localStart),
-                translationMode,
+                gizmoSpace,
                 gizmoLocation
         );
 
         Vector3f axisEnd = GizmoMathUtil.rotate(
                 new Vector3f(localEnd),
-                translationMode,
+                gizmoSpace,
                 gizmoLocation
         );
 

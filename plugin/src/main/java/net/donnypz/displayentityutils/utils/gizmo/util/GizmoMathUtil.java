@@ -1,14 +1,14 @@
 package net.donnypz.displayentityutils.utils.gizmo.util;
 
 import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.donnypz.displayentityutils.utils.gizmo.TranslationMode;
+import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
 import org.bukkit.Location;
 import org.joml.Vector3f;
 
 public class GizmoMathUtil {
 
-    public static Vector3f rotate(Vector3f vec, TranslationMode mode, Location loc) {
-        if (mode == TranslationMode.TELEPORT_WORLD)
+    public static Vector3f rotate(Vector3f vec, GizmoSpace space, Location loc) {
+        if (space == GizmoSpace.WORLD)
             return vec;
 
         return DisplayUtils.rotateVector(

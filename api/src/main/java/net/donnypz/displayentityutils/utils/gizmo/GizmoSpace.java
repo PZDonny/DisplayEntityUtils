@@ -1,11 +1,11 @@
 package net.donnypz.displayentityutils.utils.gizmo;
 
-public enum TranslationMode {
-    TRANSLATE(),
-    TELEPORT();
+public enum GizmoSpace {
+    LOCAL,
+    WORLD;
 
     private final String cleanName;
-    TranslationMode(){
+    GizmoSpace(){
         String name = name();
         this.cleanName = name.charAt(0) + name.substring(1).toLowerCase();
     }

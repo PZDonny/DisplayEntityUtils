@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.utils.gizmo.controls.selector;
 
-import net.donnypz.displayentityutils.utils.gizmo.TranslationMode;
+import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Control;
@@ -14,7 +14,7 @@ public abstract class Selector extends Control {
         super(axis);
     }
 
-    public abstract float intersect(TranslationMode translationMode, Player player, Location gizmoLocation);
+    public abstract float intersect(GizmoSpace gizmoSpace, Player player, Location gizmoLocation);
 
     public abstract void scale(float oldScale, float scaleMultiplier);
 
