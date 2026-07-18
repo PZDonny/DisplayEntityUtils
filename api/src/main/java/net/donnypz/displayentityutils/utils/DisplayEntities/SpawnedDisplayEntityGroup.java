@@ -340,7 +340,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
     @Override
     public Collection<Player> getTrackingPlayers() {
-        return getMasterEntity().getTrackedBy();
+        Entity master = getMasterEntity();
+        return master == null ? List.of() : master.getTrackedBy();
     }
 
 
@@ -1217,7 +1218,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
         //Restore pivot in original group
         for (ActivePart part : pivotedParts){
-            part.setRotation(groupPitch, groupYaw, true, true); //had wrong pivot locs when using `clone -here`
+            part.setRotation(groupPitch, groupYaw, true, true);
         }
 
         clone.setRotation(newPitch, newYaw, true, true);
