@@ -889,98 +889,120 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public void setTransformation(@NotNull Transformation transformation) {
         if (!isDisplay()) return;
-        ((Display) getEntity()).setTransformation(transformation);
+        Display entity = (Display) getEntity();
+        if (entity == null) return;
+        entity.setTransformation(transformation);
     }
 
     @Override
     public void setTransformationMatrix(@NotNull Matrix4f matrix) {
-        if (!isDisplay()) return;
-        ((Display) getEntity()).setTransformationMatrix(matrix);
+        Display entity = (Display) getEntity();
+        if (entity == null) return;
+        entity.setTransformationMatrix(matrix);
     }
 
     @Override
     public void setTextDisplayText(@NotNull Component text) {
-        if (type == PartType.TEXT_DISPLAY){
-            ((TextDisplay) getEntity()).text(text);
-        }
+        if (type != PartType.TEXT_DISPLAY) return;
+        TextDisplay entity = (TextDisplay) getEntity();
+        if (entity == null) return;
+        entity.text(text);
     }
 
     @Override
     public void setTextDisplayLineWidth(int lineWidth) {
-        if (type == PartType.TEXT_DISPLAY) {
-            ((TextDisplay) getEntity()).setLineWidth(lineWidth);
-        }
+        if (type != PartType.TEXT_DISPLAY) return;
+        TextDisplay entity = (TextDisplay) getEntity();
+        if (entity == null) return;
+        entity.setLineWidth(lineWidth);
     }
 
     @Override
     public void setTextDisplayBackgroundColor(@Nullable Color color) {
-        if (type == PartType.TEXT_DISPLAY){
-            ((TextDisplay) getEntity()).setBackgroundColor(color);
-        }
+        if (type != PartType.TEXT_DISPLAY) return;
+        TextDisplay entity = (TextDisplay) getEntity();
+        if (entity == null) return;
+        entity.setBackgroundColor(color);
     }
 
     @Override
     public void setTextDisplayTextOpacity(byte opacity) {
-        if (type == PartType.TEXT_DISPLAY){
-            ((TextDisplay) getEntity()).setTextOpacity(opacity);
-        }
+        if (type != PartType.TEXT_DISPLAY) return;
+        TextDisplay entity = (TextDisplay) getEntity();
+        if (entity == null) return;
+        entity.setTextOpacity(opacity);
     }
 
     @Override
     public void setTextDisplayShadowed(boolean shadowed) {
-        if (type == PartType.TEXT_DISPLAY){
-            ((TextDisplay) getEntity()).setShadowed(shadowed);
-        }
+        if (type != PartType.TEXT_DISPLAY) return;
+        TextDisplay entity = (TextDisplay) getEntity();
+        if (entity == null) return;
+        entity.setShadowed(shadowed);
     }
 
     @Override
     public void setTextDisplaySeeThrough(boolean seeThrough) {
-        if (type == PartType.TEXT_DISPLAY){
-            ((TextDisplay) getEntity()).setSeeThrough(seeThrough);
-        }
+        if (type != PartType.TEXT_DISPLAY) return;
+        TextDisplay entity = (TextDisplay) getEntity();
+        if (entity == null) return;
+        entity.setSeeThrough(seeThrough);
     }
 
     @Override
     public void setTextDisplayDefaultBackground(boolean defaultBackground) {
-        if (type == PartType.TEXT_DISPLAY){
-            ((TextDisplay) getEntity()).setDefaultBackground(defaultBackground);
-        }
+        if (type != PartType.TEXT_DISPLAY) return;
+        TextDisplay entity = (TextDisplay) getEntity();
+        if (entity == null) return;
+        entity.setDefaultBackground(defaultBackground);
     }
 
 
     @Override
     public void setTextDisplayAlignment(TextDisplay.@NotNull TextAlignment alignment) {
-        if (type == PartType.TEXT_DISPLAY) {
-            ((TextDisplay) getEntity()).setAlignment(alignment);
-        }
+        if (type != PartType.TEXT_DISPLAY) return;
+        TextDisplay entity = (TextDisplay) getEntity();
+        if (entity == null) return;
+        entity.setAlignment(alignment);
     }
 
     @Override
     public void setBlockDisplayBlock(@NotNull BlockData blockData) {
         if (type != PartType.BLOCK_DISPLAY) return;
-        ((BlockDisplay) getEntity()).setBlock(blockData);
+        BlockDisplay entity = (BlockDisplay) getEntity();
+        if (entity == null) return;
+        entity.setBlock(blockData);
     }
 
     @Override
     public void setItemDisplayItem(@NotNull ItemStack itemStack) {
         if (type != PartType.ITEM_DISPLAY) return;
-        ((ItemDisplay) getEntity()).setItemStack(itemStack);
+        ItemDisplay entity = (ItemDisplay) getEntity();
+        if (entity == null) return;
+        entity.setItemStack(itemStack);
     }
 
     @Override
     public void setItemDisplayTransform(ItemDisplay.@NotNull ItemDisplayTransform transform) {
         if (type != PartType.ITEM_DISPLAY) return;
-        ((ItemDisplay) getEntity()).setItemDisplayTransform(transform);
+        ItemDisplay entity = (ItemDisplay) getEntity();
+        if (entity == null) return;
+        entity.setItemDisplayTransform(transform);
     }
 
     @Override
     public void setItemDisplayItemGlint(boolean hasGlint) {
-        ItemStack itemStack = getItemDisplayItem();
-        if (itemStack == null) return;
+        if (type != PartType.ITEM_DISPLAY) return;
+
+        ItemDisplay entity = (ItemDisplay) getEntity();
+        if (entity == null) return;
+
+        ItemStack itemStack = entity.getItemStack();
         ItemMeta meta = itemStack.getItemMeta();
         meta.setEnchantmentGlintOverride(hasGlint);
         itemStack.setItemMeta(meta);
-        ((ItemDisplay) getEntity()).setItemStack(itemStack);
+
+        entity.setItemStack(itemStack);
     }
 
     @Override
