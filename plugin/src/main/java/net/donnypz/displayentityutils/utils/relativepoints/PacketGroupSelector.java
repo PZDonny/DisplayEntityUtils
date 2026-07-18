@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.relativepoints;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
@@ -68,6 +69,7 @@ public class PacketGroupSelector extends RelativePointSelector<RelativePoint> {
         if (selectResult){
             group.glowAndMarkInteractions(player, 40);
             RelativePointUtils.removeRelativePoints(player);
+            GizmoCMD.selectShowGizmo(player, group.getLocation());
             player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Selected the clicked point's <light_purple>packet-based <green>group!")));
             player.playSound(spawnLocation, Sound.UI_STONECUTTER_TAKE_RESULT, 1, 2f);
         }
