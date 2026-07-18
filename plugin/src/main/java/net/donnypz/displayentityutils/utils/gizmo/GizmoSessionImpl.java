@@ -125,6 +125,7 @@ public class GizmoSessionImpl implements GizmoSession {
         updateRotation();
     }
 
+    @Override
     public void updateRotation() {
         ActivePartSelection<?> sel = DEUUser.getOrCreateUser(playerUUID)
                 .getSelectedPartSelection();
@@ -194,6 +195,7 @@ public class GizmoSessionImpl implements GizmoSession {
     /**
      * Show the Gizmo if a player has a selection and if visibility is enabled
      */
+    @Override
     public void selectShow(Location spawnLocation) {
         if (!valid) return;
         teleport(spawnLocation);

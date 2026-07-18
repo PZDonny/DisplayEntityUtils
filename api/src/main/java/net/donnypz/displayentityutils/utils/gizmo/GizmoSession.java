@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.gizmo;
 
+import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
 public interface GizmoSession {
@@ -25,5 +26,9 @@ public interface GizmoSession {
     void setScanning(boolean scanning);
 
     void unregister();
+
+    void updateRotation();
+
+    void selectShow(Location spawnLocation);
 
 }

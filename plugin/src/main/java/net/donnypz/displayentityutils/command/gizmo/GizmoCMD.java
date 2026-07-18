@@ -40,7 +40,7 @@ public final class GizmoCMD extends ParentSubCommand {
 
     //show gizmo on display/group selection
     public static void selectShowGizmo(Player player, @NotNull Location spawnLocation) {
-        GizmoSessionImpl gizmo = getOrCreateGizmo(player, spawnLocation);
+        GizmoSession gizmo = getOrCreateGizmo(player, spawnLocation);
         gizmo.selectShow(spawnLocation);
         player.sendMessage(Component.text("|", NamedTextColor.GRAY)
                 .appendSpace()
