@@ -639,20 +639,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     /**
-     * Pivot all non-display parts in this group around the group
-     *
-     * @param angleInDegrees the pivot angle
-     */
-    @Override
-    public void pivot(float angleInDegrees) {
-        for (PacketDisplayEntityPart part : groupParts.values()) {
-            if (!part.isDisplay()) {
-                part.pivot(angleInDegrees);
-            }
-        }
-    }
-
-    /**
      * Resend this {@link PacketDisplayEntityGroup}'s location to viewers of the group, refreshing its position.
      */
     public void resendLocation() {
@@ -824,32 +810,37 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * @return a cloned {@link PacketDisplayEntityGroup}
      */
     public PacketDisplayEntityGroup clone(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow) {
+        Location groupLoc = getLocation();
         //Reset pivot to 0
-        float groupYaw = getLocation().getYaw();
-        HashSet<ActivePart> resettedParts = new HashSet<>();
+        float groupYaw = groupLoc.getYaw();
+        float groupPitch = groupLoc.getPitch();
+
+        HashSet<ActivePart> pivotedParts = new HashSet<>();
         for (ActivePart part : groupParts.values()) {
             if (part.isDisplay()) continue;
-            part.pivot(-groupYaw);
-            resettedParts.add(part);
+            part.setRotation(0, 0, true, true);
+            pivotedParts.add(part);
         }
 
-
-        DisplayEntityGroup group = toDisplayEntityGroup();
+        DisplayEntityGroup savedGroup = toDisplayEntityGroup();
         float newYaw = location.getYaw();
+        float newPitch = location.getPitch();
         location = location.clone();
         location.setYaw(0);
-        PacketDisplayEntityGroup clone = group.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.CLONE,
+        location.setPitch(0);
+
+        PacketDisplayEntityGroup clone = savedGroup.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.CLONE,
                 new GroupSpawnSettings()
                         .visibleByDefault(autoShow, null)
                         .playSpawnAnimation(playSpawnAnimation)
         );
 
         //Restore pivot
-        for (ActivePart part : resettedParts) {
-            part.pivot(groupYaw);
+        for (ActivePart part : pivotedParts) {
+            part.setRotation(groupPitch, groupYaw, true, true);
         }
 
-        clone.setYaw(newYaw, true);
+        clone.setRotation(newPitch, newYaw, true, true);
         if (this.isPersistent()) clone.setPersistent(true);
         return clone;
     }

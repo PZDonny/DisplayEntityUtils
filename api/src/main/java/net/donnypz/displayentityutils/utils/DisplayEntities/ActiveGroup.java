@@ -13,6 +13,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayState
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.FollowType;
 import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.PivotAxis;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -169,10 +170,29 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         }
     }
 
+    /**
+     * Set the rotation of all parts in this group
+     * @param pitch the pitch
+     * @param yaw the yaw
+     * @param pivotPitch whether non-display parts should pivot with the pitch change
+     * @param pivotYaw whether non-display parts should pivot with the yaw change
+     */
     @Override
-    public void setRotation(float pitch, float yaw, boolean pivot) {
+    public void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
         for (ActivePart part : groupParts.values()) {
-            part.setRotation(pitch, yaw, pivot);
+            part.setRotation(pitch, yaw, pivotPitch, pivotYaw);
+        }
+    }
+
+    /**
+     * Pivot all non-display parts in this group around the group
+     * @param angleInDegrees the pivot angle
+     * @param pivotAxis the axis to perform the pivot on
+     */
+    @Override
+    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis) {
+        for (T part : groupParts.values()){
+            part.pivot(angleInDegrees, pivotAxis);
         }
     }
 
@@ -288,9 +308,9 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
-     * Change the yaw of this group
+     * Change the yaw of this group, and optionally pivot non-displays
      * @param yaw The yaw to set for this group
-     * @param pivot whether non-display entities should pivot around the group
+     * @param pivot whether parts should pivot around the group's location, if the part is not a display
      */
     @Override
     public void setYaw(float yaw, boolean pivot){
@@ -300,13 +320,14 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
-     * Change the pitch of this group
+     * Change the pitch of this group, and optionally pivot non-displays
      * @param pitch The pitch to set for this group
+     * @param pivot whether parts should pivot around the group's location, if the part is not a display
      */
     @Override
-    public void setPitch(float pitch){
+    public void setPitch(float pitch, boolean pivot){
         for (ActivePart part : groupParts.values()){
-            part.setPitch(pitch);
+            part.setPitch(pitch, pivot);
         }
     }
 

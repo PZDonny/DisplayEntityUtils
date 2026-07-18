@@ -17,16 +17,16 @@ import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Direction (Pitch, Yaw, Pivot)")
-@Description("Get/Set the pitch and yaw of an active group/part/filter. Optionally pivot interactions")
+@Description("Get/Set the pitch and yaw of an active group/part/filter. Optionally pivot non-display entities")
 @Examples({
         "set {_activegroup}'s deu pitch to -45",
         "set {_activegroup}'s deu yaw to 73",
-        "set {_activegroup}'s deu yaw with interaction pivot to 25",
+        "set {_activegroup}'s deu yaw with pivot to 25",
         "",
         "#3.4.3 and earlier",
         "deu set {_activegroup}'s yaw with interaction pivot to 35",
         "deu set {_activepart}'s pitch to -90"})
-@Since("2.6.2, 3.0.0 (Packet)")
+@Since("2.6.2, 3.0.0 (Packet), 3.6.0 (Pitch Pivot)")
 public class ExprActiveDirection extends SimplePropertyExpression<Active, Number> {
 
     boolean pitch;
@@ -35,7 +35,7 @@ public class ExprActiveDirection extends SimplePropertyExpression<Active, Number
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
                 SyntaxInfo.Expression.builder(ExprActiveDirection.class, Number.class)
-                        .addPatterns(getPatterns("deu (1¦yaw [p:with [interaction] pivot]|2¦pitch)", "activegroups/activeparts/partfilters"))
+                        .addPatterns(getPatterns("deu (1¦yaw|2¦pitch) [p:with [(interaction|entity)] pivot]", "activegroups/activeparts/partfilters"))
                         .supplier(ExprActiveDirection::new)
                         .build()
         );
@@ -77,7 +77,7 @@ public class ExprActiveDirection extends SimplePropertyExpression<Active, Number
                 for (Object o : arr){
                     if (!(o instanceof Active a)) continue;
                     if (pitch){
-                        a.setPitch(rotVal);
+                        a.setPitch(rotVal, pivot);
                     }
                     else{
                         a.setYaw(rotVal, pivot);
@@ -88,7 +88,7 @@ public class ExprActiveDirection extends SimplePropertyExpression<Active, Number
                 for (Object o : arr){
                     if (!(o instanceof Active a)) continue;
                     if (pitch){
-                        a.setPitch(0);
+                        a.setPitch(0, pivot);
                     }
                     else{
                         a.setYaw(0, pivot);

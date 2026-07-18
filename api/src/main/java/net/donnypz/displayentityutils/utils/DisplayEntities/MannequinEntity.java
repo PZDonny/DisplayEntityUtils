@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.utils.PivotAxis;
 import net.donnypz.displayentityutils.utils.WorldUtils;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
@@ -81,7 +82,14 @@ final class MannequinEntity implements Serializable {
         Location spawnLoc = WorldUtils.getPivotLocation(
                 vector,
                 origin,
-                origin.getYaw());
+                origin.getPitch(),
+                PivotAxis.X);
+
+        spawnLoc = WorldUtils.getPivotLocation(
+                spawnLoc,
+                origin,
+                origin.getYaw(),
+                PivotAxis.Y);
 
         PacketDisplayEntityPart part = attributeContainer.createPart(SpawnedDisplayEntityPart.PartType.MANNEQUIN, spawnLoc);
 

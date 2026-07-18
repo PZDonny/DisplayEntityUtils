@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.PivotAxis;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
@@ -110,8 +111,8 @@ public final class SinglePartSelection extends ActivePartSelection<SpawnedDispla
     }
 
     @Override
-    public void setPitch(float pitch) {
-        selectedPart.setPitch(pitch);
+    public void setPitch(float pitch, boolean pivot) {
+        selectedPart.setPitch(pitch, pivot);
     }
 
     @Override
@@ -119,18 +120,27 @@ public final class SinglePartSelection extends ActivePartSelection<SpawnedDispla
         selectedPart.setYaw(yaw, pivot);
     }
 
+    /**
+     * Set the pitch and yaw rotation of the part in this selection. Pivoting only applies to non-displays
+     * @param pitch the pitch
+     * @param yaw the yaw
+     * @param pivotPitch whether the non-display parts should pivot, using the pitch value, around its group's location, if it has one
+     * @param pivotYaw whether the non-display parts should pivot, using the yaw value, around its group's location, if it has one
+     */
     @Override
-    public void setRotation(float pitch, float yaw, boolean pivot) {
-        selectedPart.setRotation(pitch, yaw, pivot);
+    public void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
+        selectedPart.setRotation(pitch, yaw, pivotPitch, pivotYaw);
     }
 
     /**
-     * Pivot a non-display entity around its group's master part
+     * Pivot the part in this selection around this selection's group, if it's not a display
      * @param angleInDegrees the pivot angle
+     * @param pivotAxis the axis to perform the pivot on
      */
     @Override
-    public void pivot(float angleInDegrees) {
-        selectedPart.pivot(angleInDegrees);
+    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis) {
+        if (selectedPart.isDisplay()) return;
+        selectedPart.pivot(angleInDegrees, pivotAxis);
     }
 
     @Override

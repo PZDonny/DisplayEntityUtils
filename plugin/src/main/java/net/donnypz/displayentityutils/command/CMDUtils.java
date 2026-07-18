@@ -1,10 +1,12 @@
 package net.donnypz.displayentityutils.command;
 
+import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
+import net.donnypz.displayentityutils.utils.PivotAxis;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -66,6 +68,22 @@ public final class CMDUtils {
             ((MultiPartSelection<?>) DisplayGroupManager.getPartSelection(player)).refresh();
 
             player.sendMessage(Component.text("- The "+entityTypeName+" has been added to your selected group", NamedTextColor.GRAY));
+        }
+    }
+
+    public static PivotAxis getPivotAxis(String arg, Player player) {
+        if (arg.equalsIgnoreCase("x")){
+            return PivotAxis.X;
+        }
+        else if (arg.equalsIgnoreCase("y")){
+            return PivotAxis.Y;
+        }
+        else if (arg.equalsIgnoreCase("z")){
+            return PivotAxis.Z;
+        }
+        else{
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid pivot axis!", NamedTextColor.RED)));
+            return null;
         }
     }
 }

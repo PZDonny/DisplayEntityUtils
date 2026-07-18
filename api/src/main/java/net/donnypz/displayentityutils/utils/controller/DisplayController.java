@@ -353,7 +353,7 @@ public class DisplayController {
             startFollowersAndMachine(entity, activeGroup);
         }
 
-        activeGroup.setPitch(0);
+        activeGroup.setPitch(0, true);
         DisplayControllerManager.registerEntity(entity, activeGroup);
         return true;
     }

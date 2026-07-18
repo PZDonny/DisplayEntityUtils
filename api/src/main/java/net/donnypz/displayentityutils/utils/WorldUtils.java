@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.HashSet;
@@ -76,11 +77,15 @@ public class WorldUtils {
      * @param origin the pivoting location
      * @param pivotLocation the location to pivot around
      * @param angleInDegrees the pivot angle in degrees
+     * @param pivotAxis the axis to pivot around
      * @return a {@link Location}
      */
-    public static @NotNull Location getPivotLocation(@NotNull Location origin, @NotNull Location pivotLocation, double angleInDegrees){
+    public static @NotNull Location getPivotLocation(@NotNull Location origin,
+                                                     @NotNull Location pivotLocation,
+                                                     double angleInDegrees,
+                                                     @NotNull PivotAxis pivotAxis){
         Vector translationVector = pivotLocation.clone().subtract(origin).toVector();
-        return getPivotLocation(translationVector, pivotLocation, angleInDegrees);
+        return getPivotLocation(translationVector, pivotLocation, angleInDegrees, pivotAxis, origin.getYaw(), origin.getPitch());
     }
 
     /**
@@ -88,10 +93,14 @@ public class WorldUtils {
      * @param translationVector the translation offset vector from an origin, that will pivot
      * @param pivotLocation the location to pivot around
      * @param angleInDegrees the pivot angle in degrees
+     * @param pivotAxis the axis to pivot around
      * @return a {@link Location}
      */
-    public static @NotNull Location getPivotLocation(@NotNull Vector translationVector, @NotNull Location pivotLocation, double angleInDegrees){
-        return getPivotLocation(translationVector.toVector3f(), pivotLocation, angleInDegrees);
+    public static @NotNull Location getPivotLocation(@NotNull Vector translationVector,
+                                                     @NotNull Location pivotLocation,
+                                                     double angleInDegrees,
+                                                     @NotNull PivotAxis pivotAxis){
+        return getPivotLocation(translationVector.toVector3f(), pivotLocation, angleInDegrees, pivotAxis);
     }
 
     /**
@@ -99,11 +108,88 @@ public class WorldUtils {
      * @param translationVector the translation offset vector from an origin, that will pivot
      * @param pivotLocation the location to pivot around
      * @param angleInDegrees the pivot angle in degrees
+     * @param pivotAxis the axis to pivot around
+     * @param yaw the yaw to consider when pivoting around the X or Z axis
+     * @param pitch the yaw to consider when pivoting around the Z axis
      * @return a {@link Location}
      */
-    public static @NotNull Location getPivotLocation(@NotNull Vector3f translationVector, @NotNull Location pivotLocation, double angleInDegrees){
-        Vector3f v = new Vector3f(translationVector);
-        v.rotateY((float) Math.toRadians(-angleInDegrees));
-        return pivotLocation.clone().subtract(Vector.fromJOML(v));
+    public static @NotNull Location getPivotLocation(@NotNull Vector translationVector,
+                                                     @NotNull Location pivotLocation,
+                                                     double angleInDegrees,
+                                                     @NotNull PivotAxis pivotAxis,
+                                                     float yaw,
+                                                     float pitch){
+        return getPivotLocation(translationVector.toVector3f(), pivotLocation, angleInDegrees, pivotAxis, yaw, pitch);
+    }
+
+    /**
+     * Get the resulting location after pivoting around a given location
+     * @param translationVector the translation offset vector from an origin, that will pivot
+     * @param pivotLocation the location to pivot around
+     * @param angleInDegrees the pivot angle in degrees
+     * @param pivotAxis the axis to pivot around
+     * @return a {@link Location}
+     */
+    public static @NotNull Location getPivotLocation(@NotNull Vector3f translationVector,
+                                                     @NotNull Location pivotLocation,
+                                                     double angleInDegrees,
+                                                     @NotNull PivotAxis pivotAxis){
+        return getPivotLocation(translationVector, pivotLocation, angleInDegrees, pivotAxis, 0, 0);
+    }
+
+    /**
+     * Get the resulting location after pivoting around a given location
+     * @param translationVector the translation offset vector from an origin, that will pivot
+     * @param pivotLocation the location to pivot around
+     * @param angleInDegrees the pivot angle in degrees
+     * @param pivotAxis the axis to pivot around
+     * @param yaw the yaw to consider when pivoting around the X or Z axis
+     * @param pitch the yaw to consider when pivoting around the Z axis
+     * @return a {@link Location}
+     */
+    public static @NotNull Location getPivotLocation(@NotNull Vector3f translationVector,
+                                                     @NotNull Location pivotLocation,
+                                                     double angleInDegrees,
+                                                     @NotNull PivotAxis pivotAxis,
+                                                     float yaw,
+                                                     float pitch) {
+        Vector3f translationVectorCopy = new Vector3f(translationVector);
+
+        float angleRad = (float) -Math.toRadians(angleInDegrees);
+        if (pivotAxis == PivotAxis.X){
+            Quaternionf q = new Quaternionf()
+                    .rotateY((float) -Math.toRadians(yaw));
+
+            Vector3f xVector = new Vector3f(-1, 0, 0);
+            q.transform(xVector);
+
+            translationVectorCopy.rotateAxis(
+                    angleRad,
+                    xVector.x,
+                    xVector.y,
+                    xVector.z
+            );
+        }
+        else if (pivotAxis == PivotAxis.Y){
+            translationVectorCopy.rotateY(angleRad);
+        }
+        else{
+            Quaternionf q = new Quaternionf()
+                    .rotateY((float) -Math.toRadians(yaw))
+                    .rotateX((float) Math.toRadians(pitch));
+            Vector3f zVector = new Vector3f(0, 0, -1);
+            q.transform(zVector);
+
+            translationVectorCopy.rotateAxis(
+                    angleRad,
+                    zVector.x,
+                    zVector.y,
+                    zVector.z
+            );
+        }
+
+        return pivotLocation
+                .clone()
+                .subtract(Vector.fromJOML(translationVectorCopy));
     }
 }

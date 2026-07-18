@@ -5,7 +5,6 @@ import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
-import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Control;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
 import net.donnypz.displayentityutils.utils.gizmo.controls.selector.RotationSelector;
@@ -19,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -89,7 +87,7 @@ public class GizmoSessionImpl implements GizmoSession {
     }
 
     public void setPitch(float pitch) {
-        gizmoModel.setPitch(pitch);
+        gizmoModel.setPitch(pitch, false);
     }
 
     public void setYaw(float yaw) {
@@ -115,10 +113,10 @@ public class GizmoSessionImpl implements GizmoSession {
 
         switch (translationMode) {
             case TRANSLATE, TELEPORT_LOCAL -> {
-                gizmoModel.setRotation(selLoc.getPitch(), selLoc.getYaw(), false);
+                gizmoModel.setRotation(selLoc.getPitch(), selLoc.getYaw(), false, false);
             }
             case TELEPORT_WORLD -> {
-                gizmoModel.setRotation(0, 0, false);
+                gizmoModel.setRotation(0, 0, false, false);
             }
         }
 
@@ -255,7 +253,9 @@ public class GizmoSessionImpl implements GizmoSession {
                 } else { //Drag
                     movementLock.lock();
                     try {
-                        activeDrag.updatePosition(player);
+                        if (activeDrag != null) {
+                            activeDrag.updatePosition(player);
+                        }
                     } finally {
                         movementLock.unlock();
                     }

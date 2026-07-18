@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.InteractionUtils;
+import net.donnypz.displayentityutils.utils.PivotAxis;
 import net.donnypz.displayentityutils.utils.WorldUtils;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
@@ -53,7 +54,6 @@ final class InteractionEntity implements Serializable {
     }
 
     InteractionEntity(PacketDisplayEntityPart part){
-
         PacketAttributeContainer c = part.attributeContainer;
         this.height = c.getAttributeOrDefault(DisplayAttributes.Interaction.HEIGHT, 1f);
         this.width = c.getAttributeOrDefault(DisplayAttributes.Interaction.WIDTH, 1f);
@@ -76,7 +76,16 @@ final class InteractionEntity implements Serializable {
         Location spawnLoc = WorldUtils.getPivotLocation(
                 vector,
                 origin,
-                origin.getYaw());
+                origin.getPitch(),
+                PivotAxis.X);
+
+        spawnLoc = WorldUtils.getPivotLocation(
+                spawnLoc,
+                origin,
+                origin.getYaw(),
+                PivotAxis.Y);
+
+
         return spawnLoc.getWorld().spawn(spawnLoc, Interaction.class, i ->{
             i.setInteractionHeight(height);
             i.setInteractionWidth(width);
@@ -115,7 +124,14 @@ final class InteractionEntity implements Serializable {
         Location spawnLoc = WorldUtils.getPivotLocation(
                 vector,
                 origin,
-                origin.getYaw());
+                origin.getPitch(),
+                PivotAxis.X);
+
+        spawnLoc = WorldUtils.getPivotLocation(
+                spawnLoc,
+                origin,
+                origin.getYaw(),
+                PivotAxis.Y);
 
         PacketDisplayEntityPart part = attributeContainer.createPart(SpawnedDisplayEntityPart.PartType.INTERACTION, spawnLoc);
 

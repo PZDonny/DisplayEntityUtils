@@ -522,31 +522,8 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     @Override
     public @NotNull Collection<Player> getTrackingPlayers() {
         Entity e = getEntity();
-        if (e == null) return Collections.EMPTY_LIST;
+        if (e == null) return Set.of();
         return new HashSet<>(e.getTrackedBy());
-    }
-
-    /**
-     * Change the yaw of this part
-     * @param yaw The yaw to set for this part
-     * @param pivot whether the part should pivot around its group's location, if it has one, and if the part is an Interaction
-     */
-    @Override
-    public void setYaw(float yaw, boolean pivot){
-        Entity entity = getEntity();
-        if (!isDisplay() && pivot){
-            pivot(yaw-entity.getYaw());
-        }
-        entity.setRotation(yaw, entity.getPitch());
-        if (entity instanceof LivingEntity le){
-            le.setBodyYaw(yaw);
-        }
-    }
-
-    @Override
-    public void setRotation(float pitch, float yaw, boolean pivot) {
-        setPitch(pitch);
-        setYaw(yaw, pivot);
     }
 
     /**
@@ -554,9 +531,69 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @param pitch The pitch to set for this part
      */
     @Override
-    public void setPitch(float pitch){
+    public void setPitch(float pitch, boolean pivot){
+        pitch = Math.clamp(pitch, -90, 90);
         Entity entity = getEntity();
+
+        float oldPitch = entity.getPitch();
+        float delta = pitch - oldPitch;
+
         entity.setRotation(entity.getYaw(), pitch);
+
+        if (!isDisplay() && pivot){
+            pivot(delta, PivotAxis.X);
+        }
+    }
+
+    /**
+     * Change the yaw of this part
+     * @param yaw The yaw to set for this part
+     * @param pivot whether the part should pivot around its group's location, if it has one, and if the part is not a display
+     */
+    @Override
+    public void setYaw(float yaw, boolean pivot){
+        Entity entity = getEntity();
+
+        float oldYaw = entity.getYaw();
+        float delta = yaw - oldYaw;
+
+        entity.setRotation(yaw, entity.getPitch());
+
+        if (!isDisplay() && pivot){
+            pivot(delta, PivotAxis.Y);
+        }
+
+        if (entity instanceof LivingEntity le){
+            le.setBodyYaw(yaw);
+        }
+    }
+
+    /**
+     * Set the pitch and yaw rotation of this part. Pivoting only applies to non-displays
+     * @param pitch the pitch
+     * @param yaw the yaw
+     * @param pivotPitch whether the part should pivot, using the pitch value, around its group's location, if it has one
+     * @param pivotYaw whether the part should pivot, using the yaw value, around its group's location, if it has one
+     */
+    @Override
+    public void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
+        setPitch(pitch, pivotPitch);
+        setYaw(yaw, pivotYaw);
+    }
+
+    /**
+     * Pivot a non-display entity around its group
+     * @param angleInDegrees the pivot angle
+     * @param pivotAxis the axis to perform the pivot on
+     */
+    @Override
+    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis) {
+        if (isDisplay() || isSingle || group == null) return;
+        Entity e = getEntity();
+        if (e == null) return;
+        if (angleInDegrees != 0.0f){
+            DisplayUtils.pivotAxisLocal(e, group.getLocation(), angleInDegrees, pivotAxis);
+        }
     }
 
     @Override
@@ -821,19 +858,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     void translateForce(Direction direction, float distance, int durationInTicks, int delayInTicks){
         DisplayUtils.translate(this, direction, distance, durationInTicks, delayInTicks);
     }
-
-    /**
-     * Pivot a non-display entity around its group
-     * @param angleInDegrees the pivot angle
-     */
-    @Override
-    public void pivot(float angleInDegrees){
-        if (isDisplay() || isSingle || group == null) return;
-        Entity e = getEntity();
-        if (e == null) return;
-        DisplayUtils.pivot(e, group.getLocation(), angleInDegrees);
-    }
-
 
 
     /**

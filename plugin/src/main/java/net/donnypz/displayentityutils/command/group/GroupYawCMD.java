@@ -44,6 +44,6 @@ class GroupYawCMD extends GroupSubCommand {
 
     @Override
     protected String getDescription() {
-        return "Set your selected group's yaw, \"-pivot\" pivots interaction entities around the group";
+        return "Set your selected group's yaw. \"-pivot\" pivots non-display entities around the group";
     }
 }

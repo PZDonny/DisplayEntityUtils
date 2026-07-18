@@ -2,10 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityHeadLook;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityRotation;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
@@ -828,7 +825,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
-     * Get the Interaction's translation vector relative to a location
+     * Get the non-display's translation vector from the represented entity, to the reference location
      * @param referenceLocation the reference location
      * @return A vector or null if the part is not an interaction
      */
@@ -1068,88 +1065,144 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         }
     }
 
+    /**
+     * Set the pitch and yaw rotation of this part. Pivoting only applies to non-displays
+     * @param pitch the pitch
+     * @param yaw the yaw
+     * @param pivotPitch whether the part should pivot, using the pitch value, around its group's location, if it has one
+     * @param pivotYaw whether the part should pivot, using the yaw value, around its group's location, if it has one
+     */
     @Override
-    public void setRotation(float pitch, float yaw, boolean pivot){
-        if (pivot && !isDisplay()){
-            pivot(yaw, pitch);
-        }
-        else if (!viewers.isEmpty()){
-            WrapperPlayServerEntityHeadLook headLook = getHeadLookPacket(yaw);
-            WrapperPlayServerEntityRotation rotPacket = new WrapperPlayServerEntityRotation(getEntityId(), yaw, pitch, false);
+    public void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw){
+        pitch = Math.clamp(pitch, -90, 90);
+        setPitchSilent(pitch, pivotPitch);
+        setYawSilent(yaw, pivotYaw);
+
+        if (!viewers.isEmpty()){
+            Location newLoc = getLocation();
             for (UUID uuid : getViewers()){
-                Player p = Bukkit.getPlayer(uuid);
-                if (p == null) continue;
-                PacketEvents.getAPI().getPlayerManager().sendPacket(p, rotPacket);
-                if (packetLocation.yaw != yaw && type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
-                    PacketEvents.getAPI().getPlayerManager().sendPacket(p, headLook);
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null) continue;
+                if (pivotPitch || pivotYaw){
+                    PacketUtils.teleport(player, this, newLoc);
                 }
+                else{
+                    PacketUtils.setRotation(player, this, yaw, pitch);
+                }
+                sendHeadLookPacket(player, yaw);
             }
         }
-        packetLocation.pitch = pitch;
-        packetLocation.yaw = yaw;
+    }
+
+    @Override
+    public float getPitch(){
+        return packetLocation == null ? 0.0f : packetLocation.pitch;
+    }
+
+    @Override
+    public float getYaw(){
+        return packetLocation == null ? 0.0f : packetLocation.yaw;
     }
 
 
+
+    /**
+     * Change the pitch of this part
+     * @param pitch The pitch to set for this part
+     * @param pivot whether the part should pivot around its group's location, if it has one, and if the part is not a display
+     */
     @Override
-    public void setPitch(float pitch) {
-        setRotation(pitch, getYaw(), false);
+    public void setPitch(float pitch, boolean pivot) {
+        Location resultLoc = setPitchSilent(pitch, pivot);
+        pitch = resultLoc.getPitch();
+        float yaw = getYaw();
+        for (UUID uuid : getViewers()){
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null) continue;
+            if (pivot && !isDisplay()){
+                PacketUtils.teleport(player, this, resultLoc);
+            }
+            else{
+                PacketUtils.setRotation(player, this, yaw, pitch);
+            }
+        }
     }
 
     /**
      * Change the yaw of this part
      * @param yaw The yaw to set for this part
-     * @param pivot whether the part should pivot around its group's location, if it has one, and if the part is an Interaction
+     * @param pivot whether the part should pivot around its group's location, if it has one, and if the part is not a display
      */
     @Override
     public void setYaw(float yaw, boolean pivot) {
-        setRotation(getPitch(), yaw, pivot);
-    }
+        Location resultLoc = setYawSilent(yaw, pivot);
+        float pitch = getPitch();
 
-    @Override
-    public float getPitch(){
-        return packetLocation.pitch;
-    }
-
-    @Override
-    public float getYaw(){
-        return packetLocation.yaw;
-    }
-
-    /**
-     * Pivot a non-display entity around its group\
-     * @param angleInDegrees the pivot angle
-     */
-    @Override
-    public void pivot(float angleInDegrees) {
-        if (isDisplay() || group == null) return;
-        pivot(getYaw(), getPitch(), angleInDegrees);
-    }
-
-    private void pivot(float yaw, float pitch){
-        pivot(yaw, pitch, yaw-getYaw());
-    }
-
-    private void pivot(float yaw, float pitch, float angleInDegrees){
-        if (group == null || isDisplay()) return;
-        Location groupLoc = group.getLocation();
-        Location pivotedLoc = WorldUtils.getPivotLocation(getLocation(), groupLoc, angleInDegrees);
-        packetLocation.setCoordinates(pivotedLoc);
-
-
-        WrapperPlayServerEntityHeadLook headLook = getHeadLookPacket(yaw);
-        WrapperPlayServerEntityTeleport teleport = new WrapperPlayServerEntityTeleport(getEntityId(),
-                new Vector3d(pivotedLoc.x(), pivotedLoc.y(), pivotedLoc.z()),
-                yaw,
-                pitch,
-                false);
         for (UUID uuid : getViewers()){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
-            PacketEvents.getAPI().getPlayerManager().sendPacket(player, teleport);
-            if (type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
-                PacketEvents.getAPI().getPlayerManager().sendPacket(player, headLook);
+            if (pivot && !isDisplay()){
+                PacketUtils.teleport(player, this, resultLoc);
+            }
+            else{
+                PacketUtils.setRotation(player, this, yaw, pitch);
             }
         }
+    }
+
+    private Location setPitchSilent(float pitch, boolean pivot){
+        pitch = Math.clamp(pitch, -90, 90);
+
+        float oldPitch = this.getPitch();
+        float delta = pitch - oldPitch;
+
+        packetLocation.pitch = pitch;
+
+        if (!isDisplay() && pivot){
+            return pivotSilent(delta, PivotAxis.X);
+        }
+        return packetLocation.toLocation();
+    }
+
+    private Location setYawSilent(float yaw, boolean pivot){
+        float oldYaw = this.getYaw();
+        float delta = yaw - oldYaw;
+        packetLocation.yaw = yaw;
+
+        if (!isDisplay() && pivot){
+            return pivotSilent(delta, PivotAxis.Y);
+        }
+
+        return packetLocation.toLocation();
+    }
+
+    /**
+     * Pivot a non-display entity around its group
+     * @param angleInDegrees the pivot angle
+     * @param pivotAxis the axis to perform the pivot on
+     */
+    @Override
+    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis) {
+        if (isDisplay() || group == null) return;
+
+        Location result = pivotSilent(angleInDegrees, pivotAxis);
+        if (!viewers.isEmpty()){
+            for (UUID uuid : getViewers()){
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null) continue;
+                PacketUtils.teleport(player, this, result);
+            }
+        }
+    }
+
+    private Location pivotSilent(float angleInDegrees, @NotNull PivotAxis pivotAxis){
+        if (angleInDegrees == 0.0f) return getLocation();
+        Location result = WorldUtils.getPivotLocation(getLocation(),
+                group.getLocation(),
+                angleInDegrees,
+                pivotAxis);
+        packetLocation.setCoordinates(result);
+        return result;
     }
 
     /**
@@ -1399,7 +1452,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     private void sendHeadLookPacket(Player player, float yaw){
-        PacketEvents.getAPI().getPlayerManager().sendPacket(player, getHeadLookPacket(yaw));
+        if (type == SpawnedDisplayEntityPart.PartType.MANNEQUIN) {
+            PacketEvents.getAPI().getPlayerManager().sendPacket(player, getHeadLookPacket(yaw));
+        }
     }
 
 
@@ -1419,10 +1474,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             this.z = location.z();
             this.yaw = location.getYaw();
             this.pitch = location.getPitch();
-        }
-
-        PacketLocation(Location location, Vector3f vector){
-            this(vector == null ? location : WorldUtils.getPivotLocation(Vector.fromJOML(vector), location, location.getYaw()));
         }
 
         PacketLocation setRotation(float yaw, float pitch){

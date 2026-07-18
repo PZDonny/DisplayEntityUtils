@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.PivotAxis;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
@@ -41,17 +42,17 @@ public interface Active {
 
     void unglow(@NotNull Player player);
 
-    void setPitch(float pitch);
+    void setPitch(float pitch, boolean pivot);
 
     void setYaw(float yaw, boolean pivot);
 
     default void setRotation(float pitch, float yaw){
-        setRotation(pitch, yaw, false);
+        setRotation(pitch, yaw, false, false);
     }
 
-    void setRotation(float pitch, float yaw, boolean pivot);
+    void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw);
 
-    void pivot(float angleInDegrees);
+    void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis);
 
     default boolean translate(@NotNull Vector direction, int durationInTicks, int delayInTicks){
         return translate(direction, (float) direction.length(), durationInTicks, delayInTicks);

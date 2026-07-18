@@ -307,7 +307,7 @@ public final class DisplayUtils {
     }
 
     /**
-     * Get the translation vector from a location to the entity's location
+     * Get the translation vector from the entity to the reference location
      * @param entity the non-display entity
      * @param referenceLocation the reference location
      * @return a vector
@@ -534,17 +534,85 @@ public final class DisplayUtils {
 
 
     /**
-     * Pivot an entity around a location
+     * Pivot an entity around a location, in world space
+     * <ul>
+     *     <li>X (Pitch)</li>
+     *     <li>Y (Yaw)</li>
+     *     <li>Z (Roll)</li>
+     * </ul>
      * @param entity the entity
      * @param pivotLocation the location to pivot around
      * @param angleInDegrees the pivot angle in degrees
+     * @param pivotAxis the axis to pivot around
      */
-    public static void pivot(@NotNull Entity entity, @NotNull Location pivotLocation, double angleInDegrees){
-        Vector3f translationVector = DisplayUtils.getNonDisplayTranslation(entity, pivotLocation).toVector3f();
-        new Quaternionf()
-                .rotateY((float) Math.toRadians(-angleInDegrees))
-                .transform(translationVector);
-        Location newLoc = pivotLocation.clone().subtract(Vector.fromJOML(translationVector));
+    public static void pivotAxis(@NotNull Entity entity,
+                                 @NotNull Location pivotLocation,
+                                 double angleInDegrees,
+                                 @NotNull PivotAxis pivotAxis){
+        Vector translationVector = DisplayUtils.getNonDisplayTranslation(entity, pivotLocation);
+
+        double angleRad = -Math.toRadians(angleInDegrees);
+
+        if (pivotAxis == PivotAxis.X){
+            translationVector.rotateAroundX(angleRad);
+        }
+        else if (pivotAxis == PivotAxis.Y){
+            translationVector.rotateAroundY(angleRad);
+        }
+        else{
+            translationVector.rotateAroundZ(angleRad);
+        }
+
+        Location newLoc = pivotLocation.clone().subtract(translationVector);
+        FoliaUtils.teleport(entity, newLoc);
+    }
+
+    /**
+     * Pivot an entity around a location, respective of an entity's facing direction
+     * <ul>
+     *     <li>X (Pitch)</li>
+     *     <li>Y (Yaw)</li>
+     *     <li>Z (Roll)</li>
+     * </ul>
+     * @param entity the entity
+     * @param pivotLocation the location to pivot around
+     * @param angleInDegrees the pivot angle in degrees
+     * @param pivotAxis the axis to pivot around
+     */
+    public static void pivotAxisLocal(@NotNull Entity entity,
+                                      @NotNull Location pivotLocation,
+                                      double angleInDegrees,
+                                      @NotNull PivotAxis pivotAxis){
+        Vector translationVector = DisplayUtils.getNonDisplayTranslation(entity, pivotLocation);
+
+        double angleRad = -Math.toRadians(angleInDegrees);
+
+        float entityYaw = entity.getYaw();
+        float entityPitch = entity.getPitch();
+        if (pivotAxis == PivotAxis.X){
+            Quaternionf q = new Quaternionf()
+                    .rotateY((float) -Math.toRadians(entityYaw));
+
+            Vector3f xVector = new Vector3f(-1, 0, 0);
+            q.transform(xVector);
+            translationVector.rotateAroundAxis(Vector.fromJOML(xVector), angleRad);
+        }
+        else if (pivotAxis == PivotAxis.Y){
+            translationVector.rotateAroundY(angleRad);
+        }
+        else{
+            Quaternionf q = new Quaternionf()
+                    .rotateY((float) -Math.toRadians(entityYaw))
+                    .rotateX((float) Math.toRadians(entityPitch));
+
+            Vector3f zVector = new Vector3f(0, 0, -1);
+            q.transform(zVector);
+            translationVector.rotateAroundAxis(Vector.fromJOML(zVector), angleRad);
+        }
+
+        Location newLoc = pivotLocation.clone().subtract(translationVector);
+        newLoc.setPitch(entity.getPitch());
+        newLoc.setYaw(entity.getYaw());
         FoliaUtils.teleport(entity, newLoc);
     }
 

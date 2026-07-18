@@ -27,6 +27,8 @@ class PartsYawCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        if (PartsCMD.isUnwantedMultiSelection(player, selection)) return false;
+
         try{
             float yaw = Float.parseFloat(args[2]);
             double oldYaw = selectedPart.getYaw();

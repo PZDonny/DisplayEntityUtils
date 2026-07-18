@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.PivotAxis;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Display;
@@ -321,10 +322,17 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
     }
 
 
+    /**
+     * Set the pitch and yaw rotation of parts in this selection. Pivoting only applies to non-displays
+     * @param pitch the pitch
+     * @param yaw the yaw
+     * @param pivotPitch whether the non-display parts should pivot, using the pitch value, around its group's location, if it has one
+     * @param pivotYaw whether the non-display parts should pivot, using the yaw value, around its group's location, if it has one
+     */
     @Override
-    public void setRotation(float pitch, float yaw, boolean pivot) {
+    public void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
         for (T part : selectedParts){
-            part.setRotation(pitch, yaw, pivot);
+            part.setRotation(pitch, yaw, pivotPitch, pivotPitch);
         }
     }
 
@@ -494,18 +502,19 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
     /**
      * Pivot all non-display parts in this selection around this selection's group
      * @param angleInDegrees the pivot angle
+     * @param pivotAxis the axis to perform the pivot on
      */
     @Override
-    public void pivot(float angleInDegrees){
+    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis) {
         for (T part : selectedParts){
-            part.pivot(angleInDegrees);
+            part.pivot(angleInDegrees, pivotAxis);
         }
     }
 
     /**
      * Set the yaw of all parts in this selection
      * @param yaw the yaw to set
-     * @param pivot whether non-display entities should pivot around the group
+     * @param pivot whether non-display parts should pivot around their group's location
      */
     @Override
     public void setYaw(float yaw, boolean pivot){
@@ -517,11 +526,12 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
     /**
      * Set the pitch of all parts in this selection
      * @param pitch the pitch to set
+     * @param pivot whether non-display parts should pivot around their group's location
      */
     @Override
-    public void setPitch(float pitch){
+    public void setPitch(float pitch, boolean pivot){
         for (T part : selectedParts){
-            part.setPitch(pitch);
+            part.setPitch(pitch, pivot);
         }
     }
 

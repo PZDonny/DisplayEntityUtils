@@ -1,57 +1,49 @@
 package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.*;
 import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePartSelection;
+import net.donnypz.displayentityutils.utils.DisplayEntities.MultiPartSelection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-class PartsPitchCMD extends PlayerSubCommand {
+class PartsPitchCMD extends PartsSubCommand {
 
     PartsPitchCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("pitch", parentSubCommand, Permission.PARTS_TRANSFORM);
         setTabComplete(2, "<pitch>");
-        super.cancelIfDraggingGizmo();
     }
 
     @Override
-    public void execute(Player player, String[] args) {
-        ActivePartSelection<?> selection = DisplayGroupManager.getPartSelection(player);
-        if (selection == null){
-            DisplayEntityPluginCommand.noPartSelection(player);
-            return;
-        }
+    protected void sendIncorrectUsage(@NotNull Player player) {}
 
-        if (PartsCMD.isUnwantedMultiSelection(player, selection)){
-            return;
-        }
+    @Override
+    protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+        return false;
+    }
 
-        if (!hasMinimumArguments(player, args)) return;
-
-        if (!selection.hasSelectedPart()){
-            PartsCMD.invalidPartSelection(player);
-            return;
-        }
+    @Override
+    protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
+        if (PartsCMD.isUnwantedMultiSelection(player, selection)) return false;
 
         try{
             float pitch = Float.parseFloat(args[2]);
-            ActivePart part = selection.getSelectedPart();
-            double oldPitch = part.getPitch();
-            part.setPitch(pitch);
+            double oldPitch = selectedPart.getPitch();
+            selectedPart.setPitch(pitch, false);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Pitch set!", NamedTextColor.GREEN)));
             player.sendMessage(Component.text("| Old Pitch: "+oldPitch, NamedTextColor.GRAY));
             GizmoCMD.updateGizmoRotationIfExists(player);
+            return true;
         }
         catch(NumberFormatException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the pitch!", NamedTextColor.RED)));
+            return false;
         }
     }
 

@@ -727,20 +727,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
 
     /**
-     * Pivot all non-display parts in this group around the group
-     * @param angleInDegrees the pivot angle
-     */
-    @Override
-    public void pivot(float angleInDegrees){
-        for (ActivePart part : groupParts.values()){
-            if (!part.isDisplay()){
-                part.pivot(angleInDegrees);
-            }
-        }
-    }
-
-
-    /**
      * Change the translation of all the SpawnedDisplayEntityParts in this group.
      * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results
@@ -1206,28 +1192,36 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      * @return a cloned {@link SpawnedDisplayEntityGroup}
      */
     public SpawnedDisplayEntityGroup clone(@NotNull Location location, @NotNull GroupSpawnSettings settings){
-        //Reset pivot to 0 yaw
-        float groupYaw = getLocation().getYaw();
-        HashSet<ActivePart> resettedParts = new HashSet<>();
+        Location groupLoc = getLocation();
+        float groupYaw = groupLoc.getYaw();
+        float groupPitch = groupLoc.getPitch();
+
+        //Reset pivot
+        HashSet<ActivePart> pivotedParts = new HashSet<>();
         for (ActivePart part : groupParts.values()){
             if (part.isDisplay()) continue;
-            part.pivot(-groupYaw);
-            resettedParts.add(part);
+            part.setRotation(0, 0, true, true);
+            pivotedParts.add(part);
         }
 
         DisplayEntityGroup savedGroup = toDisplayEntityGroup();
         float newYaw = location.getYaw();
+        float newPitch = location.getPitch();
         location = location.clone();
+        location.setPitch(0);
         location.setYaw(0);
-        SpawnedDisplayEntityGroup cloned = savedGroup.spawn(location, GroupSpawnedEvent.SpawnReason.CLONE, settings);
 
-        //Restore pivot
-        for (ActivePart part : resettedParts){
-            part.pivot(groupYaw);
+        SpawnedDisplayEntityGroup clone = savedGroup.spawn(location,
+                GroupSpawnedEvent.SpawnReason.CLONE,
+                settings);
+
+        //Restore pivot in original group
+        for (ActivePart part : pivotedParts){
+            part.setRotation(groupPitch, groupYaw, true, true); //had wrong pivot locs when using `clone -here`
         }
 
-        cloned.setYaw(newYaw, true);
-        return cloned;
+        clone.setRotation(newPitch, newYaw, true, true);
+        return clone;
     }
 
     public PacketDisplayEntityGroup toPacket(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow, boolean persistent){
@@ -1238,18 +1232,24 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     public PacketDisplayEntityGroup toPacket(@NotNull Location location, GroupSpawnSettings settings){
-        //Reset pivot to 0 yaw
-        float groupYaw = getLocation().getYaw();
-        HashSet<ActivePart> resettedParts = new HashSet<>();
+        Location groupLoc = getLocation();
+        float groupYaw = groupLoc.getYaw();
+        float groupPitch = groupLoc.getPitch();
+
+        //Reset pivot
+        HashSet<ActivePart> pivotedParts = new HashSet<>();
         for (ActivePart part : groupParts.values()){
-            part.pivot(-groupYaw);
-            resettedParts.add(part);
+            if (part.isDisplay()) continue;
+            part.setRotation(0, 0, true, true);
+            pivotedParts.add(part);
         }
 
         DisplayEntityGroup savedGroup = toDisplayEntityGroup();
         float newYaw = location.getYaw();
+        float newPitch = location.getPitch();
         location = location.clone();
         location.setYaw(0);
+        location.setPitch(0);
 
         PacketDisplayEntityGroup packetGroup;
         if (settings.persistentByDefault){
@@ -1261,10 +1261,11 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
 
         //Restore pivot
-        for (ActivePart part : resettedParts){
-            part.pivot(groupYaw);
+        for (ActivePart part : pivotedParts){
+            part.setRotation(groupPitch, groupYaw, true, true);
         }
-        packetGroup.setYaw(newYaw, true);
+
+        packetGroup.setRotation(newPitch, newYaw, true, true);
         return packetGroup;
     }
 
