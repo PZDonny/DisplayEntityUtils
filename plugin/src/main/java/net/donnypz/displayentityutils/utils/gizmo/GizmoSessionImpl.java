@@ -15,6 +15,7 @@ import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -149,6 +150,12 @@ public class GizmoSessionImpl implements GizmoSession {
             }
         }
 
+    }
+
+    @Override
+    public void teleport(Vector direction) {
+        if (!valid) return;
+        gizmoModel.teleport(direction, direction.length());
     }
 
     @Override

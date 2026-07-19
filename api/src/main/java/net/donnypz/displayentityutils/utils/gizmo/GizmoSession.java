@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.gizmo;
 
 import org.bukkit.Location;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 public interface GizmoSession {
@@ -28,6 +29,8 @@ public interface GizmoSession {
     void unregister();
 
     void updateRotation();
+
+    void teleport(Vector direction);
 
     void selectShow(Location spawnLocation);
 

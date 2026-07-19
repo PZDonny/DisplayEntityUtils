@@ -71,6 +71,15 @@ public final class GizmoCMD extends ParentSubCommand {
         if (gizmo != null) gizmo.deselectHide();
     }
 
+    public static boolean isDraggingCancel(Player player) {
+        GizmoSession gizmo = getGizmo(player);
+        if (gizmo != null && gizmo.isDragging()) {
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot do that while having a Gizmo axis selected.", NamedTextColor.RED)));
+            return true;
+        }
+        return false;
+    }
+
     public static boolean isDraggingCancel(Player player, GizmoSession gizmo) {
         if (gizmo != null && gizmo.isDragging()) {
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot do that while having a Gizmo axis selected.", NamedTextColor.RED)));

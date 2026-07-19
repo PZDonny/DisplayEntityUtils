@@ -5,6 +5,8 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
+import net.donnypz.displayentityutils.managers.GizmoManager;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
@@ -40,6 +42,7 @@ class PartsMoveCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
+        if (GizmoCMD.isDraggingCancel(player)) return false;
         try{
             Direction direction = Direction.valueOf(args[2].toUpperCase());
             float distance = Float.parseFloat(args[3]);
@@ -47,6 +50,7 @@ class PartsMoveCMD extends PartsSubCommand {
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number non-zero number for the distance!", NamedTextColor.RED)));
                 return false;
             }
+
             for (ActivePart part : selection.getSelectedParts()){
                 if (part.isDisplay()) continue;
                 Location loc = part.getLocation();
@@ -72,9 +76,10 @@ class PartsMoveCMD extends PartsSubCommand {
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (selectedPart.isDisplay() && group != null){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You cannot do this for grouped display entities!", NamedTextColor.RED)));
-            player.sendMessage(Component.text("| Use \"/deu display translate\" instead", NamedTextColor.GRAY));
+            player.sendMessage(Component.text("| Use \"/deu display translate\"", NamedTextColor.GRAY));
             return false;
         }
+
         try{
             Direction direction = Direction.valueOf(args[2].toUpperCase());
             float distance = Float.parseFloat(args[3]);
@@ -86,6 +91,7 @@ class PartsMoveCMD extends PartsSubCommand {
             Vector v = direction.getVector(selection.getSelectedPart(), false).normalize().multiply(distance);
             loc.add(v);
             selectedPart.teleport(loc);
+            GizmoManager.syncPosition(player, selection, direction, distance);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Moved your selected part!", NamedTextColor.GREEN)));
         }
         catch(NumberFormatException e){
@@ -102,6 +108,6 @@ class PartsMoveCMD extends PartsSubCommand {
 
     @Override
     protected String getDescription() {
-        return "Change the actual location of your selected part";
+        return "Change the actual location of your selected part. Use \"-all\" to move all non-displays parts in a group";
     }
 }
