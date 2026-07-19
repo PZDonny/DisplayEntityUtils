@@ -28,7 +28,7 @@ public final class GroupCMD extends ParentSubCommand{
         new GroupSaveCMD(this);
         new GroupSaveJsonCMD(this);
         new GroupToPacketCMD(this);
-        new GroupMarkPacketGroupsCMD(this);
+        new GroupSelectPacketCMD(this);
         new GroupHidePersistentPacketGroupsCMD(this);
         new GroupShowPersistentPacketGroupsCMD(this);
         new GroupDeleteCMD(this);

@@ -29,7 +29,7 @@ class GroupSelectNearestCMD extends PlayerSubCommand {
             GroupResult result = DisplayGroupManager.getOrCreateNearestSpawnedGroup(player.getLocation(), searchDistance);
             if (result == null){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("There are not any spawned groups in your defined distance!", NamedTextColor.RED)));
-                player.sendMessage(Component.text("| Use \"/deu group markpacketgroups\" to mark packet-based groups in your current chunk.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                player.sendMessage(Component.text("| Use \"/deu group selectpacket\" to mark packet-based groups in your current chunk.", NamedTextColor.GRAY, TextDecoration.ITALIC));
                 return;
             }
 

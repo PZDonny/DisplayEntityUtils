@@ -7,9 +7,9 @@ import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-class GroupMarkPacketGroupsCMD extends PlayerSubCommand {
-    GroupMarkPacketGroupsCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("markpacketgroups", parentSubCommand, Permission.GROUP_MARK_PACKET_GROUPS);
+class GroupSelectPacketCMD extends PlayerSubCommand {
+    GroupSelectPacketCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("selectpacket", parentSubCommand, Permission.GROUP_SELECT);
     }
 
     @Override
@@ -19,6 +19,6 @@ class GroupMarkPacketGroupsCMD extends PlayerSubCommand {
 
     @Override
     protected String getDescription() {
-        return "Create markers for all packet groups stored in your current chunk";
+        return "Create selectable markers for all packet groups stored in your current chunk";
     }
 }
