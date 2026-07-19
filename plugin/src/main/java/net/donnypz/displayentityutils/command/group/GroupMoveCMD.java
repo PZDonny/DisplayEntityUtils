@@ -39,9 +39,9 @@ class GroupMoveCMD extends GroupSubCommand {
 
         try{
             Direction direction = Direction.valueOf(args[2].toUpperCase());
-            double distance = Double.parseDouble(args[3]);
-            if (distance <= 0){
-                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number greater than 0 for the distance!", NamedTextColor.RED)));
+            float distance = Float.parseFloat(args[3]);
+            if (distance == 0.0f){
+                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number non-zero number for the distance!", NamedTextColor.RED)));
                 return;
             }
 

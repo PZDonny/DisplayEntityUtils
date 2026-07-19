@@ -59,8 +59,8 @@ class DisplayTranslateCMD extends PartsSubCommand {
         try{
             Direction direction = Direction.valueOf(args[2].toUpperCase());
             float distance = Float.parseFloat(args[3]);
-            if (distance <= 0){
-                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number greater than 0 for the distance!", NamedTextColor.RED)));
+            if (distance == 0.0f){
+                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number non-zero number for the distance!", NamedTextColor.RED)));
                 return null;
             }
             int duration = Integer.parseInt(args[4]);

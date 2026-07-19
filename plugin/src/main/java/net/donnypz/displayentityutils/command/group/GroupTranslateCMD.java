@@ -33,16 +33,16 @@ class GroupTranslateCMD extends GroupSubCommand {
         }
         try{
             Direction direction = Direction.valueOf(args[2].toUpperCase());
-            double distance = Double.parseDouble(args[3]);
-            if (distance <= 0){
-                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number greater than 0 for the distance!", NamedTextColor.RED)));
+            float distance = Float.parseFloat(args[3]);
+            if (distance == 0.0f){
+                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number non-zero number for the distance!", NamedTextColor.RED)));
                 return;
             }
             int duration = Integer.parseInt(args[4]);
             if (duration <= 0){
                 duration = 0;
             }
-            group.translate(direction, (float) distance, duration, -1);
+            group.translate(direction, distance, duration, -1);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Translating your selected group!", NamedTextColor.GREEN)));
         }
         catch(IllegalArgumentException e){

@@ -507,6 +507,7 @@ public final class DisplayUtils {
 
         DisplayAPI.getScheduler().entityRunTimer(entity, new Scheduler.SchedulerRunnable() {
             double currentDistance = 0;
+            final double DISTANCE_ABS = Math.abs(distance);
             float lastYaw = entity.getYaw();
             @Override
             public void run() {
@@ -518,7 +519,7 @@ public final class DisplayUtils {
                 currentDistance+=Math.abs(movementIncrement);
                 Location tpLoc = entity.getLocation().clone().add(incrementVector);
 
-                if (currentDistance >= distance){
+                if (Math.abs(currentDistance) >= DISTANCE_ABS){
                     FoliaUtils.teleport(entity, destination);
                     cancel();
                 }
