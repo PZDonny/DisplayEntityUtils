@@ -1,13 +1,13 @@
 package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.command.CMDUtils;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -42,7 +42,7 @@ class AnimEditFrameCMD extends PlayerSubCommand {
             return;
         }
         try {
-            Collection<SpawnedDisplayAnimationFrame> frames = DEUCommandUtils.getFrames(player, args[2], anim);
+            Collection<SpawnedDisplayAnimationFrame> frames = CMDUtils.getFrames(player, args[2], anim);
             int delay = Integer.parseInt(args[3]);
             int duration = Integer.parseInt(args[4]);
             if (delay < 0 || duration < 0) {

@@ -7,6 +7,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.command.CMDUtils;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.events.InteractionClickEvent;
@@ -18,7 +19,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
 import net.donnypz.displayentityutils.utils.InteractionUtils;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointSelector;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
@@ -174,7 +174,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
                 .clickEvent(ClickEvent.callback(a -> {
                     Player p = (Player) a;
                     boolean result = point.removeFromPointHolder();
-                    DEUCommandUtils.removeRelativePoint(p, point);
+                    CMDUtils.removeRelativePoint(p, point);
                     if (result){
                         p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully removed point!", NamedTextColor.YELLOW)));
                         point.despawn();

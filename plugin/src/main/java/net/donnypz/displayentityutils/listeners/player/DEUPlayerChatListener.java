@@ -1,10 +1,10 @@
 package net.donnypz.displayentityutils.listeners.player;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
+import net.donnypz.displayentityutils.command.CMDUtils;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -73,7 +73,7 @@ public final class DEUPlayerChatListener implements Listener {
                 }
             }
             case BLOCK -> {
-                BlockData blockData = DEUCommandUtils.getBlockFromText(msg, p);
+                BlockData blockData = CMDUtils.getBlockFromText(msg, p);
                 if (blockData == null){
                     return;
                 }
@@ -81,7 +81,7 @@ public final class DEUPlayerChatListener implements Listener {
                 builder.advanceStep(AnimationParticleBuilder.Step.EXTRA);
             }
             case ITEM -> {
-                ItemStack item = DEUCommandUtils.getItemFromText(msg, p);
+                ItemStack item = CMDUtils.getItemFromText(msg, p);
                 if (item == null){
                     return;
                 }

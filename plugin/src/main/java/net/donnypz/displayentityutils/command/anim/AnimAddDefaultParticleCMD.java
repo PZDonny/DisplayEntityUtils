@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.command.anim;
 
+import net.donnypz.displayentityutils.command.CMDUtils;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -8,7 +9,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.donnypz.displayentityutils.utils.dialogs.animationparticles.AnimationParticleSelectDialog;
 import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import org.bukkit.entity.Player;
@@ -32,7 +32,7 @@ class AnimAddDefaultParticleCMD extends PlayerSubCommand {
         }
 
         try{
-            Collection<FramePoint> framePoints = DEUCommandUtils.getFrames(player, args[2], anim)
+            Collection<FramePoint> framePoints = CMDUtils.getFrames(player, args[2], anim)
                     .stream()
                     .map(SpawnedDisplayAnimationFrame::getDefaultFramePoint)
                     .toList();

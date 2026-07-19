@@ -1,13 +1,9 @@
 package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.*;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -97,7 +93,7 @@ class PartsInfoCMD extends PlayerSubCommand {
         if (part.isDisplay()){
             player.sendMessage(MiniMessage.miniMessage().deserialize("View Range Multiplier: <yellow>"+part.getViewRange()));
             sendBrightness(player, part);
-            DEUCommandUtils.sendGlowColor(player, part.getGlowColor());
+            CMDUtils.sendGlowColor(player, part.getGlowColor());
         }
         else if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
             player.sendMessage(MiniMessage.miniMessage().deserialize("Height: <yellow>"+part.getInteractionHeight()));

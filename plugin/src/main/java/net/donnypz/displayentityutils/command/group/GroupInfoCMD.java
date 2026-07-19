@@ -1,17 +1,13 @@
 package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.*;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -76,7 +72,7 @@ public class GroupInfoCMD extends PlayerSubCommand {
         player.sendMessage(MiniMessage.miniMessage().deserialize("Spawn Animation Tag: "+animTag));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Spawn Animation Type: "+animType));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Spawn Animation Storage: "+animLoadMethod));
-        DEUCommandUtils.sendGlowColor(player, group.getGlowColor());
+        CMDUtils.sendGlowColor(player, group.getGlowColor());
     }
 
     @Override
