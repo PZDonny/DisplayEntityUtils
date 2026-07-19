@@ -604,45 +604,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return GroupTeleportCompletableFuture.create(groupFuture, nonDisplayFutures);
     }
 
-    private static void translateEntityEventless(@NotNull Entity entity, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
-        DisplayUtils.translate(entity, direction, distance, durationInTicks, delayInTicks);
-        Location destination = entity.getLocation().clone().add(direction.clone().normalize().multiply(distance));
-
-        if (durationInTicks <= 0 && delayInTicks <= 0){
-            FoliaUtils.teleport(entity, destination);
-            return;
-        }
-
-        double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
-        Vector incrementVector = direction
-                .clone()
-                .normalize()
-                .multiply(movementIncrement);
-
-        DisplayAPI.getScheduler().entityRunTimer(entity, new Scheduler.SchedulerRunnable() {
-            double currentDistance = 0;
-            float lastYaw = entity.getYaw();
-            @Override
-            public void run() {
-                float newYaw = entity.getYaw();
-                if (newYaw != lastYaw){
-                    incrementVector.rotateAroundY(Math.toRadians(lastYaw-newYaw));
-                    lastYaw = newYaw;
-                }
-                currentDistance+=Math.abs(movementIncrement);
-                Location tpLoc = entity.getLocation().clone().add(incrementVector);
-
-                if (currentDistance >= distance){
-                    FoliaUtils.teleport(entity, destination);
-                    cancel();
-                }
-                else{
-                    FoliaUtils.teleport(entity, tpLoc);
-                }
-            }
-        }, delayInTicks, 1);
-    }
-
     @Override
     public void teleportMove(@NotNull Vector direction, double distance, int durationInTicks){
         Entity masterEntity = getMasterEntity();
@@ -659,7 +620,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
         for (SpawnedDisplayEntityPart part : groupParts.values()){
             if (!part.isDisplay()){
-                translateEntityEventless(part.getEntity(), direction, distance, durationInTicks, 0);
+                DisplayUtils.translateSilent(part.getEntity(), direction, distance, durationInTicks, 0);
             }
         }
 

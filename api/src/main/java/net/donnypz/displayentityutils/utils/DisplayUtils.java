@@ -474,6 +474,25 @@ public final class DisplayUtils {
         if (!new PartTranslateEvent(entity, destination, null,null).callEvent()){
             return;
         }
+        translateSilent(entity, direction, distance, durationInTicks, delayInTicks);
+    }
+
+    /**
+     * Attempts to change the translation of an entity similar
+     * to a Display Entity, through smooth teleportation.
+     * <br>
+     * Doing multiple translations on an entity at the same time may have unexpected results
+     * <br>
+     * This will <b>NOT</b> call the {@link PartTranslateEvent}
+     * @param direction The direction to translate the entity
+     * @param entity entity to translate
+     * @param distance How far the entity should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
+     */
+    public static void translateSilent(@NotNull Entity entity, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
+        if (distance == 0) return;
+        Location destination = entity.getLocation().clone().add(direction.clone().normalize().multiply(distance));
 
         if (durationInTicks <= 0 && delayInTicks <= 0){
             FoliaUtils.teleport(entity, destination);
