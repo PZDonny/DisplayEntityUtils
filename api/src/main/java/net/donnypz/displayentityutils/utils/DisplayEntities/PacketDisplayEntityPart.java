@@ -103,10 +103,11 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
                     .createPacketPart(null, entity.getLocation(), null);
         }
         else if (entity instanceof Interaction i){
-            part = new InteractionEntity(i).createPacketPart(entity.getLocation(), null);
+            part = new InteractionEntity(i, null)
+                    .createPacketPart(i.getLocation(), null);
         }
         else if (VersionUtils.canSpawnMannequins() && entity instanceof Mannequin){
-            MannequinEntity m = SavedEntityBuilder.buildMannequin(entity);
+            MannequinEntity m = SavedEntityBuilder.buildMannequin(entity, null);
             part = m.createPacketPart(entity.getLocation(), null);
         }
         else{

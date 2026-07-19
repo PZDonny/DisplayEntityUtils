@@ -96,7 +96,7 @@ public final class DisplayUtils {
      * @param yawChange the yaw change
      * @return a new vector with the rotation applied
      */
-    public static Vector3f rotateVector(@NotNull Vector3f vector, float pitchChange, float yawChange){
+    public static @NotNull Vector3f rotateVector(@NotNull Vector3f vector, float pitchChange, float yawChange){
         final Vector3f vectorCopy = new Vector3f(vector);
 
         //Apply Pitch
@@ -110,13 +110,43 @@ public final class DisplayUtils {
     }
 
     /**
+     * Normalize a vector, removing any pitch and yaw rotation from it. Used when resetting pivots of non-display entities
+     * @param vector the vector to normalize
+     * @param currentPitch the current pitch of the pivot
+     * @param currentYaw the current yaw of the pivot
+     * @return a new vector with the rotation applied
+     */
+    public static @NotNull Vector3f normalizeVector(@NotNull Vector3f vector, float currentPitch, float currentYaw){
+        final Vector3f vectorCopy = new Vector3f(vector);
+
+        //Undo Pitch
+        Quaternionf q = new Quaternionf()
+                .rotateY((float) -Math.toRadians(currentYaw));
+
+        Vector3f localX = new Vector3f(-1, 0, 0);
+        q.transform(localX);
+
+        vectorCopy.rotateAxis(
+                (float) Math.toRadians(currentPitch),
+                localX.x,
+                localX.y,
+                localX.z
+        );
+
+        //Undo Yaw
+        vectorCopy.rotateY((float) Math.toRadians(currentYaw));
+
+        return vectorCopy;
+    }
+
+    /**
      * Rotate a vector by a given pitch and yaw
      * @param vector the vector
      * @param pitchChange the pitch
      * @param yawChange the yaw
      * @return a new vector with the rotation applied
      */
-    public static Vector rotateVector(@NotNull Vector vector, float pitchChange, float yawChange){
+    public static @NotNull Vector rotateVector(@NotNull Vector vector, float pitchChange, float yawChange){
         return Vector.fromJOML(rotateVector(vector.toVector3f(), pitchChange, yawChange));
     }
 

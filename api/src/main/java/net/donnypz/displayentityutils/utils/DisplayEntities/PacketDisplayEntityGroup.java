@@ -810,39 +810,13 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
      * @return a cloned {@link PacketDisplayEntityGroup}
      */
     public PacketDisplayEntityGroup clone(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow) {
-        Location groupLoc = getLocation();
-        //Reset pivot to 0
-        float groupYaw = groupLoc.getYaw();
-        float groupPitch = groupLoc.getPitch();
-
-        HashSet<ActivePart> pivotedParts = new HashSet<>();
-        for (ActivePart part : groupParts.values()) {
-            if (part.isDisplay()) continue;
-            part.setRotation(0, 0, true, true);
-            pivotedParts.add(part);
-        }
-
-        DisplayEntityGroup savedGroup = toDisplayEntityGroup();
-        float newYaw = location.getYaw();
-        float newPitch = location.getPitch();
-        location = location.clone();
-        location.setYaw(0);
-        location.setPitch(0);
-
-        PacketDisplayEntityGroup clone = savedGroup.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.CLONE,
-                new GroupSpawnSettings()
-                        .visibleByDefault(autoShow, null)
-                        .playSpawnAnimation(playSpawnAnimation)
-        );
-
-        //Restore pivot
-        for (ActivePart part : pivotedParts) {
-            part.setRotation(groupPitch, groupYaw, true, true);
-        }
-
-        clone.setRotation(newPitch, newYaw, true, true);
-        if (this.isPersistent()) clone.setPersistent(true);
-        return clone;
+        return toDisplayEntityGroup()
+                .createPacketGroup(location, GroupSpawnedEvent.SpawnReason.CLONE,
+                        new GroupSpawnSettings()
+                                .visibleByDefault(autoShow, null)
+                                .playSpawnAnimation(playSpawnAnimation)
+                                .persistentByDefault(this.isPersistent())
+                );
     }
 
     /**

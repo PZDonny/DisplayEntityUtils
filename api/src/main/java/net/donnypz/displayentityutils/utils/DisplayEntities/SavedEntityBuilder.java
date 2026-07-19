@@ -9,6 +9,7 @@ import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
@@ -20,6 +21,8 @@ import org.bukkit.inventory.MainHand;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.profile.PlayerTextures;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,7 +31,8 @@ import java.util.List;
 
 class SavedEntityBuilder {
 
-    static MannequinEntity buildMannequin(Entity entity){ //Accept entity instead of mannequin, preventing issues on versions below 1.21.9
+    //Accept entity instead of mannequin, preventing issues on versions below 1.21.9
+    static MannequinEntity buildMannequin(@NotNull Entity entity, @Nullable Location groupLocation){
         MannequinEntity mannequinEntity = new MannequinEntity();
         org.bukkit.entity.Mannequin mannequin = (org.bukkit.entity.Mannequin) entity;
 
@@ -56,6 +60,12 @@ class SavedEntityBuilder {
         };
 
         mannequinEntity.vector = DisplayUtils.getNonDisplayTranslation(mannequin).toVector3f();
+        if (groupLocation != null){
+            mannequinEntity.vector = DisplayUtils.normalizeVector(
+                            mannequinEntity.vector,
+                            groupLocation.getPitch(),
+                            groupLocation.getYaw());
+        }
 
         try{
             mannequinEntity.persistentDataContainer = mannequin.getPersistentDataContainer().serializeToBytes();
@@ -66,7 +76,7 @@ class SavedEntityBuilder {
         return mannequinEntity;
     }
 
-    static MannequinEntity buildMannequin(PacketDisplayEntityPart part){
+    static MannequinEntity buildMannequin(@NotNull PacketDisplayEntityPart part, @NotNull Location groupLocation){
         MannequinEntity mannequinEntity = new MannequinEntity();
         PacketAttributeContainer c = part.attributeContainer;
 
@@ -96,8 +106,10 @@ class SavedEntityBuilder {
                 serializeItemStack(part.getMannequinEquipment(EquipmentSlot.OFF_HAND))
         };
 
-
-        mannequinEntity.vector = part.getNonDisplayTranslation().toVector3f();
+        mannequinEntity.vector = DisplayUtils.normalizeVector(
+                        part.getNonDisplayTranslation().toVector3f(),
+                        groupLocation.getPitch(),
+                        groupLocation.getYaw());
 
         try{
             ItemStack i = new ItemStack(Material.STICK);

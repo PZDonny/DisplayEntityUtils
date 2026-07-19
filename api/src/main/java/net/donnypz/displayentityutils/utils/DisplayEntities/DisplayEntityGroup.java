@@ -33,12 +33,13 @@ public final class DisplayEntityGroup implements Serializable{
         Display spawnedMasterEntity = (Display) spawnedGroup.getMasterPart().getEntity();
         this.masterEntity = addDisplayEntity(spawnedMasterEntity).setMaster();
 
+        Location groupLoc = spawnedGroup.getLocation();
         for (SpawnedDisplayEntityPart part : spawnedGroup.getParts()){
             if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                addInteractionEntity((Interaction) part.getEntity());
+                addInteractionEntity((Interaction) part.getEntity(), groupLoc);
             }
             else if (VersionUtils.IS_1_21_9 && part.type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
-                addMannequinEntity(part.getEntity());
+                addMannequinEntity(part.getEntity(), groupLoc);
             }
             else{
                 if (!part.isMaster()){
@@ -55,12 +56,13 @@ public final class DisplayEntityGroup implements Serializable{
 
         this.masterEntity = addDisplayEntity(packetGroup.masterPart, packetGroup).setMaster();
 
+        Location groupLocation = packetGroup.getLocation();
         for (PacketDisplayEntityPart part : packetGroup.getParts()){
             if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                addInteractionEntity(part);
+                addInteractionEntity(part, groupLocation);
             }
             else if (VersionUtils.IS_1_21_9 && part.type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
-                addMannequinEntity(part);
+                addMannequinEntity(part, groupLocation);
             }
             else{
                 if (!part.isMaster()){
@@ -108,20 +110,20 @@ public final class DisplayEntityGroup implements Serializable{
         return display;
     }
 
-    private void addInteractionEntity(Interaction entity){
-        interactionEntities.add(new InteractionEntity(entity));
+    private void addInteractionEntity(Interaction entity, Location groupLocation){
+        interactionEntities.add(new InteractionEntity(entity, groupLocation));
     }
 
-    private void addInteractionEntity(PacketDisplayEntityPart part){
-        interactionEntities.add(new InteractionEntity(part));
+    private void addInteractionEntity(PacketDisplayEntityPart part, Location groupLocation){
+        interactionEntities.add(new InteractionEntity(part, groupLocation));
     }
 
-    private void addMannequinEntity(Entity entity){
-        mannequinEntities.add(SavedEntityBuilder.buildMannequin(entity));
+    private void addMannequinEntity(Entity entity, Location groupLocation){
+        mannequinEntities.add(SavedEntityBuilder.buildMannequin(entity, groupLocation));
     }
 
-    private void addMannequinEntity(PacketDisplayEntityPart part){
-        mannequinEntities.add(SavedEntityBuilder.buildMannequin(part));
+    private void addMannequinEntity(PacketDisplayEntityPart part, Location groupLocation){
+        mannequinEntities.add(SavedEntityBuilder.buildMannequin(part, groupLocation));
     }
 
 

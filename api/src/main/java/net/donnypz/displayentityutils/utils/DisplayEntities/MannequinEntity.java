@@ -82,14 +82,14 @@ final class MannequinEntity implements Serializable {
         Location spawnLoc = WorldUtils.getPivotLocation(
                 vector,
                 origin,
-                origin.getPitch(),
-                PivotAxis.X);
+                origin.getYaw(),
+                PivotAxis.Y);
 
         spawnLoc = WorldUtils.getPivotLocation(
                 spawnLoc,
                 origin,
-                origin.getYaw(),
-                PivotAxis.Y);
+                origin.getPitch(),
+                PivotAxis.X);
 
         PacketDisplayEntityPart part = attributeContainer.createPart(SpawnedDisplayEntityPart.PartType.MANNEQUIN, spawnLoc);
 

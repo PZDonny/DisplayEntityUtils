@@ -15,6 +15,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.io.IOException;
@@ -39,11 +41,14 @@ final class InteractionEntity implements Serializable {
 
     InteractionEntity(){}
 
-    InteractionEntity(Interaction interaction){
+    InteractionEntity(@NotNull Interaction interaction, @Nullable Location groupLocation){
         this.height = interaction.getInteractionHeight();
         this.width = interaction.getInteractionWidth();
         this.isResponsive = interaction.isResponsive();
         this.vector = DisplayUtils.getNonDisplayTranslation(interaction).toVector3f();
+        if (groupLocation != null){
+            vector = DisplayUtils.normalizeVector(vector, groupLocation.getPitch(), groupLocation.getYaw());
+        }
 
         try{
             persistentDataContainer = interaction.getPersistentDataContainer().serializeToBytes();
@@ -53,12 +58,13 @@ final class InteractionEntity implements Serializable {
         }
     }
 
-    InteractionEntity(PacketDisplayEntityPart part){
+    InteractionEntity(@NotNull PacketDisplayEntityPart part, @NotNull Location groupLocation){
         PacketAttributeContainer c = part.attributeContainer;
         this.height = c.getAttributeOrDefault(DisplayAttributes.Interaction.HEIGHT, 1f);
         this.width = c.getAttributeOrDefault(DisplayAttributes.Interaction.WIDTH, 1f);
         this.isResponsive = c.getAttributeOrDefault(DisplayAttributes.Interaction.RESPONSIVE, false);
         this.vector = part.getNonDisplayTranslation().toVector3f();
+        vector = DisplayUtils.normalizeVector(vector, groupLocation.getPitch(), groupLocation.getYaw());
 
         try{
             ItemStack i = new ItemStack(Material.STICK);
@@ -76,17 +82,17 @@ final class InteractionEntity implements Serializable {
         Location spawnLoc = WorldUtils.getPivotLocation(
                 vector,
                 origin,
-                origin.getPitch(),
-                PivotAxis.X);
+                origin.getYaw(),
+                PivotAxis.Y);
 
         spawnLoc = WorldUtils.getPivotLocation(
                 spawnLoc,
                 origin,
-                origin.getYaw(),
-                PivotAxis.Y);
+                origin.getPitch(),
+                PivotAxis.X);
 
-
-        return spawnLoc.getWorld().spawn(spawnLoc, Interaction.class, i ->{
+        return spawnLoc.getWorld().spawn(spawnLoc, Interaction.class, i -> {
+            i.setRotation(origin.getYaw(), origin.getPitch());
             i.setInteractionHeight(height);
             i.setInteractionWidth(width);
             i.setResponsive(isResponsive);
@@ -122,16 +128,16 @@ final class InteractionEntity implements Serializable {
                 .setAttribute(DisplayAttributes.Interaction.RESPONSIVE, isResponsive);
 
         Location spawnLoc = WorldUtils.getPivotLocation(
-                vector,
-                origin,
-                origin.getPitch(),
-                PivotAxis.X);
+                        vector,
+                        origin,
+                        origin.getYaw(),
+                        PivotAxis.Y);
 
         spawnLoc = WorldUtils.getPivotLocation(
                 spawnLoc,
                 origin,
-                origin.getYaw(),
-                PivotAxis.Y);
+                origin.getPitch(),
+                PivotAxis.X);
 
         PacketDisplayEntityPart part = attributeContainer.createPart(SpawnedDisplayEntityPart.PartType.INTERACTION, spawnLoc);
 
