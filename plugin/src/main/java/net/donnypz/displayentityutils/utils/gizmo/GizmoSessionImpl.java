@@ -77,6 +77,8 @@ public class GizmoSessionImpl implements GizmoSession {
         gizmoModel.setSelectable(false);
         updateRotation();
         setAutoShow();
+
+        this.scanning = GizmoManager.isGizmoWand(player.getInventory().getItemInMainHand());
         scan();
     }
 
@@ -253,9 +255,6 @@ public class GizmoSessionImpl implements GizmoSession {
         Player player = Bukkit.getPlayer(playerUUID);
         if (player == null) {
             unregister();
-            return;
-        }
-        if (!GizmoManager.isGizmoWand(player.getInventory().getItemInMainHand())){
             return;
         }
 
