@@ -9,6 +9,7 @@ import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -112,7 +113,10 @@ public final class GroupCMD extends ParentSubCommand{
             player.sendMessage(Component.text("Your spawned group has been automatically selected", NamedTextColor.GRAY));
         }
         else{
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Group selected!", NamedTextColor.GREEN)));
+            String groupTag = group.getTag();
+            player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage
+                    .miniMessage()
+                    .deserialize("<green>Group selected!" + (groupTag == null ? "" : " <white>(Tagged: "+groupTag+")"))));
         }
 
         return true;
