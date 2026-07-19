@@ -8,6 +8,7 @@ import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.events.PlacedGroupBreakEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.managers.GizmoManager;
 import net.donnypz.displayentityutils.managers.PlaceableGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
@@ -53,6 +54,8 @@ public class DEUPlayerDigListener implements Listener {
 
     //bool determines whether to break the block or not
     private boolean breakPlacedGroup(Player player, Block block){
+        if (GizmoManager.isGizmoWand(player.getInventory().getItemInMainHand())) return false;
+
         CustomBlockData data = new CustomBlockData(block, DisplayAPI.getPlugin());
 
         String groupId = data.get(DisplayKeys.PlaceableGroup.ID, PersistentDataType.STRING);
