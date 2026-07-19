@@ -259,8 +259,8 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param distance How far the group should be translated
      * @param durationInTicks How long it should take for the translation to complete
      */
-    public void teleportMove(@NotNull Direction direction, double distance, int durationInTicks){
-        teleportMove(direction.getVector(masterPart, false), distance, durationInTicks);
+    public Location teleportMove(@NotNull Direction direction, double distance, int durationInTicks){
+        return teleportMove(direction.getVector(masterPart, false), distance, durationInTicks);
     }
 
     /**
@@ -268,8 +268,9 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param direction The direction to translate the group
      * @param distance How far the group should be translated
      * @param durationInTicks How long it should take for the translation to complete
+     * @return a destination {@link Location}
      */
-    public abstract void teleportMove(@NotNull Vector direction, double distance, int durationInTicks);
+    public abstract Location teleportMove(@NotNull Vector direction, double distance, int durationInTicks);
 
 
     /**

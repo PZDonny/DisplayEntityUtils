@@ -605,11 +605,11 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     @Override
-    public void teleportMove(@NotNull Vector direction, double distance, int durationInTicks){
+    public @NotNull Location teleportMove(@NotNull Vector direction, double distance, int durationInTicks){
         Entity masterEntity = getMasterEntity();
         Location destination = masterEntity.getLocation().clone().add(direction.clone().normalize().multiply(distance));
         if (!new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent()){
-            return;
+            return destination;
         }
 
         double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
@@ -651,6 +651,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 }
             }
         }, 0, 1);
+        return destination;
     }
 
     /**
