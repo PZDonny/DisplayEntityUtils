@@ -666,6 +666,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
             }
         }
         DisplayAPI.getScheduler().partRunTimerAsync(masterPart, new Scheduler.SchedulerRunnable() {
+            final double DISTANCE_ABS = Math.abs(distance);
             double currentDistance = 0;
 
             @Override
@@ -678,7 +679,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 Location tpLocation = getLocation().add(incrementVector);
 
                 updateChunkAndWorld(tpLocation);
-                if (currentDistance >= distance) {
+                if (Math.abs(currentDistance) >= DISTANCE_ABS) {
                     masterPart.teleportUnsetPassengers(destination);
                     cancel();
                 } else {

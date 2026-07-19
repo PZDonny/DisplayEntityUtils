@@ -6,7 +6,6 @@ import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.concurrent.GroupTeleportCompletableFuture;
@@ -23,7 +22,6 @@ import org.bukkit.entity.*;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -272,6 +270,52 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param durationInTicks How long it should take for the translation to complete
      */
     public abstract void teleportMove(@NotNull Vector direction, double distance, int durationInTicks);
+
+
+    /**
+     * Get the locations this group would teleport to if it was translated with {@link #teleportMove(Direction, double, int)}
+     * or {@link #teleportMove(Vector, double, int)}.
+     * @param direction The direction the group would be moved
+     * @param distance How far the group would be translated
+     * @param durationInTicks How long the teleport move should take, in ticks
+     * @return A list of locations this group would teleport to
+     * @throws IllegalArgumentException if divisions is 0 or less
+     */
+    public List<Location> getTeleportMoveLocations(Vector direction, double distance, int durationInTicks){
+        return getTeleportMoveLocations(direction, distance, durationInTicks, 1);
+    }
+
+    /**
+     * Get the locations this group would teleport to if it was translated with {@link #teleportMove(Direction, double, int)}
+     * or {@link #teleportMove(Vector, double, int)}.
+     * @param direction The direction the group would be moved
+     * @param distance How far the group would be translated
+     * @param durationInTicks How long the teleport move should take, in ticks
+     * @param divisions Number of times the space should be divided (returning x times the number of locations)
+     * @return A list of locations this group would teleport to
+     * @throws IllegalArgumentException if divisions is 0 or less
+     */
+    public List<Location> getTeleportMoveLocations(Vector direction, double distance, int durationInTicks, int divisions){
+        if (durationInTicks <= 0) durationInTicks = 1;
+        if (divisions <= 0) throw new IllegalArgumentException("divisions must be > 0");
+        Location loc = getLocation();
+        if (loc == null) return List.of();
+        if (distance == 0) return List.of(loc);
+
+        int steps = durationInTicks * divisions;
+
+        Vector step = direction.clone()
+                .normalize()
+                .multiply(distance / steps);
+
+        List<Location> locations = new ArrayList<>();
+
+        for (int i = 0; i < steps; i++){
+            locations.add(loc.clone());
+            loc.add(step);
+        }
+        return locations;
+    }
 
     /**
      * Set the teleportation duration of all parts in this group

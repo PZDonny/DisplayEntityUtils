@@ -625,7 +625,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
 
         DisplayAPI.getScheduler().entityRunTimer(masterEntity, new Scheduler.SchedulerRunnable() {
+            final double DISTANCE_ABS = Math.abs(distance);
             double currentDistance = 0;
+
             @Override
             public void run() {
                 if (!isSpawned()){
@@ -637,7 +639,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
                 masterEntity.setRotation(tpLoc.getYaw(), tpLoc.getPitch());
                 Location lastLoc = masterEntity.getLocation();
-                if (currentDistance >= distance){
+                if (Math.abs(currentDistance) >= DISTANCE_ABS){
                     FoliaUtils.teleport(masterEntity, destination, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                     DisplayGroupManager.updateSpawnedGroup(lastLoc, tpLoc, SpawnedDisplayEntityGroup.this);
                     new GroupTeleportMoveEndEvent(SpawnedDisplayEntityGroup.this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent();
@@ -650,44 +652,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             }
         }, 0, 1);
     }
-
-    /**
-     * Get the locations this SpawnedDisplayEntityGroup would teleport to if it was translated with {@link #teleportMove(Direction, double, int)}
-     * or {@link #teleportMove(Vector, double, int)}.
-     * @param direction The direction the group would be moved
-     * @param distance How far the group would be translated
-     * @return A list of locations this group would teleport to
-     */
-    public List<Location> getTeleportMoveLocations(Vector direction, double distance, int durationInTicks){
-        return getTeleportMoveLocations(direction, distance, durationInTicks, 1);
-    }
-
-    /**
-     * Get the locations this SpawnedDisplayEntityGroup would teleport to if it was translated with {@link #teleportMove(Direction, double, int)}
-     * or {@link #teleportMove(Vector, double, int)}.
-     * @param direction The direction the group would be moved
-     * @param distance How far the group would be translated
-     * @param divisions Number of times the space should be divided (returning x times the number of locations)
-     * @return A list of locations this group would teleport to
-     */
-    public List<Location> getTeleportMoveLocations(Vector direction, double distance, int durationInTicks, int divisions){
-        if (durationInTicks <= 0){
-            durationInTicks = 1;
-        }
-        direction.normalize();
-        double movementIncrement = distance/(double) durationInTicks;
-        movementIncrement/=divisions;
-        direction.multiply(movementIncrement);
-        Entity master = getMasterEntity();
-        List<Location> locations = new ArrayList<>();
-        Location loc = master.getLocation().clone();
-        for (double currentDistance = 0; currentDistance <= distance; currentDistance+=Math.abs(movementIncrement)){
-            locations.add(loc.clone());
-            loc.add(direction);
-        }
-        return locations;
-    }
-
 
     /**
      * Change the translation of all the SpawnedDisplayEntityParts in this group.
