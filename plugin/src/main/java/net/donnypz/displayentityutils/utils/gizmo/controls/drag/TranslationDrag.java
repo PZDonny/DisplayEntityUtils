@@ -124,11 +124,19 @@ public abstract class TranslationDrag extends Drag {
                 return false;
             }
             ActiveGroup<?> group = mp.getGroup();
-            if (group != null && group.isRiding()) {
-                GizmoTitleUtil.show(player,
-                        Component.text("Teleport Failed", NamedTextColor.RED),
-                        MiniMessage.miniMessage().deserialize("<red>⚠ <gray>Group cannot be riding an entity <red>⚠"));
-                return false;
+            if (group != null){
+                if (group.isRiding()){
+                    GizmoTitleUtil.show(player,
+                            Component.text("Teleport Failed", NamedTextColor.RED),
+                            MiniMessage.miniMessage().deserialize("<red>⚠ <gray>Group cannot be riding an entity <red>⚠"));
+                    return false;
+                }
+                else if (group instanceof PacketDisplayEntityGroup pdeg && pdeg.isPersistent()){
+                    GizmoTitleUtil.show(player,
+                            Component.text("Teleport Failed", NamedTextColor.RED),
+                            MiniMessage.miniMessage().deserialize("<red>⚠ <gray>Cannot teleport group placed by player w/ item <red>⚠"));
+                    return false;
+                }
             }
         }
         return true;
