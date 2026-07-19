@@ -584,16 +584,14 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             if (!part.isDisplay()){
                 Vector vector = oldMasterLoc.toVector().subtract(partEntity.getLocation().toVector());
                 Location tpLocation = location.clone().subtract(vector);
-                if (groupFuture != null){
-                    CompletableFuture<Boolean> future = FoliaUtils
-                            .teleportSafe(part.getEntity(), tpLocation, TeleportFlag.EntityState.RETAIN_PASSENGERS)
-                            .orElse(null);
-                    if (future != null) nonDisplayFutures.add(future);
-                }
+                CompletableFuture<Boolean> future = FoliaUtils
+                        .teleportSafe(part.getEntity(), tpLocation, TeleportFlag.EntityState.RETAIN_PASSENGERS)
+                        .orElse(null);
+                if (future != null) nonDisplayFutures.add(future);
             }
 
             if (!sameWorld){
-                if (part == masterPart) continue;
+                if (part == masterPart || !part.isDisplay()) continue;
                 master.addPassenger(partEntity);
             }
         }
