@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.gizmo;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoTitleUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -86,7 +87,7 @@ public class GizmoWand {
                                 .decoration(TextDecoration.ITALIC, false)
                 ));
                 PersistentDataContainer pdc = meta.getPersistentDataContainer();
-                pdc.set(DisplayAPI.getGizmoWand(), PersistentDataType.BOOLEAN, true);
+                pdc.set(DisplayKeys.Gizmo.WAND, PersistentDataType.BOOLEAN, true);
             });
         }
     }

@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.InteractionUtils;
 import net.donnypz.displayentityutils.utils.PivotAxis;
@@ -63,8 +63,8 @@ final class InteractionEntity implements Serializable {
         try{
             ItemStack i = new ItemStack(Material.STICK);
             PersistentDataContainer pdc = i.getItemMeta().getPersistentDataContainer();
-            pdc.set(DisplayAPI.getPartPDCTagKey(), PersistentDataType.LIST.strings(), new ArrayList<>(part.getTags()));
-            pdc.set(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING, part.partUUID.toString());
+            pdc.set(DisplayKeys.Part.PART_TAGS, PersistentDataType.LIST.strings(), new ArrayList<>(part.getTags()));
+            pdc.set(DisplayKeys.Part.PART_UUID, PersistentDataType.STRING, part.partUUID.toString());
             persistentDataContainer = pdc.serializeToBytes();
         }
         catch(IOException e){
@@ -106,7 +106,7 @@ final class InteractionEntity implements Serializable {
             if (partUUID != null){
                 i
                     .getPersistentDataContainer()
-                    .set(DisplayAPI.getPartUUIDKey(),
+                    .set(DisplayKeys.Part.PART_UUID,
                             PersistentDataType.STRING,
                             partUUID.toString());
             }
@@ -145,7 +145,7 @@ final class InteractionEntity implements Serializable {
                 throw new RuntimeException(e);
             }
 
-            part.partTags = DisplayEntity.getSetFromPDC(pdc, DisplayAPI.getPartPDCTagKey());
+            part.partTags = DisplayEntity.getSetFromPDC(pdc, DisplayKeys.Part.PART_TAGS);
             part.partUUID = partUUID != null ? partUUID : DisplayEntity.getPDCPartUUID(pdc);
             part.interactionCommands = getInteractionCommands(pdc);
         }

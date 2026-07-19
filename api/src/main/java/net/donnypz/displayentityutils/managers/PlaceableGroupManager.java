@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.managers;
 
 import com.jeff_media.customblockdata.CustomBlockData;
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.events.ItemPlaceGroupEvent;
 import net.donnypz.displayentityutils.events.PreItemPlaceGroupEvent;
@@ -49,7 +50,7 @@ public final class PlaceableGroupManager {
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         checkExistingData(pdc);
 
-        pdc.set(DisplayAPI.getPlaceableGroupKey(), PersistentDataType.STRING, groupTag);
+        pdc.set(DisplayKeys.PlaceableGroup.GROUP_TAG, PersistentDataType.STRING, groupTag);
         itemStack.setItemMeta(meta);
     }
 
@@ -66,10 +67,10 @@ public final class PlaceableGroupManager {
         checkExistingData(pdc);
 
         if (placePermission == null){
-            pdc.remove(DisplayAPI.getPlaceableGroupPermissionKey());
+            pdc.remove(DisplayKeys.PlaceableGroup.PERMISSION);
         }
         else{
-            pdc.set(DisplayAPI.getPlaceableGroupPermissionKey(), PersistentDataType.STRING, placePermission);
+            pdc.set(DisplayKeys.PlaceableGroup.PERMISSION, PersistentDataType.STRING, placePermission);
         }
         itemStack.setItemMeta(meta);
     }
@@ -85,7 +86,7 @@ public final class PlaceableGroupManager {
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         checkExistingData(pdc);
 
-        pdc.set(DisplayAPI.getPlaceableGroupRespectPlayerFacing(), PersistentDataType.BOOLEAN, respect);
+        pdc.set(DisplayKeys.PlaceableGroup.RESPECT_PLAYER_FACING, PersistentDataType.BOOLEAN, respect);
         itemStack.setItemMeta(meta);
     }
 
@@ -100,7 +101,7 @@ public final class PlaceableGroupManager {
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         checkExistingData(pdc);
 
-        pdc.set(DisplayAPI.getPlaceableGroupRespectBlockFace(), PersistentDataType.BOOLEAN, respect);
+        pdc.set(DisplayKeys.PlaceableGroup.RESPECT_BLOCK_FACE, PersistentDataType.BOOLEAN, respect);
         itemStack.setItemMeta(meta);
     }
 
@@ -115,7 +116,7 @@ public final class PlaceableGroupManager {
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         checkExistingData(pdc);
 
-        pdc.set(DisplayAPI.getPlaceableGroupDropItem(), PersistentDataType.BOOLEAN, dropItem);
+            pdc.set(DisplayKeys.PlaceableGroup.DROP_ITEM_ON_BREAK, PersistentDataType.BOOLEAN, dropItem);
         itemStack.setItemMeta(meta);
     }
 
@@ -129,7 +130,7 @@ public final class PlaceableGroupManager {
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         checkExistingData(pdc);
 
-        pdc.set(DisplayAPI.getPlaceableGroupPlacerBreaksOnly(), PersistentDataType.BOOLEAN, placerBreaksOnly);
+        pdc.set(DisplayKeys.PlaceableGroup.PLACER_BREAKS_ONLY, PersistentDataType.BOOLEAN, placerBreaksOnly);
         itemStack.setItemMeta(meta);
     }
 
@@ -297,7 +298,7 @@ public final class PlaceableGroupManager {
     }
 
     private static NamespacedKey getSoundKey(boolean isPlace){
-        return isPlace ? DisplayAPI.getPlaceableGroupPlaceSounds() : DisplayAPI.getPlaceableGroupBreakSounds();
+        return isPlace ? DisplayKeys.PlaceableGroup.PLACE_SOUNDS : DisplayKeys.PlaceableGroup.BREAK_SOUNDS;
     }
 
     @ApiStatus.Internal
@@ -339,7 +340,9 @@ public final class PlaceableGroupManager {
     }
 
     private static void checkExistingData(PersistentDataContainer pdc){
-        if (!pdc.has(DisplayAPI.getPlaceableGroupKey())) throw new IllegalArgumentException("ItemStack was never provided PlaceableGroupData");
+        if (!pdc.has(DisplayKeys.PlaceableGroup.GROUP_TAG)){
+            throw new IllegalArgumentException("ItemStack was never provided PlaceableGroupData");
+        }
     }
 
     /**
@@ -349,14 +352,14 @@ public final class PlaceableGroupManager {
     public static void unassign(@NotNull ItemStack itemStack){
         ItemMeta meta = itemStack.getItemMeta();
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
-        pdc.remove(DisplayAPI.getPlaceableGroupKey());
-        pdc.remove(DisplayAPI.getPlaceableGroupPermissionKey());
-        pdc.remove(DisplayAPI.getPlaceableGroupRespectPlayerFacing());
-        pdc.remove(DisplayAPI.getPlaceableGroupRespectBlockFace());
-        pdc.remove(DisplayAPI.getPlaceableGroupPlaceSounds());
-        pdc.remove(DisplayAPI.getPlaceableGroupBreakSounds());
-        pdc.remove(DisplayAPI.getPlaceableGroupPlacerBreaksOnly());
-        pdc.remove(DisplayAPI.getPlaceableGroupDropItem());
+        pdc.remove(DisplayKeys.PlaceableGroup.GROUP_TAG);
+        pdc.remove(DisplayKeys.PlaceableGroup.PERMISSION);
+        pdc.remove(DisplayKeys.PlaceableGroup.RESPECT_PLAYER_FACING);
+        pdc.remove(DisplayKeys.PlaceableGroup.RESPECT_BLOCK_FACE);
+        pdc.remove(DisplayKeys.PlaceableGroup.PLACE_SOUNDS);
+        pdc.remove(DisplayKeys.PlaceableGroup.BREAK_SOUNDS);
+        pdc.remove(DisplayKeys.PlaceableGroup.PLACER_BREAKS_ONLY);
+        pdc.remove(DisplayKeys.PlaceableGroup.ITEMSTACK);
         itemStack.setItemMeta(meta);
     }
 
@@ -368,7 +371,7 @@ public final class PlaceableGroupManager {
     public static boolean hasData(@NotNull ItemStack itemStack){
         PersistentDataContainer pdc = getPDC(itemStack);
         if (pdc == null) return false;
-        return pdc.has(DisplayAPI.getPlaceableGroupKey(), PersistentDataType.STRING);
+        return pdc.has(DisplayKeys.PlaceableGroup.GROUP_TAG, PersistentDataType.STRING);
     }
 
     /**
@@ -379,7 +382,7 @@ public final class PlaceableGroupManager {
     public static @Nullable String getGroupTag(@NotNull ItemStack itemStack){
         PersistentDataContainer pdc = getPDC(itemStack);
         if (pdc == null) return null;
-        return pdc.get(DisplayAPI.getPlaceableGroupKey(), PersistentDataType.STRING);
+        return pdc.get(DisplayKeys.PlaceableGroup.GROUP_TAG, PersistentDataType.STRING);
     }
 
     /**
@@ -402,7 +405,7 @@ public final class PlaceableGroupManager {
     public static boolean hasPlacePermission(@NotNull ItemStack itemStack){
         PersistentDataContainer pdc = getPDC(itemStack);
         if (pdc == null) return false;
-        return pdc.has(DisplayAPI.getPlaceableGroupPermissionKey(), PersistentDataType.STRING);
+        return pdc.has(DisplayKeys.PlaceableGroup.PERMISSION, PersistentDataType.STRING);
     }
 
     /**
@@ -413,7 +416,7 @@ public final class PlaceableGroupManager {
     public static @Nullable String getPlacePermission(@NotNull ItemStack itemStack){
         PersistentDataContainer pdc = getPDC(itemStack);
         if (pdc == null) return null;
-        return pdc.get(DisplayAPI.getPlaceableGroupPermissionKey(), PersistentDataType.STRING);
+        return pdc.get(DisplayKeys.PlaceableGroup.PERMISSION, PersistentDataType.STRING);
     }
 
     /**
@@ -424,7 +427,7 @@ public final class PlaceableGroupManager {
     public static boolean isRespectingPlayerFacing(@NotNull ItemStack itemStack){
         PersistentDataContainer pdc = getPDC(itemStack);
         if (pdc == null) return false;
-        return Boolean.TRUE.equals(pdc.get(DisplayAPI.getPlaceableGroupRespectPlayerFacing(), PersistentDataType.BOOLEAN));
+        return Boolean.TRUE.equals(pdc.get(DisplayKeys.PlaceableGroup.RESPECT_PLAYER_FACING, PersistentDataType.BOOLEAN));
     }
 
     /**
@@ -435,7 +438,7 @@ public final class PlaceableGroupManager {
     public static boolean isRespectingBlockFace(@NotNull ItemStack itemStack){
         PersistentDataContainer pdc = getPDC(itemStack);
         if (pdc == null) return false;
-        return Boolean.TRUE.equals(pdc.get(DisplayAPI.getPlaceableGroupRespectBlockFace(), PersistentDataType.BOOLEAN));
+        return Boolean.TRUE.equals(pdc.get(DisplayKeys.PlaceableGroup.RESPECT_BLOCK_FACE, PersistentDataType.BOOLEAN));
     }
 
     /**
@@ -446,7 +449,7 @@ public final class PlaceableGroupManager {
     public static boolean isPlacerBreaksOnly(@NotNull ItemStack itemStack){
         PersistentDataContainer pdc = getPDC(itemStack);
         if (pdc == null) return false;
-        return Boolean.TRUE.equals(pdc.get(DisplayAPI.getPlaceableGroupPlacerBreaksOnly(), PersistentDataType.BOOLEAN));
+        return Boolean.TRUE.equals(pdc.get(DisplayKeys.PlaceableGroup.PLACER_BREAKS_ONLY, PersistentDataType.BOOLEAN));
     }
 
     /**
@@ -457,7 +460,7 @@ public final class PlaceableGroupManager {
     public static boolean isDropItem(@NotNull ItemStack itemStack){
         PersistentDataContainer pdc = getPDC(itemStack);
         if (pdc == null) return false;
-        return Boolean.TRUE.equals(pdc.get(DisplayAPI.getPlaceableGroupDropItem(), PersistentDataType.BOOLEAN));
+        return Boolean.TRUE.equals(pdc.get(DisplayKeys.PlaceableGroup.DROP_ITEM_ON_BREAK, PersistentDataType.BOOLEAN));
     }
 
     /**
@@ -538,7 +541,7 @@ public final class PlaceableGroupManager {
     public static @Nullable UUID getWhoPlaced(@NotNull Block block){
         if (!CustomBlockData.hasCustomBlockData(block, DisplayAPI.getPlugin())) return null;
         CustomBlockData data = new CustomBlockData(block, DisplayAPI.getPlugin());
-        String uuidStr = data.get(DisplayAPI.getPlaceableGroupPlacer(), PersistentDataType.STRING);
+        String uuidStr = data.get(DisplayKeys.PlaceableGroup.PLACER_PLAYER_UUID, PersistentDataType.STRING);
         return uuidStr == null ? null : UUID.fromString(uuidStr);
     }
 
@@ -565,7 +568,7 @@ public final class PlaceableGroupManager {
         if (!CustomBlockData.hasCustomBlockData(block, DisplayAPI.getPlugin())) return null;
         CustomBlockData data = new CustomBlockData(block, DisplayAPI.getPlugin());
 
-        String b64 = data.get(DisplayAPI.getPlaceableGroupItemStack(), PersistentDataType.STRING);
+        String b64 = data.get(DisplayKeys.PlaceableGroup.ITEMSTACK, PersistentDataType.STRING);
         return ItemStack.deserializeBytes(Base64.getDecoder().decode(b64));
     }
 
@@ -578,19 +581,19 @@ public final class PlaceableGroupManager {
         if (!CustomBlockData.hasCustomBlockData(block, DisplayAPI.getPlugin())) return null;
         CustomBlockData data = new CustomBlockData(block, DisplayAPI.getPlugin());
 
-        String id = data.get(DisplayAPI.getPlaceableGroupId(), PersistentDataType.STRING);
+        String id = data.get(DisplayKeys.PlaceableGroup.ID, PersistentDataType.STRING);
         return PacketDisplayEntityGroup.getGroup(id);
     }
 
     private static void setBlockData(Player itemHolder, Block block, ItemStack itemStack, String groupID){
         block.setType(Material.BARRIER);
         PersistentDataContainer pdc = new CustomBlockData(block, DisplayAPI.getPlugin());
-        pdc.set(DisplayAPI.getPlaceableGroupId(), PersistentDataType.STRING, groupID);
+        pdc.set(DisplayKeys.PlaceableGroup.ID, PersistentDataType.STRING, groupID);
 
         itemStack.setAmount(1);
         String b64 = Base64.getEncoder().encodeToString(itemStack.serializeAsBytes());
-        pdc.set(DisplayAPI.getPlaceableGroupItemStack(), PersistentDataType.STRING, b64);
-        if (itemHolder != null) pdc.set(DisplayAPI.getPlaceableGroupPlacer(), PersistentDataType.STRING, itemHolder.getUniqueId().toString());
+        pdc.set(DisplayKeys.PlaceableGroup.ITEMSTACK, PersistentDataType.STRING, b64);
+        if (itemHolder != null) pdc.set(DisplayKeys.PlaceableGroup.PLACER_PLAYER_UUID, PersistentDataType.STRING, itemHolder.getUniqueId().toString());
     }
 
 

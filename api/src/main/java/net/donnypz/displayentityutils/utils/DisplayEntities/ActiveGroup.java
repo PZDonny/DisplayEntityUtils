@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
@@ -1094,19 +1095,19 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     void setSpawnAnimation(PersistentDataContainer pdc){
-        if (pdc.has(DisplayAPI.getSpawnAnimationKey())){
-            spawnAnimationTag = pdc.get(DisplayAPI.getSpawnAnimationKey(), PersistentDataType.STRING);
+        if (pdc.has(DisplayKeys.SpawnAnimation.ANIMATION_TAG)){
+            spawnAnimationTag = pdc.get(DisplayKeys.SpawnAnimation.ANIMATION_TAG, PersistentDataType.STRING);
         }
-        if (pdc.has(DisplayAPI.getSpawnAnimationTypeKey())){
+        if (pdc.has(DisplayKeys.SpawnAnimation.TYPE)){
             try{
-                spawnAnimationType = DisplayAnimator.AnimationType.valueOf(pdc.get(DisplayAPI.getSpawnAnimationTypeKey(), PersistentDataType.STRING));
+                spawnAnimationType = DisplayAnimator.AnimationType.valueOf(pdc.get(DisplayKeys.SpawnAnimation.TYPE, PersistentDataType.STRING));
             }
             catch(IllegalArgumentException e){
                 spawnAnimationType = DisplayAnimator.AnimationType.LOOP;
             }
         }
-        if (pdc.has(DisplayAPI.getSpawnAnimationKey())){
-            spawnAnimationLoadMethod = LoadMethod.valueOf(pdc.get(DisplayAPI.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING));
+        if (pdc.has(DisplayKeys.SpawnAnimation.LOAD_METHOD)){
+            spawnAnimationLoadMethod = LoadMethod.valueOf(pdc.get(DisplayKeys.SpawnAnimation.LOAD_METHOD, PersistentDataType.STRING));
         }
     }
 

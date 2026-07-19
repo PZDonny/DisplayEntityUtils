@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.events.PartTranslateEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
@@ -624,7 +625,7 @@ public final class DisplayUtils {
     public static @Nullable String getGroupTag(Entity entity){
         if (entity == null) return null;
         PersistentDataContainer pdc = entity.getPersistentDataContainer();
-        return pdc.get(DisplayAPI.getGroupTagKey(), PersistentDataType.STRING);
+        return pdc.get(DisplayKeys.Group.GROUP_TAG, PersistentDataType.STRING);
     }
 
     /**
@@ -647,7 +648,7 @@ public final class DisplayUtils {
     public static @Nullable UUID getPartUUID(Entity entity){
         if (entity == null) return null;
         PersistentDataContainer pdc = entity.getPersistentDataContainer();
-        String value = pdc.get(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING);
+        String value = pdc.get(DisplayKeys.Part.PART_UUID, PersistentDataType.STRING);
         if (value != null){
             return UUID.fromString(value);
         }
@@ -662,7 +663,7 @@ public final class DisplayUtils {
      */
     public static boolean addTag(@NotNull Entity entity, @NotNull String partTag){
         if (!isValidTag(partTag)) return false;
-        return addToPDCList(entity, partTag, DisplayAPI.getPartPDCTagKey());
+        return addToPDCList(entity, partTag, DisplayKeys.Part.PART_TAGS);
     }
 
     /**
@@ -672,7 +673,7 @@ public final class DisplayUtils {
      * @return a set of invalid tags that could not be added, per {@link DisplayUtils#isValidTag(String)}
      */
     public static Set<String> addTags(@NotNull Entity entity, @NotNull List<String> partTags){
-        NamespacedKey key = DisplayAPI.getPartPDCTagKey();
+        NamespacedKey key = DisplayKeys.Part.PART_TAGS;
         if (partTags.isEmpty()){
             return Collections.unmodifiableSet(new HashSet<>());
         }
@@ -712,7 +713,6 @@ public final class DisplayUtils {
     }
 
     static void addManyToPDCList(@NotNull Entity entity, @NotNull List<String> elements, NamespacedKey key){
-        boolean isGroupTag = DisplayAPI.getGroupTagKey() == key;
         if (elements.isEmpty()){
             return;
         }
@@ -746,7 +746,7 @@ public final class DisplayUtils {
      * @param tag the tag to remove from this part
      */
     public static void removeTag(@NotNull Entity entity, @NotNull String tag){
-        removeFromPDCList(entity, tag, DisplayAPI.getPartPDCTagKey());
+        removeFromPDCList(entity, tag, DisplayKeys.Part.PART_TAGS);
     }
 
     /**
@@ -754,7 +754,7 @@ public final class DisplayUtils {
      * @param tags the tags to remove from this part
      */
     public static void removeTags(@NotNull Entity entity, @NotNull List<String> tags){
-        removeManyFromPDCList(entity, tags, DisplayAPI.getPartPDCTagKey());
+        removeManyFromPDCList(entity, tags, DisplayKeys.Part.PART_TAGS);
     }
 
     static void removeFromPDCList(@NotNull Entity entity, String element, NamespacedKey key){
@@ -792,7 +792,7 @@ public final class DisplayUtils {
      * @return The part's part tags.
      */
     public static @NotNull List<String> getTags(@NotNull Entity entity){
-        return getPDCList(entity, DisplayAPI.getPartPDCTagKey());
+        return getPDCList(entity, DisplayKeys.Part.PART_TAGS);
     }
 
     static @NotNull List<String> getPDCList(@NotNull Entity entity, NamespacedKey key){
@@ -811,10 +811,10 @@ public final class DisplayUtils {
      */
     public static boolean hasPartTag(@NotNull Entity entity, @NotNull String tag){
         PersistentDataContainer container = entity.getPersistentDataContainer();
-        if (!container.has(DisplayAPI.getPartPDCTagKey(), LIST_PDC_TYPE)){
+        if (!container.has(DisplayKeys.Part.PART_TAGS, LIST_PDC_TYPE)){
             return false;
         }
-        List<String> pdcTags = container.get(DisplayAPI.getPartPDCTagKey(), LIST_PDC_TYPE);
+        List<String> pdcTags = container.get(DisplayKeys.Part.PART_TAGS, LIST_PDC_TYPE);
         return pdcTags != null && pdcTags.contains(tag);
     }
 
@@ -827,7 +827,7 @@ public final class DisplayUtils {
      * @return a boolean
      */
     public static boolean isGroupTag(@NotNull Entity entity, @NotNull String tag){
-        String value = entity.getPersistentDataContainer().get(DisplayAPI.getGroupTagKey(), PersistentDataType.STRING);
+        String value = entity.getPersistentDataContainer().get(DisplayKeys.Group.GROUP_TAG, PersistentDataType.STRING);
         if (value == null) return false;
         return tag.equals(value);
     }
@@ -849,7 +849,7 @@ public final class DisplayUtils {
      */
     public static boolean isMaster(@NotNull Display display){
         PersistentDataContainer container = display.getPersistentDataContainer();
-        return container.has(DisplayAPI.getMasterKey(), PersistentDataType.BOOLEAN);
+        return container.has(DisplayKeys.Part.MASTER_PART, PersistentDataType.BOOLEAN);
     }
 
     @ApiStatus.Internal

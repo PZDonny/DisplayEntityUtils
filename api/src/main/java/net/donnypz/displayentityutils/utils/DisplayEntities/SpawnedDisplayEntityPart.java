@@ -4,6 +4,7 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import io.papermc.paper.entity.TeleportFlag;
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.utils.*;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
@@ -115,13 +116,13 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (isSingle) return;
         this.partUUID = uuid;
         PersistentDataContainer pdc = getEntity().getPersistentDataContainer();
-        pdc.set(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
+        pdc.set(DisplayKeys.Part.PART_UUID, PersistentDataType.STRING, partUUID.toString());
         group.groupParts.put(partUUID, this);
     }
 
     private void setPartUUID(Random random){
         PersistentDataContainer pdc = getEntity().getPersistentDataContainer();
-        String value = pdc.get(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING);
+        String value = pdc.get(DisplayKeys.Part.PART_UUID, PersistentDataType.STRING);
     //New Part/Group
         if (value == null){
             if (partUUID == null || groupContainsUUID(partUUID)){
@@ -132,7 +133,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                     partUUID = UUID.nameUUIDFromBytes(byteArray);
                 }while(groupContainsUUID(partUUID));
             }
-            pdc.set(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
+            pdc.set(DisplayKeys.Part.PART_UUID, PersistentDataType.STRING, partUUID.toString());
         }
     //Group/Part already exists
         else {
@@ -352,7 +353,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     SpawnedDisplayEntityPart setMaster(){
         group.masterPart = this;
-        getEntity().getPersistentDataContainer().set(DisplayAPI.getMasterKey(), PersistentDataType.BOOLEAN, true);
+        getEntity().getPersistentDataContainer().set(DisplayKeys.Part.MASTER_PART, PersistentDataType.BOOLEAN, true);
         return this;
     }
 
@@ -408,16 +409,16 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     void setGroupPDC(){
         PersistentDataContainer pdc = getEntity().getPersistentDataContainer();
         if (group == null || group.getTag() == null){
-            pdc.remove(DisplayAPI.getGroupTagKey());
+            pdc.remove(DisplayKeys.Group.GROUP_TAG);
         }
         else{
-            pdc.set(DisplayAPI.getGroupTagKey(), PersistentDataType.STRING, group.getTag());
+            pdc.set(DisplayKeys.Group.GROUP_TAG, PersistentDataType.STRING, group.getTag());
         }
     }
 
     @Override
     public boolean isMaster(){
-        return this.getEntity().getPersistentDataContainer().has(DisplayAPI.getMasterKey(), PersistentDataType.BOOLEAN);
+        return this.getEntity().getPersistentDataContainer().has(DisplayKeys.Part.MASTER_PART, PersistentDataType.BOOLEAN);
     }
 
     /**

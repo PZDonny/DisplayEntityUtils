@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import io.papermc.paper.entity.TeleportFlag;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
@@ -1074,24 +1075,24 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     @Override
     public void setSpawnAnimation(@NotNull String animationTag, @NotNull DisplayAnimator.AnimationType animationType, @NotNull LoadMethod loadMethod){
         PersistentDataContainer c = getMasterEntity().getPersistentDataContainer();
-        c.set(DisplayAPI.getSpawnAnimationKey(), PersistentDataType.STRING, animationTag);
-        c.set(DisplayAPI.getSpawnAnimationTypeKey(), PersistentDataType.STRING, animationType.name());
-        c.set(DisplayAPI.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING, loadMethod.name());
+        c.set(DisplayKeys.SpawnAnimation.ANIMATION_TAG, PersistentDataType.STRING, animationTag);
+        c.set(DisplayKeys.SpawnAnimation.TYPE, PersistentDataType.STRING, animationType.name());
+        c.set(DisplayKeys.SpawnAnimation.LOAD_METHOD, PersistentDataType.STRING, loadMethod.name());
         super.setSpawnAnimation(animationTag, animationType, loadMethod);
     }
 
     void setSpawnAnimation(PersistentDataContainer pdc, String animationTag, DisplayAnimator.AnimationType animationType, LoadMethod loadMethod){
-        pdc.set(DisplayAPI.getSpawnAnimationKey(), PersistentDataType.STRING, animationTag);
-        pdc.set(DisplayAPI.getSpawnAnimationTypeKey(), PersistentDataType.STRING, animationType.name());
-        pdc.set(DisplayAPI.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING, loadMethod.name());
+        pdc.set(DisplayKeys.SpawnAnimation.ANIMATION_TAG, PersistentDataType.STRING, animationTag);
+        pdc.set(DisplayKeys.SpawnAnimation.TYPE, PersistentDataType.STRING, animationType.name());
+        pdc.set(DisplayKeys.SpawnAnimation.LOAD_METHOD, PersistentDataType.STRING, loadMethod.name());
         super.setSpawnAnimation(animationTag, animationType, loadMethod);
     }
 
     public void unsetSpawnAnimation(){
         PersistentDataContainer c = getMasterEntity().getPersistentDataContainer();
-        c.remove(DisplayAPI.getSpawnAnimationKey());
-        c.remove(DisplayAPI.getSpawnAnimationTypeKey());
-        c.remove(DisplayAPI.getSpawnAnimationLoadMethodKey());
+        c.remove(DisplayKeys.SpawnAnimation.ANIMATION_TAG);
+        c.remove(DisplayKeys.SpawnAnimation.TYPE);
+        c.remove(DisplayKeys.SpawnAnimation.LOAD_METHOD);
         super.unsetSpawnAnimation();
     }
 

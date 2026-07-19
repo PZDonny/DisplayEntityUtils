@@ -4,6 +4,7 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.events.GroupRegisteredEvent;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.holders.GroupHolder;
@@ -764,7 +765,7 @@ public final class DisplayGroupManager {
 
         String json = gson.toJson(cpg);
         list.add(json);
-        pdc.set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
+        pdc.set(DisplayKeys.Group.CHUNK_PACKET_GROUP, PersistentDataType.LIST.strings(), list);
         group.setPersistentIds(id, c);
     }
 
@@ -788,7 +789,7 @@ public final class DisplayGroupManager {
 
         String json = gson.toJson(cpg);
         list.add(json);
-        pdc.set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
+        pdc.set(DisplayKeys.Group.CHUNK_PACKET_GROUP, PersistentDataType.LIST.strings(), list);
         PacketDisplayEntityGroup pdeg = displayEntityGroup.createPacketGroup(location, spawnReason,
                 new GroupSpawnSettings()
                     .visibleByDefault(autoShow, null));
@@ -818,7 +819,7 @@ public final class DisplayGroupManager {
         if (cpg != null){
             String json = gson.toJson(cpg);
             list.add(json);
-            pdc.set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
+            pdc.set(DisplayKeys.Group.CHUNK_PACKET_GROUP, PersistentDataType.LIST.strings(), list);
             pdeg.setPersistentIds(id, c);
         }
         return pdeg;
@@ -868,7 +869,7 @@ public final class DisplayGroupManager {
                 cpg.setGroup(group.toDisplayEntityGroup());
                 list.set(i, gson.toJson(cpg));
             }
-            pdc.set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
+            pdc.set(DisplayKeys.Group.CHUNK_PACKET_GROUP, PersistentDataType.LIST.strings(), list);
             return;
         }
     }
@@ -889,7 +890,7 @@ public final class DisplayGroupManager {
             if (cpg == null) continue;
             if (cpg.id == id){
                 list.remove(json);
-                chunk.getPersistentDataContainer().set(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings(), list);
+                chunk.getPersistentDataContainer().set(DisplayKeys.Group.CHUNK_PACKET_GROUP, PersistentDataType.LIST.strings(), list);
                 if (!unregister) return true;
 
                 DisplayAPI.getScheduler().runAsync(() -> {
@@ -908,7 +909,7 @@ public final class DisplayGroupManager {
 
     @ApiStatus.Internal
     public static void removePersistentPacketGroups(@NotNull Chunk chunk){
-        chunk.getPersistentDataContainer().remove(DisplayAPI.getChunkPacketGroupsKey());
+        chunk.getPersistentDataContainer().remove(DisplayKeys.Group.CHUNK_PACKET_GROUP);
     }
 
     @ApiStatus.Internal
@@ -929,7 +930,7 @@ public final class DisplayGroupManager {
     }
 
     private static List<String> getChunkList(PersistentDataContainer pdc){
-        List<String> list = pdc.get(DisplayAPI.getChunkPacketGroupsKey(), PersistentDataType.LIST.strings());
+        List<String> list = pdc.get(DisplayKeys.Group.CHUNK_PACKET_GROUP, PersistentDataType.LIST.strings());
         return list == null ? new ArrayList<>() : new ArrayList<>(list);
     }
 

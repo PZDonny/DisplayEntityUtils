@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
@@ -179,8 +179,7 @@ abstract class DisplayEntitySpecifics implements Serializable {
         }
 
         if (partUUID != null){
-            display.getPersistentDataContainer().set(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
+            display.getPersistentDataContainer().set(DisplayKeys.Part.PART_UUID, PersistentDataType.STRING, partUUID.toString());
         }
-
     }
 }

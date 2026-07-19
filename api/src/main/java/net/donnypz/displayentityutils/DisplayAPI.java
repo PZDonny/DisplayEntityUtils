@@ -20,27 +20,6 @@ public final class DisplayAPI {
 
     static JavaPlugin plugin;
 
-    static NamespacedKey partUUIDKey;
-    static NamespacedKey partPDCTagKey;
-    static NamespacedKey groupTagKey;
-    static NamespacedKey masterKey;
-    static NamespacedKey spawnAnimationKey;
-    static NamespacedKey spawnAnimationTypeKey;
-    static NamespacedKey spawnAnimationLoadMethodKey;
-    static NamespacedKey chunkPacketGroupsKey;
-    static NamespacedKey placeableGroupKey;
-    static NamespacedKey placeableGroupPermissionKey;
-    static NamespacedKey placeableGroupRespectFacingKey;
-    static NamespacedKey placeableGroupRespectBlockFace;
-    static NamespacedKey placeableGroupPlaceSounds;
-    static NamespacedKey placeableGroupBreakSounds;
-    static NamespacedKey placeableGroupDropItem;
-    static NamespacedKey placeableGroupPlacerBreaksOnly;
-    static NamespacedKey placeableGroupItemStack;
-    static NamespacedKey placeableGroupPlacer;
-    static NamespacedKey placeableGroupId;
-    static NamespacedKey gizmoWand;
-
     static boolean isMythicMobsInstalled;
     static boolean isLibsDisguisesInstalled;
     static boolean isViaVerInstalled;
@@ -72,90 +51,6 @@ public final class DisplayAPI {
     public static @NotNull BDEConversionHandler getBDEConversionHandler(){
         return BDE_CONVERSION_HANDLER;
     }
-
-    public static @NotNull NamespacedKey getPartUUIDKey() {
-        return partUUIDKey;
-    }
-
-    public static @NotNull NamespacedKey getPartPDCTagKey() {
-        return partPDCTagKey;
-    }
-
-    public static @NotNull NamespacedKey getGroupTagKey() {
-        return groupTagKey;
-    }
-
-    public static @NotNull NamespacedKey getMasterKey() {
-        return masterKey;
-    }
-
-    public static @NotNull NamespacedKey getSpawnAnimationKey() {
-        return spawnAnimationKey;
-    }
-
-    public static @NotNull NamespacedKey getSpawnAnimationTypeKey() {
-        return spawnAnimationTypeKey;
-    }
-
-    public static @NotNull NamespacedKey getSpawnAnimationLoadMethodKey() {
-        return spawnAnimationLoadMethodKey;
-    }
-
-    public static @NotNull NamespacedKey getChunkPacketGroupsKey() {
-        return chunkPacketGroupsKey;
-    }
-
-    public static @NotNull NamespacedKey getPlaceableGroupKey(){
-        return placeableGroupKey;
-    }
-
-
-    public static @NotNull NamespacedKey getPlaceableGroupPermissionKey(){
-        return placeableGroupPermissionKey;
-    }
-
-    public static @NotNull NamespacedKey getPlaceableGroupRespectPlayerFacing(){
-        return placeableGroupRespectFacingKey;
-    }
-
-    public static @NotNull NamespacedKey getPlaceableGroupRespectBlockFace(){
-        return placeableGroupRespectBlockFace;
-    }
-
-    public static @NotNull NamespacedKey getPlaceableGroupPlaceSounds(){
-        return placeableGroupPlaceSounds;
-    }
-
-    public static @NotNull NamespacedKey getPlaceableGroupBreakSounds(){
-        return placeableGroupBreakSounds;
-    }
-
-    public static @NotNull NamespacedKey getPlaceableGroupPlacerBreaksOnly() {
-        return placeableGroupPlacerBreaksOnly;
-    }
-
-    public static @NotNull NamespacedKey getPlaceableGroupDropItem() {
-        return placeableGroupDropItem;
-    }
-
-
-    public static @NotNull NamespacedKey getPlaceableGroupItemStack(){
-        return placeableGroupItemStack;
-    }
-
-    public static @NotNull NamespacedKey getPlaceableGroupId(){
-        return placeableGroupId;
-    }
-
-    public static @NotNull NamespacedKey getPlaceableGroupPlacer() {
-        return placeableGroupPlacer;
-    }
-
-    public static @NotNull NamespacedKey getGizmoWand(){
-        return gizmoWand;
-    }
-
-
 
     @ApiStatus.Internal
     public static String getLegacyPartTagPrefix(){

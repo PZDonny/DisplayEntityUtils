@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.utils.PivotAxis;
 import net.donnypz.displayentityutils.utils.WorldUtils;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
@@ -102,7 +102,7 @@ final class MannequinEntity implements Serializable {
             throw new RuntimeException(e);
         }
 
-        part.partTags = DisplayEntity.getSetFromPDC(pdc, DisplayAPI.getPartPDCTagKey());
+        part.partTags = DisplayEntity.getSetFromPDC(pdc, DisplayKeys.Part.PART_TAGS);
         part.partUUID = DisplayEntity.getPDCPartUUID(pdc);
         if (settings != null) settings.applyAttributes(part);
 
