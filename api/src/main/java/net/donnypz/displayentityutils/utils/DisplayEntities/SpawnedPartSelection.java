@@ -87,7 +87,8 @@ public final class SpawnedPartSelection extends MultiPartSelection<SpawnedDispla
      */
     @Override
     public @Nullable Location getLocation() {
-        return getGroup().getLocation();
+        SpawnedDisplayEntityGroup g = getGroup();
+        return g == null ? null : g.getLocation();
     }
 
     void removeSilent(){

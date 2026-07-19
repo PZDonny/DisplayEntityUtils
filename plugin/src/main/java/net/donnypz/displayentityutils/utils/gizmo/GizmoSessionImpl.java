@@ -131,6 +131,7 @@ public class GizmoSessionImpl implements GizmoSession {
                 .getSelectedPartSelection();
         if (sel == null) return;
         Location selLoc = sel.getLocation();
+        if (selLoc == null) return;
 
         switch (gizmoSpace) {
             case LOCAL -> {

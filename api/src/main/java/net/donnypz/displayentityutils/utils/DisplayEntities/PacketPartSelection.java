@@ -90,7 +90,8 @@ public class PacketPartSelection extends MultiPartSelection<PacketDisplayEntityP
      */
     @Override
     public @Nullable Location getLocation() {
-        return getGroup().getLocation();
+        PacketDisplayEntityGroup g = getGroup();
+        return g == null ? null : g.getLocation();
     }
 
     /**
