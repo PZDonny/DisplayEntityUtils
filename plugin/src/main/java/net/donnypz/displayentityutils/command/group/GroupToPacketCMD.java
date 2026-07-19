@@ -55,7 +55,7 @@ class GroupToPacketCMD extends PlayerSubCommand {
             else{
                 player.sendMessage(Component.text("| Your selected group was not despawned", NamedTextColor.GRAY, TextDecoration.ITALIC));
             }
-            pg.addPlayerSelection(player);
+            DisplayGroupManager.setSelectedGroup(player, pg);
             return;
         }
 

@@ -4,8 +4,6 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.PlaceableGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
@@ -29,17 +27,7 @@ class GroupSelectPlacedCMD extends PlayerSubCommand {
             return;
         }
 
-        boolean selectResult = DisplayGroupManager.setSelectedGroup(player, group);
-        if (selectResult){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Selected placed group!", NamedTextColor.GREEN)));
-        }
-        else{
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to select placed group! Another player already has that group selected!", NamedTextColor.RED)));
-        }
-
-        int selectDuration = 50;
-        group.glowAndMarkInteractions(player, selectDuration);
-        GizmoCMD.selectShowGizmo(player, group.getLocation());
+        GroupCMD.selectGroup(player, group, false, true);
     }
 
     @Override

@@ -216,6 +216,8 @@ public abstract class DEUSubCommand {
     protected static class TabSuggestion{
         public static final TabSuggestion STORAGES = new TabSuggestion(List.of("local", "mysql", "mongodb"))
                 .suggestUsingCurrentString();
+        public static final TabSuggestion STORAGES_WITH_ALL = new TabSuggestion(List.of("local", "mysql", "mongodb", "all"))
+                .suggestUsingCurrentString();
         public static final TabSuggestion BILLBOARDS = new TabSuggestion(Arrays.stream(Display.Billboard.values()).map(Enum::name).toList())
                 .suggestUsingCurrentString();
         public static final TabSuggestion PART_TYPES = new TabSuggestion(List.of("block", "item", "text", "interaction", "mannequin"))

@@ -56,6 +56,8 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     private volatile Vector rideOffset = new Vector();
     private volatile int lastAnimatedTick = -1;
 
+    private boolean isSelectable = true;
+
 
     /**
      * Get this group's unique ID created during the current game session
@@ -66,14 +68,19 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
-     * Make a player select this group
-     * @param player The player to give the selection to
-     * @return this
+     * Get whether this group can be selected by players
+     * @return a boolean
      */
-    @ApiStatus.Internal
-    public ActiveGroup<T> addPlayerSelection(Player player){
-        DisplayGroupManager.setSelectedGroup(player, this);
-        return this;
+    public boolean isSelectable(){
+        return isSelectable;
+    }
+
+    /**
+     * Set whether this group is selectable by players
+     * @param isSelectable whether the group can be selected
+     */
+    public void setSelectable(boolean isSelectable){
+        this.isSelectable = isSelectable;
     }
 
     /**

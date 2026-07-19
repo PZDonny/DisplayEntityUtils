@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.managers.GizmoManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Control;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
@@ -68,8 +69,12 @@ public class GizmoSessionImpl implements GizmoSession {
                 .allowPersistenceOverride(false)
                 .persistentByDefault(false);
         gizmoModel = SAVED_GIZMO_MODEL.createPacketGroup(finalSpawnLoc, GroupSpawnedEvent.SpawnReason.INTERNAL, settings);
+        if (gizmoModel == null){
+            valid = false;
+            return;
+        }
         gizmoModel.glow();
-
+        gizmoModel.setSelectable(false);
         updateRotation();
         setAutoShow();
         scan();
@@ -248,6 +253,9 @@ public class GizmoSessionImpl implements GizmoSession {
         Player player = Bukkit.getPlayer(playerUUID);
         if (player == null) {
             unregister();
+            return;
+        }
+        if (!GizmoManager.isGizmoWand(player.getInventory().getItemInMainHand())){
             return;
         }
 

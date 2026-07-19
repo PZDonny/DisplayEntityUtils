@@ -359,7 +359,8 @@ public final class DisplayGroupManager {
      * Set the selected {@link ActiveGroup} that a player is selecting
      * @param player the player selecting the group
      * @param activeGroup the group to select
-     * @return false if {@link DisplayConfig#limitGroupSelections()} is true and a player already has the group selected
+     * @return false if {@link DisplayConfig#limitGroupSelections()} is enabled and a player already has the group selected
+     * OR if {@link ActiveGroup#isSelectable()} is false
      */
     public static boolean setSelectedGroup(@NotNull Player player, @NotNull ActiveGroup<?> activeGroup) {
         return DEUUser.getOrCreateUser(player).setSelectedGroup(activeGroup);

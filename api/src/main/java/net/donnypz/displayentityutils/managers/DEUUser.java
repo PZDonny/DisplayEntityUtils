@@ -125,9 +125,11 @@ public class DEUUser {
     /**
      * Set the selected {@link ActiveGroup} of a user
      * @param activeGroup the group
-     * @return false if {@link DisplayConfig#limitGroupSelections()} is true and another player already has the group selected
+     * @return false if {@link DisplayConfig#limitGroupSelections()} is enabled and a player already has the group selected
+     * OR if {@link ActiveGroup#isSelectable()} is false
      */
     public boolean setSelectedGroup(@NotNull ActiveGroup<?> activeGroup) {
+        if (!activeGroup.isSelectable()) return false;
         synchronized (userLock){
             for (DEUUser user : DEUUser.users.values()){
                 if (user.getSelectedGroup() == activeGroup){
