@@ -48,7 +48,7 @@ public class RelativePointUtils {
 
         Set<RelativePointSelector<?>> displays = new HashSet<>();
         for (PacketDisplayEntityGroup group : PacketDisplayEntityGroup.getGroups(chunk)){
-            if (!group.isSelectable()) continue;
+            if (!group.isSelectable() || group.isPlaced()) continue;
             PacketGroupSelector display = new PacketGroupSelector(player, group);
             displays.add(display);
         }
