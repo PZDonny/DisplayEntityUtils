@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.concurrent.GroupTeleportCompletableFuture;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
+import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
 import net.donnypz.displayentityutils.utils.gizmo.TranslationMode;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoTitleUtil;
@@ -87,7 +88,6 @@ public abstract class TranslationDrag extends Drag {
     protected void applyToPlayerSelection(Vector3f delta, Vector3f translateDelta) {
         if (!gizmo.isLinked()) return;
 
-
         ActivePartSelection<?> sel = DEUUser
                 .getOrCreateUser(gizmo.getPlayerUUID())
                 .getSelectedPartSelection();
@@ -142,9 +142,26 @@ public abstract class TranslationDrag extends Drag {
         return true;
     }
 
+    private void undoTranslateDeltaRotation(Vector3f translateDelta, ActivePartSelection<?> sel){
+        Location loc = sel.getLocation();
+        float pitch = loc.getPitch();
+        float yaw = loc.getYaw();
+        Quaternionf undoRotation = new Quaternionf()
+                .rotateY((float)Math.toRadians(-yaw))
+                .rotateX((float)Math.toRadians(pitch))
+                .invert(); //normalize and conjugates (negate imaginary, keep scalar same)
+
+        undoRotation.transform(translateDelta);
+    }
+
     private void translate(Vector3f delta, Vector3f translateDelta, ActivePartSelection<?> sel) {
-        Vector bukkitTranslateDelta = Vector.fromJOML(translateDelta);
+        Vector bukkitTranslateDelta;
+        if (gizmo.getGizmoSpace() == GizmoSpace.WORLD){
+            undoTranslateDeltaRotation(translateDelta, sel);
+        }
+        bukkitTranslateDelta = Vector.fromJOML(translateDelta);
         Vector bukkitDelta = Vector.fromJOML(delta);
+
         if (sel instanceof SinglePartSelection s) {
             s.translate(s.getSelectedPart().isDisplay()
                             ? bukkitTranslateDelta
