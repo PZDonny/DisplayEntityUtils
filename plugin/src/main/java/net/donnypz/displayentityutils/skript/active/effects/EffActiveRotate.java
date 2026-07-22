@@ -10,6 +10,7 @@ import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
+import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -19,22 +20,26 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 @Name("Rotate Active Group/Part")
 @Description("Update the axis rotation of an active group/part, in degrees. \nThis only applies to display entity parts and display entities in groups")
 @Examples({
+        "deu rotate y of {_activegroup} by 45 degrees",
+        "deu rotate x of {_activegroup} by 30 degrees around {_pivotlocation}",
+        "",
+        "#Before 3.6.0",
         "deu rotate y of {_activegroup} by 45",
         "",
         "deu rotate z of {_activepart} by 20",
         "deu rotate world y of {_activepart} by 90"
         })
-@Since("3.4.3")
+@Since("3.4.3, 3.6.0 (Pivot)")
 public class EffActiveRotate extends Effect {
     Expression<?> object;
     Expression<Number> rotation;
-    boolean worldRot;
+    Expression<Location> pivotLocation;
     char axis;
 
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
                 SyntaxInfo.builder(EffActiveRotate.class)
-                        .addPattern("deu rotate [:world] (:x|:y|:z) of %activegroup/activepart% by %number%")
+                        .addPattern("deu rotate  (:x|:y|:z) of %activegroup/activepart% by %number% [degrees] [a:around %-location%]")
                         .supplier(EffActiveRotate::new)
                         .build()
         );
@@ -51,7 +56,7 @@ public class EffActiveRotate extends Effect {
         } else if (parseResult.hasTag("z")) {
             axis = 'z';
         }
-        worldRot = parseResult.hasTag("world");
+        pivotLocation = (Expression<Location>) expressions[2];
         return true;
     }
 
@@ -62,6 +67,8 @@ public class EffActiveRotate extends Effect {
 
         Number rot = rotation.getSingle(event);
         if (rot == null) return;
+
+        Location pivotLoc = pivotLocation.getSingle(event);
 
         float rotRad = (float) Math.toRadians(rot.doubleValue());
         Quaternionf q = new Quaternionf();
@@ -76,10 +83,12 @@ public class EffActiveRotate extends Effect {
         }
 
         if (obj instanceof ActiveGroup<?> gr){
-            gr.rotateDisplays(q);
+            if (pivotLoc == null) gr.rotateDisplays(q);
+            else gr.rotateDisplays(q, pivotLoc);
         }
         else if (obj instanceof ActivePart part){
-            part.rotateDisplay(q, worldRot);
+            if (pivotLoc == null) part.rotateDisplay(q);
+            else part.rotateDisplay(q, pivotLoc);
         }
     }
 

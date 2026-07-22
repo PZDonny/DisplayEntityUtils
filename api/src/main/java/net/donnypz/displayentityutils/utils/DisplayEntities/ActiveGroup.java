@@ -356,7 +356,18 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      */
     public void rotateDisplays(@NotNull Quaternionf rotation){
         for (ActivePart p : groupParts.values()){
-            p.rotateDisplay(rotation, true);
+            p.rotateDisplay(rotation);
+        }
+    }
+
+    /**
+     * Rotate the display entities in this group, around a given pivot
+     * @param rotation the rotation
+     * @param pivotLocation the location to pivot around
+     */
+    public void rotateDisplays(@NotNull Quaternionf rotation, @NotNull Location pivotLocation){
+        for (ActivePart p : groupParts.values()){
+            p.rotateDisplay(rotation, pivotLocation);
         }
     }
 

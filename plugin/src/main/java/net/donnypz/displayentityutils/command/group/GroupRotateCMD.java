@@ -67,6 +67,6 @@ public class GroupRotateCMD extends GroupSubCommand {
 
     @Override
     protected String getDescription() {
-        return "Rotate a group around a given axis. Use \"-local\" to rotate in local space";
+        return "Rotate a group around a given axis.";
     }
 }

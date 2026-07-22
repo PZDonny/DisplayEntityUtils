@@ -391,24 +391,56 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public void rotateDisplay(@NotNull Quaternionf rotation, boolean worldRotation) {
+    public void rotateDisplay(@NotNull Quaternionf rotation) {
         if (!isDisplay()) return;
-        Vector3f translation = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.TRANSLATION, new Vector3f());
-        Quaternionf originalRot = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.LEFT_ROTATION, new Quaternionf());
+
+        Quaternionf originalRot = attributeContainer
+                .getAttributeOrDefault(
+                        DisplayAttributes.Transform.LEFT_ROTATION,
+                        new Quaternionf());
+        Quaternionf finalRot = new Quaternionf(originalRot).mul(rotation);
+
+        this.setAttribute(DisplayAttributes.Transform.LEFT_ROTATION, finalRot);
+    }
+
+    @Override
+    public void rotateDisplay(@NotNull Quaternionf rotation, @NotNull Location pivotLocation) {
+        if (!isDisplay()) return;
+
+        Quaternionf originalRot = attributeContainer
+                .getAttributeOrDefault(
+                        DisplayAttributes.Transform.LEFT_ROTATION,
+                        new Quaternionf());
 
 
-        Quaternionf finalRot;
-        if (worldRotation){
-            translation.rotate(rotation);
-            finalRot = new Quaternionf(rotation).mul(originalRot);
-        }
-        else{
-            finalRot = new Quaternionf(originalRot.mul(rotation));
-        }
+        Vector3f translation = new Vector3f(attributeContainer
+                .getAttributeOrDefault(
+                        DisplayAttributes.Transform.TRANSLATION,
+                        new Vector3f()));
 
-        attributeContainer.setAttributesAndSend(new DisplayAttributeMap()
+        //entity to pivot
+        Vector3f worldPivot = pivotLocation.toVector()
+                .subtract(getLocation().toVector())
+                .toVector3f();
+
+
+        //undo entity's rotation
+        Quaternionf invertedEntityRotation = new Quaternionf()
+                .rotateY((float) Math.toRadians(-getYaw()))
+                .rotateX((float) Math.toRadians(getPitch()))
+                .invert();
+
+        Vector3f localPivot = worldPivot.rotate(invertedEntityRotation);
+
+        //rot around pivot point
+        translation.sub(localPivot);
+        translation.rotate(rotation);
+        translation.add(localPivot);
+
+        Quaternionf finalRot = new Quaternionf(rotation).mul(originalRot);
+        this.setAttributes(new DisplayAttributeMap()
                 .add(DisplayAttributes.Transform.TRANSLATION, translation)
-                .add(DisplayAttributes.Transform.LEFT_ROTATION, finalRot), getEntityId(), viewers);
+                .add(DisplayAttributes.Transform.LEFT_ROTATION, finalRot));
     }
 
 

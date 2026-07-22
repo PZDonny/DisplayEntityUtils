@@ -403,11 +403,18 @@ public abstract class ActivePart implements Active{
     public abstract int getInterpolationDelay();
 
     /**
-     * Rotate this display entity part by a given quaternion
+     * Rotate this display entity part in its local space {@link Transformation}
+     *
      * @param rotation the rotation
-     * @param worldRotation whether rotation should occur in world space, rather than local
      */
-    public abstract void rotateDisplay(@NotNull Quaternionf rotation, boolean worldRotation);
+    public abstract void rotateDisplay(@NotNull Quaternionf rotation);
+
+    /**
+     * Rotate this display entity part in world space, around a given pivot
+     * @param rotation the rotation
+     * @param pivotLocation the location that this part should pivot around
+     */
+    public abstract void rotateDisplay(@NotNull Quaternionf rotation, @NotNull Location pivotLocation);
 
     /**
      * Set the text of this part if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
