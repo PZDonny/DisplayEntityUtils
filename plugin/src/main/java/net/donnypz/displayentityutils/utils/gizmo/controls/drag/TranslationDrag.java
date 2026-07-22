@@ -116,13 +116,14 @@ public abstract class TranslationDrag extends Drag {
         }
 
         Player player = Bukkit.getPlayer(gizmo.getPlayerUUID());
-        if (sel instanceof MultiPartSelection<?> mp) {
+        if (sel instanceof MultiPartSelection<?> mp && gizmo.isLinked()) {
             if (mp.hasFilters()) {
                 GizmoTitleUtil.show(player,
                         Component.text("Teleport Failed", NamedTextColor.RED),
                         MiniMessage.miniMessage().deserialize("<red>⚠ <gray>Selection cannot have filters <red>⚠"));
                 return false;
             }
+
             ActiveGroup<?> group = mp.getGroup();
             if (group != null){
                 if (group.isRiding()){
@@ -131,7 +132,8 @@ public abstract class TranslationDrag extends Drag {
                             MiniMessage.miniMessage().deserialize("<red>⚠ <gray>Group cannot be riding an entity <red>⚠"));
                     return false;
                 }
-                else if (group instanceof PacketDisplayEntityGroup pdeg && pdeg.isPersistent()){
+                else if (group instanceof PacketDisplayEntityGroup pdeg
+                        && pdeg.isPlaced()){
                     GizmoTitleUtil.show(player,
                             Component.text("Teleport Failed", NamedTextColor.RED),
                             MiniMessage.miniMessage().deserialize("<red>⚠ <gray>Cannot teleport group placed by player w/ item <red>⚠"));
