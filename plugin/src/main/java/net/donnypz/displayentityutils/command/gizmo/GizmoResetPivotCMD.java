@@ -12,10 +12,10 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class GizmoResetCMD extends PlayerSubCommand {
+public class GizmoResetPivotCMD extends PlayerSubCommand {
 
-    public GizmoResetCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("reset", parentSubCommand, Permission.GIZMO_USE);
+    public GizmoResetPivotCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("resetpivot", parentSubCommand, Permission.GIZMO_USE);
     }
 
     @Override

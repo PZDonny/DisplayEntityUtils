@@ -21,7 +21,7 @@ public final class GizmoCMD extends ParentSubCommand {
         new GizmoScaleCMD(this);
         new GizmoToggleCMD(this);
         new GizmoMoveHereCMD(this);
-        new GizmoResetCMD(this);
+        new GizmoResetPivotCMD(this);
     }
 
     public static GizmoSessionImpl getOrCreateGizmo(Player player, Location spawnLocation) {
