@@ -318,7 +318,7 @@ public class PacketAttributeContainer implements Cloneable{
      */
     public int sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Player player, @NotNull Location location){
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, createEntityPacket(entityId, partType, location));
-        sendAttributes(partType, player, entityId);
+        sendAttributes(player, entityId);
         return entityId;
     }
 
@@ -330,9 +330,9 @@ public class PacketAttributeContainer implements Cloneable{
      * @param location the spawn location
      * @return the entity's entity id
      */
-    public int sendEntityUsingPlayers(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Collection<Player> players, @NotNull Location location){
+    public int sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Collection<Player> players, @NotNull Location location){
         int entityId = SpigotReflectionUtil.generateEntityId();
-        sendEntityUsingPlayers(partType, SpigotReflectionUtil.generateEntityId(), players, location);
+        sendEntity(partType, SpigotReflectionUtil.generateEntityId(), players, location);
         return entityId;
     }
 
@@ -345,7 +345,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @param location the spawn location
      * @return the entity's entity id
      */
-    public int sendEntityUsingPlayers(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Collection<Player> players, @NotNull Location location){
+    public int sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Collection<Player> players, @NotNull Location location){
         for (Player player : players){
             sendEntity(partType, entityId, player, location);
         }
@@ -360,9 +360,9 @@ public class PacketAttributeContainer implements Cloneable{
      * @param location the spawn location
      * @return the entity's entity id
      */
-    public int sendEntityUsingUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location){
+    public int sendEntityToUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location){
         int entityId = SpigotReflectionUtil.generateEntityId();
-        sendEntityUsingUUIDs(partType, entityId, playerUUIDs, location);
+        sendEntityToUUIDs(partType, entityId, playerUUIDs, location);
         return entityId;
     }
 
@@ -375,7 +375,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @param location the spawn location
      * @return the entity's entity id
      */
-    public int sendEntityUsingUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location){
+    public int sendEntityToUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location){
         for (UUID uuid : playerUUIDs){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
@@ -383,18 +383,6 @@ public class PacketAttributeContainer implements Cloneable{
         }
         return entityId;
     }
-
-    /**
-     * Send attribute data to a player for a specific entity
-     * @param player the player
-     * @param entityId the entity's entity id
-     * @return this
-     */
-    private PacketAttributeContainer sendAttributes(SpawnedDisplayEntityPart.PartType partType, Player player, int entityId){
-        new PacketResult(entityId, this).send(player);
-        return this;
-    }
-
 
     /**
      * Send attribute data to a player for a specific entity
@@ -472,7 +460,6 @@ public class PacketAttributeContainer implements Cloneable{
     public PacketAttributeContainer clone() {
         try {
             PacketAttributeContainer clone = new PacketAttributeContainer();
-            //clone.attributes = new HashMap<>();
 
             for (Map.Entry<DisplayAttribute<?, ?>, Object> entry : this.attributes.entrySet()) {
                 DisplayAttribute<?, ?> key = entry.getKey();

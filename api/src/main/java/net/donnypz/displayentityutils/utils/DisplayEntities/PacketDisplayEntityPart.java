@@ -253,7 +253,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             Vector translation = getNonDisplayTranslation(group.getLocation());
             location = location.clone().add(translation);
         }
-        attributeContainer.sendEntityUsingPlayers(type, getEntityId(), plrs, location);
+        attributeContainer.sendEntity(type, getEntityId(), plrs, location);
     }
 
     /**
