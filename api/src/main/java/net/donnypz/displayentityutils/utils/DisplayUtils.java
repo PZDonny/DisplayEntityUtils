@@ -668,6 +668,68 @@ public final class DisplayUtils {
     }
 
     /**
+     * Rotate a display entity in its local space {@link Transformation}.
+     * The rotation is applied in addition to the entity's current rotation.
+     * @param display the display entity
+     * @param rotation the rotation
+     */
+    public static void rotate(@NotNull Display display, @NotNull Quaternionf rotation){
+        Transformation t = display.getTransformation();
+        Quaternionf originalRot = t.getLeftRotation();
+
+        Quaternionf finalRot = new Quaternionf(originalRot).mul(rotation);
+
+        Transformation newT = new Transformation(
+                t.getTranslation(),
+                finalRot,
+                t.getScale(),
+                t.getRightRotation()
+        );
+        display.setTransformation(newT);
+    }
+
+    /**
+     * Rotate a display entity around a given pivot. The rotation is applied in addition to the entity's current rotation.
+     * @param display the display entity
+     * @param rotation the rotation
+     * @param pivotLocation the location that should be pivoted around
+     */
+    public static void rotateAround(@NotNull Display display, @NotNull Quaternionf rotation, @NotNull Location pivotLocation){
+        Transformation t = display.getTransformation();
+
+        Vector3f translation = t.getTranslation();
+        Quaternionf originalRot = t.getLeftRotation();
+
+        //entity to pivot
+        Vector3f worldPivot = pivotLocation.toVector()
+                .subtract(display.getLocation().toVector())
+                .toVector3f();
+
+
+        //undo entity's rotation
+        Quaternionf invertedEntityRotation = new Quaternionf()
+                .rotateY((float) Math.toRadians(-display.getYaw()))
+                .rotateX((float) Math.toRadians(display.getPitch()))
+                .invert();
+
+        Vector3f localPivot = worldPivot.rotate(invertedEntityRotation);
+
+        //rot around pivot point
+        translation.sub(localPivot);
+        translation.rotate(rotation);
+        translation.add(localPivot);
+
+        Quaternionf finalRot = new Quaternionf(rotation).mul(originalRot);
+
+        display.setTransformation(new Transformation(
+                translation,
+                finalRot,
+                t.getScale(),
+                t.getRightRotation()
+        ));
+    }
+
+    /**
      * Gets the group tag of a valid part entity
      * @param entity entity to retrieve the tag from
      * @return a string, null if the entity did not have a group tag.

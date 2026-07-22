@@ -659,20 +659,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (!isDisplay()) return;
         Display display = (Display) getEntity();
         if (display == null) return;
-
-        Transformation t = getTransformation();
-        if (t == null) return;
-        Quaternionf originalRot = t.getLeftRotation();
-
-        Quaternionf finalRot = new Quaternionf(originalRot).mul(rotation);
-
-        Transformation newT = new Transformation(
-                t.getTranslation(),
-                finalRot,
-                t.getScale(),
-                t.getRightRotation()
-        );
-        display.setTransformation(newT);
+        DisplayUtils.rotate(display, rotation);
     }
 
     @Override
@@ -682,40 +669,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         Display display = (Display) getEntity();
         if (display == null) return;
 
-        Transformation t = getTransformation();
-        if (t == null) return;
-
-        Vector3f translation = t.getTranslation();
-        Quaternionf originalRot = t.getLeftRotation();
-
-        //entity to pivot
-        Vector3f worldPivot = pivotLocation.toVector()
-                .subtract(display.getLocation().toVector())
-                .toVector3f();
-
-
-        //undo entity's rotation
-        Quaternionf invertedEntityRotation = new Quaternionf()
-                .rotateY((float) Math.toRadians(-display.getYaw()))
-                .rotateX((float) Math.toRadians(display.getPitch()))
-                .invert();
-
-        Vector3f localPivot = worldPivot.rotate(invertedEntityRotation);
-
-        //rot around pivot point
-        translation.sub(localPivot);
-        translation.rotate(rotation);
-        translation.add(localPivot);
-
-
-        Quaternionf finalRot = new Quaternionf(rotation).mul(originalRot);
-
-        display.setTransformation(new Transformation(
-                translation,
-                finalRot,
-                t.getScale(),
-                t.getRightRotation()
-        ));
+        DisplayUtils.rotateAround(display, rotation, pivotLocation);
     }
 
     /**

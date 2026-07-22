@@ -16,10 +16,13 @@ import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.Location;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.Collection;
@@ -145,6 +148,147 @@ public final class PacketUtils {
         for (Player player : players){
             PacketEvents.getAPI().getPlayerManager().sendPacket(player, rotationPacket);
         }
+    }
+
+    /**
+     * Rotate a display entity. The rotation is applied in addition to the entity's current rotation.
+     * @param player the player that should see the rotation
+     * @param display the display entity
+     * @param rotation the rotation
+     */
+    public static void rotate(@NotNull Player player, @NotNull Display display, @NotNull Quaternionf rotation){
+        rotate(List.of(player), display, rotation);
+    }
+
+    /**
+     * Rotate a display entity. The rotation is applied in addition to the entity's current rotation.
+     * @param players the players that should see the rotation
+     * @param display the display entity
+     * @param rotation the rotation
+     */
+    public static void rotate(@NotNull Collection<Player> players, @NotNull Display display, @NotNull Quaternionf rotation){
+        rotate(players, display.getEntityId(), rotation, display.getTransformation());
+    }
+
+    /**
+     * Rotate a display entity part. The rotation is applied in addition to the entity's current rotation.
+     * @param player the player that should see the rotation
+     * @param part the part
+     * @param rotation the rotation
+     */
+    public static void rotate(@NotNull Player player, @NotNull ActivePart part, @NotNull Quaternionf rotation){
+        rotate(List.of(player), part, rotation);
+    }
+
+    /**
+     * Rotate a display entity part. The rotation is applied in addition to the entity's current rotation.
+     * @param players the players that should see the rotation
+     * @param part the part
+     * @param rotation the rotation
+     */
+    public static void rotate(@NotNull Collection<Player> players, @NotNull ActivePart part, @NotNull Quaternionf rotation){
+        if (!part.isDisplay()) return;
+
+        Transformation t = part.getTransformation();
+        if (t == null) return;
+
+        rotate(players, part.getEntityId(), rotation, t);
+    }
+
+    private static void rotate(Collection<Player> players, int entityId, Quaternionf rotation, Transformation transformation){
+        Quaternionf originalRot = transformation.getLeftRotation();
+        Quaternionf finalRot = new Quaternionf(originalRot).mul(rotation);
+
+        new DisplayAttributeMap()
+                .add(DisplayAttributes.Transform.LEFT_ROTATION, finalRot)
+                .send(players, entityId);
+    }
+
+    /**
+     * Rotate a display entity around a given pivot. The rotation is applied in addition to the entity's current rotation.
+     * @param player the player that should see the rotation
+     * @param display the display entity
+     * @param rotation the rotation
+     * @param pivotLocation the location that should be pivoted around
+     */
+    public static void rotateAround(@NotNull Player player, @NotNull Display display, @NotNull Quaternionf rotation, @NotNull Location pivotLocation){
+        rotateAround(List.of(player), display, rotation, pivotLocation);
+    }
+
+    /**
+     * Rotate a display entity around a given pivot. The rotation is applied in addition to the entity's current rotation.
+     * @param players the players that should see the rotation
+     * @param display the display entity
+     * @param rotation the rotation
+     * @param pivotLocation the location that should be pivoted around
+     */
+    public static void rotateAround(@NotNull Collection<Player> players, @NotNull Display display, @NotNull Quaternionf rotation, @NotNull Location pivotLocation){
+        rotateAround(players, display.getEntityId(), rotation, pivotLocation, display.getTransformation(), display.getLocation());
+    }
+
+    /**
+     * Rotate a display entity part around a given pivot. The rotation is applied in addition to the entity's current rotation.
+     * @param player the player that should see the rotation
+     * @param part the part
+     * @param rotation the rotation
+     * @param pivotLocation the location that should be pivoted around
+     */
+    public static void rotateAround(@NotNull Player player, @NotNull ActivePart part, @NotNull Quaternionf rotation, @NotNull Location pivotLocation){
+        rotateAround(List.of(player), part, rotation, pivotLocation);
+    }
+
+    /**
+     * Rotate a display entity part around a given pivot. The rotation is applied in addition to the entity's current rotation.
+     * @param players the players that should see the rotation
+     * @param part the part
+     * @param rotation the rotation
+     * @param pivotLocation the location that should be pivoted around
+     */
+    public static void rotateAround(@NotNull Collection<Player> players, @NotNull ActivePart part, @NotNull Quaternionf rotation, @NotNull Location pivotLocation){
+        if (!part.isDisplay()) return;
+
+        Transformation t = part.getTransformation();
+        if (t == null) return;
+
+        Location partLoc = part.getLocation();
+        if (partLoc == null) return;
+
+        rotateAround(players, part.getEntityId(), rotation, pivotLocation, t, partLoc);
+    }
+
+    private static void rotateAround(Collection<Player> players,
+                                     int entityId,
+                                     Quaternionf rotation,
+                                     Location pivotLocation,
+                                     Transformation transformation,
+                                     Location entityLocation){
+        Quaternionf originalRot = transformation.getLeftRotation();
+        Vector3f translation = transformation.getTranslation();
+
+        //entity to pivot
+        Vector3f worldPivot = pivotLocation.toVector()
+                .subtract(entityLocation.toVector())
+                .toVector3f();
+
+
+        //undo entity's rotation
+        Quaternionf invertedEntityRotation = new Quaternionf()
+                .rotateY((float) Math.toRadians(-entityLocation.getYaw()))
+                .rotateX((float) Math.toRadians(entityLocation.getPitch()))
+                .invert();
+
+        Vector3f localPivot = worldPivot.rotate(invertedEntityRotation);
+
+        //rot around pivot point
+        translation.sub(localPivot);
+        translation.rotate(rotation);
+        translation.add(localPivot);
+
+        Quaternionf finalRot = new Quaternionf(rotation).mul(originalRot);
+        new DisplayAttributeMap()
+                .add(DisplayAttributes.Transform.TRANSLATION, translation)
+                .add(DisplayAttributes.Transform.LEFT_ROTATION, finalRot)
+                .send(players, entityId);
     }
 
     /**
