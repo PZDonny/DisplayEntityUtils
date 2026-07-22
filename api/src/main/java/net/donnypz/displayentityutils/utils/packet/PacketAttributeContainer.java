@@ -391,7 +391,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @return this
      */
     private PacketAttributeContainer sendAttributes(SpawnedDisplayEntityPart.PartType partType, Player player, int entityId){
-        new PacketResult(entityId).send(player);
+        new PacketResult(entityId, this).send(player);
         return this;
     }
 
@@ -403,7 +403,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @return this
      */
     public PacketAttributeContainer sendAttributes(@NotNull Player player, int entityId){
-        new PacketResult(entityId).send(player);
+        new PacketResult(entityId, this).send(player);
         return this;
     }
 
@@ -414,7 +414,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @return this
      */
     public PacketAttributeContainer sendAttributesUsingUUIDs(@NotNull Collection<UUID> playerUUIDs, int entityId){
-        new PacketResult(entityId).sendUUIDs(playerUUIDs);
+        new PacketResult(entityId, this).sendUUIDs(playerUUIDs);
         return this;
     }
 
@@ -425,7 +425,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @return this
      */
     public PacketAttributeContainer sendAttributesUsingPlayers(@NotNull Collection<Player> players, int entityId){
-        new PacketResult(entityId).send(players);
+        new PacketResult(entityId, this).send(players);
         return this;
     }
 
@@ -497,15 +497,15 @@ public class PacketAttributeContainer implements Cloneable{
         }
     }
 
-    class PacketResult{
+    static class PacketResult{
         int entityId;
         WrapperPlayServerEntityMetadata metadataPacket;
         WrapperPlayServerEntityEquipment equipmentPacket;
         WrapperPlayServerUpdateAttributes attributesPacket;
 
-        PacketResult(int entityId){
+        PacketResult(int entityId, PacketAttributeContainer container){
             this.entityId = entityId;
-            setPackets(attributes);
+            setPackets(container.attributes);
         }
 
         PacketResult(int entityId, DisplayAttributeMap map){

@@ -1,15 +1,19 @@
 package net.donnypz.displayentityutils.utils.packet;
 
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -65,5 +69,62 @@ public class DisplayAttributeMap {
      */
     public DisplayAttributeMap addTransformationMatrix(@NotNull Matrix4f matrix){
         return addTransformation(DisplayUtils.getTransformation(matrix));
+    }
+
+    /**
+     * Send the set attributes of this {@link DisplayAttributeMap} to a player, for that player
+     * @param player the player
+     * @param part the part to apply the changes to
+     */
+    public void send(@NotNull Player player, @NotNull PacketDisplayEntityPart part){
+        send(player, part.getEntityId());
+    }
+
+    /**
+     * Send the set attributes of this {@link DisplayAttributeMap} to a player, for that player
+     * @param player the player
+     * @param entityId the entity to apply the changes to
+     */
+    public void send(@NotNull Player player, int entityId){
+        new PacketAttributeContainer.PacketResult(entityId, this)
+                .send(player);
+    }
+
+    /**
+     * Send the set attributes of this {@link DisplayAttributeMap} to players, for those players
+     * @param players the players
+     * @param part the part to apply the changes
+     */
+    public void send(@NotNull Collection<Player> players, @NotNull PacketDisplayEntityPart part){
+        send(players, part.getEntityId());
+    }
+
+    /**
+     * Send the set attributes of this {@link DisplayAttributeMap} to players, for those players
+     * @param players the players
+     * @param entityId the entity to apply the changes to
+     */
+    public void send(@NotNull Collection<Player> players, int entityId){
+        new PacketAttributeContainer.PacketResult(entityId, this)
+                .send(players);
+    }
+
+    /**
+     * Send the set attributes of this {@link DisplayAttributeMap} to players, for those players
+     * @param playerUUIDs the players
+     * @param part the part to apply the changes
+     */
+    public void sendToUUIDs(@NotNull Collection<UUID> playerUUIDs, @NotNull PacketDisplayEntityPart part){
+        sendToUUIDs(playerUUIDs, part.getEntityId());
+    }
+
+    /**
+     * Send the set attributes of this {@link DisplayAttributeMap} to players, for those players
+     * @param playerUUIDs the players
+     * @param entityId the entity to apply the changes to
+     */
+    public void sendToUUIDs(@NotNull Collection<UUID> playerUUIDs, int entityId){
+        new PacketAttributeContainer.PacketResult(entityId, this)
+                .sendUUIDs(playerUUIDs);
     }
 }
