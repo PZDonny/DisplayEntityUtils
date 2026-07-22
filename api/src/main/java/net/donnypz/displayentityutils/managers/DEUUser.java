@@ -314,7 +314,7 @@ public class DEUUser {
                     Vector moveVector = oldVector.subtract(translationVector);
                     PacketUtils.translateNonDisplay(player, part, moveVector, moveVector.length(), 0, 0);
                 } else if (part.getType() == SpawnedDisplayEntityPart.PartType.MANNEQUIN) {
-                    new PacketAttributeContainer().setAttributeAndSend(DisplayAttributes.Mannequin.SCALE,
+                    new PacketAttributeContainer().setAndSend(DisplayAttributes.Mannequin.SCALE,
                             (float) part.getMannequinScale() * extraMultiplier,
                             part.getEntityId(),
                             player);

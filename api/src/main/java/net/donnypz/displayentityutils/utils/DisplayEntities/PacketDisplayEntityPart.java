@@ -345,7 +345,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (!isDisplay()) return false;
         Vector3f vec = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.SCALE, new Vector3f());
         vec.x = scale;
-        attributeContainer.setAttributeAndSend(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
+        attributeContainer.setAndSendToUUIDs(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
         return true;
     }
 
@@ -354,7 +354,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (!isDisplay()) return false;
         Vector3f vec = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.SCALE, new Vector3f());
         vec.y = scale;
-        attributeContainer.setAttributeAndSend(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
+        attributeContainer.setAndSendToUUIDs(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
         return true;
     }
 
@@ -363,7 +363,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (!isDisplay()) return false;
         Vector3f vec = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.SCALE, new Vector3f());
         vec.z = scale;
-        attributeContainer.setAttributeAndSend(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
+        attributeContainer.setAndSendToUUIDs(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
         return true;
     }
 
@@ -374,7 +374,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         vec.x = x;
         vec.y = y;
         vec.z = z;
-        attributeContainer.setAttributeAndSend(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
+        attributeContainer.setAndSendToUUIDs(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
         return true;
     }
 
@@ -778,13 +778,13 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     @Override
     public <T, V> void setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value) {
-        this.attributeContainer.setAttributeAndSend(attribute, value, getEntityId(), viewers);
+        this.attributeContainer.setAndSendToUUIDs(attribute, value, getEntityId(), viewers);
     }
 
 
     @Override
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap){
-        this.attributeContainer.setAttributesAndSend(attributeMap, getEntityId(), viewers);
+        this.attributeContainer.setAndSendToUUIDs(attributeMap, getEntityId(), viewers);
     }
 
     /**
@@ -805,7 +805,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     private <T, V>void setAndSend(DisplayAttribute<T, V> attribute, T value){
-        attributeContainer.setAttributeAndSend(attribute, value, getEntityId(), viewers);
+        attributeContainer.setAndSendToUUIDs(attribute, value, getEntityId(), viewers);
     }
 
     /**
@@ -870,21 +870,21 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     @Override
     public void setInteractionHeight(float height) {
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            attributeContainer.setAttributeAndSend(DisplayAttributes.Interaction.HEIGHT, height, getEntityId(), viewers);
+            attributeContainer.setAndSendToUUIDs(DisplayAttributes.Interaction.HEIGHT, height, getEntityId(), viewers);
         }
     }
 
     @Override
     public void setInteractionWidth(float width) {
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            attributeContainer.setAttributeAndSend(DisplayAttributes.Interaction.WIDTH, width, getEntityId(), viewers);
+            attributeContainer.setAndSendToUUIDs(DisplayAttributes.Interaction.WIDTH, width, getEntityId(), viewers);
         }
     }
 
     @Override
     public void setInteractionResponsive(boolean responsive) {
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            attributeContainer.setAttributeAndSend(DisplayAttributes.Interaction.RESPONSIVE, responsive, getEntityId(), viewers);
+            attributeContainer.setAndSendToUUIDs(DisplayAttributes.Interaction.RESPONSIVE, responsive, getEntityId(), viewers);
         }
     }
 
@@ -976,7 +976,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     protected void cull(float width, float height) {
         if (!isDisplay()) return;
         attributeContainer
-            .setAttributesAndSend(new DisplayAttributeMap()
+            .setAndSendToUUIDs(new DisplayAttributeMap()
                     .add(DisplayAttributes.Culling.HEIGHT, height)
                     .add(DisplayAttributes.Culling.WIDTH, width),
             getEntityId(),

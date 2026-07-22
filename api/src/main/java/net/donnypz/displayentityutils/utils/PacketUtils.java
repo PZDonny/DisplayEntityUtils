@@ -39,7 +39,7 @@ public final class PacketUtils {
      */
     public static <T,V> PacketAttributeContainer setAttribute(@NotNull Player player, int entityId, @NotNull DisplayAttribute<T, V> attribute, T value){
         return new PacketAttributeContainer()
-                .setAttributeAndSend(attribute, value, entityId, player);
+                .setAndSend(attribute, value, entityId, player);
     }
 
     /**
@@ -51,7 +51,7 @@ public final class PacketUtils {
      */
     public static PacketAttributeContainer setAttributes(@NotNull Player player, int entityId, @NotNull DisplayAttributeMap attributeMap){
         return new PacketAttributeContainer()
-                .setAttributesAndSend(attributeMap, entityId, player);
+                .setAndSend(attributeMap, entityId, player);
     }
 
 

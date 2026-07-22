@@ -389,7 +389,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                             .add(DisplayAttributes.Culling.WIDTH, values[0]);
                 }
 
-                part.attributeContainer.setAttributesAndSend(attributeMap, part.getEntityId(), part.viewers);
+                part.attributeContainer.setAndSendToUUIDs(attributeMap, part.getEntityId(), part.viewers);
             }
             //Non Displays
             else if (scaleNonDisplays) {
@@ -414,7 +414,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
                 } else if (part.type == SpawnedDisplayEntityPart.PartType.MANNEQUIN) {
                     double scale = part.attributeContainer.getAttributeOrDefault(DisplayAttributes.Mannequin.SCALE, 1f);
                     scale = (scale / originalScaleMultiplier) * newScaleMultiplier;
-                    part.attributeContainer.setAttributeAndSend(DisplayAttributes.Mannequin.SCALE, (float) scale, part.getEntityId(), part.viewers);
+                    part.attributeContainer.setAndSendToUUIDs(DisplayAttributes.Mannequin.SCALE, (float) scale, part.getEntityId(), part.viewers);
                 }
             }
         }
