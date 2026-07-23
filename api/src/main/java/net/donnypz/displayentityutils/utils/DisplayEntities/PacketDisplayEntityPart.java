@@ -391,53 +391,79 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public void rotate(@NotNull Quaternionf rotation) {
+    public void rotate(@NotNull Quaternionf rotation, boolean worldSpace) {
         if (!isDisplay()) return;
 
         Quaternionf originalRot = attributeContainer
                 .getAttributeOrDefault(
                         DisplayAttributes.Transform.LEFT_ROTATION,
                         new Quaternionf());
-        Quaternionf finalRot = new Quaternionf(originalRot).mul(rotation);
+        Quaternionf appliedRotation = new Quaternionf(rotation);
+
+        if (worldSpace) {
+            Location loc = getLocation();
+            Quaternionf entityRot = new Quaternionf()
+                    .rotateY((float) Math.toRadians(-loc.getYaw()))
+                    .rotateX((float) Math.toRadians(loc.getPitch()));
+
+            Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
+
+            //world space to display's space
+            appliedRotation = invertedEntityRot
+                    .mul(appliedRotation)
+                    .mul(entityRot);
+        }
+
+        Quaternionf finalRot = new Quaternionf(appliedRotation).mul(originalRot);
 
         this.setAttribute(DisplayAttributes.Transform.LEFT_ROTATION, finalRot);
     }
 
     @Override
-    public void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation) {
+    public void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
         if (!isDisplay()) return;
-
-        Quaternionf originalRot = attributeContainer
-                .getAttributeOrDefault(
-                        DisplayAttributes.Transform.LEFT_ROTATION,
-                        new Quaternionf());
-
 
         Vector3f translation = new Vector3f(attributeContainer
                 .getAttributeOrDefault(
                         DisplayAttributes.Transform.TRANSLATION,
                         new Vector3f()));
 
+        Quaternionf originalRot = attributeContainer
+                .getAttributeOrDefault(
+                        DisplayAttributes.Transform.LEFT_ROTATION,
+                        new Quaternionf());
+
         //entity to pivot
-        Vector3f worldPivot = pivotLocation.toVector()
+        Vector3f toPivot = pivotLocation.toVector()
                 .subtract(getLocation().toVector())
                 .toVector3f();
 
+        Quaternionf appliedRotation = new Quaternionf(rotation);
+        Vector3f localPivot = new Vector3f(toPivot);
 
-        //undo entity's rotation
-        Quaternionf invertedEntityRotation = new Quaternionf()
-                .rotateY((float) Math.toRadians(-getYaw()))
-                .rotateX((float) Math.toRadians(getPitch()))
-                .invert();
 
-        Vector3f localPivot = worldPivot.rotate(invertedEntityRotation);
+        if (worldSpace) {
+            Location loc = getLocation();
+            Quaternionf entityRot = new Quaternionf()
+                    .rotateY((float) Math.toRadians(-loc.getYaw()))
+                    .rotateX((float) Math.toRadians(loc.getPitch()));
+            Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
+
+            //convert the offset from world space into the display's space (pitch/yaw)
+            localPivot.rotate(invertedEntityRot);
+
+            //world space to display's space (pitch/yaw)
+            appliedRotation = invertedEntityRot
+                    .mul(appliedRotation)
+                    .mul(entityRot);
+        }
 
         //rot around pivot point
         translation.sub(localPivot);
-        translation.rotate(rotation);
+        translation.rotate(appliedRotation);
         translation.add(localPivot);
 
-        Quaternionf finalRot = new Quaternionf(rotation).mul(originalRot);
+        Quaternionf finalRot = new Quaternionf(appliedRotation).mul(originalRot);
         this.setAttributes(new DisplayAttributeMap()
                 .add(DisplayAttributes.Transform.TRANSLATION, translation)
                 .add(DisplayAttributes.Transform.LEFT_ROTATION, finalRot));

@@ -156,8 +156,11 @@ public final class PacketUtils {
      * @param display the display entity
      * @param rotation the rotation
      */
-    public static void rotate(@NotNull Player player, @NotNull Display display, @NotNull Quaternionf rotation){
-        rotate(List.of(player), display, rotation);
+    public static void rotate(@NotNull Player player,
+                              @NotNull Display display,
+                              @NotNull Quaternionf rotation,
+                              boolean worldSpace){
+        rotate(List.of(player), display, rotation, worldSpace);
     }
 
     /**
@@ -166,8 +169,14 @@ public final class PacketUtils {
      * @param display the display entity
      * @param rotation the rotation
      */
-    public static void rotate(@NotNull Collection<Player> players, @NotNull Display display, @NotNull Quaternionf rotation){
-        rotate(players, display.getEntityId(), rotation, display.getTransformation());
+    public static void rotate(@NotNull Collection<Player> players,
+                              @NotNull Display display,
+                              @NotNull Quaternionf rotation,
+                              boolean worldSpace){
+        Transformation t = display.getTransformation();
+        float pitch = display.getPitch();
+        float yaw = display.getYaw();
+        rotate(players, display.getEntityId(), rotation, t, worldSpace, pitch, yaw);
     }
 
     /**
@@ -176,8 +185,11 @@ public final class PacketUtils {
      * @param part the part
      * @param rotation the rotation
      */
-    public static void rotate(@NotNull Player player, @NotNull ActivePart part, @NotNull Quaternionf rotation){
-        rotate(List.of(player), part, rotation);
+    public static void rotate(@NotNull Player player,
+                              @NotNull ActivePart part,
+                              @NotNull Quaternionf rotation,
+                              boolean worldSpace){
+        rotate(List.of(player), part, rotation, worldSpace);
     }
 
     /**
@@ -186,18 +198,46 @@ public final class PacketUtils {
      * @param part the part
      * @param rotation the rotation
      */
-    public static void rotate(@NotNull Collection<Player> players, @NotNull ActivePart part, @NotNull Quaternionf rotation){
+    public static void rotate(@NotNull Collection<Player> players,
+                              @NotNull ActivePart part,
+                              @NotNull Quaternionf rotation,
+                              boolean worldSpace){
         if (!part.isDisplay()) return;
 
         Transformation t = part.getTransformation();
         if (t == null) return;
 
-        rotate(players, part.getEntityId(), rotation, t);
+        Location l = part.getLocation();
+        float pitch = l == null ? 0 : l.getPitch();
+        float yaw = l == null ? 0 : l.getYaw();
+
+        rotate(players, part.getEntityId(), rotation, t, worldSpace, pitch, yaw);
     }
 
-    private static void rotate(Collection<Player> players, int entityId, Quaternionf rotation, Transformation transformation){
+    private static void rotate(Collection<Player> players,
+                               int entityId,
+                               Quaternionf rotation,
+                               Transformation transformation,
+                               boolean worldSpace,
+                               float pitch,
+                               float yaw){
         Quaternionf originalRot = transformation.getLeftRotation();
-        Quaternionf finalRot = new Quaternionf(originalRot).mul(rotation);
+        Quaternionf appliedRotation = new Quaternionf(rotation);
+
+        if (worldSpace) {
+            Quaternionf entityRot = new Quaternionf()
+                    .rotateY((float) Math.toRadians(-yaw))
+                    .rotateX((float) Math.toRadians(pitch));
+
+            Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
+
+            //world space to display's space
+            appliedRotation = invertedEntityRot
+                    .mul(appliedRotation)
+                    .mul(entityRot);
+        }
+
+        Quaternionf finalRot = new Quaternionf(appliedRotation).mul(originalRot);
 
         new DisplayAttributeMap()
                 .add(DisplayAttributes.Transform.LEFT_ROTATION, finalRot)
@@ -211,8 +251,12 @@ public final class PacketUtils {
      * @param rotation the rotation
      * @param pivotLocation the location that should be pivoted around
      */
-    public static void rotateAround(@NotNull Player player, @NotNull Display display, @NotNull Quaternionf rotation, @NotNull Location pivotLocation){
-        rotateAround(List.of(player), display, rotation, pivotLocation);
+    public static void rotateAround(@NotNull Player player,
+                                    @NotNull Display display,
+                                    @NotNull Quaternionf rotation,
+                                    @NotNull Location pivotLocation,
+                                    boolean worldSpace){
+        rotateAround(List.of(player), display, rotation, pivotLocation, worldSpace);
     }
 
     /**
@@ -222,8 +266,12 @@ public final class PacketUtils {
      * @param rotation the rotation
      * @param pivotLocation the location that should be pivoted around
      */
-    public static void rotateAround(@NotNull Collection<Player> players, @NotNull Display display, @NotNull Quaternionf rotation, @NotNull Location pivotLocation){
-        rotateAround(players, display.getEntityId(), rotation, pivotLocation, display.getTransformation(), display.getLocation());
+    public static void rotateAround(@NotNull Collection<Player> players,
+                                    @NotNull Display display,
+                                    @NotNull Quaternionf rotation,
+                                    @NotNull Location pivotLocation,
+                                    boolean worldSpace){
+        rotateAround(players, display.getEntityId(), rotation, pivotLocation, display.getTransformation(), display.getLocation(), worldSpace);
     }
 
     /**
@@ -233,8 +281,12 @@ public final class PacketUtils {
      * @param rotation the rotation
      * @param pivotLocation the location that should be pivoted around
      */
-    public static void rotateAround(@NotNull Player player, @NotNull ActivePart part, @NotNull Quaternionf rotation, @NotNull Location pivotLocation){
-        rotateAround(List.of(player), part, rotation, pivotLocation);
+    public static void rotateAround(@NotNull Player player,
+                                    @NotNull ActivePart part,
+                                    @NotNull Quaternionf rotation,
+                                    @NotNull Location pivotLocation,
+                                    boolean worldSpace){
+        rotateAround(List.of(player), part, rotation, pivotLocation, worldSpace);
     }
 
     /**
@@ -244,7 +296,11 @@ public final class PacketUtils {
      * @param rotation the rotation
      * @param pivotLocation the location that should be pivoted around
      */
-    public static void rotateAround(@NotNull Collection<Player> players, @NotNull ActivePart part, @NotNull Quaternionf rotation, @NotNull Location pivotLocation){
+    public static void rotateAround(@NotNull Collection<Player> players,
+                                    @NotNull ActivePart part,
+                                    @NotNull Quaternionf rotation,
+                                    @NotNull Location pivotLocation,
+                                    boolean worldSpace){
         if (!part.isDisplay()) return;
 
         Transformation t = part.getTransformation();
@@ -253,7 +309,7 @@ public final class PacketUtils {
         Location partLoc = part.getLocation();
         if (partLoc == null) return;
 
-        rotateAround(players, part.getEntityId(), rotation, pivotLocation, t, partLoc);
+        rotateAround(players, part.getEntityId(), rotation, pivotLocation, t, partLoc, worldSpace);
     }
 
     private static void rotateAround(Collection<Player> players,
@@ -261,30 +317,43 @@ public final class PacketUtils {
                                      Quaternionf rotation,
                                      Location pivotLocation,
                                      Transformation transformation,
-                                     Location entityLocation){
-        Quaternionf originalRot = transformation.getLeftRotation();
+                                     Location entityLocation,
+                                     boolean worldSpace){
         Vector3f translation = transformation.getTranslation();
+        Quaternionf originalRot = transformation.getLeftRotation();
 
         //entity to pivot
-        Vector3f worldPivot = pivotLocation.toVector()
+        Vector3f toPivot = pivotLocation.toVector()
                 .subtract(entityLocation.toVector())
                 .toVector3f();
 
+        Quaternionf appliedRotation = new Quaternionf(rotation);
+        Vector3f localPivot = new Vector3f(toPivot);
 
-        //undo entity's rotation
-        Quaternionf invertedEntityRotation = new Quaternionf()
-                .rotateY((float) Math.toRadians(-entityLocation.getYaw()))
-                .rotateX((float) Math.toRadians(entityLocation.getPitch()))
-                .invert();
 
-        Vector3f localPivot = worldPivot.rotate(invertedEntityRotation);
+        if (worldSpace) {
+            float pitch = entityLocation.getPitch();
+            float yaw = entityLocation.getYaw();
+            Quaternionf entityRot = new Quaternionf()
+                    .rotateY((float) Math.toRadians(-yaw))
+                    .rotateX((float) Math.toRadians(pitch));
+            Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
+
+            //convert the offset from world space into the display's space (pitch/yaw)
+            localPivot.rotate(invertedEntityRot);
+
+            //world space to display's space (pitch/yaw)
+            appliedRotation = invertedEntityRot
+                    .mul(appliedRotation)
+                    .mul(entityRot);
+        }
 
         //rot around pivot point
         translation.sub(localPivot);
-        translation.rotate(rotation);
+        translation.rotate(appliedRotation);
         translation.add(localPivot);
 
-        Quaternionf finalRot = new Quaternionf(rotation).mul(originalRot);
+        Quaternionf finalRot = new Quaternionf(appliedRotation).mul(originalRot);
         new DisplayAttributeMap()
                 .add(DisplayAttributes.Transform.TRANSLATION, translation)
                 .add(DisplayAttributes.Transform.LEFT_ROTATION, finalRot)

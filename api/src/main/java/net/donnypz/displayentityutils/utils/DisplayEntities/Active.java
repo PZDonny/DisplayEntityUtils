@@ -65,14 +65,16 @@ public interface Active {
 
     /**
      * @param rotation the rotation
+     * @param worldSpace whether the rotation should occur on world space axis
      */
-    void rotate(@NotNull Quaternionf rotation);
+    void rotate(@NotNull Quaternionf rotation, boolean worldSpace);
 
     /**
      * @param rotation the rotation
      * @param pivotLocation the location that should be pivoted around
+     * @param worldSpace whether the rotation should occur on world space axis
      */
-    void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation);
+    void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace);
 
     void hideFromPlayer(@NotNull Player player);
 

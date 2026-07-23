@@ -672,12 +672,29 @@ public final class DisplayUtils {
      * The rotation is applied in addition to the entity's current rotation.
      * @param display the display entity
      * @param rotation the rotation
+     * @param worldSpace whether the rotation should occur on world space axis
      */
-    public static void rotate(@NotNull Display display, @NotNull Quaternionf rotation){
+    public static void rotate(@NotNull Display display, @NotNull Quaternionf rotation, boolean worldSpace){
         Transformation t = display.getTransformation();
         Quaternionf originalRot = t.getLeftRotation();
 
-        Quaternionf finalRot = new Quaternionf(originalRot).mul(rotation);
+        Quaternionf appliedRotation = new Quaternionf(rotation);
+
+        if (worldSpace) {
+            Quaternionf entityRot = new Quaternionf()
+                    .rotateY((float) Math.toRadians(-display.getYaw()))
+                    .rotateX((float) Math.toRadians(display.getPitch()));
+
+            Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
+
+            //world space to display's space
+            appliedRotation = invertedEntityRot
+                    .mul(appliedRotation)
+                    .mul(entityRot);
+        }
+
+        Quaternionf finalRot = new Quaternionf(appliedRotation)
+                .mul(originalRot);
 
         Transformation newT = new Transformation(
                 t.getTranslation(),
@@ -693,33 +710,48 @@ public final class DisplayUtils {
      * @param display the display entity
      * @param rotation the rotation
      * @param pivotLocation the location that should be pivoted around
+     * @param worldSpace whether the rotation should occur on world space axis
      */
-    public static void rotateAround(@NotNull Display display, @NotNull Quaternionf rotation, @NotNull Location pivotLocation){
+    public static void rotateAround(
+            @NotNull Display display,
+            @NotNull Quaternionf rotation,
+            @NotNull Location pivotLocation,
+            boolean worldSpace
+    ) {
         Transformation t = display.getTransformation();
 
         Vector3f translation = t.getTranslation();
         Quaternionf originalRot = t.getLeftRotation();
 
         //entity to pivot
-        Vector3f worldPivot = pivotLocation.toVector()
+        Vector3f toPivot = pivotLocation.toVector()
                 .subtract(display.getLocation().toVector())
                 .toVector3f();
 
+        Quaternionf appliedRotation = new Quaternionf(rotation);
+        Vector3f localPivot = new Vector3f(toPivot);
 
-        //undo entity's rotation
-        Quaternionf invertedEntityRotation = new Quaternionf()
-                .rotateY((float) Math.toRadians(-display.getYaw()))
-                .rotateX((float) Math.toRadians(display.getPitch()))
-                .invert();
+        if (worldSpace) {
+            Quaternionf entityRot = new Quaternionf()
+                    .rotateY((float) Math.toRadians(-display.getYaw()))
+                    .rotateX((float) Math.toRadians(display.getPitch()));
+            Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
 
-        Vector3f localPivot = worldPivot.rotate(invertedEntityRotation);
+            //convert the offset from world space into the display's space (pitch/yaw)
+            localPivot.rotate(invertedEntityRot);
+
+            //world space to display's space (pitch/yaw)
+            appliedRotation = invertedEntityRot
+                    .mul(appliedRotation)
+                    .mul(entityRot);
+        }
 
         //rot around pivot point
         translation.sub(localPivot);
-        translation.rotate(rotation);
+        translation.rotate(appliedRotation);
         translation.add(localPivot);
 
-        Quaternionf finalRot = new Quaternionf(rotation).mul(originalRot);
+        Quaternionf finalRot = new Quaternionf(appliedRotation).mul(originalRot);
 
         display.setTransformation(new Transformation(
                 translation,

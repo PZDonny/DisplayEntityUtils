@@ -355,19 +355,19 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * Rotate the display entities in this group in their local space {@link Transformation} and around this group.
      */
     @Override
-    public void rotate(@NotNull Quaternionf rotation){
+    public void rotate(@NotNull Quaternionf rotation, boolean worldSpace){
         Location location = getLocation();
         if (location == null) return;
-        this.rotateAround(rotation, location);
+        this.rotateAround(rotation, location, worldSpace);
     }
 
     /**
      * Rotate the display entities in this group in their local space {@link Transformation} and around a given pivot location.
      */
     @Override
-    public void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation){
+    public void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace){
         for (ActivePart p : groupParts.values()){
-            p.rotateAround(rotation, pivotLocation);
+            p.rotateAround(rotation, pivotLocation, worldSpace);
         }
     }
 

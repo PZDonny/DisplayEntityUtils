@@ -343,19 +343,19 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
      * Rotate the display entities in this selection in their local space {@link Transformation} and around their group.
      */
     @Override
-    public void rotate(@NotNull Quaternionf rotation) {
+    public void rotate(@NotNull Quaternionf rotation, boolean worldSpace) {
         Location location = getLocation();
         if (location == null) return;
-        this.rotateAround(rotation, location);
+        this.rotateAround(rotation, location, worldSpace);
     }
 
     /**
      * Rotate the display entities in this selection in their local space {@link Transformation} and around a given pivot location.
      */
     @Override
-    public void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation) {
+    public void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
         for (T part : selectedParts){
-            part.rotateAround(rotation, pivotLocation);
+            part.rotateAround(rotation, pivotLocation, worldSpace);
         }
     }
 

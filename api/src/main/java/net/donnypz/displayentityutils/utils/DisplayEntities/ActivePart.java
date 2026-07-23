@@ -405,19 +405,16 @@ public abstract class ActivePart implements Active{
     /**
      * Rotate this display entity part in its local space {@link Transformation}.
      * The rotation is applied in addition to the entity's current rotation
-     * @param rotation the rotation
      */
     @Override
-    public abstract void rotate(@NotNull Quaternionf rotation);
+    public abstract void rotate(@NotNull Quaternionf rotation, boolean worldSpace);
 
     /**
      * Rotate this display entity part around a given pivot and their local space {@link Transformation}.
      * The rotation is applied in addition to the entity's current rotation
-     * @param rotation the rotation
-     * @param pivotLocation the location that should be pivoted around
      */
     @Override
-    public abstract void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation);
+    public abstract void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace);
 
     /**
      * Set the text of this part if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.

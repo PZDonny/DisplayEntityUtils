@@ -20,6 +20,7 @@ public class GroupRotateCMD extends GroupSubCommand {
         super("rotate", parentSubCommand, Permission.GROUP_TRANSFORM, true);
         setTabComplete(2, List.of("x", "y", "z"));
         setTabComplete(3, "<angle-in-degrees>");
+        addFlag("-world");
     }
 
     @Override
@@ -56,7 +57,8 @@ public class GroupRotateCMD extends GroupSubCommand {
             else{
                 q.rotateZ(rotRad);
             }
-            group.rotate(q);
+            boolean worldSpace = getOptionalArguments(player, args).hasFlag("-world");
+            group.rotate(q, worldSpace);
         }
         catch(IllegalArgumentException e){
             if (e instanceof NumberFormatException){
@@ -67,6 +69,6 @@ public class GroupRotateCMD extends GroupSubCommand {
 
     @Override
     protected String getDescription() {
-        return "Rotate a group around a given axis.";
+        return "Rotate a group around a given axis. Use \"-world\" to rotate in world space.";
     }
 }

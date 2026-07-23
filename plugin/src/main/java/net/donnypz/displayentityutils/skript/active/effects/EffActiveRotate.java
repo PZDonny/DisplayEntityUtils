@@ -34,6 +34,7 @@ public class EffActiveRotate extends Effect {
     Expression<?> object;
     Expression<Number> rotation;
     Expression<Location> pivotLocation;
+    boolean world;
     char axis;
 
     public static void register(SyntaxRegistry registry){
@@ -56,6 +57,7 @@ public class EffActiveRotate extends Effect {
         } else if (parseResult.hasTag("z")) {
             axis = 'z';
         }
+        world = parseResult.hasTag("world");
         pivotLocation = (Expression<Location>) expressions[2];
         return true;
     }
@@ -68,8 +70,7 @@ public class EffActiveRotate extends Effect {
         Number rot = rotation.getSingle(event);
         if (rot == null) return;
 
-        Location pivotLoc = pivotLocation.getSingle(event);
-
+        Location pivotLoc = pivotLocation == null ? null : pivotLocation.getSingle(event);
         float rotRad = (float) Math.toRadians(rot.doubleValue());
         Quaternionf q = new Quaternionf();
         if (axis == 'x'){
@@ -83,12 +84,12 @@ public class EffActiveRotate extends Effect {
         }
 
         if (obj instanceof ActiveGroup<?> gr){
-            if (pivotLoc == null) gr.rotate(q);
-            else gr.rotateAround(q, pivotLoc);
+            if (pivotLoc == null) gr.rotate(q, world);
+            else gr.rotateAround(q, pivotLoc, world);
         }
         else if (obj instanceof ActivePart part){
-            if (pivotLoc == null) part.rotate(q);
-            else part.rotateAround(q, pivotLoc);
+            if (pivotLoc == null) part.rotate(q, world);
+            else part.rotateAround(q, pivotLoc, world);
         }
     }
 
