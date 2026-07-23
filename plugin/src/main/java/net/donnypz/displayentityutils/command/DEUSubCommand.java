@@ -131,6 +131,12 @@ public abstract class DEUSubCommand {
         return suggestion;
     }
 
+    protected TabSuggestion setOptionalTabComplete(int index, List<String> suggestions){
+        TabSuggestion s = new TabSuggestion(suggestions);
+        setTabComplete(index, s, false);
+        return s;
+    }
+
     protected void setTabComplete(int index, TabSuggestion suggestion){
         setTabComplete(index, suggestion, true);
     }
