@@ -83,12 +83,12 @@ public class EffActiveRotate extends Effect {
         }
 
         if (obj instanceof ActiveGroup<?> gr){
-            if (pivotLoc == null) gr.rotateDisplays(q);
-            else gr.rotateDisplays(q, pivotLoc);
+            if (pivotLoc == null) gr.rotate(q);
+            else gr.rotateAround(q, pivotLoc);
         }
         else if (obj instanceof ActivePart part){
-            if (pivotLoc == null) part.rotateDisplay(q);
-            else part.rotateDisplay(q, pivotLoc);
+            if (pivotLoc == null) part.rotate(q);
+            else part.rotateAround(q, pivotLoc);
         }
     }
 

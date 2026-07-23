@@ -6,10 +6,12 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
 
 import java.util.Collection;
 
@@ -151,6 +153,27 @@ public final class SinglePartSelection extends ActivePartSelection<SpawnedDispla
     @Override
     public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks) {
         return selectedPart.translate(direction, distance, durationInTicks, delayInTicks);
+    }
+
+    /**
+     * Rotate the select display entity part in its local space {@link Transformation}.
+     * The rotation is applied in addition to the entity's current rotation
+     * @param rotation the rotation
+     */
+    @Override
+    public void rotate(@NotNull Quaternionf rotation) {
+        selectedPart.rotate(rotation);
+    }
+
+    /**
+     * Rotate the selected display entity part around a given pivot and their local space {@link Transformation}
+     * The rotation is applied in addition to the entity's current rotation
+     * @param rotation the rotation
+     * @param pivotLocation the location that should be pivoted around
+     */
+    @Override
+    public void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation) {
+        selectedPart.rotateAround(rotation, pivotLocation);
     }
 
     @Override

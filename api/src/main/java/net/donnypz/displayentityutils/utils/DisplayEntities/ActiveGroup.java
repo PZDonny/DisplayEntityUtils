@@ -21,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -351,23 +352,22 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
-     * Rotate the display entities in this group
-     * @param rotation the rotation
+     * Rotate the display entities in this group in their local space {@link Transformation} and around this group.
      */
-    public void rotateDisplays(@NotNull Quaternionf rotation){
-        for (ActivePart p : groupParts.values()){
-            p.rotateDisplay(rotation);
-        }
+    @Override
+    public void rotate(@NotNull Quaternionf rotation){
+        Location location = getLocation();
+        if (location == null) return;
+        this.rotateAround(rotation, location);
     }
 
     /**
-     * Rotate the display entities in this group, around a given pivot
-     * @param rotation the rotation
-     * @param pivotLocation the location to pivot around
+     * Rotate the display entities in this group in their local space {@link Transformation} and around a given pivot location.
      */
-    public void rotateDisplays(@NotNull Quaternionf rotation, @NotNull Location pivotLocation){
+    @Override
+    public void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation){
         for (ActivePart p : groupParts.values()){
-            p.rotateDisplay(rotation, pivotLocation);
+            p.rotateAround(rotation, pivotLocation);
         }
     }
 

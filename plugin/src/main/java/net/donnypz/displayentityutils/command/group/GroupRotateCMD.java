@@ -56,7 +56,7 @@ public class GroupRotateCMD extends GroupSubCommand {
             else{
                 q.rotateZ(rotRad);
             }
-            group.rotateDisplays(q);
+            group.rotate(q);
         }
         catch(IllegalArgumentException e){
             if (e instanceof NumberFormatException){

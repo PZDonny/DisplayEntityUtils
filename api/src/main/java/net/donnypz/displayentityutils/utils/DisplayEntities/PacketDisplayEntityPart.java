@@ -391,7 +391,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public void rotateDisplay(@NotNull Quaternionf rotation) {
+    public void rotate(@NotNull Quaternionf rotation) {
         if (!isDisplay()) return;
 
         Quaternionf originalRot = attributeContainer
@@ -404,7 +404,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public void rotateDisplay(@NotNull Quaternionf rotation, @NotNull Location pivotLocation) {
+    public void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation) {
         if (!isDisplay()) return;
 
         Quaternionf originalRot = attributeContainer

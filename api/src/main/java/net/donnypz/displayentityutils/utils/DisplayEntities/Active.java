@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
 
 import java.util.Collection;
 
@@ -61,6 +62,17 @@ public interface Active {
     boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks);
 
     boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks);
+
+    /**
+     * @param rotation the rotation
+     */
+    void rotate(@NotNull Quaternionf rotation);
+
+    /**
+     * @param rotation the rotation
+     * @param pivotLocation the location that should be pivoted around
+     */
+    void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation);
 
     void hideFromPlayer(@NotNull Player player);
 

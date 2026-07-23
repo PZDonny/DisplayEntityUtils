@@ -6,12 +6,15 @@ import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.PivotAxis;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
 
 import java.util.*;
 
@@ -333,6 +336,26 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
     public void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
         for (T part : selectedParts){
             part.setRotation(pitch, yaw, pivotPitch, pivotPitch);
+        }
+    }
+
+    /**
+     * Rotate the display entities in this selection in their local space {@link Transformation} and around their group.
+     */
+    @Override
+    public void rotate(@NotNull Quaternionf rotation) {
+        Location location = getLocation();
+        if (location == null) return;
+        this.rotateAround(rotation, location);
+    }
+
+    /**
+     * Rotate the display entities in this selection in their local space {@link Transformation} and around a given pivot location.
+     */
+    @Override
+    public void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation) {
+        for (T part : selectedParts){
+            part.rotateAround(rotation, pivotLocation);
         }
     }
 

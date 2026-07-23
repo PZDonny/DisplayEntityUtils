@@ -507,7 +507,7 @@ public final class PlaceableGroupManager {
 
         PacketDisplayEntityGroup pg = group.createPacketGroup(spawnLocation, GroupSpawnedEvent.SpawnReason.ITEMSTACK, true);
         if (pg == null) return null;
-        pg.rotateDisplays(rotation);
+        pg.rotate(rotation);
         pg.setPersistent(true);
 
         Bukkit.getScheduler().runTask(DisplayAPI.getPlugin(), () -> {
