@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 class DisplayTranslateCMD extends PartsSubCommand {
     DisplayTranslateCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("translate", parentSubCommand, Permission.DISPLAY_TRANSLATE, true);
+        super("translate", parentSubCommand, Permission.DISPLAY_TRANSFORM, true);
         setTabComplete(2, TabSuggestion.DIRECTIONS);
         setTabComplete(3, "<distance>");
         setTabComplete(4, "<tick-duration>");

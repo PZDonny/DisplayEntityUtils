@@ -61,7 +61,6 @@ public enum Permission {
 
     DISPLAY_SET_BLOCK("deu.display.setblock"),
     DISPLAY_GLOW_COLOR("deu.display.glowcolor"),
-    DISPLAY_TRANSLATE("deu.display.translate"),
     DISPLAY_TRANSFORM("deu.display.transform"),
     DISPLAY_BILLBOARD("deu.display.billboard"),
     DISPLAY_BRIGHTNESS("deu.display.brightness"),

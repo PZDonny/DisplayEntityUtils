@@ -22,7 +22,7 @@ import java.util.List;
 
 class DisplayResetCMD extends PartsSubCommand {
     DisplayResetCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("reset", parentSubCommand, Permission.DISPLAY_TRANSLATE, true);
+        super("reset", parentSubCommand, Permission.DISPLAY_TRANSFORM, true);
         setTabComplete(2, List.of("translation", "rotation", "scale", "all"));
         super.cancelIfDraggingGizmo();
     }
