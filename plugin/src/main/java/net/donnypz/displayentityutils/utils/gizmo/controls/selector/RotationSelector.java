@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
+import net.donnypz.displayentityutils.utils.gizmo.controls.drag.RotationDrag;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoMathUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -83,6 +84,7 @@ public class RotationSelector extends Selector {
                 gizmoSpace,
                 gizmoLocation
         ).normalize();
+
         Vector3f axis2 = GizmoMathUtil.rotate(
                 rotPlaneAxes[1].getDirections()[0],
                 gizmoSpace,
@@ -92,7 +94,6 @@ public class RotationSelector extends Selector {
         float dotAxis1 = hit.dot(axis1);
         float dotAxis2 = hit.dot(axis2);
 
-        //
         //would be zero, but gizmo model is a bit longer on rotation rings
         if (dotAxis1 < -0.16f || dotAxis2 < -0.16f) return -1;
 
@@ -115,7 +116,6 @@ public class RotationSelector extends Selector {
 
     @Override
     public Drag getDrag(Player player, GizmoSessionImpl gizmo) {
-        // TODO
-        return null;
+        return new RotationDrag(player, gizmo, axis);
     }
 }
