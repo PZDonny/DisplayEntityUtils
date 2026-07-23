@@ -7,12 +7,9 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.util.Color;
 import ch.njol.skript.util.ColorRGB;
-import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.Active;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
@@ -30,7 +27,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
         "#3.0.0 or later",
         "set {_packetgroup}'s deu glow color to green"})
 @Since("2.6.2, 3.0.0 (Packet), 3.3.2 (Plural)")
-public class ExprActiveGlowColor extends SimplePropertyExpression<Object, Color> {
+public class ExprActiveGlowColor extends SimplePropertyExpression<Active, Color> {
 
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
@@ -48,14 +45,14 @@ public class ExprActiveGlowColor extends SimplePropertyExpression<Object, Color>
 
     @Override
     @Nullable
-    public Color convert(Object object) {
-        if (object instanceof ActiveGroup group){
+    public Color convert(Active active) {
+        if (active instanceof ActiveGroup<?> group){
             if (group.getGlowColor() != null){
                 return ColorRGB.fromBukkitColor(group.getGlowColor());
             }
             return null;
         }
-        else if (object instanceof ActivePart part){
+        else if (active instanceof ActivePart part){
             if (part.getGlowColor() != null){
                 return ColorRGB.fromBukkitColor(part.getGlowColor());
             }
@@ -81,22 +78,20 @@ public class ExprActiveGlowColor extends SimplePropertyExpression<Object, Color>
 
     @Override
     public void change(Event event, Object[] delta, Changer.ChangeMode mode){
-        Object o = getExpr().getSingle(event);
-        if (o == null){
-            return;
-        }
-        Active spawned = (Active) o;
-
         switch (mode) {
             case SET -> {
                 if (delta == null){
                     return;
                 }
                 Color color = (Color) delta[0];
-                spawned.setGlowColor(color.asBukkitColor());
+                for (Active a : getExpr().getArray(event)){
+                    a.setGlowColor(color.asBukkitColor());
+                }
             }
             case RESET -> {
-                spawned.setGlowColor(null);
+                for (Active a : getExpr().getArray(event)){
+                    a.setGlowColor(null);
+                }
             }
         }
     }
