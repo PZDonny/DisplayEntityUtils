@@ -582,7 +582,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
             ItemStack i = attributeContainer.getAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK);
             if (i == null) return false;
-            return i.getItemMeta().getEnchantmentGlintOverride();
+            return i.getItemMeta().hasEnchantmentGlintOverride() && i.getItemMeta().getEnchantmentGlintOverride();
         }
         return false;
     }

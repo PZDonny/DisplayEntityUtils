@@ -1000,7 +1000,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     public boolean hasItemDisplayItemGlint() {
         ItemStack itemStack = getItemDisplayItem();
         if (itemStack == null) return false;
-        return itemStack.getItemMeta().getEnchantmentGlintOverride();
+        return itemStack.getItemMeta().hasEnchantmentGlintOverride() && itemStack.getItemMeta().getEnchantmentGlintOverride();
     }
 
     @Override
