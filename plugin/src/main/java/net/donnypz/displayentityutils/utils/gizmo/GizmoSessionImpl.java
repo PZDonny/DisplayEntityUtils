@@ -42,7 +42,7 @@ public class GizmoSessionImpl implements GizmoSession {
     private boolean isLinked = true;
     private float scale = 1;
     private final UUID playerUUID;
-    private final ReentrantLock movementLock = new ReentrantLock();
+    private final ReentrantLock dragLock = new ReentrantLock();
 
 
     static {
@@ -272,7 +272,7 @@ public class GizmoSessionImpl implements GizmoSession {
                     cancel();
                     return;
                 }
-                if (!canScan()) {
+                if (!canScan(player)) {
                     return;
                 }
 
@@ -288,13 +288,13 @@ public class GizmoSessionImpl implements GizmoSession {
                         hoveredSelector = hovered;
                     }
                 } else { //Drag
-                    movementLock.lock();
+                    dragLock.lock();
                     try {
                         if (activeDrag != null) {
                             activeDrag.updatePosition(player);
                         }
                     } finally {
-                        movementLock.unlock();
+                        dragLock.unlock();
                     }
                 }
             }
@@ -354,9 +354,10 @@ public class GizmoSessionImpl implements GizmoSession {
         return hovered;
     }
 
-    private boolean canScan() {
+    private boolean canScan(Player player) {
         return valid
                 && visible
-                && scanning;
+                && scanning
+                && player.getWorld().equals(gizmoModel.getLocation().getWorld());
     }
 }
