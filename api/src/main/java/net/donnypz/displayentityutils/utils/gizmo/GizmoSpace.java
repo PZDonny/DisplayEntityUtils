@@ -1,16 +1,15 @@
 package net.donnypz.displayentityutils.utils.gizmo;
 
 public enum GizmoSpace {
-    LOCAL,
-    WORLD;
+    LOCAL("Local (Pitch/Yaw)"),
+    WORLD("World (NSEW)");
 
-    private final String cleanName;
-    GizmoSpace(){
-        String name = name();
-        this.cleanName = name.charAt(0) + name.substring(1).toLowerCase();
+    private final String displayName;
+    GizmoSpace(String displayName){
+        this.displayName = displayName;
     }
 
-    public String getCleanName() {
-        return cleanName;
+    public String getDisplayName() {
+        return displayName;
     }
 }

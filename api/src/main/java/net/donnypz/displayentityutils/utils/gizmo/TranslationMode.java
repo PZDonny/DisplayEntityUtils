@@ -4,13 +4,13 @@ public enum TranslationMode {
     TRANSLATE(),
     TELEPORT();
 
-    private final String cleanName;
+    private final String displayName;
     TranslationMode(){
         String name = name();
-        this.cleanName = name.charAt(0) + name.substring(1).toLowerCase();
+        this.displayName = name.charAt(0) + name.substring(1).toLowerCase();
     }
 
-    public String getCleanName() {
-        return cleanName;
+    public String getDisplayName() {
+        return displayName;
     }
 }

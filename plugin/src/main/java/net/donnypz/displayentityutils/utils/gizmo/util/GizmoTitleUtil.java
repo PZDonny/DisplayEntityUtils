@@ -28,11 +28,11 @@ public class GizmoTitleUtil {
 
     public static void showNewMode(Player player, TranslationMode mode){
         showSubtitle(player,
-                MiniMessage.miniMessage().deserialize("<light_purple>Translation Mode: <yellow>" + mode.getCleanName()));
+                MiniMessage.miniMessage().deserialize("<light_purple>Translation Mode: <yellow>" + mode.getDisplayName()));
     }
 
     public static void showNewSpace(Player player, GizmoSpace gizmoSpace){
         showSubtitle(player,
-                MiniMessage.miniMessage().deserialize("<aqua>Space: <yellow>" + gizmoSpace.getCleanName()));
+                MiniMessage.miniMessage().deserialize("<aqua>Space: <yellow>" + gizmoSpace.getDisplayName()));
     }
 }
