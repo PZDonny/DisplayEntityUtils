@@ -65,7 +65,6 @@ public class EffActiveRotate extends Effect {
         return true;
     }
 
-    //TODO: add functionality for multiple entries, add functionality for displays
     @Override
     protected void execute(Event event) {
         Object[] objects = object.getArray(event);

@@ -44,7 +44,7 @@ public class ExprActiveTeleportDuration extends SimplePropertyExpression<Active,
     @Override
     @Nullable
     public Number convert(Active active) {
-        if (active instanceof ActiveGroup ag){
+        if (active instanceof ActiveGroup<?> ag){
             return ag.getTeleportDuration();
         }
         if (active instanceof ActivePart ap){
