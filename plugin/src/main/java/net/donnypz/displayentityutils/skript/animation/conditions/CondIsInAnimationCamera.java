@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Is Player In Animation Camera?")
+@Name("Is In Animation Camera?")
 @Description("Check if a player is in an animation camera")
 @Examples({"if {_player} is in an animation camera:",
         "\tbroadcast \"The player is viewing an animation from its camera!\""})

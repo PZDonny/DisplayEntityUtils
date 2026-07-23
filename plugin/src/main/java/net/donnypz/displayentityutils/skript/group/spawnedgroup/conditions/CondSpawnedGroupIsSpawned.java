@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Spawned Group Is Spawned?")
+@Name("Spawned Group - Is Spawned")
 @Description("Check if a spawned group is present in the game world")
 @Examples({"if {_group} is spawned:", "\tbroadcast \"The group is spawned in the world!\""})
 @Since("2.6.2")

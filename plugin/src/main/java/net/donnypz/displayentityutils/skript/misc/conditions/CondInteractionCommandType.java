@@ -15,7 +15,7 @@ import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Interaction Command Type")
-@Description("Check if a saved or spawned group has a tag")
+@Description("Check an interaction command's type")
 @Examples({"if {_interactioncmd} is player cmd:", "\tbroadcast \"The player will execute the command!\""})
 @Since("2.6.2")
 public class CondInteractionCommandType extends Condition {

@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Text Display Part Shadowed?")
+@Name("Text Display Part - Is Shadowed")
 @Description("Check if an text display part's text has shadows")
 @Examples({"if {_activepart} has deu text shadows:",
         "\tbroadcast \"This text display part has text shadow!\""})

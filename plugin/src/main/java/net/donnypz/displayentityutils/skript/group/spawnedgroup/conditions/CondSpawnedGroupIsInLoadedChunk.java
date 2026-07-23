@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Spawned Group Is In Loaded Chunk?")
+@Name("Spawned Group - Is In Loaded Chunk")
 @Description("Check if a spawned group is in a loaded chunk")
 @Examples({"if {_group} is in a loaded chunk:", "\tbroadcast \"The group is in a loaded chunk!\""})
 @Since("2.6.2")

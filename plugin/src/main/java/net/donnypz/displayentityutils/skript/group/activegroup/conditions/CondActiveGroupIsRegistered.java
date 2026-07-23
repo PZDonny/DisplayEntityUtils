@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Active Group Is Registered?")
+@Name("Active Group - Is Registered")
 @Description("Check if an active group is registered and usable")
 @Examples({"if deu {_group} is registered:",
         "\tbroadcast \"This group is registered\"",

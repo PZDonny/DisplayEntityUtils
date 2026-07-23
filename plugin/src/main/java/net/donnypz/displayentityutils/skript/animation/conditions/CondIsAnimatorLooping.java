@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Is Display Animator Looping")
+@Name("DisplayAnimator - Is Looping")
 @Description("Check if an animator is looping")
 @Examples({"if {_displayanimator}'s animation type is looping:",
         "\tbroadcast \"The animator's type is looping!\""})

@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Player can see Active Group/Part?")
+@Name("Can see Active Group/Part")
 @Description("Check if a player can see an active group or active part")
 @Examples({"if {_player} can see the deu {_group}:", "\tbroadcast \"The player can see this group\""})
 @Since({"3.0.0"})

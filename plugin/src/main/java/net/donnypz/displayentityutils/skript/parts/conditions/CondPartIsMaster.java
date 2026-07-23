@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Is Part Master/Parent?")
+@Name("Active Part - Is Master/Parent")
 @Description("Check if an active part or a display entity is the master/parent part of an active group")
 @Examples({"if {_activepart} is the master part:",
         "\tbroadcast \"All other parts are the passengers of this one!\""})
