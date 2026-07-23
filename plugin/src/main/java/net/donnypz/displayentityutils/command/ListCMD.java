@@ -17,8 +17,8 @@ import java.util.List;
 public class ListCMD extends ConsoleUsableSubCommand {
     Component incorrectUsageMessage;
     int minLength;
-    private final int STORAGE_INDEX = 2;
-    private final int PAGE_NUMBER_INDEX = 3;
+    private final int STORAGE_INDEX;
+    private final int PAGE_NUMBER_INDEX;
     boolean listsGroups;
 
     public ListCMD(Component incorrectUsageMessage, int minLength, boolean listsGroups) {
@@ -30,6 +30,10 @@ public class ListCMD extends ConsoleUsableSubCommand {
         this.incorrectUsageMessage = incorrectUsageMessage;
         this.minLength = minLength;
         this.listsGroups = listsGroups;
+
+        this.STORAGE_INDEX = minLength-1;
+        this.PAGE_NUMBER_INDEX = minLength;
+
         setTabComplete(STORAGE_INDEX, TabSuggestion.STORAGES);
         setOptionalTabComplete(PAGE_NUMBER_INDEX, "[page-number]");
     }
