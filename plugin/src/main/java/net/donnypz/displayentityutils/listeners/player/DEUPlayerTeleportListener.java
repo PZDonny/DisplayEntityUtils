@@ -1,7 +1,9 @@
 package net.donnypz.displayentityutils.listeners.player;
 
+import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
+import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,6 +33,13 @@ public class DEUPlayerTeleportListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onTPAcrossWorlds(PlayerChangedWorldEvent e) {
         Player player = e.getPlayer();
+
+        DEUUser user = DEUUser.getUser(player);
+        if (user != null){
+            GizmoSessionImpl gizmoSession = (GizmoSessionImpl) user.getGizmo();
+            if (gizmoSession != null) gizmoSession.deselectDrag();
+        }
+
         HashSet<SpawnedDisplayEntityGroup> groups = removePlayerGroupPassengers(player.getUniqueId());
         if (groups == null) {
             return;
