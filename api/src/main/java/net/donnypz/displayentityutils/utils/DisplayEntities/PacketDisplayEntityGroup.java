@@ -795,7 +795,6 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     /**
-     *
      * @return a cloned {@link PacketDisplayEntityGroup}
      */
     @Override
@@ -804,21 +803,26 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     }
 
     /**
-     * Creates a copy of this group at a location
-     *
+     * Create a clone of this group at a location
      * @param location           where to spawn the clone
      * @param playSpawnAnimation whether this packet group should automatically play its spawn animation when created
      * @param autoShow           whether this packet group should automatically handle revealing and hiding itself to players
      * @return a cloned {@link PacketDisplayEntityGroup}
      */
     public PacketDisplayEntityGroup clone(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow) {
+        return clone(location, new GroupSpawnSettings()
+                .visibleByDefault(autoShow, null)
+                .playSpawnAnimation(playSpawnAnimation)
+                .persistentByDefault(this.isPersistent()));
+    }
+
+    /**
+     * @return a cloned {@link PacketDisplayEntityGroup}
+     */
+    @Override
+    public PacketDisplayEntityGroup clone(@NotNull Location location, @NotNull GroupSpawnSettings settings) {
         return toDisplayEntityGroup()
-                .createPacketGroup(location, GroupSpawnedEvent.SpawnReason.CLONE,
-                        new GroupSpawnSettings()
-                                .visibleByDefault(autoShow, null)
-                                .playSpawnAnimation(playSpawnAnimation)
-                                .persistentByDefault(this.isPersistent())
-                );
+                .createPacketGroup(location, GroupSpawnedEvent.SpawnReason.CLONE, settings);
     }
 
     /**

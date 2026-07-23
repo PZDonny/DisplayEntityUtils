@@ -851,11 +851,19 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     public abstract void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay);
 
     /**
-     * Creates a copy of this group at a location
+     * Create a clone of this group at a location
      * @param location where to spawn the cloned group
-     * @return a copy of this group
+     * @return a clone of this group
      */
     public abstract ActiveGroup<T> clone(@NotNull Location location);
+
+    /**
+     * Create a clone of this group at a location with {@link GroupSpawnSettings}
+     * @param location where to spawn the cloned group
+     * @param settings the settings to use on the cloned group
+     * @return a clone of this group
+     */
+    public abstract ActiveGroup<T> clone(@NotNull Location location, @NotNull GroupSpawnSettings settings);
 
 
     /**

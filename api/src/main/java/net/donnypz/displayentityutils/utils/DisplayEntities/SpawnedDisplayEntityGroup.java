@@ -1112,11 +1112,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     /**
-     * Creates a copy of this group at a location with {@link GroupSpawnSettings}
-     * @param location where to spawn the cloned group
-     * @param settings the settings to use on the cloned group
      * @return a cloned {@link SpawnedDisplayEntityGroup}
      */
+    @Override
     public SpawnedDisplayEntityGroup clone(@NotNull Location location, @NotNull GroupSpawnSettings settings) {
         return toDisplayEntityGroup()
                 .spawn(location,
