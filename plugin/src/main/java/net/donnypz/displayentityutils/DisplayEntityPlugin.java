@@ -36,6 +36,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.bdengine.convert.common.BDEConversionHandlerImpl;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerUtils;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.donnypz.displayentityutils.utils.version.folia.SchedulerImpl;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -78,8 +79,15 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         ConfigUtils.registerDisplayControllers();
         initializeDependencies();
         registerListeners();
-        initializeBStats();
         checkFolia();
+
+        boolean isDevVersion = VersionUtils.isDevVersion();
+        if (!isDevVersion){
+            initializeBStats();
+        }
+        else{
+            getComponentLogger().warn(Component.text("bStats disabled on server using dev version."));
+        }
         getServer().getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
     }
 

@@ -9,18 +9,42 @@ import org.bukkit.block.BlockType;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemType;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 public final class VersionUtils {
 
-    public static boolean IS_1_20_4 = Bukkit.getUnsafe().getProtocolVersion() >= 765;
-    public static boolean IS_1_20_5 = Bukkit.getUnsafe().getProtocolVersion() >= 766;
-    public static boolean IS_1_21 = Bukkit.getUnsafe().getProtocolVersion() >= 767;
-    public static boolean IS_1_21_2 = Bukkit.getUnsafe().getProtocolVersion() >= 768;
-    public static boolean IS_1_21_5 = Bukkit.getUnsafe().getProtocolVersion() >= 770;
-    public static boolean IS_1_21_6 = Bukkit.getUnsafe().getProtocolVersion() >= 771;
-    public static boolean IS_1_21_7 = Bukkit.getUnsafe().getProtocolVersion() >= 772;
-    public static boolean IS_1_21_9 = Bukkit.getUnsafe().getProtocolVersion() >= 773;
+    public static final boolean IS_1_20_4 = Bukkit.getUnsafe().getProtocolVersion() >= 765;
+    public static final boolean IS_1_20_5 = Bukkit.getUnsafe().getProtocolVersion() >= 766;
+    public static final boolean IS_1_21 = Bukkit.getUnsafe().getProtocolVersion() >= 767;
+    public static final boolean IS_1_21_2 = Bukkit.getUnsafe().getProtocolVersion() >= 768;
+    public static final boolean IS_1_21_5 = Bukkit.getUnsafe().getProtocolVersion() >= 770;
+    public static final boolean IS_1_21_6 = Bukkit.getUnsafe().getProtocolVersion() >= 771;
+    public static final boolean IS_1_21_7 = Bukkit.getUnsafe().getProtocolVersion() >= 772;
+    public static final boolean IS_1_21_9 = Bukkit.getUnsafe().getProtocolVersion() >= 773;
+    public static final boolean IS_26_1 = Bukkit.getUnsafe().getProtocolVersion() >= 775;
+    public static final boolean IS_26_2 = Bukkit.getUnsafe().getProtocolVersion() >= 776;
+    public static final boolean IS_DEV_VERSION;
+
+    static{
+        String pluginVer = DisplayAPI.getPlugin().getPluginMeta().getVersion();
+        IS_DEV_VERSION = isDevVersion(pluginVer);
+    }
+
+    public static boolean isDevVersion(){
+        return IS_DEV_VERSION;
+    }
+
+    @ApiStatus.Internal
+    public static boolean isDevVersion(@NotNull String version){
+        String clean = cleanVersionString(version);
+        return !version.equals(clean);
+    }
+
+    @ApiStatus.Internal
+    public static @NotNull String cleanVersionString(@NotNull String version){
+        return version.replaceAll("[^0-9.]", "");
+    }
 
     public static boolean canViewDialogs(@NotNull Player player, boolean sendErrorMessage){
         if (!serverHasDialogs()){

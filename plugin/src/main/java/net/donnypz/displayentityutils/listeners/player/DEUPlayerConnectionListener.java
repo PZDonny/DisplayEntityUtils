@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -86,9 +87,8 @@ public final class DEUPlayerConnectionListener implements Listener {
     }
 
     void compareVersions(Player player, String current, String latest){
-        String cleanCurrent = current.replaceAll("[^0-9.]", "");
-
-        boolean isDevVersion = !current.equals(cleanCurrent);
+        String cleanCurrent = VersionUtils.cleanVersionString(current);
+        boolean isDevVersion = VersionUtils.isDevVersion();
 
         String[] a = cleanCurrent.split("\\.");
         String[] b = latest.split("\\.");
@@ -110,7 +110,7 @@ public final class DEUPlayerConnectionListener implements Listener {
             }
         }
 
-        String cleanLatest = latest.replaceAll("[^0-9.]", "");
+        String cleanLatest = VersionUtils.cleanVersionString(latest);
         if (!cleanCurrent.equals(cleanLatest)){
             sendLatestOnDev(player, latest);
         }
