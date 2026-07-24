@@ -314,13 +314,9 @@ public abstract class AnimationPlayer {
 
     private void useScheduler(Runnable runnable, int delay) {
         if (packetAnimationPlayer) {
-            DisplayAPI.getScheduler().partRunLaterAsync(group.getMasterPart(), () -> {
-                runnable.run();
-            }, delay);
+            DisplayAPI.getScheduler().partRunLaterAsync(group.getMasterPart(), runnable, delay);
         } else {
-            DisplayAPI.getScheduler().partRunLater(group.getMasterPart(), () -> {
-                runnable.run();
-            }, delay);
+            DisplayAPI.getScheduler().partRunLater(group.getMasterPart(), runnable, delay);
         }
 
     }
