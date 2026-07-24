@@ -15,7 +15,9 @@ import org.joml.Quaternionf;
 
 import java.util.Collection;
 
-public final class SinglePartSelection extends ActivePartSelection<SpawnedDisplayEntityPart> implements Spawned {
+public final class SinglePartSelection implements ActivePartSelection<SpawnedDisplayEntityPart>, Spawned {
+
+    SpawnedDisplayEntityPart selectedPart;
 
     @ApiStatus.Internal
     public SinglePartSelection(@NotNull SpawnedDisplayEntityPart part){
@@ -23,6 +25,16 @@ public final class SinglePartSelection extends ActivePartSelection<SpawnedDispla
             throw new IllegalArgumentException("Unable to create a SinglePartSelection with a (previously) grouped part");
         }
         this.selectedPart = part;
+    }
+
+    @Override
+    public SpawnedDisplayEntityPart getSelectedPart() {
+        return selectedPart;
+    }
+
+    @Override
+    public boolean hasSelectedPart() {
+        return selectedPart != null;
     }
 
     @Override

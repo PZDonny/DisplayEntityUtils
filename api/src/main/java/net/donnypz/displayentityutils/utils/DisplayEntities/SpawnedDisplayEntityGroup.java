@@ -249,28 +249,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     /**
-     * Hide this group from a player
-     * @param player The player to hide this group from
-     */
-    @Override
-    public void hideFromPlayer(@NotNull Player player){
-        for (ActivePart part : groupParts.values()){
-            part.hideFromPlayer(player);
-        }
-    }
-
-    /**
-     * Hide this group from players
-     * @param players The players to hide this group from
-     */
-    @Override
-    public void hideFromPlayers(@NotNull Collection<Player> players){
-        for (ActivePart part : groupParts.values()){
-            part.hideFromPlayers(players);
-        }
-    }
-
-    /**
      * Get whether this group is visible to players by default
      * If not, use {@link #showToPlayer(Player)} to reveal this group to the player
      * and hideFromPlayer() to hide it

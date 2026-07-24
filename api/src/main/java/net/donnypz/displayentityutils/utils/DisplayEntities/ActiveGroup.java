@@ -13,7 +13,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayState
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.FollowType;
 import net.donnypz.displayentityutils.utils.PacketUtils;
-import net.donnypz.displayentityutils.utils.PivotAxis;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -21,17 +20,15 @@ import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class ActiveGroup<T extends ActivePart> implements Active{
+public abstract class ActiveGroup<T extends ActivePart> extends ActivePartHolder<T> {
 
     private final int ID = IDGenerator.next();
 
@@ -178,21 +175,6 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
-     * Set the rotation of all parts in this group
-     * @param pitch the pitch
-     * @param yaw the yaw
-     * @param pivotPitch whether non-display parts should pivot with the pitch change
-     * @param pivotYaw whether non-display parts should pivot with the yaw change
-     */
-    @Override
-    public void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
-        for (ActivePart part : groupParts.values()) {
-            part.setRotation(pitch, yaw, pivotPitch, pivotYaw);
-        }
-    }
-
-
-    /**
      * Change the scale of all parts in this group by the given scale multiplier
      * @param newScaleMultiplier the scale multiplier to apply to this group
      * @param durationInTicks how long it should take for the group to scale
@@ -308,201 +290,6 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
-     * Set the teleportation duration of all parts in this group
-     */
-    @Override
-    public void setTeleportDuration(int teleportDuration){
-        for (ActivePart part : groupParts.values()){
-            part.setTeleportDuration(teleportDuration);
-        }
-    }
-
-    /**
-     * Set the interpolation duration of all parts in this group
-     * @param interpolationDuration the duration
-     */
-    @Override
-    public void setInterpolationDuration(int interpolationDuration){
-        for (ActivePart part : groupParts.values()){
-            part.setInterpolationDuration(interpolationDuration);
-        }
-    }
-
-    /**
-     * Set the interpolation delay of all parts in this group
-     * @param interpolationDelay the delay
-     */
-    @Override
-    public void setInterpolationDelay(int interpolationDelay){
-        for (ActivePart part : groupParts.values()){
-            part.setInterpolationDelay(interpolationDelay);
-        }
-    }
-
-    /**
-     * Pivot all non-display parts in this group around the group
-     */
-    @Override
-    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis) {
-        for (T part : groupParts.values()){
-            if (part.isDisplay()) continue;
-            part.pivot(angleInDegrees, pivotAxis);
-        }
-    }
-
-    /**
-     * Pivot the non-display entities in this group around a given location, representative of the provided rotation.
-     */
-    @Override
-    public void pivot(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
-        for (T part : groupParts.values()){
-            if (part.isDisplay()) continue;
-            part.pivot(rotation, pivotLocation, worldSpace);
-        }
-    }
-
-    /**
-     * Rotate the display entities in this group in their local space {@link Transformation} and around this group.
-     */
-    @Override
-    public void rotate(@NotNull Quaternionf rotation, boolean worldSpace){
-        Location location = getLocation();
-        if (location == null) return;
-        this.rotateAround(rotation, location, worldSpace);
-    }
-
-    /**
-     * Rotate the display entities in this group in their local space {@link Transformation} and around a given pivot location.
-     */
-    @Override
-    public void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace){
-        for (T part : groupParts.values()){
-            if (!part.isDisplay()) continue;
-            part.rotateAround(rotation, pivotLocation, worldSpace);
-        }
-    }
-
-    /**
-     * Change the yaw of this group, and optionally pivot non-displays
-     * @param yaw The yaw to set for this group
-     * @param pivot whether parts should pivot around the group's location, if the part is not a display
-     */
-    @Override
-    public void setYaw(float yaw, boolean pivot){
-        for (ActivePart part : groupParts.values()){
-            part.setYaw(yaw, pivot);
-        }
-    }
-
-    /**
-     * Change the pitch of this group, and optionally pivot non-displays
-     * @param pitch The pitch to set for this group
-     * @param pivot whether parts should pivot around the group's location, if the part is not a display
-     */
-    @Override
-    public void setPitch(float pitch, boolean pivot){
-        for (ActivePart part : groupParts.values()){
-            part.setPitch(pitch, pivot);
-        }
-    }
-
-    /**
-     * Set the brightness of this group
-     * @param brightness the brightness to set, null to use brightness based on position
-     */
-    @Override
-    public void setBrightness(@Nullable Display.Brightness brightness){
-        for (ActivePart part : groupParts.values()){
-            part.setBrightness(brightness);
-        }
-    }
-
-    /**
-     * Set the billboard of this group
-     * @param billboard the billboard to set
-     */
-    @Override
-    public void setBillboard(@NotNull Display.Billboard billboard){
-        for (ActivePart part : groupParts.values()){
-            part.setBillboard(billboard);
-        }
-    }
-
-    /**
-     * Set the view range of this group
-     * @param viewRangeMultiplier The range multiplier to set
-     */
-    @Override
-    public void setViewRange(float viewRangeMultiplier){
-        for (ActivePart part : groupParts.values()){
-            part.setViewRange(viewRangeMultiplier);
-        }
-    }
-
-    /**
-     * Set the glow color of this group
-     * @param color The color to set
-     */
-    @Override
-    public void setGlowColor(@Nullable Color color){
-        for (ActivePart part : groupParts.values()){
-            part.setGlowColor(color);
-        }
-    }
-
-
-    /**
-     * Adds the glow effect to all the block and item display parts in this group
-     */
-    @Override
-    public void glow(){
-        for (ActivePart part : groupParts.values()){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || part.type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
-                part.glow();
-            }
-        }
-    }
-
-    /**
-     * Adds the glow effect to all the block and item display parts in this group for a player
-     * @param player the player
-     */
-    @Override
-    public void glow(@NotNull Player player){
-        for (ActivePart part : groupParts.values()){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || part.type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
-                part.glow(player);
-            }
-        }
-    }
-
-    /**
-     * Adds the glow effect to all the block and item display parts in this group
-     * @param durationInTicks How long to highlight this selection
-     */
-    @Override
-    public void glow(long durationInTicks){
-        for (ActivePart part : groupParts.values()){
-            part.glow(durationInTicks);
-        }
-    }
-
-    /**
-     * Make this group's block and item display entities glow for a player for a set period of time
-     * @param player the player
-     * @param durationInTicks how long the glowing should last
-     */
-    @Override
-    public void glow(@NotNull Player player, long durationInTicks){
-        for (ActivePart part : groupParts.values()){
-            if (!part.canGlow()) continue;
-            if (!part.isGlowing()){
-                part.glow(player, durationInTicks);
-            }
-        }
-    }
-
-    /**
      * Make this group's display entities glow, and interactions be outlined, for a player for a set period of time
      * @param player the player
      * @param durationInTicks how long the glowing should last. -1 to last forever
@@ -535,27 +322,6 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
-     * Removes the glow effect from all the display parts in this group
-     */
-    @Override
-    public void unglow(){
-        for (ActivePart part : groupParts.values()){
-            part.unglow();
-        }
-    }
-
-    /**
-     * Removes the glow effect from all the display parts in this group, for the specified player
-     * @param player the player
-     */
-    @Override
-    public void unglow(@NotNull Player player){
-        for (ActivePart part : groupParts.values()){
-            part.unglow(player);
-        }
-    }
-
-    /**
      * Get the glow color of this group
      * @return a color or null if not set
      */
@@ -573,72 +339,9 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         return groupParts.get(partUUID);
     }
 
-    /**
-     * Get all the parts contained in this group
-     * @return a list of parts
-     */
-    public @NotNull List<T> getParts(){
-        return new ArrayList<>(groupParts.sequencedValues());
-    }
-
-    /**
-     * Get a list of all parts in this group with the given tag
-     * @return a list of parts
-     */
-    public List<T> getParts(@NotNull String tag){
-        List<T> partList = new ArrayList<>();
-        for (T part : groupParts.sequencedValues()){
-            if (part.hasTag(tag)){
-                partList.add(part);
-            }
-        }
-        return partList;
-    }
-
-    /**
-     * Get a list of all parts with at least one of the given tags
-     * @return a list of parts
-     */
-    public List<T> getParts(@NotNull Collection<String> tags){
-        List<T> partList = new ArrayList<>();
-        for (T part : groupParts.sequencedValues()){
-            for (String tag : tags){
-                if (part.hasTag(tag)){
-                    partList.add(part);
-                    break;
-                }
-            }
-        }
-        return partList;
-    }
-
-
-    /**
-     * Get a collection of all parts of a certain type within this group.
-     * @return a list of {@link ActivePart}
-     */
-    public List<T> getParts(@NotNull SpawnedDisplayEntityPart.PartType partType){
-        List<T> partList = new ArrayList<>();
-        for (T part : groupParts.sequencedValues()){
-            if (partType == part.getType()){
-                partList.add(part);
-            }
-        }
-        return partList;
-    }
-
-    /**
-     * Get a list of all display entity parts (block, item, text display) within this group
-     * @return a list of {@link ActivePart}
-     */
-    public List<T> getDisplayParts(){
-        List<T> partList = new ArrayList<>();
-        for (T part : groupParts.sequencedValues()){
-            if (part.isDisplay()){
-                partList.add(part);
-            }
-        }
-        return partList;
+    @Override
+    @NotNull Collection<T> getPartsRaw(){
+        return groupParts.sequencedValues();
     }
 
     /**

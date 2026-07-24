@@ -33,14 +33,27 @@ public interface Active {
 
     void glow();
 
+    /**
+     * @param player the player
+     */
     void glow(@NotNull Player player);
 
+    /**
+     * @param durationInTicks how long the glowing should last
+     */
     void glow(long durationInTicks);
 
+    /**
+     * @param player the player
+     * @param durationInTicks how long the glowing should last
+     */
     void glow(@NotNull Player player, long durationInTicks);
 
     void unglow();
 
+    /**
+     * @param player the player
+     */
     void unglow(@NotNull Player player);
 
     void setPitch(float pitch, boolean pivot);
