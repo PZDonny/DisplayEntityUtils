@@ -17,6 +17,7 @@ import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
@@ -358,6 +359,122 @@ public final class PacketUtils {
                 .add(DisplayAttributes.Transform.TRANSLATION, translation)
                 .add(DisplayAttributes.Transform.LEFT_ROTATION, finalRot)
                 .send(players, entityId);
+    }
+
+    /**
+     * Pivot a non-display entity around a location
+     * @param player the player that should see the pivot
+     * @param entity the entity
+     * @param rotation the rotation
+     * @param pivotLocation the location to pivot around
+     * @param worldSpace whether the pivot should occur on world space axis
+     */
+    public static void pivot(@NotNull Player player,
+                             @NotNull Entity entity,
+                             @NotNull Quaternionf rotation,
+                             @NotNull Location pivotLocation,
+                             boolean worldSpace){
+        pivot(List.of(player), entity, rotation, pivotLocation, worldSpace);
+    }
+
+    /**
+     * Pivot a non-display entity around a location
+     * @param players the players that should see the pivot
+     * @param entity the entity
+     * @param rotation the rotation
+     * @param pivotLocation the location to pivot around
+     * @param worldSpace whether the pivot should occur on world space axis
+     */
+    public static void pivot(@NotNull Collection<Player> players,
+                             @NotNull Entity entity,
+                             @NotNull Quaternionf rotation,
+                             @NotNull Location pivotLocation,
+                             boolean worldSpace){
+        Vector3f translationVector = DisplayUtils.getNonDisplayTranslation(entity, pivotLocation).toVector3f();
+        pivot(
+                players,
+                entity.getEntityId(),
+                rotation,
+                pivotLocation,
+                worldSpace,
+                translationVector,
+                entity.getLocation()
+        );
+    }
+
+    /**
+     * Pivot a non-display part around a location
+     * @param player the player that should see the pivot
+     * @param part the part
+     * @param rotation the rotation
+     * @param pivotLocation the location to pivot around
+     * @param worldSpace whether the pivot should occur on world space axis
+     */
+    public static void pivot(@NotNull Player player,
+                             @NotNull ActivePart part,
+                             @NotNull Quaternionf rotation,
+                             @NotNull Location pivotLocation,
+                             boolean worldSpace){
+        pivot(List.of(player), part, rotation, pivotLocation, worldSpace);
+    }
+
+    /**
+     * Pivot a non-display part around a location
+     * @param players the players that should see the pivot
+     * @param part the part
+     * @param rotation the rotation
+     * @param pivotLocation the location to pivot around
+     * @param worldSpace whether the pivot should occur on world space axis
+     */
+    public static void pivot(@NotNull Collection<Player> players,
+                             @NotNull ActivePart part,
+                             @NotNull Quaternionf rotation,
+                             @NotNull Location pivotLocation,
+                             boolean worldSpace){
+        Vector translation = part.getNonDisplayTranslation();
+        if (translation == null) return;
+
+        Location partLoc = part.getLocation();
+        if (partLoc == null) return;
+
+        pivot(
+                players,
+                part.getEntityId(),
+                rotation, pivotLocation,
+                worldSpace, translation.toVector3f(),
+                partLoc
+        );
+    }
+
+    private static void pivot(@NotNull Collection<Player> players,
+                              int entityId,
+                              @NotNull Quaternionf rotation,
+                              @NotNull Location pivotLocation,
+                              boolean worldSpace,
+                              Vector3f translationVector,
+                              Location entityLocation){
+
+        Quaternionf appliedRotation = new Quaternionf(rotation);
+
+        if (!worldSpace) {
+            Quaternionf entityRot = new Quaternionf()
+                    .rotateY((float) Math.toRadians(-entityLocation.getYaw()))
+                    .rotateX((float) Math.toRadians(entityLocation.getPitch()));
+
+            Quaternionf inverse = new Quaternionf(entityRot).invert();
+
+            //entity's space to world space
+            appliedRotation = entityRot
+                    .mul(appliedRotation)
+                    .mul(inverse);
+        }
+
+        appliedRotation.transform(translationVector);
+
+        Location newLoc = pivotLocation.clone().subtract(Vector.fromJOML(translationVector));
+        newLoc.setPitch(entityLocation.getPitch());
+        newLoc.setYaw(entityLocation.getYaw());
+        teleport(players, entityId, newLoc);
     }
 
     /**

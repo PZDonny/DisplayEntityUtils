@@ -191,18 +191,6 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         }
     }
 
-    /**
-     * Pivot all non-display parts in this group around the group
-     * @param angleInDegrees the pivot angle
-     * @param pivotAxis the axis to perform the pivot on
-     */
-    @Override
-    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis) {
-        for (T part : groupParts.values()){
-            part.pivot(angleInDegrees, pivotAxis);
-        }
-    }
-
 
     /**
      * Change the scale of all parts in this group by the given scale multiplier
@@ -352,6 +340,28 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
+     * Pivot all non-display parts in this group around the group
+     */
+    @Override
+    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis) {
+        for (T part : groupParts.values()){
+            if (part.isDisplay()) continue;
+            part.pivot(angleInDegrees, pivotAxis);
+        }
+    }
+
+    /**
+     * Pivot the non-display entities in this group around a given location, representative of the provided rotation.
+     */
+    @Override
+    public void pivot(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
+        for (T part : groupParts.values()){
+            if (part.isDisplay()) continue;
+            part.pivot(rotation, pivotLocation, worldSpace);
+        }
+    }
+
+    /**
      * Rotate the display entities in this group in their local space {@link Transformation} and around this group.
      */
     @Override
@@ -366,8 +376,9 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      */
     @Override
     public void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace){
-        for (ActivePart p : groupParts.values()){
-            p.rotateAround(rotation, pivotLocation, worldSpace);
+        for (T part : groupParts.values()){
+            if (!part.isDisplay()) continue;
+            part.rotateAround(rotation, pivotLocation, worldSpace);
         }
     }
 

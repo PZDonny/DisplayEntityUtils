@@ -1237,8 +1237,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     /**
      * Pivot a non-display entity around its group
-     * @param angleInDegrees the pivot angle
-     * @param pivotAxis the axis to perform the pivot on
      */
     @Override
     public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis) {
@@ -1263,6 +1261,41 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         packetLocation.setCoordinates(result);
         return result;
     }
+
+
+    /**
+     *  Pivot a non-display entity around a given location by a provided rotation
+     */
+    @Override
+    public void pivot(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
+        if (isDisplay()) return;
+        Vector3f translationVector = getNonDisplayTranslation().toVector3f();
+        Quaternionf appliedRotation = new Quaternionf(rotation);
+        float pitch = getPitch();
+        float yaw = getYaw();
+
+        if (!worldSpace) {
+            Quaternionf entityRot = new Quaternionf()
+                    .rotateY((float) Math.toRadians(-yaw))
+                    .rotateX((float) Math.toRadians(pitch));
+
+            Quaternionf inverse = new Quaternionf(entityRot).invert();
+
+            //entity's space to world space
+            appliedRotation = entityRot
+                    .mul(appliedRotation)
+                    .mul(inverse);
+        }
+
+        appliedRotation.transform(translationVector);
+
+        Location newLoc = pivotLocation.clone().subtract(Vector.fromJOML(translationVector));
+        newLoc.setPitch(pitch);
+        newLoc.setYaw(yaw);
+        teleport(newLoc);
+    }
+
+
 
     /**
      * Set the location of this packet-based entity.<br>

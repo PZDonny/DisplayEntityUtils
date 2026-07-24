@@ -584,8 +584,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     /**
      * Pivot a non-display entity around its group
-     * @param angleInDegrees the pivot angle
-     * @param pivotAxis the axis to perform the pivot on
      */
     @Override
     public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis) {
@@ -595,6 +593,17 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         if (angleInDegrees != 0.0f){
             DisplayUtils.pivotAxisLocal(e, group.getLocation(), angleInDegrees, pivotAxis);
         }
+    }
+
+    /**
+     * Pivot a non-display entity around a given location by a provided rotation
+     */
+    @Override
+    public void pivot(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
+        if (isDisplay()) return;
+        Entity entity = getEntity();
+        if (entity == null) return;
+        DisplayUtils.pivot(entity, rotation, pivotLocation, worldSpace);
     }
 
     @Override

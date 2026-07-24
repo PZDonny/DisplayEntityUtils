@@ -615,7 +615,7 @@ public final class DisplayUtils {
         }
 
         Location newLoc = pivotLocation.clone().subtract(translationVector);
-        FoliaUtils.teleport(entity, newLoc);
+        FoliaUtils.teleportSafe(entity, newLoc);
     }
 
     /**
@@ -664,7 +664,45 @@ public final class DisplayUtils {
         Location newLoc = pivotLocation.clone().subtract(translationVector);
         newLoc.setPitch(entity.getPitch());
         newLoc.setYaw(entity.getYaw());
-        FoliaUtils.teleport(entity, newLoc);
+        FoliaUtils.teleportSafe(entity, newLoc);
+    }
+
+    /**
+     * Pivot a non-display entity around a location
+     * @param entity the entity
+     * @param rotation the rotation
+     * @param pivotLocation the location to pivot around
+     * @param worldSpace whether the pivot should occur on world space axis
+     */
+    public static void pivot(@NotNull Entity entity,
+                             @NotNull Quaternionf rotation,
+                             @NotNull Location pivotLocation,
+                             boolean worldSpace){
+        Vector3f translation3f = DisplayUtils
+                .getNonDisplayTranslation(entity, pivotLocation)
+                .toVector3f();
+
+        Quaternionf appliedRotation = new Quaternionf(rotation);
+
+        if (!worldSpace) {
+            Quaternionf entityRot = new Quaternionf()
+                    .rotateY((float) Math.toRadians(-entity.getYaw()))
+                    .rotateX((float) Math.toRadians(entity.getPitch()));
+
+            Quaternionf inverse = new Quaternionf(entityRot).invert();
+
+            //entity's space to world space
+            appliedRotation = entityRot
+                    .mul(appliedRotation)
+                    .mul(inverse);
+        }
+
+        appliedRotation.transform(translation3f);
+
+        Location newLoc = pivotLocation.clone().subtract(Vector.fromJOML(translation3f));
+        newLoc.setPitch(entity.getPitch());
+        newLoc.setYaw(entity.getYaw());
+        FoliaUtils.teleportSafe(entity, newLoc);
     }
 
     /**

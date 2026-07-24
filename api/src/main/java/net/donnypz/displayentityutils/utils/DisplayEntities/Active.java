@@ -53,7 +53,18 @@ public interface Active {
 
     void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw);
 
+    /**
+     * @param angleInDegrees the pivot angle
+     * @param pivotAxis the axis to perform the pivot on
+     */
     void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis);
+
+    /**
+     * @param rotation the rotation
+     * @param pivotLocation the location that should be pivoted around
+     * @param worldSpace whether the pivot should occur on world space axis
+     */
+    void pivot(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace);
 
     default boolean translate(@NotNull Vector direction, int durationInTicks, int delayInTicks){
         return translate(direction, (float) direction.length(), durationInTicks, delayInTicks);

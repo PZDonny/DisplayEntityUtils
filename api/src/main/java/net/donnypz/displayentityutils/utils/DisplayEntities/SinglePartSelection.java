@@ -136,13 +136,20 @@ public final class SinglePartSelection extends ActivePartSelection<SpawnedDispla
 
     /**
      * Pivot the part in this selection around this selection's group, if it's not a display
-     * @param angleInDegrees the pivot angle
-     * @param pivotAxis the axis to perform the pivot on
      */
     @Override
     public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis) {
         if (selectedPart.isDisplay()) return;
         selectedPart.pivot(angleInDegrees, pivotAxis);
+    }
+
+    /**
+     * Pivot the part in this selection around this selection's group, if it's not a display
+     */
+    @Override
+    public void pivot(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
+        if (selectedPart.isDisplay()) return;
+        selectedPart.pivot(rotation, pivotLocation, worldSpace);
     }
 
     @Override

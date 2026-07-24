@@ -524,13 +524,24 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
 
     /**
      * Pivot all non-display parts in this selection around this selection's group
-     * @param angleInDegrees the pivot angle
-     * @param pivotAxis the axis to perform the pivot on
      */
     @Override
     public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis) {
         for (T part : selectedParts){
+            if (part.isDisplay()) continue;
             part.pivot(angleInDegrees, pivotAxis);
+        }
+    }
+
+
+    /**
+     * Pivot all non-display parts in this group around a location by a provided rotation
+     */
+    @Override
+    public void pivot(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
+        for (T part : selectedParts){
+            if (part.isDisplay()) continue;
+            part.pivot(rotation, pivotLocation, worldSpace);
         }
     }
 
