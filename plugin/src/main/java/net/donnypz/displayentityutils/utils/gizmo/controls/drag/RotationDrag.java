@@ -80,8 +80,8 @@ public class RotationDrag extends Drag {
         Quaternionf q = new Quaternionf();
 
         //Undo rotation, if in world space
-        if (sel instanceof SinglePartSelection ){
-            if (axis != Axis.Y){
+        if (sel instanceof SinglePartSelection){
+            if (axis != Axis.Y && sel.getSelectedPart().isDisplay()){
                 angle = -angle;
             }
             if (gizmo.getGizmoSpace() == GizmoSpace.WORLD){
@@ -101,15 +101,21 @@ public class RotationDrag extends Drag {
 
         Location gizmoLoc = gizmo.getGizmoModel().getLocation();
 
+        boolean worldSpace = gizmo.getGizmoSpace() == GizmoSpace.WORLD;
         if (sel instanceof SinglePartSelection) {
             ActivePart part = sel.getSelectedPart();
-            if (gizmo.getGizmoSpace() == GizmoSpace.WORLD) {
-                part.rotateAround(q, gizmoLoc, true);
-            } else {
-                part.rotate(q, false);
+            if (!part.isDisplay()){
+                part.pivot(q, gizmoLoc, false);
+            }
+            else{
+                if (worldSpace) {
+                    part.rotateAround(q, gizmoLoc, true);
+                } else {
+                    part.rotate(q, false);
+                }
             }
         } else if (sel instanceof MultiPartSelection<?> mps) {
-            mps.rotateAround(q, gizmoLoc, gizmo.getGizmoSpace() == GizmoSpace.WORLD);
+            mps.pivotAndRotate(q, gizmoLoc, worldSpace);
         }
     }
 
