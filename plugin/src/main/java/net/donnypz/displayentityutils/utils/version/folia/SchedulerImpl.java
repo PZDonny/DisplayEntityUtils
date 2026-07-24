@@ -11,7 +11,7 @@ public class SchedulerImpl implements Scheduler{
 
 
     @Override
-    public void run(Runnable runnable) {
+    public void run(@NotNull Runnable runnable) {
         if (isPluginDisabled()) return;
         if (FoliaUtils.isFolia()){
             Bukkit.getGlobalRegionScheduler()
@@ -23,7 +23,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public void runAsync(Runnable runnable) {
+    public void runAsync(@NotNull Runnable runnable) {
         if (isPluginDisabled()) return;
         if (FoliaUtils.isFolia()){
             Bukkit.getGlobalRegionScheduler()
@@ -35,7 +35,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public Task runLater(Runnable runnable, long delay) {
+    public Task runLater(@NotNull Runnable runnable, long delay) {
         if (isPluginDisabled()) return new EmptyTask();
         Task task;
         if (FoliaUtils.isFolia()){
@@ -49,7 +49,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public Task runLaterAsync(Runnable runnable, long delay) {
+    public Task runLaterAsync(@NotNull Runnable runnable, long delay) {
         if (isPluginDisabled()) return new EmptyTask();
         Task task;
         if (FoliaUtils.isFolia()){
@@ -63,7 +63,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public Task runTimer(SchedulerRunnable runnable, long delay, long period) {
+    public Task runTimer(@NotNull SchedulerRunnable runnable, long delay, long period) {
         if (isPluginDisabled()) return new EmptyTask();
         Task task;
         if (FoliaUtils.isFolia()){
@@ -78,7 +78,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public Task runTimerAsync(SchedulerRunnable runnable, long delay, long period) {
+    public Task runTimerAsync(@NotNull SchedulerRunnable runnable, long delay, long period) {
         if (isPluginDisabled()) return new EmptyTask();
         Task task;
         if (FoliaUtils.isFolia()){
@@ -93,7 +93,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public void entityRun(@NotNull Entity entity, Runnable runnable) {
+    public void entityRun(@NotNull Entity entity, @NotNull Runnable runnable) {
         if (!DisplayAPI.getPlugin().isEnabled()) return;
         if (FoliaUtils.isFolia()){
             entity.getScheduler().execute(DisplayAPI.getPlugin(), runnable, null, 0);
@@ -104,7 +104,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public void entityRunAsync(@NotNull Entity entity, Runnable runnable) {
+    public void entityRunAsync(@NotNull Entity entity, @NotNull Runnable runnable) {
         if (!DisplayAPI.getPlugin().isEnabled()) return;
         if (FoliaUtils.isFolia()){
             entityRun(entity, runnable);
@@ -115,7 +115,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public Task entityRunLater(@NotNull Entity entity, Runnable runnable, long delay) {
+    public Task entityRunLater(@NotNull Entity entity, @NotNull Runnable runnable, long delay) {
         if (isPluginDisabled()) return new EmptyTask();
         Task task;
         if (FoliaUtils.isFolia()){
@@ -128,7 +128,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public Task entityRunLaterAsync(@NotNull Entity entity, Runnable runnable, long delay) {
+    public Task entityRunLaterAsync(@NotNull Entity entity, @NotNull Runnable runnable, long delay) {
         if (!DisplayAPI.getPlugin().isEnabled()) return new EmptyTask();
         Task task;
         if (FoliaUtils.isFolia()){
@@ -141,7 +141,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public Task entityRunTimer(@NotNull Entity entity, SchedulerRunnable runnable, long delay, long period) {
+    public Task entityRunTimer(@NotNull Entity entity, @NotNull SchedulerRunnable runnable, long delay, long period) {
         if (isPluginDisabled()) return new EmptyTask();
         Task task;
         if (FoliaUtils.isFolia()){
@@ -156,7 +156,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public Task entityRunTimerAsync(@NotNull Entity entity, SchedulerRunnable runnable, long delay, long period) {
+    public Task entityRunTimerAsync(@NotNull Entity entity, @NotNull SchedulerRunnable runnable, long delay, long period) {
         if (isPluginDisabled()) return new EmptyTask();
         Task task;
         if (FoliaUtils.isFolia()){
@@ -171,7 +171,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public void partRun(@NotNull ActivePart part, Runnable runnable) {
+    public void partRun(ActivePart part, @NotNull Runnable runnable) {
         if (isPluginDisabled()) return;
         if (part instanceof SpawnedDisplayEntityPart sp){
             Entity entity = sp.getEntity();
@@ -184,7 +184,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public void partRunAsync(@NotNull ActivePart part, Runnable runnable) {
+    public void partRunAsync(ActivePart part, @NotNull Runnable runnable) {
         if (isPluginDisabled()) return;
         if (part instanceof SpawnedDisplayEntityPart sp){
             Entity entity = sp.getEntity();
@@ -197,7 +197,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public Task partRunLater(@NotNull ActivePart part, Runnable runnable, long delay) {
+    public Task partRunLater(ActivePart part, @NotNull Runnable runnable, long delay) {
         if (isPluginDisabled()) return new EmptyTask();
         Task task;
         if (part instanceof SpawnedDisplayEntityPart sp){
@@ -212,7 +212,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public Task partRunLaterAsync(@NotNull ActivePart part, Runnable runnable, long delay) {
+    public Task partRunLaterAsync(ActivePart part, @NotNull Runnable runnable, long delay) {
         if (isPluginDisabled()) return new EmptyTask();
         Task task;
 
@@ -228,7 +228,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public Task partRunTimer(@NotNull ActivePart part, SchedulerRunnable runnable, long delay, long period) {
+    public Task partRunTimer(ActivePart part, @NotNull SchedulerRunnable runnable, long delay, long period) {
         if (isPluginDisabled()) return new EmptyTask();
         if (part instanceof SpawnedDisplayEntityPart sp){
             Entity entity = sp.getEntity();
@@ -241,7 +241,7 @@ public class SchedulerImpl implements Scheduler{
     }
 
     @Override
-    public Task partRunTimerAsync(@NotNull ActivePart part, SchedulerRunnable runnable, long delay, long period) {
+    public Task partRunTimerAsync(ActivePart part, @NotNull SchedulerRunnable runnable, long delay, long period) {
         if (isPluginDisabled()) return new EmptyTask();
         if (part instanceof SpawnedDisplayEntityPart sp){
             Entity entity = sp.getEntity();
