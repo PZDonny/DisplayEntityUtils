@@ -33,7 +33,7 @@ class DisplayResetCMD extends PartsSubCommand {
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         String option = args[2];
-        List<? extends ActivePart> parts = selection.getSelectedParts();
+        List<? extends ActivePart> parts = selection.getParts();
         if (option.equalsIgnoreCase("translation")){
             parts.forEach(this::resetTranslation);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Translation reset for all selected displays!", NamedTextColor.GREEN)));

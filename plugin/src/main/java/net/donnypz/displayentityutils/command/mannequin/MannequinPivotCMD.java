@@ -34,7 +34,7 @@ class MannequinPivotCMD extends PartsSubCommand {
         try{
             float angle = Float.parseFloat(args[3]);
             boolean worldSpace = getOptionalArguments(player, args).hasFlag("-world");
-            for (ActivePart p : selection.getSelectedParts()){
+            for (ActivePart p : selection.getParts()){
                 if (p.getType() != SpawnedDisplayEntityPart.PartType.MANNEQUIN) continue;
                 p.pivot(angle, axis, worldSpace);
             }

@@ -8,7 +8,6 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Pose;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +25,7 @@ class MannequinScaleCMD extends PartsSubCommand {
         String scaleStr = args[2];
         try{
             float scale = Float.parseFloat(scaleStr);
-            for (ActivePart p : selection.getSelectedParts()){
+            for (ActivePart p : selection.getParts()){
                 if (p.getType() != SpawnedDisplayEntityPart.PartType.MANNEQUIN) continue;
                 p.setMannequinScale(scale);
             }

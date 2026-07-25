@@ -26,7 +26,7 @@ class MannequinSkinCMD extends PartsSubCommand {
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         String name = args[2];
         ResolvableProfile profile = ResolvableProfile.resolvableProfile(Bukkit.createProfile(name));
-        for (ActivePart p : selection.getSelectedParts()){
+        for (ActivePart p : selection.getParts()){
             p.setMannequinProfile(profile);
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set skin of ALL selected mannequins!", NamedTextColor.GREEN)));

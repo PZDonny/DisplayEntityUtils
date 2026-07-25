@@ -21,7 +21,7 @@ class MannequinUnnameCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
-        for (ActivePart p : selection.getSelectedParts()){
+        for (ActivePart p : selection.getParts()){
             if (p.getType() == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
                 p.setCustomName(null);
             }

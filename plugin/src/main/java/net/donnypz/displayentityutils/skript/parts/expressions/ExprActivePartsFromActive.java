@@ -50,14 +50,9 @@ public class ExprActivePartsFromActive extends PropertyExpression<Object, Active
         return Arrays.stream(objects)
                 .flatMap(object -> {
                     List<? extends ActivePart> parts = null;
-                    if (object instanceof SpawnedDisplayEntityGroup g)
-                        parts = g.getParts();
-                    else if (object instanceof SpawnedPartSelection sel)
-                        parts = sel.getSelectedParts();
-                    else if (object instanceof PacketDisplayEntityGroup g)
-                        parts = g.getParts();
-                    else if (object instanceof PacketPartSelection sel)
-                        parts = sel.getSelectedParts();
+                    if (object instanceof ActivePartHolder<?> h){
+                        parts = h.getParts();
+                    }
                     return parts == null ? Stream.empty() : parts.stream();
                 })
                 .filter(Objects::nonNull)

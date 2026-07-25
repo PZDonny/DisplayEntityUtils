@@ -170,7 +170,7 @@ public abstract class TranslationDrag extends Drag {
                             : bukkitDelta,
                     GizmoSessionImpl.SCAN_FREQUENCY, 0);
         } else if (sel instanceof MultiPartSelection<?> m) {
-            for (ActivePart p : m.getSelectedParts()) {
+            for (ActivePart p : m.getParts()) {
                 p.translate(p.isDisplay()
                                 ? bukkitTranslateDelta
                                 : bukkitDelta,

@@ -25,7 +25,7 @@ class ItemTransformCMD extends PartsSubCommand {
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         ItemDisplay.ItemDisplayTransform transform = getTransform(player, args[2]);
         if (transform == null) return false;
-        for (ActivePart part : selection.getSelectedParts()){
+        for (ActivePart part : selection.getParts()){
             part.setItemDisplayTransform(transform);
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Set item transform of ALL selected item displays!", NamedTextColor.GREEN)));

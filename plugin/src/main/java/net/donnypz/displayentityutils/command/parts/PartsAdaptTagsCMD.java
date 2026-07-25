@@ -27,7 +27,7 @@ class PartsAdaptTagsCMD extends PartsSubCommand {
 
         boolean removeFromSB = isRemoveFromScoreboard(player, args);
 
-        for (SpawnedDisplayEntityPart part : ((SpawnedPartSelection) selection).getSelectedParts()){
+        for (SpawnedDisplayEntityPart part : ((SpawnedPartSelection) selection).getParts()){
             part.adaptScoreboardTags(removeFromSB);
         }
 

@@ -35,7 +35,7 @@ class PartsMoveHereCMD extends PartsSubCommand {
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         if (GizmoCMD.isDraggingCancel(player)) return false;
-        for (ActivePart part : selection.getSelectedParts()){
+        for (ActivePart part : selection.getParts()){
             if (part.isDisplay()) continue;
             Location loc = player.getLocation();
             loc.setYaw(part.getYaw());

@@ -470,14 +470,6 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
         return group != null && group.isValid();
     }
 
-    /**
-     * Get the parts contained in this selection
-     * @return the parts in this selection
-     */
-    public List<T> getSelectedParts(){
-        return new ArrayList<>(selectedParts);
-    }
-
     public abstract ActiveGroup<T> getGroup();
 
     /**

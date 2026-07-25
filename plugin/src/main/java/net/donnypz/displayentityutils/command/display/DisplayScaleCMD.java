@@ -23,7 +23,7 @@ class DisplayScaleCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
-        for (ActivePart selectedPart : selection.getSelectedParts()){
+        for (ActivePart selectedPart : selection.getParts()){
             if (!selectedPart.isDisplay()){
                 continue;
             }

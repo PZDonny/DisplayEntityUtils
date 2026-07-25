@@ -24,7 +24,7 @@ class PartsRemoveCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
-        for (ActivePart part : selection.getSelectedParts()){
+        for (ActivePart part : selection.getParts()){
             if (part.isMaster()){
                 continue;
             }

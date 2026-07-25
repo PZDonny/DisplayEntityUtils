@@ -28,7 +28,7 @@ class DisplaySetBlockCMD extends PartsSubCommand {
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         BlockData blockData = CMDUtils.getBlockFromText(args[2], player);
         if (blockData == null) return false;
-        for (ActivePart part : selection.getSelectedParts()){
+        for (ActivePart part : selection.getParts()){
             if (part.isMaster()) continue;
             if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY) {
                 setBlock(part, blockData);

@@ -30,7 +30,7 @@ class ItemSetCMD extends PartsSubCommand {
         ItemStack itemStack = CMDUtils.getItemFromText(item, player);
         if (itemStack == null) return false;
 
-        for (ActivePart part : selection.getSelectedParts()){
+        for (ActivePart part : selection.getParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
                 part.setItemDisplayItem(itemStack);
             }

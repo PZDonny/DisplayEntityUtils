@@ -28,7 +28,7 @@ class MannequinMainHandCMD extends PartsSubCommand {
         String handStr = args[2];
         try{
             MainHand hand = MainHand.valueOf(handStr);
-            for (ActivePart p : selection.getSelectedParts()){
+            for (ActivePart p : selection.getParts()){
                 if (p.getType() != SpawnedDisplayEntityPart.PartType.MANNEQUIN) continue;
                 p.setMannequinMainHand(hand);
             }

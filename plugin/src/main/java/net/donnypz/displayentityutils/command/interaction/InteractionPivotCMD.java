@@ -61,7 +61,7 @@ class InteractionPivotCMD extends PlayerSubCommand {
 
         MultiPartSelection<?> selection = (MultiPartSelection<?>) sel;
         if (isAll){
-            for (ActivePart p : selection.getSelectedParts()){
+            for (ActivePart p : selection.getParts()){
                 if (p.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
                     p.pivot(angle, axis, worldSpace);
                 }

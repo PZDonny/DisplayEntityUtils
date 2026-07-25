@@ -51,7 +51,7 @@ class PartsMoveCMD extends PartsSubCommand {
                 return false;
             }
 
-            for (ActivePart part : selection.getSelectedParts()){
+            for (ActivePart part : selection.getParts()){
                 if (part.isDisplay()) continue;
                 Location loc = part.getLocation();
                 Vector v = direction.getVector(selection.getSelectedPart(), false).normalize().multiply(distance);
