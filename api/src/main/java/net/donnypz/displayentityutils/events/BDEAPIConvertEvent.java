@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 /**
- * Called sometime after {@link BDEResult#convert(String, Player, Location, String, String, boolean, boolean, boolean)}
+ * Called sometime after {@link BDEResult#convert(String, Player, Location, String, String, boolean, boolean, boolean, boolean)}
  * or similar is called, converting an import BDEngine project into a group and animations. This contains all information related to the conversion.
  */
 public class BDEAPIConvertEvent extends BDEConvertEvent{

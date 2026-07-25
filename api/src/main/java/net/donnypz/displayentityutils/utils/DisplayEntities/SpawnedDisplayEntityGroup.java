@@ -49,11 +49,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         this.creationTime = System.currentTimeMillis();
     }
 
-    /**
-     * Creates a group that will represent a collection of display and interaction entities as a single object.
-     * @param masterDisplay the master entity that will be the vehicle for display entity parts and the pivot/origin point for interaction entities
-     * @apiNote This should NEVER have to be called! Only do so if you truly know what you're doing
-     */
     @ApiStatus.Internal
     public SpawnedDisplayEntityGroup(@NotNull Display masterDisplay){
         this.isVisibleByDefault = masterDisplay.isVisibleByDefault();

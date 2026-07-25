@@ -4,13 +4,14 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.bdengine.BDEngineUtils;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 /**
- * Called sometime after {@link BDEngineUtils#convertDatapack(String, Player, String, String, boolean, boolean, boolean)}
+ * Called sometime after {@link BDEngineUtils#convertDatapack(String, Location, String, String, boolean, boolean, boolean, boolean)}
  * or similar is called, converting a datapack into a group and animations. This contains all information related to the conversion.
  */
 public class BDEDatapackConvertEvent extends BDEConvertEvent{
