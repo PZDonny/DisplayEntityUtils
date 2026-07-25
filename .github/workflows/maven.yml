@@ -44,7 +44,7 @@ jobs:
           SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c1-7)
           BRANCH=$(echo "$GITHUB_REF_NAME" | tr '/' '-')
           
-          VERSION="$BASE_VERSION-$BRANCH-$GITHUB_RUN_NUMBER-$SHORT_SHA"
+          VERSION="$BASE_VERSION-$BRANCH-$SHORT_SHA"
           
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           
