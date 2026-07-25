@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
+import net.donnypz.displayentityutils.utils.gizmo.util.GizmoMathUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.joml.Quaternionf;
@@ -15,9 +16,15 @@ public class RotationDrag extends Drag {
     private final float MAX_LOOK_DISTANCE = 10f;
     private final GizmoSessionImpl gizmo;
     private final Vector3f pivotPoint;
-    private final Quaternionf rotation = new Quaternionf();
     private final Vector3f originalAxis;
-    private final Vector3f currentAxis = new Vector3f();
+
+    //for drag intersection on the plane
+    private final Vector3f dragAxis = new Vector3f();
+    //for entity rotation
+    private final Vector3f rotationAxis = new Vector3f();
+
+    private final Vector3f planeAxis1 = new Vector3f();
+    private final Vector3f planeAxis2 = new Vector3f();
 
     //prev dir from gizmo to player's looking dir
     private final Vector3f lastDirection = new Vector3f();
@@ -28,7 +35,22 @@ public class RotationDrag extends Drag {
         this.originalAxis = axis.getDirections()[0];
         this.pivotPoint = gizmo.getGizmoModel().getLocation().toVector().toVector3f();
 
-        computeCurrentAxis();
+        Axis[] rotPlaneAxes = axis.getRotationPlaneAxes();
+
+        planeAxis1.set(
+                GizmoMathUtil.rotate(
+                        rotPlaneAxes[0].getDirections()[0],
+                        gizmo.getGizmoSpace(),
+                        gizmo.getGizmoModel().getLocation()
+                )).normalize();
+
+        planeAxis2.set(
+                GizmoMathUtil.rotate(
+                        rotPlaneAxes[1].getDirections()[0],
+                        gizmo.getGizmoSpace(),
+                        gizmo.getGizmoModel().getLocation()
+                )).normalize();
+
 
         ActivePartSelection<?> sel = DEUUser.getUser(player).getSelectedPartSelection();
         sel.setInterpolationDelay(-1);
@@ -44,6 +66,7 @@ public class RotationDrag extends Drag {
 
     @Override
     public void updatePosition(Player player) {
+        if (!gizmo.isLinked()) return;
         Vector3f hit = playerRayAndPlaneCollision(player);
         if (hit == null) {
             return;
@@ -53,7 +76,10 @@ public class RotationDrag extends Drag {
                 .sub(pivotPoint)
                 .normalize();
 
-        float angle = lastDirection.angleSigned(currentDirection, currentAxis);
+        float angle = lastDirection.angleSigned(currentDirection, dragAxis);
+
+        //stop further calculation if player's crosshair hasn't moved
+        if (lastDirection.equals(currentDirection)) return;
 
         lastDirection.set(currentDirection);
 
@@ -65,10 +91,6 @@ public class RotationDrag extends Drag {
     }
 
     private void applyToPlayerSelection(float angle) {
-        if (!gizmo.isLinked()) {
-            return;
-        }
-
         ActivePartSelection<?> sel = DEUUser
                 .getOrCreateUser(gizmo.getPlayerUUID())
                 .getSelectedPartSelection();
@@ -77,27 +99,8 @@ public class RotationDrag extends Drag {
             return;
         }
 
-        Quaternionf q = new Quaternionf();
-
-        //Undo rotation, if in world space
-        if (sel instanceof SinglePartSelection){
-            if (axis != Axis.Y && sel.getSelectedPart().isDisplay()){
-                angle = -angle;
-            }
-            if (gizmo.getGizmoSpace() == GizmoSpace.WORLD){
-                Location loc = sel.getLocation();
-
-                rotation.identity()
-                        .rotateY((float) Math.toRadians(-loc.getYaw()))
-                        .rotateX((float) Math.toRadians(loc.getPitch()));
-
-                rotation.invert();
-                rotation.transform(currentAxis);
-            }
-        }
-
-
-        q.rotateAxis(angle, currentAxis);
+        Quaternionf q = new Quaternionf()
+                .rotateAxis(angle, rotationAxis);
 
         Location gizmoLoc = gizmo.getGizmoModel().getLocation();
 
@@ -124,12 +127,21 @@ public class RotationDrag extends Drag {
         return axis.getRotationTag();
     }
 
-    private void computeCurrentAxis() {
-        currentAxis.set(originalAxis).normalize();
+    private void computeAxes() {
+        rotationAxis.set(originalAxis).normalize();
+
+
+        dragAxis.set(
+                GizmoMathUtil.rotate(
+                        originalAxis,
+                        gizmo.getGizmoSpace(),
+                        gizmo.getGizmoModel().getLocation()
+                )
+        ).normalize();
     }
 
     private Vector3f playerRayAndPlaneCollision(Player player) {
-        computeCurrentAxis();
+        computeAxes();
 
         Location eye = player.getEyeLocation();
 
@@ -137,7 +149,7 @@ public class RotationDrag extends Drag {
         Vector3f ray = eye.getDirection().toVector3f().normalize();
 
 
-        float denom = ray.dot(currentAxis);
+        float denom = ray.dot(dragAxis);
 
         if (Math.abs(denom) < 1e-5f) {
             return null;
@@ -145,7 +157,7 @@ public class RotationDrag extends Drag {
 
         float distance = new Vector3f(pivotPoint)
                 .sub(playerEyePosVec)
-                .dot(currentAxis) / denom;
+                .dot(dragAxis) / denom;
 
         if (distance < 0) {
             return null;
