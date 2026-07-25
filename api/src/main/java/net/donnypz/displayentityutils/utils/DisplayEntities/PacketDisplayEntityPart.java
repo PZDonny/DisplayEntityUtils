@@ -1229,7 +1229,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         packetLocation.yaw = yaw;
 
         if (!isDisplay() && pivot){
-            return pivotSilent(delta, PivotAxis.Y, false);
+            return pivotSilent(delta, PivotAxis.Y, true);
         }
 
         return packetLocation.toLocation();
@@ -1248,7 +1248,8 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
     private Location pivotSilent(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace){
         if (angleInDegrees == 0.0f) return getLocation();
-        Location result = WorldUtils.getPivotLocation(getLocation(),
+        Location result = WorldUtils.getPivotLocation(
+                getLocation(),
                 group.getLocation(),
                 angleInDegrees,
                 pivotAxis,
@@ -1264,30 +1265,12 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     @Override
     public void pivot(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
         if (isDisplay()) return;
-        Vector3f translationVector = getNonDisplayTranslation().toVector3f();
-        Quaternionf appliedRotation = new Quaternionf(rotation);
-        float pitch = getPitch();
-        float yaw = getYaw();
-
-        if (!worldSpace) {
-            Quaternionf entityRot = new Quaternionf()
-                    .rotateY((float) Math.toRadians(-yaw))
-                    .rotateX((float) Math.toRadians(pitch));
-
-            Quaternionf inverse = new Quaternionf(entityRot).invert();
-
-            //entity's space to world space
-            appliedRotation = entityRot
-                    .mul(appliedRotation)
-                    .mul(inverse);
-        }
-
-        appliedRotation.transform(translationVector);
-
-        Location newLoc = pivotLocation.clone().subtract(Vector.fromJOML(translationVector));
-        newLoc.setPitch(pitch);
-        newLoc.setYaw(yaw);
-        teleport(newLoc);
+        Location result = WorldUtils.getPivotLocation(
+                getLocation(),
+                rotation,
+                pivotLocation,
+                worldSpace);
+        this.teleport(result);
     }
 
     /**
