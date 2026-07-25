@@ -267,10 +267,10 @@ public abstract class ActivePartHolder<T extends ActivePart> implements Active {
      * Pivot all non-display parts in this
      */
     @Override
-    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis) {
+    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace) {
         for (T part : getPartsRaw()){
             if (part.isDisplay()) continue;
-            part.pivot(angleInDegrees, pivotAxis);
+            part.pivot(angleInDegrees, pivotAxis, worldSpace);
         }
     }
 

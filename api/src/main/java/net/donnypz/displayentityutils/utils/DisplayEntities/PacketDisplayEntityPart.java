@@ -1218,7 +1218,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         packetLocation.pitch = pitch;
 
         if (!isDisplay() && pivot){
-            return pivotSilent(delta, PivotAxis.X);
+            return pivotSilent(delta, PivotAxis.X, false);
         }
         return packetLocation.toLocation();
     }
@@ -1229,7 +1229,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         packetLocation.yaw = yaw;
 
         if (!isDisplay() && pivot){
-            return pivotSilent(delta, PivotAxis.Y);
+            return pivotSilent(delta, PivotAxis.Y, false);
         }
 
         return packetLocation.toLocation();
@@ -1239,25 +1239,20 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * Pivot a non-display entity around its group
      */
     @Override
-    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis) {
+    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace) {
         if (isDisplay() || group == null) return;
 
-        Location result = pivotSilent(angleInDegrees, pivotAxis);
-        if (!viewers.isEmpty()){
-            for (UUID uuid : getViewers()){
-                Player player = Bukkit.getPlayer(uuid);
-                if (player == null) continue;
-                PacketUtils.teleport(player, this, result);
-            }
-        }
+        Location result = pivotSilent(angleInDegrees, pivotAxis, worldSpace);
+        this.teleport(result);
     }
 
-    private Location pivotSilent(float angleInDegrees, @NotNull PivotAxis pivotAxis){
+    private Location pivotSilent(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace){
         if (angleInDegrees == 0.0f) return getLocation();
         Location result = WorldUtils.getPivotLocation(getLocation(),
                 group.getLocation(),
                 angleInDegrees,
-                pivotAxis);
+                pivotAxis,
+                worldSpace);
         packetLocation.setCoordinates(result);
         return result;
     }
@@ -1295,8 +1290,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         teleport(newLoc);
     }
 
-
-
     /**
      * Set the location of this packet-based entity.<br>
      * {@inheritDoc}
@@ -1306,6 +1299,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public void teleport(@NotNull Location location){
         if (hasGroup() && isDisplay() && !isMaster) return;
         packetLocation = new PacketLocation(location);
+
         for (UUID uuid : getViewers()){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;

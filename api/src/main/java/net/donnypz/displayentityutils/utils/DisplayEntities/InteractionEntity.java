@@ -80,16 +80,10 @@ final class InteractionEntity implements Serializable {
 
     Interaction createEntity(Location origin, GroupSpawnSettings settings){
         Location spawnLoc = WorldUtils.getPivotLocation(
-                vector,
+                Vector.fromJOML(vector),
                 origin,
                 origin.getYaw(),
-                PivotAxis.Y);
-
-        spawnLoc = WorldUtils.getPivotLocation(
-                spawnLoc,
-                origin,
-                origin.getPitch(),
-                PivotAxis.X);
+                origin.getPitch());
 
         return spawnLoc.getWorld().spawn(spawnLoc, Interaction.class, i -> {
             i.setRotation(origin.getYaw(), origin.getPitch());
@@ -128,16 +122,10 @@ final class InteractionEntity implements Serializable {
                 .setAttribute(DisplayAttributes.Interaction.RESPONSIVE, isResponsive);
 
         Location spawnLoc = WorldUtils.getPivotLocation(
-                        vector,
-                        origin,
-                        origin.getYaw(),
-                        PivotAxis.Y);
-
-        spawnLoc = WorldUtils.getPivotLocation(
-                spawnLoc,
+                Vector.fromJOML(vector),
                 origin,
-                origin.getPitch(),
-                PivotAxis.X);
+                origin.getYaw(),
+                origin.getPitch());
 
         PacketDisplayEntityPart part = attributeContainer.createPart(SpawnedDisplayEntityPart.PartType.INTERACTION, spawnLoc);
 

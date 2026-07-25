@@ -19,7 +19,7 @@ class InteractionPivotCMD extends PlayerSubCommand {
         setTabComplete(2, List.of("x", "y", "z"));
         setTabComplete(3, "<angle>");
         addFlag("-all");
-        addFlag("-local");
+        addFlag("-world");
     }
 
     @Override
@@ -45,6 +45,10 @@ class InteractionPivotCMD extends PlayerSubCommand {
 
         if (!hasMinimumArguments(player, args)) return;
 
+        OptionalArguments oArgs = getOptionalArguments(player, args);
+        boolean isAll = oArgs.hasFlag("-all");
+        boolean worldSpace = oArgs.hasFlag("-world");
+
         float angle;
         try{
             angle = Float.parseFloat(args[3]);
@@ -56,11 +60,10 @@ class InteractionPivotCMD extends PlayerSubCommand {
 
 
         MultiPartSelection<?> selection = (MultiPartSelection<?>) sel;
-        boolean isAll = getOptionalArguments(player, args).hasFlag("-all");
         if (isAll){
             for (ActivePart p : selection.getSelectedParts()){
                 if (p.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                    p.pivot(angle, axis);
+                    p.pivot(angle, axis, worldSpace);
                 }
             }
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Pivoting ALL Interaction entities in your selection around your group", NamedTextColor.GREEN)));
@@ -70,13 +73,15 @@ class InteractionPivotCMD extends PlayerSubCommand {
             if (interaction == null){
                 return;
             }
-            interaction.pivot(selection.getGroup().getLocation(), angle, axis);
+            interaction.pivot(selection.getGroup().getLocation(), angle, axis, worldSpace);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Pivoting Interaction around group", NamedTextColor.GREEN)));
         }
     }
 
     @Override
     protected String getDescription() {
-        return "Pivot an interaction around its group's location. Pivot around the X (pitch), Y (yaw), or Z (roll) axes";
+        return "Pivot an interaction around its group's location. " +
+                "Pivot around the X (pitch), Y (yaw), or Z (roll) axes" +
+                "\nUse \"-world\" to pivot in world space";
     }
 }

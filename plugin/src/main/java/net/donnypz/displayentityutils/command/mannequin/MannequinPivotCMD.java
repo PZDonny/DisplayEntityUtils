@@ -20,7 +20,7 @@ class MannequinPivotCMD extends PartsSubCommand {
         super("pivot", parentSubCommand, Permission.MANNEQUIN_PIVOT, true);
         setTabComplete(2, List.of("x", "y", "z"));
         setTabComplete(3, "<angle>");
-        addFlag("-all");
+        addFlag("-world");
     }
 
     @Override
@@ -33,9 +33,10 @@ class MannequinPivotCMD extends PartsSubCommand {
 
         try{
             float angle = Float.parseFloat(args[3]);
+            boolean worldSpace = getOptionalArguments(player, args).hasFlag("-world");
             for (ActivePart p : selection.getSelectedParts()){
                 if (p.getType() != SpawnedDisplayEntityPart.PartType.MANNEQUIN) continue;
-                p.pivot(angle, axis);
+                p.pivot(angle, axis, worldSpace);
             }
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Pivoted ALL selected mannequins!", NamedTextColor.GREEN)));
             return true;
@@ -55,7 +56,8 @@ class MannequinPivotCMD extends PartsSubCommand {
 
         try{
             float angle = Float.parseFloat(args[3]);
-            selectedPart.pivot(angle, axis);
+            boolean worldSpace = getOptionalArguments(player, args).hasFlag("-world");
+            selectedPart.pivot(angle, axis, worldSpace);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Pivot applied to mannequin!", NamedTextColor.GREEN)));
             return true;
         }
@@ -67,6 +69,8 @@ class MannequinPivotCMD extends PartsSubCommand {
 
     @Override
     protected String getDescription() {
-        return "Pivot a mannequin around its group's location. Pivot around the X (pitch), Y (yaw), or Z (roll) axes";
+        return "Pivot a mannequin around its group's location. " +
+                "Pivot around the X (pitch), Y (yaw), or Z (roll) axes" +
+                "\nUse \"-world\" to pivot in world space";
     }
 }

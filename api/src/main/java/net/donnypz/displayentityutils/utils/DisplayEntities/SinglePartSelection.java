@@ -150,9 +150,9 @@ public final class SinglePartSelection implements ActivePartSelection<SpawnedDis
      * Pivot the part in this selection around this selection's group, if it's not a display
      */
     @Override
-    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis) {
+    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace) {
         if (selectedPart.isDisplay()) return;
-        selectedPart.pivot(angleInDegrees, pivotAxis);
+        selectedPart.pivot(angleInDegrees, pivotAxis, worldSpace);
     }
 
     /**

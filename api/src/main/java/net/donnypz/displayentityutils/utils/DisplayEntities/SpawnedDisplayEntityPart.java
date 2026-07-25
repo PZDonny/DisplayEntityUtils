@@ -542,7 +542,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         entity.setRotation(entity.getYaw(), pitch);
 
         if (!isDisplay() && pivot){
-            pivot(delta, PivotAxis.X);
+            pivot(delta, PivotAxis.X, false);
         }
     }
 
@@ -561,7 +561,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         entity.setRotation(yaw, entity.getPitch());
 
         if (!isDisplay() && pivot){
-            pivot(delta, PivotAxis.Y);
+            pivot(delta, PivotAxis.Y, true);
         }
 
         if (entity instanceof LivingEntity le){
@@ -586,12 +586,17 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * Pivot a non-display entity around its group
      */
     @Override
-    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis) {
+    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace) {
         if (isDisplay() || isSingle || group == null) return;
         Entity e = getEntity();
         if (e == null) return;
         if (angleInDegrees != 0.0f){
-            DisplayUtils.pivotAxisLocal(e, group.getLocation(), angleInDegrees, pivotAxis);
+            DisplayUtils.pivot(
+                    e,
+                    group.getLocation(),
+                    angleInDegrees,
+                    pivotAxis,
+                    worldSpace);
         }
     }
 

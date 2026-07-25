@@ -390,7 +390,7 @@ public final class PacketUtils {
                              @NotNull Quaternionf rotation,
                              @NotNull Location pivotLocation,
                              boolean worldSpace){
-        Vector3f translationVector = DisplayUtils.getNonDisplayTranslation(entity, pivotLocation).toVector3f();
+        Vector translationVector = DisplayUtils.getNonDisplayTranslation(entity, pivotLocation);
         pivot(
                 players,
                 entity.getEntityId(),
@@ -431,17 +431,20 @@ public final class PacketUtils {
                              @NotNull Quaternionf rotation,
                              @NotNull Location pivotLocation,
                              boolean worldSpace){
+        Location partLoc = part.getLocation();
+        if (partLoc == null) return;
+
         Vector translation = part.getNonDisplayTranslation();
         if (translation == null) return;
 
-        Location partLoc = part.getLocation();
-        if (partLoc == null) return;
 
         pivot(
                 players,
                 part.getEntityId(),
-                rotation, pivotLocation,
-                worldSpace, translation.toVector3f(),
+                rotation,
+                pivotLocation,
+                worldSpace,
+                translation,
                 partLoc
         );
     }
@@ -451,29 +454,18 @@ public final class PacketUtils {
                               @NotNull Quaternionf rotation,
                               @NotNull Location pivotLocation,
                               boolean worldSpace,
-                              Vector3f translationVector,
-                              Location entityLocation){
-
-        Quaternionf appliedRotation = new Quaternionf(rotation);
-
-        if (!worldSpace) {
-            Quaternionf entityRot = new Quaternionf()
-                    .rotateY((float) Math.toRadians(-entityLocation.getYaw()))
-                    .rotateX((float) Math.toRadians(entityLocation.getPitch()));
-
-            Quaternionf inverse = new Quaternionf(entityRot).invert();
-
-            //entity's space to world space
-            appliedRotation = entityRot
-                    .mul(appliedRotation)
-                    .mul(inverse);
-        }
-
-        appliedRotation.transform(translationVector);
-
-        Location newLoc = pivotLocation.clone().subtract(Vector.fromJOML(translationVector));
-        newLoc.setPitch(entityLocation.getPitch());
-        newLoc.setYaw(entityLocation.getYaw());
+                              Vector translationVector,
+                              @NotNull Location entityLocation){
+        float yaw = entityLocation.getYaw();
+        float pitch = entityLocation.getPitch();
+        Location newLoc = WorldUtils.getPivotLocation(
+                translationVector,
+                rotation,
+                pivotLocation,
+                worldSpace,
+                yaw,
+                pitch);
+        
         teleport(players, entityId, newLoc);
     }
 

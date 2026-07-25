@@ -69,8 +69,9 @@ public interface Active {
     /**
      * @param angleInDegrees the pivot angle
      * @param pivotAxis the axis to perform the pivot on
+     * @param worldSpace whether the pivot should occur on world space axis
      */
-    void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis);
+    void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace);
 
     /**
      * @param rotation the rotation

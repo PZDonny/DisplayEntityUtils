@@ -595,76 +595,26 @@ public final class DisplayUtils {
      * @param pivotLocation the location to pivot around
      * @param angleInDegrees the pivot angle in degrees
      * @param pivotAxis the axis to pivot around
+     * @param worldSpace whether the pivot should occur on world space axis
      */
-    public static void pivotAxis(@NotNull Entity entity,
-                                 @NotNull Location pivotLocation,
-                                 double angleInDegrees,
-                                 @NotNull PivotAxis pivotAxis){
-        Vector translationVector = DisplayUtils.getNonDisplayTranslation(entity, pivotLocation);
-
-        double angleRad = -Math.toRadians(angleInDegrees);
+    public static void pivot(@NotNull Entity entity,
+                             @NotNull Location pivotLocation,
+                             double angleInDegrees,
+                             @NotNull PivotAxis pivotAxis,
+                             boolean worldSpace){
+        float angleRad = (float) Math.toRadians(angleInDegrees);
+        Quaternionf rotation = new Quaternionf();
 
         if (pivotAxis == PivotAxis.X){
-            translationVector.rotateAroundX(angleRad);
+            rotation.rotateX(angleRad);
         }
         else if (pivotAxis == PivotAxis.Y){
-            translationVector.rotateAroundY(angleRad);
+            rotation.rotateY(-angleRad);
         }
         else{
-            translationVector.rotateAroundZ(angleRad);
+            rotation.rotateZ(angleRad);
         }
-
-        Location newLoc = pivotLocation.clone().subtract(translationVector);
-        FoliaUtils.teleportSafe(entity, newLoc);
-    }
-
-    /**
-     * Pivot an entity around a location, respective of an entity's facing direction
-     * <ul>
-     *     <li>X (Pitch)</li>
-     *     <li>Y (Yaw)</li>
-     *     <li>Z (Roll)</li>
-     * </ul>
-     * @param entity the entity
-     * @param pivotLocation the location to pivot around
-     * @param angleInDegrees the pivot angle in degrees
-     * @param pivotAxis the axis to pivot around
-     */
-    public static void pivotAxisLocal(@NotNull Entity entity,
-                                      @NotNull Location pivotLocation,
-                                      double angleInDegrees,
-                                      @NotNull PivotAxis pivotAxis){
-        Vector translationVector = DisplayUtils.getNonDisplayTranslation(entity, pivotLocation);
-
-        double angleRad = -Math.toRadians(angleInDegrees);
-
-        float entityYaw = entity.getYaw();
-        float entityPitch = entity.getPitch();
-        if (pivotAxis == PivotAxis.X){
-            Quaternionf q = new Quaternionf()
-                    .rotateY((float) -Math.toRadians(entityYaw));
-
-            Vector3f xVector = new Vector3f(-1, 0, 0);
-            q.transform(xVector);
-            translationVector.rotateAroundAxis(Vector.fromJOML(xVector), angleRad);
-        }
-        else if (pivotAxis == PivotAxis.Y){
-            translationVector.rotateAroundY(angleRad);
-        }
-        else{
-            Quaternionf q = new Quaternionf()
-                    .rotateY((float) -Math.toRadians(entityYaw))
-                    .rotateX((float) Math.toRadians(entityPitch));
-
-            Vector3f zVector = new Vector3f(0, 0, -1);
-            q.transform(zVector);
-            translationVector.rotateAroundAxis(Vector.fromJOML(zVector), angleRad);
-        }
-
-        Location newLoc = pivotLocation.clone().subtract(translationVector);
-        newLoc.setPitch(entity.getPitch());
-        newLoc.setYaw(entity.getYaw());
-        FoliaUtils.teleportSafe(entity, newLoc);
+        pivot(entity, rotation, pivotLocation, worldSpace);
     }
 
     /**
@@ -678,30 +628,12 @@ public final class DisplayUtils {
                              @NotNull Quaternionf rotation,
                              @NotNull Location pivotLocation,
                              boolean worldSpace){
-        Vector3f translation3f = DisplayUtils
-                .getNonDisplayTranslation(entity, pivotLocation)
-                .toVector3f();
-
-        Quaternionf appliedRotation = new Quaternionf(rotation);
-
-        if (!worldSpace) {
-            Quaternionf entityRot = new Quaternionf()
-                    .rotateY((float) Math.toRadians(-entity.getYaw()))
-                    .rotateX((float) Math.toRadians(entity.getPitch()));
-
-            Quaternionf inverse = new Quaternionf(entityRot).invert();
-
-            //entity's space to world space
-            appliedRotation = entityRot
-                    .mul(appliedRotation)
-                    .mul(inverse);
-        }
-
-        appliedRotation.transform(translation3f);
-
-        Location newLoc = pivotLocation.clone().subtract(Vector.fromJOML(translation3f));
-        newLoc.setPitch(entity.getPitch());
-        newLoc.setYaw(entity.getYaw());
+        Location newLoc = WorldUtils
+                .getPivotLocation(
+                        entity.getLocation(),
+                        rotation,
+                        pivotLocation,
+                        worldSpace);
         FoliaUtils.teleportSafe(entity, newLoc);
     }
 

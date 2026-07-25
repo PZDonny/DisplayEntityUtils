@@ -107,12 +107,12 @@ public final class InteractionCMD extends ParentSubCommand {
             }
         }
 
-        void pivot(Location pivotLoc, float angle, PivotAxis pivotAxis){
+        void pivot(Location pivotLoc, float angle, PivotAxis pivotAxis, boolean worldSpace){
             if (interaction != null){
-                DisplayUtils.pivotAxisLocal(interaction, pivotLoc, angle, pivotAxis);
+                DisplayUtils.pivot(interaction, pivotLoc, angle, pivotAxis, worldSpace);
             }
             else{
-                interactionPart.pivot(angle, pivotAxis);
+                interactionPart.pivot(angle, pivotAxis, worldSpace);
                 updatePacketGroup();
             }
         }
