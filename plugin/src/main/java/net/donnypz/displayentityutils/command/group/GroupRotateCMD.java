@@ -65,7 +65,7 @@ public class GroupRotateCMD extends GroupSubCommand {
             boolean worldSpace = oArgs.hasFlag("-world");
             boolean displaysOnly = oArgs.hasFlag(DISPLAYS_ONLY_FLAG);
             if (!displaysOnly){
-                group.pivotAndRotate(q, group.getLocation(), worldSpace);
+                group.pivotOrRotateAround(q, group.getLocation(), worldSpace);
             }
             else{
                 group.rotate(q, worldSpace);

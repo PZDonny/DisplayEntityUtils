@@ -118,7 +118,7 @@ public class RotationDrag extends Drag {
                 }
             }
         } else if (sel instanceof MultiPartSelection<?> mps) {
-            mps.pivotAndRotate(q, gizmoLoc, worldSpace);
+            mps.pivotOrRotateAround(q, gizmoLoc, worldSpace);
         }
     }
 

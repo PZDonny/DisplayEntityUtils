@@ -105,7 +105,7 @@ public class EffActiveRotate extends Effect {
         for (Object o : objects){
             if (o instanceof ActivePartHolder<?> h){
                 if (pivotNonDisplays){
-                    h.pivotAndRotate(rotation,
+                    h.pivotOrRotateAround(rotation,
                             pivotLoc == null ? h.getLocation() : pivotLoc,
                             world);
                     return;
