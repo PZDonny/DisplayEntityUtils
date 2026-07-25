@@ -113,8 +113,8 @@ public class EffActiveRotate extends Effect {
                 //fall through if not pivoting non-displays
             }
             if (o instanceof Active a){
-                boolean isNonDisplay = (a instanceof ActivePart p && !p.isDisplay());
                 if (pivotLoc == null){
+                    boolean isNonDisplay = (a instanceof ActivePart p && !p.isDisplay());
                     if (isNonDisplay){
                         sendPivotRequiredError();
                         return;
@@ -122,12 +122,7 @@ public class EffActiveRotate extends Effect {
                     a.rotate(rotation, world);
                 }
                 else{
-                    if (isNonDisplay){
-                        a.pivot(rotation, pivotLoc, world);
-                    }
-                    else{
-                        a.rotateAround(rotation, pivotLoc, world);
-                    }
+                    a.pivotOrRotateAround(rotation, pivotLoc, world);
                 }
             }
             else if (o instanceof Display display){
@@ -149,7 +144,7 @@ public class EffActiveRotate extends Effect {
         return String.format("rotate %s on %s %s axis",
                 object.toString(event, debug),
                 axis,
-                world ? "world" : "");
+                world ? "world" : "local");
     }
 
     private void sendPivotRequiredError(){
