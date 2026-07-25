@@ -13,6 +13,8 @@ import org.joml.Quaternionf;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public abstract class ActivePartHolder<T extends ActivePart> implements Active {
 
@@ -25,6 +27,52 @@ public abstract class ActivePartHolder<T extends ActivePart> implements Active {
      */
     public @NotNull List<T> getParts(){
         return new ArrayList<>(getPartsRaw());
+    }
+
+    /**
+     * Get the number of parts contained in this
+     * @return an int
+     */
+    public int size(){
+        return getPartsRaw().size();
+    }
+
+    /**
+     * Get the number of parts contained in this that pass a given condition
+     * @param condition the test to perform on each part
+     */
+    public int size(@NotNull Predicate<T> condition){
+        int size = 0;
+        for (T part : getPartsRaw()){
+            if (condition.test(part)){
+                size++;
+            }
+        }
+        return size;
+    }
+
+    /**
+     * Perform an action on each part of this until all parts have been processed or the action throws an exception.
+     * @param action the action to perform on each part
+     */
+    public void forEach(@NotNull Consumer<T> action){
+        for (T part : getPartsRaw()){
+            action.accept(part);
+        }
+    }
+
+    /**
+     * Get a list of all parts in this that pass a given condition
+     * @return a list of parts
+     */
+    public List<T> getParts(@NotNull Predicate<T> condition){
+        List<T> parts = new ArrayList<>();
+        for (T part : getPartsRaw()){
+            if (condition.test(part)){
+                parts.add(part);
+            }
+        }
+        return parts;
     }
 
     /**
@@ -71,6 +119,7 @@ public abstract class ActivePartHolder<T extends ActivePart> implements Active {
         }
         return partList;
     }
+
     /**
      * Get all parts of a display type contained in this
      * @return a list of {@link ActivePart}
@@ -79,6 +128,20 @@ public abstract class ActivePartHolder<T extends ActivePart> implements Active {
         List<T> partList = new ArrayList<>();
         for (T part : getPartsRaw()){
             if (part.isDisplay()){
+                partList.add(part);
+            }
+        }
+        return partList;
+    }
+
+    /**
+     * Get all parts that are not displays contained in this
+     * @return a list of {@link ActivePart}
+     */
+    public List<T> getNonDisplayParts(){
+        List<T> partList = new ArrayList<>();
+        for (T part : getPartsRaw()){
+            if (!part.isDisplay()){
                 partList.add(part);
             }
         }
