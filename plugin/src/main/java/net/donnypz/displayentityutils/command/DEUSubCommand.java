@@ -158,6 +158,11 @@ public abstract class DEUSubCommand {
         options.put(option, new ArrayList<>(inputPlaceholders));
     }
 
+    protected void addOption(@NotNull String option, @NotNull TabSuggestion suggestion){
+        options.put(option, new ArrayList<>(suggestion.suggestions));
+    }
+
+
     public Permission getPermission() {
         return permission;
     }
