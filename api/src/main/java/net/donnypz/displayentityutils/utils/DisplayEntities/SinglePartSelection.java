@@ -192,6 +192,14 @@ public final class SinglePartSelection implements ActivePartSelection<SpawnedDis
         selectedPart.rotateAround(rotation, pivotLocation, worldSpace);
     }
 
+    /**
+     * Pivot or rotate the selected part around a location by a provided rotation, using the correct action based on the part's type
+     */
+    @Override
+    public void pivotOrRotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
+        selectedPart.pivotOrRotateAround(rotation, pivotLocation, worldSpace);
+    }
+
     @Override
     public void hideFromPlayer(@NotNull Player player) {
         selectedPart.hideFromPlayer(player);

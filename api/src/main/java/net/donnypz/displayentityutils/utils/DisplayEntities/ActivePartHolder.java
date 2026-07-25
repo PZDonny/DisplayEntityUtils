@@ -371,14 +371,11 @@ public abstract class ActivePartHolder<T extends ActivePart> implements Active {
 
     /**
      * Pivot or rotate entities around a location by a provided rotation, using the correct action based on a part's type
-     * @param rotation      the rotation
-     * @param pivotLocation the location that should be pivoted around
-     * @param worldSpace    whether the pivot should occur on world space axis
      */
+    @Override
     public void pivotOrRotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace){
         for (T part : getPartsRaw()){
-            if (part.isDisplay()) part.rotateAround(rotation, pivotLocation, worldSpace);
-            else part.pivot(rotation, pivotLocation, worldSpace);
+            part.pivotOrRotateAround(rotation, pivotLocation, worldSpace);
         }
     }
 

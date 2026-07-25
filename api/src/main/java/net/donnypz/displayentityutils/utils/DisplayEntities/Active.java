@@ -80,14 +80,6 @@ public interface Active {
      */
     void pivot(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace);
 
-    default boolean translate(@NotNull Vector direction, int durationInTicks, int delayInTicks){
-        return translate(direction, (float) direction.length(), durationInTicks, delayInTicks);
-    }
-
-    boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks);
-
-    boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks);
-
     /**
      * @param rotation the rotation
      * @param worldSpace whether the rotation should occur on world space axis
@@ -100,6 +92,22 @@ public interface Active {
      * @param worldSpace whether the rotation should occur on world space axis
      */
     void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace);
+
+    /**
+     * Safely pivot or rotate entities based on their type
+     * @param rotation the rotation
+     * @param pivotLocation the location that should be pivoted around
+     * @param worldSpace whether the rotation should occur on world space axis
+     */
+    void pivotOrRotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace);
+
+    default boolean translate(@NotNull Vector direction, int durationInTicks, int delayInTicks){
+        return translate(direction, (float) direction.length(), durationInTicks, delayInTicks);
+    }
+
+    boolean translate(@NotNull Vector direction, float distance, int durationInTicks, int delayInTicks);
+
+    boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks);
 
     void hideFromPlayer(@NotNull Player player);
 

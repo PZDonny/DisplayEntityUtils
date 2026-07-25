@@ -417,6 +417,15 @@ public abstract class ActivePart implements Active{
     public abstract void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace);
 
     /**
+     * Pivot or rotate around a location by a provided rotation, using the correct action based on this part's type
+     */
+    @Override
+    public void pivotOrRotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
+        if (this.isDisplay()) this.rotateAround(rotation, pivotLocation, worldSpace);
+        else this.pivot(rotation, pivotLocation, worldSpace);
+    }
+
+    /**
      * Set the text of this part if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
      * @param text the text
      */
