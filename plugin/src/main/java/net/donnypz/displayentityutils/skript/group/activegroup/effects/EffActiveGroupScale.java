@@ -21,10 +21,13 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 @Description("Change the scale multiplier of an active group")
 @Examples({
         "deu scale {_activegroup} by 2 over 0 ticks",
-        "deu scale {_activegroup} by 5 over 0 ticks and scale interactions",
+        "deu scale {_activegroup} by 5 over 0 ticks and scale non-displays",
         "",
         "#Additional scaling for player (group's scale * 1.25)",
         "deu scale {_activegroup}'s by to 1.25 for {_player} ",
+        "",
+        "#Before 3.6.0 (Non-Displays)",
+        "deu scale {_activegroup} by 5 over 0 ticks and scale interactions",
         "",
         "#3.4.3 and earlier",
         "set {_activegroup}'s scale multiplier to 7 over 0 ticks",
@@ -32,19 +35,19 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
         "",
 
 })
-@Since("2.6.3, 3.0.0 (Packet), 3.5.0 (Player)")
+@Since("2.6.3, 3.0.0 (Packet), 3.5.0 (Player), 3.6.0 (Non-Displays)")
 public class EffActiveGroupScale extends Effect {
 
-    Expression<ActiveGroup> group;
+    Expression<ActiveGroup<?>> group;
     Expression<Number> multiplier;
     Expression<Timespan> timespan;
     Expression<Player> players;
-    boolean scaleInteractions;
+    boolean scaleNonDisplays;
 
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EFFECT,
                 SyntaxInfo.builder(EffActiveGroupScale.class)
-                        .addPattern("deu scale %activegroup%['s] by [multiplier] %number% (1¦for %-players%|2¦(for|over) %-timespan%) [i:and [scale] interactions]")
+                        .addPattern("deu scale %activegroup%['s] by [multiplier] %number% (1¦for %-players%|2¦(for|over) %-timespan%) [n:and [scale] (non( |-)displays)]")
                         .supplier(EffActiveGroupScale::new)
                         .build()
         );
@@ -52,7 +55,7 @@ public class EffActiveGroupScale extends Effect {
 
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        group = (Expression<ActiveGroup>) expressions[0];
+        group = (Expression<ActiveGroup<?>>) expressions[0];
         multiplier = (Expression<Number>) expressions[1];
         if (parseResult.mark == 1){
             players = (Expression<Player>) expressions[2];
@@ -60,13 +63,13 @@ public class EffActiveGroupScale extends Effect {
         else if (parseResult.mark == 2){
             timespan = (Expression<Timespan>) expressions[3];
         }
-        scaleInteractions = parseResult.hasTag("i");
+        scaleNonDisplays = parseResult.hasTag("n");
         return true;
     }
 
     @Override
     protected void execute(Event event) {
-        ActiveGroup[] groupArr = group.getArray(event);
+        ActiveGroup<?>[] groupArr = group.getArray(event);
         Number n = multiplier.getSingle(event);
 
 
@@ -76,14 +79,14 @@ public class EffActiveGroupScale extends Effect {
         Player[] playerArr = players == null ? null : players.getArray(event);
 
         float multiplier = n.floatValue();
-        for (ActiveGroup g : groupArr){
+        for (ActiveGroup<?> g : groupArr){
             if (playerArr != null){
                 for (Player p : playerArr){
-                    DEUUser.getOrCreateUser(p).setScaleMultiplier(g, multiplier, scaleInteractions);
+                    DEUUser.getOrCreateUser(p).setScaleMultiplier(g, multiplier, scaleNonDisplays);
                 }
             }
             else{
-                g.scale(n.floatValue(), ticks, scaleInteractions);
+                g.scale(n.floatValue(), ticks, scaleNonDisplays);
             }
         }
     }
