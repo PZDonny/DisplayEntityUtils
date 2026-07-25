@@ -33,6 +33,13 @@ public class DisplayEntitySelector extends RelativePointSelector<RelativePoint> 
 
     @Override
     public boolean removeFromPointHolder() {
+        SpawnedDisplayEntityPart existing = SpawnedDisplayEntityPart.getPart(display);
+        if (existing != null){
+            existing.remove(true);
+        }
+        else{
+            display.remove();;
+        }
         return true;
     }
 
