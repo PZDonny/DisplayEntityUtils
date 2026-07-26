@@ -309,7 +309,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
     @Override
     public boolean isTrackedBy(@NotNull Player player) {
-        return player.canSee(getMasterEntity());
+        Entity masterEntity = getMasterEntity();
+        return masterEntity != null && player.canSee(masterEntity);
     }
 
     @Override
