@@ -42,7 +42,10 @@ jobs:
           BASE_VERSION: ${{ steps.get_version.outputs.version }}
         run: |
           SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c1-7)
-          BRANCH=$(echo "$GITHUB_REF_NAME" | tr '/' '-')
+
+        #If PR, use source branch name; else use current branch name.
+          BRANCH="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+          BRANCH=$(echo "$BRANCH" | tr '/' '-')
           
           VERSION="$BASE_VERSION-$BRANCH-$SHORT_SHA"
           
