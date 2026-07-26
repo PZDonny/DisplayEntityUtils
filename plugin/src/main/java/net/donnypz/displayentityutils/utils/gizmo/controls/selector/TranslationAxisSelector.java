@@ -10,7 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.joml.Vector3f;
 
-public class TranslationAxisSelector extends TranslationSelector {
+public class TranslationAxisSelector extends AxisSelector {
 
     private final Vector3f localStart;
     private final Vector3f localEnd;

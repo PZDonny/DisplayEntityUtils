@@ -6,11 +6,13 @@ import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.GizmoManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Control;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
 import net.donnypz.displayentityutils.utils.gizmo.controls.selector.RotationSelector;
+import net.donnypz.displayentityutils.utils.gizmo.controls.selector.ScaleSelector;
 import net.donnypz.displayentityutils.utils.gizmo.controls.selector.Selector;
-import net.donnypz.displayentityutils.utils.gizmo.controls.selector.TranslationSelector;
+import net.donnypz.displayentityutils.utils.gizmo.controls.selector.AxisSelector;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -51,12 +53,23 @@ public class GizmoSessionImpl implements GizmoSession {
 
     public GizmoSessionImpl(Player player, Location spawnLocation) {
         this.playerUUID = player.getUniqueId();
-        this.selectors.add(TranslationSelector.x());
-        this.selectors.add(TranslationSelector.y());
-        this.selectors.add(TranslationSelector.z());
-        this.selectors.add(TranslationSelector.xy());
-        this.selectors.add(TranslationSelector.xz());
-        this.selectors.add(TranslationSelector.yz());
+
+        //Translate Axis
+        this.selectors.add(AxisSelector.x());
+        this.selectors.add(AxisSelector.y());
+        this.selectors.add(AxisSelector.z());
+
+        //Translate Plane
+        this.selectors.add(AxisSelector.xy());
+        this.selectors.add(AxisSelector.xz());
+        this.selectors.add(AxisSelector.yz());
+
+        //Scale Axis
+        this.selectors.add(new ScaleSelector(Axis.X));
+        this.selectors.add(new ScaleSelector(Axis.Y));
+        this.selectors.add(new ScaleSelector(Axis.Z));
+
+        //Rotate Axis
         this.selectors.add(RotationSelector.x());
         this.selectors.add(RotationSelector.y());
         this.selectors.add(RotationSelector.z());
