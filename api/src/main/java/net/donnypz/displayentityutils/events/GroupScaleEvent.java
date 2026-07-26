@@ -1,12 +1,13 @@
 package net.donnypz.displayentityutils.events;
 
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * Called when a {@link SpawnedDisplayEntityGroup} begins scaling.
+ * Called when an {@link ActiveGroup} begins scaling.
  * Can be cancelled
  */
 public class GroupScaleEvent extends Event implements Cancellable {
@@ -14,10 +15,11 @@ public class GroupScaleEvent extends Event implements Cancellable {
     float newScale;
     float lastScale;
     int scaleDuration;
-    SpawnedDisplayEntityGroup group;
+    ActiveGroup<?> group;
     private boolean isCancelled = false;
 
-    public GroupScaleEvent(SpawnedDisplayEntityGroup group, float newScale, float lastScale, int scaleDuration){
+    public GroupScaleEvent(ActiveGroup<?> group, float newScale, float lastScale, int scaleDuration){
+        super(!Bukkit.isPrimaryThread());
         this.group = group;
         this.newScale = newScale;
         this.lastScale = lastScale;
@@ -25,15 +27,15 @@ public class GroupScaleEvent extends Event implements Cancellable {
     }
 
     /**
-     * Get the {@link SpawnedDisplayEntityGroup} involved in this event
-     * @return a {@link SpawnedDisplayEntityGroup}
+     * Get the {@link ActiveGroup} involved in this event
+     * @return a {@link ActiveGroup}
      */
-    public SpawnedDisplayEntityGroup getGroup(){
+    public ActiveGroup<?> getGroup(){
         return group;
     }
 
     /**
-     * Get the scale the {@link SpawnedDisplayEntityGroup} will have
+     * Get the scale the {@link ActiveGroup} will have
      * @return a float
      */
     public float getNewScale(){
@@ -41,7 +43,7 @@ public class GroupScaleEvent extends Event implements Cancellable {
     }
 
     /**
-     * Get the scale the {@link SpawnedDisplayEntityGroup} had before this event was called
+     * Get the scale the {@link ActiveGroup} had before this event was called
      * @return a float
      */
     public float getLastScale() {

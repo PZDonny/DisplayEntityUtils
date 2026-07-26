@@ -359,6 +359,8 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
         float originalScaleMultiplier = getScaleMultiplier();
         if (newScaleMultiplier == originalScaleMultiplier) return true;
+        GroupScaleEvent event = new GroupScaleEvent(this, newScaleMultiplier, originalScaleMultiplier, durationInTicks);
+        if (!event.callEvent()) return false;
 
         for (PacketDisplayEntityPart part : groupParts.values()) {
             //Displays
