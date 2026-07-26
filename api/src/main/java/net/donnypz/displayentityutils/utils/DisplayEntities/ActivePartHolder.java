@@ -33,7 +33,7 @@ public abstract class ActivePartHolder<T extends ActivePart> implements Active {
      * Get the number of parts contained in this
      * @return an int
      */
-    public int size(){
+    public int getSize(){
         return getPartsRaw().size();
     }
 
@@ -41,7 +41,7 @@ public abstract class ActivePartHolder<T extends ActivePart> implements Active {
      * Get the number of parts contained in this that pass a given condition
      * @param condition the test to perform on each part
      */
-    public int size(@NotNull Predicate<T> condition){
+    public int getSize(@NotNull Predicate<T> condition){
         int size = 0;
         for (T part : getPartsRaw()){
             if (condition.test(part)){
