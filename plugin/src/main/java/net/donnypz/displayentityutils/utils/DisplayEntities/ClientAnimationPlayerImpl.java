@@ -1,6 +1,5 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.DisplayAPI;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,41 +10,33 @@ final class ClientAnimationPlayerImpl extends ClientAnimationPlayer{
 
     ClientAnimationPlayerImpl(@NotNull Collection<Player> players,
                               @NotNull DisplayAnimator animator,
-                              @NotNull SpawnedDisplayAnimation animation,
                               @NotNull ActiveGroup<?> group,
-                              @NotNull SpawnedDisplayAnimationFrame frame,
-                              int startFrameId,
-                              int delay,
-                              boolean playSingleFrame)
+                              int startFrameId)
     {
-        super(players, animator, animation, group, frame, startFrameId, delay, playSingleFrame);
+        super(players, animator, group, startFrameId);
+    }
+
+    public ClientAnimationPlayerImpl(@NotNull Collection<Player> players,
+                                     @NotNull DisplayAnimator animator,
+                                     @NotNull ActiveGroup<?> group,
+                                     @NotNull SpawnedDisplayAnimationFrame frame) {
+        super(players, animator, group, frame);
     }
 
     @Override
-    public void prepareAnimation(SpawnedDisplayAnimation animation, ActiveGroup<?> group, SpawnedDisplayAnimationFrame frame, int frameId, int delay){
-        group.addActiveAnimator(animator);
-        MultiPartSelection<?> selection = animation.hasFilter() ? group.createPartSelection(animation.filter) : group.createPartSelection();
+    protected void onAnimationStart(MultiPartSelection<?> selection) {
         selection.addPlayerAnimationPlayer(this);
-        DisplayAPI
-                .getScheduler()
-                .runLaterAsync(() -> {
-                    executeAnimation(players, animation, group, selection, frame, frameId, playSingleFrame);
-                }, Math.max(delay, 0));
     }
 
     @Override
-    protected boolean canContinueAnimation(ActiveGroup<?> group) {
+    protected boolean canFrameStart(ActiveGroup<?> group) {
         return group.isRegistered();
     }
 
     @Override
     protected void handleAnimationInterrupted(ActiveGroup<?> group, MultiPartSelection<?> selection) {
         animator.stop(players, this);
-        if (group instanceof SpawnedDisplayEntityGroup g){
-            if (!g.isRegistered()){
-                removeSelection(selection);
-            }
-        }
+        removeSelection(selection);
     }
 
     @Override

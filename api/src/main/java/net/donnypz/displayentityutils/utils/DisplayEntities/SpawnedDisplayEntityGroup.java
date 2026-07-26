@@ -1035,7 +1035,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             return;
         }
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
-        DisplayAPI.getAnimationPlayerService().play(animator, animation, this, frame, -1, 0, true);
+        DisplayAPI.getAnimationPlayerService().showFrameForClient(animator, frame, this);
     }
 
     /**
@@ -1053,16 +1053,15 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
         SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
         clonedFrame.duration = duration;
-        DisplayAPI.getAnimationPlayerService().play(animator, animation, this, clonedFrame, -1, delay, true);
+        clonedFrame.delay = delay;
+        DisplayAPI.getAnimationPlayerService().showFrameForClient(animator, clonedFrame, this);
     }
-
-
 
     @Override
     public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
         if (isInLoadedChunk()){
             DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
-            DisplayAPI.getAnimationPlayerService().playForClient(Set.of(player), animator, animation, this, frame, -1, 0, true);
+            DisplayAPI.getAnimationPlayerService().showFrameForClient(Set.of(player), animator, frame, this);
         }
     }
 
@@ -1072,10 +1071,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
             SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
             clonedFrame.duration = duration;
-            DisplayAPI.getAnimationPlayerService().playForClient(Set.of(player), animator, animation, this, clonedFrame, -1, delay, true);
+            clonedFrame.delay = delay;
+            DisplayAPI.getAnimationPlayerService().showFrameForClient(Set.of(player), animator, clonedFrame, this);
         }
     }
-
 
     /**
      * @return a cloned {@link SpawnedDisplayEntityGroup}

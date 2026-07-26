@@ -29,15 +29,19 @@ public abstract class AnimationPlayer {
     private final boolean packetAnimationPlayer;
 
     AnimationPlayer(@NotNull DisplayAnimator animator,
-                    @NotNull SpawnedDisplayAnimation animation,
+                    @NotNull ActiveGroup<?> group,
+                    int startFrameId,
+                    boolean packetAnimationPlayer) {
+        this(animator, group, false, packetAnimationPlayer);
+        startAnimation(group, startFrameId);
+    }
+
+    AnimationPlayer(@NotNull DisplayAnimator animator,
                     @NotNull ActiveGroup<?> group,
                     @NotNull SpawnedDisplayAnimationFrame frame,
-                    int startFrameId,
-                    int delay,
-                    boolean playSingleFrame,
                     boolean packetAnimationPlayer) {
-        this(animator, group, playSingleFrame, packetAnimationPlayer);
-        prepareAnimation(animation, group, frame, startFrameId, delay);
+        this(animator, group, true, packetAnimationPlayer);
+        startAnimation(group, frame, -1);
     }
 
     AnimationPlayer(@NotNull DisplayAnimator animator,
@@ -50,40 +54,47 @@ public abstract class AnimationPlayer {
         this.packetAnimationPlayer = packetAnimationPlayer;
     }
 
-    protected void prepareAnimation(SpawnedDisplayAnimation animation,
-                                    ActiveGroup<?> group,
-                                    SpawnedDisplayAnimationFrame frame,
-                                    int frameId,
-                                    int delay) {
+
+    protected void startAnimation(ActiveGroup<?> group, int frameId) {
+        SpawnedDisplayAnimationFrame frame = animator.getAnimation().getFrame(frameId);
+        this.startAnimation(group, frame, frameId);
+    }
+
+    protected void startAnimation(ActiveGroup<?> group, SpawnedDisplayAnimationFrame frame, int frameId){
         group.addActiveAnimator(animator);
-        MultiPartSelection<?> selection = animation.hasFilter() ? group.createPartSelection(animation.filter) : group.createPartSelection();
-        if (packetAnimationPlayer) {
-            DisplayAPI
-                    .getScheduler()
-                    .partRunLaterAsync(group.getMasterPart(), () -> executeAnimation(null, animation, group, selection, frame, frameId, playSingleFrame),
-                            Math.max(delay, 0));
-        } else {
-            if (delay <= 0) {
-                executeAnimation(null, animation, group, selection, frame, frameId, playSingleFrame);
-            } else {
-                DisplayAPI.getScheduler().runLater(() -> executeAnimation(null, animation, group, selection, frame, frameId, playSingleFrame), delay);
-            }
+        SpawnedDisplayAnimation animation = animator.getAnimation();
+        MultiPartSelection<?> selection = animation.hasFilter()
+                ? group.createPartSelection(animation.filter)
+                : group.createPartSelection();
+
+        onAnimationStart(selection);
+
+        int delay = frame.delay;
+
+        if (!packetAnimationPlayer && delay <= 0){
+            playFrame(null, animation, group, selection, frame, frameId, playSingleFrame);
+        }
+        else{
+            useScheduler(() -> playFrame(null, animation, group, selection, frame, frameId, playSingleFrame), Math.max(delay, 0));
         }
     }
 
-    protected void executeAnimation(Collection<Player> players,
-                                    SpawnedDisplayAnimation animation,
-                                    ActiveGroup<?> group,
-                                    MultiPartSelection<?> selection,
-                                    SpawnedDisplayAnimationFrame frame,
-                                    int frameId,
-                                    boolean playSingleFrame) {
-        if (!onStartNewFrame(group, selection)) return;
-        //Check if the animation can continue playing
-        if (!canContinueAnimation(group)) {
+    protected abstract void onAnimationStart(MultiPartSelection<?> selection);
+
+    protected void playFrame(Collection<Player> players,
+                             SpawnedDisplayAnimation animation,
+                             ActiveGroup<?> group,
+                             MultiPartSelection<?> selection,
+                             SpawnedDisplayAnimationFrame frame,
+                             int frameId,
+                             boolean playSingleFrame) {
+        if (!canFrameStart(group)) {
             handleAnimationInterrupted(group, selection);
             return;
         }
+
+        if (!onStartNewFrame(group, selection)) return;
+        //Check if the animation can continue playing
 
         groupScaleMultiplier = group.getScaleMultiplier();
 
@@ -93,7 +104,7 @@ public abstract class AnimationPlayer {
             if (startFrame == frame) {
                 callAnimationLoopStart(players, group);
             } else if (frame == lastFrame && startFrame.equals(frame) && !playSingleFrame && animation.frames.size() > 1) { //Skip if start and last frame are identical
-                executeAnimation(players, animation, group, selection, animation.frames.getFirst(), 0, false);
+                playFrame(players, animation, group, selection, animation.frames.getFirst(), 0, false);
                 return;
             }
         }
@@ -141,7 +152,7 @@ public abstract class AnimationPlayer {
 
             useScheduler(() -> {
                 SpawnedDisplayAnimationFrame nextFrame = animation.frames.get(frameId + 1);
-                executeAnimation(players, animation, group, selection, nextFrame, frameId + 1, false);
+                playFrame(players, animation, group, selection, nextFrame, frameId + 1, false);
             }, delay);
         }
 
@@ -164,10 +175,10 @@ public abstract class AnimationPlayer {
                 if (frame.duration > 0) {
                     SpawnedDisplayAnimationFrame firstFrame = animation.frames.getFirst();
                     useScheduler(() -> {
-                        executeAnimation(players, animation, group, selection, firstFrame, 0, false);
+                        playFrame(players, animation, group, selection, firstFrame, 0, false);
                     }, frame.duration);
                 } else {
-                    executeAnimation(players, animation, group, selection, animation.frames.getFirst(), 0, false);
+                    playFrame(players, animation, group, selection, animation.frames.getFirst(), 0, false);
                 }
             }
         }
@@ -318,7 +329,6 @@ public abstract class AnimationPlayer {
         } else {
             DisplayAPI.getScheduler().partRunLater(group.getMasterPart(), runnable, delay);
         }
-
     }
 
     private void callAnimationLoopStart(Collection<Player> players, ActiveGroup<?> group) {
@@ -493,7 +503,7 @@ public abstract class AnimationPlayer {
 
     protected abstract boolean onStartNewFrame(ActiveGroup<?> group, MultiPartSelection<?> selection);
 
-    protected abstract boolean canContinueAnimation(ActiveGroup<?> group);
+    protected abstract boolean canFrameStart(ActiveGroup<?> group);
 
     protected abstract void handleAnimationInterrupted(ActiveGroup<?> group, MultiPartSelection<?> selection);
 
@@ -502,28 +512,30 @@ public abstract class AnimationPlayer {
     public interface AnimationPlayerProvider {
 
         AnimationPlayer play(@NotNull DisplayAnimator animator,
-                             @NotNull SpawnedDisplayAnimation animation,
                              @NotNull SpawnedDisplayEntityGroup group,
-                             @NotNull SpawnedDisplayAnimationFrame frame,
-                             int startFrameId,
-                             int delay,
-                             boolean playSingleFrame);
+                             int startFrameId);
+
 
         AnimationPlayer playWithPackets(@NotNull DisplayAnimator animator,
-                                        @NotNull SpawnedDisplayAnimation animation,
                                         @NotNull ActiveGroup<?> group,
-                                        @NotNull SpawnedDisplayAnimationFrame frame,
-                                        int startFrameId,
-                                        int delay,
-                                        boolean playSingleFrame);
+                                        int startFrameId);
 
         AnimationPlayer playForClient(@NotNull Collection<Player> players,
                                       @NotNull DisplayAnimator animator,
-                                      @NotNull SpawnedDisplayAnimation animation,
                                       @NotNull ActiveGroup<?> group,
-                                      @NotNull SpawnedDisplayAnimationFrame frame,
-                                      int startFrameId,
-                                      int delay,
-                                      boolean playSingleFrame);
+                                      int startFrameId);
+
+        AnimationPlayer showFrameForClient(@NotNull DisplayAnimator animator,
+                                           @NotNull SpawnedDisplayAnimationFrame frame,
+                                           @NotNull SpawnedDisplayEntityGroup group);
+
+        AnimationPlayer showFrameWithPackets(@NotNull DisplayAnimator animator,
+                                             @NotNull SpawnedDisplayAnimationFrame frame,
+                                             @NotNull ActiveGroup<?> group);
+
+        AnimationPlayer showFrameForClient(@NotNull Collection<Player> players,
+                                           @NotNull DisplayAnimator animator,
+                                           @NotNull SpawnedDisplayAnimationFrame frame,
+                                           @NotNull ActiveGroup<?> group);
     }
 }
