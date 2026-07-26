@@ -58,6 +58,6 @@ public class GizmoMoveHereCMD extends PlayerSubCommand {
 
     @Override
     protected String getDescription() {
-        return "";
+        return "Move your Gizmo to your current location.";
     }
 }
