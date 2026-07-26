@@ -378,7 +378,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     /**
-     * Set whether this group's persistence can be overriden when loaded by a chunk
+     * Set whether this group's persistence can be overridden when loaded by a chunk
      * <br>
      * The persistence can only change if {@code automaticGroupDetection.persistenceOverride.enabled} is true in the config.
      * @param override whether the persistence should be overriden
@@ -393,19 +393,20 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     @Override
-    public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays){
+    public GroupTeleportCompletableFuture scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays){
         if (newScaleMultiplier <= 0){
             throw new IllegalArgumentException("New Scale Multiplier cannot be <= 0");
         }
 
         float originalScaleMultiplier = super.getScaleMultiplier();
-        if (newScaleMultiplier == originalScaleMultiplier) return true;
+        if (newScaleMultiplier == originalScaleMultiplier) return null;
 
-        if (!isInLoadedChunk()) return false;
+        if (!isInLoadedChunk()) return null;
 
 
         GroupScaleEvent event = new GroupScaleEvent(this, newScaleMultiplier, originalScaleMultiplier, durationInTicks);
-        if (!event.callEvent()) return false;
+        if (!event.callEvent()) return null;
+        List<CompletableFuture<Boolean>> nonDisplayFutures = new ArrayList<>();
 
         for (SpawnedDisplayEntityPart part : groupParts.values()){
             //Displays
@@ -448,16 +449,17 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
                     //Reset Translation then multiply by newScaleMultiplier
                     Vector translationVector = DisplayUtils.getNonDisplayTranslation(i);
-                    if (translationVector == null){
-                        continue;
-                    }
-                    Vector oldVector = new Vector(translationVector.getX(), translationVector.getY(), translationVector.getZ());
+                    if (translationVector == null) continue;
+
                     translationVector.setX((translationVector.getX()/originalScaleMultiplier)*newScaleMultiplier);
                     translationVector.setY((translationVector.getY()/originalScaleMultiplier)*newScaleMultiplier);
                     translationVector.setZ((translationVector.getZ()/originalScaleMultiplier)*newScaleMultiplier);
 
-                    Vector moveVector = oldVector.subtract(translationVector);
-                    part.translateForce(moveVector, (float) moveVector.length(), durationInTicks, 0);
+                    Location tpLoc = getLocation();
+                    if (tpLoc == null) continue;
+                    tpLoc.subtract(translationVector);
+                    CompletableFuture<Boolean> future = part.teleportSafe(tpLoc);
+                    if (future != null) nonDisplayFutures.add(future);
                 }
                 else if (part.type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
                     Mannequin m = (Mannequin) part.getEntity();
@@ -471,7 +473,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         PersistentDataContainer pdc = getMasterEntity().getPersistentDataContainer();
         pdc.set(scaleKey, PersistentDataType.FLOAT, newScaleMultiplier);
         super.setScaleMultiplier(newScaleMultiplier);
-        return true;
+        return GroupTeleportCompletableFuture.create(null, nonDisplayFutures);
     }
 
 

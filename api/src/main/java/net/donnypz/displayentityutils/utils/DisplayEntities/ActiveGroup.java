@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class ActiveGroup<T extends ActivePart> extends ActivePartHolder<T> {
@@ -180,8 +181,9 @@ public abstract class ActiveGroup<T extends ActivePart> extends ActivePartHolder
      * @param durationInTicks how long it should take for the group to scale
      * @param scaleNonDisplays whether non-display entities should scale
      * @throws IllegalArgumentException if newScaleMultiplier is less than or equal to 0
+     * @return a {@link GroupTeleportCompletableFuture} containing {@link CompletableFuture} for scaled and teleported non-display entities or null.
      */
-    public abstract boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays);
+    public abstract @Nullable GroupTeleportCompletableFuture scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays);
 
     /**
      * Teleport this group to a location.

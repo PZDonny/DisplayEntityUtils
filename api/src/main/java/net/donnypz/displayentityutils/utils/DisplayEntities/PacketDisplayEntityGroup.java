@@ -352,15 +352,16 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
 
     @Override
-    public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays) {
+    public GroupTeleportCompletableFuture scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays) {
         if (newScaleMultiplier <= 0) {
             throw new IllegalArgumentException("New Scale Multiplier cannot be <= 0");
         }
 
         float originalScaleMultiplier = getScaleMultiplier();
-        if (newScaleMultiplier == originalScaleMultiplier) return true;
+        if (newScaleMultiplier == originalScaleMultiplier) return null;
+
         GroupScaleEvent event = new GroupScaleEvent(this, newScaleMultiplier, originalScaleMultiplier, durationInTicks);
-        if (!event.callEvent()) return false;
+        if (!event.callEvent()) return null;
 
         for (PacketDisplayEntityPart part : groupParts.values()) {
             //Displays
@@ -403,16 +404,16 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
 
                     //Reset Translation then multiply by newScaleMultiplier
                     Vector translationVector = part.getNonDisplayTranslation();
-                    if (translationVector == null) {
-                        continue;
-                    }
-                    Vector oldVector = new Vector(translationVector.getX(), translationVector.getY(), translationVector.getZ());
-                    translationVector.setX((translationVector.getX() / originalScaleMultiplier) * newScaleMultiplier);
-                    translationVector.setY((translationVector.getY() / originalScaleMultiplier) * newScaleMultiplier);
-                    translationVector.setZ((translationVector.getZ() / originalScaleMultiplier) * newScaleMultiplier);
+                    if (translationVector == null) continue;
 
-                    Vector moveVector = oldVector.subtract(translationVector);
-                    PacketUtils.translateNonDisplay(part, moveVector, moveVector.length(), durationInTicks, 0);
+                    translationVector.setX((translationVector.getX()/originalScaleMultiplier)*newScaleMultiplier);
+                    translationVector.setY((translationVector.getY()/originalScaleMultiplier)*newScaleMultiplier);
+                    translationVector.setZ((translationVector.getZ()/originalScaleMultiplier)*newScaleMultiplier);
+
+                    Location tpLoc = getLocation();
+                    if (tpLoc == null) continue;
+                    tpLoc.subtract(translationVector);
+                    part.teleportSafe(tpLoc);
                 } else if (part.type == SpawnedDisplayEntityPart.PartType.MANNEQUIN) {
                     double scale = part.attributeContainer.getAttributeOrDefault(DisplayAttributes.Mannequin.SCALE, 1f);
                     scale = (scale / originalScaleMultiplier) * newScaleMultiplier;
@@ -422,7 +423,7 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
         }
 
         super.setScaleMultiplier(newScaleMultiplier);
-        return true;
+        return null;
     }
 
     @Override
