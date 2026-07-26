@@ -25,12 +25,18 @@ public final class VersionUtils {
     public static final boolean IS_1_21_11 = Bukkit.getUnsafe().getProtocolVersion() >= 774;
     public static final boolean IS_26_1 = Bukkit.getUnsafe().getProtocolVersion() >= 775;
     public static final boolean IS_26_2 = Bukkit.getUnsafe().getProtocolVersion() >= 776;
+
     public static final boolean IS_DEV_VERSION;
+    private static Particle ENTITY_EFFECT_PARTICLE;
+    private static Particle ITEM_PARTICLE;
 
     static{
         String pluginVer = DisplayAPI.getPlugin().getPluginMeta().getVersion();
         IS_DEV_VERSION = isDevVersion(pluginVer);
+        setParticles();
     }
+
+    private VersionUtils(){}
 
     public static boolean isDevVersion(){
         return IS_DEV_VERSION;
@@ -87,22 +93,24 @@ public final class VersionUtils {
         return IS_1_21_11;
     }
 
-    public static Particle getEntityEffectParticle(){
+    private static void setParticles(){
         if (IS_1_20_5){
-            return Particle.valueOf("ENTITY_EFFECT");
+            ENTITY_EFFECT_PARTICLE = Particle.valueOf("ENTITY_EFFECT");
+            ITEM_PARTICLE = Particle.valueOf("ITEM");
+
         }
         else{
-            return Particle.valueOf("SPELL_MOB");
+            ENTITY_EFFECT_PARTICLE = Particle.valueOf("SPELL_MOB");
+            ITEM_PARTICLE = Particle.valueOf("ITEM_CRACK");
         }
     }
 
+    public static Particle getEntityEffectParticle(){
+        return ENTITY_EFFECT_PARTICLE;
+    }
+
     public static Particle getItemParticle(){
-        if (IS_1_20_5){
-            return Particle.valueOf("ITEM");
-        }
-        else{
-            return Particle.valueOf("ITEM_CRACK");
-        }
+        return ITEM_PARTICLE;
     }
 
     public static Sound getSound(String soundName){
