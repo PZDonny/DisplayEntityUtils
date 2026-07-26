@@ -22,6 +22,7 @@ public final class VersionUtils {
     public static final boolean IS_1_21_6 = Bukkit.getUnsafe().getProtocolVersion() >= 771;
     public static final boolean IS_1_21_7 = Bukkit.getUnsafe().getProtocolVersion() >= 772;
     public static final boolean IS_1_21_9 = Bukkit.getUnsafe().getProtocolVersion() >= 773;
+    public static final boolean IS_1_21_11 = Bukkit.getUnsafe().getProtocolVersion() >= 774;
     public static final boolean IS_26_1 = Bukkit.getUnsafe().getProtocolVersion() >= 775;
     public static final boolean IS_26_2 = Bukkit.getUnsafe().getProtocolVersion() >= 776;
     public static final boolean IS_DEV_VERSION;
@@ -80,6 +81,10 @@ public final class VersionUtils {
 
     public static boolean hasBlockAndItemRegistry(){
         return IS_1_20_5;
+    }
+
+    public static boolean hasSpears(){
+        return IS_1_21_11;
     }
 
     public static Particle getEntityEffectParticle(){
