@@ -1,8 +1,8 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities.particles;
 
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
@@ -22,7 +22,7 @@ class ItemStackAnimationParticle extends AnimationParticle implements Serializab
 
 
     ItemStackAnimationParticle(AnimationParticleBuilder builder, ItemStack itemStack) {
-        super(builder, Particle.ITEM);
+        super(builder, VersionUtils.getItemParticle());
         updateItem(itemStack);
     }
     @ApiStatus.Internal

@@ -3,10 +3,10 @@ package net.donnypz.displayentityutils.utils.dialogs.animationparticles;
 import io.papermc.paper.registry.data.dialog.action.DialogActionCallback;
 import io.papermc.paper.registry.data.dialog.input.DialogInput;
 import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Particle;
 import org.bukkit.Registry;
 import org.bukkit.inventory.ItemType;
 
@@ -37,7 +37,7 @@ class ItemParticleDialog extends ParticleDialog {
                 audience.sendMessage(Component.text("Failed to use item with the given id: "+itemId, NamedTextColor.RED));
                 return;
             }
-            this.buildParticle(view, audience, Particle.ITEM, itemType.createItemStack(), framePoints);
+            this.buildParticle(view, audience, VersionUtils.getItemParticle(), itemType.createItemStack(), framePoints);
         };
     }
 }
