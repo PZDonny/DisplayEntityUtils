@@ -38,6 +38,8 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     private static final Component itemMSG = prefix.append(Component.text("Enter the item to use for the particle(s)", NamedTextColor.YELLOW));
     private static final Component offsetMSG = prefix.append(Component.text("Enter the x, y, and z offset for the particle(s)", NamedTextColor.YELLOW));
     private static final Component delayMSG = prefix.append(Component.text("Enter the amount of delay (in ticks) before the particle should be shown", NamedTextColor.YELLOW));
+    private static final Component geyserMSG = prefix.append(Component.text("Enter the particle's water blocks", NamedTextColor.YELLOW));
+    private static final Component geyserBaseMSG = prefix.append(Component.text("Enter the particle's water blocks and burst impulse", NamedTextColor.YELLOW));
     private static final Component separatedMSG = Component.text("All values should be entered separated by spaces.", NamedTextColor.GRAY, TextDecoration.ITALIC);
 
 
@@ -120,6 +122,13 @@ public class AnimationParticleBuilder extends ParticleBuilder{
             case COUNT -> {
                 player.sendMessage(amountMSG);
             }
+            case OFFSETS -> {
+                player.sendMessage(offsetMSG);
+                player.sendMessage(separatedMSG);
+            }
+            case DELAY -> {
+                player.sendMessage(delayMSG);
+            }
             case COLOR_AND_SIZE -> {
                 player.sendMessage(colorAndSizeMSG);
                 player.sendMessage(separatedMSG);
@@ -135,20 +144,19 @@ public class AnimationParticleBuilder extends ParticleBuilder{
             case EXTRA -> {
                 player.sendMessage(extraMSG);
             }
-        //Block
             case BLOCK -> {
                 player.sendMessage(blockMSG);
             }
-        //Item
             case ITEM -> {
                 player.sendMessage(itemMSG);
             }
-            case OFFSETS -> {
-                player.sendMessage(offsetMSG);
-                player.sendMessage(separatedMSG);
+            case GEYSER -> {
+                player.sendMessage(geyserMSG);
             }
-            case DELAY -> {
-                player.sendMessage(delayMSG);
+            case GEYSER_BASE -> {
+                player.sendMessage(geyserBaseMSG);
+                player.sendMessage(separatedMSG);
+                player.sendMessage(Component.text("Example: 4 3.5", NamedTextColor.GRAY));
             }
         }
     }
@@ -191,6 +199,14 @@ public class AnimationParticleBuilder extends ParticleBuilder{
 
     public static boolean isDustTransitionParticle(@NotNull Particle particle){
         return particle == Particle.DUST_COLOR_TRANSITION;
+    }
+
+    public static boolean isGeyserParticle(@NotNull Particle particle){
+        return particle.getDataType().isAssignableFrom(Particle.Geyser.class);
+    }
+
+    public static boolean isGeyserBaseParticle(@NotNull Particle particle){
+        return particle.getDataType().isAssignableFrom(Particle.GeyserBase.class);
     }
 
     public Step getStep() {
@@ -243,10 +259,15 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         else if (particle() == Particle.FLASH) {
             return new FlashAnimationParticle(this, data());
         }
+        else if (isGeyserBaseParticle(particle())){
+            return new GeyserBaseAnimationParticle(this, particle(), data());
+        }
+        else if (isGeyserParticle(particle())){
+            return new GeyserAnimationParticle(this, particle(), data());
+        }
         else {
             return new GeneralAnimationParticle(this, particle());
         }
-
     }
 
     public static Class<? extends AnimationParticle> getAnimationParticleClass(@NotNull Particle particle){
@@ -268,6 +289,12 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         else if (particle == Particle.FLASH) {
             return FlashAnimationParticle.class;
         }
+        else if (isGeyserBaseParticle(particle)){
+            return GeyserBaseAnimationParticle.class;
+        }
+        else if (isGeyserParticle(particle)){
+            return GeyserAnimationParticle.class;
+        }
         else {
             return GeneralAnimationParticle.class;
         }
@@ -284,12 +311,16 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     public enum Step{
         PARTICLE,
         COUNT,
+        EXTRA,
+
         COLOR_AND_SIZE,
         COLOR_ONLY,
         COLOR_TRANSITION,
-        EXTRA,
         ITEM,
         BLOCK,
+        GEYSER,
+        GEYSER_BASE,
+
         OFFSETS,
         DELAY
     }

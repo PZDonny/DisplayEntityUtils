@@ -177,6 +177,31 @@ public final class DEUPlayerChatListener implements Listener {
                     p.sendMessage(Component.text("color color size", NamedTextColor.GRAY, TextDecoration.ITALIC));
                 }
             }
+            case GEYSER -> {
+                try{
+                    String[] args = msg.split(" ");
+                    int waterBlocks = Integer.parseInt(args[0]);
+
+                    builder.data(new Particle.Geyser(waterBlocks));
+                    builder.advanceStep(AnimationParticleBuilder.Step.OFFSETS);
+                }
+                catch(IllegalArgumentException e){
+                    p.sendMessage(Component.text("Invalid water blocks value! Enter a whole number 1-4.", NamedTextColor.RED));
+                }
+            }
+            case GEYSER_BASE -> {
+                try{
+                    String[] args = msg.split(" ");
+                    int waterBlocks = Integer.parseInt(args[0]);
+                    float burstImpulse = Float.parseFloat(args[1]);
+
+                    builder.data(new Particle.GeyserBase(waterBlocks, burstImpulse));
+                    builder.advanceStep(AnimationParticleBuilder.Step.OFFSETS);
+                }
+                catch(IllegalArgumentException e){
+                    p.sendMessage(Component.text("Invalid value! Use a whole number for the water blocks and a positive number for the burst impulse.", NamedTextColor.RED));
+                }
+            }
         }
     }
 }
