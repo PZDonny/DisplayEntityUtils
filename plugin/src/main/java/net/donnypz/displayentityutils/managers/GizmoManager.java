@@ -11,6 +11,7 @@ import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class GizmoManager {
 
@@ -20,7 +21,9 @@ public class GizmoManager {
 
     public static boolean isGizmoWand(ItemStack itemStack){
         if (itemStack == null) return false;
-        return itemStack.getPersistentDataContainer().has(DisplayKeys.Gizmo.WAND);
+        ItemMeta meta = itemStack.getItemMeta();
+        if (meta == null) return false;
+        return meta.getPersistentDataContainer().has(DisplayKeys.Gizmo.WAND);
     }
 
     public static void syncPosition(Player player, ActiveGroup<?> group, Direction direction, float distance){
