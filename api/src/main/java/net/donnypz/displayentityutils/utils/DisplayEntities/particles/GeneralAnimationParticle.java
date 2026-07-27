@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ApiStatus.Internal
-class GeneralAnimationParticle extends AnimationParticle implements Serializable {
+class GeneralAnimationParticle extends AnimationParticle<Void> implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 99L;
@@ -34,15 +34,34 @@ class GeneralAnimationParticle extends AnimationParticle implements Serializable
 
 
     GeneralAnimationParticle(AnimationParticleBuilder builder, Particle particle) {
-        super(builder, particle);
+        super(builder, particle, null);
     }
+
+    @Override
+    AnimationParticleBuilder.Step getStep() {
+        return null;
+    }
+
+    @Override
+    Void getSpawnData() {
+        return null;
+    }
+
+    @Override
+    void update(Void data) {}
+
+    @Override
+    boolean canUseData() {
+        return true;
+    }
+
     @ApiStatus.Internal
     public GeneralAnimationParticle() {
     }
 
     @Override
     public void spawn(Location location) {
-        location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra);
+        location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, getDataDefault(particle));
     }
 
     @Override
@@ -50,7 +69,7 @@ class GeneralAnimationParticle extends AnimationParticle implements Serializable
         player.spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, getDataDefault(particle));
     }
 
-    //Get default data for a particle for situations when an older minecraft version didnt have data for a particle, but a newer one does.
+    //Get default data for a particle for situations when an older minecraft version didn't have data for a particle, but a newer one does.
     private Object getDataDefault(Particle particle){
         return defaultData.get(particle.getDataType());
     }

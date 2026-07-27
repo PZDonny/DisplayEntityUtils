@@ -2,18 +2,14 @@ package net.donnypz.displayentityutils.utils.DisplayEntities.particles;
 
 import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
 
 @ApiStatus.Internal
-class BlockAnimationParticle extends AnimationParticle implements Serializable {
+class BlockAnimationParticle extends AnimationParticle<BlockData> implements Serializable {
 
 
     transient BlockData blockData;
@@ -24,8 +20,7 @@ class BlockAnimationParticle extends AnimationParticle implements Serializable {
 
 
     BlockAnimationParticle(AnimationParticleBuilder builder, BlockData blockData) {
-        super(builder, builder.particle());
-        updateBlockData(blockData);
+        super(builder, builder.particle(), blockData);
     }
 
     @ApiStatus.Internal
@@ -33,15 +28,25 @@ class BlockAnimationParticle extends AnimationParticle implements Serializable {
     }
 
     @Override
-    public void spawn(Location location) {
-        location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, blockData);
+    AnimationParticleBuilder.Step getStep() {
+        return AnimationParticleBuilder.Step.BLOCK;
     }
 
     @Override
-    public void spawn(Location location, @NotNull Player player) {
-        player.spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, blockData);
+    BlockData getSpawnData() {
+        return blockData;
     }
 
+    @Override
+    void update(BlockData data) {
+        this.blockData = data;
+        this.blockDataAsString = blockData.getAsString();
+    }
+
+    @Override
+    boolean canUseData() {
+        return true;
+    }
 
     @Override
     protected void initalize() {
@@ -50,20 +55,6 @@ class BlockAnimationParticle extends AnimationParticle implements Serializable {
 
     @Override
     protected Component getUniqueInfo() {
-        return getEditMSG("| Block: "+blockData.getMaterial().name(), AnimationParticleBuilder.Step.BLOCK);
-    }
-
-    @Override
-    protected boolean editUniqueParticle(AnimationParticleBuilder builder, AnimationParticleBuilder.Step step) {
-        if (step == AnimationParticleBuilder.Step.BLOCK){
-            updateBlockData(builder.data());
-            return true;
-        }
-        return false;
-    }
-
-    private void updateBlockData(BlockData blockData){
-        this.blockData = blockData;
-        this.blockDataAsString = blockData.getAsString();
+        return getEditMSG("| Block: "+blockData.getMaterial().name());
     }
 }

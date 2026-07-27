@@ -1,17 +1,14 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities.particles;
 
 import net.kyori.adventure.text.Component;
-import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
 
 @ApiStatus.Internal
-class GeyserAnimationParticle extends AnimationParticle implements Serializable {
+class GeyserAnimationParticle extends AnimationParticle<Particle.Geyser> implements Serializable {
 
     int waterBlocks;
     transient Particle.Geyser geyser;
@@ -21,8 +18,7 @@ class GeyserAnimationParticle extends AnimationParticle implements Serializable 
 
 
     GeyserAnimationParticle(AnimationParticleBuilder builder, Particle particle, Particle.Geyser geyser) {
-        super(builder, particle);
-        updateGeyser(geyser);
+        super(builder, particle, geyser);
     }
 
     @ApiStatus.Internal
@@ -30,13 +26,24 @@ class GeyserAnimationParticle extends AnimationParticle implements Serializable 
     }
 
     @Override
-    public void spawn(Location location) {
-        location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, geyser);
+    AnimationParticleBuilder.Step getStep() {
+        return AnimationParticleBuilder.Step.GEYSER;
     }
 
     @Override
-    public void spawn(Location location, @NotNull Player player) {
-        player.spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, geyser);
+    Particle.Geyser getSpawnData() {
+        return geyser;
+    }
+
+    @Override
+    void update(Particle.Geyser data) {
+        this.geyser = data;
+        this.waterBlocks = geyser.getWaterBlocks();
+    }
+
+    @Override
+    boolean canUseData() {
+        return true;
     }
 
     @Override
@@ -46,20 +53,6 @@ class GeyserAnimationParticle extends AnimationParticle implements Serializable 
 
     @Override
     protected Component getUniqueInfo() {
-        return getEditMSG("| Water Blocks: "+waterBlocks, AnimationParticleBuilder.Step.GEYSER);
-    }
-
-    @Override
-    protected boolean editUniqueParticle(AnimationParticleBuilder builder, AnimationParticleBuilder.Step step) {
-        if (step == AnimationParticleBuilder.Step.GEYSER){
-            updateGeyser(builder.data());
-            return true;
-        }
-        return false;
-    }
-
-    private void updateGeyser(Particle.Geyser geyser){
-        this.waterBlocks = geyser.getWaterBlocks();
-        this.geyser = geyser;
+        return getEditMSG("| Water Blocks: "+waterBlocks);
     }
 }

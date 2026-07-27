@@ -25,7 +25,7 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     Collection<FramePoint> framePoints;
     Step step;
     int delayInTicks = 0;
-    AnimationParticle editParticle = null;
+    AnimationParticle<?> editParticle = null;
 
     private static final Component prefix = DisplayAPI.pluginPrefix;
     private static final Component particleMSG = prefix.append(Component.text("Enter the name of the particle to use", NamedTextColor.YELLOW));
@@ -62,7 +62,7 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     }
 
     @ApiStatus.Internal
-    public AnimationParticleBuilder(@NotNull Player player, @NotNull AnimationParticle editParticle, Step step){
+    public AnimationParticleBuilder(@NotNull Player player, @NotNull AnimationParticle<?> editParticle, Step step){
         super(Particle.FLAME);
         this.player = player;
         DEUUser.getOrCreateUser(player).setAnimationParticleBuilder(this);
@@ -122,13 +122,6 @@ public class AnimationParticleBuilder extends ParticleBuilder{
             case COUNT -> {
                 player.sendMessage(amountMSG);
             }
-            case OFFSETS -> {
-                player.sendMessage(offsetMSG);
-                player.sendMessage(separatedMSG);
-            }
-            case DELAY -> {
-                player.sendMessage(delayMSG);
-            }
             case COLOR_AND_SIZE -> {
                 player.sendMessage(colorAndSizeMSG);
                 player.sendMessage(separatedMSG);
@@ -157,6 +150,13 @@ public class AnimationParticleBuilder extends ParticleBuilder{
                 player.sendMessage(geyserBaseMSG);
                 player.sendMessage(separatedMSG);
                 player.sendMessage(Component.text("Example: 4 3.5", NamedTextColor.GRAY));
+            }
+            case OFFSETS -> {
+                player.sendMessage(offsetMSG);
+                player.sendMessage(separatedMSG);
+            }
+            case DELAY -> {
+                player.sendMessage(delayMSG);
             }
         }
     }
@@ -222,8 +222,8 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         player = null;
     }
 
-    public AnimationParticle build(){
-        AnimationParticle animParticle = getAnimationParticle();
+    public AnimationParticle<?> build(){
+        AnimationParticle<?> animParticle = getAnimationParticle();
         for (FramePoint fp : framePoints){
             fp.addParticle(animParticle.clone());
         }
@@ -231,7 +231,7 @@ public class AnimationParticleBuilder extends ParticleBuilder{
 
     }
 
-    public static Class<? extends AnimationParticle> getAnimationParticleClass(@NotNull String particleName){
+    public static Class<? extends AnimationParticle<?>> getAnimationParticleClass(@NotNull String particleName){
         try{
             return getAnimationParticleClass(Particle.valueOf(particleName));
         }
@@ -240,7 +240,7 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         }
     }
 
-    AnimationParticle getAnimationParticle(){
+    AnimationParticle<?> getAnimationParticle(){
         if (isBlockDataParticle()){
             return new BlockAnimationParticle(this, data());
         }
@@ -270,7 +270,7 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         }
     }
 
-    public static Class<? extends AnimationParticle> getAnimationParticleClass(@NotNull Particle particle){
+    public static Class<? extends AnimationParticle<?>> getAnimationParticleClass(@NotNull Particle particle){
         if (isBlockDataParticle(particle)){
             return BlockAnimationParticle.class;
         }
@@ -322,6 +322,6 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         GEYSER_BASE,
 
         OFFSETS,
-        DELAY
+        DELAY;
     }
 }
