@@ -3,7 +3,9 @@ package net.donnypz.displayentityutils.listeners.entity;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAttack;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.donnypz.displayentityutils.DisplayAPI;
@@ -43,21 +45,25 @@ public class DEUInteractionListener implements Listener, PacketListener {
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
         User user = event.getUser();
-        if (event.getPacketType() != PacketType.Play.Client.INTERACT_ENTITY)
-            return;
-
-        WrapperPlayClientInteractEntity interact = new WrapperPlayClientInteractEntity(event);
-        if (interact.getAction() == WrapperPlayClientInteractEntity.InteractAction.INTERACT){
+        InteractionClickEvent.ClickType clickType;
+        int entityId;
+        if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY){
+            WrapperPlayClientInteractEntity packet = new WrapperPlayClientInteractEntity(event);
+            if (packet.getHand() == InteractionHand.OFF_HAND || packet.getAction() == WrapperPlayClientInteractEntity.InteractAction.INTERACT) return;
+            entityId = packet.getEntityId();
+            clickType = packet.getAction() == WrapperPlayClientInteractEntity.InteractAction.ATTACK
+                    ? InteractionClickEvent.ClickType.LEFT
+                    : InteractionClickEvent.ClickType.RIGHT;
+        }
+        else if (event.getPacketType() == PacketType.Play.Client.ATTACK){
+            WrapperPlayClientAttack packet = new WrapperPlayClientAttack(event);
+            entityId = packet.getEntityId();
+            clickType = InteractionClickEvent.ClickType.LEFT;
+        }
+        else{
             return;
         }
-        InteractionClickEvent.ClickType clickType =
-                    interact.getAction() == WrapperPlayClientInteractEntity.InteractAction.ATTACK
-                        ?
-                            InteractionClickEvent.ClickType.LEFT
-                            :
-                            InteractionClickEvent.ClickType.RIGHT;
 
-        int entityId = interact.getEntityId();
         ActivePart activePart = ActivePart.getPart(entityId);
         if (!(activePart instanceof PacketDisplayEntityPart part)){
             return;
