@@ -191,6 +191,16 @@ public class DEUUser {
     }
 
     /**
+     * Remove a user's selected {@link ActiveGroup}, selected {@link ActivePartSelection}, and hide their {@link GizmoSession}
+     */
+    public void clearGroupSelections(){
+        deselectGroup();
+        deselectPartSelection();
+        if (gizmoSession != null) gizmoSession.deselectHide();
+
+    }
+
+    /**
      * Unset this user's selected {@link SpawnedDisplayAnimation}
      */
     public void deselectSpawnedAnimation(){
