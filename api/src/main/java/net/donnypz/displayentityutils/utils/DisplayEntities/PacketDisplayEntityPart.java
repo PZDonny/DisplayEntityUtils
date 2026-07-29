@@ -442,17 +442,17 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         Vector3f localPivot = new Vector3f(toPivot);
 
 
-        if (worldSpace) {
-            Location loc = getLocation();
-            Quaternionf entityRot = new Quaternionf()
-                    .rotateY((float) Math.toRadians(-loc.getYaw()))
-                    .rotateX((float) Math.toRadians(loc.getPitch()));
-            Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
+        Location loc = getLocation();
+        Quaternionf entityRot = new Quaternionf()
+                .rotateY((float) Math.toRadians(-loc.getYaw()))
+                .rotateX((float) Math.toRadians(loc.getPitch()));
+        Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
 
-            //convert the offset from world space into the display's space (pitch/yaw)
-            localPivot.rotate(invertedEntityRot);
+        //convert the offset from world space into the display's space (pitch/yaw)
+        localPivot.rotate(invertedEntityRot);
 
-            //world space to display's space (pitch/yaw)
+        //world space to display's space (pitch/yaw)
+        if (worldSpace){
             appliedRotation = invertedEntityRot
                     .mul(appliedRotation)
                     .mul(entityRot);

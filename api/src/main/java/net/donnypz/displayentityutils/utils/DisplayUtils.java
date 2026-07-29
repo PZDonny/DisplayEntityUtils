@@ -701,16 +701,16 @@ public final class DisplayUtils {
         Quaternionf appliedRotation = new Quaternionf(rotation);
         Vector3f localPivot = new Vector3f(toPivot);
 
-        if (worldSpace) {
-            Quaternionf entityRot = new Quaternionf()
-                    .rotateY((float) Math.toRadians(-display.getYaw()))
-                    .rotateX((float) Math.toRadians(display.getPitch()));
-            Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
+        Quaternionf entityRot = new Quaternionf()
+                .rotateY((float) Math.toRadians(-display.getYaw()))
+                .rotateX((float) Math.toRadians(display.getPitch()));
+        Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
 
-            //convert the offset from world space into the display's space (pitch/yaw)
-            localPivot.rotate(invertedEntityRot);
+        //convert the offset from world space into the display's space (pitch/yaw)
+        localPivot.rotate(invertedEntityRot);
 
-            //world space to display's space (pitch/yaw)
+        //world space to display's space (pitch/yaw)
+        if (worldSpace){
             appliedRotation = invertedEntityRot
                     .mul(appliedRotation)
                     .mul(entityRot);

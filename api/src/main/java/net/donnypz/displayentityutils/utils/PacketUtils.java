@@ -332,18 +332,18 @@ public final class PacketUtils {
         Vector3f localPivot = new Vector3f(toPivot);
 
 
-        if (worldSpace) {
-            float pitch = entityLocation.getPitch();
-            float yaw = entityLocation.getYaw();
-            Quaternionf entityRot = new Quaternionf()
-                    .rotateY((float) Math.toRadians(-yaw))
-                    .rotateX((float) Math.toRadians(pitch));
-            Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
+        float pitch = entityLocation.getPitch();
+        float yaw = entityLocation.getYaw();
+        Quaternionf entityRot = new Quaternionf()
+                .rotateY((float) Math.toRadians(-yaw))
+                .rotateX((float) Math.toRadians(pitch));
+        Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
 
-            //convert the offset from world space into the display's space (pitch/yaw)
-            localPivot.rotate(invertedEntityRot);
+        //convert the offset from world space into the display's space (pitch/yaw)
+        localPivot.rotate(invertedEntityRot);
 
-            //world space to display's space (pitch/yaw)
+        //world space to display's space (pitch/yaw)
+        if (worldSpace){
             appliedRotation = invertedEntityRot
                     .mul(appliedRotation)
                     .mul(entityRot);
