@@ -68,11 +68,11 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     /**
-     * Create a {@link SpawnedDisplayEntityPart} that is not included in any group.
+     * Create a {@link SpawnedDisplayEntityPart} that cannot be later added to a {@link SpawnedDisplayEntityGroup}.
      * <br>
      * If the entity is already included in a group, its respective part will be returned.
      * @param uuid the entity uuid
-     * @return a {@link SpawnedDisplayEntityPart} or null if the entity uuid is not a display or interaction
+     * @return a {@link SpawnedDisplayEntityPart} or null if the entity uuid is not an eligible entity part per the {@link PartType}s
      * @throws IllegalArgumentException if the entity is not a valid entity
      */
     public static @NotNull SpawnedDisplayEntityPart create(@NotNull UUID uuid){
@@ -80,7 +80,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     /**
-     * Create a {@link SpawnedDisplayEntityPart} that is not included in any group.
+     * Create a {@link SpawnedDisplayEntityPart} that cannot be later added to in a {@link SpawnedDisplayEntityGroup}.
      * <br>
      * If the entity is already included in a group, its respective part will be returned.
      * @param entity the valid part entity
@@ -1391,6 +1391,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return InteractionUtils.getInteractionCommandsWithData((Interaction) getEntity());
     }
 
+
     @Override
     public int getTeleportDuration() {
         if (!isDisplay()){
@@ -1488,5 +1489,30 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
         this.entity = null;
         return entity;
+    }
+
+    @Override
+    public @Nullable SpawnedDisplayEntityPart clone() {
+        if (!isValid() || isMaster()) return null;
+
+        Entity e = getEntity();
+        if (e == null) return null;
+
+        Location loc = e.getLocation();
+
+        EntitySnapshot snapshot = e.createSnapshot();
+
+        Entity newEntity = snapshot.createEntity(loc);
+
+        SpawnedDisplayEntityPart cloned;
+        if (hasGroup()){
+            cloned = new SpawnedDisplayEntityPart(group, newEntity, group.partUUIDRandom);
+            group.masterPart.entity.addPassenger(newEntity);
+            //add as passenger
+        } else{
+            cloned = create(newEntity);
+        }
+
+        return cloned;
     }
 }

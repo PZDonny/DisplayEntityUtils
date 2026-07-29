@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class ActivePart implements Active{
+public abstract class ActivePart implements Active, Cloneable{
 
     protected SpawnedDisplayEntityPart.PartType type;
     protected UUID partUUID;
@@ -748,4 +748,11 @@ public abstract class ActivePart implements Active{
     public abstract @NotNull List<String> getInteractionCommands();
 
     public abstract @NotNull List<InteractionCommand> getInteractionCommandsWithData();
+
+    /**
+     * Get a clone of this part. If this part is in a group, the cloned part will be automatically added.
+     * @return a clone of this part or null if this part is invalid or a group's parent part entity
+     */
+    @Override
+    public abstract @Nullable ActivePart clone();
 }

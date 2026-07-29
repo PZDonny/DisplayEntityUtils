@@ -1526,6 +1526,21 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         }
     }
 
+    @Override
+    public @Nullable PacketDisplayEntityPart clone() {
+        if (!isValid() || isMaster) return null;
+
+        Location loc = getLocation();
+        if (loc == null) return null;
+
+        PacketDisplayEntityPart cloned = this.attributeContainer.createPart(type, loc);
+        if (this.hasGroup()){
+            this.group.addPart(cloned);
+        }
+
+        return cloned;
+    }
+
 
     static final class PacketLocation {
 
