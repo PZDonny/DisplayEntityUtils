@@ -92,7 +92,7 @@ public class RelativePointUtils {
                 d.despawn();
             }
         }
-        RelativePointUtils.deselectRelativePoint(player);
+        selectedSelector.remove(player.getUniqueId());
         return selectors != null;
     }
 
@@ -127,9 +127,5 @@ public class RelativePointUtils {
         }
         player.playSound(player, Sound.ENTITY_ITEM_FRAME_PLACE, 1, 1);
         selector.select();
-    }
-
-    public static void deselectRelativePoint(Player player){
-        selectedSelector.remove(player.getUniqueId());
     }
 }

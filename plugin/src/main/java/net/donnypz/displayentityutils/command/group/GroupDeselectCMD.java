@@ -29,7 +29,7 @@ class GroupDeselectCMD extends PlayerSubCommand {
 
         GizmoCMD.deselectHideGizmo(player);
         DEUUser.getOrCreateUser(player).deselectGroup();
-        RelativePointUtils.deselectRelativePoint(player);
+        RelativePointUtils.removeRelativePoints(player);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Group selection cleared!", NamedTextColor.GREEN)));
     }
 
