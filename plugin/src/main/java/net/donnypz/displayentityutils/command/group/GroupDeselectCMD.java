@@ -4,7 +4,6 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
@@ -27,8 +26,7 @@ class GroupDeselectCMD extends PlayerSubCommand {
             return;
         }
 
-        GizmoCMD.deselectHideGizmo(player);
-        DEUUser.getOrCreateUser(player).deselectGroup();
+        DEUUser.getOrCreateUser(player).clearGroupSelections();
         RelativePointUtils.removeRelativePoints(player);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Group selection cleared!", NamedTextColor.GREEN)));
     }

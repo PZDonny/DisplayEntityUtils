@@ -4,9 +4,12 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.ConsoleUsableSubCommand;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
+import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -47,6 +50,10 @@ public class GroupDespawnAtCMD extends ConsoleUsableSubCommand {
             OptionalArguments optionalArgs = getOptionalArguments(sender, args);
             if (!optionalArgs.isValidOptions()) return;
 
+            DEUUser user = sender instanceof Player player
+                    ? DEUUser.getUser(player)
+                    : null;
+
             World w;
             String worldName = optionalArgs.getOption("-world");
             if (worldName.isEmpty()){
@@ -69,25 +76,40 @@ public class GroupDespawnAtCMD extends ConsoleUsableSubCommand {
             }
 
             Location searchLocation = new Location(w, x, y, z);
-            boolean hasGroups = false;
+            boolean hasSelectableGroups = false;
             String packetOption = optionalArgs.getOption("-packet");
 
             if (packetOption.equalsIgnoreCase(PACKET_INCLUDE) || packetOption.equalsIgnoreCase(PACKET_ONLY)){
                 Set<PacketDisplayEntityGroup> groups = PacketDisplayEntityGroup.getNearbyGroups(searchLocation, distance);
-                hasGroups = !groups.isEmpty();
-                if (hasGroups) groups.forEach(PacketDisplayEntityGroup::unregister);
+                for (PacketDisplayEntityGroup pg : groups){
+                    if (!pg.isSelectable()) continue;
+                    handlePlayerSelection(user, pg);
+
+                    if (pg.isPersistent()){
+                        DisplayGroupManager.removePersistentPacketGroup(pg, true);
+                    }
+                    else{
+                        pg.unregister();
+                    }
+                    hasSelectableGroups = true;
+                }
             }
 
             if (!packetOption.equalsIgnoreCase(PACKET_ONLY)){
                 Set<SpawnedDisplayEntityGroup> groups = DisplayGroupManager.getNearbySpawnedGroups(searchLocation, distance);
                 if (!groups.isEmpty()){
-                    hasGroups = true;
-                    groups.forEach(sg -> sg.unregister(true, optionalArgs.hasFlag("-force")));
+                    for (SpawnedDisplayEntityGroup sg : groups){
+                        if (!sg.isSelectable()) continue;
+                        handlePlayerSelection(user, sg);
+
+                        sg.unregister(true, optionalArgs.hasFlag("-force"));
+                        hasSelectableGroups = true;
+                    }
                 }
             }
 
-            if (!hasGroups){
-                sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("There are no groups within the given range", NamedTextColor.RED)));
+            if (!hasSelectableGroups){
+                sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("There are no selectable groups within the given range", NamedTextColor.RED)));
                 return;
             }
 
@@ -115,6 +137,14 @@ public class GroupDespawnAtCMD extends ConsoleUsableSubCommand {
         else{
             return Double.parseDouble(userInput);
         }
+    }
+
+    private void handlePlayerSelection(DEUUser user, ActiveGroup<?> group){
+        if (user == null || !group.equals(user.getSelectedGroup())){
+            return;
+        }
+        user.clearGroupSelections();
+        RelativePointUtils.removeRelativePoints(Bukkit.getPlayer(user.getUserUUID()));
     }
 
     @Override

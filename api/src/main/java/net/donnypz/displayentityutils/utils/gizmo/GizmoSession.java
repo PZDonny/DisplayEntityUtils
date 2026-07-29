@@ -32,6 +32,8 @@ public interface GizmoSession {
 
     void teleport(Vector direction);
 
+    void deselectHide();
+
     void selectShow(Location spawnLocation);
 
 }

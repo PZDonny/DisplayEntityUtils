@@ -223,6 +223,7 @@ public class GizmoSessionImpl implements GizmoSession {
     /**
      * Hide the Gizmo if a player doesn't have a selection
      */
+    @Override
     public void deselectHide() {
         if (valid) {
             gizmoModel.hide();
