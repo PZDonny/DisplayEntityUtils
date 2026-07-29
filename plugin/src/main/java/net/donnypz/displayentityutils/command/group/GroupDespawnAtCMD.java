@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Set;
 
 public class GroupDespawnAtCMD extends ConsoleUsableSubCommand {
+    private final String PACKET_INCLUDE = "include";
+    private final String PACKET_ONLY = "only";
+
     GroupDespawnAtCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("despawnat", parentSubCommand, Permission.GROUP_DESPAWN);
         setTabComplete(2, TabSuggestion.X_COORDINATE);
@@ -28,7 +31,7 @@ public class GroupDespawnAtCMD extends ConsoleUsableSubCommand {
         setTabComplete(5, "<distance>");
         addFlag("-force");
         addOption("-world", "<world_name>");
-        addOption("-packet", List.of("include", "only"));
+        addOption("-packet", List.of(PACKET_INCLUDE, PACKET_ONLY));
     }
 
     @Override
@@ -69,13 +72,13 @@ public class GroupDespawnAtCMD extends ConsoleUsableSubCommand {
             boolean hasGroups = false;
             String packetOption = optionalArgs.getOption("-packet");
 
-            if (packetOption.equals("included") || packetOption.equals("only")){
+            if (packetOption.equalsIgnoreCase(PACKET_INCLUDE) || packetOption.equalsIgnoreCase(PACKET_ONLY)){
                 Set<PacketDisplayEntityGroup> groups = PacketDisplayEntityGroup.getNearbyGroups(searchLocation, distance);
                 hasGroups = !groups.isEmpty();
                 if (hasGroups) groups.forEach(PacketDisplayEntityGroup::unregister);
             }
 
-            if (!packetOption.equals("only")){
+            if (!packetOption.equalsIgnoreCase(PACKET_ONLY)){
                 Set<SpawnedDisplayEntityGroup> groups = DisplayGroupManager.getNearbySpawnedGroups(searchLocation, distance);
                 if (!groups.isEmpty()){
                     hasGroups = true;
