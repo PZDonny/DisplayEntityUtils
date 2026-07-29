@@ -13,7 +13,12 @@ import net.donnypz.displayentityutils.utils.gizmo.controls.selector.RotationSele
 import net.donnypz.displayentityutils.utils.gizmo.controls.selector.ScaleSelector;
 import net.donnypz.displayentityutils.utils.gizmo.controls.selector.Selector;
 import net.donnypz.displayentityutils.utils.gizmo.controls.selector.AxisSelector;
+import net.donnypz.displayentityutils.utils.gizmo.util.GizmoTitleUtil;
+import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -46,6 +51,8 @@ public class GizmoSessionImpl implements GizmoSession {
     private final UUID playerUUID;
     private final ReentrantLock dragLock = new ReentrantLock();
 
+    private final DEUUser deuUser;
+
 
     static {
         SAVED_GIZMO_MODEL = DisplayGroupManager.getGroup(DisplayAPI.getPlugin(), "models/gizmo/gizmo.deg");
@@ -53,6 +60,7 @@ public class GizmoSessionImpl implements GizmoSession {
 
     public GizmoSessionImpl(Player player, Location spawnLocation) {
         this.playerUUID = player.getUniqueId();
+        this.deuUser = DEUUser.getOrCreateUser(player);
 
         //Translate Axis
         this.selectors.add(AxisSelector.x());
@@ -188,7 +196,7 @@ public class GizmoSessionImpl implements GizmoSession {
 
     @Override
     public boolean hasSelection() {
-        return DEUUser.getOrCreateUser(playerUUID).isPartSelectionValid();
+        return deuUser.isPartSelectionValid();
     }
 
     private void setAutoShow() {
@@ -289,6 +297,11 @@ public class GizmoSessionImpl implements GizmoSession {
                     return;
                 }
 
+                if (!deuUser.isPartSelectionValid()){
+                    deselectHide();
+                    return;
+                }
+
                 if (activeDrag == null) { //Selector
                     Selector hovered = getCollidingControl(player);
                     if (hovered != hoveredSelector) {
@@ -304,6 +317,12 @@ public class GizmoSessionImpl implements GizmoSession {
                     dragLock.lock();
                     try {
                         if (activeDrag != null) {
+                            if (RelativePointUtils.isViewingRelativePoints(player)){
+                                GizmoTitleUtil.show(player,
+                                        Component.text("Gizmo Failed", NamedTextColor.RED),
+                                        MiniMessage.miniMessage().deserialize("<red>⚠ <gray>Cannot use Gizmo while viewing points <red>⚠"));
+                                return;
+                            }
                             activeDrag.updatePosition(player);
                         }
                     } finally {
