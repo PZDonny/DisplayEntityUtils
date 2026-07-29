@@ -29,7 +29,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
-public class DEUUser {
+public final class DEUUser {
     static final Object userLock = new Object();
     static final HashMap<UUID, DEUUser> users = new HashMap<>();
     private static final ConcurrentHashMap<Integer, Vector3f> suppressedVectors = new ConcurrentHashMap<>();
