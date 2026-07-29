@@ -65,7 +65,7 @@ class GroupToPacketCMD extends PlayerSubCommand {
 
     @Override
     protected String getDescription() {
-        return "Make your selected group packet-based, making it unselectable. \"-confirm\" confirms the action." +
+        return "Make your selected group packet-based. \"-confirm\" confirms the action." +
                 " \"-keep\" keeps the non-packet based version of your group spawned.";
     }
 }
