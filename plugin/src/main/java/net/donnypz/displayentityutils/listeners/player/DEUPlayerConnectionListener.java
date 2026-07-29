@@ -49,7 +49,7 @@ public final class DEUPlayerConnectionListener implements Listener {
             }
             catch(IOException | InterruptedException ex){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Could not perform version check.", NamedTextColor.RED)));
-                player.sendMessage(Component.text("| GitHub is experiencing issue or your server has no internet connection", NamedTextColor.GRAY));
+                player.sendMessage(Component.text("| GitHub is experiencing issues or your server has no internet connection", NamedTextColor.GRAY));
             }
         });
 
