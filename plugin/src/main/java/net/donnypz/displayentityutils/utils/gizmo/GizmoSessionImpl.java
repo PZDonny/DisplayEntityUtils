@@ -95,6 +95,7 @@ public class GizmoSessionImpl implements GizmoSession {
             valid = false;
             return;
         }
+        gizmoModel.removeCulling();
         gizmoModel.glow();
         gizmoModel.setSelectable(false);
         updateRotation();
@@ -189,6 +190,7 @@ public class GizmoSessionImpl implements GizmoSession {
         float oldScale = this.scale;
         this.scale = scaleMultiplier;
         gizmoModel.scale(scaleMultiplier, 0, false);
+        gizmoModel.removeCulling();
         for (Selector c : selectors) {
             c.scale(oldScale, scaleMultiplier);
         }
