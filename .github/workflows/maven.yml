@@ -51,8 +51,7 @@ jobs:
           
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           
-          echo "Setting project version to $VERSION"
-          mvn versions:set -DnewVersion="$VERSION" -DgenerateBackupPoms=false
+          mvn -B versions:set -DnewVersion="$VERSION" -DgenerateBackupPoms=false
 
       - name: Build with Maven
         run: mvn -B package
