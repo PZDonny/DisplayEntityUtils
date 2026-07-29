@@ -178,7 +178,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
     }
 
     public static void invalidTagRestrictions(CommandSender sender){
-        sender.sendMessage(Component.text("| Valid tags do not start with an \"!\" and do not contain commas.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+        sender.sendMessage(Component.text("| Valid tags have letters a-z, A-Z, numbers 0-9 and underscores (_).", NamedTextColor.GRAY, TextDecoration.ITALIC));
         sender.sendMessage(Component.text("| The tag may also already exist or be set", NamedTextColor.GRAY, TextDecoration.ITALIC));
     }
 
