@@ -33,7 +33,8 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     }
 
     @ApiStatus.Internal
-    public AnimationParticleBuilder(@NotNull Player player, @NotNull Collection<FramePoint> framePoints){
+    public AnimationParticleBuilder(@NotNull Player player,
+                                    @NotNull Collection<FramePoint> framePoints){
         super(Particle.FLAME);
         this.player = player;
         this.framePoints = new HashSet<>(framePoints);
@@ -42,7 +43,9 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     }
 
     @ApiStatus.Internal
-    public AnimationParticleBuilder(@NotNull Player player, @NotNull AnimationParticle<?> editParticle, Step step){
+    public AnimationParticleBuilder(@NotNull Player player,
+                                    @NotNull AnimationParticle<?> editParticle,
+                                    Step step){
         super(Particle.FLAME);
         this.player = player;
         DEUUser.getOrCreateUser(player).setAnimationParticleBuilder(this);
@@ -50,7 +53,8 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         this.editParticle = editParticle;
     }
 
-    private AnimationParticleBuilder(Collection<FramePoint> framePoints, Particle particle){
+    private AnimationParticleBuilder(Collection<FramePoint> framePoints,
+                                     Particle particle){
         super(particle);
         this.framePoints = new HashSet<>(framePoints);
     }
@@ -206,6 +210,9 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         else if (particle() == Particle.FLASH) {
             return new FlashAnimationParticle(this, data());
         }
+        else if (particle() == Particle.TINTED_LEAVES){
+            return new TintedLeavesAnimationParticle(this, data());
+        }
         else if (isGeyserBaseParticle(particle())){
             return new GeyserBaseAnimationParticle(this, particle(), data());
         }
@@ -235,6 +242,9 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         }
         else if (particle == Particle.FLASH) {
             return FlashAnimationParticle.class;
+        }
+        else if (particle == Particle.TINTED_LEAVES){
+            return TintedLeavesAnimationParticle.class;
         }
         else if (isGeyserBaseParticle(particle)){
             return GeyserBaseAnimationParticle.class;
