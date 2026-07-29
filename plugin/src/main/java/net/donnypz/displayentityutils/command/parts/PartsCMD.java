@@ -16,6 +16,7 @@ public final class PartsCMD extends ParentSubCommand {
         new PartsSelectCMD(this);
         new PartsDeselectCMD(this);
         new PartsCycleCMD(this);
+        new PartsCloneCMD(this);
         new PartsGlowCMD(this);
         new PartsUnglowCMD(this);
         new PartsFilterTagsCMD(this);
