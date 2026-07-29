@@ -38,6 +38,8 @@ public class GizmoSessionImpl implements GizmoSession {
     private final PacketDisplayEntityGroup gizmoModel;
     private TranslationMode translationMode = TranslationMode.TELEPORT;
     private GizmoSpace gizmoSpace = GizmoSpace.LOCAL;
+    private GizmoSelectionMode selectionMode = GizmoSelectionMode.GROUP;
+
     private final ArrayList<Selector> selectors = new ArrayList<>();
     private Selector hoveredSelector;
     private Drag activeDrag;
@@ -154,6 +156,17 @@ public class GizmoSessionImpl implements GizmoSession {
         this.gizmoSpace = gizmoSpace;
         updateRotation();
     }
+
+    @Override
+    public GizmoSelectionMode getSelectionMode() {
+        return selectionMode;
+    }
+
+    @Override
+    public void setSelectionMode(@NotNull GizmoSelectionMode selectionMode) {
+        this.selectionMode = selectionMode;
+    }
+
 
     @Override
     public void updateRotation() {

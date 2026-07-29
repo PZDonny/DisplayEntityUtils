@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
@@ -60,7 +61,15 @@ public class DEUGizmoListener implements Listener {
         if (!GizmoManager.isGizmoWand(item)) return;
 
         e.setCancelled(true);
-        this.setGizmoStatus(player, false);
+        GizmoSessionImpl gizmo = (GizmoSessionImpl) getGizmoSession(player);
+        if (gizmo == null) return;
+
+        if (gizmo.hasActiveControl()){
+            this.setGizmoStatus(player, false);
+        }
+        else{
+            this.switchSelectionMode(player);
+        }
     }
 
     //LEFT OR RIGHT CLICK
@@ -80,7 +89,17 @@ public class DEUGizmoListener implements Listener {
         if (!GizmoManager.isGizmoWand(item)) return;
 
         e.setCancelled(true);
-        this.setGizmoStatus(player, e.getAction().isLeftClick());
+        if (e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK){
+            this.setGizmoStatus(player, true);
+        }
+        else{
+            if (gizmo.hasActiveControl()){
+                this.setGizmoStatus(player, false);
+            }
+            else{
+                this.switchSelectionMode(player);
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -135,7 +154,7 @@ public class DEUGizmoListener implements Listener {
         int next = (mode.ordinal()+1) % TranslationMode.values().length;
         TranslationMode newMode = TranslationMode.values()[next];
 
-        GizmoTitleUtil.showNewMode(player, newMode);
+        GizmoTitleUtil.showNewTranslationMode(player, newMode);
         gizmo.setTranslationMode(newMode);
         player.playSound(player, Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, 1, 1.2f);
 
@@ -153,6 +172,19 @@ public class DEUGizmoListener implements Listener {
         GizmoTitleUtil.showNewSpace(player, newSpace);
         gizmo.setGizmoSpace(newSpace);
         player.playSound(player, Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, 1, 1.2f);
+    }
+
+    private void switchSelectionMode(Player player){
+        GizmoSessionImpl gizmo = (GizmoSessionImpl) getGizmoSession(player);
+        if (gizmo == null) return;
+        GizmoSelectionMode mode = gizmo.getSelectionMode();
+
+        int next = (mode.ordinal()+1) % GizmoSelectionMode.values().length;
+        GizmoSelectionMode newMode = GizmoSelectionMode.values()[next];
+
+        GizmoTitleUtil.showNewSelectionMode(player, newMode);
+        gizmo.setSelectionMode(newMode);
+        player.playSound(player, Sound.BLOCK_NOTE_BLOCK_HARP, 1, 1.2f);
     }
 
     private void setGizmoStatus(Player player, boolean leftClick) {
@@ -176,7 +208,7 @@ public class DEUGizmoListener implements Listener {
             else {
                 GizmoWand.toggleLink(player, gizmo, true);
             }
-        } else if (gizmo.hasActiveControl()) {
+        } else {
             gizmo.deselectDrag();
             GizmoTitleUtil.showSubtitle(player,
                     MiniMessage.miniMessage().deserialize("<red>❌ <gray>Selection cleared <red>❌"));

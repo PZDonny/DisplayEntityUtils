@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils.gizmo.controls.drag;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.concurrent.GroupTeleportCompletableFuture;
+import net.donnypz.displayentityutils.utils.gizmo.GizmoSelectionMode;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
 import net.donnypz.displayentityutils.utils.gizmo.TranslationMode;
@@ -18,6 +19,7 @@ import org.bukkit.util.Vector;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.IntStream;
@@ -117,13 +119,6 @@ public abstract class TranslationDrag extends Drag {
 
         Player player = Bukkit.getPlayer(gizmo.getPlayerUUID());
         if (sel instanceof MultiPartSelection<?> mp && gizmo.isLinked()) {
-            if (mp.hasFilters()) {
-                GizmoTitleUtil.show(player,
-                        Component.text("Teleport Failed", NamedTextColor.RED),
-                        MiniMessage.miniMessage().deserialize("<red>⚠ <gray>Selection cannot have filters <red>⚠"));
-                return false;
-            }
-
             ActiveGroup<?> group = mp.getGroup();
             if (group != null){
                 if (group.isRiding()){
@@ -164,13 +159,16 @@ public abstract class TranslationDrag extends Drag {
         bukkitTranslateDelta = Vector.fromJOML(translateDelta);
         Vector bukkitDelta = Vector.fromJOML(delta);
 
-        if (sel instanceof SinglePartSelection s) {
-            s.translate(s.getSelectedPart().isDisplay()
+        if (gizmo.getSelectionMode() == GizmoSelectionMode.PART || sel instanceof SinglePartSelection){
+            ActivePart part = sel.getSelectedPart();
+            if (part == null) return;
+            part.translate(part.isDisplay()
                             ? bukkitTranslateDelta
                             : bukkitDelta,
                     GizmoSessionImpl.SCAN_FREQUENCY, 0);
-        } else if (sel instanceof MultiPartSelection<?> m) {
-            for (ActivePart p : m.getParts()) {
+        }
+        else if (sel instanceof MultiPartSelection<?> mps){
+            for (ActivePart p : getParts(mps)) {
                 p.translate(p.isDisplay()
                                 ? bukkitTranslateDelta
                                 : bukkitDelta,
@@ -180,8 +178,9 @@ public abstract class TranslationDrag extends Drag {
     }
 
     private void teleport(Location tpLoc, ActivePartSelection<?> sel) {
-        if (sel instanceof SinglePartSelection s) {
-            SpawnedDisplayEntityPart part = s.getSelectedPart();
+        if (sel instanceof SinglePartSelection){
+            ActivePart part = sel.getSelectedPart();
+            if (part == null) return;
             part.setTeleportDuration(GizmoSessionImpl.SCAN_FREQUENCY);
 
             CompletableFuture<Boolean> future = part.teleportSafe(tpLoc);
@@ -191,8 +190,9 @@ public abstract class TranslationDrag extends Drag {
             } catch (ExecutionException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
-        } else if (sel instanceof MultiPartSelection<?> mp) {
-            ActiveGroup<?> group = mp.getGroup();
+        }
+        else if (sel instanceof MultiPartSelection<?> mps){
+            ActiveGroup<?> group = mps.getGroup();
             if (group != null) {
                 group.setTeleportDuration(GizmoSessionImpl.SCAN_FREQUENCY);
                 GroupTeleportCompletableFuture future = group.teleportSafe(tpLoc, true);
@@ -203,5 +203,11 @@ public abstract class TranslationDrag extends Drag {
                 }
             }
         }
+    }
+
+    private List<? extends ActivePart> getParts(MultiPartSelection<?> mps){
+        return gizmo.getSelectionMode() == GizmoSelectionMode.GROUP
+                ? mps.getGroup().getParts()
+                : mps.getParts();
     }
 }

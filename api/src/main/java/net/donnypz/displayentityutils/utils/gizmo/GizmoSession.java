@@ -14,6 +14,10 @@ public interface GizmoSession {
 
     void setGizmoSpace(@NotNull GizmoSpace gizmoSpace);
 
+    GizmoSelectionMode getSelectionMode();
+
+    void setSelectionMode(@NotNull GizmoSelectionMode selectionMode);
+
     float getScale();
 
     void setScale(float scale);

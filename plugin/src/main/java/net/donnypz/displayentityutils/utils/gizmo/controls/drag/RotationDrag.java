@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.gizmo.controls.drag;
 
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.gizmo.GizmoSelectionMode;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
@@ -105,20 +106,29 @@ public class RotationDrag extends Drag {
         Location gizmoLoc = gizmo.getGizmoModel().getLocation();
 
         boolean worldSpace = gizmo.getGizmoSpace() == GizmoSpace.WORLD;
-        if (sel instanceof SinglePartSelection) {
+
+        if (gizmo.getSelectionMode() == GizmoSelectionMode.PART || sel instanceof SinglePartSelection){
             ActivePart part = sel.getSelectedPart();
-            if (!part.isDisplay()){
-                part.pivot(q, gizmoLoc, false);
-            }
-            else{
-                if (worldSpace) {
-                    part.rotateAround(q, gizmoLoc, true);
-                } else {
-                    part.rotate(q, false);
+            if (part != null){
+                if (!part.isDisplay()){
+                    part.pivot(q, gizmoLoc, false);
+                }
+                else{
+                    if (worldSpace) {
+                        part.rotateAround(q, gizmoLoc, true);
+                    } else {
+                        part.rotate(q, false);
+                    }
                 }
             }
-        } else if (sel instanceof MultiPartSelection<?> mps) {
-            mps.pivotOrRotateAround(q, gizmoLoc, worldSpace);
+        }
+        else if (sel instanceof MultiPartSelection<?> mps){
+            if (gizmo.getSelectionMode() == GizmoSelectionMode.GROUP){
+                mps.getGroup().pivotOrRotateAround(q, gizmoLoc, worldSpace);
+            }
+            else{
+                mps.pivotOrRotateAround(q, gizmoLoc, worldSpace);
+            }
         }
     }
 

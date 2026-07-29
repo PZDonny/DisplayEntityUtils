@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils.gizmo.controls.drag;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.concurrent.GroupTeleportCompletableFuture;
+import net.donnypz.displayentityutils.utils.gizmo.GizmoSelectionMode;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
@@ -126,8 +127,10 @@ public class ScaleDrag extends Drag {
                 DEUUser.getOrCreateUser(gizmo.getPlayerUUID())
                         .getSelectedPartSelection();
 
-        if (selection instanceof SinglePartSelection single) {
-            ActivePart part = single.getSelectedPart();
+        if (gizmo.getSelectionMode() == GizmoSelectionMode.PART || selection instanceof SinglePartSelection) {
+            ActivePart part = selection.getSelectedPart();
+            if (part == null) return;
+
             if (part.isDisplay()) {
                 scaleDisplay(part, scaleDelta);
             } else if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
@@ -147,14 +150,15 @@ public class ScaleDrag extends Drag {
                 return;
             }
 
-            if (group.getSize() == multi.getSize()) {
+            if (gizmo.getSelectionMode() == GizmoSelectionMode.FILTER && group.getSize() != multi.getSize()) {
+                GizmoTitleUtil.show(Bukkit.getPlayer(gizmo.getPlayerUUID()),
+                        Component.text("Scale Failed", NamedTextColor.RED),
+                        MiniMessage.miniMessage().deserialize("<red>⚠ <gray>Filtered selection cannot be scaled separately <red>⚠"));
+
+            } else {
                 GroupTeleportCompletableFuture future = group.scale(scale, GizmoSessionImpl.SCAN_FREQUENCY + 1, true);
                 //block thread until non-display teleports complete
                 if (future != null) future.block();
-            } else {
-                GizmoTitleUtil.show(Bukkit.getPlayer(gizmo.getPlayerUUID()),
-                        Component.text("Scale Failed", NamedTextColor.RED),
-                        MiniMessage.miniMessage().deserialize("<red>⚠ <gray>Selection cannot have filters <red>⚠"));
             }
         }
     }

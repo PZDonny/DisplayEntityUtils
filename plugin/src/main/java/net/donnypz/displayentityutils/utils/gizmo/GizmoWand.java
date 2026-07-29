@@ -38,7 +38,7 @@ public class GizmoWand {
             gizmo.setLinked(false);
             player.sendMessage(DisplayAPI.pluginPrefix
                     .append(Component.text("The Gizmo has been unlinked from your selection", NamedTextColor.YELLOW)));
-            player.sendMessage(MiniMessage.miniMessage().deserialize("<gray><italic>| Your selection will not move when a</italic>" +
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<gray><italic>| Only the Gizmo will move, with a</italic>" +
                     " <gold>TRANSLATION " +
                     "<gray><italic>axis is selected"));
             if (effects){
@@ -68,14 +68,16 @@ public class GizmoWand {
                                 .decoration(TextDecoration.ITALIC, false),
                         MiniMessage.miniMessage().deserialize("<dark_green>L-CLICK (With selected Axis)<gray>: Unlink Gizmo/Move pivot")
                                 .decoration(TextDecoration.ITALIC, false),
-                        MiniMessage.miniMessage().deserialize("<red>R-CLICK<gray>: Deselect Axis")
+                        MiniMessage.miniMessage().deserialize("<gold>R-CLICK <gray>: Switch Selection Mode (Group/Filter/Part)")
+                                .decoration(TextDecoration.ITALIC, false),
+                        MiniMessage.miniMessage().deserialize("<red>R-CLICK (With selected Axis)<gray>: Deselect Axis")
                                 .decoration(TextDecoration.ITALIC, false),
                         Component.text("Offhand (", NamedTextColor.YELLOW)
                                 .append(Component.keybind("key.swapOffhand"))
                                 .append(Component.text(")"))
                                 .append(Component.text(": Toggle Space (Local/World)", NamedTextColor.GRAY))
                                 .decoration(TextDecoration.ITALIC, false),
-                        Component.text("Drop Item (", TextColor.color(351, 100, 86))
+                        Component.text("Drop Item (", TextColor.color(150, 100, 150))
                                 .append(Component.keybind("key.drop"))
                                 .append(Component.text(")"))
                                 .append(Component.text(": Toggle Translation Mode (Translate/Teleport)", NamedTextColor.GRAY))
