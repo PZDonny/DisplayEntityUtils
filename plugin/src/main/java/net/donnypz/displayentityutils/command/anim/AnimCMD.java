@@ -61,8 +61,8 @@ public final class AnimCMD extends ParentSubCommand {
     }
 
     static void noFramePointSelection(Player player){
-        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You do not have an frame point selected!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/deu anim frameinfo <frame-id>", NamedTextColor.GRAY));
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You do not have a frame point selected!", NamedTextColor.RED)));
+        player.sendMessage(Component.text("/deu anim showpoints <frame-id>", NamedTextColor.GRAY));
     }
 
     static void hasNoFrames(Player player){
