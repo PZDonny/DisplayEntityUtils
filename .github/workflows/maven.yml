@@ -13,10 +13,12 @@ on:
     branches: [ "*" ]
     paths-ignore:
       - README.md
+      - 'images/**'
   pull_request:
     branches: [ "*" ]
     paths-ignore:
       - README.md
+      - 'images/**'
 
 jobs:
   build:
