@@ -27,7 +27,7 @@ public class CondTextDisplaySeeThrough extends Condition {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.CONDITION,
                 SyntaxInfo.builder(CondTextDisplaySeeThrough.class)
-                        .addPattern("%activepart/displays% (1¦is|2¦is(n't| not)) deu visible through (blocks|walls)")
+                        .addPattern("%activepart/display% (1¦is|2¦is(n't| not)) deu visible through (blocks|walls)")
                         .supplier(CondTextDisplaySeeThrough::new)
                         .build()
         );

@@ -27,7 +27,7 @@ public class CondTextDisplayIsShadowed extends Condition {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.CONDITION,
                 SyntaxInfo.builder(CondTextDisplayIsShadowed.class)
-                        .addPattern("%activepart/displays% (1¦(is|has)|2¦is(n't| not)) deu [text] [drop] shadow[ed|s]")
+                        .addPattern("%activepart/display% (1¦(is|has)|2¦is(n't| not)) deu [text] [drop] shadow[ed|s]")
                         .supplier(CondTextDisplayIsShadowed::new)
                         .build()
         );
