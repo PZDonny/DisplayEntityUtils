@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Entity Id of Active Part")
+@Name("Active Part - Entity Id")
 @Description("Get the entity id of an active part. This can be used in packet operations.")
 @Examples({"set {_id} to {_spawnedpart}'s deu entity id",
             "set {_id} to {_packetpart}'s deu entity id"})

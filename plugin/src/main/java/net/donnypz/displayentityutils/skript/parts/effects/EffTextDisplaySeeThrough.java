@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Text Display Part See Through Blocks")
+@Name("Text Display Part - Visible Through Blocks")
 @Description("Set whether a text display part should be visible through walls")
 @Examples({
         "deu make {_activepart} visible through blocks",

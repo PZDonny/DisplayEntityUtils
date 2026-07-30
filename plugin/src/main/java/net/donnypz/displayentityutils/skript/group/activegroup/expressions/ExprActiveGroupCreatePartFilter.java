@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Active Group Parts Filter")
+@Name("Active Group - Part Filter")
 @Description("Create a selection of parts from an active group, which can later be filtered")
 @Examples({
         "set {_partfilter} to a new part filter from {_activegroup}",

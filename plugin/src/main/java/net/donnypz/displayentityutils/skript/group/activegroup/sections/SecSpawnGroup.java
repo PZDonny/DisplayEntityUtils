@@ -28,7 +28,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 import java.util.List;
 
 
-@Name("Spawn Group")
+@Name("Active Group - Spawn")
 @Description({"Spawn a DEU Group/Model at a location, with specified options",
         "**Entries**",
         "`packet` = whether the group should be packet-based. False by default",

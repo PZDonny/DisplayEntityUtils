@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Text Display Part - Is Visible Through Blocks")
+@Name("Text Display Part - Visible Through Blocks")
 @Description("Check if an text display part is visible through blocks")
 @Examples({"if {_activepart} is deu visible through blocks:",
         "\tbroadcast \"This text display part is visible through walls!\""})

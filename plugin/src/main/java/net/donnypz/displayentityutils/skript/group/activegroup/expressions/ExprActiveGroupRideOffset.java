@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Active Group Ride Offset")
+@Name("Active Group - Ride Offset")
 @Description("Get or set the translation offset to apply to a group when its riding an entity. " +
         "This should be used before making a group ride any entities")
 @Examples({

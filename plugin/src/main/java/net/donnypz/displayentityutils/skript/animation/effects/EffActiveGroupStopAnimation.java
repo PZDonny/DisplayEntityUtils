@@ -19,7 +19,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 import java.util.Arrays;
 import java.util.Collection;
 
-@Name("Stop Animation")
+@Name("Animation - Stop")
 @Description("Stop an animation playing on an active group")
 @Examples({"stop animation on {_spawnedgroup} from {_displayanimator}",
             "",

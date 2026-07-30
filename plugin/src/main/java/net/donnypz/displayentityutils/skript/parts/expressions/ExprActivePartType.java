@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Active Part's Type")
+@Name("Active Part - Type")
 @Description("Get the active part's type")
 @Examples({"set {_type} to {_spawnedpart}'s active part type",
         "if {_type} is block_display:",

@@ -22,6 +22,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
         "set {_activegroup}'s deu pitch to -45",
         "set {_activegroup}'s deu yaw to 73",
         "set {_activegroup}'s deu yaw with pivot to 25",
+        "set {_activegroup}'s deu pitch with non-display pivot to -15",
         "",
         "#3.4.3 and earlier",
         "deu set {_activegroup}'s yaw with interaction pivot to 35",
@@ -35,7 +36,7 @@ public class ExprActiveDirection extends SimplePropertyExpression<Active, Number
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.EXPRESSION,
                 SyntaxInfo.Expression.builder(ExprActiveDirection.class, Number.class)
-                        .addPatterns(getPatterns("deu (1¦yaw|2¦pitch) [p:with [(interaction|entity)] pivot]", "activegroups/activeparts/partfilters"))
+                        .addPatterns(getPatterns("deu (1¦yaw|2¦pitch) [p:with [(interaction|non( |-)display)] pivot]", "activegroups/activeparts/partfilters"))
                         .supplier(ExprActiveDirection::new)
                         .build()
         );

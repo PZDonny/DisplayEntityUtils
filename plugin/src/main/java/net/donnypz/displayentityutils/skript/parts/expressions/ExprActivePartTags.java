@@ -13,7 +13,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.Arrays;
 
-@Name("Active Part's Tags")
+@Name("Active Part - Part Tags")
 @Description("Get all the tags of a part")
 @Examples({"set {_tags::*} to {_activepart}'s part tags"})
 @Since("2.6.2, 3.0.0 (Packet), 3.3.2 (Plural)")

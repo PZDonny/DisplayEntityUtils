@@ -20,7 +20,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 import java.util.HashSet;
 import java.util.Set;
 
-@Name("Part Filter Items/Blocks")
+@Name("Part Filter - Filter Items/Blocks")
 @Description("Set the items/blocks that should be filtered in a partfilter")
 @Examples({
             "deu filter {_partfilter} with block stone",

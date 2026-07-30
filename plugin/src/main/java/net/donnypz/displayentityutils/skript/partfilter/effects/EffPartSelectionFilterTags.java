@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Part Filter Part Tags")
+@Name("Part Filter - Filter Part Tags")
 @Description("Filter parts by part tags in a partfilter")
 @Examples({
         "#Filter parts with the tag \"head\" but exclude if they have \"eye\"",

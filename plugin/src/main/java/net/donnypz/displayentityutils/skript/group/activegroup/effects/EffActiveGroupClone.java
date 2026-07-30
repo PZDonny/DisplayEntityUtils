@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Clone Active Group")
+@Name("Active Group - Clone")
 @Description("Create a clone of an active group")
 @Examples({
         "deu clone {_activegroup}",

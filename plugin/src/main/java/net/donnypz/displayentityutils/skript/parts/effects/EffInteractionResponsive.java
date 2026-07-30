@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Interaction Part's Responsiveness")
+@Name("Interaction Part - Responsiveness")
 @Description("Set whether a interaction part should be visible through walls")
 @Examples({
         "deu make {_activepart} responsive",

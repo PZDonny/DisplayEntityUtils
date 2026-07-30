@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Scale Active Group")
+@Name("Active Group - Scale")
 @Description("Change the scale multiplier of an active group")
 @Examples({
         "deu scale {_activegroup} by 2 over 0 ticks",

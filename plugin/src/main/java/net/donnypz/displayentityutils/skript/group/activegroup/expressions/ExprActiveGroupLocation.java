@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Active Group Location")
+@Name("Active Group - Location")
 @Description("Get the location of an active group")
 @Examples({"set {_location} to {_spawnedgroup}'s deu location",
             "",

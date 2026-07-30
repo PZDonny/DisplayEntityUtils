@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Stop All Animations")
+@Name("Animation - Stop All")
 @Description("Stop all animations playing on an active group")
 @Examples({"stop all animations on {_spawnedgroup}",
         "stop animations on {_spawnedgroup} and remove from state machine",

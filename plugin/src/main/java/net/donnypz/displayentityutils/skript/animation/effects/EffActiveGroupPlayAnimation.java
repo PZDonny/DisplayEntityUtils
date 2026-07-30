@@ -20,7 +20,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 import java.util.Arrays;
 import java.util.Collection;
 
-@Name("Play Animation")
+@Name("Animation - Play")
 @Description("Play an animation on an active group with a display animator")
 @Examples({"play animation on {_activegroup} using {_displayanimator}",
         "",

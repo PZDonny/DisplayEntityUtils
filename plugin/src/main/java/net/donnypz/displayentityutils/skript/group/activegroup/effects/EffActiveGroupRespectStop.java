@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Active Group Stop Respecting Entity")
+@Name("Active Group - Stop Respecting Entity")
 @Description("Make an active group stop respecting an entity's looking direction")
 @Examples({"make {_spawnedgroup} stop following entity",
             "make {_activegroup} stop following",

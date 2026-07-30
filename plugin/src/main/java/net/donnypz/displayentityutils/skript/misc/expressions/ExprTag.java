@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Group/Animation/Frame Point Tag")
+@Name("Get/Set Tag")
 @Description("Get or set the tag of a group/animation. Only the tag of a active group/animation can be changed")
 @Examples({"reset {_spawnedgroup}'s deu tag",
             "set {_savedgrouptag} to {_savedgroup}'s deu tag",

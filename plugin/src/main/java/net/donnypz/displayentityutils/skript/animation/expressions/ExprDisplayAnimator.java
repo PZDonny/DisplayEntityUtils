@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Create Display Animator")
+@Name("Display Animator")
 @Description("Create a display animator to play animations on an active group")
 @Examples({
         "set {_animator} to a new linear display animator using {_animation}",

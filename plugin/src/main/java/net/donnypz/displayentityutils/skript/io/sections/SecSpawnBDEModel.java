@@ -29,7 +29,7 @@ import java.io.File;
 import java.util.List;
 
 
-@Name("Spawn BDEngine Model from File")
+@Name("BDEngine Model - Spawn from File")
 @Description({"Spawn a BDEngine Model, from a file, at a location, with specified options",
         "**Entries**",
         "`packet` = whether the group should be packet-based. False by default",

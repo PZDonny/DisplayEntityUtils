@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Active Group/Part/Filter Interpolation")
+@Name("Interpolation Duration/Delay")
 @Description("Get/Set the interpolation duration/delay of an active group/part/filter")
 @Examples({"set deu interpolation duration of {_activepart} to 5 ticks",
         "set {_activegroup}'s deu interpolation delay to 2 ticks",

@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Text Display Part Shadow")
+@Name("Text Display Part - Shadow")
 @Description("Set whether a text display part's text should have a shadow")
 @Examples({
         "deu add text shadow to {_activepart}'s text",

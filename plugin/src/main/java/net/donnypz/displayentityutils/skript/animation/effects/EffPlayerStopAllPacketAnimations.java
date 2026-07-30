@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Stop Animations for Player")
+@Name("Animations - Stop for Player")
 @Description("Stop all packet animations playing on an active group for a player")
 @Examples({"stop packet animations from {_displayanimator} for {_player::*}"})
 @Since("3.0.0")

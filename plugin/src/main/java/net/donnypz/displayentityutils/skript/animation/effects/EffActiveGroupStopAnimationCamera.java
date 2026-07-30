@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Stop Animation Camera")
+@Name("Animation - Stop Camera")
 @Description("Stop players from viewing an animation camera")
 @Examples({"stop animation camera for {_player}",
             "",

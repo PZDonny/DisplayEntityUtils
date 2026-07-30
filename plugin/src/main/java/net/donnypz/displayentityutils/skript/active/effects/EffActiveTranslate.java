@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Translate Active Group/Parts/Filter")
+@Name("Translate")
 @Description("Change the translation of an active group/filter's parts, or of an active part")
 @Examples({"add {_vector} to {_activegroup}'s translation",
         "add {_vector} to {_partfilter}'s translation over 20 ticks"})

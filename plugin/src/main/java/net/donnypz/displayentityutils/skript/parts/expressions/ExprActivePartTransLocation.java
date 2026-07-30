@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Translated Location of Active Part / Entity")
+@Name("Active Part / Entity - Translated Location")
 @Description("Get the location relative to a active part's true location, based off of its translation.")
 @Examples({"set {_loc} to {_activepart}'s translated location",
             "set {_loc} to {_displayentity}'s translated location"})

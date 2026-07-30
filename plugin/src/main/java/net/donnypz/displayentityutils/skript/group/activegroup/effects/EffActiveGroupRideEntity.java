@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Active Group Ride")
+@Name("Active Group - Ride")
 @Description("Make an active group ride an entity or vice versa")
 @Examples({
         "#Use \"mount\" instead of \"ride\" if you experience unexpected behavior",
