@@ -40,12 +40,11 @@ public final class DEUPlayerConnectionListener implements Listener {
         //Version Check
         if (!player.hasPermission("deu.help")) return;
         DisplayAPI.getScheduler().runAsync(() -> {
-            String currentVersion = DisplayAPI.getPlugin().getPluginMeta().getVersion();
             String latestVersion;
 
             try{
                 latestVersion = getLatest();
-                compareVersions(player, currentVersion, latestVersion);
+                compareVersions(player, latestVersion);
             }
             catch(IOException | InterruptedException ex){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Could not perform version check.", NamedTextColor.RED)));
@@ -86,31 +85,24 @@ public final class DEUPlayerConnectionListener implements Listener {
         return obj.get("tag_name").getAsString();
     }
 
-    void compareVersions(Player player, String current, String latest){
-        String cleanCurrent = VersionUtils.cleanVersionString(current);
-        boolean isDevVersion = VersionUtils.isDevVersion();
+    void compareVersions(Player player, String latest){
+        String current = VersionUtils.getPluginVersion();
+        boolean isCurrentOlder = VersionUtils.isCurrentOlderThan(latest);
 
-        String[] a = cleanCurrent.split("\\.");
-        String[] b = latest.split("\\.");
-
-        int length = Math.max(a.length, b.length);
-
-        for (int i = 0; i < length; i++){
-            int num1 = i < a.length ? Integer.parseInt(a[i]) : 0;
-            int num2 = i < b.length ? Integer.parseInt(b[i]) : 0;
-
-            if (num2 > num1){ //behind
-                if (isDevVersion){
-                    sendNewVersionAvailableOnDev(player, latest);
-                }
-                else{
-                    sendNewVersionAvailable(player, latest);
-                }
-                return;
+        if (isCurrentOlder){
+            boolean isDevVersion = VersionUtils.isDevVersion();
+            if (isDevVersion){
+                sendNewVersionAvailableOnDev(player, latest);
             }
+            else{
+                sendNewVersionAvailable(player, latest);
+            }
+            return;
         }
 
+        String cleanCurrent = VersionUtils.cleanVersionString(current);
         String cleanLatest = VersionUtils.cleanVersionString(latest);
+
         if (!cleanCurrent.equals(cleanLatest)){
             sendLatestOnDev(player, latest);
         }

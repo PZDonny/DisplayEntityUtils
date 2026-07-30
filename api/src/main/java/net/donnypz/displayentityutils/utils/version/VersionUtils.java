@@ -38,6 +38,14 @@ public final class VersionUtils {
 
     private VersionUtils(){}
 
+    public static @NotNull String getPluginVersion(){
+        return DisplayAPI.getPlugin().getPluginMeta().getVersion();
+    }
+
+    public static @NotNull String getCleanPluginVersion(){
+        return cleanVersionString(getPluginVersion());
+    }
+
     public static boolean isDevVersion(){
         return IS_DEV_VERSION;
     }
@@ -51,6 +59,27 @@ public final class VersionUtils {
     @ApiStatus.Internal
     public static @NotNull String cleanVersionString(@NotNull String version){
         return version.replaceAll("[^0-9.]", "");
+    }
+
+    public static boolean isCurrentOlderThan(@NotNull String comparedVersion){
+        String current = getPluginVersion();
+        String cleanCurrent = VersionUtils.cleanVersionString(current);
+        String cleanComparedVersion = VersionUtils.cleanVersionString(comparedVersion);
+
+        String[] currentArr = cleanCurrent.split("\\.");
+        String[] comparedArr = cleanComparedVersion.split("\\.");
+
+        int length = Math.max(currentArr.length, comparedArr.length);
+
+        for (int i = 0; i < length; i++){
+            int num1 = i < currentArr.length ? Integer.parseInt(currentArr[i]) : 0;
+            int num2 = i < comparedArr.length ? Integer.parseInt(comparedArr[i]) : 0;
+
+            //behind
+            if (num2 > num1) return true;
+            if (num1 > num2) return false;
+        }
+        return false;
     }
 
     public static boolean canViewDialogs(@NotNull Player player, boolean sendErrorMessage){
