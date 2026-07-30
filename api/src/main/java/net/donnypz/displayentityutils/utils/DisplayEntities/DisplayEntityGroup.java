@@ -22,6 +22,7 @@ public final class DisplayEntityGroup implements Serializable{
     DisplayEntity masterEntity;
     private final String tag;
     private Boolean isPersistent = true;
+    private final String savedPluginVersion; //started saving in v3.6.0
 
     @Serial
     private static final long serialVersionUID = 99L;
@@ -49,6 +50,7 @@ public final class DisplayEntityGroup implements Serializable{
             }
         }
         this.isPersistent = spawnedGroup.isPersistent();
+        this.savedPluginVersion = VersionUtils.getPluginVersion();
     }
 
     DisplayEntityGroup(PacketDisplayEntityGroup packetGroup){
@@ -71,6 +73,7 @@ public final class DisplayEntityGroup implements Serializable{
             }
         }
         this.isPersistent = false;
+        this.savedPluginVersion = VersionUtils.getPluginVersion();
     }
 
     private DisplayEntity addDisplayEntity(Display entity){
@@ -91,21 +94,8 @@ public final class DisplayEntityGroup implements Serializable{
     }
 
     private DisplayEntity addDisplayEntity(PacketDisplayEntityPart part, PacketDisplayEntityGroup packetGroup){
-        DisplayEntity display;
-        switch (part.type){
-            case TEXT_DISPLAY -> {
-                display = new DisplayEntity(part, DisplayEntity.Type.TEXT, packetGroup);
-            }
-            case BLOCK_DISPLAY -> {
-                display = new DisplayEntity(part, DisplayEntity.Type.BLOCK, packetGroup);
-            }
-            case ITEM_DISPLAY -> {
-                display = new DisplayEntity(part, DisplayEntity.Type.ITEM, packetGroup);
-            }
-            default -> {
-                return null;
-            }
-        }
+        if (!part.isDisplay()) return null;
+        DisplayEntity display = new DisplayEntity(part, DisplayEntity.Type.fromPartType(part.type), packetGroup);
         displayEntities.add(display);
         return display;
     }
@@ -141,6 +131,14 @@ public final class DisplayEntityGroup implements Serializable{
      */
     public String getTag() {
         return tag;
+    }
+
+    /**
+     * Get the plugin version that this {@link DisplayEntityGroup} was saved on
+     * @return a String with the plugin version, or null if saved before <code>v3.6.0</code>
+     */
+    public @Nullable String getSavedPluginVersion(){
+        return savedPluginVersion;
     }
 
     /**
