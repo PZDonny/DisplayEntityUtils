@@ -66,7 +66,7 @@ public class GizmoWand {
                 meta.lore(List.of(
                         MiniMessage.miniMessage().deserialize("<green>L-CLICK<gray>: Select Axis")
                                 .decoration(TextDecoration.ITALIC, false),
-                        MiniMessage.miniMessage().deserialize("<dark_green>L-CLICK (With selected Axis)<gray>: Unlink Gizmo/Move pivot")
+                        MiniMessage.miniMessage().deserialize("<#b5deb4>L-CLICK (With selected Axis)<gray>: Unlink Gizmo/Move pivot")
                                 .decoration(TextDecoration.ITALIC, false),
                         MiniMessage.miniMessage().deserialize("<gold>R-CLICK <gray>: Switch Selection Mode (Group/Filter/Part)")
                                 .decoration(TextDecoration.ITALIC, false),
