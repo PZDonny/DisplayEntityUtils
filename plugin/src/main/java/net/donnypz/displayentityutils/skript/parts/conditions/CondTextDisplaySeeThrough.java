@@ -37,10 +37,10 @@ public class CondTextDisplaySeeThrough extends Condition {
     public boolean check(Event event) {
         Object obj = partExpr.getSingle(event);
         if (obj instanceof ActivePart p){
-            return p.isTextDisplaySeeThrough();
+            return p.isTextDisplaySeeThrough() != isNegated();
         }
         else if (obj instanceof TextDisplay td){
-            return td.isSeeThrough();
+            return td.isSeeThrough() != isNegated();
         }
         return isNegated();
     }

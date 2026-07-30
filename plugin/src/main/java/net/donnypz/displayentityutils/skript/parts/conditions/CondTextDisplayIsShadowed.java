@@ -37,10 +37,10 @@ public class CondTextDisplayIsShadowed extends Condition {
     public boolean check(Event event) {
         Object obj = partExpr.getSingle(event);
         if (obj instanceof ActivePart p){
-            return p.isTextDisplayShadowed();
+            return p.isTextDisplayShadowed() != isNegated();
         }
         else if (obj instanceof TextDisplay td){
-            return td.isShadowed();
+            return td.isShadowed() != isNegated();
         }
         return isNegated();
     }
