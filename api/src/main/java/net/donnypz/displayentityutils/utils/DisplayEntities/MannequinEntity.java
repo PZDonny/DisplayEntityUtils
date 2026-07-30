@@ -50,6 +50,10 @@ final class MannequinEntity implements Serializable {
     MannequinEntity(){}
 
     PacketDisplayEntityPart createPacketPart(Location origin, GroupSpawnSettings settings){
+        return createPacketPart(origin, settings, VersionUtils.getPluginVersion());
+    }
+
+    PacketDisplayEntityPart createPacketPart(Location origin, GroupSpawnSettings settings, String savedPluginVersion){
         PacketAttributeContainer attributeContainer = new PacketAttributeContainer()
                 .setAttribute(DisplayAttributes.Mannequin.SCALE, (float) scale)
                 .setAttribute(DisplayAttributes.Mannequin.IMMOVABLE, true)
@@ -68,8 +72,11 @@ final class MannequinEntity implements Serializable {
             attributeContainer.setAttribute(DisplayAttributes.CUSTOM_NAME, MiniMessage.miniMessage().deserialize(customName));
         }
 
-        if (VersionUtils.hasBelowNameDistance()){
-            attributeContainer.setAttribute(DisplayAttributes.Mannequin.BELOW_NAME_DISTANCE, (float) belowNameDistance);
+        if (VersionUtils.hasBelowNameDistance()) {
+            attributeContainer.setAttribute(DisplayAttributes.Mannequin.BELOW_NAME_DISTANCE,
+                    savedPluginVersion == null
+                            ? 10.0f
+                            : (float) belowNameDistance);
         }
 
         if (description != null){

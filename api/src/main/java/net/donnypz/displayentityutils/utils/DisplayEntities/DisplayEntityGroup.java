@@ -200,7 +200,7 @@ public final class DisplayEntityGroup implements Serializable{
 
         if (mannequinEntities != null){
             for (MannequinEntity entity : mannequinEntities){
-                Entity e = SavedEntityLoader.spawnMannequin(masterDisplay.getLocation(), settings, entity);
+                Entity e = SavedEntityLoader.spawnMannequin(masterDisplay.getLocation(), settings, entity, savedPluginVersion);
                 group.addEntity(e);
             }
         }
@@ -288,7 +288,7 @@ public final class DisplayEntityGroup implements Serializable{
 
         if (mannequinEntities != null){ //old models won't have this field
             for (MannequinEntity entity : mannequinEntities){
-                PacketDisplayEntityPart part = entity.createPacketPart(spawnLocation, settings);
+                PacketDisplayEntityPart part = entity.createPacketPart(spawnLocation, settings, savedPluginVersion);
                 packetGroup.addPartSilent(part);
             }
         }
