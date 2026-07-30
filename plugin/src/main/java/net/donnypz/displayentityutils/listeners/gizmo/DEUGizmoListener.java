@@ -4,6 +4,7 @@ import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.GizmoManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.SinglePartSelection;
 import net.donnypz.displayentityutils.utils.gizmo.*;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoTitleUtil;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
@@ -175,6 +176,10 @@ public class DEUGizmoListener implements Listener {
     }
 
     private void switchSelectionMode(Player player){
+        DEUUser user = DEUUser.getUser(player);
+        if (user != null && user.getSelectedPartSelection() instanceof SinglePartSelection){
+            return;
+        }
         GizmoSessionImpl gizmo = (GizmoSessionImpl) getGizmoSession(player);
         if (gizmo == null) return;
         GizmoSelectionMode mode = gizmo.getSelectionMode();
