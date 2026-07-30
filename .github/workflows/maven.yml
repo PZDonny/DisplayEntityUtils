@@ -43,7 +43,7 @@ jobs:
         run: |
           SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c1-7)
 
-        #If PR, use source branch name; else use current branch name.
+          # If PR, use source branch name; else use current branch name.
           BRANCH="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
           BRANCH=$(echo "$BRANCH" | tr '/' '-')
           
