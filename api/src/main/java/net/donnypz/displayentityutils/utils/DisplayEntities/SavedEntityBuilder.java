@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -39,6 +40,9 @@ class SavedEntityBuilder {
         Component customName = mannequin.customName();
         mannequinEntity.customName = customName != null ? MiniMessage.miniMessage().serialize(customName) : null;
         mannequinEntity.customNameVisible = mannequin.isCustomNameVisible();
+        mannequinEntity.belowNameDistance = VersionUtils.hasBelowNameDistance()
+                ? mannequin.getAttribute(Attribute.BELOW_NAME_DISTANCE).getBaseValue()
+                : 10.0d;
 
         Component description = mannequin.getDescription();
         mannequinEntity.description = description != null ? MiniMessage.miniMessage().serialize(description) : null;
@@ -83,6 +87,9 @@ class SavedEntityBuilder {
         Component customName = part.getCustomName();
         mannequinEntity.customName = customName != null ? MiniMessage.miniMessage().serialize(customName) : null;
         mannequinEntity.customNameVisible = part.isCustomNameVisible();
+        mannequinEntity.belowNameDistance = VersionUtils.hasBelowNameDistance()
+                ? c.getAttributeOrDefault(DisplayAttributes.Mannequin.BELOW_NAME_DISTANCE, 10.0f)
+                : 10.0d;
 
         Component description = part.getMannequinBelowName();
         mannequinEntity.description = description != null ? MiniMessage.miniMessage().serialize(description) : null;

@@ -122,6 +122,10 @@ public final class VersionUtils {
         return IS_1_21_11;
     }
 
+    public static boolean hasBelowNameDistance(){
+        return IS_26_2;
+    }
+
     private static void setParticles(){
         if (IS_1_20_5){
             ENTITY_EFFECT_PARTICLE = Particle.valueOf("ENTITY_EFFECT");

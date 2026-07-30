@@ -647,6 +647,13 @@ public abstract class ActivePart implements Active, Cloneable{
     public abstract void setMannequinBelowName(@Nullable Component text);
 
     /**
+     * Set the below name distance of this mannequin part, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}.
+     * <br>This attribute only exists on Minecraft versions <code>26.2</code> and higher
+     * @param distance the below name distance
+     */
+    public abstract void setMannequinBelowNameDistance(double distance);
+
+    /**
      * Set the pose of this mannequin part, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
      * @param pose the pose
      */
@@ -694,6 +701,13 @@ public abstract class ActivePart implements Active, Cloneable{
      * @return a {@link Component} or null
      */
     public abstract @Nullable Component getMannequinBelowName();
+
+    /**
+     * Get a mannequin part's description/below name distance, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * <br>This attribute only exists on Minecraft versions <code>26.2</code> and higher
+     * @return a double
+     */
+    public abstract double getMannequinBelowNameDistance();
 
     /**
      * Get a mannequin part's pose, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}

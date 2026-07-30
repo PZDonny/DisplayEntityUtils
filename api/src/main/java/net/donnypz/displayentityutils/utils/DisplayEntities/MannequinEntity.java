@@ -1,10 +1,10 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayKeys;
-import net.donnypz.displayentityutils.utils.PivotAxis;
 import net.donnypz.displayentityutils.utils.WorldUtils;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,6 +30,7 @@ final class MannequinEntity implements Serializable {
     Vector3f vector;
     String customName;
     boolean customNameVisible;
+    double belowNameDistance;
     String description;
     String profileName;
     UUID profileUUID;
@@ -65,6 +66,10 @@ final class MannequinEntity implements Serializable {
 
         if (customName != null){
             attributeContainer.setAttribute(DisplayAttributes.CUSTOM_NAME, MiniMessage.miniMessage().deserialize(customName));
+        }
+
+        if (VersionUtils.hasBelowNameDistance()){
+            attributeContainer.setAttribute(DisplayAttributes.Mannequin.BELOW_NAME_DISTANCE, (float) belowNameDistance);
         }
 
         if (description != null){

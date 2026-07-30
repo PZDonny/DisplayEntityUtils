@@ -1253,6 +1253,15 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     }
 
     @Override
+    public void setMannequinBelowNameDistance(double distance) {
+        if (type != PartType.MANNEQUIN) return;
+        if (!VersionUtils.hasBelowNameDistance()) return;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return;
+        mannequin.getAttribute(Attribute.BELOW_NAME_DISTANCE).setBaseValue(distance);
+    }
+
+    @Override
     public ResolvableProfile getMannequinProfile() {
         if (type != PartType.MANNEQUIN) return null;
         Mannequin mannequin = (Mannequin) getEntity();
@@ -1266,6 +1275,15 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         Mannequin mannequin = (Mannequin) getEntity();
         if (mannequin == null) return null;
         return mannequin.getDescription();
+    }
+
+    @Override
+    public double getMannequinBelowNameDistance() {
+        if (type != PartType.MANNEQUIN) return -1;
+        if (!VersionUtils.hasBelowNameDistance()) return -1;
+        Mannequin mannequin = (Mannequin) getEntity();
+        if (mannequin == null) return -1;
+        return mannequin.getAttribute(Attribute.BELOW_NAME_DISTANCE).getBaseValue();
     }
 
     /**

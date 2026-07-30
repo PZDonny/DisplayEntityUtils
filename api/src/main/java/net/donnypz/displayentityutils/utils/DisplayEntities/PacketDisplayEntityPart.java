@@ -790,6 +790,13 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
+    public void setMannequinBelowNameDistance(double distance) {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
+        if (!VersionUtils.hasBelowNameDistance()) return;
+        setAndSend(DisplayAttributes.Mannequin.BELOW_NAME_DISTANCE, (float) distance);
+    }
+
+    @Override
     public ResolvableProfile getMannequinProfile() {
         if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return null;
         return attributeContainer.getAttribute(DisplayAttributes.Mannequin.RESOLVABLE_PROFILE);
@@ -799,6 +806,13 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public @Nullable Component getMannequinBelowName() {
         if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return null;
         return attributeContainer.getAttribute(DisplayAttributes.Mannequin.BELOW_NAME);
+    }
+
+    @Override
+    public double getMannequinBelowNameDistance() {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return -1;
+        if (!VersionUtils.hasBelowNameDistance()) return -1;
+        return attributeContainer.getAttribute(DisplayAttributes.Mannequin.BELOW_NAME_DISTANCE);
     }
 
 
