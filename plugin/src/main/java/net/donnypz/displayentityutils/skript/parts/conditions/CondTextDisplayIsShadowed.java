@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Text Display Part - Is Shadowed")
+@Name("Text Display Part - Has Shadows")
 @Description("Check if an text display part's text has shadows")
 @Examples({"if {_activepart} has deu text shadows:",
         "\tbroadcast \"This text display part has text shadow!\""})
@@ -47,7 +47,7 @@ public class CondTextDisplayIsShadowed extends Condition {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "text display part shadowed: "+ partExpr.toString(event, debug);
+        return "text display part has shadows: "+ partExpr.toString(event, debug);
     }
 
     @SuppressWarnings("unchecked")
