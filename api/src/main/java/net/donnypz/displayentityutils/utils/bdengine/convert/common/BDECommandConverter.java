@@ -280,9 +280,8 @@ public abstract class BDECommandConverter {
             double pitch = Double.parseDouble(args[4]);
             frame.setAnimationCamera(new AnimationCamera(x, y, z, (float) yaw, (float) pitch));
             Location cameraLoc = SPAWN_LOCATION.clone().add(x, y, z);
-            cameraLoc.getWorld().spawnParticle(Particle.DRAGON_BREATH, cameraLoc, 1, 0, 0, 0, 0);
-        } catch (IndexOutOfBoundsException e) {
-        }
+            cameraLoc.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, cameraLoc, 1, 0, 0, 0, 0);
+        } catch (IndexOutOfBoundsException e) {}
     }
 
     protected void sendMessage(Component component) {
