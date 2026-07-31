@@ -153,11 +153,11 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     }
 
     public static boolean isGeyserParticle(@NotNull Particle particle){
-        return particle.getDataType().isAssignableFrom(Particle.Geyser.class);
+        return VersionUtils.IS_26_2 && particle.getDataType().isAssignableFrom(Particle.Geyser.class);
     }
 
     public static boolean isGeyserBaseParticle(@NotNull Particle particle){
-        return particle.getDataType().isAssignableFrom(Particle.GeyserBase.class);
+        return VersionUtils.IS_26_2 && particle.getDataType().isAssignableFrom(Particle.GeyserBase.class);
     }
 
     public Step getStep() {
