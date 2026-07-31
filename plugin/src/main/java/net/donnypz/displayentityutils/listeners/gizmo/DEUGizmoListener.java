@@ -20,6 +20,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 public class DEUGizmoListener implements Listener {
@@ -78,6 +79,7 @@ public class DEUGizmoListener implements Listener {
     public void onSelectControl(PlayerInteractEvent e) {
         Player player = e.getPlayer();
         if (!player.hasPermission(Permission.GIZMO_USE.getPermission())) return;
+        if (e.getHand() == EquipmentSlot.OFF_HAND) return;
 
         GizmoSessionImpl gizmo = (GizmoSessionImpl) getGizmoSession(player);
         if (gizmo == null) return;
