@@ -497,7 +497,16 @@ public abstract class ActivePart implements Active, Cloneable{
      */
     public abstract void setItemDisplayItemGlint(boolean hasGlint);
 
-    public abstract boolean hasItemDisplayItemGlint();
+    /**
+     * Check if this item display's item has an enchantment glint, if this part's type is {@link SpawnedDisplayEntityPart.PartType#ITEM_DISPLAY}
+     * @return a boolean
+     */
+    public boolean hasItemDisplayItemGlint(){
+        if (type != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) return false;
+        ItemStack item = getItemDisplayItem();
+        if (item == null) return false;
+        return item.getItemMeta().hasEnchantmentGlintOverride() && item.getItemMeta().getEnchantmentGlintOverride();
+    }
 
     public abstract @Nullable Component getTextDisplayText();
 
