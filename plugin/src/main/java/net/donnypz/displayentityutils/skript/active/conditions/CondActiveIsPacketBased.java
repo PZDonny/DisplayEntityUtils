@@ -9,20 +9,20 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.donnypz.displayentityutils.utils.DisplayEntities.Active;
-import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.Packeted;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Active Group/Part/Filter is Packet Based?")
+@Name("Is Fake / Packet Based")
 @Description("Check if an active group/part/filter is packet-based")
 @Examples({"if {_group} is packet based:",
         "\tbroadcast \"This group is packet based!\"",
         "",
         "if {_partfilter} is not packet based:",
         "\tbroadcast \"This partfilter is not packet based!\""})
-@Since("3.0.0")
+@Since("3.0.0, 3.6.0 (Fake)")
 public class CondActiveIsPacketBased extends Condition {
 
     Expression<Active> active;
@@ -30,7 +30,7 @@ public class CondActiveIsPacketBased extends Condition {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.CONDITION,
                 SyntaxInfo.builder(CondActiveIsPacketBased.class)
-                        .addPattern("%activegroup/partfilter/activepart% (1¦is|2¦is(n't| not)) packet [based]")
+                        .addPattern("%activegroup/partfilter/activepart% (1¦is|2¦is(n't| not)) (fake|packet [based])")
                         .supplier(CondActiveIsPacketBased::new)
                         .build()
         );
@@ -40,7 +40,7 @@ public class CondActiveIsPacketBased extends Condition {
     public boolean check(Event event) {
         Active g = active.getSingle(event);
         if (g == null) return isNegated();
-        return g instanceof PacketDisplayEntityGroup != isNegated();
+        return g instanceof Packeted != isNegated();
     }
 
     @Override

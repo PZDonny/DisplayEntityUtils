@@ -20,5 +20,6 @@ public interface BDEConversionHandler {
                          @NotNull String animationSavePrefix,
                          boolean saveGroup,
                          boolean saveAnimations,
-                         boolean despawnAfter);
+                         boolean despawnAfter,
+                         boolean adaptTags);
 }

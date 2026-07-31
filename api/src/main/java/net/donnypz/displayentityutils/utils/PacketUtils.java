@@ -16,10 +16,14 @@ import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import org.bukkit.Location;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.Collection;
@@ -39,7 +43,7 @@ public final class PacketUtils {
      */
     public static <T,V> PacketAttributeContainer setAttribute(@NotNull Player player, int entityId, @NotNull DisplayAttribute<T, V> attribute, T value){
         return new PacketAttributeContainer()
-                .setAttributeAndSend(attribute, value, entityId, player);
+                .setAndSend(attribute, value, entityId, player);
     }
 
     /**
@@ -51,7 +55,7 @@ public final class PacketUtils {
      */
     public static PacketAttributeContainer setAttributes(@NotNull Player player, int entityId, @NotNull DisplayAttributeMap attributeMap){
         return new PacketAttributeContainer()
-                .setAttributesAndSend(attributeMap, entityId, player);
+                .setAndSend(attributeMap, entityId, player);
     }
 
 
@@ -118,7 +122,7 @@ public final class PacketUtils {
      * @param pitch the pitch
      */
     public static void setRotation(@NotNull Player player, int entityId, float yaw, float pitch){
-        WrapperPlayServerEntityRotation rotationPacket = new WrapperPlayServerEntityRotation(entityId, pitch, yaw, false);
+        WrapperPlayServerEntityRotation rotationPacket = new WrapperPlayServerEntityRotation(entityId, yaw, pitch, false);
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, rotationPacket);
     }
 
@@ -141,10 +145,328 @@ public final class PacketUtils {
      * @param pitch the pitch
      */
     public static void setRotation(@NotNull Collection<Player> players, int entityId, float yaw, float pitch){
-        WrapperPlayServerEntityRotation rotationPacket = new WrapperPlayServerEntityRotation(entityId, pitch, yaw, false);
+        WrapperPlayServerEntityRotation rotationPacket = new WrapperPlayServerEntityRotation(entityId, yaw, pitch, false);
         for (Player player : players){
             PacketEvents.getAPI().getPlayerManager().sendPacket(player, rotationPacket);
         }
+    }
+
+    /**
+     * Rotate a display entity. The rotation is applied in addition to the entity's current rotation.
+     * @param player the player that should see the rotation
+     * @param display the display entity
+     * @param rotation the rotation
+     */
+    public static void rotate(@NotNull Player player,
+                              @NotNull Display display,
+                              @NotNull Quaternionf rotation,
+                              boolean worldSpace){
+        rotate(List.of(player), display, rotation, worldSpace);
+    }
+
+    /**
+     * Rotate a display entity. The rotation is applied in addition to the entity's current rotation.
+     * @param players the players that should see the rotation
+     * @param display the display entity
+     * @param rotation the rotation
+     */
+    public static void rotate(@NotNull Collection<Player> players,
+                              @NotNull Display display,
+                              @NotNull Quaternionf rotation,
+                              boolean worldSpace){
+        Transformation t = display.getTransformation();
+        float pitch = display.getPitch();
+        float yaw = display.getYaw();
+        rotate(players, display.getEntityId(), rotation, t, worldSpace, pitch, yaw);
+    }
+
+    /**
+     * Rotate a display entity part. The rotation is applied in addition to the entity's current rotation.
+     * @param player the player that should see the rotation
+     * @param part the part
+     * @param rotation the rotation
+     */
+    public static void rotate(@NotNull Player player,
+                              @NotNull ActivePart part,
+                              @NotNull Quaternionf rotation,
+                              boolean worldSpace){
+        rotate(List.of(player), part, rotation, worldSpace);
+    }
+
+    /**
+     * Rotate a display entity part. The rotation is applied in addition to the entity's current rotation.
+     * @param players the players that should see the rotation
+     * @param part the part
+     * @param rotation the rotation
+     */
+    public static void rotate(@NotNull Collection<Player> players,
+                              @NotNull ActivePart part,
+                              @NotNull Quaternionf rotation,
+                              boolean worldSpace){
+        if (!part.isDisplay()) return;
+
+        Transformation t = part.getTransformation();
+        if (t == null) return;
+
+        Location l = part.getLocation();
+        float pitch = l == null ? 0 : l.getPitch();
+        float yaw = l == null ? 0 : l.getYaw();
+
+        rotate(players, part.getEntityId(), rotation, t, worldSpace, pitch, yaw);
+    }
+
+    private static void rotate(Collection<Player> players,
+                               int entityId,
+                               Quaternionf rotation,
+                               Transformation transformation,
+                               boolean worldSpace,
+                               float pitch,
+                               float yaw){
+        Quaternionf originalRot = transformation.getLeftRotation();
+        Quaternionf appliedRotation = new Quaternionf(rotation);
+
+        if (worldSpace) {
+            Quaternionf entityRot = new Quaternionf()
+                    .rotateY((float) Math.toRadians(-yaw))
+                    .rotateX((float) Math.toRadians(pitch));
+
+            Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
+
+            //world space to display's space
+            appliedRotation = invertedEntityRot
+                    .mul(appliedRotation)
+                    .mul(entityRot);
+        }
+
+        Quaternionf finalRot = new Quaternionf(appliedRotation).mul(originalRot);
+
+        new DisplayAttributeMap()
+                .add(DisplayAttributes.Transform.LEFT_ROTATION, finalRot)
+                .send(players, entityId);
+    }
+
+    /**
+     * Rotate a display entity around a given pivot. The rotation is applied in addition to the entity's current rotation.
+     * @param player the player that should see the rotation
+     * @param display the display entity
+     * @param rotation the rotation
+     * @param pivotLocation the location that should be pivoted around
+     */
+    public static void rotateAround(@NotNull Player player,
+                                    @NotNull Display display,
+                                    @NotNull Quaternionf rotation,
+                                    @NotNull Location pivotLocation,
+                                    boolean worldSpace){
+        rotateAround(List.of(player), display, rotation, pivotLocation, worldSpace);
+    }
+
+    /**
+     * Rotate a display entity around a given pivot. The rotation is applied in addition to the entity's current rotation.
+     * @param players the players that should see the rotation
+     * @param display the display entity
+     * @param rotation the rotation
+     * @param pivotLocation the location that should be pivoted around
+     */
+    public static void rotateAround(@NotNull Collection<Player> players,
+                                    @NotNull Display display,
+                                    @NotNull Quaternionf rotation,
+                                    @NotNull Location pivotLocation,
+                                    boolean worldSpace){
+        rotateAround(players, display.getEntityId(), rotation, pivotLocation, display.getTransformation(), display.getLocation(), worldSpace);
+    }
+
+    /**
+     * Rotate a display entity part around a given pivot. The rotation is applied in addition to the entity's current rotation.
+     * @param player the player that should see the rotation
+     * @param part the part
+     * @param rotation the rotation
+     * @param pivotLocation the location that should be pivoted around
+     */
+    public static void rotateAround(@NotNull Player player,
+                                    @NotNull ActivePart part,
+                                    @NotNull Quaternionf rotation,
+                                    @NotNull Location pivotLocation,
+                                    boolean worldSpace){
+        rotateAround(List.of(player), part, rotation, pivotLocation, worldSpace);
+    }
+
+    /**
+     * Rotate a display entity part around a given pivot. The rotation is applied in addition to the entity's current rotation.
+     * @param players the players that should see the rotation
+     * @param part the part
+     * @param rotation the rotation
+     * @param pivotLocation the location that should be pivoted around
+     */
+    public static void rotateAround(@NotNull Collection<Player> players,
+                                    @NotNull ActivePart part,
+                                    @NotNull Quaternionf rotation,
+                                    @NotNull Location pivotLocation,
+                                    boolean worldSpace){
+        if (!part.isDisplay()) return;
+
+        Transformation t = part.getTransformation();
+        if (t == null) return;
+
+        Location partLoc = part.getLocation();
+        if (partLoc == null) return;
+
+        rotateAround(players, part.getEntityId(), rotation, pivotLocation, t, partLoc, worldSpace);
+    }
+
+    private static void rotateAround(Collection<Player> players,
+                                     int entityId,
+                                     Quaternionf rotation,
+                                     Location pivotLocation,
+                                     Transformation transformation,
+                                     Location entityLocation,
+                                     boolean worldSpace){
+        Vector3f translation = transformation.getTranslation();
+        Quaternionf originalRot = transformation.getLeftRotation();
+
+        //entity to pivot
+        Vector3f toPivot = pivotLocation.toVector()
+                .subtract(entityLocation.toVector())
+                .toVector3f();
+
+        Quaternionf appliedRotation = new Quaternionf(rotation);
+        Vector3f localPivot = new Vector3f(toPivot);
+
+
+        float pitch = entityLocation.getPitch();
+        float yaw = entityLocation.getYaw();
+        Quaternionf entityRot = new Quaternionf()
+                .rotateY((float) Math.toRadians(-yaw))
+                .rotateX((float) Math.toRadians(pitch));
+        Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
+
+        //convert the offset from world space into the display's space (pitch/yaw)
+        localPivot.rotate(invertedEntityRot);
+
+        //world space to display's space (pitch/yaw)
+        if (worldSpace){
+            appliedRotation = invertedEntityRot
+                    .mul(appliedRotation)
+                    .mul(entityRot);
+        }
+
+        //rot around pivot point
+        translation.sub(localPivot);
+        translation.rotate(appliedRotation);
+        translation.add(localPivot);
+
+        Quaternionf finalRot = new Quaternionf(appliedRotation).mul(originalRot);
+        new DisplayAttributeMap()
+                .add(DisplayAttributes.Transform.TRANSLATION, translation)
+                .add(DisplayAttributes.Transform.LEFT_ROTATION, finalRot)
+                .send(players, entityId);
+    }
+
+    /**
+     * Pivot a non-display entity around a location
+     * @param player the player that should see the pivot
+     * @param entity the entity
+     * @param rotation the rotation
+     * @param pivotLocation the location to pivot around
+     * @param worldSpace whether the pivot should occur on world space axis
+     */
+    public static void pivot(@NotNull Player player,
+                             @NotNull Entity entity,
+                             @NotNull Quaternionf rotation,
+                             @NotNull Location pivotLocation,
+                             boolean worldSpace){
+        pivot(List.of(player), entity, rotation, pivotLocation, worldSpace);
+    }
+
+    /**
+     * Pivot a non-display entity around a location
+     * @param players the players that should see the pivot
+     * @param entity the entity
+     * @param rotation the rotation
+     * @param pivotLocation the location to pivot around
+     * @param worldSpace whether the pivot should occur on world space axis
+     */
+    public static void pivot(@NotNull Collection<Player> players,
+                             @NotNull Entity entity,
+                             @NotNull Quaternionf rotation,
+                             @NotNull Location pivotLocation,
+                             boolean worldSpace){
+        Vector translationVector = DisplayUtils.getNonDisplayTranslation(entity, pivotLocation);
+        pivot(
+                players,
+                entity.getEntityId(),
+                rotation,
+                pivotLocation,
+                worldSpace,
+                translationVector,
+                entity.getLocation()
+        );
+    }
+
+    /**
+     * Pivot a non-display part around a location
+     * @param player the player that should see the pivot
+     * @param part the part
+     * @param rotation the rotation
+     * @param pivotLocation the location to pivot around
+     * @param worldSpace whether the pivot should occur on world space axis
+     */
+    public static void pivot(@NotNull Player player,
+                             @NotNull ActivePart part,
+                             @NotNull Quaternionf rotation,
+                             @NotNull Location pivotLocation,
+                             boolean worldSpace){
+        pivot(List.of(player), part, rotation, pivotLocation, worldSpace);
+    }
+
+    /**
+     * Pivot a non-display part around a location
+     * @param players the players that should see the pivot
+     * @param part the part
+     * @param rotation the rotation
+     * @param pivotLocation the location to pivot around
+     * @param worldSpace whether the pivot should occur on world space axis
+     */
+    public static void pivot(@NotNull Collection<Player> players,
+                             @NotNull ActivePart part,
+                             @NotNull Quaternionf rotation,
+                             @NotNull Location pivotLocation,
+                             boolean worldSpace){
+        Location partLoc = part.getLocation();
+        if (partLoc == null) return;
+
+        Vector translation = part.getNonDisplayTranslation();
+        if (translation == null) return;
+
+
+        pivot(
+                players,
+                part.getEntityId(),
+                rotation,
+                pivotLocation,
+                worldSpace,
+                translation,
+                partLoc
+        );
+    }
+
+    private static void pivot(@NotNull Collection<Player> players,
+                              int entityId,
+                              @NotNull Quaternionf rotation,
+                              @NotNull Location pivotLocation,
+                              boolean worldSpace,
+                              Vector translationVector,
+                              @NotNull Location entityLocation){
+        float yaw = entityLocation.getYaw();
+        float pitch = entityLocation.getPitch();
+        Location newLoc = WorldUtils.getPivotLocation(
+                translationVector,
+                rotation,
+                pivotLocation,
+                worldSpace,
+                yaw,
+                pitch);
+        
+        teleport(players, entityId, newLoc);
     }
 
     /**

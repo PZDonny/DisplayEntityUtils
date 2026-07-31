@@ -1,6 +1,5 @@
 package net.donnypz.displayentityutils.command;
 
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -15,7 +14,7 @@ public class CommandFrameIdsTests {
             "9,3,5",
     })
     void tests(String idString){
-        assertNotNull(DEUCommandUtils.commaSeparatedIDs(idString));
+        assertNotNull(CMDUtils.commaSeparatedIDs(idString));
     }
 
 
@@ -30,6 +29,6 @@ public class CommandFrameIdsTests {
             "3,a"
     })
     void invalidThrowsIllegalArgumentException(String idString){
-        assertThrows(IllegalArgumentException.class, () -> DEUCommandUtils.commaSeparatedIDs(idString));
+        assertThrows(IllegalArgumentException.class, () -> CMDUtils.commaSeparatedIDs(idString));
     }
 }

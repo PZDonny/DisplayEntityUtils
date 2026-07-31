@@ -145,26 +145,27 @@ class GroupEntityFollower {
             lastGroupScaleMultiplier = group.getScaleMultiplier();
         }
 
+        boolean pivotInteractions = properties.pivotInteractions();
         for (ActivePart part : selection.selectedParts){
             switch(finalFollowType){
                 case YAW -> {
-                    part.setYaw(newYaw, properties.pivotInteractions());
+                    part.setYaw(newYaw, pivotInteractions);
                 }
                 case PITCH -> {
                     pivotDisplayPitch(part, !zeroedPivot, newPitch);
-                    part.setPitch(newPitch);
+                    part.setPitch(newPitch, pivotInteractions);
                 }
                 case PITCH_AND_YAW -> {
                     pivotDisplayPitch(part, !zeroedPivot, newPitch);
-                    part.setPitch(newPitch);
-                    part.setYaw(newYaw, properties.pivotInteractions());
+                    part.setPitch(newPitch, pivotInteractions);
+                    part.setYaw(newYaw, pivotInteractions);
                 }
                 case BODY -> {
                     LivingEntity e = (LivingEntity) entity;
                     part.setYaw(properties.flip() ? e.getBodyYaw()+180 : e.getBodyYaw(), properties.pivotInteractions());
                     if (trueFollowType == FollowType.PITCH || trueFollowType == FollowType.PITCH_AND_YAW){
                         pivotDisplayPitch(part, !zeroedPivot, newPitch);
-                        part.setPitch(newPitch);
+                        part.setPitch(newPitch, pivotInteractions);
                     }
                 }
             }

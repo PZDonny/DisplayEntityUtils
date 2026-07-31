@@ -1,19 +1,17 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import com.google.gson.*;
-import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayKeys;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Base64;
 import java.util.List;
 
-@ApiStatus.Internal
 final class JSONAdapter_DisplayEntity implements JsonDeserializer<DisplayEntity>, JsonSerializer<DisplayEntity> {
 
     JSONAdapter_DisplayEntity(){}
@@ -74,7 +72,7 @@ final class JSONAdapter_DisplayEntity implements JsonDeserializer<DisplayEntity>
         try{
             PersistentDataContainer pdc = new ItemStack(Material.STICK).getItemMeta().getPersistentDataContainer();
             pdc.readFromBytes(src.persistentDataContainer);
-            List<String> tags = pdc.get(DisplayAPI.getPartPDCTagKey(), PersistentDataType.LIST.strings());
+            List<String> tags = pdc.get(DisplayKeys.Part.PART_TAGS, PersistentDataType.LIST.strings());
             json.add("partTags", new Gson().toJsonTree(tags));
         }
         catch(IOException | NullPointerException e){}

@@ -79,7 +79,7 @@ public class ExprPlayerSelectedGroup extends SimplePropertyExpression<Player, Ac
                     return;
                 }
                 ActiveGroup<?> deltaGroup = (ActiveGroup<?>) delta[0];
-                deltaGroup.addPlayerSelection(p);
+                DisplayGroupManager.setSelectedGroup(p, deltaGroup);
             }
             case RESET -> {
                 DisplayGroupManager.deselectGroup(p);

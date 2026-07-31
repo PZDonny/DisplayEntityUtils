@@ -10,10 +10,6 @@ import java.util.Collection;
 
 public interface Packeted{
 
-    void setRotation(float pitch, float yaw, boolean pivot);
-
-    @Nullable Location getLocation();
-
     @Nullable String getWorldName();
 
     void showToPlayer(@NotNull Player player, @NotNull GroupSpawnedEvent.SpawnReason spawnReason);

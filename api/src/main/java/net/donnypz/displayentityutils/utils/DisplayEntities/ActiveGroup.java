@@ -2,12 +2,13 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.DisplayEntities.concurrent.GroupTeleportCompletableFuture;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.FollowType;
@@ -20,33 +21,39 @@ import org.bukkit.entity.*;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class ActiveGroup<T extends ActivePart> implements Active{
+public abstract class ActiveGroup<T extends ActivePart> extends ActivePartHolder<T> {
 
     private final int ID = IDGenerator.next();
+
     protected T masterPart;
     protected LinkedHashMap<UUID, T> groupParts = new LinkedHashMap<>();
     protected String tag;
-    final Set<GroupEntityFollower> followers = new HashSet<>();
+
     final Object followerLock = new Object();
+    final Set<GroupEntityFollower> followers = new HashSet<>();
     GroupEntityFollower defaultFollower;
+
     private final Object animatorLock = new Object();
     protected final Set<DisplayAnimator> activeAnimators = new HashSet<>();
     protected String spawnAnimationTag;
     protected LoadMethod spawnAnimationLoadMethod;
     protected DisplayAnimator.AnimationType spawnAnimationType;
+
     protected MachineState currentMachineState;
-    protected float scaleMultiplier = 1;
-    protected Vector rideOffset = new Vector();
-    int lastAnimatedTick = -1;
+
+    private volatile float scaleMultiplier = 1;
+    private volatile Vector rideOffset = new Vector();
+    private volatile int lastAnimatedTick = -1;
+
+    private boolean isSelectable = true;
 
 
     /**
@@ -58,14 +65,19 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
-     * Make a player select this group
-     * @param player The player to give the selection to
-     * @return this
+     * Get whether this group can be selected by players
+     * @return a boolean
      */
-    @ApiStatus.Internal
-    public ActiveGroup<T> addPlayerSelection(Player player){
-        DisplayGroupManager.setSelectedGroup(player, this);
-        return this;
+    public boolean isSelectable(){
+        return isSelectable;
+    }
+
+    /**
+     * Set whether this group is selectable by players
+     * @param isSelectable whether the group can be selected
+     */
+    public void setSelectable(boolean isSelectable){
+        this.isSelectable = isSelectable;
     }
 
     /**
@@ -126,11 +138,13 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param includeRideOffset whether the group's rideOffset should be included in calculation
      */
     public void autoCull(boolean includeRideOffset){
+        Vector offset = rideOffset;
+
         float widthAdder = DisplayConfig.widthCullingAdder();
         float heightAdder = DisplayConfig.heightCullingAdder();
         if (includeRideOffset){
-            widthAdder += (float) Math.max(Math.abs(rideOffset.getX()), Math.abs(rideOffset.getZ()));
-            heightAdder += (float) Math.abs(rideOffset.getY());
+            widthAdder += (float) Math.max(Math.abs(offset.getX()), Math.abs(offset.getZ()));
+            heightAdder += (float) Math.abs(offset.getY());
         }
 
         autoCull(widthAdder, heightAdder);
@@ -161,23 +175,31 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         }
     }
 
-
     /**
      * Change the scale of all parts in this group by the given scale multiplier
      * @param newScaleMultiplier the scale multiplier to apply to this group
      * @param durationInTicks how long it should take for the group to scale
      * @param scaleNonDisplays whether non-display entities should scale
      * @throws IllegalArgumentException if newScaleMultiplier is less than or equal to 0
+     * @return a {@link GroupTeleportCompletableFuture} containing {@link CompletableFuture} for scaled and teleported non-display entities or null.
      */
-    public abstract boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays);
+    public abstract @Nullable GroupTeleportCompletableFuture scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays);
 
     /**
-     * Change the true location of this group.
+     * Teleport this group to a location.
      * @param location The location to teleport this group
      * @param respectGroupDirection Whether to respect this group's pitch and yaw or the location's pitch and yaw
      * @return true if the teleport was successful
      */
     public abstract boolean teleport(@NotNull Location location, boolean respectGroupDirection);
+
+    /**
+     * Teleport this group to a location, automatically determining whether to do it async.
+     * @param location The location to teleport this group
+     * @param respectGroupDirection Whether to respect this group's pitch and yaw or the location's pitch and yaw
+     * @return a {@link GroupTeleportCompletableFuture} or null
+     */
+    public abstract @Nullable GroupTeleportCompletableFuture teleportSafe(@NotNull Location location, boolean respectGroupDirection);
 
 
     /**
@@ -210,8 +232,8 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param distance How far the group should be translated
      * @param durationInTicks How long it should take for the translation to complete
      */
-    public void teleportMove(@NotNull Direction direction, double distance, int durationInTicks){
-        teleportMove(direction.getVector(masterPart, false), distance, durationInTicks);
+    public Location teleportMove(@NotNull Direction direction, double distance, int durationInTicks){
+        return teleportMove(direction.getVector(masterPart, false), distance, durationInTicks);
     }
 
     /**
@@ -219,168 +241,54 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * @param direction The direction to translate the group
      * @param distance How far the group should be translated
      * @param durationInTicks How long it should take for the translation to complete
+     * @return a destination {@link Location}
      */
-    public abstract void teleportMove(@NotNull Vector direction, double distance, int durationInTicks);
+    public abstract Location teleportMove(@NotNull Vector direction, double distance, int durationInTicks);
+
 
     /**
-     * Set the teleportation duration of all parts in this group
+     * Get the locations this group would teleport to if it was translated with {@link #teleportMove(Direction, double, int)}
+     * or {@link #teleportMove(Vector, double, int)}.
+     * @param direction The direction the group would be moved
+     * @param distance How far the group would be translated
+     * @param durationInTicks How long the teleport move should take, in ticks
+     * @return A list of locations this group would teleport to
+     * @throws IllegalArgumentException if divisions is 0 or less
      */
-    @Override
-    public void setTeleportDuration(int teleportDuration){
-        for (ActivePart part : groupParts.values()){
-            part.setTeleportDuration(teleportDuration);
-        }
+    public List<Location> getTeleportMoveLocations(Vector direction, double distance, int durationInTicks){
+        return getTeleportMoveLocations(direction, distance, durationInTicks, 1);
     }
 
     /**
-     * Set the interpolation duration of all parts in this group
-     * @param interpolationDuration the duration
+     * Get the locations this group would teleport to if it was translated with {@link #teleportMove(Direction, double, int)}
+     * or {@link #teleportMove(Vector, double, int)}.
+     * @param direction The direction the group would be moved
+     * @param distance How far the group would be translated
+     * @param durationInTicks How long the teleport move should take, in ticks
+     * @param divisions Number of times the space should be divided (returning x times the number of locations)
+     * @return A list of locations this group would teleport to
+     * @throws IllegalArgumentException if divisions is 0 or less
      */
-    @Override
-    public void setInterpolationDuration(int interpolationDuration){
-        for (ActivePart part : groupParts.values()){
-            part.setInterpolationDuration(interpolationDuration);
-        }
-    }
+    public List<Location> getTeleportMoveLocations(Vector direction, double distance, int durationInTicks, int divisions){
+        if (durationInTicks <= 0) durationInTicks = 1;
+        if (divisions <= 0) throw new IllegalArgumentException("divisions must be > 0");
+        Location loc = getLocation();
+        if (loc == null) return List.of();
+        if (distance == 0) return List.of(loc);
 
-    /**
-     * Set the interpolation delay of all parts in this group
-     * @param interpolationDelay the delay
-     */
-    @Override
-    public void setInterpolationDelay(int interpolationDelay){
-        for (ActivePart part : groupParts.values()){
-            part.setInterpolationDelay(interpolationDelay);
-        }
-    }
+        int steps = durationInTicks * divisions;
 
-    /**
-     * Rotate the display entities in this group
-     * @param rotation the rotation
-     */
-    public void rotateDisplays(@NotNull Quaternionf rotation){
-        for (ActivePart p : groupParts.values()){
-            p.rotateDisplay(rotation, true);
-        }
-    }
+        Vector step = direction.clone()
+                .normalize()
+                .multiply(distance / steps);
 
-    /**
-     * Change the yaw of this group
-     * @param yaw The yaw to set for this group
-     * @param pivot whether non-display entities should pivot around the group
-     */
-    @Override
-    public void setYaw(float yaw, boolean pivot){
-        for (ActivePart part : groupParts.values()){
-            part.setYaw(yaw, pivot);
-        }
-    }
+        List<Location> locations = new ArrayList<>();
 
-    /**
-     * Change the pitch of this group
-     * @param pitch The pitch to set for this group
-     */
-    @Override
-    public void setPitch(float pitch){
-        for (ActivePart part : groupParts.values()){
-            part.setPitch(pitch);
+        for (int i = 0; i < steps; i++){
+            locations.add(loc.clone());
+            loc.add(step);
         }
-    }
-
-    /**
-     * Set the brightness of this group
-     * @param brightness the brightness to set, null to use brightness based on position
-     */
-    @Override
-    public void setBrightness(@Nullable Display.Brightness brightness){
-        for (ActivePart part : groupParts.values()){
-            part.setBrightness(brightness);
-        }
-    }
-
-    /**
-     * Set the billboard of this group
-     * @param billboard the billboard to set
-     */
-    @Override
-    public void setBillboard(@NotNull Display.Billboard billboard){
-        for (ActivePart part : groupParts.values()){
-            part.setBillboard(billboard);
-        }
-    }
-
-    /**
-     * Set the view range of this group
-     * @param viewRangeMultiplier The range multiplier to set
-     */
-    @Override
-    public void setViewRange(float viewRangeMultiplier){
-        for (ActivePart part : groupParts.values()){
-            part.setViewRange(viewRangeMultiplier);
-        }
-    }
-
-    /**
-     * Set the glow color of this group
-     * @param color The color to set
-     */
-    @Override
-    public void setGlowColor(@Nullable Color color){
-        for (ActivePart part : groupParts.values()){
-            part.setGlowColor(color);
-        }
-    }
-
-
-    /**
-     * Adds the glow effect to all the block and item display parts in this group
-     */
-    @Override
-    public void glow(){
-        for (ActivePart part : groupParts.values()){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || part.type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
-                part.glow();
-            }
-        }
-    }
-
-    /**
-     * Adds the glow effect to all the block and item display parts in this group for a player
-     * @param player the player
-     */
-    @Override
-    public void glow(@NotNull Player player){
-        for (ActivePart part : groupParts.values()){
-            if (part.getType() == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY || part.type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY){
-                part.glow(player);
-            }
-        }
-    }
-
-    /**
-     * Adds the glow effect to all the block and item display parts in this group
-     * @param durationInTicks How long to highlight this selection
-     */
-    @Override
-    public void glow(long durationInTicks){
-        for (ActivePart part : groupParts.values()){
-            part.glow(durationInTicks);
-        }
-    }
-
-    /**
-     * Make this group's block and item display entities glow for a player for a set period of time
-     * @param player the player
-     * @param durationInTicks how long the glowing should last
-     */
-    @Override
-    public void glow(@NotNull Player player, long durationInTicks){
-        for (ActivePart part : groupParts.values()){
-            if (!part.canGlow()) continue;
-            if (!part.isGlowing()){
-                part.glow(player, durationInTicks);
-            }
-        }
+        return locations;
     }
 
     /**
@@ -416,27 +324,6 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     /**
-     * Removes the glow effect from all the display parts in this group
-     */
-    @Override
-    public void unglow(){
-        for (ActivePart part : groupParts.values()){
-            part.unglow();
-        }
-    }
-
-    /**
-     * Removes the glow effect from all the display parts in this group, for the specified player
-     * @param player the player
-     */
-    @Override
-    public void unglow(@NotNull Player player){
-        for (ActivePart part : groupParts.values()){
-            part.unglow(player);
-        }
-    }
-
-    /**
      * Get the glow color of this group
      * @return a color or null if not set
      */
@@ -454,72 +341,9 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
         return groupParts.get(partUUID);
     }
 
-    /**
-     * Get all the parts contained in this group
-     * @return a list of parts
-     */
-    public @NotNull List<T> getParts(){
-        return new ArrayList<>(groupParts.sequencedValues());
-    }
-
-    /**
-     * Get a list of all parts in this group with the given tag
-     * @return a list of parts
-     */
-    public List<T> getParts(@NotNull String tag){
-        List<T> partList = new ArrayList<>();
-        for (T part : groupParts.sequencedValues()){
-            if (part.hasTag(tag)){
-                partList.add(part);
-            }
-        }
-        return partList;
-    }
-
-    /**
-     * Get a list of all parts with at least one of the given tags
-     * @return a list of parts
-     */
-    public List<T> getParts(@NotNull Collection<String> tags){
-        List<T> partList = new ArrayList<>();
-        for (T part : groupParts.sequencedValues()){
-            for (String tag : tags){
-                if (part.hasTag(tag)){
-                    partList.add(part);
-                    break;
-                }
-            }
-        }
-        return partList;
-    }
-
-
-    /**
-     * Get a collection of all parts of a certain type within this group.
-     * @return a list of {@link ActivePart}
-     */
-    public List<T> getParts(@NotNull SpawnedDisplayEntityPart.PartType partType){
-        List<T> partList = new ArrayList<>();
-        for (T part : groupParts.sequencedValues()){
-            if (partType == part.getType()){
-                partList.add(part);
-            }
-        }
-        return partList;
-    }
-
-    /**
-     * Get a list of all display entity parts (block, item, text display) within this group
-     * @return a list of {@link ActivePart}
-     */
-    public List<T> getDisplayParts(){
-        List<T> partList = new ArrayList<>();
-        for (T part : groupParts.sequencedValues()){
-            if (part.isDisplay()){
-                partList.add(part);
-            }
-        }
-        return partList;
+    @Override
+    @NotNull Collection<T> getPartsRaw(){
+        return groupParts.sequencedValues();
     }
 
     /**
@@ -569,9 +393,6 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      */
     public abstract boolean isPersistent();
 
-    public abstract Location getLocation();
-
-
     /**
      * Get the name of this group's world
      */
@@ -583,6 +404,10 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      */
     public float getScaleMultiplier(){
         return scaleMultiplier;
+    }
+
+    protected void setScaleMultiplier(float scaleMultiplier){
+        this.scaleMultiplier = scaleMultiplier;
     }
 
     /**
@@ -742,11 +567,19 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     public abstract void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame, int duration, int delay);
 
     /**
-     * Creates a copy of this group at a location
+     * Create a clone of this group at a location
      * @param location where to spawn the cloned group
-     * @return a copy of this group
+     * @return a clone of this group
      */
     public abstract ActiveGroup<T> clone(@NotNull Location location);
+
+    /**
+     * Create a clone of this group at a location with {@link GroupSpawnSettings}
+     * @param location where to spawn the cloned group
+     * @param settings the settings to use on the cloned group
+     * @return a clone of this group
+     */
+    public abstract ActiveGroup<T> clone(@NotNull Location location, @NotNull GroupSpawnSettings settings);
 
 
     /**
@@ -1018,16 +851,16 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
      * Get the ride translation offset of this group
      * @return a {@link Vector}
      */
-    public synchronized @NotNull Vector getRideOffset() {
+    public @NotNull Vector getRideOffset() {
         return rideOffset.clone();
     }
 
     /**
      * Get the ride translation offset of this group
-     * @return a {@link Vector}
+     * @return a {@link Vector3f}
      */
     public @NotNull Vector3f getRideOffset3f() {
-        return getRideOffset().toVector3f();
+        return rideOffset.toVector3f();
     }
 
     /**
@@ -1049,19 +882,19 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
     }
 
     void setSpawnAnimation(PersistentDataContainer pdc){
-        if (pdc.has(DisplayAPI.getSpawnAnimationKey())){
-            spawnAnimationTag = pdc.get(DisplayAPI.getSpawnAnimationKey(), PersistentDataType.STRING);
+        if (pdc.has(DisplayKeys.SpawnAnimation.ANIMATION_TAG)){
+            spawnAnimationTag = pdc.get(DisplayKeys.SpawnAnimation.ANIMATION_TAG, PersistentDataType.STRING);
         }
-        if (pdc.has(DisplayAPI.getSpawnAnimationTypeKey())){
+        if (pdc.has(DisplayKeys.SpawnAnimation.TYPE)){
             try{
-                spawnAnimationType = DisplayAnimator.AnimationType.valueOf(pdc.get(DisplayAPI.getSpawnAnimationTypeKey(), PersistentDataType.STRING));
+                spawnAnimationType = DisplayAnimator.AnimationType.valueOf(pdc.get(DisplayKeys.SpawnAnimation.TYPE, PersistentDataType.STRING));
             }
             catch(IllegalArgumentException e){
                 spawnAnimationType = DisplayAnimator.AnimationType.LOOP;
             }
         }
-        if (pdc.has(DisplayAPI.getSpawnAnimationKey())){
-            spawnAnimationLoadMethod = LoadMethod.valueOf(pdc.get(DisplayAPI.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING));
+        if (pdc.has(DisplayKeys.SpawnAnimation.LOAD_METHOD)){
+            spawnAnimationLoadMethod = LoadMethod.valueOf(pdc.get(DisplayKeys.SpawnAnimation.LOAD_METHOD, PersistentDataType.STRING));
         }
     }
 
@@ -1097,9 +930,19 @@ public abstract class ActiveGroup<T extends ActivePart> implements Active{
 
     /**
      * Check if a group is currently registered and usable.
+     * @return a boolean
      */
     public boolean isRegistered(){
         return masterPart != null;
+    }
+
+    /**
+     * Get whether this group is valid. This checks {@link ActiveGroup#isRegistered()}
+     * @return a boolean
+     */
+    @Override
+    public boolean isValid(){
+        return isRegistered();
     }
 
     protected void removeScaleMultipliers(){

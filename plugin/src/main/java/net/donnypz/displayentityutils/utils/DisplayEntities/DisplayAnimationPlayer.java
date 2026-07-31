@@ -5,14 +5,16 @@ import org.jetbrains.annotations.NotNull;
 final class DisplayAnimationPlayer extends AnimationPlayer{
 
     DisplayAnimationPlayer(@NotNull DisplayAnimator animator,
-                           @NotNull SpawnedDisplayAnimation animation,
                            @NotNull SpawnedDisplayEntityGroup group,
-                           @NotNull SpawnedDisplayAnimationFrame frame,
-                           int startFrameId,
-                           int delay,
-                           boolean playSingleFrame)
+                           int startFrameId)
     {
-        super(animator, animation, group, frame, startFrameId, delay, playSingleFrame, false);
+        super(animator, group, startFrameId, false);
+    }
+
+    public DisplayAnimationPlayer(@NotNull DisplayAnimator animator,
+                                  @NotNull ActiveGroup<?> group,
+                                  @NotNull SpawnedDisplayAnimationFrame frame) {
+        super(animator, group, frame, false);
     }
 
     @Override
@@ -27,9 +29,12 @@ final class DisplayAnimationPlayer extends AnimationPlayer{
     }
 
     @Override
-    protected boolean canContinueAnimation(ActiveGroup<?> group) {
+    protected boolean canFrameStart(ActiveGroup<?> group) {
         return group.isActiveAnimator(animator) && group.isRegistered();
     }
+
+    @Override
+    protected void onAnimationStart(MultiPartSelection<?> selection) {}
 
     @Override
     protected boolean onStartNewFrame(ActiveGroup<?> group, MultiPartSelection<?> selection) {

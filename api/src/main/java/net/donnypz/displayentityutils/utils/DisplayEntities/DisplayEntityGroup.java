@@ -22,6 +22,7 @@ public final class DisplayEntityGroup implements Serializable{
     DisplayEntity masterEntity;
     private final String tag;
     private Boolean isPersistent = true;
+    private final String savedPluginVersion; //started saving in v3.6.0
 
     @Serial
     private static final long serialVersionUID = 99L;
@@ -33,12 +34,13 @@ public final class DisplayEntityGroup implements Serializable{
         Display spawnedMasterEntity = (Display) spawnedGroup.getMasterPart().getEntity();
         this.masterEntity = addDisplayEntity(spawnedMasterEntity).setMaster();
 
+        Location groupLoc = spawnedGroup.getLocation();
         for (SpawnedDisplayEntityPart part : spawnedGroup.getParts()){
             if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                addInteractionEntity((Interaction) part.getEntity());
+                addInteractionEntity((Interaction) part.getEntity(), groupLoc);
             }
             else if (VersionUtils.IS_1_21_9 && part.type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
-                addMannequinEntity(part.getEntity());
+                addMannequinEntity(part.getEntity(), groupLoc);
             }
             else{
                 if (!part.isMaster()){
@@ -48,6 +50,7 @@ public final class DisplayEntityGroup implements Serializable{
             }
         }
         this.isPersistent = spawnedGroup.isPersistent();
+        this.savedPluginVersion = VersionUtils.getPluginVersion();
     }
 
     DisplayEntityGroup(PacketDisplayEntityGroup packetGroup){
@@ -55,12 +58,13 @@ public final class DisplayEntityGroup implements Serializable{
 
         this.masterEntity = addDisplayEntity(packetGroup.masterPart, packetGroup).setMaster();
 
+        Location groupLocation = packetGroup.getLocation();
         for (PacketDisplayEntityPart part : packetGroup.getParts()){
             if (part.type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                addInteractionEntity(part);
+                addInteractionEntity(part, groupLocation);
             }
             else if (VersionUtils.IS_1_21_9 && part.type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
-                addMannequinEntity(part);
+                addMannequinEntity(part, groupLocation);
             }
             else{
                 if (!part.isMaster()){
@@ -69,6 +73,7 @@ public final class DisplayEntityGroup implements Serializable{
             }
         }
         this.isPersistent = false;
+        this.savedPluginVersion = VersionUtils.getPluginVersion();
     }
 
     private DisplayEntity addDisplayEntity(Display entity){
@@ -89,39 +94,26 @@ public final class DisplayEntityGroup implements Serializable{
     }
 
     private DisplayEntity addDisplayEntity(PacketDisplayEntityPart part, PacketDisplayEntityGroup packetGroup){
-        DisplayEntity display;
-        switch (part.type){
-            case TEXT_DISPLAY -> {
-                display = new DisplayEntity(part, DisplayEntity.Type.TEXT, packetGroup);
-            }
-            case BLOCK_DISPLAY -> {
-                display = new DisplayEntity(part, DisplayEntity.Type.BLOCK, packetGroup);
-            }
-            case ITEM_DISPLAY -> {
-                display = new DisplayEntity(part, DisplayEntity.Type.ITEM, packetGroup);
-            }
-            default -> {
-                return null;
-            }
-        }
+        if (!part.isDisplay()) return null;
+        DisplayEntity display = new DisplayEntity(part, DisplayEntity.Type.fromPartType(part.type), packetGroup);
         displayEntities.add(display);
         return display;
     }
 
-    private void addInteractionEntity(Interaction entity){
-        interactionEntities.add(new InteractionEntity(entity));
+    private void addInteractionEntity(Interaction entity, Location groupLocation){
+        interactionEntities.add(new InteractionEntity(entity, groupLocation));
     }
 
-    private void addInteractionEntity(PacketDisplayEntityPart part){
-        interactionEntities.add(new InteractionEntity(part));
+    private void addInteractionEntity(PacketDisplayEntityPart part, Location groupLocation){
+        interactionEntities.add(new InteractionEntity(part, groupLocation));
     }
 
-    private void addMannequinEntity(Entity entity){
-        mannequinEntities.add(SavedEntityBuilder.buildMannequin(entity));
+    private void addMannequinEntity(Entity entity, Location groupLocation){
+        mannequinEntities.add(SavedEntityBuilder.buildMannequin(entity, groupLocation));
     }
 
-    private void addMannequinEntity(PacketDisplayEntityPart part){
-        mannequinEntities.add(SavedEntityBuilder.buildMannequin(part));
+    private void addMannequinEntity(PacketDisplayEntityPart part, Location groupLocation){
+        mannequinEntities.add(SavedEntityBuilder.buildMannequin(part, groupLocation));
     }
 
 
@@ -139,6 +131,14 @@ public final class DisplayEntityGroup implements Serializable{
      */
     public String getTag() {
         return tag;
+    }
+
+    /**
+     * Get the plugin version that this {@link DisplayEntityGroup} was saved on
+     * @return a String with the plugin version, or null if saved before <code>v3.6.0</code>
+     */
+    public @Nullable String getSavedPluginVersion(){
+        return savedPluginVersion;
     }
 
     /**
@@ -200,7 +200,7 @@ public final class DisplayEntityGroup implements Serializable{
 
         if (mannequinEntities != null){
             for (MannequinEntity entity : mannequinEntities){
-                Entity e = SavedEntityLoader.spawnMannequin(masterDisplay.getLocation(), settings, entity);
+                Entity e = SavedEntityLoader.spawnMannequin(masterDisplay.getLocation(), settings, entity, savedPluginVersion);
                 group.addEntity(e);
             }
         }
@@ -288,7 +288,7 @@ public final class DisplayEntityGroup implements Serializable{
 
         if (mannequinEntities != null){ //old models won't have this field
             for (MannequinEntity entity : mannequinEntities){
-                PacketDisplayEntityPart part = entity.createPacketPart(spawnLocation, settings);
+                PacketDisplayEntityPart part = entity.createPacketPart(spawnLocation, settings, savedPluginVersion);
                 packetGroup.addPartSilent(part);
             }
         }

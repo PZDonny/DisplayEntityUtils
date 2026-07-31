@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Is Interaction Part Responsive?")
+@Name("Interaction Part - Is Responsive")
 @Description("Check if an interaction part/entity is responsive")
 @Examples({"if {_activepart} is deu_interaction:",
         "\tif {_activepart} is deu responsive:",

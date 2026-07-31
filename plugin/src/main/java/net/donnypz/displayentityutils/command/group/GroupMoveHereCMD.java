@@ -2,6 +2,8 @@ package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
+import net.donnypz.displayentityutils.managers.GizmoManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
@@ -14,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 class GroupMoveHereCMD extends GroupSubCommand {
     GroupMoveHereCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("movehere", parentSubCommand, Permission.GROUP_TRANSFORM, 0, false);
+        super.cancelIfDraggingGizmo();
     }
 
     @Override
@@ -31,10 +34,13 @@ class GroupMoveHereCMD extends GroupSubCommand {
             return;
         }
 
+        if (GizmoCMD.isDraggingCancel(player)) return;
+
         if (!group.teleport(player.getLocation(), true)){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to move your selected group to your location", NamedTextColor.RED)));
             return;
         }
+        GizmoManager.syncPosition(player, group.getLocation());
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Moved your selected group to your location!", NamedTextColor.GREEN)));
     }
 

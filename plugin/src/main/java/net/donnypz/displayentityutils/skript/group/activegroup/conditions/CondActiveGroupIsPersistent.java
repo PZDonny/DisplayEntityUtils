@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Active Group Is Persistent")
+@Name("Active Group - Is Persistent")
 @Description("Check if a spawned group is persistent")
 @Examples({ "if deu {_activegroup} is persistent:", "\tbroadcast \"The group wont despawn!\"",
         "",

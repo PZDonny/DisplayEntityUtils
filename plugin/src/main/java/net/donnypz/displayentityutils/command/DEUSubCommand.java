@@ -131,6 +131,12 @@ public abstract class DEUSubCommand {
         return suggestion;
     }
 
+    protected TabSuggestion setOptionalTabComplete(int index, List<String> suggestions){
+        TabSuggestion s = new TabSuggestion(suggestions);
+        setTabComplete(index, s, false);
+        return s;
+    }
+
     protected void setTabComplete(int index, TabSuggestion suggestion){
         setTabComplete(index, suggestion, true);
     }
@@ -151,6 +157,11 @@ public abstract class DEUSubCommand {
     protected void addOption(@NotNull String option, @NotNull List<String> inputPlaceholders){
         options.put(option, new ArrayList<>(inputPlaceholders));
     }
+
+    protected void addOption(@NotNull String option, @NotNull TabSuggestion suggestion){
+        options.put(option, new ArrayList<>(suggestion.suggestions));
+    }
+
 
     public Permission getPermission() {
         return permission;
@@ -215,6 +226,8 @@ public abstract class DEUSubCommand {
 
     protected static class TabSuggestion{
         public static final TabSuggestion STORAGES = new TabSuggestion(List.of("local", "mysql", "mongodb"))
+                .suggestUsingCurrentString();
+        public static final TabSuggestion STORAGES_WITH_ALL = new TabSuggestion(List.of("local", "mysql", "mongodb", "all"))
                 .suggestUsingCurrentString();
         public static final TabSuggestion BILLBOARDS = new TabSuggestion(Arrays.stream(Display.Billboard.values()).map(Enum::name).toList())
                 .suggestUsingCurrentString();

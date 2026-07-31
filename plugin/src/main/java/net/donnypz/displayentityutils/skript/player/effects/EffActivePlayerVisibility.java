@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Show/Hide Active Group/Part/Filter")
+@Name("Active Group/Part/Filter - Show/Hide")
 @Description("Show or hide an active group/part/filter to/from a player")
 @Examples({"deu hide {_partfilter} from player",
         "deu show {_activepart} to player"})

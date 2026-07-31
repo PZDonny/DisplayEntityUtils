@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Frame Point Relative Location")
+@Name("Frame Point - Relative Location")
 @Description("Get the location of a Frame Point relative to a group or location. " +
         "\nThe provided location is more accurate when used on an Active Group since group scale is included in calculation.")
 @Examples({"set {_loc} to {_framepoint}'s location relative to {_activegroup}",

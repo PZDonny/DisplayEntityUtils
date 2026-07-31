@@ -1,10 +1,10 @@
 package net.donnypz.displayentityutils.listeners.player;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
+import net.donnypz.displayentityutils.command.CMDUtils;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -73,7 +73,7 @@ public final class DEUPlayerChatListener implements Listener {
                 }
             }
             case BLOCK -> {
-                BlockData blockData = DEUCommandUtils.getBlockFromText(msg, p);
+                BlockData blockData = CMDUtils.getBlockFromText(msg, p);
                 if (blockData == null){
                     return;
                 }
@@ -81,7 +81,7 @@ public final class DEUPlayerChatListener implements Listener {
                 builder.advanceStep(AnimationParticleBuilder.Step.EXTRA);
             }
             case ITEM -> {
-                ItemStack item = DEUCommandUtils.getItemFromText(msg, p);
+                ItemStack item = CMDUtils.getItemFromText(msg, p);
                 if (item == null){
                     return;
                 }
@@ -175,6 +175,31 @@ public final class DEUPlayerChatListener implements Listener {
                 catch(IllegalArgumentException e){
                     p.sendMessage(Component.text("Invalid Color Values! Enter two colors and a particle size.", NamedTextColor.RED));
                     p.sendMessage(Component.text("color color size", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                }
+            }
+            case GEYSER -> {
+                try{
+                    String[] args = msg.split(" ");
+                    int waterBlocks = Integer.parseInt(args[0]);
+
+                    builder.data(new Particle.Geyser(waterBlocks));
+                    builder.advanceStep(AnimationParticleBuilder.Step.OFFSETS);
+                }
+                catch(IllegalArgumentException e){
+                    p.sendMessage(Component.text("Invalid water blocks value! Enter a whole number 1-4.", NamedTextColor.RED));
+                }
+            }
+            case GEYSER_BASE -> {
+                try{
+                    String[] args = msg.split(" ");
+                    int waterBlocks = Integer.parseInt(args[0]);
+                    float burstImpulse = Float.parseFloat(args[1]);
+
+                    builder.data(new Particle.GeyserBase(waterBlocks, burstImpulse));
+                    builder.advanceStep(AnimationParticleBuilder.Step.OFFSETS);
+                }
+                catch(IllegalArgumentException e){
+                    p.sendMessage(Component.text("Invalid value! Use a whole number for the water blocks and a positive number for the burst impulse.", NamedTextColor.RED));
                 }
             }
         }

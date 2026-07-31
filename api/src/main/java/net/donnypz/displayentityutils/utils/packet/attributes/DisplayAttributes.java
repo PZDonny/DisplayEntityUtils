@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils.packet.attributes;
 import com.github.retrooper.packetevents.protocol.attribute.Attributes;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.player.EquipmentSlot;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
@@ -113,11 +114,18 @@ public final class DisplayAttributes {
 
     public static final class Mannequin{
         public static final AttributeDisplayAttribute SCALE = new AttributeDisplayAttribute(Attributes.SCALE);
+        public static final AttributeDisplayAttribute BELOW_NAME_DISTANCE;
         public static final BasicDisplayAttribute<Boolean> NO_GRAVITY = new BasicDisplayAttribute<>(5, Boolean.class, EntityDataTypes.BOOLEAN);
         public static final PoseDisplayAttribute POSE = new PoseDisplayAttribute(6);
         public static final MainHandDisplayAttribute MAIN_HAND = new MainHandDisplayAttribute(15);
         public static final ResolvableProfileDisplayAttribute RESOLVABLE_PROFILE = new ResolvableProfileDisplayAttribute(17);
         public static final BasicDisplayAttribute<Boolean> IMMOVABLE = new BasicDisplayAttribute<>(18, Boolean.class, EntityDataTypes.BOOLEAN);
         public static final OptionalComponentDisplayAttribute BELOW_NAME = new OptionalComponentDisplayAttribute(19);
+
+        static{
+            BELOW_NAME_DISTANCE = VersionUtils.hasBelowNameDistance()
+                    ? new AttributeDisplayAttribute(Attributes.BELOW_NAME_DISTANCE)
+                    : null;
+        }
     }
 }

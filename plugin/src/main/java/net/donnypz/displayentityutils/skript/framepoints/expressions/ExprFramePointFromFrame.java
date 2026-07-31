@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Frame Point from Animation Frame")
+@Name("Frame Point")
 @Description("Get a Frame Point, of a given tag, from an Animation Frame")
 @Examples({"set {_framepoint} to point with tag \"myframepoint\" from {_animationframe}"})
 @Since("3.2.1")

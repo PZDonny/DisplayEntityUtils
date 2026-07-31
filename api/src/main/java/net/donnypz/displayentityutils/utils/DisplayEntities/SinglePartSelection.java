@@ -1,17 +1,23 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.PivotAxis;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
 
 import java.util.Collection;
 
-public final class SinglePartSelection extends ActivePartSelection<SpawnedDisplayEntityPart> implements Spawned {
+public final class SinglePartSelection implements ActivePartSelection<SpawnedDisplayEntityPart>, Spawned {
+
+    SpawnedDisplayEntityPart selectedPart;
 
     @ApiStatus.Internal
     public SinglePartSelection(@NotNull SpawnedDisplayEntityPart part){
@@ -19,6 +25,16 @@ public final class SinglePartSelection extends ActivePartSelection<SpawnedDispla
             throw new IllegalArgumentException("Unable to create a SinglePartSelection with a (previously) grouped part");
         }
         this.selectedPart = part;
+    }
+
+    @Override
+    public SpawnedDisplayEntityPart getSelectedPart() {
+        return selectedPart;
+    }
+
+    @Override
+    public boolean hasSelectedPart() {
+        return selectedPart != null;
     }
 
     @Override
@@ -31,6 +47,16 @@ public final class SinglePartSelection extends ActivePartSelection<SpawnedDispla
     @Override
     public boolean isValid() {
         return selectedPart != null;
+    }
+
+    /**
+     * Get the location of the {@link SpawnedDisplayEntityPart} represented in this selection
+     * @return a {@link Location} or null if the selection is invalid
+     */
+    @Override
+    public @Nullable Location getLocation() {
+        if (!isValid()) return null;
+        return selectedPart.getLocation();
     }
 
     @Override
@@ -99,8 +125,8 @@ public final class SinglePartSelection extends ActivePartSelection<SpawnedDispla
     }
 
     @Override
-    public void setPitch(float pitch) {
-        selectedPart.setPitch(pitch);
+    public void setPitch(float pitch, boolean pivot) {
+        selectedPart.setPitch(pitch, pivot);
     }
 
     @Override
@@ -109,12 +135,33 @@ public final class SinglePartSelection extends ActivePartSelection<SpawnedDispla
     }
 
     /**
-     * Pivot a non-display entity around its group's master part
-     * @param angleInDegrees the pivot angle
+     * Set the pitch and yaw rotation of the part in this selection. Pivoting only applies to non-displays
+     * @param pitch the pitch
+     * @param yaw the yaw
+     * @param pivotPitch whether the non-display parts should pivot, using the pitch value, around its group's location, if it has one
+     * @param pivotYaw whether the non-display parts should pivot, using the yaw value, around its group's location, if it has one
      */
     @Override
-    public void pivot(float angleInDegrees) {
-        selectedPart.pivot(angleInDegrees);
+    public void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
+        selectedPart.setRotation(pitch, yaw, pivotPitch, pivotYaw);
+    }
+
+    /**
+     * Pivot the part in this selection around this selection's group, if it's not a display
+     */
+    @Override
+    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace) {
+        if (selectedPart.isDisplay()) return;
+        selectedPart.pivot(angleInDegrees, pivotAxis, worldSpace);
+    }
+
+    /**
+     * Pivot the part in this selection around this selection's group, if it's not a display
+     */
+    @Override
+    public void pivot(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
+        if (selectedPart.isDisplay()) return;
+        selectedPart.pivot(rotation, pivotLocation, worldSpace);
     }
 
     @Override
@@ -125,6 +172,32 @@ public final class SinglePartSelection extends ActivePartSelection<SpawnedDispla
     @Override
     public boolean translate(@NotNull Direction direction, float distance, int durationInTicks, int delayInTicks) {
         return selectedPart.translate(direction, distance, durationInTicks, delayInTicks);
+    }
+
+    /**
+     * Rotate the select display entity part in its local space {@link Transformation}.
+     * The rotation is applied in addition to the entity's current rotation
+     */
+    @Override
+    public void rotate(@NotNull Quaternionf rotation, boolean worldSpace) {
+        selectedPart.rotate(rotation, worldSpace);
+    }
+
+    /**
+     * Rotate the selected display entity part around a given pivot and their local space {@link Transformation}
+     * The rotation is applied in addition to the entity's current rotation
+     */
+    @Override
+    public void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
+        selectedPart.rotateAround(rotation, pivotLocation, worldSpace);
+    }
+
+    /**
+     * Pivot or rotate the selected part around a location by a provided rotation, using the correct action based on the part's type
+     */
+    @Override
+    public void pivotOrRotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
+        selectedPart.pivotOrRotateAround(rotation, pivotLocation, worldSpace);
     }
 
     @Override

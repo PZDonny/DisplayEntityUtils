@@ -3,21 +3,24 @@ package net.donnypz.displayentityutils.listeners.entity;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.InteractionHand;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAttack;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.command.CMDUtils;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.events.InteractionClickEvent;
 import net.donnypz.displayentityutils.events.PacketInteractionClickEvent;
 import net.donnypz.displayentityutils.events.PreInteractionClickEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
+import net.donnypz.displayentityutils.managers.GizmoManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActivePart;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityPart;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
 import net.donnypz.displayentityutils.utils.InteractionUtils;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointSelector;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
@@ -32,7 +35,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 
 import java.util.List;
 
@@ -42,21 +45,25 @@ public class DEUInteractionListener implements Listener, PacketListener {
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
         User user = event.getUser();
-        if (event.getPacketType() != PacketType.Play.Client.INTERACT_ENTITY)
-            return;
-
-        WrapperPlayClientInteractEntity interact = new WrapperPlayClientInteractEntity(event);
-        if (interact.getAction() == WrapperPlayClientInteractEntity.InteractAction.INTERACT){
+        InteractionClickEvent.ClickType clickType;
+        int entityId;
+        if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY){
+            WrapperPlayClientInteractEntity packet = new WrapperPlayClientInteractEntity(event);
+            if (packet.getHand() == InteractionHand.OFF_HAND || packet.getAction() == WrapperPlayClientInteractEntity.InteractAction.INTERACT) return;
+            entityId = packet.getEntityId();
+            clickType = packet.getAction() == WrapperPlayClientInteractEntity.InteractAction.ATTACK
+                    ? InteractionClickEvent.ClickType.LEFT
+                    : InteractionClickEvent.ClickType.RIGHT;
+        }
+        else if (event.getPacketType() == PacketType.Play.Client.ATTACK){
+            WrapperPlayClientAttack packet = new WrapperPlayClientAttack(event);
+            entityId = packet.getEntityId();
+            clickType = InteractionClickEvent.ClickType.LEFT;
+        }
+        else{
             return;
         }
-        InteractionClickEvent.ClickType clickType =
-                    interact.getAction() == WrapperPlayClientInteractEntity.InteractAction.ATTACK
-                        ?
-                            InteractionClickEvent.ClickType.LEFT
-                            :
-                            InteractionClickEvent.ClickType.RIGHT;
 
-        int entityId = interact.getEntityId();
         ActivePart activePart = ActivePart.getPart(entityId);
         if (!(activePart instanceof PacketDisplayEntityPart part)){
             return;
@@ -100,7 +107,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
             return;
         }
 
-        if (!new PacketInteractionClickEvent(player, part, clickType).callEvent()){
+        if (GizmoManager.isGizmoWand(player.getInventory().getItemInMainHand()) || !new PacketInteractionClickEvent(player, part, clickType).callEvent()){
             return;
         }
 
@@ -128,15 +135,15 @@ public class DEUInteractionListener implements Listener, PacketListener {
     }
 
     //Right Click
-    @EventHandler(priority = EventPriority.HIGHEST)
-    private void rClick(PlayerInteractEntityEvent e){
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private void rClick(PlayerInteractAtEntityEvent e){
         if (e.getRightClicked() instanceof Interaction entity){
             determineBukkitAction(entity, e.getPlayer(), InteractionClickEvent.ClickType.RIGHT);
         }
     }
 
     //Left Click
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void lClick(EntityDamageByEntityEvent e){
         if (e.getEntity() instanceof Interaction entity){
             determineBukkitAction(entity, (Player) e.getDamager(), InteractionClickEvent.ClickType.LEFT);
@@ -173,7 +180,7 @@ public class DEUInteractionListener implements Listener, PacketListener {
                 .clickEvent(ClickEvent.callback(a -> {
                     Player p = (Player) a;
                     boolean result = point.removeFromPointHolder();
-                    DEUCommandUtils.removeRelativePoint(p, point);
+                    CMDUtils.removeRelativePoint(p, point);
                     if (result){
                         p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully removed point!", NamedTextColor.YELLOW)));
                         point.despawn();

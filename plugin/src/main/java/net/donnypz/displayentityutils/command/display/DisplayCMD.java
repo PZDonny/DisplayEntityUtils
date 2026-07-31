@@ -12,7 +12,8 @@ public final class DisplayCMD extends ParentSubCommand {
         new DisplayViewRangeCMD(this);
         new DisplayBillboardCMD(this);
         new DisplayTranslateCMD(this);
-        new DisplayResetTranslationCMD(this);
+        new DisplayResetCMD(this);
+        new DisplayRotateCMD(this);
         new DisplayScaleCMD(this);
         new DisplaySetBlockCMD(this);
     }

@@ -4,18 +4,17 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.PacketUtils;
-import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public abstract class MultiPartSelection<T extends ActivePart> extends ActivePartSelection<T> {
+public abstract class MultiPartSelection<T extends ActivePart> extends ActivePartHolder<T> implements ActivePartSelection<T> {
+
     ActiveGroup<T> group;
+    T selectedPart;
     LinkedHashSet<T> selectedParts = new LinkedHashSet<>();
     Set<SpawnedDisplayEntityPart.PartType> partTypes = new HashSet<>();
 
@@ -49,6 +48,20 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
         applyFilter(filter, false);
     }
 
+    @Override
+    public T getSelectedPart() {
+        return selectedPart;
+    }
+
+    @Override
+    public boolean hasSelectedPart() {
+        return selectedPart != null;
+    }
+
+    @Override
+    @NotNull Collection<T> getPartsRaw() {
+        return selectedParts;
+    }
 
     void addPlayerAnimationPlayer(ClientAnimationPlayer animationPlayer){
         for (ActivePart part : selectedParts){
@@ -60,14 +73,6 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
         for (ActivePart part : selectedParts){
             part.clientAnimationPlayers.remove(animationPlayer);
         }
-    }
-
-    /**
-     * Get the total number of parts within this part selection
-     * @return an integer
-     */
-    public int getSize(){
-        return selectedParts.size();
     }
 
     /**
@@ -320,119 +325,6 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
         }
     }
 
-
-    /**
-     * Set the view range of all parts in this selection
-     * @param viewRangeMultiplier The range to set
-     */
-    @Override
-    public void setViewRange(float viewRangeMultiplier) {
-        for (T part : selectedParts){
-            part.setViewRange(viewRangeMultiplier);
-        }
-    }
-
-    /**
-     * Set the billboard of all parts in this selection
-     * @param billboard the billboard to set
-     */
-
-    @Override
-    public void setBillboard(Display.@NotNull Billboard billboard) {
-        for (T part : selectedParts){
-            part.setBillboard(billboard);
-        }
-    }
-
-    /**
-     * Set the brightness of all parts in this selection
-     * @param brightness the brightness to set
-     */
-    @Override
-    public void setBrightness(Display.@Nullable Brightness brightness) {
-        for (T part : selectedParts){
-            part.setBrightness(brightness);
-        }
-    }
-
-    /**
-     * Set the teleport duration of all parts in this selection
-     */
-    @Override
-    public void setTeleportDuration(int teleportDuration) {
-        for (T part : selectedParts){
-            part.setTeleportDuration(teleportDuration);
-        }
-    }
-
-    /**
-     * Set the interpolation duration of all parts in this selection
-     * @param interpolationDuration the duration
-     */
-    @Override
-    public void setInterpolationDuration(int interpolationDuration){
-        for (T part : selectedParts){
-            part.setInterpolationDuration(interpolationDuration);
-        }
-    }
-
-    /**
-     * Set the interpolation delay of all parts in this selection
-     * @param interpolationDelay the delay
-     */
-    @Override
-    public void setInterpolationDelay(int interpolationDelay){
-        for (T part : selectedParts){
-            part.setInterpolationDelay(interpolationDelay);
-        }
-    }
-
-    /**
-     * Set the glow color of all parts in this selection
-     * @param color The color to set
-     */
-    @Override
-    public void setGlowColor(@Nullable Color color){
-        for (T part : selectedParts){
-            part.setGlowColor(color);
-        }
-    }
-
-    /**
-     * Make all display parts in this selection glow
-     */
-    @Override
-    public void glow(){
-        for (T part : selectedParts){
-            part.glow();
-        }
-    }
-
-    /**
-     * Make all display parts in this selection glow for a player
-     */
-    @Override
-    public void glow(@NotNull Player player){
-        for (T part : selectedParts){
-            part.glow(player);
-        }
-    }
-
-
-    @Override
-    public void glow(long durationInTicks){
-        for (T part : selectedParts){
-            part.glow(durationInTicks);
-        }
-    }
-
-    @Override
-    public void glow(@NotNull Player player, long durationInTicks){
-        for (T part : selectedParts){
-            part.glow(player, durationInTicks);
-        }
-    }
-
     /**
      * Make this group's display entities glow, and interactions be outlined, for a player for a set period of time
      * @param player the player
@@ -461,82 +353,6 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Removes the glow effect from all the display parts in this selection
-     */
-    @Override
-    public void unglow(){
-        for (T part : selectedParts){
-            part.unglow();
-        }
-    }
-
-    /**
-     * Removes the glow effect from all the display parts in this selection for a player
-     */
-    @Override
-    public void unglow(@NotNull Player player){
-        for (T part : selectedParts){
-            part.unglow(player);
-        }
-    }
-
-    /**
-     * Pivot all non-display parts in this selection around this selection's group
-     * @param angleInDegrees the pivot angle
-     */
-    @Override
-    public void pivot(float angleInDegrees){
-        for (T part : selectedParts){
-            part.pivot(angleInDegrees);
-        }
-    }
-
-    /**
-     * Set the yaw of all parts in this selection
-     * @param yaw the yaw to set
-     * @param pivot whether non-display entities should pivot around the group
-     */
-    @Override
-    public void setYaw(float yaw, boolean pivot){
-        for (T part : selectedParts){
-            part.setYaw(yaw, pivot);
-        }
-    }
-
-    /**
-     * Set the pitch of all parts in this selection
-     * @param pitch the pitch to set
-     */
-    @Override
-    public void setPitch(float pitch){
-        for (T part : selectedParts){
-            part.setPitch(pitch);
-        }
-    }
-
-    /**
-     * Hide all parts in this selection from a player
-     * @param player The player to hide parts from
-     */
-    @Override
-    public void hideFromPlayer(@NotNull Player player){
-        for (T part : selectedParts){
-            part.hideFromPlayer(player);
-        }
-    }
-
-    /**
-     * Hide all parts in this selection from players
-     * @param players The players to hide parts from
-     */
-    @Override
-    public void hideFromPlayers(@NotNull Collection<Player> players){
-        for (T part : selectedParts){
-            part.hideFromPlayers(players);
         }
     }
 
@@ -643,15 +459,7 @@ public abstract class MultiPartSelection<T extends ActivePart> extends ActivePar
 
     @Override
     public boolean isValid(){
-        return group != null;
-    }
-
-    /**
-     * Get the parts contained in this selection
-     * @return the parts in this selection
-     */
-    public List<T> getSelectedParts(){
-        return new ArrayList<>(selectedParts);
+        return group != null && group.isValid();
     }
 
     public abstract ActiveGroup<T> getGroup();

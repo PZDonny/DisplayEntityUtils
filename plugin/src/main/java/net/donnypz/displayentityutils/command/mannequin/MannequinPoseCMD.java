@@ -4,16 +4,11 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
-import net.donnypz.displayentityutils.managers.PlaceableGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Pose;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,7 +26,7 @@ class MannequinPoseCMD extends PartsSubCommand {
         String poseStr = args[2];
         try{
             Pose pose = Pose.valueOf(poseStr.toUpperCase());
-            for (ActivePart p : selection.getSelectedParts()){
+            for (ActivePart p : selection.getParts()){
                 if (p.getType() != SpawnedDisplayEntityPart.PartType.MANNEQUIN) continue;
                 p.setMannequinPose(pose);
             }

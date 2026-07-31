@@ -1,5 +1,6 @@
 package net.donnypz.displayentityutils.utils.relativepoints;
 
+import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
@@ -47,11 +48,14 @@ public class RelativePointUtils {
 
         Set<RelativePointSelector<?>> displays = new HashSet<>();
         for (PacketDisplayEntityGroup group : PacketDisplayEntityGroup.getGroups(chunk)){
+            if (!group.isSelectable() || group.isPlaced()) continue;
             PacketGroupSelector display = new PacketGroupSelector(player, group);
             displays.add(display);
         }
+
         if (displays.isEmpty()){
-            player.sendMessage(Component.text("Failed to view points! The chunk does not have any persistent packet based groups!", NamedTextColor.RED));
+            player.sendMessage(DisplayAPI.pluginPrefix
+                    .append(Component.text("Failed to view points! The chunk does not have any selectable packet based groups!", NamedTextColor.RED)));
         }
         else{
             setDisplays(player, displays, false);
@@ -88,7 +92,7 @@ public class RelativePointUtils {
                 d.despawn();
             }
         }
-        RelativePointUtils.deselectRelativePoint(player);
+        selectedSelector.remove(player.getUniqueId());
         return selectors != null;
     }
 
@@ -123,9 +127,5 @@ public class RelativePointUtils {
         }
         player.playSound(player, Sound.ENTITY_ITEM_FRAME_PLACE, 1, 1);
         selector.select();
-    }
-
-    public static void deselectRelativePoint(Player player){
-        selectedSelector.remove(player.getUniqueId());
     }
 }

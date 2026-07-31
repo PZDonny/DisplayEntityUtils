@@ -15,17 +15,23 @@ public abstract class ClientAnimationPlayer extends AnimationPlayer{
 
     ClientAnimationPlayer(@NotNull Collection<Player> players,
                           @NotNull DisplayAnimator animator,
-                          @NotNull SpawnedDisplayAnimation animation,
                           @NotNull ActiveGroup<?> group,
-                          @NotNull SpawnedDisplayAnimationFrame frame,
-                          int startFrameId,
-                          int delay,
-                          boolean playSingleFrame)
+                          int startFrameId)
     {
-        super(animator, group, playSingleFrame, true);
+        super(animator, group, false, true);
         this.players.addAll(players);
         animator.addPlayers(players, this);
-        prepareAnimation(animation, group, frame, startFrameId, delay);
+        startAnimation(group, startFrameId);
+    }
+
+    public ClientAnimationPlayer(@NotNull Collection<Player> players,
+                                 @NotNull DisplayAnimator animator,
+                                 @NotNull ActiveGroup<?> group,
+                                 @NotNull SpawnedDisplayAnimationFrame frame) {
+        super(animator, group,true, true);
+        this.players.addAll(players);
+        animator.addPlayers(players, this);
+        startAnimation(group, frame, -1);
     }
 
     boolean contains(Player player){

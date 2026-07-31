@@ -13,7 +13,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.UUID;
 
-@Name("Active Part's Part UUID")
+@Name("Active Part - Part UUID")
 @Description("Get the part uuid of an active part, used to identify the part in its group and for animations. " +
         "\nThis is different than the uuid of the entity a part represents." +
         "\nPart UUIDs are typically used to identify which part is which internally for animations")

@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.utils.relativepoints;
 
-import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.command.group.GroupCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
@@ -64,15 +64,9 @@ public class PacketGroupSelector extends RelativePointSelector<RelativePoint> {
 
     @Override
     public void rightClick(Player player) {
-        boolean selectResult = DisplayGroupManager.setSelectedGroup(player, group);
-        if (selectResult){
-            group.glowAndMarkInteractions(player, 40);
-            RelativePointUtils.removeRelativePoints(player);
-            player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Selected the clicked point's <light_purple>packet-based <green>group!")));
+        boolean result = GroupCMD.selectGroup(player, group, false, true);
+        if (result) {
             player.playSound(spawnLocation, Sound.UI_STONECUTTER_TAKE_RESULT, 1, 2f);
-        }
-        else{
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to select that group! Another player already has that group selected!", NamedTextColor.RED)));
         }
     }
 

@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Text Display Part Visible Through Blocks?")
+@Name("Text Display Part - Visible Through Blocks")
 @Description("Check if an text display part is visible through blocks")
 @Examples({"if {_activepart} is deu visible through blocks:",
         "\tbroadcast \"This text display part is visible through walls!\""})
@@ -27,7 +27,7 @@ public class CondTextDisplaySeeThrough extends Condition {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.CONDITION,
                 SyntaxInfo.builder(CondTextDisplaySeeThrough.class)
-                        .addPattern("%activepart/displays% (1¦is|2¦is(n't| not)) deu visible through (blocks|walls)")
+                        .addPattern("%activepart/display% (1¦is|2¦is(n't| not)) deu visible through (blocks|walls)")
                         .supplier(CondTextDisplaySeeThrough::new)
                         .build()
         );
@@ -37,10 +37,10 @@ public class CondTextDisplaySeeThrough extends Condition {
     public boolean check(Event event) {
         Object obj = partExpr.getSingle(event);
         if (obj instanceof ActivePart p){
-            return p.isTextDisplaySeeThrough();
+            return p.isTextDisplaySeeThrough() != isNegated();
         }
         else if (obj instanceof TextDisplay td){
-            return td.isSeeThrough();
+            return td.isSeeThrough() != isNegated();
         }
         return isNegated();
     }

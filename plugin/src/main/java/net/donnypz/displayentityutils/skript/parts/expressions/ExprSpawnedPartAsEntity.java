@@ -13,7 +13,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.UUID;
 
-@Name("Entity of Spawned Part")
+@Name("Entity of Active Part")
 @Description("Get the Display or Interaction entity that a part represents. " +
         "\nThis should only be done on non-packet based parts")
 @Examples({"set {_entity} to {_spawnedpart}'s true entity",

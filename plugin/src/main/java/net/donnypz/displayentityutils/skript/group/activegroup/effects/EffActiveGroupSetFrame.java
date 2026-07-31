@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Active Group show Animation Frame")
+@Name("Active Group - Show Animation Frame")
 @Description("Show an animation frame on an active group, optionally with custom duration and delay.")
 @Examples({
         "show frame with id 5 on {_spawnedgroup} from {_animation}",

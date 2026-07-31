@@ -24,7 +24,7 @@ class TextLineWidthCMD extends PartsSubCommand {
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         int width = getLineWidth(args, player);
         if (width == -1) return false;
-        for (ActivePart part : selection.getSelectedParts()){
+        for (ActivePart part : selection.getParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
                 part.setTextDisplayLineWidth(width);
             }

@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 class DisplayTranslateCMD extends PartsSubCommand {
     DisplayTranslateCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("translate", parentSubCommand, Permission.DISPLAY_TRANSLATE, true);
+        super("translate", parentSubCommand, Permission.DISPLAY_TRANSFORM, true);
         setTabComplete(2, TabSuggestion.DIRECTIONS);
         setTabComplete(3, "<distance>");
         setTabComplete(4, "<tick-duration>");
@@ -59,8 +59,8 @@ class DisplayTranslateCMD extends PartsSubCommand {
         try{
             Direction direction = Direction.valueOf(args[2].toUpperCase());
             float distance = Float.parseFloat(args[3]);
-            if (distance <= 0){
-                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number greater than 0 for the distance!", NamedTextColor.RED)));
+            if (distance == 0.0f){
+                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number non-zero number for the distance!", NamedTextColor.RED)));
                 return null;
             }
             int duration = Integer.parseInt(args[4]);

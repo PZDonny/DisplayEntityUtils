@@ -2,10 +2,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityHeadLook;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityRotation;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
@@ -35,6 +32,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PacketDisplayEntityPart extends ActivePart implements Packeted{
@@ -47,7 +45,9 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
 
     @ApiStatus.Internal
-    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull PacketAttributeContainer attributeContainer){
+    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType,
+                                   int entityId,
+                                   @NotNull PacketAttributeContainer attributeContainer){
         super(entityId, true);
         this.type = partType;
         this.attributeContainer = attributeContainer;
@@ -55,7 +55,10 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @ApiStatus.Internal
-    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer){
+    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType,
+                                   Location location,
+                                   int entityId,
+                                   @NotNull PacketAttributeContainer attributeContainer){
         super(entityId, true);
         this.type = partType;
         this.attributeContainer = attributeContainer;
@@ -64,7 +67,11 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @ApiStatus.Internal
-    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull String partTag){
+    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType,
+                                   Location location,
+                                   int entityId,
+                                   @NotNull PacketAttributeContainer attributeContainer,
+                                   @NotNull String partTag){
         this(partType, location, entityId, attributeContainer);
         this.partTags.add(partTag);
         this.teleport(location);
@@ -72,7 +79,11 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @ApiStatus.Internal
-    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType, Location location, int entityId, @NotNull PacketAttributeContainer attributeContainer, @NotNull Set<String> partTags){
+    public PacketDisplayEntityPart(@NotNull SpawnedDisplayEntityPart.PartType partType,
+                                   Location location,
+                                   int entityId,
+                                   @NotNull PacketAttributeContainer attributeContainer,
+                                   @NotNull Set<String> partTags){
         this(partType, location, entityId, attributeContainer);
         this.partTags.addAll(partTags);
         this.teleport(location);
@@ -92,10 +103,11 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
                     .createPacketPart(null, entity.getLocation(), null);
         }
         else if (entity instanceof Interaction i){
-            part = new InteractionEntity(i).createPacketPart(entity.getLocation(), null);
+            part = new InteractionEntity(i, null)
+                    .createPacketPart(i.getLocation(), null);
         }
         else if (VersionUtils.canSpawnMannequins() && entity instanceof Mannequin){
-            MannequinEntity m = SavedEntityBuilder.buildMannequin(entity);
+            MannequinEntity m = SavedEntityBuilder.buildMannequin(entity, null);
             part = m.createPacketPart(entity.getLocation(), null);
         }
         else{
@@ -241,7 +253,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             Vector translation = getNonDisplayTranslation(group.getLocation());
             location = location.clone().add(translation);
         }
-        attributeContainer.sendEntityUsingPlayers(type, getEntityId(), plrs, location);
+        attributeContainer.sendEntity(type, getEntityId(), plrs, location);
     }
 
     /**
@@ -333,7 +345,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (!isDisplay()) return false;
         Vector3f vec = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.SCALE, new Vector3f());
         vec.x = scale;
-        attributeContainer.setAttributeAndSend(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
+        attributeContainer.setAndSendToUUIDs(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
         return true;
     }
 
@@ -342,7 +354,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (!isDisplay()) return false;
         Vector3f vec = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.SCALE, new Vector3f());
         vec.y = scale;
-        attributeContainer.setAttributeAndSend(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
+        attributeContainer.setAndSendToUUIDs(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
         return true;
     }
 
@@ -351,7 +363,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         if (!isDisplay()) return false;
         Vector3f vec = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.SCALE, new Vector3f());
         vec.z = scale;
-        attributeContainer.setAttributeAndSend(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
+        attributeContainer.setAndSendToUUIDs(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
         return true;
     }
 
@@ -362,7 +374,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         vec.x = x;
         vec.y = y;
         vec.z = z;
-        attributeContainer.setAttributeAndSend(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
+        attributeContainer.setAndSendToUUIDs(DisplayAttributes.Transform.SCALE, vec, getEntityId(), viewers);
         return true;
     }
 
@@ -379,24 +391,82 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public void rotateDisplay(@NotNull Quaternionf rotation, boolean worldRotation) {
+    public void rotate(@NotNull Quaternionf rotation, boolean worldSpace) {
         if (!isDisplay()) return;
-        Vector3f translation = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.TRANSLATION, new Vector3f());
-        Quaternionf originalRot = attributeContainer.getAttributeOrDefault(DisplayAttributes.Transform.LEFT_ROTATION, new Quaternionf());
 
+        Quaternionf originalRot = attributeContainer
+                .getAttributeOrDefault(
+                        DisplayAttributes.Transform.LEFT_ROTATION,
+                        new Quaternionf());
+        Quaternionf appliedRotation = new Quaternionf(rotation);
 
-        Quaternionf finalRot;
-        if (worldRotation){
-            translation.rotate(rotation);
-            finalRot = new Quaternionf(rotation).mul(originalRot);
+        if (worldSpace) {
+            Location loc = getLocation();
+            Quaternionf entityRot = new Quaternionf()
+                    .rotateY((float) Math.toRadians(-loc.getYaw()))
+                    .rotateX((float) Math.toRadians(loc.getPitch()));
+
+            Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
+
+            //world space to display's space
+            appliedRotation = invertedEntityRot
+                    .mul(appliedRotation)
+                    .mul(entityRot);
         }
-        else{
-            finalRot = new Quaternionf(originalRot.mul(rotation));
+
+        Quaternionf finalRot = new Quaternionf(appliedRotation).mul(originalRot);
+
+        this.setAttribute(DisplayAttributes.Transform.LEFT_ROTATION, finalRot);
+    }
+
+    @Override
+    public void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
+        if (!isDisplay()) return;
+
+        Vector3f translation = new Vector3f(attributeContainer
+                .getAttributeOrDefault(
+                        DisplayAttributes.Transform.TRANSLATION,
+                        new Vector3f()));
+
+        Quaternionf originalRot = attributeContainer
+                .getAttributeOrDefault(
+                        DisplayAttributes.Transform.LEFT_ROTATION,
+                        new Quaternionf());
+
+        //entity to pivot
+        Vector3f toPivot = pivotLocation.toVector()
+                .subtract(getLocation().toVector())
+                .toVector3f();
+
+        Quaternionf appliedRotation = new Quaternionf(rotation);
+        Vector3f localPivot = new Vector3f(toPivot);
+
+
+        Location loc = getLocation();
+        Quaternionf entityRot = new Quaternionf()
+                .rotateY((float) Math.toRadians(-loc.getYaw()))
+                .rotateX((float) Math.toRadians(loc.getPitch()));
+        Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
+
+        //convert the offset from world space into the display's space (pitch/yaw)
+        localPivot.rotate(invertedEntityRot);
+
+        //world space to display's space (pitch/yaw)
+        if (worldSpace){
+            appliedRotation = invertedEntityRot
+                    .mul(appliedRotation)
+                    .mul(entityRot);
         }
 
-        attributeContainer.setAttributesAndSend(new DisplayAttributeMap()
+        //rot around pivot point
+        translation.sub(localPivot);
+        translation.rotate(appliedRotation);
+        translation.add(localPivot);
+
+        Quaternionf finalRot = new Quaternionf(appliedRotation).mul(originalRot);
+        this.setAttributes(new DisplayAttributeMap()
                 .add(DisplayAttributes.Transform.TRANSLATION, translation)
-                .add(DisplayAttributes.Transform.LEFT_ROTATION, finalRot), getEntityId(), viewers);
+                .add(DisplayAttributes.Transform.LEFT_ROTATION, finalRot));
     }
 
 
@@ -506,17 +576,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             setAndSend(DisplayAttributes.ItemDisplay.ITEMSTACK, item);
         }
     }
-
-    @Override
-    public boolean hasItemDisplayItemGlint() {
-        if (type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
-            ItemStack i = attributeContainer.getAttribute(DisplayAttributes.ItemDisplay.ITEMSTACK);
-            if (i == null) return false;
-            return i.getItemMeta().getEnchantmentGlintOverride();
-        }
-        return false;
-    }
-
 
     @Override
     public @Nullable Component getTextDisplayText() {
@@ -720,6 +779,13 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
+    public void setMannequinBelowNameDistance(double distance) {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return;
+        if (!VersionUtils.hasBelowNameDistance()) return;
+        setAndSend(DisplayAttributes.Mannequin.BELOW_NAME_DISTANCE, (float) distance);
+    }
+
+    @Override
     public ResolvableProfile getMannequinProfile() {
         if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return null;
         return attributeContainer.getAttribute(DisplayAttributes.Mannequin.RESOLVABLE_PROFILE);
@@ -731,16 +797,23 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         return attributeContainer.getAttribute(DisplayAttributes.Mannequin.BELOW_NAME);
     }
 
+    @Override
+    public double getMannequinBelowNameDistance() {
+        if (type != SpawnedDisplayEntityPart.PartType.MANNEQUIN) return -1;
+        if (!VersionUtils.hasBelowNameDistance()) return -1;
+        return attributeContainer.getAttribute(DisplayAttributes.Mannequin.BELOW_NAME_DISTANCE);
+    }
+
 
     @Override
     public <T, V> void setAttribute(@NotNull DisplayAttribute<T, V> attribute, T value) {
-        this.attributeContainer.setAttributeAndSend(attribute, value, getEntityId(), viewers);
+        this.attributeContainer.setAndSendToUUIDs(attribute, value, getEntityId(), viewers);
     }
 
 
     @Override
     public void setAttributes(@NotNull DisplayAttributeMap attributeMap){
-        this.attributeContainer.setAttributesAndSend(attributeMap, getEntityId(), viewers);
+        this.attributeContainer.setAndSendToUUIDs(attributeMap, getEntityId(), viewers);
     }
 
     /**
@@ -761,7 +834,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     private <T, V>void setAndSend(DisplayAttribute<T, V> attribute, T value){
-        attributeContainer.setAttributeAndSend(attribute, value, getEntityId(), viewers);
+        attributeContainer.setAndSendToUUIDs(attribute, value, getEntityId(), viewers);
     }
 
     /**
@@ -814,7 +887,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     /**
-     * Get the Interaction's translation vector relative to a location
+     * Get the non-display's translation vector from the represented entity, to the reference location
      * @param referenceLocation the reference location
      * @return A vector or null if the part is not an interaction
      */
@@ -826,21 +899,21 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     @Override
     public void setInteractionHeight(float height) {
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            attributeContainer.setAttributeAndSend(DisplayAttributes.Interaction.HEIGHT, height, getEntityId(), viewers);
+            attributeContainer.setAndSendToUUIDs(DisplayAttributes.Interaction.HEIGHT, height, getEntityId(), viewers);
         }
     }
 
     @Override
     public void setInteractionWidth(float width) {
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            attributeContainer.setAttributeAndSend(DisplayAttributes.Interaction.WIDTH, width, getEntityId(), viewers);
+            attributeContainer.setAndSendToUUIDs(DisplayAttributes.Interaction.WIDTH, width, getEntityId(), viewers);
         }
     }
 
     @Override
     public void setInteractionResponsive(boolean responsive) {
         if (type == SpawnedDisplayEntityPart.PartType.INTERACTION){
-            attributeContainer.setAttributeAndSend(DisplayAttributes.Interaction.RESPONSIVE, responsive, getEntityId(), viewers);
+            attributeContainer.setAndSendToUUIDs(DisplayAttributes.Interaction.RESPONSIVE, responsive, getEntityId(), viewers);
         }
     }
 
@@ -932,7 +1005,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     protected void cull(float width, float height) {
         if (!isDisplay()) return;
         attributeContainer
-            .setAttributesAndSend(new DisplayAttributeMap()
+            .setAndSendToUUIDs(new DisplayAttributeMap()
                     .add(DisplayAttributes.Culling.HEIGHT, height)
                     .add(DisplayAttributes.Culling.WIDTH, width),
             getEntityId(),
@@ -960,7 +1033,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     @Override
-    public Collection<Player> getTrackingPlayers() {
+    public @NotNull Collection<Player> getTrackingPlayers() {
         HashSet<Player> players = new HashSet<>();
         for (UUID uuid : viewers){
             Player p = Bukkit.getPlayer(uuid);
@@ -1054,92 +1127,157 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         }
     }
 
+    /**
+     * Set the pitch and yaw rotation of this part. Pivoting only applies to non-displays
+     * @param pitch the pitch
+     * @param yaw the yaw
+     * @param pivotPitch whether the part should pivot, using the pitch value, around its group's location, if it has one
+     * @param pivotYaw whether the part should pivot, using the yaw value, around its group's location, if it has one
+     */
     @Override
-    public void setRotation(float pitch, float yaw, boolean pivot){
-        if (pivot && !isDisplay()){
-            pivot(yaw, pitch);
-        }
-        else if (!viewers.isEmpty()){
-            WrapperPlayServerEntityHeadLook headLook = getHeadLookPacket(yaw);
-            WrapperPlayServerEntityRotation rotPacket = new WrapperPlayServerEntityRotation(getEntityId(), yaw, pitch, false);
+    public void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw){
+        pitch = Math.clamp(pitch, -90, 90);
+        setPitchSilent(pitch, pivotPitch);
+        setYawSilent(yaw, pivotYaw);
+
+        if (!viewers.isEmpty()){
+            Location newLoc = getLocation();
             for (UUID uuid : getViewers()){
-                Player p = Bukkit.getPlayer(uuid);
-                if (p == null) continue;
-                PacketEvents.getAPI().getPlayerManager().sendPacket(p, rotPacket);
-                if (packetLocation.yaw != yaw && type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
-                    PacketEvents.getAPI().getPlayerManager().sendPacket(p, headLook);
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null) continue;
+                if (pivotPitch || pivotYaw){
+                    PacketUtils.teleport(player, this, newLoc);
                 }
+                else{
+                    PacketUtils.setRotation(player, this, yaw, pitch);
+                }
+                sendHeadLookPacket(player, yaw);
             }
         }
-        packetLocation.pitch = pitch;
-        packetLocation.yaw = yaw;
+    }
+
+    @Override
+    public float getPitch(){
+        return packetLocation == null ? 0.0f : packetLocation.pitch;
+    }
+
+    @Override
+    public float getYaw(){
+        return packetLocation == null ? 0.0f : packetLocation.yaw;
     }
 
 
+
+    /**
+     * Change the pitch of this part
+     * @param pitch The pitch to set for this part
+     * @param pivot whether the part should pivot around its group's location, if it has one, and if the part is not a display
+     */
     @Override
-    public void setPitch(float pitch) {
-        setRotation(pitch, getYaw(), false);
+    public void setPitch(float pitch, boolean pivot) {
+        Location resultLoc = setPitchSilent(pitch, pivot);
+        pitch = resultLoc.getPitch();
+        float yaw = getYaw();
+        for (UUID uuid : getViewers()){
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null) continue;
+            if (pivot && !isDisplay()){
+                PacketUtils.teleport(player, this, resultLoc);
+            }
+            else{
+                PacketUtils.setRotation(player, this, yaw, pitch);
+            }
+        }
     }
 
     /**
      * Change the yaw of this part
      * @param yaw The yaw to set for this part
-     * @param pivot whether the part should pivot around its group's location, if it has one, and if the part is an Interaction
+     * @param pivot whether the part should pivot around its group's location, if it has one, and if the part is not a display
      */
     @Override
     public void setYaw(float yaw, boolean pivot) {
-        setRotation(getPitch(), yaw, pivot);
-    }
+        Location resultLoc = setYawSilent(yaw, pivot);
+        float pitch = getPitch();
 
-    @Override
-    public float getPitch(){
-        return packetLocation.pitch;
-    }
-
-    @Override
-    public float getYaw(){
-        return packetLocation.yaw;
-    }
-
-    /**
-     * Pivot a non-display entity around its group\
-     * @param angleInDegrees the pivot angle
-     */
-    @Override
-    public void pivot(float angleInDegrees) {
-        if (isDisplay() || group == null) return;
-        pivot(getYaw(), getPitch(), angleInDegrees);
-    }
-
-    private void pivot(float yaw, float pitch){
-        pivot(yaw, pitch, yaw-getYaw());
-    }
-
-    private void pivot(float yaw, float pitch, float angleInDegrees){
-        if (group == null || isDisplay()) return;
-        Location groupLoc = group.getLocation();
-        Location pivotedLoc = WorldUtils.getPivotLocation(getLocation(), groupLoc, angleInDegrees);
-        packetLocation.setCoordinates(pivotedLoc);
-
-
-        WrapperPlayServerEntityHeadLook headLook = getHeadLookPacket(yaw);
-        WrapperPlayServerEntityTeleport teleport = new WrapperPlayServerEntityTeleport(getEntityId(),
-                new Vector3d(pivotedLoc.x(), pivotedLoc.y(), pivotedLoc.z()),
-                yaw,
-                pitch,
-                false);
         for (UUID uuid : getViewers()){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
-            PacketEvents.getAPI().getPlayerManager().sendPacket(player, teleport);
-            if (type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
-                PacketEvents.getAPI().getPlayerManager().sendPacket(player, headLook);
+            if (pivot && !isDisplay()){
+                PacketUtils.teleport(player, this, resultLoc);
+            }
+            else{
+                PacketUtils.setRotation(player, this, yaw, pitch);
             }
         }
     }
 
+    private Location setPitchSilent(float pitch, boolean pivot){
+        pitch = Math.clamp(pitch, -90, 90);
+
+        float oldPitch = this.getPitch();
+        float delta = pitch - oldPitch;
+
+        packetLocation.pitch = pitch;
+
+        if (!isDisplay() && pivot){
+            return pivotSilent(delta, PivotAxis.X, false);
+        }
+        return packetLocation.toLocation();
+    }
+
+    private Location setYawSilent(float yaw, boolean pivot){
+        float oldYaw = this.getYaw();
+        float delta = yaw - oldYaw;
+        packetLocation.yaw = yaw;
+
+        if (!isDisplay() && pivot){
+            return pivotSilent(delta, PivotAxis.Y, true);
+        }
+
+        return packetLocation.toLocation();
+    }
+
     /**
-     * Set the location of this packet-based entity.
+     * Pivot a non-display entity around its group
+     */
+    @Override
+    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace) {
+        if (isDisplay() || group == null) return;
+
+        Location result = pivotSilent(angleInDegrees, pivotAxis, worldSpace);
+        this.teleport(result);
+    }
+
+    private Location pivotSilent(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace){
+        if (angleInDegrees == 0.0f) return getLocation();
+        Location result = WorldUtils.getPivotLocation(
+                getLocation(),
+                group.getLocation(),
+                angleInDegrees,
+                pivotAxis,
+                worldSpace);
+        packetLocation.setCoordinates(result);
+        return result;
+    }
+
+
+    /**
+     *  Pivot a non-display entity around a given location by a provided rotation
+     */
+    @Override
+    public void pivot(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
+        if (isDisplay()) return;
+        Location result = WorldUtils.getPivotLocation(
+                getLocation(),
+                rotation,
+                pivotLocation,
+                worldSpace);
+        this.teleport(result);
+    }
+
+    /**
+     * Set the location of this packet-based entity.<br>
      * {@inheritDoc}
      * <br>The part should be hidden first with {@link #hide()} if being teleported to a different world.
      * @param location the location
@@ -1147,11 +1285,26 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     public void teleport(@NotNull Location location){
         if (hasGroup() && isDisplay() && !isMaster) return;
         packetLocation = new PacketLocation(location);
+
         for (UUID uuid : getViewers()){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
             PacketUtils.teleport(player, getEntityId(), location);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <br>
+     * <br>
+     * <b> A </b>{@link PacketDisplayEntityPart} <b>will always teleport using packets, so this is effectively
+     * the same as</b> {@link #teleport(Location)}
+     * @return null
+     */
+    @Override
+    public @Nullable CompletableFuture<Boolean> teleportSafe(@NotNull Location location) {
+        teleport(location);
+        return null;
     }
 
 
@@ -1162,10 +1315,8 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             if (player == null) continue;
             if (isMaster && group != null){
                 group.unsetPassengers(player);
-                DisplayAPI.getScheduler().runAsync(() -> {
-                    PacketUtils.teleport(player, getEntityId(), location);
-                    group.setPassengers(player);
-                });
+                PacketUtils.teleport(player, getEntityId(), location);
+                group.setPassengers(player);
             }
             else{
                 PacketUtils.teleport(player, getEntityId(), location);
@@ -1194,9 +1345,14 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     @Override
     public @Nullable Location getLocation(){
         if (!isMaster && group != null && isDisplay()){
-            return group.getLocation();
+            Location groupLoc = group.getLocation();
+            if (packetLocation != null && packetLocation.isValid()){
+                groupLoc.setPitch(packetLocation.pitch);
+                groupLoc.setYaw(packetLocation.yaw);
+            }
+            return groupLoc;
         }
-        if (packetLocation != null){
+        if (packetLocation != null && packetLocation.isValid()){
             return packetLocation.toLocation();
         }
         return null;
@@ -1368,7 +1524,24 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
     }
 
     private void sendHeadLookPacket(Player player, float yaw){
-        PacketEvents.getAPI().getPlayerManager().sendPacket(player, getHeadLookPacket(yaw));
+        if (type == SpawnedDisplayEntityPart.PartType.MANNEQUIN) {
+            PacketEvents.getAPI().getPlayerManager().sendPacket(player, getHeadLookPacket(yaw));
+        }
+    }
+
+    @Override
+    public @Nullable PacketDisplayEntityPart clone() {
+        if (!isValid() || isMaster) return null;
+
+        Location loc = getLocation();
+        if (loc == null) return null;
+
+        PacketDisplayEntityPart cloned = this.attributeContainer.createPart(type, loc);
+        if (this.hasGroup()){
+            this.group.addPart(cloned);
+        }
+
+        return cloned;
     }
 
 
@@ -1390,10 +1563,6 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
             this.pitch = location.getPitch();
         }
 
-        PacketLocation(Location location, Vector3f vector){
-            this(vector == null ? location : WorldUtils.getPivotLocation(Vector.fromJOML(vector), location, location.getYaw()));
-        }
-
         PacketLocation setRotation(float yaw, float pitch){
             this.yaw = yaw;
             this.pitch = pitch;
@@ -1409,6 +1578,10 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
 
         Location toLocation(){
             return new Location(Bukkit.getWorld(worldName), x, y, z, yaw, pitch);
+        }
+
+        boolean isValid(){
+            return worldName != null;
         }
     }
 }

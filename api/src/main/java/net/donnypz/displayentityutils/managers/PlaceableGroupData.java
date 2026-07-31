@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.managers;
 
-import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DEUSound;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import org.bukkit.inventory.ItemStack;
@@ -111,7 +111,7 @@ public class PlaceableGroupData {
 
     /**
      * Apply the data to a provided itemstack, spawning the group when placed
-     * @param itemStack
+     * @param itemStack the item to apply placeable group data to
      * @throws IllegalArgumentException if the itemstack is not of a block type
      */
     public void apply(@NotNull ItemStack itemStack){
@@ -121,22 +121,22 @@ public class PlaceableGroupData {
         ItemMeta meta = itemStack.getItemMeta();
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
 
-        pdc.set(DisplayAPI.getPlaceableGroupKey(), PersistentDataType.STRING, groupTag);
+        pdc.set(DisplayKeys.PlaceableGroup.GROUP_TAG, PersistentDataType.STRING, groupTag);
 
         if (permission != null){
-            pdc.set(DisplayAPI.getPlaceableGroupPermissionKey(), PersistentDataType.STRING, permission);
+            pdc.set(DisplayKeys.PlaceableGroup.PERMISSION, PersistentDataType.STRING, permission);
         }
 
-        pdc.set(DisplayAPI.getPlaceableGroupRespectPlayerFacing(), PersistentDataType.BOOLEAN, respectPlayerFacing);
-        pdc.set(DisplayAPI.getPlaceableGroupRespectBlockFace(), PersistentDataType.BOOLEAN, respectBlockFace);
+        pdc.set(DisplayKeys.PlaceableGroup.RESPECT_PLAYER_FACING, PersistentDataType.BOOLEAN, respectPlayerFacing);
+        pdc.set(DisplayKeys.PlaceableGroup.RESPECT_BLOCK_FACE, PersistentDataType.BOOLEAN, respectBlockFace);
 
 
-        pdc.set(DisplayAPI.getPlaceableGroupPlacerBreaksOnly(), PersistentDataType.BOOLEAN, placerBreaksOnly);
-        pdc.set(DisplayAPI.getPlaceableGroupDropItem(), PersistentDataType.BOOLEAN, dropItemOnBreak);
+        pdc.set(DisplayKeys.PlaceableGroup.PLACER_BREAKS_ONLY, PersistentDataType.BOOLEAN, placerBreaksOnly);
+        pdc.set(DisplayKeys.PlaceableGroup.DROP_ITEM_ON_BREAK, PersistentDataType.BOOLEAN, dropItemOnBreak);
 
-        pdc.set(DisplayAPI.getPlaceableGroupPlaceSounds(), PersistentDataType.BYTE_ARRAY,
+        pdc.set(DisplayKeys.PlaceableGroup.PLACE_SOUNDS, PersistentDataType.BYTE_ARRAY,
                 PlaceableGroupManager.writeSoundList(placeSounds));
-        pdc.set(DisplayAPI.getPlaceableGroupBreakSounds(), PersistentDataType.BYTE_ARRAY,
+        pdc.set(DisplayKeys.PlaceableGroup.BREAK_SOUNDS, PersistentDataType.BYTE_ARRAY,
                 PlaceableGroupManager.writeSoundList(breakSounds));
         itemStack.setItemMeta(meta);
     }

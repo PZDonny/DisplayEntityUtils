@@ -2,18 +2,15 @@ package net.donnypz.displayentityutils.utils.DisplayEntities.particles;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 
 @ApiStatus.Internal
-class DustOptionAnimationParticle extends AnimationParticle implements Serializable {
+class DustOptionAnimationParticle extends AnimationParticle<Particle.DustOptions> implements Serializable {
 
     transient Color color;
     Map<String, Object> colorAsMap;
@@ -26,8 +23,7 @@ class DustOptionAnimationParticle extends AnimationParticle implements Serializa
 
 
     DustOptionAnimationParticle(AnimationParticleBuilder builder, Particle.DustOptions dustOptions) {
-        super(builder, Particle.DUST);
-        updateColor(dustOptions);
+        super(builder, Particle.DUST, dustOptions);
     }
 
     @ApiStatus.Internal
@@ -35,13 +31,26 @@ class DustOptionAnimationParticle extends AnimationParticle implements Serializa
     }
 
     @Override
-    public void spawn(Location location) {
-        location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, options);
+    AnimationParticleBuilder.Step getStep() {
+        return AnimationParticleBuilder.Step.COLOR_AND_SIZE;
     }
 
     @Override
-    public void spawn(Location location, @NotNull Player player) {
-        player.spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, options);
+    Particle.DustOptions getSpawnData() {
+        return options;
+    }
+
+    @Override
+    void update(Particle.DustOptions data) {
+        this.options = data;
+        this.color = data.getColor();
+        this.colorAsMap = color.serialize();
+        this.size = data.getSize();
+    }
+
+    @Override
+    boolean canUseData() {
+        return true;
     }
 
     @Override
@@ -52,22 +61,6 @@ class DustOptionAnimationParticle extends AnimationParticle implements Serializa
 
     @Override
     protected Component getUniqueInfo() {
-        return getEditMSG("| Color and Size: "+color.asRGB()+", "+size, AnimationParticleBuilder.Step.COLOR_AND_SIZE);
-    }
-
-    @Override
-    protected boolean editUniqueParticle(AnimationParticleBuilder builder, AnimationParticleBuilder.Step step) {
-        if (step == AnimationParticleBuilder.Step.COLOR_AND_SIZE){
-            updateColor(builder.data());
-            return true;
-        }
-        return false;
-    }
-
-    private void updateColor(Particle.DustOptions dustOptions){
-        this.options = dustOptions;
-        this.color = dustOptions.getColor();
-        this.colorAsMap = color.serialize();
-        this.size = dustOptions.getSize();
+        return getEditMSG("| Color and Size: "+color.asRGB()+", "+size);
     }
 }

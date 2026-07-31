@@ -19,7 +19,7 @@ class AnimSelectCMD extends PlayerSubCommand {
     AnimSelectCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("select", parentSubCommand, Permission.ANIM_SELECT);
         setTabComplete(2, "<anim-tag>");
-        setTabComplete(3, TabSuggestion.STORAGES);
+        setTabComplete(3, TabSuggestion.STORAGES_WITH_ALL);
     }
 
     @Override
@@ -34,7 +34,7 @@ class AnimSelectCMD extends PlayerSubCommand {
     static void getAnimation(Player p, String tag, String storage){
         if (storage.equals("all")){
             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Attempting to select animation from all storage locations", NamedTextColor.YELLOW)));
-            GroupSpawnCMD.attemptAll(p, p.getLocation(), tag, LoadMethod.LOCAL, false);
+            GroupSpawnCMD.attemptAll(p, p.getLocation(), tag, LoadMethod.LOCAL, false, false);
             return;
         }
 

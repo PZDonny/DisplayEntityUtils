@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Block Display Part's Block")
+@Name("Block Display Part - Block")
 @Description("Set the block of a block display part.")
 @Examples({"if {_activepart}'s part type is block_display:",
         "\tset {_activepart}'s deu block to stone"

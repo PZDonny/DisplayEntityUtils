@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Item Display Part's Item")
+@Name("Item Display Part - Item")
 @Description("Set the item of a item display part.")
 @Examples({"if {_activepart}'s part type is item_display:",
         "\tset {_activepart}'s deu item to diamond_sword",

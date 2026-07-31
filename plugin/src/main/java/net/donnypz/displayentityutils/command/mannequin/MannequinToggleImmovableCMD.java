@@ -12,8 +12,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 class MannequinToggleImmovableCMD extends PartsSubCommand {
     MannequinToggleImmovableCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("toggleimmovable", parentSubCommand, Permission.MANNEQUIN_IMMOVABLE, false);
@@ -44,7 +42,7 @@ class MannequinToggleImmovableCMD extends PartsSubCommand {
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled immovability for ALL selected mannequins <red>OFF")));
         }
 
-        for (ActivePart part : selection.getSelectedParts()){
+        for (ActivePart part : selection.getParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.MANNEQUIN) {
                 part.setMannequinImmovable(status);
             }

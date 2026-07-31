@@ -1,23 +1,25 @@
 package net.donnypz.displayentityutils.command.interaction;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.*;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
+import net.donnypz.displayentityutils.utils.PivotAxis;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 class InteractionPivotCMD extends PlayerSubCommand {
     InteractionPivotCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("pivot", parentSubCommand, Permission.INTERACTION_PIVOT);
-        setTabComplete(2, "<angle>");
+        setTabComplete(2, List.of("x", "y", "z"));
+        setTabComplete(3, "<angle>");
         addFlag("-all");
+        addFlag("-world");
     }
 
     @Override
@@ -38,11 +40,18 @@ class InteractionPivotCMD extends PlayerSubCommand {
             return;
         }
 
+        PivotAxis axis = CMDUtils.getPivotAxis(args[2], player);
+        if (axis == null) return;
+
         if (!hasMinimumArguments(player, args)) return;
 
-        double angle;
+        OptionalArguments oArgs = getOptionalArguments(player, args);
+        boolean isAll = oArgs.hasFlag("-all");
+        boolean worldSpace = oArgs.hasFlag("-world");
+
+        float angle;
         try{
-            angle = Double.parseDouble(args[2]);;
+            angle = Float.parseFloat(args[3]);
         }
         catch(NumberFormatException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the angle!", NamedTextColor.RED)));
@@ -51,11 +60,10 @@ class InteractionPivotCMD extends PlayerSubCommand {
 
 
         MultiPartSelection<?> selection = (MultiPartSelection<?>) sel;
-        boolean isAll = getOptionalArguments(player, args).hasFlag("-all");
         if (isAll){
-            for (ActivePart p : selection.getSelectedParts()){
+            for (ActivePart p : selection.getParts()){
                 if (p.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION){
-                    p.pivot((float) angle);
+                    p.pivot(angle, axis, worldSpace);
                 }
             }
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Pivoting ALL Interaction entities in your selection around your group", NamedTextColor.GREEN)));
@@ -65,13 +73,15 @@ class InteractionPivotCMD extends PlayerSubCommand {
             if (interaction == null){
                 return;
             }
-            interaction.pivot(selection.getGroup().getLocation(), angle);
+            interaction.pivot(selection.getGroup().getLocation(), angle, axis, worldSpace);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Pivoting Interaction around group", NamedTextColor.GREEN)));
         }
     }
 
     @Override
     protected String getDescription() {
-        return "Pivot an interaction around its group's location";
+        return "Pivot an interaction around its group's location. " +
+                "Pivot around the X (pitch), Y (yaw), or Z (roll) axes" +
+                "\nUse \"-world\" to pivot in world space";
     }
 }

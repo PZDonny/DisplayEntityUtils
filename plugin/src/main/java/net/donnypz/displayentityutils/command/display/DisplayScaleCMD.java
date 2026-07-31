@@ -23,19 +23,19 @@ class DisplayScaleCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
-        for (ActivePart selectedPart : selection.getSelectedParts()){
+        for (ActivePart selectedPart : selection.getParts()){
             if (!selectedPart.isDisplay()){
                 continue;
             }
             try {
-                if (applyScaleChange(getDimension(args), getScale(args), selectedPart, player)) {
-                    player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Scale updated for selected displays!", NamedTextColor.GREEN)));
-                }
-            } catch (NumberFormatException e) {
+                applyScaleChange(getDimension(args), getScale(args), selectedPart, player);
+            }
+            catch (NumberFormatException e) {
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the scale!", NamedTextColor.RED)));
                 return false;
             }
         }
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Scale updated for selected displays!", NamedTextColor.GREEN)));
         return true;
     }
 

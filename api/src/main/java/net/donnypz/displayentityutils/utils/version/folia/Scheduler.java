@@ -8,41 +8,41 @@ import org.jetbrains.annotations.NotNull;
 
 public interface Scheduler {
 
-    void run(Runnable runnable);
+    void run(@NotNull Runnable runnable);
 
-    void runAsync(Runnable runnable);
+    void runAsync(@NotNull Runnable runnable);
 
-    Task runLater(Runnable runnable, long delay);
+    Task runLater(@NotNull Runnable runnable, long delay);
 
-    Task runLaterAsync(Runnable runnable, long delay);
+    Task runLaterAsync(@NotNull Runnable runnable, long delay);
 
-    Task runTimer(SchedulerRunnable runnable, long delay, long period);
+    Task runTimer(@NotNull SchedulerRunnable runnable, long delay, long period);
 
-    Task runTimerAsync(SchedulerRunnable runnable, long delay, long period);
+    Task runTimerAsync(@NotNull SchedulerRunnable runnable, long delay, long period);
 
-    void entityRun(@NotNull Entity entity, Runnable runnable);
+    void entityRun(@NotNull Entity entity,@NotNull Runnable runnable);
 
-    void entityRunAsync(@NotNull Entity entity, Runnable runnable);
+    void entityRunAsync(@NotNull Entity entity, @NotNull Runnable runnable);
 
-    Task entityRunLater(@NotNull Entity entity, Runnable runnable, long delay);
+    Task entityRunLater(@NotNull Entity entity, @NotNull Runnable runnable, long delay);
 
-    Task entityRunLaterAsync(@NotNull Entity entity, Runnable runnable, long delay);
+    Task entityRunLaterAsync(@NotNull Entity entity, @NotNull Runnable runnable, long delay);
 
-    Task entityRunTimer(@NotNull Entity entity, SchedulerRunnable runnable, long delay, long period);
+    Task entityRunTimer(@NotNull Entity entity, @NotNull SchedulerRunnable runnable, long delay, long period);
 
-    Task entityRunTimerAsync(@NotNull Entity entity, SchedulerRunnable runnable, long delay, long period);
+    Task entityRunTimerAsync(@NotNull Entity entity, @NotNull SchedulerRunnable runnable, long delay, long period);
 
-    void partRun(@NotNull ActivePart part, Runnable runnable);
+    void partRun(ActivePart part, @NotNull Runnable runnable);
 
-    void partRunAsync(@NotNull ActivePart part, Runnable runnable);
+    void partRunAsync(ActivePart part, @NotNull Runnable runnable);
 
-    Task partRunLater(@NotNull ActivePart part, Runnable runnable, long delay);
+    Task partRunLater(ActivePart part, @NotNull Runnable runnable, long delay);
 
-    Task partRunLaterAsync(@NotNull ActivePart part, Runnable runnable, long delay);
+    Task partRunLaterAsync(ActivePart part, @NotNull Runnable runnable, long delay);
 
-    Task partRunTimer(@NotNull ActivePart part, SchedulerRunnable runnable, long delay, long period);
+    Task partRunTimer(ActivePart part, @NotNull SchedulerRunnable runnable, long delay, long period);
 
-    Task partRunTimerAsync(@NotNull ActivePart part, SchedulerRunnable runnable, long delay, long period);
+    Task partRunTimerAsync(ActivePart part, @NotNull SchedulerRunnable runnable, long delay, long period);
 
 
     abstract class SchedulerRunnable implements Runnable{
@@ -74,5 +74,15 @@ public interface Scheduler {
                 bukkitTask.cancel();
             }
         }
+    }
+
+    class EmptyTask extends Task{
+        EmptyTask(){
+            super((Object) null);
+        }
+
+        @Override
+        public void cancel(){}
+
     }
 }

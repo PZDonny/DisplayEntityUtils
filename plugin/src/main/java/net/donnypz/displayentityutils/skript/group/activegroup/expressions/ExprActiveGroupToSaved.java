@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Save Active Group")
+@Name("Active Group - Save")
 @Description("Get an unmodifiable version of an Active Group")
 @Examples({"set {_savedgroup} to {_activegroup} as saved group"})
 @Since("3.3.1")

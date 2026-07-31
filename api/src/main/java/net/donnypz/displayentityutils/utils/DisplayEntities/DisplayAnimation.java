@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.LegacyUtils;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,14 +16,24 @@ public final class DisplayAnimation implements Serializable {
     boolean respectGroupScale = true;
     boolean dataChanges = true;
     PartFilter filter;
+    private final String savedPluginVersion; //started saving in v3.6.0
 
     @Serial
     private static final long serialVersionUID = 99L;
     public static final String fileExtension = ".deanim";
 
 
-    DisplayAnimation(){}
+    DisplayAnimation(){
+        this.savedPluginVersion = VersionUtils.getPluginVersion();
+    }
 
+    /**
+     * Get the plugin version that this {@link DisplayAnimation} was saved on
+     * @return a String with the plugin version, or null if saved before <code>v3.6.0</code>
+     */
+    public @Nullable String getSavedPluginVersion(){
+        return savedPluginVersion;
+    }
 
 
     public String getAnimationTag() {

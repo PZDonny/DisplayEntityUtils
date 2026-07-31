@@ -1,8 +1,9 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.InteractionUtils;
+import net.donnypz.displayentityutils.utils.PivotAxis;
 import net.donnypz.displayentityutils.utils.WorldUtils;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
@@ -14,6 +15,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.io.IOException;
@@ -38,11 +41,14 @@ final class InteractionEntity implements Serializable {
 
     InteractionEntity(){}
 
-    InteractionEntity(Interaction interaction){
+    InteractionEntity(@NotNull Interaction interaction, @Nullable Location groupLocation){
         this.height = interaction.getInteractionHeight();
         this.width = interaction.getInteractionWidth();
         this.isResponsive = interaction.isResponsive();
         this.vector = DisplayUtils.getNonDisplayTranslation(interaction).toVector3f();
+        if (groupLocation != null){
+            vector = DisplayUtils.normalizeVector(vector, groupLocation.getPitch(), groupLocation.getYaw());
+        }
 
         try{
             persistentDataContainer = interaction.getPersistentDataContainer().serializeToBytes();
@@ -52,19 +58,19 @@ final class InteractionEntity implements Serializable {
         }
     }
 
-    InteractionEntity(PacketDisplayEntityPart part){
-
+    InteractionEntity(@NotNull PacketDisplayEntityPart part, @NotNull Location groupLocation){
         PacketAttributeContainer c = part.attributeContainer;
         this.height = c.getAttributeOrDefault(DisplayAttributes.Interaction.HEIGHT, 1f);
         this.width = c.getAttributeOrDefault(DisplayAttributes.Interaction.WIDTH, 1f);
         this.isResponsive = c.getAttributeOrDefault(DisplayAttributes.Interaction.RESPONSIVE, false);
         this.vector = part.getNonDisplayTranslation().toVector3f();
+        vector = DisplayUtils.normalizeVector(vector, groupLocation.getPitch(), groupLocation.getYaw());
 
         try{
             ItemStack i = new ItemStack(Material.STICK);
             PersistentDataContainer pdc = i.getItemMeta().getPersistentDataContainer();
-            pdc.set(DisplayAPI.getPartPDCTagKey(), PersistentDataType.LIST.strings(), new ArrayList<>(part.getTags()));
-            pdc.set(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING, part.partUUID.toString());
+            pdc.set(DisplayKeys.Part.PART_TAGS, PersistentDataType.LIST.strings(), new ArrayList<>(part.getTags()));
+            pdc.set(DisplayKeys.Part.PART_UUID, PersistentDataType.STRING, part.partUUID.toString());
             persistentDataContainer = pdc.serializeToBytes();
         }
         catch(IOException e){
@@ -74,10 +80,13 @@ final class InteractionEntity implements Serializable {
 
     Interaction createEntity(Location origin, GroupSpawnSettings settings){
         Location spawnLoc = WorldUtils.getPivotLocation(
-                vector,
+                Vector.fromJOML(vector),
                 origin,
-                origin.getYaw());
-        return spawnLoc.getWorld().spawn(spawnLoc, Interaction.class, i ->{
+                origin.getYaw(),
+                origin.getPitch());
+
+        return spawnLoc.getWorld().spawn(spawnLoc, Interaction.class, i -> {
+            i.setRotation(origin.getYaw(), origin.getPitch());
             i.setInteractionHeight(height);
             i.setInteractionWidth(width);
             i.setResponsive(isResponsive);
@@ -97,7 +106,7 @@ final class InteractionEntity implements Serializable {
             if (partUUID != null){
                 i
                     .getPersistentDataContainer()
-                    .set(DisplayAPI.getPartUUIDKey(),
+                    .set(DisplayKeys.Part.PART_UUID,
                             PersistentDataType.STRING,
                             partUUID.toString());
             }
@@ -113,9 +122,10 @@ final class InteractionEntity implements Serializable {
                 .setAttribute(DisplayAttributes.Interaction.RESPONSIVE, isResponsive);
 
         Location spawnLoc = WorldUtils.getPivotLocation(
-                vector,
+                Vector.fromJOML(vector),
                 origin,
-                origin.getYaw());
+                origin.getYaw(),
+                origin.getPitch());
 
         PacketDisplayEntityPart part = attributeContainer.createPart(SpawnedDisplayEntityPart.PartType.INTERACTION, spawnLoc);
 
@@ -129,7 +139,7 @@ final class InteractionEntity implements Serializable {
                 throw new RuntimeException(e);
             }
 
-            part.partTags = DisplayEntity.getSetFromPDC(pdc, DisplayAPI.getPartPDCTagKey());
+            part.partTags = DisplayEntity.getSetFromPDC(pdc, DisplayKeys.Part.PART_TAGS);
             part.partUUID = partUUID != null ? partUUID : DisplayEntity.getPDCPartUUID(pdc);
             part.interactionCommands = getInteractionCommands(pdc);
         }

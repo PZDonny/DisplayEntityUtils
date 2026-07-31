@@ -9,6 +9,7 @@ public class MannequinCMD extends ParentSubCommand {
         new MannequinNameCMD(this);
         new MannequinUnnameCMD(this);
         new MannequinBelowNameCMD(this);
+        new MannequinBelowNameDistanceCMD(this);
         new MannequinToggleNameVisibilityCMD(this);
         new MannequinSkinCMD(this);
         new MannequinPoseCMD(this);

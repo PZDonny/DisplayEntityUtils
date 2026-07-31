@@ -2,9 +2,8 @@ package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,6 +15,7 @@ class GroupPitchCMD extends GroupSubCommand {
     GroupPitchCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("pitch", parentSubCommand, Permission.GROUP_TRANSFORM, true);
         setTabComplete(2, "<pitch>");
+        addFlag("-pivot");
     }
 
     @Override
@@ -31,9 +31,12 @@ class GroupPitchCMD extends GroupSubCommand {
         try{
             double oldPitch = group.getLocation().getPitch();
             float pitch = Float.parseFloat(args[2]);
-            group.setPitch(pitch);
+            boolean pivot = getOptionalArguments(player, args).hasFlag("-pivot");
+            group.setPitch(pitch, pivot);
+
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Pitch set!", NamedTextColor.GREEN)));
             player.sendMessage(Component.text("| Old Pitch: "+oldPitch, NamedTextColor.GRAY));
+            GizmoCMD.updateGizmoRotationIfExists(player);
         }
         catch(NumberFormatException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Please enter a valid number!", NamedTextColor.RED)));
@@ -42,6 +45,6 @@ class GroupPitchCMD extends GroupSubCommand {
 
     @Override
     protected String getDescription() {
-        return "Set your selected group's pitch";
+        return "Set your selected group's pitch. \"-pivot\" pivots non-display entities around the group";
     }
 }

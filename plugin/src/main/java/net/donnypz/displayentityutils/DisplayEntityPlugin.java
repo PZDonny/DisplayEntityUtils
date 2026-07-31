@@ -11,6 +11,7 @@ import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUInteractionListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUMannequinEditorListener;
 import net.donnypz.displayentityutils.listeners.entity.mythic.DEUMythicListener;
+import net.donnypz.displayentityutils.listeners.gizmo.DEUGizmoListener;
 import net.donnypz.displayentityutils.listeners.player.*;
 import net.donnypz.displayentityutils.listeners.player.essentials.DEUEssentialsListener;
 import net.donnypz.displayentityutils.managers.LocalManager;
@@ -35,12 +36,12 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntity
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
 import net.donnypz.displayentityutils.utils.bdengine.convert.common.BDEConversionHandlerImpl;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerUtils;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.donnypz.displayentityutils.utils.version.folia.SchedulerImpl;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -78,9 +79,15 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         ConfigUtils.registerDisplayControllers();
         initializeDependencies();
         registerListeners();
-        initializeNamespacedKeys();
-        initializeBStats();
         checkFolia();
+
+        boolean isDevVersion = VersionUtils.isDevVersion();
+        if (!isDevVersion){
+            initializeBStats();
+        }
+        else{
+            getComponentLogger().warn(Component.text("bStats disabled on server using dev version."));
+        }
         getServer().getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
     }
 
@@ -97,31 +104,6 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         } catch (ClassNotFoundException e) {
             DisplayAPI.isFolia = false;
         }
-    }
-
-
-    private void initializeNamespacedKeys(){ //DO NOT CHANGE
-        DisplayAPI.partUUIDKey = new NamespacedKey(this, "partUUID");
-        DisplayAPI.partPDCTagKey = new NamespacedKey(this, "pdcTag");
-        DisplayAPI.groupTagKey = new NamespacedKey(this, "groupTag");
-        DisplayAPI.masterKey = new NamespacedKey(this, "isMaster");
-        DisplayAPI.spawnAnimationKey = new NamespacedKey(this, "spawnanimation");
-        DisplayAPI.spawnAnimationTypeKey = new NamespacedKey(this, "spawnanimationtype");
-        DisplayAPI.spawnAnimationLoadMethodKey = new NamespacedKey(this, "spawnanimationloader");
-        DisplayAPI.chunkPacketGroupsKey = new NamespacedKey(this, "chunkpacketgroups");
-
-        DisplayAPI.placeableGroupKey = new NamespacedKey(this, "placeablegroup");
-        DisplayAPI.placeableGroupPermissionKey = new NamespacedKey(this, "placeablegroup_perm");
-        DisplayAPI.placeableGroupRespectFacingKey = new NamespacedKey(this, "placeablegroup_playerfacing");
-        DisplayAPI.placeableGroupRespectBlockFace = new NamespacedKey(this, "placeablegroup_blockface");
-        DisplayAPI.placeableGroupPlaceSounds = new NamespacedKey(this, "placeablegroup_placesounds");
-        DisplayAPI.placeableGroupBreakSounds = new NamespacedKey(this, "placeablegroup_breaksounds");
-        DisplayAPI.placeableGroupPlacerBreaksOnly = new NamespacedKey(this, "placeablegroup_placerbreaks");
-        DisplayAPI.placeableGroupDropItem = new NamespacedKey(this, "placeablegroup_dropitem");
-        DisplayAPI.placeableGroupItemStack = new NamespacedKey(this, "placeablegroup_itemstack");
-        DisplayAPI.placeableGroupPlacer = new NamespacedKey(this, "placeablegroup_placer");
-        DisplayAPI.placeableGroupId = new NamespacedKey(this, "placeablegroup_groupid");
-
     }
 
     private void initializeDependencies(){
@@ -177,6 +159,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
         Bukkit.getPluginManager().registerEvents(new BDEngineConversionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUEntityListener(), this);
+        Bukkit.getPluginManager().registerEvents(new DEUGizmoListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerChatListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUPlayerWorldListener(), this);

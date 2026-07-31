@@ -2,13 +2,15 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import com.destroystokyo.paper.profile.ProfileProperty;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
-import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
@@ -20,6 +22,8 @@ import org.bukkit.inventory.MainHand;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.profile.PlayerTextures;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,13 +32,17 @@ import java.util.List;
 
 class SavedEntityBuilder {
 
-    static MannequinEntity buildMannequin(Entity entity){ //Accept entity instead of mannequin, preventing issues on versions below 1.21.9
+    //Accept entity instead of mannequin, preventing issues on versions below 1.21.9
+    static MannequinEntity buildMannequin(@NotNull Entity entity, @Nullable Location groupLocation){
         MannequinEntity mannequinEntity = new MannequinEntity();
         org.bukkit.entity.Mannequin mannequin = (org.bukkit.entity.Mannequin) entity;
 
         Component customName = mannequin.customName();
         mannequinEntity.customName = customName != null ? MiniMessage.miniMessage().serialize(customName) : null;
         mannequinEntity.customNameVisible = mannequin.isCustomNameVisible();
+        mannequinEntity.belowNameDistance = VersionUtils.hasBelowNameDistance()
+                ? mannequin.getAttribute(Attribute.BELOW_NAME_DISTANCE).getBaseValue()
+                : 10.0d;
 
         Component description = mannequin.getDescription();
         mannequinEntity.description = description != null ? MiniMessage.miniMessage().serialize(description) : null;
@@ -56,6 +64,12 @@ class SavedEntityBuilder {
         };
 
         mannequinEntity.vector = DisplayUtils.getNonDisplayTranslation(mannequin).toVector3f();
+        if (groupLocation != null){
+            mannequinEntity.vector = DisplayUtils.normalizeVector(
+                            mannequinEntity.vector,
+                            groupLocation.getPitch(),
+                            groupLocation.getYaw());
+        }
 
         try{
             mannequinEntity.persistentDataContainer = mannequin.getPersistentDataContainer().serializeToBytes();
@@ -66,13 +80,16 @@ class SavedEntityBuilder {
         return mannequinEntity;
     }
 
-    static MannequinEntity buildMannequin(PacketDisplayEntityPart part){
+    static MannequinEntity buildMannequin(@NotNull PacketDisplayEntityPart part, @NotNull Location groupLocation){
         MannequinEntity mannequinEntity = new MannequinEntity();
         PacketAttributeContainer c = part.attributeContainer;
 
         Component customName = part.getCustomName();
         mannequinEntity.customName = customName != null ? MiniMessage.miniMessage().serialize(customName) : null;
         mannequinEntity.customNameVisible = part.isCustomNameVisible();
+        mannequinEntity.belowNameDistance = VersionUtils.hasBelowNameDistance()
+                ? c.getAttributeOrDefault(DisplayAttributes.Mannequin.BELOW_NAME_DISTANCE, 10.0f)
+                : 10.0d;
 
         Component description = part.getMannequinBelowName();
         mannequinEntity.description = description != null ? MiniMessage.miniMessage().serialize(description) : null;
@@ -96,14 +113,16 @@ class SavedEntityBuilder {
                 serializeItemStack(part.getMannequinEquipment(EquipmentSlot.OFF_HAND))
         };
 
-
-        mannequinEntity.vector = part.getNonDisplayTranslation().toVector3f();
+        mannequinEntity.vector = DisplayUtils.normalizeVector(
+                        part.getNonDisplayTranslation().toVector3f(),
+                        groupLocation.getPitch(),
+                        groupLocation.getYaw());
 
         try{
             ItemStack i = new ItemStack(Material.STICK);
             PersistentDataContainer pdc = i.getItemMeta().getPersistentDataContainer();
-            pdc.set(DisplayAPI.getPartPDCTagKey(), PersistentDataType.LIST.strings(), new ArrayList<>(part.getTags()));
-            pdc.set(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING, part.partUUID.toString());
+            pdc.set(DisplayKeys.Part.PART_TAGS, PersistentDataType.LIST.strings(), new ArrayList<>(part.getTags()));
+            pdc.set(DisplayKeys.Part.PART_UUID, PersistentDataType.STRING, part.partUUID.toString());
             mannequinEntity.persistentDataContainer = pdc.serializeToBytes();
         }
         catch(IOException e){

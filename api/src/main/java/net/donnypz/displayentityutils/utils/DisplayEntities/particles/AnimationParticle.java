@@ -21,7 +21,7 @@ import java.io.*;
 import java.util.Collection;
 
 @ApiStatus.Internal
-public abstract class AnimationParticle implements Externalizable, Cloneable {
+public abstract class AnimationParticle<T> implements Externalizable, Cloneable {
 
     @Serial
     private static final long serialVersionUID = 99L;
@@ -49,7 +49,7 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
     public AnimationParticle(){}
 
 
-    AnimationParticle(AnimationParticleBuilder builder, Particle particle){
+    AnimationParticle(AnimationParticleBuilder builder, Particle particle, T data){
         this.particle = particle;
         this.particleName = particle.getKey().getKey();
         this.extra = builder.extra();
@@ -57,28 +57,23 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
         this.xOffset = builder.offsetX();
         this.yOffset = builder.offsetY();
         this.zOffset = builder.offsetZ();
+        if (canUseData()){
+            update(data);
+        }
     }
+
+    abstract AnimationParticleBuilder.Step getStep();
+
+    abstract T getSpawnData();
+
+    abstract void update(T data);
+
+    abstract boolean canUseData();
 
     public void setDelayInTicks(int delayInTicks){
         this.delayInTicks = delayInTicks;
     }
 
-
-    /*public Location getSpawnLocation(SpawnedDisplayEntityGroup group){
-        Vector v = vectorFromOrigin.clone();
-        Location groupLoc = group.getLocation();
-
-        double pitchDiff = groupLoc.getPitch() - groupPitchAtCreation;
-        double pitchAsRad = Math.toRadians(pitchDiff);
-        double sin = Math.sin(pitchAsRad);
-        double cos = Math.cos(pitchAsRad);
-
-        v.setY(-1*(v.length() * sin - v.getY() * cos)); //Adjust for pitch
-        v.rotateAroundY(Math.toRadians(groupYawAtCreation - groupLoc.getYaw())); //Pivot
-
-        groupLoc.add(v);
-        return groupLoc;
-    }*/
 
     public void spawn(@NotNull Location location, @NotNull ActiveGroup<?> group, @Nullable DisplayAnimator animator){
         if (delayInTicks == 0){
@@ -137,11 +132,23 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
         }
     }
 
+    public void spawn(Location location) {
+        if (canUseData()){
+            location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, getSpawnData());
+        }
+        else{
+            location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra);
+        }
+    }
 
-
-    public abstract void spawn(Location location);
-
-    public abstract void spawn(Location location, @NotNull Player player);
+    public void spawn(Location location, @NotNull Player player) {
+        if (canUseData()){
+            player.spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, getSpawnData());
+        }
+        else{
+            player.spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra);
+        }
+    }
 
     public void spawn(Location location, @NotNull Collection<Player> players){
         for (Player player : players){
@@ -213,14 +220,14 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
     }
 
     private void sendEditMSG(Player player, String info, AnimationParticleBuilder.Step step){
-        player.sendMessage(getEditMSG(info, step));
+        player.sendMessage(getEditMSG(info));
     }
 
-    Component getEditMSG(String info, AnimationParticleBuilder.Step step){
+    Component getEditMSG(String info){
        return Component.text(info, NamedTextColor.GREEN)
                 .hoverEvent(HoverEvent.showText(Component.text("Click to edit this value", NamedTextColor.YELLOW, TextDecoration.ITALIC)))
                 .clickEvent(ClickEvent.callback(p -> {
-                    new AnimationParticleBuilder((Player) p, this, step);
+                    new AnimationParticleBuilder((Player) p, this, getStep());
                 }, ClickCallback.Options.builder().uses(-1).build()));
     }
 
@@ -262,7 +269,14 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
 
     }
 
-    protected abstract boolean editUniqueParticle(AnimationParticleBuilder builder, AnimationParticleBuilder.Step step);
+    protected boolean editUniqueParticle(AnimationParticleBuilder builder, AnimationParticleBuilder.Step step){
+        if (step == getStep()){
+            update(builder.data());
+            return true;
+        }
+        return false;
+    }
+
 
     @ApiStatus.Internal
     @Override
@@ -353,9 +367,9 @@ public abstract class AnimationParticle implements Externalizable, Cloneable {
     }
 
     @Override
-    public AnimationParticle clone() {
+    public AnimationParticle<?> clone() {
         try {
-            return (AnimationParticle) super.clone();
+            return (AnimationParticle<?>) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }

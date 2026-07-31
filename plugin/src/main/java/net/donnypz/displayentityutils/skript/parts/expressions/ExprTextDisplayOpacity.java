@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Text Display Part's Opacity")
+@Name("Text Display Part - Opacity")
 @Description("Set the opacity of a text display part.")
 @Examples({"if {_activepart}'s part type is text_display:",
         "\tset {_activepart}'s deu opacity to 105"

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Dismount Active Group")
+@Name("Active Group - Dismount")
 @Description("Make an active group stop riding an entity")
 @Examples({"deu dismount {_activegroup}"})
 @Since("2.6.2, 3.0.0 (Packet)")

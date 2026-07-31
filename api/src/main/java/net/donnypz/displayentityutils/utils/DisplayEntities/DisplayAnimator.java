@@ -176,9 +176,9 @@ public class DisplayAnimator {
             return false;
         }
 
-        SpawnedDisplayAnimationFrame frame = animation.frames.get(startFrameId);
-        int delay = frame.delay;
-        DisplayAPI.getAnimationPlayerService().play(this, animation, group, frame, startFrameId, delay, false);
+        DisplayAPI
+                .getAnimationPlayerService()
+                .play(this, group, startFrameId);
         return true;
     }
 
@@ -194,9 +194,10 @@ public class DisplayAnimator {
         if (!new PacketAnimationStartEvent(group, this, animation, null).callEvent()) {
             return false;
         }
-        SpawnedDisplayAnimationFrame frame = animation.frames.get(startFrameId);
-        int delay = frame.delay;
-        DisplayAPI.getAnimationPlayerService().playWithPackets(this, animation, group, frame, startFrameId, delay, false);
+
+        DisplayAPI
+                .getAnimationPlayerService()
+                .playWithPackets(this, group, startFrameId);
         return true;
     }
 
@@ -226,9 +227,10 @@ public class DisplayAnimator {
         if (!new PacketAnimationStartEvent(group, this, animation, players).callEvent()) {
             return false;
         }
-        SpawnedDisplayAnimationFrame frame = animation.frames.get(startFrameId);
-        int delay = frame.delay;
-        DisplayAPI.getAnimationPlayerService().playForClient(players, this, animation, group, frame, startFrameId, delay, false);
+
+        DisplayAPI
+                .getAnimationPlayerService()
+                .playForClient(players, this, group, startFrameId);
         return true;
     }
 

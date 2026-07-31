@@ -1,34 +1,25 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-public abstract class ActivePartSelection<T extends ActivePart> implements Active{
-
-    protected T selectedPart = null;
-
+public interface ActivePartSelection<T extends ActivePart> extends Active{
     /**
      * Get the part that is currently selected in this selection
      * @return an {@link ActivePart} or null
      */
-    public T getSelectedPart(){
-        return selectedPart;
-    }
+    T getSelectedPart();
 
     /**
      * Get whether this part selection has an {@link ActivePart} currently selected
      * @return a boolean
      */
-    public boolean hasSelectedPart(){
-        return selectedPart != null;
-    }
+    boolean hasSelectedPart();
 
-    public abstract void remove();
+    void remove();
 
     /**
-     * Get whether this part selection is valid and usable
+     * Get whether this selection is a {@link SinglePartSelection}
      * @return a boolean
      */
-    public abstract boolean isValid();
-
-    public boolean isSinglePartSelection(){
+    default boolean isSinglePartSelection(){
         return (this instanceof SinglePartSelection);
     }
 }

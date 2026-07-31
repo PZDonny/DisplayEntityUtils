@@ -12,8 +12,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 class MannequinToggleGravityCMD extends PartsSubCommand {
     MannequinToggleGravityCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("togglegravity", parentSubCommand, Permission.MANNEQUIN_GRAVITY, false);
@@ -42,7 +40,7 @@ class MannequinToggleGravityCMD extends PartsSubCommand {
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled gravity for ALL selected mannequins <red>OFF")));
         }
 
-        for (ActivePart part : selection.getSelectedParts()){
+        for (ActivePart part : selection.getParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.MANNEQUIN) {
                 part.setMannequinGravity(status);
             }

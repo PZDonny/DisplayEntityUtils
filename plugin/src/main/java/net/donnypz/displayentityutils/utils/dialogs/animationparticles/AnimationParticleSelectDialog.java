@@ -56,6 +56,7 @@ public class AnimationParticleSelectDialog {
 
     private static List<ActionButton> getActionButtons(Collection<FramePoint> framePoints){
         List<ActionButton> buttons = new ArrayList<>();
+        buttons.add(getGeneralAction(framePoints));
         buttons.add(getBlockParticleAction(framePoints));
         buttons.add(getItemstackAction(framePoints));
         buttons.add(getDustOptionAction(framePoints));
@@ -68,7 +69,11 @@ public class AnimationParticleSelectDialog {
 
         if (VersionUtils.IS_1_21_9) buttons.add(getFlashAction(framePoints));
 
-        buttons.add(getGeneralAction(framePoints));
+        if (VersionUtils.IS_26_2){
+            buttons.add(getGeyserAction(framePoints));
+            buttons.add(getGeyserBaseAction(framePoints));
+        }
+
         return buttons;
     }
 
@@ -148,6 +153,26 @@ public class AnimationParticleSelectDialog {
                 .tooltip(Component.text("Create an Animation Particle from a basic particle without additional data", NamedTextColor.YELLOW))
                 .action(DialogAction.customClick((view, audience) -> {
                     createOrSendExisting(framePoints, (Player) audience, AnimationParticleDialogs.GENERAL);
+                }, CALLBACK_OPTIONS))
+                .build();
+    }
+
+    private static ActionButton getGeyserAction(final Collection<FramePoint> framePoints){
+        return ActionButton
+                .builder(Component.text("Geyser / Geyser Plume"))
+                .tooltip(Component.text("Create a Geyser or Geyser Plume Animation Particle", NamedTextColor.YELLOW))
+                .action(DialogAction.customClick((view, audience) -> {
+                    createOrSendExisting(framePoints, (Player) audience, AnimationParticleDialogs.GEYSER);
+                }, CALLBACK_OPTIONS))
+                .build();
+    }
+
+    private static ActionButton getGeyserBaseAction(final Collection<FramePoint> framePoints){
+        return ActionButton
+                .builder(Component.text("Geyser Base / Geyser Poof"))
+                .tooltip(Component.text("Create a Geyser Base or Geyser Poof Animation Particle", NamedTextColor.YELLOW))
+                .action(DialogAction.customClick((view, audience) -> {
+                    createOrSendExisting(framePoints, (Player) audience, AnimationParticleDialogs.GEYSER_BASE);
                 }, CALLBACK_OPTIONS))
                 .build();
     }

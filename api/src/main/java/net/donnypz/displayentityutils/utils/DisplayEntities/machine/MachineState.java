@@ -29,13 +29,14 @@ public class MachineState {
 
     /**
      * Create a machine state for an {@link DisplayStateMachine}, determining which animation should be played when this state is active
+     * <br>
+     * An animation type of {@link DisplayAnimator.AnimationType#LOOP} will force the <code>transitionLock</code> to false, regardless of the set value.
      * @param stateMachine the state machine
      * @param stateType this state's type
      * @param animationTags the tags of the animations that will be played (with random selection) through when this state is active
      * @param loadMethod where the animation will be loaded from. Null to determine the animation through the {@link NullGroupLoaderEvent}
      * @param animationType the type of animation
      * @param transitionLock whether this state should lock transitions to another state before this one's animation finishes
-     * @apiNote Having the animation type as {@link DisplayAnimator.AnimationType#LOOP} will force the transitionLock to false, regardless of the value set.
      */
     public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull StateType stateType, @NotNull List<String> animationTags, @Nullable LoadMethod loadMethod, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock, boolean animationDataChanges){
         this(stateMachine, stateType.getStateID(), animationTags, loadMethod, animationType, transitionLock, animationDataChanges);
@@ -43,13 +44,14 @@ public class MachineState {
 
     /**
      * Create a machine state for an {@link DisplayStateMachine}, determining which animation should be played when this state is active
+     * <br>
+     * An animation type of {@link DisplayAnimator.AnimationType#LOOP} will force the <code>transitionLock</code> to false, regardless of the set value.
      * @param stateMachine the state machine
      * @param stateID this state's ID
      * @param animationTags the tags of the animations that will be played (with random selection) through when this state is active
      * @param loadMethod where the animation will be loaded from. Null to determine the animation through the {@link NullGroupLoaderEvent}
      * @param animationType the type of animation
      * @param transitionLock whether this state should lock transitions to another state before this one's animation finishes
-     * @apiNote Having the animation type as {@link DisplayAnimator.AnimationType#LOOP} will force the transitionLock to false, regardless of the value set.
      */
     public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull String stateID, @NotNull List<String> animationTags, @Nullable LoadMethod loadMethod, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock, boolean animationDataChanges){
         this.stateMachine = stateMachine;
@@ -77,12 +79,13 @@ public class MachineState {
 
     /**
      * Create a machine state for an {@link DisplayStateMachine}, determining which animation should be played when this state is active
+     * <br>
+     * An animation type of {@link DisplayAnimator.AnimationType#LOOP} will force the <code>transitionLock</code> to false, regardless of the set value.
      * @param stateMachine the state machine
      * @param stateType this state's type
      * @param animations the animations that will be played (with random selection) through when this state is active
      * @param animationType the type of animation
      * @param transitionLock whether this state should lock transitions to another state before this one's animation finishes
-     * @apiNote Having the animation type as {@link DisplayAnimator.AnimationType#LOOP} will force the transitionLock to false, regardless of the value set.
      */
     public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull StateType stateType, @NotNull List<SpawnedDisplayAnimation> animations, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock, boolean animationDataChanges){
         this(stateMachine, stateType.getStateID(), animations, animationType, transitionLock, animationDataChanges);
@@ -90,12 +93,13 @@ public class MachineState {
 
     /**
      * Create a machine state for an {@link DisplayStateMachine}, determining which animation should be played when this state is active
+     * <br>
+     * An animation type of {@link DisplayAnimator.AnimationType#LOOP} will force the <code>transitionLock</code> to false, regardless of the set value.
      * @param stateMachine the state machine
      * @param stateID this state's ID
      * @param animations the animations that will be played (with random selection) through when this state is active
      * @param animationType the type of animation
      * @param transitionLock whether this state should lock transitions to another state before this one's animation finishes
-     * @apiNote Having the animation type as {@link DisplayAnimator.AnimationType#LOOP} will force the transitionLock to false, regardless of the value set.
      */
     public MachineState(@NotNull DisplayStateMachine stateMachine, @NotNull String stateID, @NotNull List<SpawnedDisplayAnimation> animations, @NotNull DisplayAnimator.AnimationType animationType, boolean transitionLock, boolean animationDataChanges){
         this.stateMachine = stateMachine;

@@ -1,9 +1,10 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.utils.WorldUtils;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,6 +30,7 @@ final class MannequinEntity implements Serializable {
     Vector3f vector;
     String customName;
     boolean customNameVisible;
+    double belowNameDistance;
     String description;
     String profileName;
     UUID profileUUID;
@@ -48,6 +50,10 @@ final class MannequinEntity implements Serializable {
     MannequinEntity(){}
 
     PacketDisplayEntityPart createPacketPart(Location origin, GroupSpawnSettings settings){
+        return createPacketPart(origin, settings, VersionUtils.getPluginVersion());
+    }
+
+    PacketDisplayEntityPart createPacketPart(Location origin, GroupSpawnSettings settings, String savedPluginVersion){
         PacketAttributeContainer attributeContainer = new PacketAttributeContainer()
                 .setAttribute(DisplayAttributes.Mannequin.SCALE, (float) scale)
                 .setAttribute(DisplayAttributes.Mannequin.IMMOVABLE, true)
@@ -66,6 +72,13 @@ final class MannequinEntity implements Serializable {
             attributeContainer.setAttribute(DisplayAttributes.CUSTOM_NAME, MiniMessage.miniMessage().deserialize(customName));
         }
 
+        if (VersionUtils.hasBelowNameDistance()) {
+            attributeContainer.setAttribute(DisplayAttributes.Mannequin.BELOW_NAME_DISTANCE,
+                    savedPluginVersion == null
+                            ? 10.0f
+                            : (float) belowNameDistance);
+        }
+
         if (description != null){
            attributeContainer.setAttribute(DisplayAttributes.Mannequin.BELOW_NAME, MiniMessage.miniMessage().deserialize(description));
         }
@@ -79,9 +92,10 @@ final class MannequinEntity implements Serializable {
         }
 
         Location spawnLoc = WorldUtils.getPivotLocation(
-                vector,
+                Vector.fromJOML(vector),
                 origin,
-                origin.getYaw());
+                origin.getYaw(),
+                origin.getPitch());
 
         PacketDisplayEntityPart part = attributeContainer.createPart(SpawnedDisplayEntityPart.PartType.MANNEQUIN, spawnLoc);
 
@@ -94,7 +108,7 @@ final class MannequinEntity implements Serializable {
             throw new RuntimeException(e);
         }
 
-        part.partTags = DisplayEntity.getSetFromPDC(pdc, DisplayAPI.getPartPDCTagKey());
+        part.partTags = DisplayEntity.getSetFromPDC(pdc, DisplayKeys.Part.PART_TAGS);
         part.partUUID = DisplayEntity.getPDCPartUUID(pdc);
         if (settings != null) settings.applyAttributes(part);
 

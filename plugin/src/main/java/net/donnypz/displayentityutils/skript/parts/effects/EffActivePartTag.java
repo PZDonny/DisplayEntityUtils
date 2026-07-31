@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Add/Remove Part Tag")
+@Name("Active Part - Part Tag")
 @Description("Add/Remove a part tag from an active part")
 @Examples({"add part tag \"newtag\" to {_activepart}",
         "remove tag \"i_dont_want_this_tag\" from {_activepart}",})

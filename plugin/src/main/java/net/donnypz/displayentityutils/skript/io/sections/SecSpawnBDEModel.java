@@ -29,12 +29,13 @@ import java.io.File;
 import java.util.List;
 
 
-@Name("Spawn BDEngine Model from File")
+@Name("BDEngine Model - Spawn from File")
 @Description({"Spawn a BDEngine Model, from a file, at a location, with specified options",
         "**Entries**",
         "`packet` = whether the group should be packet-based. False by default",
         "`teleport-duration` = the teleport-duration of display entities in the group. 0 by default",
         "`billboard` = the billboard of display entities in the group. FIXED by default",
+        "`glowing` = whether **all** entities in the group should glow. False by default",
         "`persistent` = the persistence of **all** entities in the group. True by default",
         "`visible` = whether the group should be visible. True by default",
         "`brightness` = the brightness of display entities in the group. Use `-1 and -1` for default brightness",
@@ -50,6 +51,7 @@ import java.util.List;
         "\tpacket: false",
         "\tteleport-duration: 2",
         "\tbillboard: VERTICAL",
+        "\tglowing: true",
         "\tpersistent: true",
         "\tvisible: true",
         "\tbrightness: 10 and 5 #Block and Sky, -1 and -1 to reset",
@@ -60,7 +62,7 @@ import java.util.List;
         "set {_activegroup} to bdengine model \"mymodel\" spawned at {_location}",
         "set {_activegroup} to bde model \"model.bdengine\" spawned at {_location}"
 })
-@Since("3.3.0, 3.5.0 (New Syntax), 3.5.1 (Section)")
+@Since("3.3.0, 3.5.0 (New Syntax), 3.5.1 (Section), 3.6.0 (Glowing)")
 @DocumentationId("EffBDEModelToSpawned")
 public class SecSpawnBDEModel extends EffectSection {
 
@@ -71,6 +73,7 @@ public class SecSpawnBDEModel extends EffectSection {
     private Expression<Boolean> packetExpr;
     private Expression<Integer> teleportDurationExpr;
     private Expression<Display.Billboard> billboardExpr;
+    private Expression<Boolean> glowingExpr;
     private Expression<Boolean> persistentExpr;
     private Expression<Boolean> visibleExpr;
     private Expression<Number> brightnessExpr;
@@ -83,6 +86,7 @@ public class SecSpawnBDEModel extends EffectSection {
                 .addEntryData(new ExpressionEntryData<>("packet", null, true, Boolean.class))
                 .addEntryData(new ExpressionEntryData<>("teleport-duration", null, true, Integer.class))
                 .addEntryData(new ExpressionEntryData<>("billboard", null, true, Display.Billboard.class))
+                .addEntryData(new ExpressionEntryData<>("glowing", null, true, Boolean.class))
                 .addEntryData(new ExpressionEntryData<>("persistent", null, true, Boolean.class))
                 .addEntryData(new ExpressionEntryData<>("visible", null, true, Boolean.class))
                 .addEntryData(new ExpressionEntryData<>("brightness", null, true, Number.class))
@@ -112,6 +116,7 @@ public class SecSpawnBDEModel extends EffectSection {
             this.packetExpr = (Expression<Boolean>) container.getOptional("packet",false);
             this.teleportDurationExpr = (Expression<Integer>) container.getOptional("teleport-duration",false);
             this.billboardExpr = (Expression<Display.Billboard>) container.getOptional("billboard",false);
+            this.glowingExpr = (Expression<Boolean>) container.getOptional("glowing",false);
             this.persistentExpr = (Expression<Boolean>) container.getOptional("persistent",false);
             this.visibleExpr = (Expression<Boolean>) container.getOptional("visible",false);
             this.brightnessExpr = (Expression<Number>) container.getOptional("brightness",false);
@@ -172,6 +177,11 @@ public class SecSpawnBDEModel extends EffectSection {
             isPacket = packet != null && packet;
         }
         else isPacket = false;
+
+        if (glowingExpr != null){
+            Boolean glow = glowingExpr.getSingle(event);
+            settings.addGlowing(glow != null ? glow : false, null);
+        }
 
         if (persistentExpr != null){
             Boolean persist = persistentExpr.getSingle(event);

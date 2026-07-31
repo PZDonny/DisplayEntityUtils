@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Interaction Part's Height/Width")
+@Name("Interaction Part - Height/Width")
 @Description("Get/Set the height or width of an interaction part.")
 @Examples({"if {_activepart}'s part type is deu_interaction:",
         "\tset {_activepart}'s deu interaction height to 2"

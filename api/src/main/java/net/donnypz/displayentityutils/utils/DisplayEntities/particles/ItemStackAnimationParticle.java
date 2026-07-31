@@ -1,18 +1,15 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities.particles;
 
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
 
 @ApiStatus.Internal
-class ItemStackAnimationParticle extends AnimationParticle implements Serializable {
+class ItemStackAnimationParticle extends AnimationParticle<ItemStack> implements Serializable {
 
     byte[] itemStackAsBytes;
     transient ItemStack itemStack;
@@ -20,22 +17,31 @@ class ItemStackAnimationParticle extends AnimationParticle implements Serializab
     @Serial
     private static final long serialVersionUID = 99L;
 
-
     ItemStackAnimationParticle(AnimationParticleBuilder builder, ItemStack itemStack) {
-        super(builder, Particle.ITEM);
-        updateItem(itemStack);
+        super(builder, VersionUtils.getItemParticle(), itemStack);
     }
     @ApiStatus.Internal
     public ItemStackAnimationParticle() {}
 
     @Override
-    public void spawn(Location location) {
-        location.getWorld().spawnParticle(particle, location, count, xOffset, yOffset, zOffset, extra, itemStack);
+    AnimationParticleBuilder.Step getStep() {
+        return AnimationParticleBuilder.Step.ITEM;
     }
 
     @Override
-    public void spawn(Location location, @NotNull Player player) {
-        player.spawnParticle(particle, location, count, xOffset, yOffset, zOffset, itemStack);
+    ItemStack getSpawnData() {
+        return itemStack;
+    }
+
+    @Override
+    void update(ItemStack data) {
+        this.itemStack = data;
+        this.itemStackAsBytes = itemStack.serializeAsBytes();
+    }
+
+    @Override
+    boolean canUseData() {
+        return true;
     }
 
     @Override
@@ -45,20 +51,6 @@ class ItemStackAnimationParticle extends AnimationParticle implements Serializab
 
     @Override
     protected Component getUniqueInfo() {
-        return getEditMSG("| Item: "+itemStack.getType().name(), AnimationParticleBuilder.Step.ITEM);
-    }
-
-    @Override
-    protected boolean editUniqueParticle(AnimationParticleBuilder builder, AnimationParticleBuilder.Step step) {
-        if (step == AnimationParticleBuilder.Step.ITEM){
-            updateItem(builder.data());
-            return true;
-        }
-        return false;
-    }
-
-    private void updateItem(ItemStack itemStack){
-        this.itemStack = itemStack;
-        this.itemStackAsBytes = itemStack.serializeAsBytes();
+        return getEditMSG("| Item: "+itemStack.getType().name());
     }
 }

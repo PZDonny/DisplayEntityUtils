@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Teleport Active Group")
+@Name("Active Group - Teleport")
 @Description("Teleport an Active Group to a location")
 @Examples({"deu teleport {_activegroup} to player",
         "deu teleport {_activegroup} to {_location} and respect group direction"})

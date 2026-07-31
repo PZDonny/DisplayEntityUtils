@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import com.google.gson.*;
-import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayKeys;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -14,7 +14,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
-public class JSONAdapter_InteractionEntity implements JsonSerializer<InteractionEntity>, JsonDeserializer<InteractionEntity> {
+final class JSONAdapter_InteractionEntity implements JsonSerializer<InteractionEntity>, JsonDeserializer<InteractionEntity> {
 
     @Override
     public InteractionEntity deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext ctx) throws JsonParseException {
@@ -49,7 +49,7 @@ public class JSONAdapter_InteractionEntity implements JsonSerializer<Interaction
             //Add part tags
             try{
                 pdc.readFromBytes(pdcBytes);
-                List<String> tags = pdc.get(DisplayAPI.getPartPDCTagKey(), PersistentDataType.LIST.strings());
+                List<String> tags = pdc.get(DisplayKeys.Part.PART_TAGS, PersistentDataType.LIST.strings());
                 json.add("partTags", new Gson().toJsonTree(tags));
             }
             catch(IOException | NullPointerException e){}
@@ -60,7 +60,7 @@ public class JSONAdapter_InteractionEntity implements JsonSerializer<Interaction
                 partUUID = src.partUUID;
             }
             else{
-                partUUID = UUID.fromString(pdc.get(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING));
+                partUUID = UUID.fromString(pdc.get(DisplayKeys.Part.PART_UUID, PersistentDataType.STRING));
             }
             json.addProperty(DEUJSONAdapter.PART_UUID_FIELD, partUUID.toString());
 

@@ -6,12 +6,11 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
+import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -25,7 +24,7 @@ public class GroupSpawnCMD extends PlayerSubCommand {
     GroupSpawnCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("spawn", parentSubCommand, Permission.GROUP_SPAWN);
         setTabComplete(2, "<group-tag>");
-        setTabComplete(3, TabSuggestion.STORAGES);
+        setTabComplete(3, TabSuggestion.STORAGES_WITH_ALL);
         addFlag("-packet");
     }
 
@@ -43,7 +42,7 @@ public class GroupSpawnCMD extends PlayerSubCommand {
     static void spawnGroup(CommandSender sender, Location spawnLoc, String tag, String storage, boolean isPacket){
         if (storage.equals("all")){
             sender.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Attempting to spawn display entity group from all storage locations", NamedTextColor.YELLOW)));
-            attemptAll(sender, spawnLoc, tag, LoadMethod.LOCAL, true);
+            attemptAll(sender, spawnLoc, tag, LoadMethod.LOCAL, true, isPacket);
             return;
         }
 
@@ -68,17 +67,46 @@ public class GroupSpawnCMD extends PlayerSubCommand {
         }
 
         if (isPacket){
-            DisplayGroupManager.addPersistentPacketGroup(spawnLoc, group, true, GroupSpawnedEvent.SpawnReason.COMMAND);
-            sender.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Spawned a <light_purple>packet-based <green>display entity group at your location! <white>(Tagged: "+tag+")")));
+            spawnPacketGroup(sender, spawnLoc, group, tag);
         }
         else{
-            group.spawn(spawnLoc, GroupSpawnedEvent.SpawnReason.COMMAND);
-            sender.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Spawned a display entity group at your location! <white>(Tagged: "+tag+")")));
+            spawnGroup(sender, spawnLoc, group, tag);
+        }
+    }
+
+    private static void spawnPacketGroup(CommandSender sender, Location spawnLoc, DisplayEntityGroup group, String tag){
+        PacketDisplayEntityGroup packetGroup = DisplayGroupManager
+                .addPersistentPacketGroup(spawnLoc,
+                        group,
+                        true,
+                        GroupSpawnedEvent.SpawnReason.COMMAND);
+        sender.sendMessage(DisplayAPI.pluginPrefix
+                .append(MiniMessage
+                        .miniMessage()
+                        .deserialize("<green>Spawned a <light_purple>packet-based <green> group at your location! <white>(Tagged: "+tag+")")));
+        if (sender instanceof Player player && DisplayConfig.autoSelectGroups()){
+            GroupCMD.selectGroup(player, packetGroup, true, false);
+        }
+    }
+
+    private static void spawnGroup(CommandSender sender, Location spawnLoc, DisplayEntityGroup group, String tag){
+        SpawnedDisplayEntityGroup spawnedGroup = group.spawn(spawnLoc, GroupSpawnedEvent.SpawnReason.COMMAND);
+        sender.sendMessage(DisplayAPI.pluginPrefix
+                .append(MiniMessage
+                        .miniMessage()
+                        .deserialize("<green>Spawned a group at your location! <white>(Tagged: "+tag+")")));
+        if (sender instanceof Player player && DisplayConfig.autoSelectGroups()){
+            GroupCMD.selectGroup(player, spawnedGroup, true, false);
         }
     }
 
 
-    public static void attemptAll(CommandSender sender, Location spawnLoc, String tag, LoadMethod storage, boolean isGroup){
+    public static void attemptAll(CommandSender sender,
+                                  Location spawnLoc,
+                                  String tag,
+                                  LoadMethod storage,
+                                  boolean isGroup,
+                                  boolean isPacketGroup){
         LoadMethod nextStorage;
         if (storage == LoadMethod.LOCAL){
             nextStorage = LoadMethod.MONGODB;
@@ -91,7 +119,7 @@ public class GroupSpawnCMD extends PlayerSubCommand {
 
             if (!DisplayConfig.isLocalEnabled()){
                 sender.sendMessage(Component.text("- Local storage is disabled, checking MongoDB...", NamedTextColor.GRAY));
-                attemptAll(sender, spawnLoc, tag, nextStorage, isGroup);
+                attemptAll(sender, spawnLoc, tag, nextStorage, isGroup, isPacketGroup);
                 return;
             }
         }
@@ -99,7 +127,7 @@ public class GroupSpawnCMD extends PlayerSubCommand {
             nextStorage = LoadMethod.MYSQL;
             if (!DisplayConfig.isMongoEnabled()){
                 sender.sendMessage(Component.text("- MongoDB storage is disabled, checking MYSQL...", NamedTextColor.GRAY));
-                attemptAll(sender, spawnLoc, tag, nextStorage, isGroup);
+                attemptAll(sender, spawnLoc, tag, nextStorage, isGroup, isPacketGroup);
             }
         }
         else{
@@ -116,27 +144,23 @@ public class GroupSpawnCMD extends PlayerSubCommand {
                 if (group == null){
                     if (nextStorage != null){
                         sender.sendMessage(Component.text("- Failed to find saved display entity group in "+storage.getDisplayName()+" database! Checking "+nextStorage.getDisplayName()+"...", NamedTextColor.RED));
-                        attemptAll(sender, spawnLoc, tag, nextStorage, true);
+                        attemptAll(sender, spawnLoc, tag, nextStorage, true, isPacketGroup);
                     }
                     return;
                 }
 
                 sender.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<green>Successfully spawned display entity group at your location! <white>(Tagged: "+tag+")")));
 
+                if (isPacketGroup){
+                    spawnPacketGroup(sender, spawnLoc, group, tag);
+                    return;
+                }
                 DisplayAPI.getScheduler().run(() -> {
                     if (!spawnLoc.isChunkLoaded()){
                         Bukkit.getConsoleSender().sendMessage(Component.text("Failed to spawn group in unloaded chunk", NamedTextColor.RED));
                         return;
                     }
-
-                    SpawnedDisplayEntityGroup g = group.spawn(spawnLoc, GroupSpawnedEvent.SpawnReason.COMMAND);
-                    if (sender instanceof Player player){
-                        if (player.isConnected() && DisplayConfig.autoSelectGroups()){
-                            g.addPlayerSelection(player);
-                            sender.sendMessage(Component.text("Spawned group has been automatically selected", NamedTextColor.GRAY));
-                        }
-                    }
-
+                    spawnGroup(sender, spawnLoc, group, tag);
                 });
             }
             else{
@@ -144,7 +168,7 @@ public class GroupSpawnCMD extends PlayerSubCommand {
                 if (anim == null){
                     if (nextStorage != null){
                         sender.sendMessage(Component.text("- Failed to find saved display animation in "+storage.getDisplayName()+" database! Checking "+nextStorage.getDisplayName()+"...", NamedTextColor.RED));
-                        attemptAll(sender, spawnLoc, tag, nextStorage, false);
+                        attemptAll(sender, spawnLoc, tag, nextStorage, false, false);
                     }
                     return;
                 }

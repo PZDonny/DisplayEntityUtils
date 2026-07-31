@@ -17,13 +17,12 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Unregister Active Group")
+@Name("Active Group - Unregister")
 @Description("Unregister an active group, making the group unusable. Packet based groups do not require forced chunk loading, and will always despawn.")
 @Examples({
         "deu unregister {_activegroup}",
         "deu unregister {_activegroup} and despawn",
         "deu unregister {_activegroup} and despawn with forced chunk loading",
-        "",
 })
 @Since("2.6.2, 3.0.0 (Packet)")
 public class EffActiveGroupUnregister extends Effect {

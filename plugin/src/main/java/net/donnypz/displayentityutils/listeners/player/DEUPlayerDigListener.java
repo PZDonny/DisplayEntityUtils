@@ -3,10 +3,12 @@ package net.donnypz.displayentityutils.listeners.player;
 import com.jeff_media.customblockdata.CustomBlockData;
 import io.papermc.paper.event.block.BlockBreakProgressUpdateEvent;
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.events.PlacedGroupBreakEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.managers.GizmoManager;
 import net.donnypz.displayentityutils.managers.PlaceableGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.kyori.adventure.text.Component;
@@ -52,9 +54,11 @@ public class DEUPlayerDigListener implements Listener {
 
     //bool determines whether to break the block or not
     private boolean breakPlacedGroup(Player player, Block block){
+        if (GizmoManager.isGizmoWand(player.getInventory().getItemInMainHand())) return false;
+
         CustomBlockData data = new CustomBlockData(block, DisplayAPI.getPlugin());
 
-        String groupId = data.get(DisplayAPI.getPlaceableGroupId(), PersistentDataType.STRING);
+        String groupId = data.get(DisplayKeys.PlaceableGroup.ID, PersistentDataType.STRING);
         if (groupId == null) return true; //Not a placed group block
 
         PacketDisplayEntityGroup group = PacketDisplayEntityGroup.getGroup(groupId);
@@ -65,7 +69,7 @@ public class DEUPlayerDigListener implements Listener {
         }
 
         ItemStack itemStack = PlaceableGroupManager.getItemStack(block);
-        String uuidString = data.get(DisplayAPI.getPlaceableGroupPlacer(), PersistentDataType.STRING);
+        String uuidString = data.get(DisplayKeys.PlaceableGroup.PLACER_PLAYER_UUID, PersistentDataType.STRING);
         UUID placerUUID = uuidString == null ? null : UUID.fromString(uuidString);
 
         DEUUser user = DEUUser.getUser(player);
@@ -101,8 +105,5 @@ public class DEUPlayerDigListener implements Listener {
 
     private void clearPDC(CustomBlockData data){
         data.clear();
-//        data.remove(DisplayAPI.getPlaceableGroupId());
-//        data.remove(DisplayAPI.getPlaceableGroupPlacer());
-//        data.remove(DisplayAPI.getPlaceableGroupItemStack());
     }
 }

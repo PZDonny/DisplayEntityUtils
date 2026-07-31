@@ -12,7 +12,7 @@ import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 
-@Name("Active Group Persistence")
+@Name("Active Group - Persistence")
 @Description({"Change the persistence state of a active group.",
     "Persisting a packet-based group causes it to be saved in chunk data and it cannot ride entities.",
     "Any changes made to a persistent packet-based group must be applied using \"\""})

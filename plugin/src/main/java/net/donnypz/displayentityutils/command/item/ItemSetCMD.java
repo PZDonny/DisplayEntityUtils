@@ -1,11 +1,11 @@
 package net.donnypz.displayentityutils.command.item;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.command.CMDUtils;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -27,10 +27,10 @@ class ItemSetCMD extends PartsSubCommand {
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         String item = args[2];
-        ItemStack itemStack = DEUCommandUtils.getItemFromText(item, player);
+        ItemStack itemStack = CMDUtils.getItemFromText(item, player);
         if (itemStack == null) return false;
 
-        for (ActivePart part : selection.getSelectedParts()){
+        for (ActivePart part : selection.getParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) {
                 part.setItemDisplayItem(itemStack);
             }
@@ -43,7 +43,7 @@ class ItemSetCMD extends PartsSubCommand {
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY)) return false;
         String item = args[2];
-        ItemStack itemStack = DEUCommandUtils.getItemFromText(item, player);
+        ItemStack itemStack = CMDUtils.getItemFromText(item, player);
         if (itemStack == null) return false;
 
         selectedPart.setItemDisplayItem(itemStack);

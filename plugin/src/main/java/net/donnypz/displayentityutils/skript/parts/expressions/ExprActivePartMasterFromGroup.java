@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Master/Parent Part of Active Group")
+@Name("Active Group - Master/Part Part")
 @Description("Get the master/parent part of an active group, which all other parts are passengers of")
 @Examples({"set {_masterpart} to {_spawnedgroup}'s master part"})
 @Since("3.3.2, 3.0.0 (Packet), 3.3.2 (Plural)")

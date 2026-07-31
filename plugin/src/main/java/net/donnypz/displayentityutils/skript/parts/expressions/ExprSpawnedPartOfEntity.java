@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Spawned Part of Entity")
+@Name("Active Part of Entity")
 @Description("Get the spawned part that represents a part-eligible entity")
 @Examples({"set {_foundpart} to {_entity}'s deu part",
         "",

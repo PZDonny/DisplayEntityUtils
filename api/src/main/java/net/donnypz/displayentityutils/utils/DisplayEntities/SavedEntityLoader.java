@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.WorldUtils;
+import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
@@ -12,22 +13,31 @@ import org.bukkit.entity.Pose;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.profile.PlayerTextures;
+import org.bukkit.util.Vector;
 
 import java.io.IOException;
 
 class SavedEntityLoader {
 
-    static Mannequin spawnMannequin(Location origin, GroupSpawnSettings settings, MannequinEntity mannequinEntity){
+    static Mannequin spawnMannequin(Location origin, GroupSpawnSettings settings, MannequinEntity mannequinEntity, String savedPluginVersion){
         Location spawnLoc = WorldUtils.getPivotLocation(
-                mannequinEntity.vector,
+                Vector.fromJOML(mannequinEntity.vector),
                 origin,
-                origin.getYaw());
+                origin.getYaw(),
+                origin.getPitch());
 
         return spawnLoc.getWorld().spawn(spawnLoc, org.bukkit.entity.Mannequin.class, m ->{
             DisplayUtils.prepareMannequin(m);
 
             m.customName(mannequinEntity.customName != null ? MiniMessage.miniMessage().deserialize(mannequinEntity.customName): null);
             m.setDescription(mannequinEntity.description != null ? MiniMessage.miniMessage().deserialize(mannequinEntity.description) : null);
+            if (VersionUtils.hasBelowNameDistance()){
+                m.getAttribute(Attribute.BELOW_NAME_DISTANCE)
+                        .setBaseValue(savedPluginVersion == null
+                                ? 10.0d
+                                : mannequinEntity.belowNameDistance
+                        );
+            }
 
             m.setProfile(getMannequinProfile(mannequinEntity));
             m.getAttribute(Attribute.SCALE).setBaseValue(mannequinEntity.scale);

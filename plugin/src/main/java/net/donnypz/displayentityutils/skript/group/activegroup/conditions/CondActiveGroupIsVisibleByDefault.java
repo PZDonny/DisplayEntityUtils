@@ -8,14 +8,16 @@ import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Spawned Group Is Visible By Default?")
-@Description("Check if a spawned group is visible by default")
+@Name("Active Group - Is Visible By Default")
+@Description("Check if an active group is visible by default")
 @Examples({ "if deu {_activegroup} is visible by default:", "\tbroadcast \"Players can see the group by default!\"",
         "",
         "#3.4.3 and earlier",
@@ -23,7 +25,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 @Since("2.6.2")
 public class CondActiveGroupIsVisibleByDefault extends Condition {
 
-    Expression<SpawnedDisplayEntityGroup> group;
+    Expression<ActiveGroup<?>> group;
 
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.CONDITION,
@@ -36,20 +38,25 @@ public class CondActiveGroupIsVisibleByDefault extends Condition {
 
     @Override
     public boolean check(Event event) {
-        SpawnedDisplayEntityGroup g = group.getSingle(event);
-        if (g == null) return isNegated();
-        return g.isVisibleByDefault() != isNegated();
+        ActiveGroup<?> g = group.getSingle(event);
+        if (g instanceof PacketDisplayEntityGroup pg){
+            return pg.isAutoShow() != isNegated();
+        }
+        else if (g instanceof SpawnedDisplayEntityGroup sg){
+            return sg.isVisibleByDefault() != isNegated();
+        }
+        return isNegated();
     }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "Spawned group visible by default: "+group.toString(event, debug);
+        return "Active group visible by default: "+group.toString(event, debug);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parseResult) {
-        this.group = (Expression<SpawnedDisplayEntityGroup>) expressions[0];
+        this.group = (Expression<ActiveGroup<?>>) expressions[0];
         setNegated(parseResult.mark == 2);
         return true;
     }

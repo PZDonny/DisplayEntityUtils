@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.version.VersionUtils;
@@ -14,7 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.Serial;
@@ -69,11 +68,11 @@ final class DisplayEntity implements Serializable {
 
         try{
             PersistentDataContainer pdc = new ItemStack(Material.STICK).getItemMeta().getPersistentDataContainer();
-            pdc.set(DisplayAPI.getPartPDCTagKey(), PersistentDataType.LIST.strings(), new ArrayList<>(part.getTags()));
+            pdc.set(DisplayKeys.Part.PART_TAGS, PersistentDataType.LIST.strings(), new ArrayList<>(part.getTags()));
             if (part.isMaster && group.getSpawnAnimationTag() != null){
-                pdc.set(DisplayAPI.getSpawnAnimationKey(), PersistentDataType.STRING, group.spawnAnimationTag);
-                pdc.set(DisplayAPI.getSpawnAnimationTypeKey(), PersistentDataType.STRING, group.spawnAnimationType.name());
-                pdc.set(DisplayAPI.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING, group.spawnAnimationLoadMethod.name());
+                pdc.set(DisplayKeys.SpawnAnimation.ANIMATION_TAG, PersistentDataType.STRING, group.spawnAnimationTag);
+                pdc.set(DisplayKeys.SpawnAnimation.TYPE, PersistentDataType.STRING, group.spawnAnimationType.name());
+                pdc.set(DisplayKeys.SpawnAnimation.LOAD_METHOD, PersistentDataType.STRING, group.spawnAnimationLoadMethod.name());
             }
             persistentDataContainer = pdc.serializeToBytes();
         }
@@ -135,7 +134,7 @@ final class DisplayEntity implements Serializable {
                 throw new RuntimeException(e);
             }
 
-            part.partTags = getSetFromPDC(pdc, DisplayAPI.getPartPDCTagKey());
+            part.partTags = getSetFromPDC(pdc, DisplayKeys.Part.PART_TAGS);
             part.partUUID = specifics.getPartUUID();
             if (group != null){
                 if (group.masterPart == null && isMaster){
@@ -167,12 +166,12 @@ final class DisplayEntity implements Serializable {
      * Get the tag of the animation applied to this group when it's spawned/loaded
      * @return a string or null if not set;
      */
-    public @Nullable String getSpawnAnimationTag(PersistentDataContainer pdc){
-        return pdc.get(DisplayAPI.getSpawnAnimationKey(), PersistentDataType.STRING);
+    String getSpawnAnimationTag(PersistentDataContainer pdc){
+        return pdc.get(DisplayKeys.SpawnAnimation.ANIMATION_TAG, PersistentDataType.STRING);
     }
 
-    @Nullable DisplayAnimator.AnimationType getSpawnAnimationType(PersistentDataContainer pdc){
-        String type = pdc.get(DisplayAPI.getSpawnAnimationTypeKey(), PersistentDataType.STRING);
+    DisplayAnimator.AnimationType getSpawnAnimationType(PersistentDataContainer pdc){
+        String type = pdc.get(DisplayKeys.SpawnAnimation.TYPE, PersistentDataType.STRING);
         if (type == null){
             return null;
         }
@@ -184,8 +183,8 @@ final class DisplayEntity implements Serializable {
         }
     }
 
-    @Nullable LoadMethod getSpawnAnimationLoadMethod(PersistentDataContainer pdc){
-        String method = pdc.get(DisplayAPI.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING);
+    LoadMethod getSpawnAnimationLoadMethod(PersistentDataContainer pdc){
+        String method = pdc.get(DisplayKeys.SpawnAnimation.LOAD_METHOD, PersistentDataType.STRING);
         if (method == null){
             return null;
         }
@@ -198,7 +197,7 @@ final class DisplayEntity implements Serializable {
     }
 
     static UUID getPDCPartUUID(PersistentDataContainer pdc){
-        String value = pdc.get(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING);
+        String value = pdc.get(DisplayKeys.Part.PART_UUID, PersistentDataType.STRING);
         if (value != null){
             return UUID.fromString(value);
         }
@@ -206,7 +205,7 @@ final class DisplayEntity implements Serializable {
     }
 
     static boolean isMasterPart(PersistentDataContainer pdc){
-        Boolean value = pdc.get(DisplayAPI.getMasterKey(), PersistentDataType.BOOLEAN);
+        Boolean value = pdc.get(DisplayKeys.Part.MASTER_PART, PersistentDataType.BOOLEAN);
         if (value != null){
             return value;
         }

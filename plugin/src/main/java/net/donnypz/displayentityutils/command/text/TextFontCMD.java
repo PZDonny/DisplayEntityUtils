@@ -26,7 +26,7 @@ class TextFontCMD extends PartsSubCommand {
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         Key font = getFont(args, player);
         if (font == null) return false;
-        for (ActivePart part : selection.getSelectedParts()){
+        for (ActivePart part : selection.getParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
                 part.setTextDisplayText(part.getTextDisplayText().font(font));
             }

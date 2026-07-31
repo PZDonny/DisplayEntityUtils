@@ -21,7 +21,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 import java.util.Arrays;
 import java.util.Collection;
 
-@Name("Play Animation Camera")
+@Name("Animation - Play Camera")
 @Description("Make players follow an animation's camera on an active group using a display animator or animation")
 @Examples({"play camera on {_packetgroup} with {_animator} for {_player}",
             "",

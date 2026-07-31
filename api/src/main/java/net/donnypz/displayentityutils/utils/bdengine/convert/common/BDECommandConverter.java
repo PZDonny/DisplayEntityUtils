@@ -39,6 +39,7 @@ public abstract class BDECommandConverter {
     protected final boolean saveGroup;
     protected final boolean saveAnimations;
     protected final boolean despawnAfter;
+    protected final boolean adaptTags;
 
 
     protected final HashSet<DEUSound> bufferedSounds = new HashSet<>();
@@ -55,7 +56,8 @@ public abstract class BDECommandConverter {
             @NotNull String animationSavePrefix,
             boolean saveGroup,
             boolean saveAnimations,
-            boolean despawnAfter) {
+            boolean despawnAfter,
+            boolean adaptTags) {
         this.conversionId = conversionId;
         this.player = player;
         this.SPAWN_LOCATION = spawnLocation;
@@ -68,6 +70,7 @@ public abstract class BDECommandConverter {
         this.saveGroup = saveGroup;
         this.saveAnimations = saveAnimations;
         this.despawnAfter = despawnAfter;
+        this.adaptTags = adaptTags;
 
         Display masterEntity = spawnLocation.getWorld()
                 .spawn(spawnLocation, BlockDisplay.class, bd -> {
@@ -84,7 +87,11 @@ public abstract class BDECommandConverter {
         return masterEntityUUID;
     }
 
-    public String getSubMasterScoreboardTag(){
+    public String getGroupSaveTag() {
+        return groupSaveTag.isBlank() ? projectName.replace(".zip", "_auto") : groupSaveTag;
+    }
+
+    protected String getSubMasterScoreboardTag(){
         return CONVERSION_SCOREBOARD_PREFIX+masterEntityUUID;
     }
 
@@ -98,6 +105,11 @@ public abstract class BDECommandConverter {
             this.sendMessage(Component.text("Failed to find model/group created from datapack!", NamedTextColor.RED));
             this.sendMessage(Component.text("| The datapack may have been generated for a different game version or of an older BDEngine format", NamedTextColor.GRAY, TextDecoration.ITALIC));
             return;
+        }
+
+        if (adaptTags){
+            createdGroup.getParts().forEach(p -> p.adaptScoreboardTags(false));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<white>- <aqua>Scoreboard tags adapted to part tags"));
         }
 
         this.sendMessage(Component.empty());
@@ -222,10 +234,6 @@ public abstract class BDECommandConverter {
         return (getLastFrameId(animationName)+1)*2;
     }
 
-    public String getGroupSaveTag() {
-        return groupSaveTag.isBlank() ? projectName.replace(".zip", "_auto") : groupSaveTag;
-    }
-
     protected abstract SpawnedDisplayAnimationFrame executeFrameCommands(String animationName, int frameId, int lastAddedFrameId);
 
     protected void executeFrameCommand(SpawnedDisplayAnimationFrame frame, String command) {
@@ -272,9 +280,8 @@ public abstract class BDECommandConverter {
             double pitch = Double.parseDouble(args[4]);
             frame.setAnimationCamera(new AnimationCamera(x, y, z, (float) yaw, (float) pitch));
             Location cameraLoc = SPAWN_LOCATION.clone().add(x, y, z);
-            cameraLoc.getWorld().spawnParticle(Particle.DRAGON_BREATH, cameraLoc, 1, 0, 0, 0, 0);
-        } catch (IndexOutOfBoundsException e) {
-        }
+            cameraLoc.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, cameraLoc, 1, 0, 0, 0, 0);
+        } catch (IndexOutOfBoundsException e) {}
     }
 
     protected void sendMessage(Component component) {

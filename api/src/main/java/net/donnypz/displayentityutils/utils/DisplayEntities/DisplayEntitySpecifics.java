@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
@@ -139,7 +139,8 @@ abstract class DisplayEntitySpecifics implements Serializable {
                 .setAttribute(DisplayAttributes.Transform.LEFT_ROTATION, transformation.getLeftRotation())
                 .setAttribute(DisplayAttributes.Transform.RIGHT_ROTATION, transformation.getRightRotation())
                 .setAttribute(DisplayAttributes.Transform.SCALE, transformation.getScale())
-                .setAttribute(DisplayAttributes.Transform.TRANSLATION, transformation.getTranslation());
+                .setAttribute(DisplayAttributes.Transform.TRANSLATION, transformation.getTranslation())
+                .setAttribute(DisplayAttributes.GLOW_COLOR_OVERRIDE, glowColorOverride != Color.WHITE.asRGB() ? Color.fromRGB(glowColorOverride) : Color.WHITE);
 
         if (brightnessBlockLight != -1 && brightnessSkyLight != -1)
             attributeContainer.setAttribute(DisplayAttributes.BRIGHTNESS, new Display.Brightness(brightnessBlockLight, brightnessSkyLight));
@@ -178,8 +179,7 @@ abstract class DisplayEntitySpecifics implements Serializable {
         }
 
         if (partUUID != null){
-            display.getPersistentDataContainer().set(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING, partUUID.toString());
+            display.getPersistentDataContainer().set(DisplayKeys.Part.PART_UUID, PersistentDataType.STRING, partUUID.toString());
         }
-
     }
 }

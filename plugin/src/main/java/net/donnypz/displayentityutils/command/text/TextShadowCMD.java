@@ -12,8 +12,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 class TextShadowCMD extends PartsSubCommand {
     TextShadowCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("shadow", parentSubCommand, Permission.TEXT_TOGGLE_SHADOW, false);
@@ -38,7 +36,7 @@ class TextShadowCMD extends PartsSubCommand {
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled shadowed for ALL selected text displays <red>OFF")));
         }
 
-        for (ActivePart part : selection.getSelectedParts()){
+        for (ActivePart part : selection.getParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
                 part.setTextDisplayShadowed(status);
             }

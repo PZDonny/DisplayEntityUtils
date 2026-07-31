@@ -26,7 +26,7 @@ class TextAlignCMD extends PartsSubCommand {
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
         TextDisplay.TextAlignment alignment = getAlignment(args[2], player);
         if (alignment == null) return false;
-        for (ActivePart part : selection.getSelectedParts()){
+        for (ActivePart part : selection.getParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
                 part.setTextDisplayAlignment(alignment);
             }

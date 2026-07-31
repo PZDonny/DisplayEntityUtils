@@ -84,20 +84,14 @@ public class PacketPartSelection extends MultiPartSelection<PacketDisplayEntityP
         group = null;
     }
 
-    @Override
-    public void setRotation(float pitch, float yaw, boolean pivot) {
-        for (PacketDisplayEntityPart part : selectedParts){
-            part.setRotation(pitch, yaw, pivot);
-        }
-    }
-
     /**
-     * Get the location of this selection's group
-     * @return a {@link Location}
+     * Get the location of the {@link PacketDisplayEntityGroup} that belongs to parts in this selection
+     * @return a {@link Location} or null if the selection is invalid
      */
     @Override
     public @Nullable Location getLocation() {
-        return getGroup().getLocation();
+        PacketDisplayEntityGroup g = getGroup();
+        return g == null ? null : g.getLocation();
     }
 
     /**

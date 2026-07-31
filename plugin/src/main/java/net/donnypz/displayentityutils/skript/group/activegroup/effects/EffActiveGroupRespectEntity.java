@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Active Group Respect Entity Direction")
+@Name("Active Group - Respect Entity Direction")
 @Description("Make an active group respect an entity's looking direction, matching its body yaw, pitch and/or yaw. " +
         "\nIN VERSIONS BELOW v3.3.5, EACH TYPE IS PREFIXED WITH \"ft\": \"ft_body\", \"ft_pitch\", \"ft_yaw\", and \"ft_pitch_and_yaw\"!" +
         "\n3.4.2+ replaces \"pitch_and_yaw\" with \"pitch and yaw\"")

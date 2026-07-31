@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Text Display Part Shadowed?")
+@Name("Text Display Part - Has Shadows")
 @Description("Check if an text display part's text has shadows")
 @Examples({"if {_activepart} has deu text shadows:",
         "\tbroadcast \"This text display part has text shadow!\""})
@@ -27,7 +27,7 @@ public class CondTextDisplayIsShadowed extends Condition {
     public static void register(SyntaxRegistry registry){
         registry.register(SyntaxRegistry.CONDITION,
                 SyntaxInfo.builder(CondTextDisplayIsShadowed.class)
-                        .addPattern("%activepart/displays% (1¦(is|has)|2¦is(n't| not)) deu [text] [drop] shadow[ed|s]")
+                        .addPattern("%activepart/display% (1¦(is|has)|2¦(has no|does(n't| not) have)) deu [text] [drop] shadow[ed|s]")
                         .supplier(CondTextDisplayIsShadowed::new)
                         .build()
         );
@@ -37,17 +37,17 @@ public class CondTextDisplayIsShadowed extends Condition {
     public boolean check(Event event) {
         Object obj = partExpr.getSingle(event);
         if (obj instanceof ActivePart p){
-            return p.isTextDisplayShadowed();
+            return p.isTextDisplayShadowed() != isNegated();
         }
         else if (obj instanceof TextDisplay td){
-            return td.isShadowed();
+            return td.isShadowed() != isNegated();
         }
         return isNegated();
     }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "text display part shadowed: "+ partExpr.toString(event, debug);
+        return "text display part has shadows: "+ partExpr.toString(event, debug);
     }
 
     @SuppressWarnings("unchecked")

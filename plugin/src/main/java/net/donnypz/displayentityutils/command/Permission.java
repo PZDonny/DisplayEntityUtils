@@ -12,7 +12,6 @@ public enum Permission {
     GROUP_SAVE("deu.group.save"),
     GROUP_TO_PACKET("deu.group.topacket"),
     GROUP_DELETE("deu.group.delete"),
-    GROUP_MARK_PACKET_GROUPS("deu.group.markpg"),
     GROUP_CHUNK_PACKET_GROUP_VISIBILITY("deu.group.pgvisbility"),
     GROUP_DESPAWN("deu.group.despawn"),
     GROUP_SELECT("deu.group.select"),
@@ -34,6 +33,8 @@ public enum Permission {
     GROUP_CULLING("deu.group.culling"),
     GROUP_WORLD_EDIT("deu.group.worldedit"),
 
+    GIZMO_USE("deu.gizmo.use"),
+
     PLACE_INFO("deu.place.info"),
     PLACE_SET_ITEM("deu.place.setitem"),
     PLACE_GET_ITEM("deu.place.getitem"),
@@ -49,6 +50,7 @@ public enum Permission {
 
     PARTS_INFO("deu.parts.info"),
     PARTS_CREATE("deu.parts.create"),
+    PARTS_CLONE("deu.parts.clone"),
     PARTS_CYCLE("deu.parts.cycle"),
     PARTS_GLOW("deu.parts.glow"),
     PARTS_SELECT("deu.parts.select"),
@@ -60,7 +62,6 @@ public enum Permission {
 
     DISPLAY_SET_BLOCK("deu.display.setblock"),
     DISPLAY_GLOW_COLOR("deu.display.glowcolor"),
-    DISPLAY_TRANSLATE("deu.display.translate"),
     DISPLAY_TRANSFORM("deu.display.transform"),
     DISPLAY_BILLBOARD("deu.display.billboard"),
     DISPLAY_BRIGHTNESS("deu.display.brightness"),

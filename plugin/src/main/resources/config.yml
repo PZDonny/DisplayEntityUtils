@@ -29,13 +29,13 @@ mysql:
 registerCommands: true
 
 #Determine whether a group can be selected by more than one player at a time
-#Leave this value as true to avoid conflicts when using "/mdis group selectnearest"
+#Leave this value as true to avoid conflicts when using "/deu group selectnearest"
 limitGroupSelections: true
 
 #When selecting a group, this is the block that will be shown, marking an interaction's entity location
 interactionPreviewBlock: TARGET
 
-#Automatically select groups when using the command "/mdis group spawn"
+#Automatically select groups when using the command "/deu group spawn"
 autoSelectGroups: false
 
 #The default persistence value that should be applied when spawning a group
@@ -56,7 +56,7 @@ automaticGroupDetection:
     persistent: true
 
     #Whether groups, when spawned, should automatically apply the "persistent" value, overriding its existing persistence
-    #Manually toggle overriding for a group with "/mdis group togglepersistoverride"
+    #Manually toggle overriding for a group with "/deu group togglepersistoverride"
     overrideByDefault: false
 
   #Maximum Search range for Interaction Entities in a Group

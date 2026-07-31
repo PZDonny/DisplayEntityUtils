@@ -80,7 +80,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @return this
      */
     public PacketAttributeContainer setTransformationAndSend(@NotNull Transformation transformation, int entityId, @NotNull Player player){
-        return setAttributesAndSend(new DisplayAttributeMap()
+        return setAndSend(new DisplayAttributeMap()
                 .addTransformation(transformation), entityId, player);
     }
 
@@ -91,7 +91,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @return this
      */
     public PacketAttributeContainer setTransformationAndSend(@NotNull Transformation transformation, int entityId, @NotNull Collection<UUID> playerUUIDs){
-        return setAttributesAndSend(new DisplayAttributeMap()
+        return setAndSendToUUIDs(new DisplayAttributeMap()
                 .addTransformation(transformation), entityId, playerUUIDs);
     }
 
@@ -143,7 +143,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @param player the player
      * @return this
      */
-    public <T, V> PacketAttributeContainer setAttributeAndSend(@NotNull DisplayAttribute<T, V> attribute, T value, int entityId, @NotNull Player player){
+    public <T, V> PacketAttributeContainer setAndSend(@NotNull DisplayAttribute<T, V> attribute, T value, int entityId, @NotNull Player player){
         this.attributes.put(attribute, value);
         new PacketResult(entityId, attribute, value).send(player);
         return this;
@@ -156,9 +156,21 @@ public class PacketAttributeContainer implements Cloneable{
      * @param entityId the entity's entity id
      * @param playerUUIDs the players
      */
-    public <T, V> void setAttributeAndSend(@NotNull DisplayAttribute<T, V> attribute, T value, int entityId, @NotNull Collection<UUID> playerUUIDs){
+    public <T, V> void setAndSendToUUIDs(@NotNull DisplayAttribute<T, V> attribute, T value, int entityId, @NotNull Collection<UUID> playerUUIDs){
         this.attributes.put(attribute, value);
         new PacketResult(entityId, attribute, value).sendUUIDs(playerUUIDs);
+    }
+
+    /**
+     * Set attributes for this container and send the given attribute data to players on the entity with the given entity id
+     * @param attribute the attribute
+     * @param value the value corresponding to the provided {@link DisplayAttribute}
+     * @param entityId the entity's entity id
+     * @param players the players
+     */
+    public <T, V> void setAndSend(@NotNull DisplayAttribute<T, V> attribute, T value, int entityId, @NotNull Collection<Player> players){
+        this.attributes.put(attribute, value);
+        new PacketResult(entityId, attribute, value).send(players);
     }
 
     /**
@@ -169,7 +181,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @param player the player
      * @return this
      */
-    public PacketAttributeContainer setAttributesAndSend(@NotNull DisplayAttributeMap attributeMap, int entityId, @NotNull Player player){
+    public PacketAttributeContainer setAndSend(@NotNull DisplayAttributeMap attributeMap, int entityId, @NotNull Player player){
         this.attributes.putAll(attributeMap.attributes);
         new PacketResult(entityId, attributeMap).send(player);
         return this;
@@ -183,9 +195,23 @@ public class PacketAttributeContainer implements Cloneable{
      * @param playerUUIDs the players
      * @return this
      */
-    public PacketAttributeContainer setAttributesAndSend(@NotNull DisplayAttributeMap attributeMap, int entityId, @NotNull Collection<UUID> playerUUIDs){
+    public PacketAttributeContainer setAndSendToUUIDs(@NotNull DisplayAttributeMap attributeMap, int entityId, @NotNull Collection<UUID> playerUUIDs){
         this.attributes.putAll(attributeMap.attributes);
         new PacketResult(entityId, attributeMap).sendUUIDs(playerUUIDs);
+        return this;
+    }
+
+    /**
+     * Set attributes for this container with a {@link DisplayAttributeMap} to set multiple attributes at once,
+     * and send the given attribute data to players on the entity with the given entity id
+     * @param attributeMap the attribute setter
+     * @param entityId the entity's entity id
+     * @param players the players
+     * @return this
+     */
+    public PacketAttributeContainer setAndSend(@NotNull DisplayAttributeMap attributeMap, int entityId, @NotNull Collection<Player> players){
+        this.attributes.putAll(attributeMap.attributes);
+        new PacketResult(entityId, attributeMap).send(players);
         return this;
     }
 
@@ -292,7 +318,7 @@ public class PacketAttributeContainer implements Cloneable{
      */
     public int sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Player player, @NotNull Location location){
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, createEntityPacket(entityId, partType, location));
-        sendAttributes(partType, player, entityId);
+        sendAttributes(player, entityId);
         return entityId;
     }
 
@@ -304,9 +330,9 @@ public class PacketAttributeContainer implements Cloneable{
      * @param location the spawn location
      * @return the entity's entity id
      */
-    public int sendEntityUsingPlayers(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Collection<Player> players, @NotNull Location location){
+    public int sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Collection<Player> players, @NotNull Location location){
         int entityId = SpigotReflectionUtil.generateEntityId();
-        sendEntityUsingPlayers(partType, SpigotReflectionUtil.generateEntityId(), players, location);
+        sendEntity(partType, SpigotReflectionUtil.generateEntityId(), players, location);
         return entityId;
     }
 
@@ -319,7 +345,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @param location the spawn location
      * @return the entity's entity id
      */
-    public int sendEntityUsingPlayers(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Collection<Player> players, @NotNull Location location){
+    public int sendEntity(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Collection<Player> players, @NotNull Location location){
         for (Player player : players){
             sendEntity(partType, entityId, player, location);
         }
@@ -334,9 +360,9 @@ public class PacketAttributeContainer implements Cloneable{
      * @param location the spawn location
      * @return the entity's entity id
      */
-    public int sendEntityUsingUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location){
+    public int sendEntityToUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location){
         int entityId = SpigotReflectionUtil.generateEntityId();
-        sendEntityUsingUUIDs(partType, entityId, playerUUIDs, location);
+        sendEntityToUUIDs(partType, entityId, playerUUIDs, location);
         return entityId;
     }
 
@@ -349,7 +375,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @param location the spawn location
      * @return the entity's entity id
      */
-    public int sendEntityUsingUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location){
+    public int sendEntityToUUIDs(@NotNull SpawnedDisplayEntityPart.PartType partType, int entityId, @NotNull Collection<UUID> playerUUIDs, @NotNull Location location){
         for (UUID uuid : playerUUIDs){
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) continue;
@@ -364,20 +390,8 @@ public class PacketAttributeContainer implements Cloneable{
      * @param entityId the entity's entity id
      * @return this
      */
-    private PacketAttributeContainer sendAttributes(SpawnedDisplayEntityPart.PartType partType, Player player, int entityId){
-        new PacketResult(entityId).send(player);
-        return this;
-    }
-
-
-    /**
-     * Send attribute data to a player for a specific entity
-     * @param player the player
-     * @param entityId the entity's entity id
-     * @return this
-     */
     public PacketAttributeContainer sendAttributes(@NotNull Player player, int entityId){
-        new PacketResult(entityId).send(player);
+        new PacketResult(entityId, this).send(player);
         return this;
     }
 
@@ -388,7 +402,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @return this
      */
     public PacketAttributeContainer sendAttributesUsingUUIDs(@NotNull Collection<UUID> playerUUIDs, int entityId){
-        new PacketResult(entityId).sendUUIDs(playerUUIDs);
+        new PacketResult(entityId, this).sendUUIDs(playerUUIDs);
         return this;
     }
 
@@ -399,7 +413,7 @@ public class PacketAttributeContainer implements Cloneable{
      * @return this
      */
     public PacketAttributeContainer sendAttributesUsingPlayers(@NotNull Collection<Player> players, int entityId){
-        new PacketResult(entityId).send(players);
+        new PacketResult(entityId, this).send(players);
         return this;
     }
 
@@ -446,7 +460,6 @@ public class PacketAttributeContainer implements Cloneable{
     public PacketAttributeContainer clone() {
         try {
             PacketAttributeContainer clone = new PacketAttributeContainer();
-            //clone.attributes = new HashMap<>();
 
             for (Map.Entry<DisplayAttribute<?, ?>, Object> entry : this.attributes.entrySet()) {
                 DisplayAttribute<?, ?> key = entry.getKey();
@@ -471,15 +484,15 @@ public class PacketAttributeContainer implements Cloneable{
         }
     }
 
-    class PacketResult{
+    static class PacketResult{
         int entityId;
         WrapperPlayServerEntityMetadata metadataPacket;
         WrapperPlayServerEntityEquipment equipmentPacket;
         WrapperPlayServerUpdateAttributes attributesPacket;
 
-        PacketResult(int entityId){
+        PacketResult(int entityId, PacketAttributeContainer container){
             this.entityId = entityId;
-            setPackets(attributes);
+            setPackets(container.attributes);
         }
 
         PacketResult(int entityId, DisplayAttributeMap map){

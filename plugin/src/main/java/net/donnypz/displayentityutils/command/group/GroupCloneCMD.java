@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.kyori.adventure.text.Component;
@@ -34,10 +35,9 @@ class GroupCloneCMD extends GroupSubCommand {
             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to clone your selected group!", NamedTextColor.RED)));
         }
         else{
+            GroupCMD.selectGroupSilentSuccess(p, clonedGroup, false, true);
             p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Cloned your selected group", NamedTextColor.GREEN)));
             p.sendMessage(Component.text("- Your group selection has been changed to the newly created group", NamedTextColor.GRAY, TextDecoration.ITALIC));
-            DisplayGroupManager.setSelectedGroup(p, clonedGroup);
-            clonedGroup.glowAndMarkInteractions(p, 80);
         }
     }
 

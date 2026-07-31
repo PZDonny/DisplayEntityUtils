@@ -64,7 +64,7 @@ public final class BDEResult {
     }
 
     /**
-     * Convert the retrieved BDEngine project into a group/model & animation format, usable for DisplayEntityUtils.
+     * Convert the retrieved BDEngine project into a group/model and animation format, usable for DisplayEntityUtils.
      * <br>The {@link BDEAPIConvertEvent} will be called after successful conversion completion.
      * <br><b>This method should be run synchronously.</b>
      * @param spawnLocation       where the conversion should take place. This should be in a loaded chunk
@@ -73,13 +73,28 @@ public final class BDEResult {
      * @param saveGroup           whether the created group should be saved
      * @param saveAnimations      whether created animations should be saved
      * @param despawnAfter        whether the created group should be despawned after conversion
+     * @param adaptTags           whether scoreboard tags should be converted to part tags
      */
-    public void convert(@NotNull Location spawnLocation, @NotNull String groupSaveTag, @NotNull String animationSavePrefix, boolean saveGroup, boolean saveAnimations, boolean despawnAfter) {
-        this.convert(null, null, spawnLocation, groupSaveTag, animationSavePrefix, saveGroup, saveAnimations, despawnAfter);
+    public void convert(@NotNull Location spawnLocation,
+                        @NotNull String groupSaveTag,
+                        @NotNull String animationSavePrefix,
+                        boolean saveGroup,
+                        boolean saveAnimations,
+                        boolean despawnAfter,
+                        boolean adaptTags) {
+        this.convert(null,
+                null,
+                spawnLocation,
+                groupSaveTag,
+                animationSavePrefix,
+                saveGroup,
+                saveAnimations,
+                despawnAfter,
+                adaptTags);
     }
 
     /**
-     * Convert the retrieved BDEngine project into a group/model & animation format, usable for DisplayEntityUtils.
+     * Convert the retrieved BDEngine project into a group/model and animation format, usable for DisplayEntityUtils.
      * <br>The {@link BDEAPIConvertEvent} will be called after successful conversion completion.
      * <br><b>This method should be run synchronously.</b>
      * @param player              the player involved in the conversion. typically supplied when using conversion commands
@@ -88,13 +103,28 @@ public final class BDEResult {
      * @param saveGroup           whether the created group should be saved
      * @param saveAnimations      whether created animations should be saved
      * @param despawnAfter        whether the created group should be despawned after conversion
+     * @param adaptTags           whether scoreboard tags should be converted to part tags
      */
-    public void convert(@NotNull Player player, @NotNull String groupSaveTag, @NotNull String animationSavePrefix, boolean saveGroup, boolean saveAnimations, boolean despawnAfter) {
-        this.convert(null, player, player.getLocation(), groupSaveTag, animationSavePrefix, saveGroup, saveAnimations, despawnAfter);
+    public void convert(@NotNull Player player,
+                        @NotNull String groupSaveTag,
+                        @NotNull String animationSavePrefix,
+                        boolean saveGroup,
+                        boolean saveAnimations,
+                        boolean despawnAfter,
+                        boolean adaptTags) {
+        this.convert(null,
+                player,
+                player.getLocation(),
+                groupSaveTag,
+                animationSavePrefix,
+                saveGroup,
+                saveAnimations,
+                despawnAfter,
+                adaptTags);
     }
 
     /**
-     * Convert the retrieved BDEngine project into a group/model & animation format, usable for DisplayEntityUtils.
+     * Convert the retrieved BDEngine project into a group/model and animation format, usable for DisplayEntityUtils.
      * <br>The {@link BDEAPIConvertEvent} will be called after successful conversion completion.
      * <br><b>This method should be run synchronously.</b>
      * @param conversionId        the id used to reference this conversion later through events.
@@ -105,6 +135,7 @@ public final class BDEResult {
      * @param saveGroup           whether the created group should be saved
      * @param saveAnimations      whether created animations should be saved
      * @param despawnAfter        whether the created group should be despawned after conversion
+     * @param adaptTags           whether scoreboard tags should be converted to part tags
      */
     public void convert(@Nullable String conversionId,
                            @Nullable Player player,
@@ -113,7 +144,8 @@ public final class BDEResult {
                            @NotNull String animationSavePrefix,
                            boolean saveGroup,
                            boolean saveAnimations,
-                           boolean despawnAfter) {
+                           boolean despawnAfter,
+                           boolean adaptTags) {
         new BDEAPIConverter(
                 this,
                 conversionId,
@@ -123,7 +155,8 @@ public final class BDEResult {
                 animationSavePrefix,
                 saveGroup,
                 saveAnimations,
-                despawnAfter
+                despawnAfter,
+                adaptTags
         );
     }
 }

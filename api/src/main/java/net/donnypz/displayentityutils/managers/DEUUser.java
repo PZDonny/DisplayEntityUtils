@@ -13,6 +13,7 @@ import net.donnypz.displayentityutils.utils.ConversionUtils;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.particles.AnimationParticleBuilder;
 import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.gizmo.GizmoSession;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;
 import org.bukkit.*;
@@ -28,7 +29,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
-public class DEUUser {
+public final class DEUUser {
     static final Object userLock = new Object();
     static final HashMap<UUID, DEUUser> users = new HashMap<>();
     private static final ConcurrentHashMap<Integer, Vector3f> suppressedVectors = new ConcurrentHashMap<>();
@@ -49,6 +50,8 @@ public class DEUUser {
     private final ConcurrentHashMap<Integer, GroupScaleMultiplier> groupScaleMultipliers = new ConcurrentHashMap<>();
 
     private boolean placedGroupBreakMode = false;
+
+    private GizmoSession gizmoSession;
 
 
     private DEUUser(UUID userUUID){
@@ -77,6 +80,15 @@ public class DEUUser {
             return users.get(uuid);
         }
     }
+
+    public @Nullable GizmoSession getGizmo(){
+        return gizmoSession;
+    }
+
+    void setGizmo(GizmoSession gizmo){
+        this.gizmoSession = gizmo;
+    }
+
 
     @ApiStatus.Internal
     public void suppressTranslation(int entityId, @NotNull Vector3f vector){
@@ -113,9 +125,11 @@ public class DEUUser {
     /**
      * Set the selected {@link ActiveGroup} of a user
      * @param activeGroup the group
-     * @return false if {@link DisplayConfig#limitGroupSelections()} is true and another player already has the group selected
+     * @return false if {@link DisplayConfig#limitGroupSelections()} is enabled and a player already has the group selected
+     * OR if {@link ActiveGroup#isSelectable()} is false
      */
     public boolean setSelectedGroup(@NotNull ActiveGroup<?> activeGroup) {
+        if (!activeGroup.isSelectable()) return false;
         synchronized (userLock){
             for (DEUUser user : DEUUser.users.values()){
                 if (user.getSelectedGroup() == activeGroup){
@@ -174,6 +188,16 @@ public class DEUUser {
      */
     public void deselectGroup() {
         selectedGroup = null;
+    }
+
+    /**
+     * Remove a user's selected {@link ActiveGroup}, selected {@link ActivePartSelection}, and hide their {@link GizmoSession}
+     */
+    public void clearGroupSelections(){
+        deselectGroup();
+        deselectPartSelection();
+        if (gizmoSession != null) gizmoSession.deselectHide();
+
     }
 
     /**
@@ -300,7 +324,7 @@ public class DEUUser {
                     Vector moveVector = oldVector.subtract(translationVector);
                     PacketUtils.translateNonDisplay(player, part, moveVector, moveVector.length(), 0, 0);
                 } else if (part.getType() == SpawnedDisplayEntityPart.PartType.MANNEQUIN) {
-                    new PacketAttributeContainer().setAttributeAndSend(DisplayAttributes.Mannequin.SCALE,
+                    new PacketAttributeContainer().setAndSend(DisplayAttributes.Mannequin.SCALE,
                             (float) part.getMannequinScale() * extraMultiplier,
                             part.getEntityId(),
                             player);
@@ -529,6 +553,7 @@ public class DEUUser {
         if (particleBuilder != null) particleBuilder.remove();
         selectedAnimation = null;
         groupScaleMultipliers.clear();
+        if (gizmoSession != null) gizmoSession.unregister();
 
         Player player = Bukkit.getPlayer(userUUID);
 

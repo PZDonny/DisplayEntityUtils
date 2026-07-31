@@ -17,6 +17,7 @@ public class PartsModule implements AddonModule {
         SkriptUtil.registerModules(addon.syntaxRegistry(),
                 CondInteractionHasCommands::register,
                 CondInteractionIsResponsive::register,
+                CondPartHasTag::register,
                 CondPartIsDisplayPart::register,
                 CondPartIsMaster::register,
                 CondTextDisplayIsShadowed::register,

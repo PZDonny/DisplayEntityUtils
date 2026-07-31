@@ -5,14 +5,10 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 class MannequinToggleNameVisibilityCMD extends PartsSubCommand {
     MannequinToggleNameVisibilityCMD(@NotNull DEUSubCommand parentSubCommand) {
@@ -42,7 +38,7 @@ class MannequinToggleNameVisibilityCMD extends PartsSubCommand {
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled name visibility for ALL selected mannequins <red>OFF")));
         }
 
-        for (ActivePart part : selection.getSelectedParts()){
+        for (ActivePart part : selection.getParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.MANNEQUIN) {
                 part.setCustomNameVisible(status);
             }

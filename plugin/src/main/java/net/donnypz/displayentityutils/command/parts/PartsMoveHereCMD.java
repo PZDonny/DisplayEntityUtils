@@ -2,6 +2,8 @@ package net.donnypz.displayentityutils.command.parts;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
+import net.donnypz.displayentityutils.managers.GizmoManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
@@ -15,6 +17,7 @@ class PartsMoveHereCMD extends PartsSubCommand {
 
     public PartsMoveHereCMD(@NotNull DEUSubCommand parentSubCommand) {
         super("movehere", parentSubCommand, Permission.PARTS_TRANSFORM, true);
+        super.cancelIfDraggingGizmo();
     }
 
     @Override
@@ -31,7 +34,8 @@ class PartsMoveHereCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
-        for (ActivePart part : selection.getSelectedParts()){
+        if (GizmoCMD.isDraggingCancel(player)) return false;
+        for (ActivePart part : selection.getParts()){
             if (part.isDisplay()) continue;
             Location loc = player.getLocation();
             loc.setYaw(part.getYaw());
@@ -50,16 +54,19 @@ class PartsMoveHereCMD extends PartsSubCommand {
             return false;
         }
 
+        if (GizmoCMD.isDraggingCancel(player)) return false;
+
         Location loc = player.getLocation();
         loc.setYaw(selectedPart.getYaw());
         loc.setPitch(selectedPart.getPitch());
         selectedPart.teleport(loc);
+        GizmoManager.syncPosition(player, selection);
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Moved your selected part to your location!", NamedTextColor.GREEN)));
         return true;
     }
 
     @Override
     protected String getDescription() {
-        return "Change your selected part's actual location to your location";
+        return "Change your selected part's actual location to your location. Use \"-all\" to move all non-display parts in a group.";
     }
 }

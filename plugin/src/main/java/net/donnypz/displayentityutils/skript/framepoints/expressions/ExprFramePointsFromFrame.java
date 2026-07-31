@@ -17,7 +17,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.Arrays;
 
-@Name("Frame Points from Animation Frame")
+@Name("Frame Points")
 @Description("Get the Frame Points of an animation frame")
 @Examples({"set {_framepoints::*} to {_animationframe}'s animation frame points"})
 @Since("3.2.1, 3.3.2 (Plural)")

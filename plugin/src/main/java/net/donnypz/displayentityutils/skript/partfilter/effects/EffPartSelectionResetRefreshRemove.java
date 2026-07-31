@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Part Filter Reset/Refresh/Remove")
+@Name("Part Filter - Reset/Refresh/Remove")
 @Description("Reset, refresh, or remove a partfilter")
 @Examples({"#Ensure filtered parts are up to date with the applied filters", "refresh {_partfilter}",
         "",

@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.command.CMDUtils;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -8,7 +9,6 @@ import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.FramePoint;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.donnypz.displayentityutils.utils.relativepoints.FramePointSelector;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointSelector;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
@@ -53,7 +53,7 @@ class AnimCopyPointCMD extends PlayerSubCommand {
 
         try {
             String arg = args[2];
-            Collection<SpawnedDisplayAnimationFrame> frames = DEUCommandUtils.getFrames(player, arg, anim);
+            Collection<SpawnedDisplayAnimationFrame> frames = CMDUtils.getFrames(player, arg, anim);
 
             for (SpawnedDisplayAnimationFrame frame : frames){
                 frame.addFramePoint(new FramePoint(framePoint));
@@ -63,7 +63,7 @@ class AnimCopyPointCMD extends PlayerSubCommand {
 
             //Single or Multiple IDs
             try{
-                for (int i : DEUCommandUtils.commaSeparatedIDs(arg)){
+                for (int i : CMDUtils.commaSeparatedIDs(arg)){
                     player.sendMessage(Component.text("- "+i, NamedTextColor.GRAY));
                 }
             }

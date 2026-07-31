@@ -3,16 +3,11 @@ package net.donnypz.displayentityutils.command.interaction;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
-import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.donnypz.displayentityutils.utils.InteractionCommand;
-import net.donnypz.displayentityutils.utils.InteractionUtils;
-import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.Player;
@@ -48,7 +43,7 @@ public final class InteractionCMD extends ParentSubCommand {
             ActivePart part = selection.getSelectedPart();
             if (part == null || part.getType() != SpawnedDisplayEntityPart.PartType.INTERACTION){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with interaction entities", NamedTextColor.RED)));
-                player.sendMessage(Component.text("| The Interaction cannot be in a packet-based group", NamedTextColor.GREEN));
+                player.sendMessage(Component.text("| The Interaction cannot be in a packet-based group", NamedTextColor.GRAY));
                 return null;
             }
             return new SelectedInteraction(part);
@@ -112,12 +107,12 @@ public final class InteractionCMD extends ParentSubCommand {
             }
         }
 
-        void pivot(Location pivotLoc, double angle){
+        void pivot(Location pivotLoc, float angle, PivotAxis pivotAxis, boolean worldSpace){
             if (interaction != null){
-                DisplayUtils.pivot(interaction, pivotLoc, angle);
+                DisplayUtils.pivot(interaction, pivotLoc, angle, pivotAxis, worldSpace);
             }
             else{
-                interactionPart.pivot((float) angle);
+                interactionPart.pivot(angle, pivotAxis, worldSpace);
                 updatePacketGroup();
             }
         }

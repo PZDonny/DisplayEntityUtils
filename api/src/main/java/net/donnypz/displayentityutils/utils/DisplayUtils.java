@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.events.PartTranslateEvent;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
@@ -89,36 +90,64 @@ public final class DisplayUtils {
     }
 
     /**
-     * Pivot a vector with a given pitch and yaw change
+     * Rotate a vector by a given pitch and yaw
      * @param vector the vector
      * @param pitchChange the pitch change
      * @param yawChange the yaw change
-     * @return a new vector with the pivot applied
+     * @return a new vector with the rotation applied
      */
-    public static Vector3f pivotPitchAndYaw(@NotNull Vector3f vector, float pitchChange, float yawChange){
-        //Apply Pitch
-        double pitchAsRad = Math.toRadians(pitchChange);
-        double sin = Math.sin(pitchAsRad);
-        double cos = Math.cos(pitchAsRad);
+    public static @NotNull Vector3f rotateVector(@NotNull Vector3f vector, float pitchChange, float yawChange){
+        final Vector3f vectorCopy = new Vector3f(vector);
 
-        float y = (float) (vector.y * cos - vector.z * sin);
-        float z = (float) (vector.y * sin + vector.z * cos);
+        //Apply Pitch
+        float pitchAsRad = (float) Math.toRadians(pitchChange);
+        vectorCopy.rotateX(pitchAsRad);
 
         //Apply Yaw
-        return new Quaternionf()
-                .rotateY((float) Math.toRadians(-yawChange))
-                .transform(new Vector3f(vector.x, y, z));
+        float yawAsRad = (float) Math.toRadians(yawChange);
+        vectorCopy.rotateY(-yawAsRad);
+        return vectorCopy;
     }
 
     /**
-     * Pivot a vector with a given pitch and yaw change
-     * @param vector the vector
-     * @param pitchChange the pitch change
-     * @param yawChange the yaw change
-     * @return a new vector with the pivot applied
+     * Normalize a vector, removing any pitch and yaw rotation from it. Used when resetting pivots of non-display entities
+     * @param vector the vector to normalize
+     * @param currentPitch the current pitch of the pivot
+     * @param currentYaw the current yaw of the pivot
+     * @return a new vector with the rotation applied
      */
-    public static Vector pivotPitchAndYaw(@NotNull Vector vector, float pitchChange, float yawChange){
-        return Vector.fromJOML(pivotPitchAndYaw(vector.toVector3f(), pitchChange, yawChange));
+    public static @NotNull Vector3f normalizeVector(@NotNull Vector3f vector, float currentPitch, float currentYaw){
+        final Vector3f vectorCopy = new Vector3f(vector);
+
+        //Undo Pitch
+        Quaternionf q = new Quaternionf()
+                .rotateY((float) -Math.toRadians(currentYaw));
+
+        Vector3f localX = new Vector3f(-1, 0, 0);
+        q.transform(localX);
+
+        vectorCopy.rotateAxis(
+                (float) Math.toRadians(currentPitch),
+                localX.x,
+                localX.y,
+                localX.z
+        );
+
+        //Undo Yaw
+        vectorCopy.rotateY((float) Math.toRadians(currentYaw));
+
+        return vectorCopy;
+    }
+
+    /**
+     * Rotate a vector by a given pitch and yaw
+     * @param vector the vector
+     * @param pitchChange the pitch
+     * @param yawChange the yaw
+     * @return a new vector with the rotation applied
+     */
+    public static @NotNull Vector rotateVector(@NotNull Vector vector, float pitchChange, float yawChange){
+        return Vector.fromJOML(rotateVector(vector.toVector3f(), pitchChange, yawChange));
     }
 
     /**
@@ -153,8 +182,8 @@ public final class DisplayUtils {
             translationVector.add(centeringVec);
         }
 
-        Vector3f pivotedVector = pivotPitchAndYaw(translationVector, display.getPitch(), display.getYaw());
-        translationLoc.add(Vector.fromJOML(pivotedVector));
+        Vector3f rotatedVector = rotateVector(translationVector, display.getPitch(), display.getYaw());
+        translationLoc.add(Vector.fromJOML(rotatedVector));
         return translationLoc;
     }
 
@@ -203,8 +232,8 @@ public final class DisplayUtils {
             translationVector.add(centerVec);
         }
 
-        Vector3f pivotedVector = pivotPitchAndYaw(translationVector, pitch, yaw);
-        translationLoc.add(Vector.fromJOML(pivotedVector));
+        Vector3f rotatedVector = rotateVector(translationVector, pitch, yaw);
+        translationLoc.add(Vector.fromJOML(rotatedVector));
         return translationLoc;
     }
 
@@ -262,7 +291,7 @@ public final class DisplayUtils {
      * @param heightAdder the fixed value to increase the calculated height by
      * @return a float array containing the width and height, respectively
      */
-    public static float[] getAutoCullValues(SpawnedDisplayEntityPart.PartType type, @NotNull Vector3f translation, @NotNull Vector3f scale, @NotNull Quaternionf leftRotation, float widthAdder, float heightAdder){
+    public static float[] getAutoCullValues(@NotNull SpawnedDisplayEntityPart.PartType type, @NotNull Vector3f translation, @NotNull Vector3f scale, @NotNull Quaternionf leftRotation, float widthAdder, float heightAdder){
         boolean isTranslatedBelow = translation.y < 0;
         float width = Math.max(scale.x, scale.z)*2;
         float height = scale.y;
@@ -309,7 +338,7 @@ public final class DisplayUtils {
     }
 
     /**
-     * Get the translation vector from a location to the entity's location
+     * Get the translation vector from the entity to the reference location
      * @param entity the non-display entity
      * @param referenceLocation the reference location
      * @return a vector
@@ -320,11 +349,11 @@ public final class DisplayUtils {
 
     /**
      * Determine whether a part's entity is in a loaded chunk
-     * @param part
+     * @param part the part
      * @return true if the part is in a loaded chunk
      */
-    public static boolean isInLoadedChunk(SpawnedDisplayEntityPart part){
-        if (part == null || part.getEntity() == null){
+    public static boolean isInLoadedChunk(@NotNull SpawnedDisplayEntityPart part){
+        if (part.getEntity() == null){
             return false;
         }
         return isInLoadedChunk(part.getEntity());
@@ -332,10 +361,10 @@ public final class DisplayUtils {
 
     /**
      * Determine whether an entity is in a loaded chunk
-     * @param entity
+     * @param entity the entity
      * @return true if the entity is in a loaded chunk
      */
-    public static boolean isInLoadedChunk(Entity entity){
+    public static boolean isInLoadedChunk(@NotNull Entity entity){
         return entity.getLocation().isChunkLoaded();
     }
 
@@ -383,20 +412,6 @@ public final class DisplayUtils {
         }
         return groups;
     }
-
-    /**
-     * Get the vehicle of a SpawnedDisplayEntityGroup
-     * @param group The group
-     * @return Vehicle entity of group, or null if it doesn't exist
-     */
-    public static Entity getGroupVehicle(@NotNull SpawnedDisplayEntityGroup group){
-        if (!group.isSpawned()){
-            return null;
-        }
-        return group.getMasterPart().getEntity().getVehicle();
-    }
-
-
 
     /**
      * Change the translation of a display entity
@@ -459,6 +474,25 @@ public final class DisplayUtils {
         if (!new PartTranslateEvent(entity, destination, null,null).callEvent()){
             return;
         }
+        translateSilent(entity, direction, distance, durationInTicks, delayInTicks);
+    }
+
+    /**
+     * Attempts to change the translation of an entity similar
+     * to a Display Entity, through smooth teleportation.
+     * <br>
+     * Doing multiple translations on an entity at the same time may have unexpected results
+     * <br>
+     * This will <b>NOT</b> call the {@link PartTranslateEvent}
+     * @param direction The direction to translate the entity
+     * @param entity entity to translate
+     * @param distance How far the entity should be translated
+     * @param durationInTicks How long it should take for the translation to complete
+     * @param delayInTicks How long before the translation should begin
+     */
+    public static void translateSilent(@NotNull Entity entity, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
+        if (distance == 0) return;
+        Location destination = entity.getLocation().clone().add(direction.clone().normalize().multiply(distance));
 
         if (durationInTicks <= 0 && delayInTicks <= 0){
             FoliaUtils.teleport(entity, destination);
@@ -473,6 +507,7 @@ public final class DisplayUtils {
 
         DisplayAPI.getScheduler().entityRunTimer(entity, new Scheduler.SchedulerRunnable() {
             double currentDistance = 0;
+            final double DISTANCE_ABS = Math.abs(distance);
             float lastYaw = entity.getYaw();
             @Override
             public void run() {
@@ -484,7 +519,7 @@ public final class DisplayUtils {
                 currentDistance+=Math.abs(movementIncrement);
                 Location tpLoc = entity.getLocation().clone().add(incrementVector);
 
-                if (currentDistance >= distance){
+                if (Math.abs(currentDistance) >= DISTANCE_ABS){
                     FoliaUtils.teleport(entity, destination);
                     cancel();
                 }
@@ -511,7 +546,7 @@ public final class DisplayUtils {
     }
 
     /**
-     * Change the translation of a SpawnedDisplayEntityPart.
+     * Change the translation of a {@link SpawnedDisplayEntityPart}.
      * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results
      * @param part SpawnedDisplayEntityPart to translate
@@ -529,7 +564,7 @@ public final class DisplayUtils {
     }
 
     /**
-     * Change the translation of a SpawnedDisplayEntityPart.
+     * Change the translation of a {@link SpawnedDisplayEntityPart}.
      * Parts that are Interaction entities will attempt to translate similar to Display Entities, through smooth teleportation.
      * Doing multiple translations on an Interaction entity at the same time may have unexpected results
      * @param part SpawnedDisplayEntityPart to translate
@@ -550,18 +585,150 @@ public final class DisplayUtils {
 
 
     /**
-     * Pivot an entity around a location
+     * Pivot an entity around a location, in world space
+     * <ul>
+     *     <li>X (Pitch)</li>
+     *     <li>Y (Yaw)</li>
+     *     <li>Z (Roll)</li>
+     * </ul>
      * @param entity the entity
-     * @param center the location to pivot around
+     * @param pivotLocation the location to pivot around
      * @param angleInDegrees the pivot angle in degrees
+     * @param pivotAxis the axis to pivot around
+     * @param worldSpace whether the pivot should occur on world space axis
      */
-    public static void pivot(@NotNull Entity entity, @NotNull Location center, double angleInDegrees){
-        Vector3f translationVector = DisplayUtils.getNonDisplayTranslation(entity, center).toVector3f();
-        new Quaternionf()
-                .rotateY((float) Math.toRadians(-angleInDegrees))
-                .transform(translationVector);
-        Location newLoc = center.clone().subtract(Vector.fromJOML(translationVector));
-        FoliaUtils.teleport(entity, newLoc);
+    public static void pivot(@NotNull Entity entity,
+                             @NotNull Location pivotLocation,
+                             double angleInDegrees,
+                             @NotNull PivotAxis pivotAxis,
+                             boolean worldSpace){
+        float angleRad = (float) Math.toRadians(angleInDegrees);
+        Quaternionf rotation = new Quaternionf();
+
+        if (pivotAxis == PivotAxis.X){
+            rotation.rotateX(angleRad);
+        }
+        else if (pivotAxis == PivotAxis.Y){
+            rotation.rotateY(-angleRad);
+        }
+        else{
+            rotation.rotateZ(angleRad);
+        }
+        pivot(entity, rotation, pivotLocation, worldSpace);
+    }
+
+    /**
+     * Pivot a non-display entity around a location
+     * @param entity the entity
+     * @param rotation the rotation
+     * @param pivotLocation the location to pivot around
+     * @param worldSpace whether the pivot should occur on world space axis
+     */
+    public static void pivot(@NotNull Entity entity,
+                             @NotNull Quaternionf rotation,
+                             @NotNull Location pivotLocation,
+                             boolean worldSpace){
+        Location newLoc = WorldUtils
+                .getPivotLocation(
+                        entity.getLocation(),
+                        rotation,
+                        pivotLocation,
+                        worldSpace);
+        FoliaUtils.teleportSafe(entity, newLoc);
+    }
+
+    /**
+     * Rotate a display entity in its local space {@link Transformation}.
+     * The rotation is applied in addition to the entity's current rotation.
+     * @param display the display entity
+     * @param rotation the rotation
+     * @param worldSpace whether the rotation should occur on world space axis
+     */
+    public static void rotate(@NotNull Display display, @NotNull Quaternionf rotation, boolean worldSpace){
+        Transformation t = display.getTransformation();
+        Quaternionf originalRot = t.getLeftRotation();
+
+        Quaternionf appliedRotation = new Quaternionf(rotation);
+
+        if (worldSpace) {
+            Quaternionf entityRot = new Quaternionf()
+                    .rotateY((float) Math.toRadians(-display.getYaw()))
+                    .rotateX((float) Math.toRadians(display.getPitch()));
+
+            Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
+
+            //world space to display's space
+            appliedRotation = invertedEntityRot
+                    .mul(appliedRotation)
+                    .mul(entityRot);
+        }
+
+        Quaternionf finalRot = new Quaternionf(appliedRotation)
+                .mul(originalRot);
+
+        Transformation newT = new Transformation(
+                t.getTranslation(),
+                finalRot,
+                t.getScale(),
+                t.getRightRotation()
+        );
+        display.setTransformation(newT);
+    }
+
+    /**
+     * Rotate a display entity around a given pivot. The rotation is applied in addition to the entity's current rotation.
+     * @param display the display entity
+     * @param rotation the rotation
+     * @param pivotLocation the location that should be pivoted around
+     * @param worldSpace whether the rotation should occur on world space axis
+     */
+    public static void rotateAround(
+            @NotNull Display display,
+            @NotNull Quaternionf rotation,
+            @NotNull Location pivotLocation,
+            boolean worldSpace
+    ) {
+        Transformation t = display.getTransformation();
+
+        Vector3f translation = t.getTranslation();
+        Quaternionf originalRot = t.getLeftRotation();
+
+        //entity to pivot
+        Vector3f toPivot = pivotLocation.toVector()
+                .subtract(display.getLocation().toVector())
+                .toVector3f();
+
+        Quaternionf appliedRotation = new Quaternionf(rotation);
+        Vector3f localPivot = new Vector3f(toPivot);
+
+        Quaternionf entityRot = new Quaternionf()
+                .rotateY((float) Math.toRadians(-display.getYaw()))
+                .rotateX((float) Math.toRadians(display.getPitch()));
+        Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
+
+        //convert the offset from world space into the display's space (pitch/yaw)
+        localPivot.rotate(invertedEntityRot);
+
+        //world space to display's space (pitch/yaw)
+        if (worldSpace){
+            appliedRotation = invertedEntityRot
+                    .mul(appliedRotation)
+                    .mul(entityRot);
+        }
+
+        //rot around pivot point
+        translation.sub(localPivot);
+        translation.rotate(appliedRotation);
+        translation.add(localPivot);
+
+        Quaternionf finalRot = new Quaternionf(appliedRotation).mul(originalRot);
+
+        display.setTransformation(new Transformation(
+                translation,
+                finalRot,
+                t.getScale(),
+                t.getRightRotation()
+        ));
     }
 
     /**
@@ -572,7 +739,7 @@ public final class DisplayUtils {
     public static @Nullable String getGroupTag(Entity entity){
         if (entity == null) return null;
         PersistentDataContainer pdc = entity.getPersistentDataContainer();
-        return pdc.get(DisplayAPI.getGroupTagKey(), PersistentDataType.STRING);
+        return pdc.get(DisplayKeys.Group.GROUP_TAG, PersistentDataType.STRING);
     }
 
     /**
@@ -595,7 +762,7 @@ public final class DisplayUtils {
     public static @Nullable UUID getPartUUID(Entity entity){
         if (entity == null) return null;
         PersistentDataContainer pdc = entity.getPersistentDataContainer();
-        String value = pdc.get(DisplayAPI.getPartUUIDKey(), PersistentDataType.STRING);
+        String value = pdc.get(DisplayKeys.Part.PART_UUID, PersistentDataType.STRING);
         if (value != null){
             return UUID.fromString(value);
         }
@@ -610,7 +777,7 @@ public final class DisplayUtils {
      */
     public static boolean addTag(@NotNull Entity entity, @NotNull String partTag){
         if (!isValidTag(partTag)) return false;
-        return addToPDCList(entity, partTag, DisplayAPI.getPartPDCTagKey());
+        return addToPDCList(entity, partTag, DisplayKeys.Part.PART_TAGS);
     }
 
     /**
@@ -620,7 +787,7 @@ public final class DisplayUtils {
      * @return a set of invalid tags that could not be added, per {@link DisplayUtils#isValidTag(String)}
      */
     public static Set<String> addTags(@NotNull Entity entity, @NotNull List<String> partTags){
-        NamespacedKey key = DisplayAPI.getPartPDCTagKey();
+        NamespacedKey key = DisplayKeys.Part.PART_TAGS;
         if (partTags.isEmpty()){
             return Collections.unmodifiableSet(new HashSet<>());
         }
@@ -660,7 +827,6 @@ public final class DisplayUtils {
     }
 
     static void addManyToPDCList(@NotNull Entity entity, @NotNull List<String> elements, NamespacedKey key){
-        boolean isGroupTag = DisplayAPI.getGroupTagKey() == key;
         if (elements.isEmpty()){
             return;
         }
@@ -694,7 +860,7 @@ public final class DisplayUtils {
      * @param tag the tag to remove from this part
      */
     public static void removeTag(@NotNull Entity entity, @NotNull String tag){
-        removeFromPDCList(entity, tag, DisplayAPI.getPartPDCTagKey());
+        removeFromPDCList(entity, tag, DisplayKeys.Part.PART_TAGS);
     }
 
     /**
@@ -702,7 +868,7 @@ public final class DisplayUtils {
      * @param tags the tags to remove from this part
      */
     public static void removeTags(@NotNull Entity entity, @NotNull List<String> tags){
-        removeManyFromPDCList(entity, tags, DisplayAPI.getPartPDCTagKey());
+        removeManyFromPDCList(entity, tags, DisplayKeys.Part.PART_TAGS);
     }
 
     static void removeFromPDCList(@NotNull Entity entity, String element, NamespacedKey key){
@@ -740,7 +906,7 @@ public final class DisplayUtils {
      * @return The part's part tags.
      */
     public static @NotNull List<String> getTags(@NotNull Entity entity){
-        return getPDCList(entity, DisplayAPI.getPartPDCTagKey());
+        return getPDCList(entity, DisplayKeys.Part.PART_TAGS);
     }
 
     static @NotNull List<String> getPDCList(@NotNull Entity entity, NamespacedKey key){
@@ -759,10 +925,10 @@ public final class DisplayUtils {
      */
     public static boolean hasPartTag(@NotNull Entity entity, @NotNull String tag){
         PersistentDataContainer container = entity.getPersistentDataContainer();
-        if (!container.has(DisplayAPI.getPartPDCTagKey(), LIST_PDC_TYPE)){
+        if (!container.has(DisplayKeys.Part.PART_TAGS, LIST_PDC_TYPE)){
             return false;
         }
-        List<String> pdcTags = container.get(DisplayAPI.getPartPDCTagKey(), LIST_PDC_TYPE);
+        List<String> pdcTags = container.get(DisplayKeys.Part.PART_TAGS, LIST_PDC_TYPE);
         return pdcTags != null && pdcTags.contains(tag);
     }
 
@@ -774,21 +940,18 @@ public final class DisplayUtils {
      * @param tag the group tag
      * @return a boolean
      */
-    public static boolean isGroupTag(Entity entity, @NotNull String tag){
-        if (entity == null) return false;
-        String value = entity.getPersistentDataContainer().get(DisplayAPI.getGroupTagKey(), PersistentDataType.STRING);
-        if (value == null){
-            return false;
-        }
+    public static boolean isGroupTag(@NotNull Entity entity, @NotNull String tag){
+        String value = entity.getPersistentDataContainer().get(DisplayKeys.Group.GROUP_TAG, PersistentDataType.STRING);
+        if (value == null) return false;
         return tag.equals(value);
     }
 
     /**
      * Check if an entity is part of a {@link SpawnedDisplayEntityGroup}
-     * @param entity
+     * @param entity the entity
      * @return a boolean
      */
-    public static boolean isInGroup(Entity entity){
+    public static boolean isInGroup(@NotNull Entity entity){
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
         return part != null && part.hasGroup();
     }
@@ -798,9 +961,9 @@ public final class DisplayUtils {
      * @param display the display to check
      * @return true if the entity is the master pat
      */
-    public static boolean isMaster(Display display){
+    public static boolean isMaster(@NotNull Display display){
         PersistentDataContainer container = display.getPersistentDataContainer();
-        return container.has(DisplayAPI.getMasterKey(), PersistentDataType.BOOLEAN);
+        return container.has(DisplayKeys.Part.MASTER_PART, PersistentDataType.BOOLEAN);
     }
 
     @ApiStatus.Internal

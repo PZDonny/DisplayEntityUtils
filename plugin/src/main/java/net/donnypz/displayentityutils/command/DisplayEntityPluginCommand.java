@@ -4,6 +4,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.anim.AnimCMD;
 import net.donnypz.displayentityutils.command.bdengine.BDEngineCMD;
 import net.donnypz.displayentityutils.command.display.DisplayCMD;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.command.group.GroupCMD;
 import net.donnypz.displayentityutils.command.interaction.InteractionCMD;
 import net.donnypz.displayentityutils.command.item.ItemCMD;
@@ -11,7 +12,9 @@ import net.donnypz.displayentityutils.command.mannequin.MannequinCMD;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.command.place.PlaceCMD;
 import net.donnypz.displayentityutils.command.text.TextCMD;
+import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -45,6 +48,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         subCommands.put("hidepoints", new HidePointsCMD());
 
 
+        subCommands.put("gizmo", new GizmoCMD());
         subCommands.put("group", new GroupCMD());
         subCommands.put("parts", new PartsCMD());
         subCommands.put("display", new DisplayCMD());
@@ -163,8 +167,9 @@ public class DisplayEntityPluginCommand implements TabExecutor {
 
     public static void noPartSelection(Player player){
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You have not selected any part(s)!", NamedTextColor.RED)));
-        player.sendMessage(Component.text("/deu parts cycle <first | prev | next>", NamedTextColor.GRAY));
-        player.sendMessage(Component.text("/deu parts select <distance | -target>", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("| Select a group or an individual entity", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("| /deu group selectnearest", NamedTextColor.GRAY));
+        player.sendMessage(Component.text("| /deu parts select <distance | -target>", NamedTextColor.GRAY));
     }
 
     public static void invalidTag(CommandSender sender, String tag){
@@ -173,7 +178,7 @@ public class DisplayEntityPluginCommand implements TabExecutor {
     }
 
     public static void invalidTagRestrictions(CommandSender sender){
-        sender.sendMessage(Component.text("| Valid tags do not start with an \"!\" and do not contain commas.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+        sender.sendMessage(Component.text("| Valid tags have letters a-z, A-Z, numbers 0-9 and underscores (_).", NamedTextColor.GRAY, TextDecoration.ITALIC));
         sender.sendMessage(Component.text("| The tag may also already exist or be set", NamedTextColor.GRAY, TextDecoration.ITALIC));
     }
 
@@ -235,11 +240,16 @@ public class DisplayEntityPluginCommand implements TabExecutor {
             c.execute(sender, args);
         }
         else if (subCommand instanceof PlayerSubCommand c){
-            if (!(sender instanceof Player p)) {
+            if (!(sender instanceof Player player)) {
                 sender.sendMessage(Component.text("You cannot use this command in the console!", NamedTextColor.RED));
                 return;
             }
-            c.execute(p, args);
+
+            GizmoSessionImpl gizmo = (GizmoSessionImpl) DEUUser.getOrCreateUser(player).getGizmo();
+            if (c.isCancelIfDraggingGizmo() && GizmoCMD.isDraggingCancel(player, gizmo)){
+                return;
+            }
+            c.execute(player, args);
         }
     }
 
@@ -256,15 +266,21 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         if (!hasPermission(sender, Permission.HELP)) {
             return;
         }
+
         sender.sendMessage(Component.empty());
         sender.sendMessage(DisplayAPI.pluginPrefixLong);
+
         if (page == 1){
             sender.sendMessage(Component.text("v"+DisplayAPI.getVersion(), NamedTextColor.GRAY));
-            CMDUtils.sendCMD(sender, "/deu help <page-number>", "Display the plugin's help commands");
+            CMDUtils.sendCMD(sender, "/deu help [page-number]", "Display the plugin's help commands");
             CMDUtils.sendCMD(sender,
                     "/deu bdengine",
                     "Commands for Importing/Converting models & animations from BDEngine",
                     "<aqua>Use <yellow>\"block-display.com\" (BDEngine) <aqua>to create convertible models and animations");
+            CMDUtils.sendCMD(sender, "/deu gizmo", "Gizmo commands for group and display transforms",
+                    """
+                            | Gizmo Model by: illystray
+                            """);
             CMDUtils.sendCMD(sender, "/deu group", "Display Entity Models/Groups related commands");
             CMDUtils.sendCMD(sender,
                     "/deu parts",
@@ -284,6 +300,8 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                     "/deu item",
                     "Commands related to specifically Item Displays",
                     "| Commands with \"-all\" will apply the command to all selected item displays in a group");
+        }
+        else if (page == 2){
             CMDUtils.sendCMD(sender,
                     "/deu text",
                     "Commands related to specifically Text Displays",
@@ -296,8 +314,6 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                             
                             | Where applicable, Interaction commands will prioritize the interaction entity you're looking at over the one you may have selected
                             """);
-        }
-        else{
             CMDUtils.sendCMD(sender,
                     "/deu mannequin",
                     "Commands related to Mannequin entities",
@@ -309,6 +325,9 @@ public class DisplayEntityPluginCommand implements TabExecutor {
                     "| Commands allowing multiple <frame-ids> are comma separated");
             CMDUtils.sendCMD(sender, "/deu listgroups <storage> [page-number]", "List all saved Display Entity Models/Groups");
             CMDUtils.sendCMD(sender, "/deu listanims <storage> [page-number]", "List all saved animations");
+        }
+        else{
+            page = 3;
             CMDUtils.sendCMD(sender, "/deu hidepoints", "Hide any visible points (frame points, persistent packet group points, etc.)");
             CMDUtils.sendCMD(sender, "/deu reload <config | controllers>", "Reload the plugin's config or Display Controllers." +
                     " To reload Local, MySQL or MongoDB config save options, the server must be restarted");
@@ -329,15 +348,15 @@ public class DisplayEntityPluginCommand implements TabExecutor {
         if (args.length == 2){
             String subcmd = args[0].toLowerCase();
             String current = args[1];
-            switch (subcmd) {
-                case "interaction", "anim", "group", "parts", "display", "bdengine", "text", "item", "place", "mannequin" -> {
-                    return getTabComplete(subcmd, current);
-                }
-                case "listgroups", "listanims" -> suggestions.addAll(DEUSubCommand.TabSuggestion.STORAGES.suggestions);
-                case "reload" -> {
-                    suggestions.add("config");
-                    suggestions.add("controllers");
-                }
+            if (subcmd.equals("listgroups") || subcmd.equals("listanims")){
+                suggestions.addAll(DEUSubCommand.TabSuggestion.STORAGES.suggestions);
+            }
+            else if (subcmd.equals("reload")){
+                suggestions.add("config");
+                suggestions.add("controllers");
+            }
+            else if (subCommands.containsKey(subcmd)){
+                return getTabComplete(subcmd, current);
             }
         }
         else{

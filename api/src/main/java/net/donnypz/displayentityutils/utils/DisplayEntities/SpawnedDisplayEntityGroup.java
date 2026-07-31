@@ -3,10 +3,12 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import io.papermc.paper.entity.TeleportFlag;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
+import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.events.*;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.*;
+import net.donnypz.displayentityutils.utils.DisplayEntities.concurrent.GroupTeleportCompletableFuture;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
@@ -24,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayEntityPart> implements Spawned {
     public static final long DEFAULT_PART_UUID_SEED = 99;
@@ -46,11 +49,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         this.creationTime = System.currentTimeMillis();
     }
 
-    /**
-     * Creates a group that will represent a collection of display and interaction entities as a single object.
-     * @param masterDisplay the master entity that will be the vehicle for display entity parts and the pivot/origin point for interaction entities
-     * @apiNote This should NEVER have to be called! Only do so if you truly know what you're doing
-     */
     @ApiStatus.Internal
     public SpawnedDisplayEntityGroup(@NotNull Display masterDisplay){
         this.isVisibleByDefault = masterDisplay.isVisibleByDefault();
@@ -62,7 +60,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             creationTime = System.currentTimeMillis();
         }
         if (c.has(scaleKey)){
-            scaleMultiplier = c.get(scaleKey, PersistentDataType.FLOAT);
+            float scaleMultiplier = c.get(scaleKey, PersistentDataType.FLOAT);
+            super.setScaleMultiplier(scaleMultiplier);
         }
         if (c.has(persistenceOverrideKey)) {
             persistenceOverride = c.get(persistenceOverrideKey, PersistentDataType.BOOLEAN);
@@ -245,28 +244,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     /**
-     * Hide this group from a player
-     * @param player The player to hide this group from
-     */
-    @Override
-    public void hideFromPlayer(@NotNull Player player){
-        for (ActivePart part : groupParts.values()){
-            part.hideFromPlayer(player);
-        }
-    }
-
-    /**
-     * Hide this group from players
-     * @param players The players to hide this group from
-     */
-    @Override
-    public void hideFromPlayers(@NotNull Collection<Player> players){
-        for (ActivePart part : groupParts.values()){
-            part.hideFromPlayers(players);
-        }
-    }
-
-    /**
      * Get whether this group is visible to players by default
      * If not, use {@link #showToPlayer(Player)} to reveal this group to the player
      * and hideFromPlayer() to hide it
@@ -320,7 +297,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
     /**
      * Get the location of this group.
-     * @return Location of this group's master part. Null if the group is invalid
+     * @return the {@link Location} of this group's master part. Null if {{@link #isValid()}} returns false
      */
     @Override
     public Location getLocation(){
@@ -332,12 +309,14 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
     @Override
     public boolean isTrackedBy(@NotNull Player player) {
-        return player.canSee(getMasterEntity());
+        Entity masterEntity = getMasterEntity();
+        return masterEntity != null && player.canSee(masterEntity);
     }
 
     @Override
     public Collection<Player> getTrackingPlayers() {
-        return getMasterEntity().getTrackedBy();
+        Entity master = getMasterEntity();
+        return master == null ? List.of() : master.getTrackedBy();
     }
 
 
@@ -399,7 +378,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     /**
-     * Set whether this group's persistence can be overriden when loaded by a chunk
+     * Set whether this group's persistence can be overridden when loaded by a chunk
      * <br>
      * The persistence can only change if {@code automaticGroupDetection.persistenceOverride.enabled} is true in the config.
      * @param override whether the persistence should be overriden
@@ -414,21 +393,20 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     @Override
-    public boolean scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays){
+    public GroupTeleportCompletableFuture scale(float newScaleMultiplier, int durationInTicks, boolean scaleNonDisplays){
         if (newScaleMultiplier <= 0){
             throw new IllegalArgumentException("New Scale Multiplier cannot be <= 0");
         }
-        if (newScaleMultiplier == scaleMultiplier){
-            return true;
-        }
-        if (!isInLoadedChunk()){
-            return false;
-        }
-        GroupScaleEvent event = new GroupScaleEvent(this, newScaleMultiplier, this.scaleMultiplier, durationInTicks);
-        event.callEvent();
-        if (event.isCancelled()){
-            return false;
-        }
+
+        float originalScaleMultiplier = super.getScaleMultiplier();
+        if (newScaleMultiplier == originalScaleMultiplier) return null;
+
+        if (!isInLoadedChunk()) return null;
+
+
+        GroupScaleEvent event = new GroupScaleEvent(this, newScaleMultiplier, originalScaleMultiplier, durationInTicks);
+        if (!event.callEvent()) return null;
+        List<CompletableFuture<Boolean>> nonDisplayFutures = new ArrayList<>();
 
         for (SpawnedDisplayEntityPart part : groupParts.values()){
             //Displays
@@ -438,15 +416,15 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
                 //Reset Scale then multiply by newScaleMultiplier
                 Vector3f scale = transformation.getScale();
-                scale.x = (scale.x/scaleMultiplier)*newScaleMultiplier;
-                scale.y = (scale.y/scaleMultiplier)*newScaleMultiplier;
-                scale.z = (scale.z/scaleMultiplier)*newScaleMultiplier;
+                scale.x = (scale.x/originalScaleMultiplier)*newScaleMultiplier;
+                scale.y = (scale.y/originalScaleMultiplier)*newScaleMultiplier;
+                scale.z = (scale.z/originalScaleMultiplier)*newScaleMultiplier;
 
                 //Reset Translation then multiply by newScaleMultiplier
                 Vector3f translationVector = transformation.getTranslation();
-                translationVector.x = (translationVector.x/scaleMultiplier)*newScaleMultiplier;
-                translationVector.y = (translationVector.y/scaleMultiplier)*newScaleMultiplier;
-                translationVector.z = (translationVector.z/scaleMultiplier)*newScaleMultiplier;
+                translationVector.x = (translationVector.x/originalScaleMultiplier)*newScaleMultiplier;
+                translationVector.y = (translationVector.y/originalScaleMultiplier)*newScaleMultiplier;
+                translationVector.z = (translationVector.z/originalScaleMultiplier)*newScaleMultiplier;
 
                 //Transformation newTransform = new Transformation(translationVector, transformation.getLeftRotation(), scaleVector, transformation.getRightRotation());
                 if (!transformation.equals(d.getTransformation())){
@@ -465,27 +443,28 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                     Interaction i = (Interaction) part.getEntity();
 
                     //Reset Scale then multiply by newScaleMultiplier
-                    float newHeight = (i.getInteractionHeight()/scaleMultiplier)*newScaleMultiplier;
-                    float newWidth = (i.getInteractionWidth()/scaleMultiplier)*newScaleMultiplier;
+                    float newHeight = (i.getInteractionHeight()/originalScaleMultiplier)*newScaleMultiplier;
+                    float newWidth = (i.getInteractionWidth()/originalScaleMultiplier)*newScaleMultiplier;
                     InteractionUtils.scaleInteraction(i, newHeight, newWidth, durationInTicks, 0);
 
                     //Reset Translation then multiply by newScaleMultiplier
                     Vector translationVector = DisplayUtils.getNonDisplayTranslation(i);
-                    if (translationVector == null){
-                        continue;
-                    }
-                    Vector oldVector = new Vector(translationVector.getX(), translationVector.getY(), translationVector.getZ());
-                    translationVector.setX((translationVector.getX()/scaleMultiplier)*newScaleMultiplier);
-                    translationVector.setY((translationVector.getY()/scaleMultiplier)*newScaleMultiplier);
-                    translationVector.setZ((translationVector.getZ()/scaleMultiplier)*newScaleMultiplier);
+                    if (translationVector == null) continue;
 
-                    Vector moveVector = oldVector.subtract(translationVector);
-                    part.translateForce(moveVector, (float) moveVector.length(), durationInTicks, 0);
+                    translationVector.setX((translationVector.getX()/originalScaleMultiplier)*newScaleMultiplier);
+                    translationVector.setY((translationVector.getY()/originalScaleMultiplier)*newScaleMultiplier);
+                    translationVector.setZ((translationVector.getZ()/originalScaleMultiplier)*newScaleMultiplier);
+
+                    Location tpLoc = getLocation();
+                    if (tpLoc == null) continue;
+                    tpLoc.subtract(translationVector);
+                    CompletableFuture<Boolean> future = part.teleportSafe(tpLoc);
+                    if (future != null) nonDisplayFutures.add(future);
                 }
                 else if (part.type == SpawnedDisplayEntityPart.PartType.MANNEQUIN){
                     Mannequin m = (Mannequin) part.getEntity();
                     double scale = m.getAttribute(Attribute.SCALE).getBaseValue();
-                    scale = (scale/scaleMultiplier)*newScaleMultiplier;
+                    scale = (scale/originalScaleMultiplier)*newScaleMultiplier;
                     m.getAttribute(Attribute.SCALE).setBaseValue(scale);
                 }
             }
@@ -493,14 +472,27 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
         PersistentDataContainer pdc = getMasterEntity().getPersistentDataContainer();
         pdc.set(scaleKey, PersistentDataType.FLOAT, newScaleMultiplier);
-        scaleMultiplier = newScaleMultiplier;
-        return true;
+        super.setScaleMultiplier(newScaleMultiplier);
+        return GroupTeleportCompletableFuture.create(null, nonDisplayFutures);
     }
 
 
     @Override
     public boolean teleport(@NotNull Location location, boolean respectGroupDirection){
         return teleport(location, respectGroupDirection, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @return a {@link GroupTeleportCompletableFuture}
+     */
+    @Override
+    public @NotNull GroupTeleportCompletableFuture teleportSafe(@NotNull Location location, boolean respectGroupDirection) {
+        GroupTranslateEvent event = new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORT, location);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) return GroupTeleportCompletableFuture.cancelled();
+
+        return teleportWithoutEvent(location, respectGroupDirection, false);
     }
 
     /**
@@ -519,7 +511,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return true;
     }
 
-    private void teleportWithoutEvent(Location location, boolean respectGroupDirection, boolean forceChunkLoading){
+    private GroupTeleportCompletableFuture teleportWithoutEvent(Location location,
+                                                                boolean respectGroupDirection,
+                                                                boolean forceChunkLoading){
         Entity master = getMasterEntity();
         Location oldMasterLoc = master.getLocation().clone();
         boolean sameWorld = location.getWorld().getName().equals(oldMasterLoc.getWorld().getName());
@@ -546,10 +540,13 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             }
         }
 
-        FoliaUtils.teleport(master, location, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+        CompletableFuture<Boolean> groupFuture =
+                FoliaUtils.teleportSafe(master, location, TeleportFlag.EntityState.RETAIN_PASSENGERS)
+                        .orElse(null);
 
         DisplayGroupManager.updateSpawnedGroup(lastLoc, location, this);
 
+        Collection<CompletableFuture<Boolean>> nonDisplayFutures = new ArrayList<>();
         for (SpawnedDisplayEntityPart part : groupParts.values()){
             Entity partEntity = part.getEntity();
             if (partEntity == null){
@@ -563,11 +560,14 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             if (!part.isDisplay()){
                 Vector vector = oldMasterLoc.toVector().subtract(partEntity.getLocation().toVector());
                 Location tpLocation = location.clone().subtract(vector);
-                FoliaUtils.teleport(part.getEntity(), tpLocation, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+                CompletableFuture<Boolean> future = FoliaUtils
+                        .teleportSafe(part.getEntity(), tpLocation, TeleportFlag.EntityState.RETAIN_PASSENGERS)
+                        .orElse(null);
+                if (future != null) nonDisplayFutures.add(future);
             }
 
             if (!sameWorld){
-                if (part == masterPart) continue;
+                if (part == masterPart || !part.isDisplay()) continue;
                 master.addPassenger(partEntity);
             }
         }
@@ -575,53 +575,15 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         if (forceChunkLoading){
             chunk.removePluginChunkTicket(DisplayAPI.getPlugin());
         }
-    }
-
-    private static void translateEntityEventless(@NotNull Entity entity, @NotNull Vector direction, double distance, int durationInTicks, int delayInTicks){
-        DisplayUtils.translate(entity, direction, distance, durationInTicks, delayInTicks);
-        Location destination = entity.getLocation().clone().add(direction.clone().normalize().multiply(distance));
-
-        if (durationInTicks <= 0 && delayInTicks <= 0){
-            FoliaUtils.teleport(entity, destination);
-            return;
-        }
-
-        double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
-        Vector incrementVector = direction
-                .clone()
-                .normalize()
-                .multiply(movementIncrement);
-
-        DisplayAPI.getScheduler().entityRunTimer(entity, new Scheduler.SchedulerRunnable() {
-            double currentDistance = 0;
-            float lastYaw = entity.getYaw();
-            @Override
-            public void run() {
-                float newYaw = entity.getYaw();
-                if (newYaw != lastYaw){
-                    incrementVector.rotateAroundY(Math.toRadians(lastYaw-newYaw));
-                    lastYaw = newYaw;
-                }
-                currentDistance+=Math.abs(movementIncrement);
-                Location tpLoc = entity.getLocation().clone().add(incrementVector);
-
-                if (currentDistance >= distance){
-                    FoliaUtils.teleport(entity, destination);
-                    cancel();
-                }
-                else{
-                    FoliaUtils.teleport(entity, tpLoc);
-                }
-            }
-        }, delayInTicks, 1);
+        return GroupTeleportCompletableFuture.create(groupFuture, nonDisplayFutures);
     }
 
     @Override
-    public void teleportMove(@NotNull Vector direction, double distance, int durationInTicks){
+    public @NotNull Location teleportMove(@NotNull Vector direction, double distance, int durationInTicks){
         Entity masterEntity = getMasterEntity();
         Location destination = masterEntity.getLocation().clone().add(direction.clone().normalize().multiply(distance));
         if (!new GroupTranslateEvent(this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent()){
-            return;
+            return destination;
         }
 
         double movementIncrement = distance/(double) Math.max(durationInTicks, 1);
@@ -632,12 +594,14 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
         for (SpawnedDisplayEntityPart part : groupParts.values()){
             if (!part.isDisplay()){
-                translateEntityEventless(part.getEntity(), direction, distance, durationInTicks, 0);
+                DisplayUtils.translateSilent(part.getEntity(), direction, distance, durationInTicks, 0);
             }
         }
 
         DisplayAPI.getScheduler().entityRunTimer(masterEntity, new Scheduler.SchedulerRunnable() {
+            final double DISTANCE_ABS = Math.abs(distance);
             double currentDistance = 0;
+
             @Override
             public void run() {
                 if (!isSpawned()){
@@ -649,7 +613,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
                 masterEntity.setRotation(tpLoc.getYaw(), tpLoc.getPitch());
                 Location lastLoc = masterEntity.getLocation();
-                if (currentDistance >= distance){
+                if (Math.abs(currentDistance) >= DISTANCE_ABS){
                     FoliaUtils.teleport(masterEntity, destination, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                     DisplayGroupManager.updateSpawnedGroup(lastLoc, tpLoc, SpawnedDisplayEntityGroup.this);
                     new GroupTeleportMoveEndEvent(SpawnedDisplayEntityGroup.this, GroupTranslateEvent.GroupTranslateType.TELEPORTMOVE, destination).callEvent();
@@ -661,59 +625,8 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
                 }
             }
         }, 0, 1);
+        return destination;
     }
-
-    /**
-     * Get the locations this SpawnedDisplayEntityGroup would teleport to if it was translated with {@link #teleportMove(Direction, double, int)}
-     * or {@link #teleportMove(Vector, double, int)}.
-     * @param direction The direction the group would be moved
-     * @param distance How far the group would be translated
-     * @return A list of locations this group would teleport to
-     */
-    public List<Location> getTeleportMoveLocations(Vector direction, double distance, int durationInTicks){
-        return getTeleportMoveLocations(direction, distance, durationInTicks, 1);
-    }
-
-    /**
-     * Get the locations this SpawnedDisplayEntityGroup would teleport to if it was translated with {@link #teleportMove(Direction, double, int)}
-     * or {@link #teleportMove(Vector, double, int)}.
-     * @param direction The direction the group would be moved
-     * @param distance How far the group would be translated
-     * @param divisions Number of times the space should be divided (returning x times the number of locations)
-     * @return A list of locations this group would teleport to
-     */
-    public List<Location> getTeleportMoveLocations(Vector direction, double distance, int durationInTicks, int divisions){
-        if (durationInTicks <= 0){
-            durationInTicks = 1;
-        }
-        direction.normalize();
-        double movementIncrement = distance/(double) durationInTicks;
-        movementIncrement/=divisions;
-        direction.multiply(movementIncrement);
-        Entity master = getMasterEntity();
-        List<Location> locations = new ArrayList<>();
-        Location loc = master.getLocation().clone();
-        for (double currentDistance = 0; currentDistance <= distance; currentDistance+=Math.abs(movementIncrement)){
-            locations.add(loc.clone());
-            loc.add(direction);
-        }
-        return locations;
-    }
-
-
-    /**
-     * Pivot all non-display parts in this group around the group
-     * @param angleInDegrees the pivot angle
-     */
-    @Override
-    public void pivot(float angleInDegrees){
-        for (ActivePart part : groupParts.values()){
-            if (!part.isDisplay()){
-                part.pivot(angleInDegrees);
-            }
-        }
-    }
-
 
     /**
      * Change the translation of all the SpawnedDisplayEntityParts in this group.
@@ -842,6 +755,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
 
         if (!vehicle.addPassenger(masterEntity)) return false;
 
+        Vector rideOffset = getRideOffset();
         if (!rideOffset.isZero()) {
             translate(rideOffset, -1, -1);
         }
@@ -912,8 +826,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         Entity masterEntity = getMasterEntity();
         if (masterEntity != null){
             if (masterEntity.leaveVehicle()){
+                Vector rideOffset = getRideOffset();
                 if (!rideOffset.isZero()){
-                    translate(rideOffset.clone().multiply(-1), -1, -1);
+                    translate(rideOffset.multiply(-1), -1, -1);
                 }
             }
             this.autoCull(false);
@@ -1060,24 +975,24 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     @Override
     public void setSpawnAnimation(@NotNull String animationTag, @NotNull DisplayAnimator.AnimationType animationType, @NotNull LoadMethod loadMethod){
         PersistentDataContainer c = getMasterEntity().getPersistentDataContainer();
-        c.set(DisplayAPI.getSpawnAnimationKey(), PersistentDataType.STRING, animationTag);
-        c.set(DisplayAPI.getSpawnAnimationTypeKey(), PersistentDataType.STRING, animationType.name());
-        c.set(DisplayAPI.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING, loadMethod.name());
+        c.set(DisplayKeys.SpawnAnimation.ANIMATION_TAG, PersistentDataType.STRING, animationTag);
+        c.set(DisplayKeys.SpawnAnimation.TYPE, PersistentDataType.STRING, animationType.name());
+        c.set(DisplayKeys.SpawnAnimation.LOAD_METHOD, PersistentDataType.STRING, loadMethod.name());
         super.setSpawnAnimation(animationTag, animationType, loadMethod);
     }
 
     void setSpawnAnimation(PersistentDataContainer pdc, String animationTag, DisplayAnimator.AnimationType animationType, LoadMethod loadMethod){
-        pdc.set(DisplayAPI.getSpawnAnimationKey(), PersistentDataType.STRING, animationTag);
-        pdc.set(DisplayAPI.getSpawnAnimationTypeKey(), PersistentDataType.STRING, animationType.name());
-        pdc.set(DisplayAPI.getSpawnAnimationLoadMethodKey(), PersistentDataType.STRING, loadMethod.name());
+        pdc.set(DisplayKeys.SpawnAnimation.ANIMATION_TAG, PersistentDataType.STRING, animationTag);
+        pdc.set(DisplayKeys.SpawnAnimation.TYPE, PersistentDataType.STRING, animationType.name());
+        pdc.set(DisplayKeys.SpawnAnimation.LOAD_METHOD, PersistentDataType.STRING, loadMethod.name());
         super.setSpawnAnimation(animationTag, animationType, loadMethod);
     }
 
     public void unsetSpawnAnimation(){
         PersistentDataContainer c = getMasterEntity().getPersistentDataContainer();
-        c.remove(DisplayAPI.getSpawnAnimationKey());
-        c.remove(DisplayAPI.getSpawnAnimationTypeKey());
-        c.remove(DisplayAPI.getSpawnAnimationLoadMethodKey());
+        c.remove(DisplayKeys.SpawnAnimation.ANIMATION_TAG);
+        c.remove(DisplayKeys.SpawnAnimation.TYPE);
+        c.remove(DisplayKeys.SpawnAnimation.LOAD_METHOD);
         super.unsetSpawnAnimation();
     }
 
@@ -1122,7 +1037,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             return;
         }
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
-        DisplayAPI.getAnimationPlayerService().play(animator, animation, this, frame, -1, 0, true);
+        DisplayAPI.getAnimationPlayerService().showFrameForClient(animator, frame, this);
     }
 
     /**
@@ -1140,16 +1055,15 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
         SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
         clonedFrame.duration = duration;
-        DisplayAPI.getAnimationPlayerService().play(animator, animation, this, clonedFrame, -1, delay, true);
+        clonedFrame.delay = delay;
+        DisplayAPI.getAnimationPlayerService().showFrameForClient(animator, clonedFrame, this);
     }
-
-
 
     @Override
     public void setToFrame(@NotNull Player player, @NotNull SpawnedDisplayAnimation animation, @NotNull SpawnedDisplayAnimationFrame frame) {
         if (isInLoadedChunk()){
             DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
-            DisplayAPI.getAnimationPlayerService().playForClient(Set.of(player), animator, animation, this, frame, -1, 0, true);
+            DisplayAPI.getAnimationPlayerService().showFrameForClient(Set.of(player), animator, frame, this);
         }
     }
 
@@ -1159,10 +1073,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
             DisplayAnimator animator = new DisplayAnimator(animation, DisplayAnimator.AnimationType.LINEAR);
             SpawnedDisplayAnimationFrame clonedFrame = frame.clone();
             clonedFrame.duration = duration;
-            DisplayAPI.getAnimationPlayerService().playForClient(Set.of(player), animator, animation, this, clonedFrame, -1, delay, true);
+            clonedFrame.delay = delay;
+            DisplayAPI.getAnimationPlayerService().showFrameForClient(Set.of(player), animator, clonedFrame, this);
         }
     }
-
 
     /**
      * @return a cloned {@link SpawnedDisplayEntityGroup}
@@ -1173,34 +1087,14 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     /**
-     * Creates a copy of this group at a location with {@link GroupSpawnSettings}
-     * @param location where to spawn the cloned group
-     * @param settings the settings to use on the cloned group
      * @return a cloned {@link SpawnedDisplayEntityGroup}
      */
-    public SpawnedDisplayEntityGroup clone(@NotNull Location location, @NotNull GroupSpawnSettings settings){
-        //Reset pivot to 0 yaw
-        float groupYaw = getLocation().getYaw();
-        HashSet<ActivePart> resettedParts = new HashSet<>();
-        for (ActivePart part : groupParts.values()){
-            if (part.isDisplay()) continue;
-            part.pivot(-groupYaw);
-            resettedParts.add(part);
-        }
-
-        DisplayEntityGroup savedGroup = toDisplayEntityGroup();
-        float newYaw = location.getYaw();
-        location = location.clone();
-        location.setYaw(0);
-        SpawnedDisplayEntityGroup cloned = savedGroup.spawn(location, GroupSpawnedEvent.SpawnReason.CLONE, settings);
-
-        //Restore pivot
-        for (ActivePart part : resettedParts){
-            part.pivot(groupYaw);
-        }
-
-        cloned.setYaw(newYaw, true);
-        return cloned;
+    @Override
+    public SpawnedDisplayEntityGroup clone(@NotNull Location location, @NotNull GroupSpawnSettings settings) {
+        return toDisplayEntityGroup()
+                .spawn(location,
+                        GroupSpawnedEvent.SpawnReason.CLONE,
+                        settings);
     }
 
     public PacketDisplayEntityGroup toPacket(@NotNull Location location, boolean playSpawnAnimation, boolean autoShow, boolean persistent){
@@ -1211,34 +1105,15 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     }
 
     public PacketDisplayEntityGroup toPacket(@NotNull Location location, GroupSpawnSettings settings){
-        //Reset pivot to 0 yaw
-        float groupYaw = getLocation().getYaw();
-        HashSet<ActivePart> resettedParts = new HashSet<>();
-        for (ActivePart part : groupParts.values()){
-            part.pivot(-groupYaw);
-            resettedParts.add(part);
-        }
-
         DisplayEntityGroup savedGroup = toDisplayEntityGroup();
-        float newYaw = location.getYaw();
-        location = location.clone();
-        location.setYaw(0);
 
-        PacketDisplayEntityGroup packetGroup;
         if (settings.persistentByDefault){
-            packetGroup = DisplayGroupManager
+            return DisplayGroupManager
                     .addPersistentPacketGroup(location, savedGroup, settings, GroupSpawnedEvent.SpawnReason.INTERNAL);
         }
         else{
-            packetGroup = savedGroup.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.INTERNAL, settings);
+            return savedGroup.createPacketGroup(location, GroupSpawnedEvent.SpawnReason.INTERNAL, settings);
         }
-
-        //Restore pivot
-        for (ActivePart part : resettedParts){
-            part.pivot(groupYaw);
-        }
-        packetGroup.setYaw(newYaw, true);
-        return packetGroup;
     }
 
     @Override

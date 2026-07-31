@@ -2,11 +2,16 @@ package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
+import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
+import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
+import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.command.CommandSender;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 
 public final class GroupCMD extends ParentSubCommand{
@@ -24,7 +29,7 @@ public final class GroupCMD extends ParentSubCommand{
         new GroupSaveCMD(this);
         new GroupSaveJsonCMD(this);
         new GroupToPacketCMD(this);
-        new GroupMarkPacketGroupsCMD(this);
+        new GroupSelectPacketCMD(this);
         new GroupHidePersistentPacketGroupsCMD(this);
         new GroupShowPersistentPacketGroupsCMD(this);
         new GroupDeleteCMD(this);
@@ -38,6 +43,7 @@ public final class GroupCMD extends ParentSubCommand{
         new GroupYawCMD(this);
         new GroupPitchCMD(this);
         new GroupScaleCMD(this);
+        new GroupRotateCMD(this);
         new GroupBrightnessCMD(this);
         new GroupMoveHereCMD(this);
         new GroupMoveCMD(this);
@@ -64,7 +70,82 @@ public final class GroupCMD extends ParentSubCommand{
         new GroupRemoveCullCMD(this);
     }
 
-    static void groupToPacketInfo(Player player){
-        player.sendMessage(Component.text("| Selected groups can become packet-based with \"/deu group topacket\"", NamedTextColor.GRAY, TextDecoration.ITALIC));
+    public static boolean selectGroupSilentSuccess(Player player,
+                                                   ActiveGroup<?> group,
+                                                   boolean isAutoSelect,
+                                                   boolean hidePoints){
+        if (!group.isValid()){
+            player.sendMessage(Component.text("Group no longer spawned or is invalid.", NamedTextColor.RED));
+            return false;
+        }
+
+        if (!group.isSelectable()){
+            if (isAutoSelect){
+                player.sendMessage(DisplayAPI.pluginPrefix
+                        .append(Component.text("Failed to automatically select an unselectable group!", NamedTextColor.RED)));
+            }
+            else{
+                player.sendMessage(DisplayAPI.pluginPrefix
+                        .append(Component.text("That group is unselectable!", NamedTextColor.RED)));
+            }
+            return false;
+        }
+
+        if (!DisplayGroupManager.setSelectedGroup(player, group)){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to select group! Another player already has the group selected!", NamedTextColor.RED)));
+            return false;
+        }
+
+        if (hidePoints) RelativePointUtils.removeRelativePoints(player);
+
+        glowGroup(player, group);
+        GizmoCMD.selectShowGizmo(player, group.getLocation());
+        return true;
     }
+
+    public static boolean selectGroup(Player player,
+                            ActiveGroup<?> group,
+                            boolean isAutoSelect,
+                            boolean hidePoints){
+        boolean result = selectGroupSilentSuccess(player, group, isAutoSelect, hidePoints);
+        if (!result) return false;
+        if (isAutoSelect){
+            player.sendMessage(Component.text("Your spawned group has been automatically selected", NamedTextColor.GRAY));
+        }
+        else{
+            String groupTag = group.getTag();
+            player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage
+                    .miniMessage()
+                    .deserialize("<green>Group selected!" + (groupTag == null ? "" : " <white>(Tagged: "+groupTag+")"))));
+        }
+
+        return true;
+    }
+
+    private static void glowGroup(Player player, ActiveGroup<?> group){
+        final int GLOW_DURATION = 30;
+
+        group.glowAndMarkInteractions(player, GLOW_DURATION);
+        DisplayAPI.getScheduler().partRunTimer(group.getMasterPart(), new Scheduler.SchedulerRunnable() {
+            final int MAX_ITERATIONS = GLOW_DURATION/2;
+            int iteration = 0;
+            @Override
+            public void run() {
+                if (iteration == MAX_ITERATIONS || !group.isValid()){
+                    cancel();
+                    return;
+                }
+                try{
+                    Location groupLoc = group.getLocation();
+                    player.spawnParticle(Particle.END_ROD, groupLoc, 1, 0,0,0,0.01);
+                    iteration++;
+                }
+                catch(NullPointerException e){
+                    cancel();
+                }
+            }
+        }, 0, 2);
+    }
+
+
 }

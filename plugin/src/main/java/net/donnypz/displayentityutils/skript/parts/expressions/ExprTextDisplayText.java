@@ -20,7 +20,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.Arrays;
 
-@Name("Text Display Part's Text")
+@Name("Text Display Part - Text")
 @Description("Set the text of a text display part.")
 @Examples({
         "if {_activepart}'s part type is text_display:",

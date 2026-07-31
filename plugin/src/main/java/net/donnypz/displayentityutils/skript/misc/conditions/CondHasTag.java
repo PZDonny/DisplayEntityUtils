@@ -16,8 +16,8 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Group/Animation Has Tag?")
-@Description("Check if a saved or spawned group/animation has a tag")
+@Name("Has Tag")
+@Description("Check if a group or animation has a tag")
 @Examples({"if {_savedgroup} has tag:", "\tbroadcast \"This group has a tag!\"",
         "",
         "if {_animation} doesn't have a tag:", "\tbroadcast \"This animation is tagless!\""})

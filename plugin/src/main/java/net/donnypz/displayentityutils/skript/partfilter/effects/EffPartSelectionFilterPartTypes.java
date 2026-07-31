@@ -19,7 +19,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@Name("Part Filter Part Types")
+@Name("Part Filter - Filter Part/Entity Types")
 @Description("Set the part types of parts that should be filtered in a partfilter")
 @Examples({
         "deu filter {_partfilter} with type item_display",

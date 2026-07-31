@@ -2,6 +2,8 @@ package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
+import net.donnypz.displayentityutils.managers.GizmoManager;
 import net.donnypz.displayentityutils.utils.Direction;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityGroup;
@@ -18,6 +20,7 @@ class GroupMoveCMD extends GroupSubCommand {
         setTabComplete(2, TabSuggestion.DIRECTIONS);
         setTabComplete(3, "<distance>");
         setOptionalTabComplete(4, "[tick-duration]");
+        super.cancelIfDraggingGizmo();
     }
 
 
@@ -36,17 +39,20 @@ class GroupMoveCMD extends GroupSubCommand {
             return;
         }
 
+        if (GizmoCMD.isDraggingCancel(player)) return;
+
         try{
             Direction direction = Direction.valueOf(args[2].toUpperCase());
-            double distance = Double.parseDouble(args[3]);
-            if (distance <= 0){
-                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number greater than 0 for the distance!", NamedTextColor.RED)));
+            float distance = Float.parseFloat(args[3]);
+            if (distance == 0.0f){
+                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a number non-zero number for the distance!", NamedTextColor.RED)));
                 return;
             }
 
             if (args.length == 4){
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Teleporting your selected group!", NamedTextColor.GREEN)));
                 group.teleport(direction, distance);
+                GizmoManager.syncPosition(player, group, direction, distance);
                 return;
             }
 
@@ -58,6 +64,7 @@ class GroupMoveCMD extends GroupSubCommand {
             }
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Moving your selected group!", NamedTextColor.GREEN)));
             group.teleportMove(direction, distance, duration);
+            GizmoManager.syncPosition(player, group, direction, distance);
         }
         catch(IllegalArgumentException e){
             if (e instanceof NumberFormatException){

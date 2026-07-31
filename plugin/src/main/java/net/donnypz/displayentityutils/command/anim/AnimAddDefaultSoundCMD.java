@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.command.CMDUtils;
 import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
@@ -8,7 +9,6 @@ import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DEUSound;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -47,7 +47,7 @@ class AnimAddDefaultSoundCMD extends PlayerSubCommand {
             int delayInTicks = Integer.parseInt(args[5]);
 
 
-            Collection<SpawnedDisplayAnimationFrame> frames = DEUCommandUtils.getFrames(player, args[6], anim);
+            Collection<SpawnedDisplayAnimationFrame> frames = CMDUtils.getFrames(player, args[6], anim);
             for (SpawnedDisplayAnimationFrame frame : frames){
                 frame.getDefaultFramePoint().addSound(new DEUSound(soundStr, volume, pitch, delayInTicks));
             }

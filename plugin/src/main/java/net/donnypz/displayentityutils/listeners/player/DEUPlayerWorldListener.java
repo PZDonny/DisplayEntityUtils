@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.listeners.player;
 import io.papermc.paper.event.packet.PlayerChunkUnloadEvent;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.managers.DEUUser;
+import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,6 +18,7 @@ public class DEUPlayerWorldListener implements Listener {
     public void onPlayerChangeWorld(PlayerChangedWorldEvent e){
         Player player = e.getPlayer();
 
+        RelativePointUtils.removeRelativePoints(player);
         DisplayAPI.getScheduler().runAsync(() -> {
             DEUUser user = DEUUser.getOrCreateUser(player);
             user.resetTrackedPacketParts();

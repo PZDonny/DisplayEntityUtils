@@ -16,6 +16,8 @@ class BDEngineConvertDatapackCMD extends PlayerSubCommand {
         setTabComplete(2, "<datapack-name>");
         setTabComplete(3, "<group-tag-to-set>");
         setTabComplete(4, "<anim-tag-prefix-to-set>");
+        addFlag(BDEngineCMD.DESPAWN_FLAG);
+        addFlag(BDEngineCMD.ADAPT_TAGS_FLAG);
     }
 
     @Override
@@ -33,6 +35,8 @@ class BDEngineConvertDatapackCMD extends PlayerSubCommand {
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Attempting to convert datapack...", NamedTextColor.AQUA)));
         player.sendMessage(Component.text(" | DO NOT LEAVE THIS AREA UNTIL COMPLETION!", NamedTextColor.YELLOW));
         player.sendMessage(Component.text(" | Conversion times may vary.", NamedTextColor.YELLOW));
+
+        OptionalArguments oArgs = getOptionalArguments(player, args);
         BDEngineUtils.convertDatapack(
                 datapackName,
                 player,
@@ -40,12 +44,19 @@ class BDEngineConvertDatapackCMD extends PlayerSubCommand {
                 !saveAnimations ? "" : animPrefix,
                 saveGroups,
                 saveAnimations,
-                true
+                oArgs.hasFlag(BDEngineCMD.DESPAWN_FLAG),
+                oArgs.hasFlag(BDEngineCMD.ADAPT_TAGS_FLAG)
         );
     }
 
     @Override
     protected String getDescription() {
-        return "Convert BDEngine datapack into group and animation formats this plugin uses";
+        return """
+               Convert BDEngine datapack into group and animation formats this plugin uses
+               
+               "-despawn" will despawn the group/model after importing
+               
+               "-adapttags" will adapt scoreboard tags into part tags (tags DEU uses to identify entities/parts)
+               """;
     }
 }

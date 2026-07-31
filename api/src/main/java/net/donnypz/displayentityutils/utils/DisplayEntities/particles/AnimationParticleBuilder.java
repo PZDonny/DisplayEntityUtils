@@ -25,24 +25,16 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     Collection<FramePoint> framePoints;
     Step step;
     int delayInTicks = 0;
-    AnimationParticle editParticle = null;
-
-    private static final Component prefix = DisplayAPI.pluginPrefix;
-    private static final Component particleMSG = prefix.append(Component.text("Enter the name of the particle to use", NamedTextColor.YELLOW));
-    private static final Component amountMSG = prefix.append(Component.text("Enter the amount of particles to spawn", NamedTextColor.YELLOW));
-    private static final Component colorAndSizeMSG = prefix.append(Component.text("Enter the color to set for the particle(s) and a particle size", NamedTextColor.YELLOW));
-    private static final Component colorMSG = prefix.append(Component.text("Enter the color to set for the particle(s)", NamedTextColor.YELLOW));
-    private static final Component colorTransitionMSG = prefix.append(Component.text("Enter the color transition to set for the particle(s) and a particle size", NamedTextColor.YELLOW));
-    private static final Component extraMSG = prefix.append(Component.text("Enter the extra value for the particle(s)", NamedTextColor.YELLOW));
-    private static final Component blockMSG = prefix.append(Component.text("Enter the block to use for the particle(s).\nType \"-held\" to use your held block item, \"-target\" for your targeted block, or the block's id.", NamedTextColor.YELLOW));
-    private static final Component itemMSG = prefix.append(Component.text("Enter the item to use for the particle(s)", NamedTextColor.YELLOW));
-    private static final Component offsetMSG = prefix.append(Component.text("Enter the x, y, and z offset for the particle(s)", NamedTextColor.YELLOW));
-    private static final Component delayMSG = prefix.append(Component.text("Enter the amount of delay (in ticks) before the particle should be shown", NamedTextColor.YELLOW));
-    private static final Component separatedMSG = Component.text("All values should be entered separated by spaces.", NamedTextColor.GRAY, TextDecoration.ITALIC);
-
+    AnimationParticle<?> editParticle = null;
 
     @ApiStatus.Internal
-    public AnimationParticleBuilder(@NotNull Player player, @NotNull Collection<FramePoint> framePoints){
+    public AnimationParticleBuilder(@NotNull Player player, @NotNull FramePoint framePoint){
+        this(player, List.of(framePoint));
+    }
+
+    @ApiStatus.Internal
+    public AnimationParticleBuilder(@NotNull Player player,
+                                    @NotNull Collection<FramePoint> framePoints){
         super(Particle.FLAME);
         this.player = player;
         this.framePoints = new HashSet<>(framePoints);
@@ -51,16 +43,9 @@ public class AnimationParticleBuilder extends ParticleBuilder{
     }
 
     @ApiStatus.Internal
-    public AnimationParticleBuilder(@NotNull Player player, @NotNull FramePoint framePoint){
-        super(Particle.FLAME);
-        this.player = player;
-        this.framePoints = List.of(framePoint);
-        DEUUser.getOrCreateUser(player).setAnimationParticleBuilder(this);
-        advanceStep(Step.PARTICLE);
-    }
-
-    @ApiStatus.Internal
-    public AnimationParticleBuilder(@NotNull Player player, @NotNull AnimationParticle editParticle, Step step){
+    public AnimationParticleBuilder(@NotNull Player player,
+                                    @NotNull AnimationParticle<?> editParticle,
+                                    Step step){
         super(Particle.FLAME);
         this.player = player;
         DEUUser.getOrCreateUser(player).setAnimationParticleBuilder(this);
@@ -68,22 +53,33 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         this.editParticle = editParticle;
     }
 
-    private AnimationParticleBuilder(FramePoint framePoint, Particle particle){
-        this(List.of(framePoint), particle);
-    }
-
-    private AnimationParticleBuilder(Collection<FramePoint> framePoints, Particle particle){
+    private AnimationParticleBuilder(Collection<FramePoint> framePoints,
+                                     Particle particle){
         super(particle);
         this.framePoints = new HashSet<>(framePoints);
     }
 
     @ApiStatus.Internal
-    public static AnimationParticleBuilder create(@NotNull FramePoint framePoint, @NotNull Particle particle, int count, double xOffset, double yOffset, double zOffset, double extra, Object data){
+    public static AnimationParticleBuilder create(@NotNull FramePoint framePoint,
+                                                  @NotNull Particle particle,
+                                                  int count,
+                                                  double xOffset,
+                                                  double yOffset,
+                                                  double zOffset,
+                                                  double extra,
+                                                  Object data){
         return create(List.of(framePoint), particle, count, xOffset, yOffset, zOffset, extra, data);
     }
 
     @ApiStatus.Internal
-    public static AnimationParticleBuilder create(@NotNull Collection<FramePoint> framePoints, @NotNull Particle particle, int count, double xOffset, double yOffset, double zOffset, double extra, Object data){
+    public static AnimationParticleBuilder create(@NotNull Collection<FramePoint> framePoints,
+                                                  @NotNull Particle particle,
+                                                  int count,
+                                                  double xOffset,
+                                                  double yOffset,
+                                                  double zOffset,
+                                                  double extra,
+                                                  Object data){
         AnimationParticleBuilder builder = new AnimationParticleBuilder(framePoints, particle);
         builder
                 .count(count)
@@ -101,56 +97,19 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         if (editParticle != null){
             Player player = this.player;
             if (updateParticle()){
-                player.sendMessage(prefix.append(Component.text("Particle Changes applied successfully!", NamedTextColor.GREEN)));
+                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Particle Changes applied successfully!", NamedTextColor.GREEN)));
             }
             return;
         }
         if (nextStep == null){
             build();
-            player.sendMessage(prefix.append(Component.text("Successfully created an animation particle!", NamedTextColor.GREEN)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Successfully created an animation particle!", NamedTextColor.GREEN)));
             DEUUser.getUser(player).removeAnimationParticleBuilder();
             return;
         }
 
         this.step = nextStep;
-        switch(nextStep){
-            case PARTICLE -> {
-                player.sendMessage(particleMSG);
-            }
-            case COUNT -> {
-                player.sendMessage(amountMSG);
-            }
-            case COLOR_AND_SIZE -> {
-                player.sendMessage(colorAndSizeMSG);
-                player.sendMessage(separatedMSG);
-            }
-            case COLOR_ONLY -> {
-                player.sendMessage(colorMSG);
-            }
-            case COLOR_TRANSITION -> {
-                player.sendMessage(colorTransitionMSG);
-                player.sendMessage(separatedMSG);
-                player.sendMessage(Component.text("Example: red blue 2", NamedTextColor.GRAY));
-            }
-            case EXTRA -> {
-                player.sendMessage(extraMSG);
-            }
-        //Block
-            case BLOCK -> {
-                player.sendMessage(blockMSG);
-            }
-        //Item
-            case ITEM -> {
-                player.sendMessage(itemMSG);
-            }
-            case OFFSETS -> {
-                player.sendMessage(offsetMSG);
-                player.sendMessage(separatedMSG);
-            }
-            case DELAY -> {
-                player.sendMessage(delayMSG);
-            }
-        }
+        nextStep.sendMessage(player);
     }
 
     public boolean isColorOnlyParticle(){
@@ -193,6 +152,14 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         return particle == Particle.DUST_COLOR_TRANSITION;
     }
 
+    public static boolean isGeyserParticle(@NotNull Particle particle){
+        return VersionUtils.IS_26_2 && particle.getDataType().isAssignableFrom(Particle.Geyser.class);
+    }
+
+    public static boolean isGeyserBaseParticle(@NotNull Particle particle){
+        return VersionUtils.IS_26_2 && particle.getDataType().isAssignableFrom(Particle.GeyserBase.class);
+    }
+
     public Step getStep() {
         return step;
     }
@@ -206,8 +173,8 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         player = null;
     }
 
-    public AnimationParticle build(){
-        AnimationParticle animParticle = getAnimationParticle();
+    public AnimationParticle<?> build(){
+        AnimationParticle<?> animParticle = getAnimationParticle();
         for (FramePoint fp : framePoints){
             fp.addParticle(animParticle.clone());
         }
@@ -215,7 +182,7 @@ public class AnimationParticleBuilder extends ParticleBuilder{
 
     }
 
-    public static Class<? extends AnimationParticle> getAnimationParticleClass(@NotNull String particleName){
+    public static Class<? extends AnimationParticle<?>> getAnimationParticleClass(@NotNull String particleName){
         try{
             return getAnimationParticleClass(Particle.valueOf(particleName));
         }
@@ -224,7 +191,7 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         }
     }
 
-    AnimationParticle getAnimationParticle(){
+    AnimationParticle<?> getAnimationParticle(){
         if (isBlockDataParticle()){
             return new BlockAnimationParticle(this, data());
         }
@@ -243,13 +210,21 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         else if (particle() == Particle.FLASH) {
             return new FlashAnimationParticle(this, data());
         }
+        else if (particle() == Particle.TINTED_LEAVES){
+            return new TintedLeavesAnimationParticle(this, data());
+        }
+        else if (isGeyserBaseParticle(particle())){
+            return new GeyserBaseAnimationParticle(this, particle(), data());
+        }
+        else if (isGeyserParticle(particle())){
+            return new GeyserAnimationParticle(this, particle(), data());
+        }
         else {
             return new GeneralAnimationParticle(this, particle());
         }
-
     }
 
-    public static Class<? extends AnimationParticle> getAnimationParticleClass(@NotNull Particle particle){
+    public static Class<? extends AnimationParticle<?>> getAnimationParticleClass(@NotNull Particle particle){
         if (isBlockDataParticle(particle)){
             return BlockAnimationParticle.class;
         }
@@ -268,6 +243,15 @@ public class AnimationParticleBuilder extends ParticleBuilder{
         else if (particle == Particle.FLASH) {
             return FlashAnimationParticle.class;
         }
+        else if (particle == Particle.TINTED_LEAVES){
+            return TintedLeavesAnimationParticle.class;
+        }
+        else if (isGeyserBaseParticle(particle)){
+            return GeyserBaseAnimationParticle.class;
+        }
+        else if (isGeyserParticle(particle)){
+            return GeyserAnimationParticle.class;
+        }
         else {
             return GeneralAnimationParticle.class;
         }
@@ -282,15 +266,36 @@ public class AnimationParticleBuilder extends ParticleBuilder{
 
 
     public enum Step{
-        PARTICLE,
-        COUNT,
-        COLOR_AND_SIZE,
-        COLOR_ONLY,
-        COLOR_TRANSITION,
-        EXTRA,
-        ITEM,
-        BLOCK,
-        OFFSETS,
-        DELAY
+        PARTICLE("Enter the name of the particle to use", null),
+        COUNT("Enter the amount of particles to spawn", null),
+        EXTRA("Enter the extra value for the particle(s)", null),
+
+        COLOR_AND_SIZE("Enter the color to set for the particle(s) and a particle size", "red 1"),
+        COLOR_ONLY("Enter the color to set for the particle(s)", null),
+        COLOR_TRANSITION("Enter the color transition to set for the particle(s) and a particle size", "red blue 2"),
+        ITEM("Enter the item to use for the particle(s)", null),
+        BLOCK("Enter the block to use for the particle(s).\nType \"-held\" to use your held block item, \"-target\" for your targeted block, or the block's id.", null),
+        GEYSER("Enter the particle's water blocks", null),
+        GEYSER_BASE("Enter the particle's water blocks and burst impulse", "4 3.5"),
+
+        OFFSETS("Enter the x, y, and z offset for the particle(s)", "1.5 0 1.5"),
+        DELAY("Enter the amount of delay (in ticks) before the particle should be shown", null);
+
+        private final Component message;
+        private final Component example;
+
+        private static final Component separatedMSG = Component.text("All values should be entered separated by spaces.", NamedTextColor.GRAY, TextDecoration.ITALIC);
+        Step(String message, String example){
+            this.message = Component.text(message, NamedTextColor.YELLOW);
+            this.example = example == null ? null : Component.text("Example: "+example, NamedTextColor.GRAY);
+        }
+
+        void sendMessage(Player player){
+            player.sendMessage(message);
+            if (example != null){
+                player.sendMessage(separatedMSG);
+                player.sendMessage(example);
+            }
+        }
     }
 }

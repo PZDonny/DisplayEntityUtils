@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.relativepoints;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
@@ -32,6 +33,13 @@ public class DisplayEntitySelector extends RelativePointSelector<RelativePoint> 
 
     @Override
     public boolean removeFromPointHolder() {
+        SpawnedDisplayEntityPart existing = SpawnedDisplayEntityPart.getPart(display);
+        if (existing != null){
+            existing.remove(true);
+        }
+        else{
+            display.remove();;
+        }
         return true;
     }
 
@@ -97,19 +105,22 @@ public class DisplayEntitySelector extends RelativePointSelector<RelativePoint> 
             entityType = "";
         }
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text(entityType+" Entity Selected!", NamedTextColor.GREEN)));
+        GizmoCMD.selectShowGizmo(player, entity.getLocation());
     }
 
-    public static void deselect(Player player){
+    public static boolean deselect(Player player){
         DEUUser user = DEUUser.getOrCreateUser(player);
         if (user.getSelectedGroup() != null){
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can do this with non-group entities", NamedTextColor.RED)));
-            return;
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You can only do this with non-group entities", NamedTextColor.RED)));
+            return false;
         }
         if (user.getSelectedPartSelection() == null){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("You do not have an entity selected", NamedTextColor.RED)));
-            return;
+            return false;
         }
+        GizmoCMD.deselectHideGizmo(player);
         user.deselectPartSelection();
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Entity selection cleared", NamedTextColor.GREEN)));
+        return true;
     }
 }

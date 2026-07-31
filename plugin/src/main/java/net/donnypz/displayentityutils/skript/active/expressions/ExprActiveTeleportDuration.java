@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Active Group/Part/Filter Teleport Duration")
+@Name("Teleport Duration")
 @Description("Get/Set the teleportation duration of an active group, part or parts in a part filter. Get the duration on an active group/part.")
 @Examples({
         "#Set",
@@ -44,7 +44,7 @@ public class ExprActiveTeleportDuration extends SimplePropertyExpression<Active,
     @Override
     @Nullable
     public Number convert(Active active) {
-        if (active instanceof ActiveGroup ag){
+        if (active instanceof ActiveGroup<?> ag){
             return ag.getTeleportDuration();
         }
         if (active instanceof ActivePart ap){

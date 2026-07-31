@@ -9,18 +9,78 @@ import org.bukkit.block.BlockType;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemType;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 public final class VersionUtils {
 
-    public static boolean IS_1_20_4 = Bukkit.getUnsafe().getProtocolVersion() >= 765;
-    public static boolean IS_1_20_5 = Bukkit.getUnsafe().getProtocolVersion() >= 766;
-    public static boolean IS_1_21 = Bukkit.getUnsafe().getProtocolVersion() >= 767;
-    public static boolean IS_1_21_2 = Bukkit.getUnsafe().getProtocolVersion() >= 768;
-    public static boolean IS_1_21_5 = Bukkit.getUnsafe().getProtocolVersion() >= 770;
-    public static boolean IS_1_21_6 = Bukkit.getUnsafe().getProtocolVersion() >= 771;
-    public static boolean IS_1_21_7 = Bukkit.getUnsafe().getProtocolVersion() >= 772;
-    public static boolean IS_1_21_9 = Bukkit.getUnsafe().getProtocolVersion() >= 773;
+    public static final boolean IS_1_20_4 = Bukkit.getUnsafe().getProtocolVersion() >= 765;
+    public static final boolean IS_1_20_5 = Bukkit.getUnsafe().getProtocolVersion() >= 766;
+    public static final boolean IS_1_21 = Bukkit.getUnsafe().getProtocolVersion() >= 767;
+    public static final boolean IS_1_21_2 = Bukkit.getUnsafe().getProtocolVersion() >= 768;
+    public static final boolean IS_1_21_5 = Bukkit.getUnsafe().getProtocolVersion() >= 770;
+    public static final boolean IS_1_21_6 = Bukkit.getUnsafe().getProtocolVersion() >= 771;
+    public static final boolean IS_1_21_7 = Bukkit.getUnsafe().getProtocolVersion() >= 772;
+    public static final boolean IS_1_21_9 = Bukkit.getUnsafe().getProtocolVersion() >= 773;
+    public static final boolean IS_1_21_11 = Bukkit.getUnsafe().getProtocolVersion() >= 774;
+    public static final boolean IS_26_1 = Bukkit.getUnsafe().getProtocolVersion() >= 775;
+    public static final boolean IS_26_2 = Bukkit.getUnsafe().getProtocolVersion() >= 776;
+
+    public static final boolean IS_DEV_VERSION;
+    private static Particle ENTITY_EFFECT_PARTICLE;
+    private static Particle ITEM_PARTICLE;
+
+    static{
+        String pluginVer = DisplayAPI.getPlugin().getPluginMeta().getVersion();
+        IS_DEV_VERSION = isDevVersion(pluginVer);
+        setParticles();
+    }
+
+    private VersionUtils(){}
+
+    public static @NotNull String getPluginVersion(){
+        return DisplayAPI.getPlugin().getPluginMeta().getVersion();
+    }
+
+    public static @NotNull String getCleanPluginVersion(){
+        return cleanVersionString(getPluginVersion());
+    }
+
+    public static boolean isDevVersion(){
+        return IS_DEV_VERSION;
+    }
+
+    @ApiStatus.Internal
+    public static boolean isDevVersion(@NotNull String version){
+        String clean = cleanVersionString(version);
+        return !version.equals(clean);
+    }
+
+    @ApiStatus.Internal
+    public static @NotNull String cleanVersionString(@NotNull String version){
+        return version.replaceAll("[^0-9.]", "");
+    }
+
+    public static boolean isCurrentOlderThan(@NotNull String comparedVersion){
+        String current = getPluginVersion();
+        String cleanCurrent = VersionUtils.cleanVersionString(current);
+        String cleanComparedVersion = VersionUtils.cleanVersionString(comparedVersion);
+
+        String[] currentArr = cleanCurrent.split("\\.");
+        String[] comparedArr = cleanComparedVersion.split("\\.");
+
+        int length = Math.max(currentArr.length, comparedArr.length);
+
+        for (int i = 0; i < length; i++){
+            int num1 = i < currentArr.length ? Integer.parseInt(currentArr[i]) : 0;
+            int num2 = i < comparedArr.length ? Integer.parseInt(comparedArr[i]) : 0;
+
+            //behind
+            if (num2 > num1) return true;
+            if (num1 > num2) return false;
+        }
+        return false;
+    }
 
     public static boolean canViewDialogs(@NotNull Player player, boolean sendErrorMessage){
         if (!serverHasDialogs()){
@@ -58,22 +118,32 @@ public final class VersionUtils {
         return IS_1_20_5;
     }
 
-    public static Particle getEntityEffectParticle(){
+    public static boolean hasSpears(){
+        return IS_1_21_11;
+    }
+
+    public static boolean hasBelowNameDistance(){
+        return IS_26_2;
+    }
+
+    private static void setParticles(){
         if (IS_1_20_5){
-            return Particle.valueOf("ENTITY_EFFECT");
+            ENTITY_EFFECT_PARTICLE = Particle.valueOf("ENTITY_EFFECT");
+            ITEM_PARTICLE = Particle.valueOf("ITEM");
+
         }
         else{
-            return Particle.valueOf("SPELL_MOB");
+            ENTITY_EFFECT_PARTICLE = Particle.valueOf("SPELL_MOB");
+            ITEM_PARTICLE = Particle.valueOf("ITEM_CRACK");
         }
     }
 
+    public static Particle getEntityEffectParticle(){
+        return ENTITY_EFFECT_PARTICLE;
+    }
+
     public static Particle getItemParticle(){
-        if (IS_1_20_5){
-            return Particle.valueOf("ITEM");
-        }
-        else{
-            return Particle.valueOf("ITEM_CRACK");
-        }
+        return ITEM_PARTICLE;
     }
 
     public static Sound getSound(String soundName){

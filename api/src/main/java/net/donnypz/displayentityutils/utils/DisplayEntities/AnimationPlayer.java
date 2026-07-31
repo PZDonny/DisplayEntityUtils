@@ -24,22 +24,24 @@ public abstract class AnimationPlayer {
     final ActiveGroup<?> group;
     final DisplayAnimator animator;
     private SpawnedDisplayAnimationFrame prevFrame;
+    private float groupScaleMultiplier;
     protected final boolean playSingleFrame;
     private final boolean packetAnimationPlayer;
 
     AnimationPlayer(@NotNull DisplayAnimator animator,
-                    @NotNull SpawnedDisplayAnimation animation,
+                    @NotNull ActiveGroup<?> group,
+                    int startFrameId,
+                    boolean packetAnimationPlayer) {
+        this(animator, group, false, packetAnimationPlayer);
+        startAnimation(group, startFrameId);
+    }
+
+    AnimationPlayer(@NotNull DisplayAnimator animator,
                     @NotNull ActiveGroup<?> group,
                     @NotNull SpawnedDisplayAnimationFrame frame,
-                    int startFrameId,
-                    int delay,
-                    boolean playSingleFrame,
                     boolean packetAnimationPlayer) {
-        this.animator = animator;
-        this.group = group;
-        this.playSingleFrame = playSingleFrame;
-        this.packetAnimationPlayer = packetAnimationPlayer;
-        prepareAnimation(animation, group, frame, startFrameId, delay);
+        this(animator, group, true, packetAnimationPlayer);
+        startAnimation(group, frame, -1);
     }
 
     AnimationPlayer(@NotNull DisplayAnimator animator,
@@ -52,30 +54,49 @@ public abstract class AnimationPlayer {
         this.packetAnimationPlayer = packetAnimationPlayer;
     }
 
-    protected void prepareAnimation(SpawnedDisplayAnimation animation, ActiveGroup<?> group, SpawnedDisplayAnimationFrame frame, int frameId, int delay) {
+
+    protected void startAnimation(ActiveGroup<?> group, int frameId) {
+        SpawnedDisplayAnimationFrame frame = animator.getAnimation().getFrame(frameId);
+        this.startAnimation(group, frame, frameId);
+    }
+
+    protected void startAnimation(ActiveGroup<?> group, SpawnedDisplayAnimationFrame frame, int frameId){
         group.addActiveAnimator(animator);
-        MultiPartSelection<?> selection = animation.hasFilter() ? group.createPartSelection(animation.filter) : group.createPartSelection();
-        if (packetAnimationPlayer) {
-            DisplayAPI
-                    .getScheduler()
-                    .partRunLaterAsync(group.getMasterPart(), () -> executeAnimation(null, animation, group, selection, frame, frameId, playSingleFrame),
-                            Math.max(delay, 0));
-        } else {
-            if (delay <= 0) {
-                executeAnimation(null, animation, group, selection, frame, frameId, playSingleFrame);
-            } else {
-                DisplayAPI.getScheduler().runLater(() -> executeAnimation(null, animation, group, selection, frame, frameId, playSingleFrame), delay);
-            }
+        SpawnedDisplayAnimation animation = animator.getAnimation();
+        MultiPartSelection<?> selection = animation.hasFilter()
+                ? group.createPartSelection(animation.filter)
+                : group.createPartSelection();
+
+        onAnimationStart(selection);
+
+        int delay = frame.delay;
+
+        if (!packetAnimationPlayer && delay <= 0){
+            playFrame(null, animation, group, selection, frame, frameId, playSingleFrame);
+        }
+        else{
+            useScheduler(() -> playFrame(null, animation, group, selection, frame, frameId, playSingleFrame), Math.max(delay, 0));
         }
     }
 
-    protected void executeAnimation(Collection<Player> players, SpawnedDisplayAnimation animation, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimationFrame frame, int frameId, boolean playSingleFrame) {
-        if (!onStartNewFrame(group, selection)) return;
-        //Check if the animation can continue playing
-        if (!canContinueAnimation(group)) {
+    protected abstract void onAnimationStart(MultiPartSelection<?> selection);
+
+    protected void playFrame(Collection<Player> players,
+                             SpawnedDisplayAnimation animation,
+                             ActiveGroup<?> group,
+                             MultiPartSelection<?> selection,
+                             SpawnedDisplayAnimationFrame frame,
+                             int frameId,
+                             boolean playSingleFrame) {
+        if (!canFrameStart(group)) {
             handleAnimationInterrupted(group, selection);
             return;
         }
+
+        if (!onStartNewFrame(group, selection)) return;
+        //Check if the animation can continue playing
+
+        groupScaleMultiplier = group.getScaleMultiplier();
 
         if (animator.type == DisplayAnimator.AnimationType.LOOP) {
             SpawnedDisplayAnimationFrame startFrame = animation.frames.getFirst();
@@ -83,7 +104,7 @@ public abstract class AnimationPlayer {
             if (startFrame == frame) {
                 callAnimationLoopStart(players, group);
             } else if (frame == lastFrame && startFrame.equals(frame) && !playSingleFrame && animation.frames.size() > 1) { //Skip if start and last frame are identical
-                executeAnimation(players, animation, group, selection, animation.frames.getFirst(), 0, false);
+                playFrame(players, animation, group, selection, animation.frames.getFirst(), 0, false);
                 return;
             }
         }
@@ -131,7 +152,7 @@ public abstract class AnimationPlayer {
 
             useScheduler(() -> {
                 SpawnedDisplayAnimationFrame nextFrame = animation.frames.get(frameId + 1);
-                executeAnimation(players, animation, group, selection, nextFrame, frameId + 1, false);
+                playFrame(players, animation, group, selection, nextFrame, frameId + 1, false);
             }, delay);
         }
 
@@ -154,36 +175,36 @@ public abstract class AnimationPlayer {
                 if (frame.duration > 0) {
                     SpawnedDisplayAnimationFrame firstFrame = animation.frames.getFirst();
                     useScheduler(() -> {
-                        executeAnimation(players, animation, group, selection, firstFrame, 0, false);
+                        playFrame(players, animation, group, selection, firstFrame, 0, false);
                     }, frame.duration);
                 } else {
-                    executeAnimation(players, animation, group, selection, animation.frames.getFirst(), 0, false);
+                    playFrame(players, animation, group, selection, animation.frames.getFirst(), 0, false);
                 }
             }
         }
     }
 
-    void animateInteractions(Collection<Player> players, Location groupLoc, SpawnedDisplayAnimationFrame frame, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimation animation) {
+    void animateInteractions(Collection<Player> players,
+                             Location groupLoc,
+                             SpawnedDisplayAnimationFrame frame,
+                             ActiveGroup<?> group,
+                             MultiPartSelection<?> selection,
+                             SpawnedDisplayAnimation animation) {
         if (!group.isActiveAnimator(animator)) {
             return;
         }
+
         for (Map.Entry<UUID, Vector3f> entry : frame.interactionTransformations.entrySet()) {
             UUID partUUID = entry.getKey();
 
             Vector3f transform = entry.getValue();
-            if (transform == null) {
-                continue;
-            }
+            if (transform == null) continue;
 
             ActivePart part = group.getPart(partUUID);
-            if (part == null || !selection.contains(part)) {
-                continue;
-            }
+            if (part == null || !selection.contains(part)) continue;
 
             Vector currentVector = part.getNonDisplayTranslation();
-            if (currentVector == null) {
-                continue;
-            }
+            if (currentVector == null) continue;
 
             Vector v;
             float height = part.getInteractionHeight();
@@ -194,9 +215,9 @@ public abstract class AnimationPlayer {
                 if (t.height != -1 && t.width != -1) {
                     height = t.height;
                     width = t.width;
-                    if (group.getScaleMultiplier() != 1 && animation.groupScaleRespect()) {
-                        height *= group.getScaleMultiplier();
-                        width *= group.getScaleMultiplier();
+                    if (animation.groupScaleRespect() && groupScaleMultiplier != 1) {
+                        height *= groupScaleMultiplier;
+                        width *= groupScaleMultiplier;
                     }
                     yawAtCreation = t.groupYawAtCreation;
                 }
@@ -204,8 +225,8 @@ public abstract class AnimationPlayer {
                 v = Vector.fromJOML(transform);
             }
 
-            if (group.getScaleMultiplier() != 1 && animation.groupScaleRespect()) {
-                v.multiply(group.getScaleMultiplier());
+            if (animation.groupScaleRespect() && groupScaleMultiplier != 1) {
+                v.multiply(groupScaleMultiplier);
             }
 
             if (yawAtCreation != InteractionTransformation.invalidDirectionValue) { //Pivot
@@ -235,21 +256,25 @@ public abstract class AnimationPlayer {
 
                     for (Player player : part.getTrackingPlayers()) {
                         boolean scaleInteractions = group.isPlayerInteractionScaleMultiplier(player);
-                        float scaleMultiplier = scaleInteractions ? group.getPlayerScaleMultiplier(player) : 1;
-                        PacketUtils.scaleInteraction(player, part, height * scaleMultiplier, width * scaleMultiplier, frame.duration, 0);
+                        float playerScaleMultiplier = scaleInteractions ? group.getPlayerScaleMultiplier(player) : 1;
+                        PacketUtils.scaleInteraction(player, part, height * playerScaleMultiplier, width * playerScaleMultiplier, frame.duration, 0);
                     }
                 } else {
                     for (Player player : players) {
                         boolean scaleInteractions = group.isPlayerInteractionScaleMultiplier(player);
-                        float scaleMultiplier = scaleInteractions ? group.getPlayerScaleMultiplier(player) : 1;
-                        PacketUtils.scaleInteraction(player, part, height * scaleMultiplier, width * scaleMultiplier, frame.duration, 0);
+                        float playerScaleMultiplier = scaleInteractions ? group.getPlayerScaleMultiplier(player) : 1;
+                        PacketUtils.scaleInteraction(player, part, height * playerScaleMultiplier, width * playerScaleMultiplier, frame.duration, 0);
                     }
                 }
             }
         }
     }
 
-    private void animateDisplays(Collection<Player> players, SpawnedDisplayAnimationFrame frame, ActiveGroup<?> group, MultiPartSelection<?> selection, SpawnedDisplayAnimation animation) {
+    private void animateDisplays(Collection<Player> players,
+                                 SpawnedDisplayAnimationFrame frame,
+                                 ActiveGroup<?> group,
+                                 MultiPartSelection<?> selection,
+                                 SpawnedDisplayAnimation animation) {
         if (!group.isActiveAnimator(animator)) {
             return;
         }
@@ -279,7 +304,12 @@ public abstract class AnimationPlayer {
         }
     }
 
-    private void animateDisplay(Collection<Player> players, ActivePart part, DisplayTransformation transformation, ActiveGroup<?> group, SpawnedDisplayAnimation animation, SpawnedDisplayAnimationFrame frame) {
+    private void animateDisplay(Collection<Player> players,
+                                ActivePart part,
+                                DisplayTransformation transformation,
+                                ActiveGroup<?> group,
+                                SpawnedDisplayAnimation animation,
+                                SpawnedDisplayAnimationFrame frame) {
         //Prevents jittering in some cases
         boolean applyDataOnly;
         if (!packetAnimationPlayer) {
@@ -295,15 +325,10 @@ public abstract class AnimationPlayer {
 
     private void useScheduler(Runnable runnable, int delay) {
         if (packetAnimationPlayer) {
-            DisplayAPI.getScheduler().partRunLaterAsync(group.getMasterPart(), () -> {
-                runnable.run();
-            }, delay);
+            DisplayAPI.getScheduler().partRunLaterAsync(group.getMasterPart(), runnable, delay);
         } else {
-            DisplayAPI.getScheduler().partRunLater(group.getMasterPart(), () -> {
-                runnable.run();
-            }, delay);
+            DisplayAPI.getScheduler().partRunLater(group.getMasterPart(), runnable, delay);
         }
-
     }
 
     private void callAnimationLoopStart(Collection<Player> players, ActiveGroup<?> group) {
@@ -362,13 +387,12 @@ public abstract class AnimationPlayer {
 
             if (group.isRiding()) translationVector.add(group.getRideOffset3f());
 
-            float groupScaleMultiplier = group.getScaleMultiplier();
 
             final DisplayTransformation finalTransformation;
 
             if (animation.respectGroupScale) {
                 Vector3f scaleVector = new Vector3f(transformation.getScale());
-                if (group.getScaleMultiplier() != 1) {
+                if (groupScaleMultiplier != 1) {
                     translationVector.mul(groupScaleMultiplier);
                     scaleVector.mul(groupScaleMultiplier);
                 }
@@ -417,7 +441,12 @@ public abstract class AnimationPlayer {
                 .sendAttributes(player, entityId);
     }
 
-    private void applyDisplayTransformation(ActivePart part, SpawnedDisplayAnimationFrame frame, SpawnedDisplayAnimation animation, ActiveGroup<?> group, DisplayTransformation transformation, boolean applyDataOnly) {
+    private void applyDisplayTransformation(ActivePart part,
+                                            SpawnedDisplayAnimationFrame frame,
+                                            SpawnedDisplayAnimation animation,
+                                            ActiveGroup<?> group,
+                                            DisplayTransformation transformation,
+                                            boolean applyDataOnly) {
         SpawnedDisplayEntityPart sp = (SpawnedDisplayEntityPart) part;
         Display display = (Display) sp.getEntity();
         if (!display.isValid()) return;
@@ -439,11 +468,11 @@ public abstract class AnimationPlayer {
         if (group.isRiding()) {
             translationVector.add(group.getRideOffset3f());
         }
-        if (animation.respectGroupScale) {
+        if (animation.groupScaleRespect()) {
             Vector3f scaleVector = new Vector3f(transformation.getScale());
-            if (group.getScaleMultiplier() != 1) {
-                translationVector.mul(group.getScaleMultiplier());
-                scaleVector.mul(group.getScaleMultiplier());
+            if (groupScaleMultiplier != 1) {
+                translationVector.mul(groupScaleMultiplier);
+                scaleVector.mul(groupScaleMultiplier);
             }
             addFollowerDisplayPivot(group, part, translationVector);
 
@@ -474,7 +503,7 @@ public abstract class AnimationPlayer {
 
     protected abstract boolean onStartNewFrame(ActiveGroup<?> group, MultiPartSelection<?> selection);
 
-    protected abstract boolean canContinueAnimation(ActiveGroup<?> group);
+    protected abstract boolean canFrameStart(ActiveGroup<?> group);
 
     protected abstract void handleAnimationInterrupted(ActiveGroup<?> group, MultiPartSelection<?> selection);
 
@@ -483,28 +512,30 @@ public abstract class AnimationPlayer {
     public interface AnimationPlayerProvider {
 
         AnimationPlayer play(@NotNull DisplayAnimator animator,
-                             @NotNull SpawnedDisplayAnimation animation,
                              @NotNull SpawnedDisplayEntityGroup group,
-                             @NotNull SpawnedDisplayAnimationFrame frame,
-                             int startFrameId,
-                             int delay,
-                             boolean playSingleFrame);
+                             int startFrameId);
+
 
         AnimationPlayer playWithPackets(@NotNull DisplayAnimator animator,
-                                        @NotNull SpawnedDisplayAnimation animation,
                                         @NotNull ActiveGroup<?> group,
-                                        @NotNull SpawnedDisplayAnimationFrame frame,
-                                        int startFrameId,
-                                        int delay,
-                                        boolean playSingleFrame);
+                                        int startFrameId);
 
         AnimationPlayer playForClient(@NotNull Collection<Player> players,
                                       @NotNull DisplayAnimator animator,
-                                      @NotNull SpawnedDisplayAnimation animation,
                                       @NotNull ActiveGroup<?> group,
-                                      @NotNull SpawnedDisplayAnimationFrame frame,
-                                      int startFrameId,
-                                      int delay,
-                                      boolean playSingleFrame);
+                                      int startFrameId);
+
+        AnimationPlayer showFrameForClient(@NotNull DisplayAnimator animator,
+                                           @NotNull SpawnedDisplayAnimationFrame frame,
+                                           @NotNull SpawnedDisplayEntityGroup group);
+
+        AnimationPlayer showFrameWithPackets(@NotNull DisplayAnimator animator,
+                                             @NotNull SpawnedDisplayAnimationFrame frame,
+                                             @NotNull ActiveGroup<?> group);
+
+        AnimationPlayer showFrameForClient(@NotNull Collection<Player> players,
+                                           @NotNull DisplayAnimator animator,
+                                           @NotNull SpawnedDisplayAnimationFrame frame,
+                                           @NotNull ActiveGroup<?> group);
     }
 }

@@ -29,9 +29,10 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class ActivePart implements Active{
+public abstract class ActivePart implements Active, Cloneable{
 
     protected SpawnedDisplayEntityPart.PartType type;
     protected UUID partUUID;
@@ -56,6 +57,7 @@ public abstract class ActivePart implements Active{
      * Get whether this part is valid
      * @return a boolean
      */
+    @Override
     public boolean isValid(){
         return valid;
     }
@@ -161,12 +163,19 @@ public abstract class ActivePart implements Active{
     public abstract boolean hasGroup();
 
     /**
-     * Teleport this part to the given location. This will fail if the part is a display entity, in a group, and is not the group's master part.
+     * Teleport this part to a location.
+     * This will fail if the part is a display entity in a group, and is not the group's master part.
      * @param location the teleport location
      */
     public abstract void teleport(@NotNull Location location);
 
-    public abstract @Nullable Location getLocation();
+    /**
+     * Teleport this part to a location, automatically determining whether to do it async.
+     * This will fail if the part is a display entity in a group, and is not the group's master part.
+     * @param location The teleport location
+     * @return a {@link CompletableFuture} or null
+     */
+    public abstract @Nullable CompletableFuture<Boolean> teleportSafe(@NotNull Location location);
 
     protected abstract void cull(float width, float height);
 
@@ -222,10 +231,12 @@ public abstract class ActivePart implements Active{
                 && type != SpawnedDisplayEntityPart.PartType.INTERACTION;
     }
 
+    /**
+     * Get whether this part's type is of a display entity type
+     * @return a boolean
+     */
     public boolean isDisplay(){
-        return type == SpawnedDisplayEntityPart.PartType.BLOCK_DISPLAY
-                || type == SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY
-                || type == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY;
+        return type.isDisplay();
     }
 
     /**
@@ -316,7 +327,7 @@ public abstract class ActivePart implements Active{
      * Get the players who can visibly see / are tracking this part
      * @return a collection of players
      */
-    public abstract Collection<Player> getTrackingPlayers();
+    public abstract @NotNull Collection<Player> getTrackingPlayers();
 
 
     /**
@@ -392,11 +403,27 @@ public abstract class ActivePart implements Active{
     public abstract int getInterpolationDelay();
 
     /**
-     * Rotate this display entity part by a given quaternion
-     * @param rotation the rotation
-     * @param worldRotation whether rotation should occur in world space, rather than local
+     * Rotate this display entity part in its local space {@link Transformation}.
+     * The rotation is applied in addition to the entity's current rotation
      */
-    public abstract void rotateDisplay(@NotNull Quaternionf rotation, boolean worldRotation);
+    @Override
+    public abstract void rotate(@NotNull Quaternionf rotation, boolean worldSpace);
+
+    /**
+     * Rotate this display entity part around a given pivot and their local space {@link Transformation}.
+     * The rotation is applied in addition to the entity's current rotation
+     */
+    @Override
+    public abstract void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace);
+
+    /**
+     * Pivot or rotate around a location by a provided rotation, using the correct action based on this part's type
+     */
+    @Override
+    public void pivotOrRotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
+        if (this.isDisplay()) this.rotateAround(rotation, pivotLocation, worldSpace);
+        else this.pivot(rotation, pivotLocation, worldSpace);
+    }
 
     /**
      * Set the text of this part if its type is {@link SpawnedDisplayEntityPart.PartType#TEXT_DISPLAY}.
@@ -470,7 +497,16 @@ public abstract class ActivePart implements Active{
      */
     public abstract void setItemDisplayItemGlint(boolean hasGlint);
 
-    public abstract boolean hasItemDisplayItemGlint();
+    /**
+     * Check if this item display's item has an enchantment glint, if this part's type is {@link SpawnedDisplayEntityPart.PartType#ITEM_DISPLAY}
+     * @return a boolean
+     */
+    public boolean hasItemDisplayItemGlint(){
+        if (type != SpawnedDisplayEntityPart.PartType.ITEM_DISPLAY) return false;
+        ItemStack item = getItemDisplayItem();
+        if (item == null) return false;
+        return item.getItemMeta().hasEnchantmentGlintOverride() && item.getItemMeta().getEnchantmentGlintOverride();
+    }
 
     public abstract @Nullable Component getTextDisplayText();
 
@@ -620,6 +656,13 @@ public abstract class ActivePart implements Active{
     public abstract void setMannequinBelowName(@Nullable Component text);
 
     /**
+     * Set the below name distance of this mannequin part, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}.
+     * <br>This attribute only exists on Minecraft versions <code>26.2</code> and higher
+     * @param distance the below name distance
+     */
+    public abstract void setMannequinBelowNameDistance(double distance);
+
+    /**
      * Set the pose of this mannequin part, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
      * @param pose the pose
      */
@@ -667,6 +710,13 @@ public abstract class ActivePart implements Active{
      * @return a {@link Component} or null
      */
     public abstract @Nullable Component getMannequinBelowName();
+
+    /**
+     * Get a mannequin part's description/below name distance, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
+     * <br>This attribute only exists on Minecraft versions <code>26.2</code> and higher
+     * @return a double
+     */
+    public abstract double getMannequinBelowNameDistance();
 
     /**
      * Get a mannequin part's pose, if its type is {@link SpawnedDisplayEntityPart.PartType#MANNEQUIN}
@@ -721,4 +771,11 @@ public abstract class ActivePart implements Active{
     public abstract @NotNull List<String> getInteractionCommands();
 
     public abstract @NotNull List<InteractionCommand> getInteractionCommandsWithData();
+
+    /**
+     * Get a clone of this part. If this part is in a group, the cloned part will be automatically added.
+     * @return a clone of this part or null if this part is invalid or a group's parent part entity
+     */
+    @Override
+    public abstract @Nullable ActivePart clone();
 }

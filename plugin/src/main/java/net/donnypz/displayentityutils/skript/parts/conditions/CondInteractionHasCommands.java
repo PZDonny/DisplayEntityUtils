@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Interaction Part Has Commands?")
+@Name("Interaction Part - Has Commands")
 @Description("Check if an interaction part/entity has commands that will run when clicked")
 @Examples({"if {_activepart} is deu_interaction:",
         "\tif {_activepart} has click commands:",

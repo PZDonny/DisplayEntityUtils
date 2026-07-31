@@ -5,14 +5,10 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 class TextSeeThroughCMD extends PartsSubCommand {
     TextSeeThroughCMD(@NotNull DEUSubCommand parentSubCommand) {
@@ -38,7 +34,7 @@ class TextSeeThroughCMD extends PartsSubCommand {
                     .append(MiniMessage.miniMessage().deserialize("<green>Toggled see through for ALL selected text displays <red>OFF")));
         }
 
-        for (ActivePart part : selection.getSelectedParts()){
+        for (ActivePart part : selection.getParts()){
             if (part.getType() == SpawnedDisplayEntityPart.PartType.TEXT_DISPLAY){
                 part.setTextDisplaySeeThrough(status);
             }

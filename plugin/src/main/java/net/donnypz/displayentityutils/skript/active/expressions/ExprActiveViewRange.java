@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Active Group/Part/Filter View Range")
+@Name("View Range")
 @Description("Get/Set the view range of an active group/part/filter")
 @Examples({
         "set deu view range of {_activepart} to 5",

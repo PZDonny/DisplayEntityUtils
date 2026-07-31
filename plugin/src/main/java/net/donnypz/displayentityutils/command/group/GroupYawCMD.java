@@ -2,9 +2,8 @@ package net.donnypz.displayentityutils.command.group;
 
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.command.*;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -36,6 +35,7 @@ class GroupYawCMD extends GroupSubCommand {
             group.setYaw(yaw, pivot);
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Yaw set!", NamedTextColor.GREEN)));
             player.sendMessage(Component.text("| Old Yaw: "+oldYaw, NamedTextColor.GRAY));
+            GizmoCMD.updateGizmoRotationIfExists(player);
         }
         catch(NumberFormatException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Please enter a valid number!", NamedTextColor.RED)));
@@ -44,6 +44,6 @@ class GroupYawCMD extends GroupSubCommand {
 
     @Override
     protected String getDescription() {
-        return "Set your selected group's yaw, \"-pivot\" pivots interaction entities around the group";
+        return "Set your selected group's yaw. \"-pivot\" pivots non-display entities around the group";
     }
 }

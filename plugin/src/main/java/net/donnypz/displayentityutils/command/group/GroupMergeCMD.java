@@ -50,7 +50,7 @@ class GroupMergeCMD extends GroupSubCommand {
                 sg.merge(g);
             }
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Nearby non-packet groups have been merged", NamedTextColor.GREEN)));
-            sg.glowAndMarkInteractions(player, 60);
+            sg.glowAndMarkInteractions(player, 30);
         }
         catch(NumberFormatException e){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the merging distance!", NamedTextColor.RED)));

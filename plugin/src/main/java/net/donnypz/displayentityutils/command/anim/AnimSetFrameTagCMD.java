@@ -1,15 +1,11 @@
 package net.donnypz.displayentityutils.command.anim;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.command.DEUSubCommand;
-import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
-import net.donnypz.displayentityutils.command.Permission;
-import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.*;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimationFrame;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.donnypz.displayentityutils.utils.command.DEUCommandUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -45,7 +41,7 @@ class AnimSetFrameTagCMD extends PlayerSubCommand {
             return;
         }
         try {
-            int[] ids = DEUCommandUtils.commaSeparatedIDs(args[2]);
+            int[] ids = CMDUtils.commaSeparatedIDs(args[2]);
             //Check if the tag is a number
             try{
                 Integer.parseInt(tag);

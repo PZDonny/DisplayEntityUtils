@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Item Display Part's Transform")
+@Name("Item Display Part - Transform")
 @Description("Set the item display transform of a part, if it's of a item display type.")
 @Examples({"if {_activepart}'s part type is item_display:",
         "\tset {_activepart}'s deu item transform to first person left handed"

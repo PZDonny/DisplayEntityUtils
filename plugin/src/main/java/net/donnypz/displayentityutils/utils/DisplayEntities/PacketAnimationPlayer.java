@@ -5,13 +5,15 @@ import org.jetbrains.annotations.NotNull;
 final class PacketAnimationPlayer extends AnimationPlayer{
 
     PacketAnimationPlayer(@NotNull DisplayAnimator animator,
-                          @NotNull SpawnedDisplayAnimation animation,
                           @NotNull ActiveGroup<?> group,
-                          @NotNull SpawnedDisplayAnimationFrame frame,
-                          int startFrameId,
-                          int delay,
-                          boolean playSingleFrame) {
-        super(animator, animation, group, frame, startFrameId, delay, playSingleFrame, true);
+                          int startFrameId) {
+        super(animator, group, startFrameId, true);
+    }
+
+    public PacketAnimationPlayer(@NotNull DisplayAnimator animator,
+                                 @NotNull ActiveGroup<?> group,
+                                 @NotNull SpawnedDisplayAnimationFrame frame) {
+        super(animator, group, frame, true);
     }
 
     @Override
@@ -26,9 +28,12 @@ final class PacketAnimationPlayer extends AnimationPlayer{
     }
 
     @Override
-    protected boolean canContinueAnimation(ActiveGroup<?> group) {
+    protected boolean canFrameStart(ActiveGroup<?> group) {
         return group.isActiveAnimator(animator) && group.isRegistered();
     }
+
+    @Override
+    protected void onAnimationStart(MultiPartSelection<?> selection) {}
 
     @Override
     protected boolean onStartNewFrame(ActiveGroup<?> group, MultiPartSelection<?> selection) {

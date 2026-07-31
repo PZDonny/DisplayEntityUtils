@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.PacketDisplayEntityG
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -21,12 +22,13 @@ import org.jetbrains.annotations.Nullable;
 public class AnimationStateChangeEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private boolean isCancelled = false;
-    private final ActiveGroup group;
+    private final ActiveGroup<?> group;
     private final DisplayStateMachine stateMachine;
     private final MachineState newState;
     private final MachineState oldState;
     
-    public AnimationStateChangeEvent(@NotNull ActiveGroup group, @NotNull DisplayStateMachine stateMachine, @Nullable MachineState newState, @Nullable MachineState oldState){
+    public AnimationStateChangeEvent(@NotNull ActiveGroup<?> group, @NotNull DisplayStateMachine stateMachine, @Nullable MachineState newState, @Nullable MachineState oldState){
+        super(!Bukkit.isPrimaryThread());
         this.group = group;
         this.stateMachine = stateMachine;
         this.newState = newState;
@@ -37,7 +39,7 @@ public class AnimationStateChangeEvent extends Event implements Cancellable {
      * Get the {@link ActiveGroup} involved in this event
      * @return a group
      */
-    public ActiveGroup getGroup() {
+    public ActiveGroup<?> getGroup() {
         return group;
     }
 

@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Text Display Part's Line Width")
+@Name("Text Display Part - Line Width")
 @Description("Set the line width of a text display part.")
 @Examples({"if {_activepart}'s part type is text_display:",
         "\tset {_activepart}'s deu text line width to 50"

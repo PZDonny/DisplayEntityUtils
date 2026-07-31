@@ -6,9 +6,9 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.command.PlayerSubCommand;
+import net.donnypz.displayentityutils.command.gizmo.GizmoCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
-import net.donnypz.displayentityutils.utils.GroupResult;
 import net.donnypz.displayentityutils.utils.version.folia.FoliaUtils;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
 import net.kyori.adventure.text.Component;
@@ -58,17 +58,17 @@ class GroupSelectCMD extends PlayerSubCommand {
         if (groups.isEmpty()){
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("No nearby groups found!", NamedTextColor.RED)));
             player.sendMessage(Component.text("| Move to a different location or increase your search distance.", NamedTextColor.GRAY, TextDecoration.ITALIC));
-            player.sendMessage(Component.text("| Use \"/deu group markpacketgroups\" to mark packet-based groups in your current chunk.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+            player.sendMessage(Component.text("| Use \"/deu group selectpacket\" to mark packet-based groups in your current chunk.", NamedTextColor.GRAY, TextDecoration.ITALIC));
             return;
         }
 
         player.sendMessage(Component.text("| Groups found! Click to select.", NamedTextColor.GREEN));
-        for (SpawnedDisplayEntityGroup g: groups){
-            Component groupTag = MiniMessage.miniMessage().deserialize("- Tag: " + (g.hasTag() ? "<gray>" + g.getTag() : "<red>No Tag"));
+        for (SpawnedDisplayEntityGroup group: groups){
+            Component groupTag = MiniMessage.miniMessage().deserialize("- Tag: " + (group.hasTag() ? "<gray>" + group.getTag() : "<red>No Tag"));
 
             Component teleport = Component.text("[TELEPORT]", NamedTextColor.AQUA)
                     .clickEvent(ClickEvent.callback(audience -> {
-                        Location groupLoc = g.getLocation();
+                        Location groupLoc = group.getLocation();
                         if (groupLoc == null){
                             audience.sendMessage(Component.text("Group no longer spawned or is invalid.", NamedTextColor.RED));
                             return;
@@ -78,50 +78,16 @@ class GroupSelectCMD extends PlayerSubCommand {
 
             Component glow = Component.text("[GLOW]", NamedTextColor.YELLOW)
                     .clickEvent(ClickEvent.callback(audience -> {
-                        if (!g.isSpawned()){
+                        if (!group.isSpawned()){
                             audience.sendMessage(Component.text("Group no longer spawned or is invalid.", NamedTextColor.RED));
                             return;
                         }
-                        g.glowAndMarkInteractions((Player) audience, 40);
+                        group.glowAndMarkInteractions((Player) audience, 40);
                     }, clickOptions));
 
             Component select = Component.text("[SELECT]", NamedTextColor.GREEN)
                     .clickEvent(ClickEvent.callback(audience -> {
-                        Player p = (Player) audience;
-                        if (!g.isSpawned()){
-                            audience.sendMessage(Component.text("Group no longer spawned or is invalid.", NamedTextColor.RED));
-                            return;
-                        }
-                        boolean selectResult = DisplayGroupManager.setSelectedGroup(p, g);
-                        if (selectResult){
-                            p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Group selected!", NamedTextColor.GREEN)));
-                            DisplayEntityPluginCommand.hideRelativePoints(player);
-                        }
-                        else{
-                            p.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to select group! Another player already has that group selected!", NamedTextColor.RED)));
-                            return;
-                        }
-                        int selectDuration = 50;
-                        g.glowAndMarkInteractions(p, selectDuration);
-                        DisplayAPI.getScheduler().partRunTimer(g.getMasterPart(), new Scheduler.SchedulerRunnable() {
-                            int maxIterations = selectDuration/2;
-                            int iteration = 0;
-                            @Override
-                            public void run() {
-                                if (iteration == maxIterations || !g.isSpawned()){
-                                    cancel();
-                                    return;
-                                }
-                                try{
-                                    Location groupLoc = g.getLocation();
-                                    p.spawnParticle(Particle.END_ROD, groupLoc, 1, 0,0,0,0.01);
-                                    iteration++;
-                                }
-                                catch(NullPointerException e){
-                                    cancel();
-                                }
-                            }
-                        }, 0, 2);
+                        GroupCMD.selectGroup((Player) audience, group, false, true);
                     }, clickOptions));
 
             Component groupMessage = groupTag
@@ -133,7 +99,6 @@ class GroupSelectCMD extends PlayerSubCommand {
                     .append(teleport);
             player.sendMessage(groupMessage);
         }
-        GroupCMD.groupToPacketInfo(player);
     }
 
     @Override

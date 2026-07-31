@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Active Group Is Animating?")
+@Name("Active Group - Is Animating")
 @Description("Check if an active group is animating")
 @Examples({"if {_group} is animating:", "\tbroadcast \"It's animating, wow!\""})
 @Since("2.6.2")

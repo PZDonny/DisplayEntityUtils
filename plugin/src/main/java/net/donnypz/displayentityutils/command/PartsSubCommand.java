@@ -15,6 +15,8 @@ import java.util.List;
 public abstract class PartsSubCommand extends PlayerSubCommand {
     int minimumArgs;
     boolean requireGroupSelection = false;
+    boolean requireValidSelection = true;
+
 
     public PartsSubCommand(@NotNull String commandName, @NotNull DEUSubCommand parentSubCommand, @NotNull Permission permission) {
         super(commandName, parentSubCommand, permission);
@@ -43,6 +45,7 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
             DisplayEntityPluginCommand.noGroupSelection(player);
             return;
         }
+
         ActivePartSelection<?> selection = DisplayGroupManager.getPartSelection(player);
         if (selection == null){
             DisplayEntityPluginCommand.noPartSelection(player);
@@ -55,12 +58,17 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
             return;
         }
 
-        if (!selection.hasSelectedPart()){
-            PartsCMD.invalidPartSelection(player);
+        if (!selection.isValid()){
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid part selection! Please try again!", NamedTextColor.RED)));
             return;
         }
 
-        boolean updatePacket;
+        if (!selection.hasSelectedPart()){
+            PartsCMD.noPartSelected(player);
+            return;
+        }
+
+        boolean updatePacketGroup;
         OptionalArguments oArgs = getOptionalArguments(player, args);
         if (!oArgs.isValidOptions()) return;
 
@@ -68,15 +76,22 @@ public abstract class PartsSubCommand extends PlayerSubCommand {
             if (PartsCMD.isUnwantedSingleSelectionAll(player, selection)){
                 return;
             }
-            updatePacket = executeAllPartsAction(player, group, (MultiPartSelection<?>) selection, args);
+            updatePacketGroup = executeAllPartsAction(player, group, (MultiPartSelection<?>) selection, args);
         }
         else{
-            updatePacket = executeSinglePartAction(player, group, selection, selection.getSelectedPart(), args);
+            updatePacketGroup = executeSinglePartAction(player, group, selection, selection.getSelectedPart(), args);
         }
 
-        if (updatePacket && group instanceof PacketDisplayEntityGroup pg && pg.getMasterPart() != null){
-            pg.update();
+        if (updatePacketGroup){
+            if (group instanceof PacketDisplayEntityGroup pg
+                    && pg.getMasterPart() != null){
+                pg.update();
+            }
         }
+    }
+
+    protected void validSelectionNotRequired(){
+        this.requireValidSelection = true;
     }
 
     protected abstract void sendIncorrectUsage(@NotNull Player player);
