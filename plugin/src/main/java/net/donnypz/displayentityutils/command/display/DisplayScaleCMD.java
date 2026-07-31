@@ -28,14 +28,14 @@ class DisplayScaleCMD extends PartsSubCommand {
                 continue;
             }
             try {
-                if (applyScaleChange(getDimension(args), getScale(args), selectedPart, player)) {
-                    player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Scale updated for selected displays!", NamedTextColor.GREEN)));
-                }
-            } catch (NumberFormatException e) {
+                applyScaleChange(getDimension(args), getScale(args), selectedPart, player);
+            }
+            catch (NumberFormatException e) {
                 player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the scale!", NamedTextColor.RED)));
                 return false;
             }
         }
+        player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Scale updated for selected displays!", NamedTextColor.GREEN)));
         return true;
     }
 
