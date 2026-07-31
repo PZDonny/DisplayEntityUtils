@@ -8,6 +8,9 @@ jobs:
   publish:
     name: Publish
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -24,6 +27,17 @@ jobs:
 
       - name: Build and package with Maven
         run: mvn -B clean package --file pom.xml
+
+      - name: Upload to GitHub Release
+        env:
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          
+          gh release upload "$TAG" \
+            "plugin/target/displayentityutils-$TAG.jar" \
+            --clobber
+
 
       - name: Upload to Modrinth
         uses: cloudnode-pro/modrinth-publish@v2
