@@ -75,7 +75,7 @@ final class DisplayEntity implements Serializable {
                     pdc.set(DisplayKeys.SpawnAnimation.TYPE, PersistentDataType.STRING, group.spawnAnimationType.name());
                     pdc.set(DisplayKeys.SpawnAnimation.LOAD_METHOD, PersistentDataType.STRING, group.spawnAnimationLoadMethod.name());
                 }
-                pdc.set(DisplayKeys.Group.GROUP_ROTATION, PersistentDataType.BYTE_ARRAY, ActiveGroup.getRotationByteArray(group.getGroupRotation()));
+                pdc.set(DisplayKeys.Group.GROUP_ROTATION, PersistentDataType.BYTE_ARRAY, ActiveGroup.getRotationByteArray(group.getRotation()));
             }
             persistentDataContainer = pdc.serializeToBytes();
         }

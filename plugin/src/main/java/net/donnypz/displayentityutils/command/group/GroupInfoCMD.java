@@ -61,7 +61,7 @@ public class GroupInfoCMD extends PlayerSubCommand {
 
         Location loc = group.getLocation();
         player.sendMessage(MiniMessage.miniMessage().deserialize("Pitch & Yaw: <yellow>"+loc.getPitch()+", "+loc.getYaw()));
-        Vector3f euler = group.getGroupRotation().getEulerAnglesXYZ(new Vector3f());
+        Vector3f euler = group.getRotation().getEulerAnglesXYZ(new Vector3f());
         float eulerXDeg = (float) Math.toDegrees(euler.x);
         float eulerYDeg = (float) Math.toDegrees(euler.y);
         float eulerZDeg = (float) Math.toDegrees(euler.z);

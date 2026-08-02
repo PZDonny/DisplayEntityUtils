@@ -260,7 +260,7 @@ public abstract class ActiveGroup<T extends ActivePart> extends ActivePartHolder
     }
 
 
-    public @NotNull Quaternionf getGroupRotation(){
+    public @NotNull Quaternionf getRotation(){
         return new Quaternionf(this.rotation);
     }
 
@@ -268,7 +268,7 @@ public abstract class ActiveGroup<T extends ActivePart> extends ActivePartHolder
      * Reset the group's rotation to its default orientation
      * @param pivotNonDisplays whether non-displays should be pivoted
      */
-    public void resetGroupRotation(boolean pivotNonDisplays){
+    public void resetRotation(boolean pivotNonDisplays){
         setRotation(new Quaternionf(), pivotNonDisplays);
     }
 
@@ -276,7 +276,7 @@ public abstract class ActiveGroup<T extends ActivePart> extends ActivePartHolder
      * Make the group's current rotation its default orientation, resetting the group's
      * stored rotation but retaining the current orientation
      */
-    public void rebaseGroupRotation(){
+    public void rebaseRotation(){
         this.rotation = new Quaternionf();
     }
 
