@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.utils.gizmo.controls.selector;
 
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
-import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
+import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Control;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 public abstract class Selector extends Control {
 
-    public Selector(Axis axis) {
+    public Selector(GizmoAxis axis) {
         super(axis);
     }
 

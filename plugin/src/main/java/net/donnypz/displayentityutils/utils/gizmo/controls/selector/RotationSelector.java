@@ -2,7 +2,7 @@ package net.donnypz.displayentityutils.utils.gizmo.controls.selector;
 
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
-import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
+import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.RotationDrag;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoMathUtil;
@@ -15,20 +15,20 @@ public class RotationSelector extends Selector {
     private float ringRadius = 1.125f;
     private float ringThickness = 0.075f;
 
-    RotationSelector(Axis axis) {
+    RotationSelector(GizmoAxis axis) {
         super(axis);
     }
 
     public static RotationSelector x() {
-        return new RotationSelector(Axis.X);
+        return new RotationSelector(GizmoAxis.X);
     }
 
     public static RotationSelector y() {
-        return new RotationSelector(Axis.Y);
+        return new RotationSelector(GizmoAxis.Y);
     }
 
     public static RotationSelector z() {
-        return new RotationSelector(Axis.Z);
+        return new RotationSelector(GizmoAxis.Z);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class RotationSelector extends Selector {
                 .fma(distanceAlongRay, ray);
 
         //keep selection ring as a quarter-circle
-        Axis[] rotPlaneAxes = axis.getRotationPlaneAxes();
+        GizmoAxis[] rotPlaneAxes = axis.getRotationPlaneAxes();
         Vector3f axis1 = GizmoMathUtil.rotate(
                 rotPlaneAxes[0].getDirections()[0],
                 gizmoSpace,

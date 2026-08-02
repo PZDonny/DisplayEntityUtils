@@ -5,7 +5,7 @@ import org.joml.Vector3f;
 
 import java.util.Arrays;
 
-public enum Axis {
+public enum GizmoAxis {
     //axes
     X(Color.RED, "move_x", new Vector3f(1, 0, 0)),
     Y(Color.LIME, "move_y", new Vector3f(0, 1, 0)),
@@ -20,7 +20,7 @@ public enum Axis {
     private final Color baseColor;
     private final String tag;
 
-    Axis(Color baseColor, String tag, Vector3f... directions) {
+    GizmoAxis(Color baseColor, String tag, Vector3f... directions) {
         this.directions = directions;
         this.baseColor = baseColor;
         this.tag = tag;
@@ -48,10 +48,10 @@ public enum Axis {
         return isPlane() ? null : "rotate_"+tag.substring(5);
     }
 
-    public Axis[] getRotationPlaneAxes(){
-        if (this == X) return new Axis[]{Y,Z};
-        if (this == Y) return new Axis[]{Z,X};
-        if (this == Z) return new Axis[]{X,Y};
+    public GizmoAxis[] getRotationPlaneAxes(){
+        if (this == X) return new GizmoAxis[]{Y,Z};
+        if (this == Y) return new GizmoAxis[]{Z,X};
+        if (this == Z) return new GizmoAxis[]{X,Y};
         return null;
     }
 

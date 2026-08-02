@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.utils.gizmo.controls.selector;
 
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
-import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
+import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.TranslationAxisDrag;
@@ -16,7 +16,7 @@ public class TranslationAxisSelector extends AxisSelector {
     private final Vector3f localEnd;
     private float radius = 0.075f;
 
-    TranslationAxisSelector(Axis axis) {
+    TranslationAxisSelector(GizmoAxis axis) {
         super(axis);
         this.localStart = axis.getDirections()[0]
                 .mul(0.1125f);

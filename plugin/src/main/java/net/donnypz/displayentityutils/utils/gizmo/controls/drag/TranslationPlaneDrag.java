@@ -1,16 +1,15 @@
 package net.donnypz.displayentityutils.utils.gizmo.controls.drag;
 
-import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
-import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
+import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.joml.Vector3f;
 
 public class TranslationPlaneDrag extends TranslationDrag {
 
-    public TranslationPlaneDrag(Player player, GizmoSessionImpl gizmo, Axis axis) {
+    public TranslationPlaneDrag(Player player, GizmoSessionImpl gizmo, GizmoAxis axis) {
         super(player, gizmo, axis);
     }
 

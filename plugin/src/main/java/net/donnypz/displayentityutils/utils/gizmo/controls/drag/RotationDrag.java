@@ -5,7 +5,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSelectionMode;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
-import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
+import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoMathUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -30,13 +30,13 @@ public class RotationDrag extends Drag {
     //prev dir from gizmo to player's looking dir
     private final Vector3f lastDirection = new Vector3f();
 
-    public RotationDrag(Player player, GizmoSessionImpl gizmo, Axis axis) {
+    public RotationDrag(Player player, GizmoSessionImpl gizmo, GizmoAxis axis) {
         super(axis);
         this.gizmo = gizmo;
         this.originalAxis = axis.getDirections()[0];
         this.pivotPoint = gizmo.getGizmoModel().getLocation().toVector().toVector3f();
 
-        Axis[] rotPlaneAxes = axis.getRotationPlaneAxes();
+        GizmoAxis[] rotPlaneAxes = axis.getRotationPlaneAxes();
 
         planeAxis1.set(
                 GizmoMathUtil.rotate(

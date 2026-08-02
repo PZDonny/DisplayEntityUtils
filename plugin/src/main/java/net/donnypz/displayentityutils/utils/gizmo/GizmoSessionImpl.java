@@ -6,7 +6,7 @@ import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.managers.GizmoManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
-import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
+import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Control;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
 import net.donnypz.displayentityutils.utils.gizmo.controls.selector.RotationSelector;
@@ -75,9 +75,9 @@ public class GizmoSessionImpl implements GizmoSession {
         this.selectors.add(AxisSelector.yz());
 
         //Scale Axis
-        this.selectors.add(new ScaleSelector(Axis.X));
-        this.selectors.add(new ScaleSelector(Axis.Y));
-        this.selectors.add(new ScaleSelector(Axis.Z));
+        this.selectors.add(new ScaleSelector(GizmoAxis.X));
+        this.selectors.add(new ScaleSelector(GizmoAxis.Y));
+        this.selectors.add(new ScaleSelector(GizmoAxis.Z));
 
         //Rotate Axis
         this.selectors.add(RotationSelector.x());
