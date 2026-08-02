@@ -229,16 +229,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         return getEntity().getYaw();
     }
 
-
-    @ApiStatus.Internal
-    public long getCreationTime() {
-        if (!getEntity().getPersistentDataContainer().has(SpawnedDisplayEntityGroup.creationTimeKey)){
-            return -1;
-        }
-        return getEntity().getPersistentDataContainer().get(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG);
-    }
-
-
     /**
      * Get the entity of that this part represents
      * @return This part's entity or null if this part has been previously removed.
