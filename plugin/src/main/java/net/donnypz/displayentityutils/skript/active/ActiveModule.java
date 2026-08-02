@@ -22,6 +22,7 @@ public class ActiveModule implements AddonModule {
                 ExprActiveDirection::register,
                 ExprActiveGlowColor::register,
                 ExprActiveInterpolation::register,
+                ExprActiveRotation::register,
                 ExprActiveTeleportDuration::register,
                 ExprActiveViewRange::register
         );
