@@ -180,10 +180,10 @@ public abstract class ActiveGroup<T extends ActivePart> extends ActivePartHolder
      * @param axis the axis to rotate on
      * @param pivotNonDisplays whether non-displays should be pivoted
      */
-    public void setGroupRotation(float angleInDegrees, @NotNull Axis axis, boolean pivotNonDisplays){
+    public void setRotation(float angleInDegrees, @NotNull Axis axis, boolean pivotNonDisplays){
         Quaternionf newRotation = new Quaternionf(this.rotation);
         newRotation = axis.set(newRotation, angleInDegrees);
-        setGroupRotation(newRotation, pivotNonDisplays);
+        setRotation(newRotation, pivotNonDisplays);
     }
 
     /**
@@ -191,7 +191,7 @@ public abstract class ActiveGroup<T extends ActivePart> extends ActivePartHolder
      * @param rotation the local space rotation to set the group's orientation to
      * @param pivotNonDisplays whether non-displays should be pivoted
      */
-    public void setGroupRotation(@NotNull Quaternionf rotation, boolean pivotNonDisplays){
+    public void setRotation(@NotNull Quaternionf rotation, boolean pivotNonDisplays){
         Quaternionf delta = new Quaternionf(this.rotation)
                 .invert()
                 .mul(rotation);
@@ -269,7 +269,7 @@ public abstract class ActiveGroup<T extends ActivePart> extends ActivePartHolder
      * @param pivotNonDisplays whether non-displays should be pivoted
      */
     public void resetGroupRotation(boolean pivotNonDisplays){
-        setGroupRotation(new Quaternionf(), pivotNonDisplays);
+        setRotation(new Quaternionf(), pivotNonDisplays);
     }
 
     /**

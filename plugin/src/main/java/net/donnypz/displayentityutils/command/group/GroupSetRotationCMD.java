@@ -44,7 +44,7 @@ public class GroupSetRotationCMD extends GroupSubCommand {
             OptionalArguments oArgs = getOptionalArguments(player, args);
             boolean displaysOnly = oArgs.hasFlag(DISPLAYS_ONLY_FLAG);
 
-            group.setGroupRotation(rotation, axis, !displaysOnly);
+            group.setRotation(rotation, axis, !displaysOnly);
 
             player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage
                     .miniMessage()
