@@ -33,14 +33,26 @@ public enum PivotAxis {
      * @return a new {@link Quaternionf} with the axis representative of this set
      */
     public @NotNull Quaternionf set(@NotNull Quaternionf quaternionf, float angleInDegrees){
-        Vector3f euler = quaternionf.getEulerAnglesXYZ(new Vector3f());
         float angleRad = (float) Math.toRadians(angleInDegrees);
 
-        switch (this) {
-            case X -> euler.x = angleRad;
-            case Y -> euler.y = angleRad;
-            case Z -> euler.z = angleRad;
+        Quaternionf q = new Quaternionf();
+        switch (this){
+            case X -> {
+                q.rotateX(angleRad);
+                q.rotateY(quaternionf.y);
+                q.rotateZ(quaternionf.z);
+            }
+            case Y -> {
+                q.rotateX(quaternionf.x);
+                q.rotateY(angleRad);
+                q.rotateZ(quaternionf.z);
+            }
+            case Z -> {
+                q.rotateX(quaternionf.x);
+                q.rotateY(quaternionf.y);
+                q.rotateZ(angleRad);
+            }
         }
-        return new Quaternionf().rotateXYZ(euler.x, euler.y, euler.z);
+        return q;
     }
 }
