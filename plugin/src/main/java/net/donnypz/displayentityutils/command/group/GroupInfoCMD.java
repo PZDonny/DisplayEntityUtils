@@ -14,6 +14,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3f;
 
 public class GroupInfoCMD extends PlayerSubCommand {
     GroupInfoCMD(@NotNull DEUSubCommand parentSubCommand) {
@@ -35,7 +36,8 @@ public class GroupInfoCMD extends PlayerSubCommand {
 
         player.sendMessage(MiniMessage.miniMessage().deserialize("Group Tag: <yellow>"+groupTag));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Total Parts: <yellow>"+(group.getParts().size())));
-        String packetBased = group instanceof PacketDisplayEntityGroup ? "<green>TRUE" : "<red>FALSE";
+
+
         Component persistence;
         if (group.isPersistent()){
             persistence = MiniMessage.miniMessage().deserialize("Is Persistent: <green>TRUE");
@@ -49,6 +51,7 @@ public class GroupInfoCMD extends PlayerSubCommand {
             persistence = MiniMessage.miniMessage().deserialize("Is Persistent: <red>FALSE");
         }
 
+        String packetBased = group instanceof PacketDisplayEntityGroup ? "<green>TRUE" : "<red>FALSE";
         player.sendMessage(MiniMessage.miniMessage().deserialize("Is Packet Based: "+packetBased));
         player.sendMessage(persistence);
 
@@ -58,6 +61,14 @@ public class GroupInfoCMD extends PlayerSubCommand {
 
         Location loc = group.getLocation();
         player.sendMessage(MiniMessage.miniMessage().deserialize("Pitch & Yaw: <yellow>"+loc.getPitch()+", "+loc.getYaw()));
+        Vector3f euler = group.getGroupRotation().getEulerAnglesXYZ(new Vector3f());
+        float eulerXDeg = (float) Math.toDegrees(euler.x);
+        float eulerYDeg = (float) Math.toDegrees(euler.y);
+        float eulerZDeg = (float) Math.toDegrees(euler.z);
+        player.sendMessage(MiniMessage.miniMessage().deserialize("Group Rotation (X, Y, Z): <yellow>"
+                +eulerXDeg+", "
+                +eulerYDeg+", "
+                +eulerZDeg));
         player.sendMessage(MiniMessage.miniMessage().deserialize("Scale Multiplier: <yellow>"+group.getScaleMultiplier()));
 
         String animTag = group.getSpawnAnimationTag();
