@@ -94,7 +94,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     private void applyData(Random random, Entity entity){
         adaptLegacyPartTags();
-        entity.getPersistentDataContainer().set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, group.getCreationTime());
+        entity.getPersistentDataContainer().set(DisplayKeys.Group.CREATION_TIME, PersistentDataType.LONG, group.getCreationTime());
 
         //Remove from previous group
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
@@ -389,7 +389,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
 
         PersistentDataContainer pdc = getEntity().getPersistentDataContainer();
-        pdc.set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, newGroup.getCreationTime());
+        pdc.set(DisplayKeys.Group.CREATION_TIME, PersistentDataType.LONG, newGroup.getCreationTime());
         setGroupPDC();
 
         getEntity().setPersistent(newGroup.isPersistent());

@@ -39,10 +39,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     private boolean isPersistent = DisplayConfig.defaultPersistence();
     private boolean persistenceOverride = DisplayConfig.persistenceOverride();
 
-    public static final NamespacedKey creationTimeKey = new NamespacedKey(DisplayAPI.getPlugin(), "creationtime");
-    static final NamespacedKey scaleKey = new NamespacedKey(DisplayAPI.getPlugin(), "scale");
-    static final NamespacedKey persistenceOverrideKey = new NamespacedKey(DisplayAPI.getPlugin(), "persistence_override");
-
 
     SpawnedDisplayEntityGroup(boolean isVisible) {
         this.isVisibleByDefault = isVisible;
@@ -54,12 +50,12 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         this.isVisibleByDefault = masterDisplay.isVisibleByDefault();
         PersistentDataContainer c = masterDisplay.getPersistentDataContainer();
 
-        this.creationTime = c.getOrDefault(creationTimeKey, PersistentDataType.LONG, System.currentTimeMillis());
+        this.creationTime = c.getOrDefault(DisplayKeys.Group.CREATION_TIME, PersistentDataType.LONG, System.currentTimeMillis());
 
-        float scaleMultiplier = c.getOrDefault(scaleKey, PersistentDataType.FLOAT, 1f);
+        float scaleMultiplier = c.getOrDefault(DisplayKeys.Group.SCALE_MULTIPLIER, PersistentDataType.FLOAT, 1f);
         super.setScaleMultiplier(scaleMultiplier);
 
-        persistenceOverride = c.getOrDefault(persistenceOverrideKey, PersistentDataType.BOOLEAN, DisplayConfig.persistenceOverride());
+        persistenceOverride = c.getOrDefault(DisplayKeys.Group.PERSISTENCE_OVERRIDE, PersistentDataType.BOOLEAN, DisplayConfig.persistenceOverride());
 
         setSpawnAnimation(c);
 
@@ -174,10 +170,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     public boolean hasSameCreationTime(@NotNull Entity entity){
         PersistentDataContainer container = entity.getPersistentDataContainer();
-        if (!container.has(creationTimeKey, PersistentDataType.LONG)){
+        if (!container.has(DisplayKeys.Group.CREATION_TIME, PersistentDataType.LONG)){
             return false;
         }
-        return creationTime == container.get(creationTimeKey, PersistentDataType.LONG);
+        return creationTime == container.get(DisplayKeys.Group.CREATION_TIME, PersistentDataType.LONG);
     }
 
 //    /**
@@ -377,7 +373,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         this.persistenceOverride = override;
         Entity master = getMasterPart().getEntity();
         PersistentDataContainer c = master.getPersistentDataContainer();
-        c.set(persistenceOverrideKey, PersistentDataType.BOOLEAN, override);
+        c.set(DisplayKeys.Group.PERSISTENCE_OVERRIDE, PersistentDataType.BOOLEAN, override);
         return this;
     }
 
@@ -460,7 +456,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
 
         PersistentDataContainer pdc = getMasterEntity().getPersistentDataContainer();
-        pdc.set(scaleKey, PersistentDataType.FLOAT, newScaleMultiplier);
+        pdc.set(DisplayKeys.Group.SCALE_MULTIPLIER, PersistentDataType.FLOAT, newScaleMultiplier);
         super.setScaleMultiplier(newScaleMultiplier);
         return GroupTeleportCompletableFuture.create(null, nonDisplayFutures);
     }

@@ -732,7 +732,7 @@ public final class DisplayUtils {
     public static long getCreationTime(Entity entity){
         if (entity == null) return -1;
         PersistentDataContainer pdc = entity.getPersistentDataContainer();
-        return pdc.getOrDefault(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, -1L);
+        return pdc.getOrDefault(DisplayKeys.Group.CREATION_TIME, PersistentDataType.LONG, -1L);
     }
 
     /**
