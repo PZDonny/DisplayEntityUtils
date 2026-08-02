@@ -7,7 +7,7 @@ import net.donnypz.displayentityutils.utils.gizmo.GizmoSelectionMode;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
 import net.donnypz.displayentityutils.utils.gizmo.TranslationMode;
-import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
+import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoTitleUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -33,7 +33,7 @@ public abstract class TranslationDrag extends Drag {
     protected final Vector3f[] originalAxes;
     protected final Vector3f[] currentAxesDir;
 
-    public TranslationDrag(Player player, GizmoSessionImpl gizmo, Axis axis) {
+    public TranslationDrag(Player player, GizmoSessionImpl gizmo, GizmoAxis axis) {
         super(axis);
         this.gizmo = gizmo;
         this.originalAxes = axis.getDirections();

@@ -8,6 +8,7 @@ import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.InteractionCommand;
 import net.donnypz.displayentityutils.utils.PacketUtils;
+import net.donnypz.displayentityutils.utils.Axis;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
@@ -359,6 +360,46 @@ public abstract class ActivePart implements Active, Cloneable{
      * @param matrix the transformation matrix
      */
     public abstract void setTransformationMatrix(@NotNull Matrix4f matrix);
+
+    /**
+     * Change this display entity part's left rotation
+     * @param rotation The rotation to set
+     * @return false if this part is not a display entity
+     */
+    public boolean setRotation(@NotNull Quaternionf rotation){
+        if (!isDisplay()) return false;
+        Transformation t = getTransformation();
+        setTransformation(new Transformation(
+                t.getTranslation(),
+                new Quaternionf(rotation),
+                t.getScale(),
+                t.getRightRotation()
+        ));
+
+        return true;
+    }
+
+    /**
+     * Change this display entity part's left rotation on a local axis
+     * @param angleInDegrees the angle in degrees
+     * @param axis the axis
+     * @return false if this part is not a display entity
+     */
+    public boolean setRotation(float angleInDegrees, @NotNull Axis axis){
+        if (!isDisplay()) return false;
+        Transformation t = getTransformation();
+        Quaternionf existing = t.getLeftRotation();
+
+        setTransformation(new Transformation(
+                t.getTranslation(),
+                axis.set(existing, angleInDegrees),
+                t.getScale(),
+                t.getRightRotation()
+        ));
+
+        return true;
+    }
+
 
     /**
      * Change this display entity part's X scale

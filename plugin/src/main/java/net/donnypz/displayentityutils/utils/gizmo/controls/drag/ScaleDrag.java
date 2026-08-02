@@ -6,7 +6,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.concurrent.GroupTele
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSelectionMode;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
-import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
+import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoTitleUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -30,7 +30,7 @@ public class ScaleDrag extends Drag {
 
     private final Vector3f lastHitPoint;
 
-    public ScaleDrag(Player player, GizmoSessionImpl gizmo, Axis axis) {
+    public ScaleDrag(Player player, GizmoSessionImpl gizmo, GizmoAxis axis) {
         super(axis);
 
         this.gizmo = gizmo;
@@ -134,7 +134,7 @@ public class ScaleDrag extends Drag {
             if (part.isDisplay()) {
                 scaleDisplay(part, scaleDelta);
             } else if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
-                if (axis == Axis.Y) {
+                if (axis == GizmoAxis.Y) {
                     part.setInteractionHeight(part.getInteractionHeight() + scaleDelta);
                 } else {
                     part.setInteractionWidth(part.getInteractionWidth() + scaleDelta);
@@ -165,10 +165,10 @@ public class ScaleDrag extends Drag {
 
     private void scaleDisplay(ActivePart part, float scaleDelta) {
         Transformation t = part.getTransformation();
-        if (axis == Axis.X) {
+        if (axis == GizmoAxis.X) {
             float scale = t.getScale().x + scaleDelta;
             part.setDisplayXScale(scale);
-        } else if (axis == Axis.Y) {
+        } else if (axis == GizmoAxis.Y) {
             float scale = t.getScale().y + scaleDelta;
             part.setDisplayYScale(scale);
         } else {

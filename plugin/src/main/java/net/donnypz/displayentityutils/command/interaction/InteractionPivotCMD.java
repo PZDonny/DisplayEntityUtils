@@ -5,7 +5,7 @@ import net.donnypz.displayentityutils.command.*;
 import net.donnypz.displayentityutils.command.parts.PartsCMD;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
-import net.donnypz.displayentityutils.utils.PivotAxis;
+import net.donnypz.displayentityutils.utils.Axis;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -40,7 +40,7 @@ class InteractionPivotCMD extends PlayerSubCommand {
             return;
         }
 
-        PivotAxis axis = CMDUtils.getPivotAxis(args[2], player);
+        Axis axis = CMDUtils.getPivotAxis(args[2], player);
         if (axis == null) return;
 
         if (!hasMinimumArguments(player, args)) return;

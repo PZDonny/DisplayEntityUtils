@@ -594,21 +594,21 @@ public final class DisplayUtils {
      * @param entity the entity
      * @param pivotLocation the location to pivot around
      * @param angleInDegrees the pivot angle in degrees
-     * @param pivotAxis the axis to pivot around
+     * @param axis the axis to pivot around
      * @param worldSpace whether the pivot should occur on world space axis
      */
     public static void pivot(@NotNull Entity entity,
                              @NotNull Location pivotLocation,
                              double angleInDegrees,
-                             @NotNull PivotAxis pivotAxis,
+                             @NotNull Axis axis,
                              boolean worldSpace){
         float angleRad = (float) Math.toRadians(angleInDegrees);
         Quaternionf rotation = new Quaternionf();
 
-        if (pivotAxis == PivotAxis.X){
+        if (axis == Axis.X){
             rotation.rotateX(angleRad);
         }
-        else if (pivotAxis == PivotAxis.Y){
+        else if (axis == Axis.Y){
             rotation.rotateY(-angleRad);
         }
         else{
@@ -645,27 +645,9 @@ public final class DisplayUtils {
      * @param worldSpace whether the rotation should occur on world space axis
      */
     public static void rotate(@NotNull Display display, @NotNull Quaternionf rotation, boolean worldSpace){
+        Quaternionf finalRot = MathUtils.calculateLeftRotation(display, rotation, worldSpace);
+
         Transformation t = display.getTransformation();
-        Quaternionf originalRot = t.getLeftRotation();
-
-        Quaternionf appliedRotation = new Quaternionf(rotation);
-
-        if (worldSpace) {
-            Quaternionf entityRot = new Quaternionf()
-                    .rotateY((float) Math.toRadians(-display.getYaw()))
-                    .rotateX((float) Math.toRadians(display.getPitch()));
-
-            Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
-
-            //world space to display's space
-            appliedRotation = invertedEntityRot
-                    .mul(appliedRotation)
-                    .mul(entityRot);
-        }
-
-        Quaternionf finalRot = new Quaternionf(appliedRotation)
-                .mul(originalRot);
-
         Transformation newT = new Transformation(
                 t.getTranslation(),
                 finalRot,
@@ -750,7 +732,7 @@ public final class DisplayUtils {
     public static long getCreationTime(Entity entity){
         if (entity == null) return -1;
         PersistentDataContainer pdc = entity.getPersistentDataContainer();
-        return pdc.getOrDefault(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, -1L);
+        return pdc.getOrDefault(DisplayKeys.Group.CREATION_TIME, PersistentDataType.LONG, -1L);
     }
 
     /**

@@ -35,13 +35,9 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     Set<SpawnedPartSelection> partSelections = new HashSet<>();
 
     private final long creationTime;
-    boolean isVisibleByDefault;
+    private boolean isVisibleByDefault;
     private boolean isPersistent = DisplayConfig.defaultPersistence();
     private boolean persistenceOverride = DisplayConfig.persistenceOverride();
-
-    public static final NamespacedKey creationTimeKey = new NamespacedKey(DisplayAPI.getPlugin(), "creationtime");
-    static final NamespacedKey scaleKey = new NamespacedKey(DisplayAPI.getPlugin(), "scale");
-    static final NamespacedKey persistenceOverrideKey = new NamespacedKey(DisplayAPI.getPlugin(), "persistence_override");
 
 
     SpawnedDisplayEntityGroup(boolean isVisible) {
@@ -53,29 +49,18 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
     public SpawnedDisplayEntityGroup(@NotNull Display masterDisplay){
         this.isVisibleByDefault = masterDisplay.isVisibleByDefault();
         PersistentDataContainer c = masterDisplay.getPersistentDataContainer();
-        if (c.has(creationTimeKey)){
-            creationTime = c.get(creationTimeKey, PersistentDataType.LONG);
-        }
-        else{
-            creationTime = System.currentTimeMillis();
-        }
-        if (c.has(scaleKey)){
-            float scaleMultiplier = c.get(scaleKey, PersistentDataType.FLOAT);
-            super.setScaleMultiplier(scaleMultiplier);
-        }
-        if (c.has(persistenceOverrideKey)) {
-            persistenceOverride = c.get(persistenceOverrideKey, PersistentDataType.BOOLEAN);
-        }
+
+        this.creationTime = c.getOrDefault(DisplayKeys.Group.CREATION_TIME, PersistentDataType.LONG, System.currentTimeMillis());
+
+        float scaleMultiplier = c.getOrDefault(DisplayKeys.Group.SCALE_MULTIPLIER, PersistentDataType.FLOAT, 1f);
+        super.setScaleMultiplier(scaleMultiplier);
+
+        persistenceOverride = c.getOrDefault(DisplayKeys.Group.PERSISTENCE_OVERRIDE, PersistentDataType.BOOLEAN, DisplayConfig.persistenceOverride());
+
         setSpawnAnimation(c);
 
+        setRotation(c);
 
-        //String tag1;
-        /*for (String tag: masterDisplay.getScoreboardTags()){
-            if (tag != null && tag.contains(DisplayEntityPlugin.tagPrefix)){
-                tag1 = tag;
-                break;
-            }
-        }*/
         this.tag = DisplayUtils.getGroupTag(masterDisplay);
         addDisplayEntity(masterDisplay).setMaster();
         for(Entity entity : masterDisplay.getPassengers()){
@@ -185,10 +170,10 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
      */
     public boolean hasSameCreationTime(@NotNull Entity entity){
         PersistentDataContainer container = entity.getPersistentDataContainer();
-        if (!container.has(creationTimeKey, PersistentDataType.LONG)){
+        if (!container.has(DisplayKeys.Group.CREATION_TIME, PersistentDataType.LONG)){
             return false;
         }
-        return creationTime == container.get(creationTimeKey, PersistentDataType.LONG);
+        return creationTime == container.get(DisplayKeys.Group.CREATION_TIME, PersistentDataType.LONG);
     }
 
 //    /**
@@ -388,7 +373,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         this.persistenceOverride = override;
         Entity master = getMasterPart().getEntity();
         PersistentDataContainer c = master.getPersistentDataContainer();
-        c.set(persistenceOverrideKey, PersistentDataType.BOOLEAN, override);
+        c.set(DisplayKeys.Group.PERSISTENCE_OVERRIDE, PersistentDataType.BOOLEAN, override);
         return this;
     }
 
@@ -471,7 +456,7 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         }
 
         PersistentDataContainer pdc = getMasterEntity().getPersistentDataContainer();
-        pdc.set(scaleKey, PersistentDataType.FLOAT, newScaleMultiplier);
+        pdc.set(DisplayKeys.Group.SCALE_MULTIPLIER, PersistentDataType.FLOAT, newScaleMultiplier);
         super.setScaleMultiplier(newScaleMultiplier);
         return GroupTeleportCompletableFuture.create(null, nonDisplayFutures);
     }
@@ -734,6 +719,12 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         return sel;
     }
 
+    @Override
+    protected void saveGroupRotation() {
+        PersistentDataContainer c = getMasterEntity().getPersistentDataContainer();
+        c.set(DisplayKeys.Group.GROUP_ROTATION, PersistentDataType.BYTE_ARRAY, getRotationByteArray(this.rotation));
+    }
+
     /**
      * Check if a Display is the master part of this group
      * @param display The Display to check
@@ -981,13 +972,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         super.setSpawnAnimation(animationTag, animationType, loadMethod);
     }
 
-    void setSpawnAnimation(PersistentDataContainer pdc, String animationTag, DisplayAnimator.AnimationType animationType, LoadMethod loadMethod){
-        pdc.set(DisplayKeys.SpawnAnimation.ANIMATION_TAG, PersistentDataType.STRING, animationTag);
-        pdc.set(DisplayKeys.SpawnAnimation.TYPE, PersistentDataType.STRING, animationType.name());
-        pdc.set(DisplayKeys.SpawnAnimation.LOAD_METHOD, PersistentDataType.STRING, loadMethod.name());
-        super.setSpawnAnimation(animationTag, animationType, loadMethod);
-    }
-
     public void unsetSpawnAnimation(){
         PersistentDataContainer c = getMasterEntity().getPersistentDataContainer();
         c.remove(DisplayKeys.SpawnAnimation.ANIMATION_TAG);
@@ -995,7 +979,6 @@ public final class SpawnedDisplayEntityGroup extends ActiveGroup<SpawnedDisplayE
         c.remove(DisplayKeys.SpawnAnimation.LOAD_METHOD);
         super.unsetSpawnAnimation();
     }
-
 
     @Override
     public @NotNull DisplayAnimator animate(@NotNull SpawnedDisplayAnimation animation, boolean allowDataChange){

@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.utils.gizmo.controls.drag;
 
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
-import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
+import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -9,7 +9,7 @@ import org.joml.Vector3f;
 
 public class TranslationAxisDrag extends TranslationDrag {
 
-    public TranslationAxisDrag(Player player, GizmoSessionImpl gizmo, Axis axis) {
+    public TranslationAxisDrag(Player player, GizmoSessionImpl gizmo, GizmoAxis axis) {
         super(player, gizmo, axis);
     }
 

@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.Direction;
-import net.donnypz.displayentityutils.utils.PivotAxis;
+import net.donnypz.displayentityutils.utils.Axis;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
@@ -142,17 +142,17 @@ public final class SinglePartSelection implements ActivePartSelection<SpawnedDis
      * @param pivotYaw whether the non-display parts should pivot, using the yaw value, around its group's location, if it has one
      */
     @Override
-    public void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
-        selectedPart.setRotation(pitch, yaw, pivotPitch, pivotYaw);
+    public void setEntityRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
+        selectedPart.setEntityRotation(pitch, yaw, pivotPitch, pivotYaw);
     }
 
     /**
      * Pivot the part in this selection around this selection's group, if it's not a display
      */
     @Override
-    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace) {
+    public void pivot(float angleInDegrees, @NotNull Axis axis, boolean worldSpace) {
         if (selectedPart.isDisplay()) return;
-        selectedPart.pivot(angleInDegrees, pivotAxis, worldSpace);
+        selectedPart.pivot(angleInDegrees, axis, worldSpace);
     }
 
     /**

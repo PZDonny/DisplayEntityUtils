@@ -5,11 +5,11 @@ import org.bukkit.Color;
 
 public abstract class Control {
 
-    protected final Axis axis;
+    protected final GizmoAxis axis;
     public static final float MAX_DISTANCE = 15.0f;
     public static final float MAX_DISTANCE_SQUARED = MAX_DISTANCE*MAX_DISTANCE;
 
-    protected Control(Axis axis){
+    protected Control(GizmoAxis axis){
         this.axis = axis;
     }
 
@@ -29,7 +29,7 @@ public abstract class Control {
                 });
     }
 
-    public Axis getAxis() {
+    public GizmoAxis getAxis() {
         return axis;
     }
 

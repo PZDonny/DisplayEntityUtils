@@ -5,7 +5,7 @@ import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
-import net.donnypz.displayentityutils.utils.PivotAxis;
+import net.donnypz.displayentityutils.utils.Axis;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointSelector;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
@@ -87,15 +87,15 @@ public final class CMDUtils {
         }
     }
 
-    public static PivotAxis getPivotAxis(String arg, Player player) {
+    public static Axis getPivotAxis(String arg, Player player) {
         if (arg.equalsIgnoreCase("x")){
-            return PivotAxis.X;
+            return Axis.X;
         }
         else if (arg.equalsIgnoreCase("y")){
-            return PivotAxis.Y;
+            return Axis.Y;
         }
         else if (arg.equalsIgnoreCase("z")){
-            return PivotAxis.Z;
+            return Axis.Z;
         }
         else{
             player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Invalid pivot axis!", NamedTextColor.RED)));

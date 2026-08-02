@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.utils.gizmo.controls.selector;
 
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
-import net.donnypz.displayentityutils.utils.gizmo.controls.Axis;
+import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.ScaleDrag;
@@ -16,7 +16,7 @@ public class ScaleSelector extends AxisSelector {
     private final Vector3f localEnd;
     private float radius = 0.125f;
 
-    public ScaleSelector(Axis axis) {
+    public ScaleSelector(GizmoAxis axis) {
         super(axis);
         this.localStart = axis.getDirections()[0]
                 .mul(1.2f);

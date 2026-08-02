@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.Direction;
-import net.donnypz.displayentityutils.utils.PivotAxis;
+import net.donnypz.displayentityutils.utils.Axis;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
@@ -60,18 +60,18 @@ public interface Active {
 
     void setYaw(float yaw, boolean pivot);
 
-    default void setRotation(float pitch, float yaw){
-        setRotation(pitch, yaw, false, false);
+    default void setEntityRotation(float pitch, float yaw){
+        setEntityRotation(pitch, yaw, false, false);
     }
 
-    void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw);
+    void setEntityRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw);
 
     /**
      * @param angleInDegrees the pivot angle
-     * @param pivotAxis the axis to perform the pivot on
+     * @param axis the axis to perform the pivot on
      * @param worldSpace whether the pivot should occur on world space axis
      */
-    void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace);
+    void pivot(float angleInDegrees, @NotNull Axis axis, boolean worldSpace);
 
     /**
      * @param rotation the rotation
@@ -79,6 +79,18 @@ public interface Active {
      * @param worldSpace whether the pivot should occur on world space axis
      */
     void pivot(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace);
+
+    /**
+     * Rotate display transformation
+     * @param angleInDegrees the rotation angle
+     * @param axis the axis to rotate on
+     * @param worldSpace whether the rotation should occur on world space axis
+     */
+    default void rotate(float angleInDegrees, @NotNull Axis axis, boolean worldSpace){
+        Quaternionf q = new Quaternionf();
+        axis.rotate(q, angleInDegrees);
+        this.rotate(q, worldSpace);
+    }
 
     /**
      * @param rotation the rotation

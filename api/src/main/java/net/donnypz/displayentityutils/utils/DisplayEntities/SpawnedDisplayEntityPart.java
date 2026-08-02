@@ -6,6 +6,7 @@ import io.papermc.paper.entity.TeleportFlag;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.utils.*;
+import net.donnypz.displayentityutils.utils.Axis;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
@@ -94,7 +95,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
 
     private void applyData(Random random, Entity entity){
         adaptLegacyPartTags();
-        entity.getPersistentDataContainer().set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, group.getCreationTime());
+        entity.getPersistentDataContainer().set(DisplayKeys.Group.CREATION_TIME, PersistentDataType.LONG, group.getCreationTime());
 
         //Remove from previous group
         SpawnedDisplayEntityPart part = SpawnedDisplayEntityPart.getPart(entity);
@@ -228,16 +229,6 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
     public float getYaw() {
         return getEntity().getYaw();
     }
-
-
-    @ApiStatus.Internal
-    public long getCreationTime() {
-        if (!getEntity().getPersistentDataContainer().has(SpawnedDisplayEntityGroup.creationTimeKey)){
-            return -1;
-        }
-        return getEntity().getPersistentDataContainer().get(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG);
-    }
-
 
     /**
      * Get the entity of that this part represents
@@ -399,7 +390,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         }
 
         PersistentDataContainer pdc = getEntity().getPersistentDataContainer();
-        pdc.set(SpawnedDisplayEntityGroup.creationTimeKey, PersistentDataType.LONG, newGroup.getCreationTime());
+        pdc.set(DisplayKeys.Group.CREATION_TIME, PersistentDataType.LONG, newGroup.getCreationTime());
         setGroupPDC();
 
         getEntity().setPersistent(newGroup.isPersistent());
@@ -542,7 +533,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         entity.setRotation(entity.getYaw(), pitch);
 
         if (!isDisplay() && pivot){
-            pivot(delta, PivotAxis.X, false);
+            pivot(delta, Axis.X, false);
         }
     }
 
@@ -561,7 +552,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         entity.setRotation(yaw, entity.getPitch());
 
         if (!isDisplay() && pivot){
-            pivot(delta, PivotAxis.Y, true);
+            pivot(delta, Axis.Y, true);
         }
 
         if (entity instanceof LivingEntity le){
@@ -577,7 +568,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @param pivotYaw whether the part should pivot, using the yaw value, around its group's location, if it has one
      */
     @Override
-    public void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
+    public void setEntityRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
         setPitch(pitch, pivotPitch);
         setYaw(yaw, pivotYaw);
     }
@@ -586,7 +577,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * Pivot a non-display entity around its group
      */
     @Override
-    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace) {
+    public void pivot(float angleInDegrees, @NotNull Axis axis, boolean worldSpace) {
         if (isDisplay() || isSingle || group == null) return;
         Entity e = getEntity();
         if (e == null) return;
@@ -595,7 +586,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                     e,
                     group.getLocation(),
                     angleInDegrees,
-                    pivotAxis,
+                    axis,
                     worldSpace);
         }
     }

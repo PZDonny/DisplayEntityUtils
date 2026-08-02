@@ -6,7 +6,7 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.PartsSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.utils.DisplayEntities.*;
-import net.donnypz.displayentityutils.utils.PivotAxis;
+import net.donnypz.displayentityutils.utils.Axis;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -28,7 +28,7 @@ class MannequinPivotCMD extends PartsSubCommand {
 
     @Override
     protected boolean executeAllPartsAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull MultiPartSelection<?> selection, @NotNull String[] args) {
-        PivotAxis axis = CMDUtils.getPivotAxis(args[2], player);
+        Axis axis = CMDUtils.getPivotAxis(args[2], player);
         if (axis == null) return false;
 
         try{
@@ -51,7 +51,7 @@ class MannequinPivotCMD extends PartsSubCommand {
     protected boolean executeSinglePartAction(@NotNull Player player, @Nullable ActiveGroup<?> group, @NotNull ActivePartSelection<?> selection, @NotNull ActivePart selectedPart, @NotNull String[] args) {
         if (isInvalidType(player, selectedPart, SpawnedDisplayEntityPart.PartType.MANNEQUIN)) return false;
 
-        PivotAxis axis = CMDUtils.getPivotAxis(args[2], player);
+        Axis axis = CMDUtils.getPivotAxis(args[2], player);
         if (axis == null) return false;
 
         try{

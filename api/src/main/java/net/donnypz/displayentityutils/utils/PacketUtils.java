@@ -222,23 +222,7 @@ public final class PacketUtils {
                                boolean worldSpace,
                                float pitch,
                                float yaw){
-        Quaternionf originalRot = transformation.getLeftRotation();
-        Quaternionf appliedRotation = new Quaternionf(rotation);
-
-        if (worldSpace) {
-            Quaternionf entityRot = new Quaternionf()
-                    .rotateY((float) Math.toRadians(-yaw))
-                    .rotateX((float) Math.toRadians(pitch));
-
-            Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
-
-            //world space to display's space
-            appliedRotation = invertedEntityRot
-                    .mul(appliedRotation)
-                    .mul(entityRot);
-        }
-
-        Quaternionf finalRot = new Quaternionf(appliedRotation).mul(originalRot);
+        Quaternionf finalRot = MathUtils.calculateLeftRotation(transformation, rotation, worldSpace, pitch, yaw);
 
         new DisplayAttributeMap()
                 .add(DisplayAttributes.Transform.LEFT_ROTATION, finalRot)

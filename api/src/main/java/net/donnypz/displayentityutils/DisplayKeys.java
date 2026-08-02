@@ -1,12 +1,20 @@
 package net.donnypz.displayentityutils;
 
 import org.bukkit.NamespacedKey;
+import org.jetbrains.annotations.ApiStatus;
 
+@ApiStatus.Internal
 public final class DisplayKeys {
+
+    private DisplayKeys(){}
 
     public static final class Group{
         public static final NamespacedKey GROUP_TAG = new NamespacedKey(DisplayAPI.getPlugin(), "groupTag");
         public static final NamespacedKey CHUNK_PACKET_GROUP = new NamespacedKey(DisplayAPI.getPlugin(), "chunkpacketgroups");
+        public static final NamespacedKey GROUP_ROTATION = new NamespacedKey(DisplayAPI.getPlugin(), "group_rotation");
+        public static final NamespacedKey CREATION_TIME = new NamespacedKey(DisplayAPI.getPlugin(), "creationtime");
+        public static final NamespacedKey SCALE_MULTIPLIER = new NamespacedKey(DisplayAPI.getPlugin(), "scale");
+        public static final NamespacedKey PERSISTENCE_OVERRIDE = new NamespacedKey(DisplayAPI.getPlugin(), "persistence_override");
     }
 
     public static final class Part{

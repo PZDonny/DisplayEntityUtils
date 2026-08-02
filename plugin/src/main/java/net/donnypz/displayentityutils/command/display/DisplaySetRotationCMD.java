@@ -15,19 +15,15 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
 
 import java.util.List;
 
-class DisplayRotateCMD extends PartsSubCommand {
+class DisplaySetRotationCMD extends PartsSubCommand {
 
-    private final String WORLD_SPACE = "-world";
-
-    DisplayRotateCMD(@NotNull DEUSubCommand parentSubCommand) {
-        super("rotate", parentSubCommand, Permission.DISPLAY_TRANSFORM, true);
+    DisplaySetRotationCMD(@NotNull DEUSubCommand parentSubCommand) {
+        super("setrotation", parentSubCommand, Permission.DISPLAY_TRANSFORM, true);
         setTabComplete(2, List.of("x", "y", "z"));
         setTabComplete(3, "<angle-in-degrees>");
-        addFlag(WORLD_SPACE);
     }
 
     @Override
@@ -36,27 +32,20 @@ class DisplayRotateCMD extends PartsSubCommand {
             String axisInput = args[2];
             Axis axis = Axis.valueOf(axisInput.toUpperCase());
             float rotation = Float.parseFloat(args[3]);
-            if (rotation == 0.0f) {
-                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a non-zero number for the rotation, in degrees!", NamedTextColor.RED)));
-                return false;
-            }
 
-            Quaternionf q = axis.rotate(new Quaternionf(), rotation);
-
-            boolean worldSpace = getOptionalArguments(player, args).hasFlag(WORLD_SPACE);
             for (ActivePart selectedPart : selection.getParts()) {
                 if (!selectedPart.isDisplay()) continue;
-                selectedPart.rotate(q, worldSpace);
+                selectedPart.setRotation(rotation, axis);
             }
+
             player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage
                     .miniMessage()
-                    .deserialize(String.format("<green>Rotating your selected parts on their %s <yellow>%s <green>axis by <yellow>%s <green>degrees!",
-                            worldSpace ? "world" : "local",
+                    .deserialize(String.format("<green>Rotating your selected parts on their local <yellow>%s <green>axis by <yellow>%s <green>degrees!",
                             args[2].toUpperCase(),
                             rotation))));
             return true;
         } catch (NumberFormatException e) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the rotation!", NamedTextColor.RED)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the scale!", NamedTextColor.RED)));
             return false;
         }
         catch(IllegalArgumentException e){
@@ -73,19 +62,11 @@ class DisplayRotateCMD extends PartsSubCommand {
             Axis axis = Axis.valueOf(axisInput.toUpperCase());
             float rotation = Float.parseFloat(args[3]);
 
-            if (rotation == 0.0f) {
-                player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a non-zero number for the rotation, in degrees!", NamedTextColor.RED)));
-                return false;
-            }
+            selectedPart.setRotation(rotation, axis);
 
-            Quaternionf q = axis.rotate(new Quaternionf(), rotation);
-
-            boolean worldSpace = getOptionalArguments(player, args).hasFlag(WORLD_SPACE);
-            selectedPart.rotate(q, worldSpace);
             player.sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage
                     .miniMessage()
-                    .deserialize(String.format("<green>Rotating your selected part on the %s <yellow>%s <green>axis by <yellow>%s <green>degrees!",
-                            worldSpace ? "world" : "local",
+                    .deserialize(String.format("<green>Rotating your selected part on the local <yellow>%s <green>axis by <yellow>%s <green>degrees!",
                             args[2].toUpperCase(),
                             rotation))));
             return true;
@@ -101,7 +82,6 @@ class DisplayRotateCMD extends PartsSubCommand {
 
     @Override
     protected void sendIncorrectUsage(@NotNull Player player) {}
-
 
     @Override
     protected String getDescription() {

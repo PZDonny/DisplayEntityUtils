@@ -69,10 +69,13 @@ final class DisplayEntity implements Serializable {
         try{
             PersistentDataContainer pdc = new ItemStack(Material.STICK).getItemMeta().getPersistentDataContainer();
             pdc.set(DisplayKeys.Part.PART_TAGS, PersistentDataType.LIST.strings(), new ArrayList<>(part.getTags()));
-            if (part.isMaster && group.getSpawnAnimationTag() != null){
-                pdc.set(DisplayKeys.SpawnAnimation.ANIMATION_TAG, PersistentDataType.STRING, group.spawnAnimationTag);
-                pdc.set(DisplayKeys.SpawnAnimation.TYPE, PersistentDataType.STRING, group.spawnAnimationType.name());
-                pdc.set(DisplayKeys.SpawnAnimation.LOAD_METHOD, PersistentDataType.STRING, group.spawnAnimationLoadMethod.name());
+            if (part.isMaster){
+                if (group.getSpawnAnimationTag() != null){
+                    pdc.set(DisplayKeys.SpawnAnimation.ANIMATION_TAG, PersistentDataType.STRING, group.spawnAnimationTag);
+                    pdc.set(DisplayKeys.SpawnAnimation.TYPE, PersistentDataType.STRING, group.spawnAnimationType.name());
+                    pdc.set(DisplayKeys.SpawnAnimation.LOAD_METHOD, PersistentDataType.STRING, group.spawnAnimationLoadMethod.name());
+                }
+                pdc.set(DisplayKeys.Group.GROUP_ROTATION, PersistentDataType.BYTE_ARRAY, ActiveGroup.getRotationByteArray(group.getRotation()));
             }
             persistentDataContainer = pdc.serializeToBytes();
         }
@@ -115,8 +118,9 @@ final class DisplayEntity implements Serializable {
             LoadMethod loadMethod = getSpawnAnimationLoadMethod(pdc);
             DisplayAnimator.AnimationType type = getSpawnAnimationType(pdc);
             if (animationTag != null){
-                group.setSpawnAnimation(pdc, animationTag, type, loadMethod);
+                group.setSpawnAnimation(animationTag, type, loadMethod);
             }
+            group.setRotation(pdc);
         }
         return d;
     }
@@ -140,6 +144,7 @@ final class DisplayEntity implements Serializable {
                 if (group.masterPart == null && isMaster){
                     part.isMaster = true;
                     group.setSpawnAnimation(pdc);
+                    group.setRotation(pdc);
                 }
             }
         }

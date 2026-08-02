@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
-import net.donnypz.displayentityutils.utils.PivotAxis;
+import net.donnypz.displayentityutils.utils.Axis;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
@@ -320,9 +320,9 @@ public abstract class ActivePartHolder<T extends ActivePart> implements Active {
      * @param pivotYaw whether non-display parts should pivot with the yaw change
      */
     @Override
-    public void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
+    public void setEntityRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
         for (ActivePart part : getPartsRaw()) {
-            part.setRotation(pitch, yaw, pivotPitch, pivotYaw);
+            part.setEntityRotation(pitch, yaw, pivotPitch, pivotYaw);
         }
     }
 
@@ -330,10 +330,10 @@ public abstract class ActivePartHolder<T extends ActivePart> implements Active {
      * Pivot all non-display parts in this
      */
     @Override
-    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace) {
+    public void pivot(float angleInDegrees, @NotNull Axis axis, boolean worldSpace) {
         for (T part : getPartsRaw()){
             if (part.isDisplay()) continue;
-            part.pivot(angleInDegrees, pivotAxis, worldSpace);
+            part.pivot(angleInDegrees, axis, worldSpace);
         }
     }
 
