@@ -56,7 +56,7 @@ class DisplayRotateCMD extends PartsSubCommand {
                             rotation))));
             return true;
         } catch (NumberFormatException e) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the scale!", NamedTextColor.RED)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the rotation!", NamedTextColor.RED)));
             return false;
         }
     }
@@ -86,7 +86,7 @@ class DisplayRotateCMD extends PartsSubCommand {
                             rotation))));
             return true;
         } catch (NumberFormatException e) {
-            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the scale!", NamedTextColor.RED)));
+            player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Enter a valid number for the rotation!", NamedTextColor.RED)));
             return false;
         }
     }
