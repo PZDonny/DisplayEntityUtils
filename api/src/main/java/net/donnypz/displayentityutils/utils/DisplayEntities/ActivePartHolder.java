@@ -320,9 +320,9 @@ public abstract class ActivePartHolder<T extends ActivePart> implements Active {
      * @param pivotYaw whether non-display parts should pivot with the yaw change
      */
     @Override
-    public void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
+    public void setEntityRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
         for (ActivePart part : getPartsRaw()) {
-            part.setRotation(pitch, yaw, pivotPitch, pivotYaw);
+            part.setEntityRotation(pitch, yaw, pivotPitch, pivotYaw);
         }
     }
 

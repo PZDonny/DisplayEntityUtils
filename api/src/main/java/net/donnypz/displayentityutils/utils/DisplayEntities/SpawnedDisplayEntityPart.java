@@ -567,7 +567,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * @param pivotYaw whether the part should pivot, using the yaw value, around its group's location, if it has one
      */
     @Override
-    public void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
+    public void setEntityRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
         setPitch(pitch, pivotPitch);
         setYaw(yaw, pivotYaw);
     }

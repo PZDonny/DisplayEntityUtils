@@ -60,11 +60,11 @@ public interface Active {
 
     void setYaw(float yaw, boolean pivot);
 
-    default void setRotation(float pitch, float yaw){
-        setRotation(pitch, yaw, false, false);
+    default void setEntityRotation(float pitch, float yaw){
+        setEntityRotation(pitch, yaw, false, false);
     }
 
-    void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw);
+    void setEntityRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw);
 
     /**
      * @param angleInDegrees the pivot angle

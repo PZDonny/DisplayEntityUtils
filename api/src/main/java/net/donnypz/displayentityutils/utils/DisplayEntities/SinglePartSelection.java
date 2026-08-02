@@ -142,8 +142,8 @@ public final class SinglePartSelection implements ActivePartSelection<SpawnedDis
      * @param pivotYaw whether the non-display parts should pivot, using the yaw value, around its group's location, if it has one
      */
     @Override
-    public void setRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
-        selectedPart.setRotation(pitch, yaw, pivotPitch, pivotYaw);
+    public void setEntityRotation(float pitch, float yaw, boolean pivotPitch, boolean pivotYaw) {
+        selectedPart.setEntityRotation(pitch, yaw, pivotPitch, pivotYaw);
     }
 
     /**

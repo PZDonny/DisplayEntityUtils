@@ -178,10 +178,10 @@ public class GizmoSessionImpl implements GizmoSession {
 
         switch (gizmoSpace) {
             case LOCAL -> {
-                gizmoModel.setRotation(selLoc.getPitch(), selLoc.getYaw(), false, false);
+                gizmoModel.setEntityRotation(selLoc.getPitch(), selLoc.getYaw(), false, false);
             }
             case WORLD -> {
-                gizmoModel.setRotation(0, 0, false, false);
+                gizmoModel.setEntityRotation(0, 0, false, false);
             }
         }
 
