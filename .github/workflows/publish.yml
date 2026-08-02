@@ -1,11 +1,14 @@
 name: Publish
 
 on:
-  release:
-    types: [ published ]
+  push:
+    tags:
+      - "*.*.*"
 
 jobs:
   publish:
+    env:
+      TAG: ${{ github.ref_name }}
     name: Publish
     runs-on: ubuntu-latest
     permissions:
@@ -22,36 +25,52 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Verify Release Notes Exist
+        run: test -f "docs/release-notes/$TAG.md"
+
       - name: Set version from release tag
-        run: mvn -B versions:set -DnewVersion=${{ github.event.release.tag_name }} -DgenerateBackupPoms=false
+        run: mvn -B versions:set -DnewVersion=$TAG -DgenerateBackupPoms=false
 
       - name: Build and package with Maven
         run: mvn -B clean package --file pom.xml
 
-      - name: Upload to GitHub Release
+      - name: Create GitHub Release
         env:
           GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
-          TAG="${{ github.event.release.tag_name }}"
-          
-          gh release upload "$TAG" \
+          gh release create "$TAG" \
             "plugin/target/displayentityutils-$TAG.jar" \
-            --clobber
+            --verify-tag \
+            --title "DEU $TAG" \
+            --notes-file "docs/release-notes/$TAG.md" \
+            --generate-notes
 
+      - name: Get Release body
+        id: release_notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          {
+            echo "body<<RELEASE_BODY"
+            gh release view "$TAG" --json body --jq '.body'
+            echo "RELEASE_BODY"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Upload to Modrinth
         uses: cloudnode-pro/modrinth-publish@v2
         with:
           token: ${{ secrets.MODRINTH_TOKEN }}
           project: ${{ vars.MODRINTH_ID }}
-          name: ${{ github.event.release.name }}
-          version: ${{ github.event.release.tag_name }}
-          changelog: ${{ github.event.release.body }}
+          name: DEU ${{ env.TAG }}
+          version: ${{ env.TAG }}
+          changelog: ${{ steps.release_notes.outputs.body }}
           loaders: |-
             paper
           game-versions: |-
-            1.20.x
+            1.20.4
+            1.20.5
+            1.20.6
             1.21.x
             26.1.x
             26.2
-          files: plugin/target/displayentityutils-${{ github.event.release.tag_name }}.jar
+          files: plugin/target/displayentityutils-${{ env.TAG }}.jar
