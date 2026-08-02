@@ -81,6 +81,18 @@ public interface Active {
     void pivot(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace);
 
     /**
+     * Rotate display transformation
+     * @param angleInDegrees the rotation angle
+     * @param axis the axis to rotate on
+     * @param worldSpace whether the rotation should occur on world space axis
+     */
+    default void rotate(float angleInDegrees, @NotNull Axis axis, boolean worldSpace){
+        Quaternionf q = new Quaternionf();
+        axis.rotate(q, angleInDegrees);
+        this.rotate(q, worldSpace);
+    }
+
+    /**
      * @param rotation the rotation
      * @param worldSpace whether the rotation should occur on world space axis
      */
