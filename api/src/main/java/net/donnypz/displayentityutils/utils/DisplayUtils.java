@@ -645,27 +645,9 @@ public final class DisplayUtils {
      * @param worldSpace whether the rotation should occur on world space axis
      */
     public static void rotate(@NotNull Display display, @NotNull Quaternionf rotation, boolean worldSpace){
+        Quaternionf finalRot = MathUtils.calculateLeftRotation(display, rotation, worldSpace);
+
         Transformation t = display.getTransformation();
-        Quaternionf originalRot = t.getLeftRotation();
-
-        Quaternionf appliedRotation = new Quaternionf(rotation);
-
-        if (worldSpace) {
-            Quaternionf entityRot = new Quaternionf()
-                    .rotateY((float) Math.toRadians(-display.getYaw()))
-                    .rotateX((float) Math.toRadians(display.getPitch()));
-
-            Quaternionf invertedEntityRot = new Quaternionf(entityRot).invert();
-
-            //world space to display's space
-            appliedRotation = invertedEntityRot
-                    .mul(appliedRotation)
-                    .mul(entityRot);
-        }
-
-        Quaternionf finalRot = new Quaternionf(appliedRotation)
-                .mul(originalRot);
-
         Transformation newT = new Transformation(
                 t.getTranslation(),
                 finalRot,

@@ -25,6 +25,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -349,6 +350,9 @@ public class PacketDisplayEntityGroup extends ActiveGroup<PacketDisplayEntityPar
     public @NotNull PacketPartSelection createPartSelection(@NotNull PartFilter partFilter) {
         return new PacketPartSelection(this, partFilter);
     }
+
+    @Override
+    protected void saveGroupRotation() {}
 
 
     @Override

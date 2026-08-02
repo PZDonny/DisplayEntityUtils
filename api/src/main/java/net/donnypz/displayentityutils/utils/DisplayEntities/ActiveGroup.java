@@ -7,12 +7,10 @@ import net.donnypz.displayentityutils.events.AnimationStateChangeEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.LoadMethod;
-import net.donnypz.displayentityutils.utils.Direction;
+import net.donnypz.displayentityutils.utils.*;
 import net.donnypz.displayentityutils.utils.DisplayEntities.concurrent.GroupTeleportCompletableFuture;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.DisplayStateMachine;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
-import net.donnypz.displayentityutils.utils.FollowType;
-import net.donnypz.displayentityutils.utils.PacketUtils;
 import net.donnypz.displayentityutils.utils.controller.GroupFollowProperties;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -23,8 +21,10 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -49,12 +49,12 @@ public abstract class ActiveGroup<T extends ActivePart> extends ActivePartHolder
 
     protected MachineState currentMachineState;
 
+    protected Quaternionf rotation = new Quaternionf();
     private volatile float scaleMultiplier = 1;
     private volatile Vector rideOffset = new Vector();
     private volatile int lastAnimatedTick = -1;
 
     private boolean isSelectable = true;
-
 
     /**
      * Get this group's unique ID created during the current game session
@@ -173,6 +173,111 @@ public abstract class ActiveGroup<T extends ActivePart> extends ActivePartHolder
         for (T part : groupParts.values()){
             part.cull(0, 0);
         }
+    }
+
+    /**
+     * Set the transformation rotation of this group, optionally pivoting non-display entities as well
+     * @param axis the axis to rotate on
+     * @param pivotNonDisplays whether non-displays should be pivoted
+     */
+    public void setGroupRotation(float angleInDegrees, @NotNull PivotAxis axis, boolean pivotNonDisplays){
+        Quaternionf newRotation = new Quaternionf(this.rotation);
+        newRotation = axis.set(newRotation, angleInDegrees);
+        setGroupRotation(newRotation, pivotNonDisplays);
+    }
+
+    /**
+     * Set the transformation rotation of this group, optionally pivoting non-display entities as well
+     * @param rotation the local space rotation to set the group's orientation to
+     * @param pivotNonDisplays whether non-displays should be pivoted
+     */
+    public void setGroupRotation(@NotNull Quaternionf rotation, boolean pivotNonDisplays){
+        Quaternionf delta = new Quaternionf(this.rotation)
+                .invert()
+                .mul(rotation);
+
+        this.rotate(delta, false);
+
+        if (pivotNonDisplays){
+            this.pivot(delta, getLocation(), false);
+        }
+    }
+
+    @Override
+    public void rotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
+        if (!worldSpace) {
+            this.rotation.mul(rotation);
+        } else {
+            Location groupLoc = getLocation();
+            Quaternionf worldSpaceRot = MathUtils.applyWorldSpaceRotation(rotation, groupLoc.getPitch(), groupLoc.getYaw());
+            worldSpaceRot.mul(this.rotation, this.rotation);
+        }
+        super.rotateAround(rotation, pivotLocation, worldSpace);
+        this.saveGroupRotation();
+    }
+
+    @Override
+    public void pivotOrRotateAround(@NotNull Quaternionf rotation, @NotNull Location pivotLocation, boolean worldSpace) {
+        if (!worldSpace) {
+            this.rotation.mul(rotation);
+        } else {
+            Location groupLoc = getLocation();
+            Quaternionf worldSpaceRot = MathUtils.applyWorldSpaceRotation(rotation, groupLoc.getPitch(), groupLoc.getYaw());
+            worldSpaceRot.mul(this.rotation, this.rotation);
+        }
+        super.pivotOrRotateAround(rotation, pivotLocation, worldSpace);
+        this.saveGroupRotation();
+    }
+
+    protected abstract void saveGroupRotation();
+
+    protected static byte @NotNull[] getRotationByteArray(@NotNull Quaternionf rotation){
+        Quaternionf q = new Quaternionf(rotation);
+
+        ByteBuffer buf = ByteBuffer.allocate(16); //4 bytes per quaternion val
+        buf.putFloat(q.x);
+        buf.putFloat(q.y);
+        buf.putFloat(q.z);
+        buf.putFloat(q.w);
+        return buf.array();
+    }
+
+    protected @NotNull Quaternionf getRotation(byte[] quaternionBytes){
+        if (quaternionBytes == null || quaternionBytes.length != 16) return new Quaternionf();
+
+        ByteBuffer buf = ByteBuffer.wrap(quaternionBytes);
+        return new Quaternionf(
+                buf.getFloat(),
+                buf.getFloat(),
+                buf.getFloat(),
+                buf.getFloat()
+        );
+    }
+
+    protected void setRotation(PersistentDataContainer pdc){
+        byte[] rotation = pdc.get(DisplayKeys.Group.GROUP_ROTATION, PersistentDataType.BYTE_ARRAY);
+        this.rotation = getRotation(rotation);
+    }
+
+
+    public @NotNull Quaternionf getGroupRotation(){
+        return new Quaternionf(this.rotation);
+    }
+
+    /**
+     * Reset the group's rotation to its default orientation
+     * @param pivotNonDisplays whether non-displays should be pivoted
+     */
+    public void resetGroupRotation(boolean pivotNonDisplays){
+        setGroupRotation(new Quaternionf(), pivotNonDisplays);
+    }
+
+    /**
+     * Make the group's current rotation its default orientation, resetting the group's
+     * stored rotation but retaining the current orientation
+     */
+    public void rebaseGroupRotation(){
+        this.rotation = new Quaternionf();
     }
 
     /**

@@ -44,6 +44,7 @@ public final class GroupCMD extends ParentSubCommand{
         new GroupPitchCMD(this);
         new GroupScaleCMD(this);
         new GroupRotateCMD(this);
+        new GroupSetRotationCMD(this);
         new GroupBrightnessCMD(this);
         new GroupMoveHereCMD(this);
         new GroupMoveCMD(this);

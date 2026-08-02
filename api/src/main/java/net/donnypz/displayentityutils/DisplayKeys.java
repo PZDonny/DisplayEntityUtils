@@ -7,6 +7,7 @@ public final class DisplayKeys {
     public static final class Group{
         public static final NamespacedKey GROUP_TAG = new NamespacedKey(DisplayAPI.getPlugin(), "groupTag");
         public static final NamespacedKey CHUNK_PACKET_GROUP = new NamespacedKey(DisplayAPI.getPlugin(), "chunkpacketgroups");
+        public static final NamespacedKey GROUP_ROTATION = new NamespacedKey(DisplayAPI.getPlugin(), "group_rotation");
     }
 
     public static final class Part{
