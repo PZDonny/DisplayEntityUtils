@@ -41,7 +41,7 @@ jobs:
           gh release create "$TAG" \
             "plugin/target/displayentityutils-$TAG.jar" \
             --verify-tag \
-            --title "DEU $TAG" \
+            --title "$TAG" \
             --notes-file "docs/release-notes/$TAG.md" \
             --generate-notes
 
@@ -61,7 +61,7 @@ jobs:
         with:
           token: ${{ secrets.MODRINTH_TOKEN }}
           project: ${{ vars.MODRINTH_ID }}
-          name: DEU ${{ env.TAG }}
+          name: ${{ env.TAG }}
           version: ${{ env.TAG }}
           changelog: ${{ steps.release_notes.outputs.body }}
           loaders: |-
