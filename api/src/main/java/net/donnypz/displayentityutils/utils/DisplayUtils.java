@@ -594,21 +594,21 @@ public final class DisplayUtils {
      * @param entity the entity
      * @param pivotLocation the location to pivot around
      * @param angleInDegrees the pivot angle in degrees
-     * @param pivotAxis the axis to pivot around
+     * @param axis the axis to pivot around
      * @param worldSpace whether the pivot should occur on world space axis
      */
     public static void pivot(@NotNull Entity entity,
                              @NotNull Location pivotLocation,
                              double angleInDegrees,
-                             @NotNull PivotAxis pivotAxis,
+                             @NotNull Axis axis,
                              boolean worldSpace){
         float angleRad = (float) Math.toRadians(angleInDegrees);
         Quaternionf rotation = new Quaternionf();
 
-        if (pivotAxis == PivotAxis.X){
+        if (axis == Axis.X){
             rotation.rotateX(angleRad);
         }
-        else if (pivotAxis == PivotAxis.Y){
+        else if (axis == Axis.Y){
             rotation.rotateY(-angleRad);
         }
         else{

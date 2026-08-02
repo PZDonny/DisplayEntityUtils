@@ -6,6 +6,7 @@ import io.papermc.paper.entity.TeleportFlag;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.utils.*;
+import net.donnypz.displayentityutils.utils.Axis;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
@@ -532,7 +533,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         entity.setRotation(entity.getYaw(), pitch);
 
         if (!isDisplay() && pivot){
-            pivot(delta, PivotAxis.X, false);
+            pivot(delta, Axis.X, false);
         }
     }
 
@@ -551,7 +552,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
         entity.setRotation(yaw, entity.getPitch());
 
         if (!isDisplay() && pivot){
-            pivot(delta, PivotAxis.Y, true);
+            pivot(delta, Axis.Y, true);
         }
 
         if (entity instanceof LivingEntity le){
@@ -576,7 +577,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
      * Pivot a non-display entity around its group
      */
     @Override
-    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace) {
+    public void pivot(float angleInDegrees, @NotNull Axis axis, boolean worldSpace) {
         if (isDisplay() || isSingle || group == null) return;
         Entity e = getEntity();
         if (e == null) return;
@@ -585,7 +586,7 @@ public final class SpawnedDisplayEntityPart extends ActivePart implements Spawne
                     e,
                     group.getLocation(),
                     angleInDegrees,
-                    pivotAxis,
+                    axis,
                     worldSpace);
         }
     }

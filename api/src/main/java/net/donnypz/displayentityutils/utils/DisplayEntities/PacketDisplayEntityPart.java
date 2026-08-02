@@ -8,6 +8,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.utils.*;
+import net.donnypz.displayentityutils.utils.Axis;
 import net.donnypz.displayentityutils.utils.packet.DisplayAttributeMap;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttribute;
@@ -1221,7 +1222,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         packetLocation.pitch = pitch;
 
         if (!isDisplay() && pivot){
-            return pivotSilent(delta, PivotAxis.X, false);
+            return pivotSilent(delta, Axis.X, false);
         }
         return packetLocation.toLocation();
     }
@@ -1232,7 +1233,7 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
         packetLocation.yaw = yaw;
 
         if (!isDisplay() && pivot){
-            return pivotSilent(delta, PivotAxis.Y, true);
+            return pivotSilent(delta, Axis.Y, true);
         }
 
         return packetLocation.toLocation();
@@ -1242,20 +1243,20 @@ public class PacketDisplayEntityPart extends ActivePart implements Packeted{
      * Pivot a non-display entity around its group
      */
     @Override
-    public void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace) {
+    public void pivot(float angleInDegrees, @NotNull Axis axis, boolean worldSpace) {
         if (isDisplay() || group == null) return;
 
-        Location result = pivotSilent(angleInDegrees, pivotAxis, worldSpace);
+        Location result = pivotSilent(angleInDegrees, axis, worldSpace);
         this.teleport(result);
     }
 
-    private Location pivotSilent(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace){
+    private Location pivotSilent(float angleInDegrees, @NotNull Axis axis, boolean worldSpace){
         if (angleInDegrees == 0.0f) return getLocation();
         Location result = WorldUtils.getPivotLocation(
                 getLocation(),
                 group.getLocation(),
                 angleInDegrees,
-                pivotAxis,
+                axis,
                 worldSpace);
         packetLocation.setCoordinates(result);
         return result;

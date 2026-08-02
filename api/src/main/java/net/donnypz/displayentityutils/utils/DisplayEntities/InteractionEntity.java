@@ -3,7 +3,6 @@ package net.donnypz.displayentityutils.utils.DisplayEntities;
 import net.donnypz.displayentityutils.DisplayKeys;
 import net.donnypz.displayentityutils.utils.DisplayUtils;
 import net.donnypz.displayentityutils.utils.InteractionUtils;
-import net.donnypz.displayentityutils.utils.PivotAxis;
 import net.donnypz.displayentityutils.utils.WorldUtils;
 import net.donnypz.displayentityutils.utils.packet.PacketAttributeContainer;
 import net.donnypz.displayentityutils.utils.packet.attributes.DisplayAttributes;

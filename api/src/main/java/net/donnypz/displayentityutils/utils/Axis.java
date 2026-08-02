@@ -2,15 +2,14 @@ package net.donnypz.displayentityutils.utils;
 
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
-public enum PivotAxis {
+public enum Axis {
     X,
     Y,
     Z;
 
     /**
-     * Rotate a quaternion on this {@link PivotAxis}'s axis
+     * Rotate a quaternion on this {@link Axis}'s axis
      * @param quaternionf the quaternion
      * @param angleInDegrees the angle in degrees
      * @return a new {@link Quaternionf} with the rotation applied

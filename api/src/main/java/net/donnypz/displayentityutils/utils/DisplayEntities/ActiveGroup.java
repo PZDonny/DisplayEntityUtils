@@ -180,7 +180,7 @@ public abstract class ActiveGroup<T extends ActivePart> extends ActivePartHolder
      * @param axis the axis to rotate on
      * @param pivotNonDisplays whether non-displays should be pivoted
      */
-    public void setGroupRotation(float angleInDegrees, @NotNull PivotAxis axis, boolean pivotNonDisplays){
+    public void setGroupRotation(float angleInDegrees, @NotNull Axis axis, boolean pivotNonDisplays){
         Quaternionf newRotation = new Quaternionf(this.rotation);
         newRotation = axis.set(newRotation, angleInDegrees);
         setGroupRotation(newRotation, pivotNonDisplays);

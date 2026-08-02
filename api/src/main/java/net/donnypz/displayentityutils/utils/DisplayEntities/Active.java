@@ -1,7 +1,7 @@
 package net.donnypz.displayentityutils.utils.DisplayEntities;
 
 import net.donnypz.displayentityutils.utils.Direction;
-import net.donnypz.displayentityutils.utils.PivotAxis;
+import net.donnypz.displayentityutils.utils.Axis;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
@@ -68,10 +68,10 @@ public interface Active {
 
     /**
      * @param angleInDegrees the pivot angle
-     * @param pivotAxis the axis to perform the pivot on
+     * @param axis the axis to perform the pivot on
      * @param worldSpace whether the pivot should occur on world space axis
      */
-    void pivot(float angleInDegrees, @NotNull PivotAxis pivotAxis, boolean worldSpace);
+    void pivot(float angleInDegrees, @NotNull Axis axis, boolean worldSpace);
 
     /**
      * @param rotation the rotation

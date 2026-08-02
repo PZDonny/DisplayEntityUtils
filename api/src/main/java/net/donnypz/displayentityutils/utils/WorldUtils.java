@@ -78,14 +78,14 @@ public final class WorldUtils {
      * @param origin the pivoting location
      * @param pivotLocation the location to pivot around
      * @param angleInDegrees the pivot angle in degrees
-     * @param pivotAxis the axis to pivot around
+     * @param axis the axis to pivot around
      * @param worldSpace whether the pivot should occur on world space axis
      * @return a {@link Location}
      */
     public static @NotNull Location getPivotLocation(@NotNull Location origin,
                                                      @NotNull Location pivotLocation,
                                                      double angleInDegrees,
-                                                     @NotNull PivotAxis pivotAxis,
+                                                     @NotNull Axis axis,
                                                      boolean worldSpace){
         Vector translationVector = pivotLocation
                 .clone()
@@ -96,7 +96,7 @@ public final class WorldUtils {
                 translationVector,
                 pivotLocation,
                 angleInDegrees,
-                pivotAxis,
+                axis,
                 worldSpace,
                 origin.getYaw(),
                 origin.getPitch());
@@ -107,7 +107,7 @@ public final class WorldUtils {
      * @param translationVector the translation offset vector from an origin, that will pivot
      * @param pivotLocation the location to pivot around
      * @param angleInDegrees the pivot angle in degrees
-     * @param pivotAxis the axis to pivot around
+     * @param axis the axis to pivot around
      * @param worldSpace whether the pivot should occur on world space axis
      * @param yaw the yaw to consider when pivoting
      * @param pitch the yaw to consider when pivoting
@@ -116,7 +116,7 @@ public final class WorldUtils {
     public static @NotNull Location getPivotLocation(@NotNull Vector translationVector,
                                                      @NotNull Location pivotLocation,
                                                      double angleInDegrees,
-                                                     @NotNull PivotAxis pivotAxis,
+                                                     @NotNull Axis axis,
                                                      boolean worldSpace,
                                                      float yaw,
                                                      float pitch) {
@@ -125,10 +125,10 @@ public final class WorldUtils {
 
         Quaternionf rotation = new Quaternionf();
 
-        if (pivotAxis == PivotAxis.X){
+        if (axis == Axis.X){
             rotation.rotateX(angleRad);
         }
-        else if (pivotAxis == PivotAxis.Y){
+        else if (axis == Axis.Y){
             rotation.rotateY(-angleRad);
         }
         else{

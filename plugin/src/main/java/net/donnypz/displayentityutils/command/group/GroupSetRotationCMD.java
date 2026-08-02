@@ -5,7 +5,7 @@ import net.donnypz.displayentityutils.command.DEUSubCommand;
 import net.donnypz.displayentityutils.command.GroupSubCommand;
 import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.PivotAxis;
+import net.donnypz.displayentityutils.utils.Axis;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -13,7 +13,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
 
 import java.util.List;
 
@@ -39,7 +38,7 @@ public class GroupSetRotationCMD extends GroupSubCommand {
         }
         try{
             String axisInput = args[2];
-            PivotAxis axis = PivotAxis.valueOf(axisInput.toUpperCase());
+            Axis axis = Axis.valueOf(axisInput.toUpperCase());
             float rotation = Float.parseFloat(args[3]);
 
             OptionalArguments oArgs = getOptionalArguments(player, args);
