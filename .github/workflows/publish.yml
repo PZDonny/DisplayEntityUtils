@@ -45,6 +45,13 @@ jobs:
             --notes-file "docs/release-notes/$TAG.md" \
             --generate-notes
 
+      - name: Trigger Build on Jitpack
+        background: true
+        continue-on-error: true
+        run: |
+          curl -L --fail --retry 3 --retry-delay 7 \
+            "https://jitpack.io/com/github/PZDonny/DisplayEntityUtils/${TAG}/build.log"
+
       - name: Get Release body
         id: release_notes
         env:
