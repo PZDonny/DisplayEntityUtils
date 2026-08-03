@@ -14,8 +14,7 @@ import java.util.HashSet;
 import java.util.UUID;
 
 /**
- * Called when a {@link DisplayAnimator} starts playing a {@link SpawnedDisplayAnimation}.
- * This is called once on an animator of the type {@link DisplayAnimator.AnimationType#LOOP}.
+ * Called when an animation camera completes its path
  */
 public class AnimationCameraStopEvent extends Event{
     private static final HandlerList handlers = new HandlerList();
