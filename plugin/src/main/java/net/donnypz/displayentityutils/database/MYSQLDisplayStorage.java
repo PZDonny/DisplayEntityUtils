@@ -1,8 +1,10 @@
-package net.donnypz.displayentityutils.managers;
+package net.donnypz.displayentityutils.database;
 
 import com.zaxxer.hikari.HikariDataSource;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
+import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
+import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.kyori.adventure.text.Component;
@@ -27,7 +29,7 @@ import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
 
-public final class MYSQLManager implements DisplayStorage{
+public final class MYSQLDisplayStorage implements DisplayStorage {
 
     private static boolean connected = false;
     private static HikariDataSource dataSource;

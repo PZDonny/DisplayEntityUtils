@@ -14,9 +14,9 @@ import net.donnypz.displayentityutils.listeners.entity.mythic.DEUMythicListener;
 import net.donnypz.displayentityutils.listeners.gizmo.DEUGizmoListener;
 import net.donnypz.displayentityutils.listeners.player.*;
 import net.donnypz.displayentityutils.listeners.player.essentials.DEUEssentialsListener;
-import net.donnypz.displayentityutils.managers.LocalManager;
-import net.donnypz.displayentityutils.managers.MYSQLManager;
-import net.donnypz.displayentityutils.managers.MongoManager;
+import net.donnypz.displayentityutils.database.LocalDisplayStorage;
+import net.donnypz.displayentityutils.database.MYSQLDisplayStorage;
+import net.donnypz.displayentityutils.database.MongoDisplayStorage;
 import net.donnypz.displayentityutils.managers.PluginFolders;
 import net.donnypz.displayentityutils.skript.SkriptTypes;
 import net.donnypz.displayentityutils.skript.active.ActiveModule;
@@ -67,9 +67,9 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         DisplayAPI.plugin = this;
-        DisplayAPI.LOCAL_STORAGE = new LocalManager();
-        DisplayAPI.MONGODB_STORAGE = new MongoManager();
-        DisplayAPI.MYSQL_STORAGE = new MYSQLManager();
+        DisplayAPI.LOCAL_STORAGE = new LocalDisplayStorage();
+        DisplayAPI.MONGODB_STORAGE = new MongoDisplayStorage();
+        DisplayAPI.MYSQL_STORAGE = new MYSQLDisplayStorage();
         DisplayAPI.ANIMATION_PLAYER_SERVICE = new AnimationPlayerProviderImpl();
         DisplayAPI.BDE_CONVERSION_HANDLER = new BDEConversionHandlerImpl();
         DisplayAPI.SCHEDULER = new SchedulerImpl();
@@ -93,8 +93,8 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        MYSQLManager.closeConnection();
-        MongoManager.closeConnection();
+        MYSQLDisplayStorage.closeConnection();
+        MongoDisplayStorage.closeConnection();
     }
 
     void checkFolia(){
@@ -196,8 +196,8 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         PluginFolders.createLocalSaveFolders(plugin);
 
         if (!isOnEnable){
-            MongoManager.closeConnection();
-            MYSQLManager.closeConnection();
+            MongoDisplayStorage.closeConnection();
+            MYSQLDisplayStorage.closeConnection();
         }
         else{
             plugin.saveDefaultConfig();

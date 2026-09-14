@@ -1,6 +1,9 @@
-package net.donnypz.displayentityutils.managers;
+package net.donnypz.displayentityutils.database;
 
 import net.donnypz.displayentityutils.DisplayConfig;
+import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
+import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.managers.PluginFolders;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.kyori.adventure.text.Component;
@@ -16,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
-public final class LocalManager implements DisplayStorage{
+public final class LocalDisplayStorage implements DisplayStorage {
 
     public boolean saveDisplayEntityGroup(@NotNull DisplayEntityGroup displayEntityGroup, @Nullable Player saver){
         try{

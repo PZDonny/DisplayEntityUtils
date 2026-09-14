@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils;
 
-import net.donnypz.displayentityutils.managers.DisplayStorage;
+import net.donnypz.displayentityutils.database.DisplayStorage;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationPlayer;
 import net.donnypz.displayentityutils.utils.bdengine.convert.common.BDEConversionHandler;

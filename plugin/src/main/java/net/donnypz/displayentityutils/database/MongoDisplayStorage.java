@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.managers;
+package net.donnypz.displayentityutils.database;
 
 import com.mongodb.*;
 import com.mongodb.client.MongoClient;
@@ -7,6 +7,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
+import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
+import net.donnypz.displayentityutils.managers.DisplayGroupManager;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.kyori.adventure.text.Component;
@@ -31,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
-public final class MongoManager implements DisplayStorage{
+public final class MongoDisplayStorage implements DisplayStorage {
     private static MongoClient client;
     private static MongoDatabase database;
     private static MongoCollection<Document> groupCollection;

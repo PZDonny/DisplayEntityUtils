@@ -1,8 +1,8 @@
 package net.donnypz.displayentityutils;
 
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
-import net.donnypz.displayentityutils.managers.MYSQLManager;
-import net.donnypz.displayentityutils.managers.MongoManager;
+import net.donnypz.displayentityutils.database.MYSQLDisplayStorage;
+import net.donnypz.displayentityutils.database.MongoDisplayStorage;
 import net.donnypz.displayentityutils.managers.PluginFolders;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.kyori.adventure.text.Component;
@@ -57,7 +57,7 @@ public final class ConfigUtils {
             String databaseName = config.getString("mongodb.database");
             String groupCollection = config.getString("mongodb.groupCollection");
             String animationCollection = config.getString("mongodb.animationCollection");
-            MongoManager.createConnection(cString, databaseName, groupCollection, animationCollection);
+            MongoDisplayStorage.createConnection(cString, databaseName, groupCollection, animationCollection);
         }
 
         if (config.getBoolean("mysql.enabled")){
@@ -65,14 +65,14 @@ public final class ConfigUtils {
             String username = config.getString("mysql.username");
             String password = config.getString("mysql.password");
             if (!config.getString("mysql.connectionURL").isBlank()){
-                MYSQLManager.createConnection(config.getString("mysql.connectionURL"), username, password);
+                MYSQLDisplayStorage.createConnection(config.getString("mysql.connectionURL"), username, password);
             }
             else{
                 String database = config.getString("mysql.database");
                 String host = config.getString("mysql.host");
                 int port = config.getInt("mysql.port");
                 boolean useSSL = config.getBoolean("mysql.useSSL");
-                MYSQLManager.createConnection(host, port, database, username, password, useSSL);
+                MYSQLDisplayStorage.createConnection(host, port, database, username, password, useSSL);
             }
         }
 
