@@ -20,4 +20,17 @@ class CommonDisplayStorageUtils {
         byteOut.close();
         return new ByteArrayInputStream(data);
     }
+
+    static byte[] toByteArray(Object entityObject) throws IOException {
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        GZIPOutputStream gzipOut = new GZIPOutputStream(byteOut);
+        ObjectOutputStream objOut = new ObjectOutputStream(gzipOut);
+        objOut.writeObject(entityObject);
+        gzipOut.close();
+        objOut.close();
+
+        byte[] data = byteOut.toByteArray();
+        byteOut.close();
+        return data;
+    }
 }

@@ -5,6 +5,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Projections;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
@@ -20,20 +21,14 @@ import org.bson.conversions.Bson;
 import org.bson.types.Binary;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.*;
-import java.util.zip.GZIPOutputStream;
 
 public final class MongoDisplayStorage implements DBDisplayStorage {
-    private static MongoClient client;
-    private static MongoDatabase database;
 
     private static MongoCollection<Document> GROUP_COLLECTION;
     private static final String GROUP_FIELD = "displayGroup";
@@ -45,198 +40,10 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
 
     private static final String TAG_FIELD = "tag";
 
-    private static boolean isConnected = false;
+    private MongoClient client;
+    private MongoDatabase database;
+    private boolean isConnected = false;
 
-    @Override
-    public boolean saveDisplayEntityGroup(@NotNull DisplayEntityGroup displayEntityGroup, @Nullable Player saver){
-        if (!isConnected){
-            return false;
-        }
-        try{
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-            GZIPOutputStream gzipOut = new GZIPOutputStream(byteOut);
-            ObjectOutputStream objOut = new ObjectOutputStream(gzipOut);
-            objOut.writeObject(displayEntityGroup);
-
-            gzipOut.close();
-            objOut.close();
-            byte[] data = byteOut.toByteArray();
-            Document doc = new Document();
-
-            doc.append("tag", displayEntityGroup.getTag())
-                .append("displayGroup", data);
-
-            Document existing = getGroupDocument(displayEntityGroup.getTag());
-            if (existing != null){
-                if (DisplayConfig.overwritexistingSaves()){
-                    Bson updateOperation = new Document ("$set", doc);
-                    GROUP_COLLECTION.updateOne(existing, updateOperation);
-                }
-                else{
-                    if (saver != null){
-                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display entity group to MongoDB!"));
-                        saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
-                    }
-                    return false;
-                }
-
-            }
-            else{
-                GROUP_COLLECTION.insertOne(doc);
-            }
-
-            if (saver != null) {
-                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved display entity group to MongoDB!"));
-            }
-            return true;
-        }
-        catch(IOException ex){
-            ex.printStackTrace();
-            if (saver != null) {
-                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display entity group to MongoDB!"));
-            }
-            return false;
-        }
-    }
-
-    @Override
-    public void deleteDisplayEntityGroup(@NotNull String tag, @Nullable Player deleter){
-        if (!isConnected()) return;
-        DisplayAPI.getScheduler().runAsync(() -> {
-            Document doc = getGroupDocument(tag);
-            if (doc != null){
-                GROUP_COLLECTION.deleteOne(doc);
-                if (deleter != null){
-
-                    deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted group from MongoDB!"));
-                    return;
-                }
-            }
-            if (deleter != null){
-                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved display entity group does not exist in MongoDB database!"));
-            }
-        });
-    }
-
-    @Override
-    public @Nullable DisplayEntityGroup getDisplayEntityGroup(@NotNull String tag){
-        if (!isConnected) return null;
-        Document doc = getGroupDocument(tag);
-        if (doc == null){
-            return null;
-        }
-        byte[] bytes = ((Binary) doc.get("displayGroup")).getData();
-        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        return DisplayGroupManager.getGroup(in);
-    }
-
-
-    @Override
-    public boolean saveDisplayAnimation(@NotNull DisplayAnimation displayAnimation, @Nullable Player saver){
-        if (!isConnected){
-            return false;
-        }
-        try{
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-            GZIPOutputStream gzipOut = new GZIPOutputStream(byteOut);
-            ObjectOutputStream objOut = new ObjectOutputStream(gzipOut);
-            objOut.writeObject(displayAnimation);
-            gzipOut.close();
-            objOut.close();
-
-            byte[] data = byteOut.toByteArray();
-            Document doc = new Document();
-
-            doc.append("tag", displayAnimation.getAnimationTag())
-                    .append("displayAnimation", data);
-
-            Document existing = getAnimationDocument(displayAnimation.getAnimationTag());
-            if (existing != null){
-                if (DisplayConfig.overwritexistingSaves()){
-                    Bson updateOperation = new Document ("$set", doc);
-                    ANIMATION_COLLECTION.updateOne(existing, updateOperation);
-                }
-                else{
-                    if (saver != null){
-                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save animation to MongoDB!"));
-                        saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
-                    }
-                    return false;
-                }
-
-            }
-            else{
-                ANIMATION_COLLECTION.insertOne(doc);
-            }
-
-            if (saver != null) {
-                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved animation to MongoDB!"));
-            }
-            return true;
-        }
-        catch(IOException ex){
-            ex.printStackTrace();
-            if (saver != null) {
-                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save animation to MongoDB!"));
-            }
-            return false;
-        }
-    }
-
-    @Override
-    public void deleteDisplayAnimation(@NotNull String tag, @Nullable Player deleter){
-        if (!isConnected()) return;
-        DisplayAPI.getScheduler().runAsync(() -> {
-            Document doc = getAnimationDocument(tag);
-            if (doc != null){
-                ANIMATION_COLLECTION.deleteOne(doc);
-                if (deleter != null){
-                    deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted animation from MongoDB database!"));
-                    return;
-                }
-            }
-            if (deleter != null){
-                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved animation does not exist in MongoDB database!"));
-            }
-        });
-    }
-
-    @Override
-    public @Nullable DisplayAnimation getDisplayAnimation(@NotNull String tag){
-        if (!isConnected){
-            return null;
-        }
-        Document doc = getAnimationDocument(tag);
-        if (doc == null){
-            return null;
-        }
-        byte[] bytes = ((Binary) doc.get("displayAnimation")).getData();
-        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-        return DisplayAnimationManager.getAnimation(in);
-    }
-
-
-    @Override
-    public @NotNull List<String> getGroupTags(){
-        return getTags(GROUP_COLLECTION);
-    }
-
-    @Override
-    public @NotNull List<String> getAnimationTags(){
-        return getTags(ANIMATION_COLLECTION);
-
-    }
-
-    private List<String> getTags(MongoCollection<Document> collection){
-        if (!isConnected()) return Collections.emptyList();
-        List<String> tags = new ArrayList<>();
-        for(Document doc : collection.find()){
-            tags.add(doc.getString("tag"));
-        }
-        return tags;
-    }
-
-    @ApiStatus.Internal
     public void createConnection(
             String connectionString,
             String databaseName,
@@ -297,6 +104,11 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
     }
 
     @Override
+    public boolean isConnected(){
+        return isConnected;
+    }
+
+    @Override
     public void closeConnection(){
         if (client == null || !isConnected){
             return;
@@ -313,16 +125,180 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
     }
 
     @Override
-    public boolean isConnected(){
-        return isConnected;
+    public boolean saveDisplayEntityGroup(@NotNull DisplayEntityGroup displayEntityGroup, @Nullable Player saver){
+        String tag = displayEntityGroup.getTag();
+        return saveEntity(
+                tag,
+                displayEntityGroup,
+                GROUP_COLLECTION,
+                GROUP_FIELD,
+                "display entity group",
+                saver);
+    }
+
+    @Override
+    public void deleteDisplayEntityGroup(@NotNull String tag, @Nullable Player deleter){
+        deleteEntity(
+                tag,
+                GROUP_COLLECTION,
+                GROUP_DISPLAY_NAME,
+                deleter
+        );
+    }
+
+    @Override
+    public @Nullable DisplayEntityGroup getDisplayEntityGroup(@NotNull String tag){
+        if (!isConnected) return null;
+        Document doc = getGroupDocument(tag);
+        if (doc == null){
+            return null;
+        }
+        byte[] bytes = ((Binary) doc.get(GROUP_FIELD)).getData();
+        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+        return DisplayGroupManager.getGroup(in);
+    }
+
+
+    @Override
+    public boolean saveDisplayAnimation(@NotNull DisplayAnimation displayAnimation, @Nullable Player saver){
+        String tag = displayAnimation.getAnimationTag();
+        return saveEntity(
+                tag,
+                displayAnimation,
+                ANIMATION_COLLECTION,
+                ANIMATION_FIELD,
+                "animation",
+                saver
+        );
+    }
+
+    @Override
+    public void deleteDisplayAnimation(@NotNull String tag, @Nullable Player deleter){
+        deleteEntity(
+                tag,
+                ANIMATION_COLLECTION,
+                ANIMATION_DISPLAY_NAME,
+                deleter
+        );
+    }
+
+    @Override
+    public @Nullable DisplayAnimation getDisplayAnimation(@NotNull String tag){
+        if (!isConnected){
+            return null;
+        }
+        Document doc = getAnimationDocument(tag);
+        if (doc == null){
+            return null;
+        }
+        byte[] bytes = ((Binary) doc.get(ANIMATION_FIELD)).getData();
+        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+        return DisplayAnimationManager.getAnimation(in);
+    }
+
+
+    @Override
+    public @NotNull List<String> getGroupTags(){
+        return getTags(GROUP_COLLECTION);
+    }
+
+    @Override
+    public @NotNull List<String> getAnimationTags(){
+        return getTags(ANIMATION_COLLECTION);
+    }
+
+
+    private boolean saveEntity(
+            String tag,
+            Object entity,
+            MongoCollection<Document> collection,
+            String fieldName,
+            String displayName,
+            Player saver){
+        if (!isConnected) return false;
+        try{
+            byte[] data = CommonDisplayStorageUtils.toByteArray(entity);
+            Document doc = new Document();
+
+            doc
+                    .append(TAG_FIELD, tag)
+                    .append(fieldName, data);
+
+            Document existing = getGroupDocument(tag);
+            if (existing != null){
+                if (DisplayConfig.overwritexistingSaves()){
+                    Bson updateOperation = new Document ("$set", doc);
+                    collection.updateOne(existing, updateOperation);
+                }
+                else{
+                    if (saver != null){
+                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save "+displayName+" to MongoDB!"));
+                        saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                    }
+                    return false;
+                }
+
+            }
+            else{
+                collection.insertOne(doc);
+            }
+
+            if (saver != null) {
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved "+displayName+" to MongoDB!"));
+            }
+            return true;
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
+            if (saver != null) {
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save "+displayName+" to MongoDB!"));
+            }
+            return false;
+        }
+    }
+
+    private void deleteEntity(
+            String tag,
+            MongoCollection<Document> collection,
+            String displayName,
+            Player deleter
+    ){
+        if (!isConnected()) return;
+        Document doc = getGroupDocument(tag);
+        if (doc != null){
+            collection.deleteOne(doc);
+            if (deleter != null){
+                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted "+displayName+" from MongoDB!"));
+                return;
+            }
+        }
+        if (deleter != null){
+            deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved "+displayName+" does not exist in MongoDB database!"));
+        }
+    }
+
+    private List<String> getTags(MongoCollection<Document> collection){
+        if (!isConnected()) return new ArrayList<>();
+
+        return collection.find()
+                .projection(
+                        Projections.fields(
+                                Projections.include(TAG_FIELD),
+                                Projections.excludeId()
+                        )
+                )
+                .map(doc -> doc.getString(TAG_FIELD))
+                .into(new ArrayList<>());
     }
 
     private Document getGroupDocument(String tag){
-        return GROUP_COLLECTION.find(new Document("tag", tag)).first();
+        return GROUP_COLLECTION.find(new Document(TAG_FIELD, tag))
+                .first();
     }
 
     private Document getAnimationDocument(String tag){
-        return ANIMATION_COLLECTION.find(new Document("tag", tag)).first();
+        return ANIMATION_COLLECTION.find(new Document(TAG_FIELD, tag))
+                .first();
     }
 
 }
