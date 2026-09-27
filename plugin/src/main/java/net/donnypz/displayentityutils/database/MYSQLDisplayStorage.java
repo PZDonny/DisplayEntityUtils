@@ -19,23 +19,37 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.zip.GZIPOutputStream;
 
 
 public final class MYSQLDisplayStorage implements DisplayStorage {
 
-    private static boolean connected = false;
-    private static HikariDataSource dataSource;
+    private static final String GROUP_TABLE = "saved_displays";
+    private static final String GROUP_COLUMN = "display_group";
+    private static final String GROUP_DISPLAY_NAME = "display entity group";
 
-    @ApiStatus.Internal
-    public static void createConnection(String host, int port, String database, String username, String password, boolean usessl){
+    private static final String ANIMATION_TABLE = "saved_animations";
+    private static final String ANIMATION_COLUMN = "display_anim";
+    private static final String ANIMATION_DISPLAY_NAME = "animation";
+
+    private static final String TAG_COLUMN = "tag";
+
+
+    private boolean connected = false;
+    private HikariDataSource dataSource;
+
+    public void createConnection(
+            String host,
+            int port,
+            String database,
+            String username,
+            String password,
+            boolean usessl
+    ){
         if (connected){
             return;
         }
@@ -43,8 +57,11 @@ public final class MYSQLDisplayStorage implements DisplayStorage {
         createConnection(url, username, password);
     }
 
-    @ApiStatus.Internal
-    public static void createConnection(String url, String username, String password){
+    public void createConnection(
+            String url,
+            String username,
+            String password
+    ){
         if (connected){
             return;
         }
@@ -65,10 +82,11 @@ public final class MYSQLDisplayStorage implements DisplayStorage {
 
                 //Create Default Table
                 Statement statement = connection.createStatement();
-                String groupCreator = "CREATE TABLE IF NOT EXISTS saved_displays(tag VARCHAR(128) UNIQUE, display_group BLOB)";
-                statement.execute(groupCreator);
-                String animCreator = "CREATE TABLE IF NOT EXISTS saved_animations(tag VARCHAR(128) UNIQUE, display_anim BLOB)";
-                statement.execute(animCreator);
+                String groupTableSQL = "CREATE TABLE IF NOT EXISTS saved_displays(tag VARCHAR(128) UNIQUE, display_group BLOB)";
+                statement.execute(groupTableSQL);
+
+                String animTableSQL = "CREATE TABLE IF NOT EXISTS saved_animations(tag VARCHAR(128) UNIQUE, display_anim BLOB)";
+                statement.execute(animTableSQL);
 
 
                 DbUtils.closeQuietly(statement);
@@ -84,17 +102,12 @@ public final class MYSQLDisplayStorage implements DisplayStorage {
         });
     }
 
-    @ApiStatus.Internal
-    public static void closeConnection(){
+    public void closeConnection(){
         try{
             if (dataSource != null){
                 dataSource.close();
             }
         }
-        /*catch(SQLException e){
-            e.printStackTrace();
-            Bukkit.getConsoleSender().sendMessage(Component.text("There was an error closing the connection to the MYSQL Database", NamedTextColor.RED);
-        }*/
         finally {
             connected = false;
             dataSource = null;
@@ -105,11 +118,11 @@ public final class MYSQLDisplayStorage implements DisplayStorage {
      * Check whether MySQL is connected
      * @return a boolean
      */
-    public static boolean isConnected() {
+    public boolean isConnected() {
         return connected;
     }
 
-    private static Connection getConnection(){
+    private Connection getConnection(){
         try{
             return dataSource.getConnection();
         }
@@ -118,105 +131,23 @@ public final class MYSQLDisplayStorage implements DisplayStorage {
         }
     }
 
+    @Override
     public boolean saveDisplayEntityGroup(@NotNull DisplayEntityGroup displayEntityGroup, @Nullable Player saver){
-        if (!connected){
-            return false;
-        }
-        PreparedStatement statement = null;
-        Connection connection = null;
-        try{
-            String tag = displayEntityGroup.getTag();
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-            GZIPOutputStream gzipOut = new GZIPOutputStream(byteOut);
-            ObjectOutputStream objOut = new ObjectOutputStream(gzipOut);
-            objOut.writeObject(displayEntityGroup);
-
-            gzipOut.close();
-            objOut.close();
-
-            byte[] data = byteOut.toByteArray();
-
-            ByteArrayInputStream blobStream = new ByteArrayInputStream(data);
-
-            String save = "INSERT INTO saved_displays VALUES(\""+tag+"\", ?);";
-            connection = getConnection();
-            statement =  connection.prepareStatement(save);
-            statement.setBlob(1, blobStream);
-            if (getDisplayEntityGroup(tag) != null){
-                if (DisplayConfig.overwritexistingSaves()){
-                    deleteDisplayEntityGroup(tag, null);
-                }
-                else{
-                    if (saver != null) {
-                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display entity group to MYSQL!"));
-                        saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
-                    }
-                    return false;
-                }
-            }
-            statement.executeUpdate();
-            blobStream.close();
-            if (saver != null) {
-                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved display entity group to MYSQL!"));
-            }
-            return true;
-        }
-        catch(SQLIntegrityConstraintViolationException e){
-            if (saver != null) {
-                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display entity group to MYSQL!"));
-                saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
-            }
-            e.printStackTrace();
-            return false;
-        }
-        catch(SQLException | IOException e){
-            if (saver != null) {
-                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save display entity group to MYSQL!"));
-            }
-            e.printStackTrace();
-            return false;
-        }
-        finally {
-            DbUtils.closeQuietly(statement);
-            DbUtils.closeQuietly(connection);
-        }
+        String tag = displayEntityGroup.getTag();
+        return saveEntity(tag, displayEntityGroup, GROUP_TABLE, GROUP_DISPLAY_NAME, saver);
     }
 
+    @Override
     public void deleteDisplayEntityGroup(@NotNull String tag, @Nullable Player deleter){
-        if (!isConnected()) return;
-        Connection connection = null;
-        Statement statement = null;
-        try{
-            connection = getConnection();
-
-            if (!hasSingleGroup(tag, connection)){
-                if (deleter != null){
-                    deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved display entity group does not exist in MYSQL database!"));
-                }
-                return;
-            }
-
-            statement =  connection.createStatement();
-            String delete = "DELETE FROM saved_displays WHERE tag = \""+tag+"\";";
-            statement.executeUpdate(delete);
-            if (deleter != null){
-                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted group from MYSQL"));
-            }
-        }
-        catch(SQLException e){
-            e.printStackTrace();
-        }
-        finally {
-            DbUtils.closeQuietly(statement);
-            DbUtils.closeQuietly(connection);
-        }
+        deleteEntity(tag, deleter, GROUP_TABLE, "display entity group");
     }
 
+    @Override
     public @Nullable DisplayEntityGroup getDisplayEntityGroup(@NotNull String tag){
         if (!isConnected()){
             return null;
         }
-        Blob blob = getSingleGroupBlob(tag);
+        Blob blob = getEntity(tag, GROUP_TABLE, GROUP_COLUMN);
         if (blob == null) return null;
         try{
             return DisplayGroupManager.getGroup(blob.getBinaryStream());
@@ -227,36 +158,63 @@ public final class MYSQLDisplayStorage implements DisplayStorage {
         }
     }
 
+    @Override
     public boolean saveDisplayAnimation(@NotNull DisplayAnimation displayAnimation, @Nullable Player saver){
-        if (!connected){
-            return false;
+        String tag = displayAnimation.getAnimationTag();
+        return saveEntity(tag, displayAnimation, ANIMATION_TABLE, ANIMATION_DISPLAY_NAME, saver);
+    }
+
+    @Override
+    public void deleteDisplayAnimation(@NotNull String tag, @Nullable Player deleter){
+        deleteEntity(tag, deleter, ANIMATION_TABLE, "animation");
+    }
+
+    @Override
+    public @Nullable DisplayAnimation getDisplayAnimation(@NotNull String tag) {
+        if (!isConnected()) return null;
+
+        try {
+            Blob blob = getEntity(tag, ANIMATION_TABLE, ANIMATION_COLUMN);
+            return blob == null
+                    ? null
+                    : DisplayAnimationManager.getAnimation(blob.getBinaryStream());
         }
-        PreparedStatement statement = null;
-        Connection connection = null;
-        try{
-            String tag = displayAnimation.getAnimationTag();
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-            GZIPOutputStream gzipOut = new GZIPOutputStream(byteOut);
-            ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
-            objOut.writeObject(displayAnimation);
-            gzipOut.close();
-            objOut.close();
+        catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-            byte[] data = byteOut.toByteArray();
-            byteOut.close();
-            ByteArrayInputStream blobStream = new ByteArrayInputStream(data);
+    @Override
+    public @NotNull List<String> getGroupTags(){
+        return getTags(GROUP_TABLE);
+    }
 
-            String save = "INSERT INTO saved_animations VALUES(\""+tag+"\", ?);";
-            connection = getConnection();
-            statement = connection.prepareStatement(save);
-            statement.setBlob(1, blobStream);
-            if (getDisplayAnimation(tag) != null){
+    @Override
+    public @NotNull List<String> getAnimationTags(){
+        return getTags(ANIMATION_TABLE);
+    }
+
+    private boolean saveEntity(String tag, Object entity, String tableName, String displayName, Player saver){
+        if (!isConnected()) return false;
+        String save = "INSERT INTO "+tableName+" VALUES(?, ?);";
+
+        try(
+                ByteArrayInputStream blobStream = CommonDisplayStorageUtils.toByteArrayInputStream(entity);
+                Connection connection = getConnection();
+                PreparedStatement statement = connection.prepareStatement(save);
+        ){
+
+            statement.setString(1, tag);
+            statement.setBlob(2, blobStream);
+
+            if (hasEntity(tag, tableName, connection)){
                 if (DisplayConfig.overwritexistingSaves()){
                     deleteDisplayAnimation(tag, null);
                 }
                 else{
                     if (saver != null) {
-                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save animation to MYSQL!"));
+                        saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save "+displayName+" to MYSQL!"));
                         saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
                     }
                     return false;
@@ -265,116 +223,73 @@ public final class MYSQLDisplayStorage implements DisplayStorage {
             statement.executeUpdate();
             blobStream.close();
             if (saver != null) {
-                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved animation to MYSQL!"));
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved "+displayName+" to MYSQL!"));
             }
             return true;
         }
-        catch(SQLException | IOException e){
+        catch(SQLIntegrityConstraintViolationException e){
             if (saver != null) {
-                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save animation to MYSQL!"));
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save "+displayName+" to MYSQL!"));
+                saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
             }
             e.printStackTrace();
             return false;
         }
-        finally {
-            DbUtils.closeQuietly(statement);
-            DbUtils.closeQuietly(connection);
+        catch(SQLException | IOException e){
+            if (saver != null) {
+                saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save "+displayName+" to MYSQL!"));
+            }
+            e.printStackTrace();
+            return false;
         }
     }
 
-    public void deleteDisplayAnimation(@NotNull String tag, @Nullable Player deleter){
-        if (!isConnected()){
-            return;
-        }
-        Statement statement = null;
-        Connection connection = null;
-        ResultSet resultSet = null;
-        try{
-            connection = getConnection();
 
-            if (!hasSingleAnimation(tag, connection)){
+
+    private void deleteEntity(String tag, Player deleter, String tableName, String displayName){
+        if (!isConnected()) return;
+
+        String delete = "DELETE FROM "+tableName+" WHERE "+TAG_COLUMN+" = ?;";
+        try(
+                Connection connection = getConnection();
+                PreparedStatement statement = connection.prepareStatement(delete);
+        ){
+
+            if (!hasEntity(tag, tableName, connection)){
                 if (deleter != null){
-                    deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved animation does not exist in MYSQL database!"));
+                    deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved "+displayName+" does not exist in MYSQL database!"));
                 }
                 return;
             }
 
-            statement = connection.createStatement();
-            String delete = "DELETE FROM saved_animations WHERE tag = \""+tag+"\";";
+            statement.setString(1, tag);
             statement.executeUpdate(delete);
             if (deleter != null){
-
-                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted animation from MYSQL database!"));
+                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted "+displayName+" from MYSQL database!"));
             }
         }
         catch(SQLException e){
             e.printStackTrace();
-            deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved animation does not exist in MYSQL database!"));
-        }
-        finally {
-            DbUtils.closeQuietly(resultSet);
-            DbUtils.closeQuietly(statement);
-            DbUtils.closeQuietly(connection);
+            deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved "+displayName+" does not exist in MYSQL database!"));
         }
     }
 
-    public @Nullable DisplayAnimation getDisplayAnimation(@NotNull String tag) {
-        if (!isConnected()){
-            return null;
-        }
-        Blob blob = getSingleAnimationBlob(tag);
-        if (blob == null) return null;
-        try {
-            return DisplayAnimationManager.getAnimation(blob.getBinaryStream());
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public @NotNull List<String> getGroupTags(){
-        if (!isConnected()) return Collections.emptyList();
-        return getTags("saved_displays");
-    }
-
-    public @NotNull List<String> getAnimationTags(){
-        if (!isConnected()) return Collections.emptyList();
-        return getTags("saved_animations");
-    }
-
-    private static boolean hasSingleGroup(String tag, Connection connection){
-        Statement statement = null;
-        ResultSet resultSet = null;
-        try{
-            statement = connection.createStatement();
-            String retrieve = "SELECT * FROM saved_displays WHERE tag = \""+tag+"\";";
-            resultSet = statement.executeQuery(retrieve);
-            return resultSet.next();
-        }catch(SQLException e){
-            return false;
-        }
-        finally {
-            DbUtils.closeQuietly(resultSet);
-            DbUtils.closeQuietly(statement);
-        }
-    }
-
-    private static Blob getSingleGroupBlob(String tag){
-        Statement statement = null;
+    private Blob getEntity(String tag, String tableName, String columnName){
+        PreparedStatement statement = null;
         Connection connection = null;
         try{
             connection = getConnection();
-            statement = connection.createStatement();
-            String retrieve = "SELECT * FROM saved_displays WHERE tag = \""+tag+"\";";
-            ResultSet results = statement.executeQuery(retrieve);
-            if (results != null && results.next()){
-                return results.getBlob("display_group");
-            }
-            else{
-                return null;
-            }
-        }catch(SQLException e){
+            String retrieve = "SELECT "+columnName+" FROM "+tableName+" WHERE "+TAG_COLUMN+" = ?;";
+            statement = connection.prepareStatement(retrieve);
+            statement.setString(1, tag);
+
+            ResultSet results = statement.executeQuery();
+
+            return results.next()
+                    ? results.getBlob(columnName)
+                    : null;
+        }
+        catch(SQLException e){
             e.printStackTrace();
             return null;
         }
@@ -384,57 +299,33 @@ public final class MYSQLDisplayStorage implements DisplayStorage {
         }
     }
 
-    private static boolean hasSingleAnimation(String tag, Connection connection){
-        Statement statement = null;
-        ResultSet resultSet = null;
-        try{
-            statement = connection.createStatement();
-            String retrieve = "SELECT * FROM saved_animations WHERE tag = \""+tag+"\";";
-            resultSet = statement.executeQuery(retrieve);
+    private boolean hasEntity(String tag, String tableName, Connection connection){
+        String retrieve = "SELECT 1 FROM "+tableName+" WHERE "+TAG_COLUMN+" = ?;";
+
+        try(PreparedStatement statement = connection.prepareStatement(retrieve)){
+            statement.setString(1, tag);
+            ResultSet resultSet = statement.executeQuery();
             return resultSet.next();
-        }catch(SQLException e){
+        }
+        catch(SQLException e){
             return false;
         }
-        finally {
-            DbUtils.closeQuietly(resultSet);
-            DbUtils.closeQuietly(statement);
-        }
     }
 
-    private static Blob getSingleAnimationBlob(String tag){
-        Statement statement = null;
-        Connection connection = null;
-        try{
-            connection = getConnection();
-            statement = connection.createStatement();
-            String retrieve = "SELECT * FROM saved_animations WHERE tag = \""+tag+"\";";
-            ResultSet results = statement.executeQuery(retrieve);
-            if (results != null && results.next()){
-                return results.getBlob("display_anim");
-            }
-            else{
-                return null;
-            }
-        }catch(SQLException e){
-            return null;
-        }
-        finally {
-            DbUtils.closeQuietly(statement);
-            DbUtils.closeQuietly(connection);
-        }
-    }
-
-    private static List<String> getTags(String tableName){
+    private List<String> getTags(String tableName){ //internally set table name
+        if (!isConnected()) return Collections.emptyList();
         List<String> tags = new ArrayList<>();
-        String retrieve = "SELECT * FROM "+tableName+";";
+        String retrieve = "SELECT "+TAG_COLUMN+" FROM "+tableName+";";
+
         try(Connection connection = getConnection();
             Statement statement = connection.createStatement();
             ResultSet results = statement.executeQuery(retrieve)){
 
             while(results.next()){
-                tags.add(results.getString("tag"));
+                tags.add(results.getString(TAG_COLUMN));
             }
-        }catch(SQLException e){
+        }
+        catch(SQLException e){
             e.printStackTrace();
         }
         return tags;

@@ -25,6 +25,4 @@ public interface DisplayStorage {
     @NotNull List<String> getGroupTags();
 
     @NotNull List<String> getAnimationTags();
-
-
 }
