@@ -14,7 +14,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.dbutils.DbUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-public final class MYSQLDisplayStorage implements DisplayStorage {
+public final class MYSQLDisplayStorage implements DBDisplayStorage {
 
     private static final String GROUP_TABLE = "saved_displays";
     private static final String GROUP_COLUMN = "display_group";
@@ -102,6 +101,7 @@ public final class MYSQLDisplayStorage implements DisplayStorage {
         });
     }
 
+    @Override
     public void closeConnection(){
         try{
             if (dataSource != null){
@@ -118,6 +118,7 @@ public final class MYSQLDisplayStorage implements DisplayStorage {
      * Check whether MySQL is connected
      * @return a boolean
      */
+    @Override
     public boolean isConnected() {
         return connected;
     }

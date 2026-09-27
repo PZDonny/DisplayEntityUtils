@@ -5,6 +5,7 @@ import ch.njol.skript.util.Version;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
+import net.donnypz.displayentityutils.database.*;
 import net.donnypz.displayentityutils.listeners.autogroup.DEULoadingListeners;
 import net.donnypz.displayentityutils.listeners.bdengine.BDEngineConversionListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
@@ -14,9 +15,7 @@ import net.donnypz.displayentityutils.listeners.entity.mythic.DEUMythicListener;
 import net.donnypz.displayentityutils.listeners.gizmo.DEUGizmoListener;
 import net.donnypz.displayentityutils.listeners.player.*;
 import net.donnypz.displayentityutils.listeners.player.essentials.DEUEssentialsListener;
-import net.donnypz.displayentityutils.database.LocalDisplayStorage;
-import net.donnypz.displayentityutils.database.MYSQLDisplayStorage;
-import net.donnypz.displayentityutils.database.MongoDisplayStorage;
+import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.managers.PluginFolders;
 import net.donnypz.displayentityutils.skript.SkriptTypes;
 import net.donnypz.displayentityutils.skript.active.ActiveModule;
@@ -51,6 +50,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
 import org.skriptlang.skript.addon.SkriptAddon;
 
+import java.util.Map;
+
 public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     SkriptAddon addon;
@@ -67,9 +68,11 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         DisplayAPI.plugin = this;
-        DisplayAPI.LOCAL_STORAGE = new LocalDisplayStorage();
-        DisplayAPI.MONGODB_STORAGE = new MongoDisplayStorage();
-        DisplayAPI.MYSQL_STORAGE = new MYSQLDisplayStorage();
+        Map<LoadMethod, DisplayStorage> storages = DisplayAPI.storages;
+        storages.put(LoadMethod.LOCAL, new LocalDisplayStorage());
+        storages.put(LoadMethod.MONGODB, new MongoDisplayStorage());
+        storages.put(LoadMethod.MYSQL, new MYSQLDisplayStorage());
+
         DisplayAPI.ANIMATION_PLAYER_SERVICE = new AnimationPlayerProviderImpl();
         DisplayAPI.BDE_CONVERSION_HANDLER = new BDEConversionHandlerImpl();
         DisplayAPI.SCHEDULER = new SchedulerImpl();
@@ -93,8 +96,11 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        MYSQLDisplayStorage.closeConnection();
-        MongoDisplayStorage.closeConnection();
+        for (DisplayStorage storage : DisplayAPI.storages.values()) {
+            if (storage instanceof DBDisplayStorage ds){
+                ds.closeConnection();
+            }
+        }
     }
 
     void checkFolia(){
@@ -196,8 +202,11 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         PluginFolders.createLocalSaveFolders(plugin);
 
         if (!isOnEnable){
-            MongoDisplayStorage.closeConnection();
-            MYSQLDisplayStorage.closeConnection();
+            for (DisplayStorage storage : DisplayAPI.storages.values()) {
+                if (storage instanceof DBDisplayStorage ds){
+                    ds.closeConnection();
+                }
+            }
         }
         else{
             plugin.saveDefaultConfig();

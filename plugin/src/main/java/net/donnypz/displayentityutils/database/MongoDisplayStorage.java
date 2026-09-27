@@ -28,18 +28,26 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.zip.GZIPOutputStream;
 
-public final class MongoDisplayStorage implements DisplayStorage {
+public final class MongoDisplayStorage implements DBDisplayStorage {
     private static MongoClient client;
     private static MongoDatabase database;
-    private static MongoCollection<Document> groupCollection;
-    private static MongoCollection<Document> animationCollection;
+
+    private static MongoCollection<Document> GROUP_COLLECTION;
+    private static final String GROUP_FIELD = "displayGroup";
+    private static final String GROUP_DISPLAY_NAME = "display entity group";
+
+    private static MongoCollection<Document> ANIMATION_COLLECTION;
+    private static final String ANIMATION_FIELD = "displayAnimation";
+    private static final String ANIMATION_DISPLAY_NAME = "animation";
+
+    private static final String TAG_FIELD = "tag";
+
     private static boolean isConnected = false;
 
+    @Override
     public boolean saveDisplayEntityGroup(@NotNull DisplayEntityGroup displayEntityGroup, @Nullable Player saver){
         if (!isConnected){
             return false;
@@ -62,7 +70,7 @@ public final class MongoDisplayStorage implements DisplayStorage {
             if (existing != null){
                 if (DisplayConfig.overwritexistingSaves()){
                     Bson updateOperation = new Document ("$set", doc);
-                    groupCollection.updateOne(existing, updateOperation);
+                    GROUP_COLLECTION.updateOne(existing, updateOperation);
                 }
                 else{
                     if (saver != null){
@@ -74,7 +82,7 @@ public final class MongoDisplayStorage implements DisplayStorage {
 
             }
             else{
-                groupCollection.insertOne(doc);
+                GROUP_COLLECTION.insertOne(doc);
             }
 
             if (saver != null) {
@@ -91,12 +99,13 @@ public final class MongoDisplayStorage implements DisplayStorage {
         }
     }
 
+    @Override
     public void deleteDisplayEntityGroup(@NotNull String tag, @Nullable Player deleter){
         if (!isConnected()) return;
         DisplayAPI.getScheduler().runAsync(() -> {
             Document doc = getGroupDocument(tag);
             if (doc != null){
-                groupCollection.deleteOne(doc);
+                GROUP_COLLECTION.deleteOne(doc);
                 if (deleter != null){
 
                     deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted group from MongoDB!"));
@@ -109,6 +118,7 @@ public final class MongoDisplayStorage implements DisplayStorage {
         });
     }
 
+    @Override
     public @Nullable DisplayEntityGroup getDisplayEntityGroup(@NotNull String tag){
         if (!isConnected) return null;
         Document doc = getGroupDocument(tag);
@@ -121,6 +131,7 @@ public final class MongoDisplayStorage implements DisplayStorage {
     }
 
 
+    @Override
     public boolean saveDisplayAnimation(@NotNull DisplayAnimation displayAnimation, @Nullable Player saver){
         if (!isConnected){
             return false;
@@ -143,7 +154,7 @@ public final class MongoDisplayStorage implements DisplayStorage {
             if (existing != null){
                 if (DisplayConfig.overwritexistingSaves()){
                     Bson updateOperation = new Document ("$set", doc);
-                    animationCollection.updateOne(existing, updateOperation);
+                    ANIMATION_COLLECTION.updateOne(existing, updateOperation);
                 }
                 else{
                     if (saver != null){
@@ -155,7 +166,7 @@ public final class MongoDisplayStorage implements DisplayStorage {
 
             }
             else{
-                animationCollection.insertOne(doc);
+                ANIMATION_COLLECTION.insertOne(doc);
             }
 
             if (saver != null) {
@@ -172,12 +183,13 @@ public final class MongoDisplayStorage implements DisplayStorage {
         }
     }
 
+    @Override
     public void deleteDisplayAnimation(@NotNull String tag, @Nullable Player deleter){
         if (!isConnected()) return;
         DisplayAPI.getScheduler().runAsync(() -> {
             Document doc = getAnimationDocument(tag);
             if (doc != null){
-                animationCollection.deleteOne(doc);
+                ANIMATION_COLLECTION.deleteOne(doc);
                 if (deleter != null){
                     deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted animation from MongoDB database!"));
                     return;
@@ -189,6 +201,7 @@ public final class MongoDisplayStorage implements DisplayStorage {
         });
     }
 
+    @Override
     public @Nullable DisplayAnimation getDisplayAnimation(@NotNull String tag){
         if (!isConnected){
             return null;
@@ -203,26 +216,33 @@ public final class MongoDisplayStorage implements DisplayStorage {
     }
 
 
+    @Override
     public @NotNull List<String> getGroupTags(){
-        if (!isConnected()) return Collections.emptyList();
-        List<String> tags = new ArrayList<>();
-        for(Document doc : groupCollection.find()){
-            tags.add(doc.getString("tag"));
-        }
-        return tags;
+        return getTags(GROUP_COLLECTION);
     }
 
+    @Override
     public @NotNull List<String> getAnimationTags(){
+        return getTags(ANIMATION_COLLECTION);
+
+    }
+
+    private List<String> getTags(MongoCollection<Document> collection){
         if (!isConnected()) return Collections.emptyList();
         List<String> tags = new ArrayList<>();
-        for(Document doc : animationCollection.find()){
+        for(Document doc : collection.find()){
             tags.add(doc.getString("tag"));
         }
         return tags;
     }
 
     @ApiStatus.Internal
-    public static void createConnection(String connectionString, String databaseName, String groupColl, String animColl) {
+    public void createConnection(
+            String connectionString,
+            String databaseName,
+            String groupColl,
+            String animColl
+    ) {
         if (isConnected()){
             return;
         }
@@ -248,8 +268,8 @@ public final class MongoDisplayStorage implements DisplayStorage {
                 createIfNotExisting(groupColl);
                 createIfNotExisting(animColl);
 
-                groupCollection = database.getCollection(groupColl);
-                animationCollection = database.getCollection(animColl);
+                GROUP_COLLECTION = database.getCollection(groupColl);
+                ANIMATION_COLLECTION = database.getCollection(animColl);
 
                 Bukkit.getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <green>MongoDB!")));
                 isConnected = true;
@@ -262,7 +282,7 @@ public final class MongoDisplayStorage implements DisplayStorage {
         });
     }
 
-    private static void createIfNotExisting(String collectionName){
+    private void createIfNotExisting(String collectionName){
         boolean contains = false;
         for (String s : database.listCollectionNames()){
             if (s.equals(collectionName)){
@@ -272,11 +292,12 @@ public final class MongoDisplayStorage implements DisplayStorage {
         }
         if (!contains){
             database.createCollection(collectionName);
-            groupCollection = database.getCollection(collectionName);
+            GROUP_COLLECTION = database.getCollection(collectionName);
         }
     }
 
-    public static void closeConnection(){
+    @Override
+    public void closeConnection(){
         if (client == null || !isConnected){
             return;
         }
@@ -291,20 +312,17 @@ public final class MongoDisplayStorage implements DisplayStorage {
         }
     }
 
-    /**
-     * Check whether MongoDB is connected
-     * @return a boolean
-     */
-    public static boolean isConnected(){
+    @Override
+    public boolean isConnected(){
         return isConnected;
     }
 
-    private static Document getGroupDocument(String tag){
-        return groupCollection.find(new Document("tag", tag)).first();
+    private Document getGroupDocument(String tag){
+        return GROUP_COLLECTION.find(new Document("tag", tag)).first();
     }
 
-    private static Document getAnimationDocument(String tag){
-        return animationCollection.find(new Document("tag", tag)).first();
+    private Document getAnimationDocument(String tag){
+        return ANIMATION_COLLECTION.find(new Document("tag", tag)).first();
     }
 
 }
