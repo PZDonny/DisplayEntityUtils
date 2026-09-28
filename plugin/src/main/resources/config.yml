@@ -8,10 +8,15 @@ localStorageEnabled: true
 #The database and collections will automatically be created if it does not exist already
 mongodb:
   enabled: false
-  connectionString: ""
+  host: "localhost"
+  port: 27017
   database: "DisplayEntityUtils"
+  username: "root"
+  password: "password"
   groupCollection: "saved_displays"
   animationCollection: "saved_animations"
+  #Using a connection string will override settings above
+  connectionString: ""
 
 mysql:
   enabled: false
@@ -21,7 +26,7 @@ mysql:
   username: "root"
   password: "password"
   useSSL: false
-#Using connection url will override settings above
+#Using a connection url will override settings above
   connectionURL: ""
 
 #Determine whether plugin commands should be registered and usable

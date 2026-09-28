@@ -45,19 +45,38 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
     private boolean isConnected = false;
 
     public void createConnection(
+            String host,
+            int port,
+            String databaseName,
+            String username,
+            String password,
+            String groupCollection,
+            String animationCollection
+    ){
+        String connectionString = String.format(
+                "mongodb://%s:%s@%s:%d/%s",
+                username,
+                password,
+                host,
+                port,
+                databaseName
+        );
+
+        this.createConnection(
+                connectionString,
+                databaseName,
+                groupCollection,
+                animationCollection
+        );
+    }
+
+    public void createConnection(
             String connectionString,
             String databaseName,
-            String groupColl,
-            String animColl
+            String groupCollection,
+            String animationCollection
     ) {
-        if (isConnected()){
-            return;
-        }
-        if (databaseName.isEmpty() || groupColl.isBlank() || animColl.isBlank()){
-            Bukkit.getConsoleSender().sendMessage(Component.text("There was an error connecting to the MongoDB Database! Database and/or Collection names are empty!", NamedTextColor.RED));
-            isConnected = false;
-            return;
-        }
+        if (!this.canConnect(databaseName, groupCollection, animationCollection)) return;
 
         DisplayAPI.getScheduler().runAsync(() -> {
             try{
@@ -72,11 +91,11 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
                 client = MongoClients.create(settings);
                 database = client.getDatabase(databaseName);
 
-                createIfNotExisting(groupColl);
-                createIfNotExisting(animColl);
+                this.createIfNotExisting(groupCollection);
+                this.createIfNotExisting(animationCollection);
 
-                GROUP_COLLECTION = database.getCollection(groupColl);
-                ANIMATION_COLLECTION = database.getCollection(animColl);
+                GROUP_COLLECTION = database.getCollection(groupCollection);
+                ANIMATION_COLLECTION = database.getCollection(animationCollection);
 
                 Bukkit.getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <green>MongoDB!")));
                 isConnected = true;
@@ -87,6 +106,22 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
                 e.printStackTrace();
             }
         });
+    }
+
+    private boolean canConnect(
+            String databaseName,
+            String groupCollection,
+            String animationCollection
+    ){
+        if (isConnected()) return false;
+
+        if (databaseName.isBlank() || groupCollection.isBlank() || animationCollection.isBlank()){
+            Bukkit.getConsoleSender().sendMessage(Component.text("There was an error connecting to the MongoDB Database! Database and/or Collection names are empty!", NamedTextColor.RED));
+            isConnected = false;
+            return false;
+        }
+
+        return true;
     }
 
     private void createIfNotExisting(String collectionName){

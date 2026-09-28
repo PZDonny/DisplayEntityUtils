@@ -55,15 +55,33 @@ public final class ConfigUtils {
         if (config.getBoolean("mongodb.enabled")){
             DisplayConfig.isMongoEnabled = true;
             String cString = config.getString("mongodb.connectionString");
+            String host = config.getString("mongodb.host");
+            int port = config.getInt("mongodb.port");
             String databaseName = config.getString("mongodb.database");
+            String username = config.getString("mongodb.username");
+            String password = config.getString("mongodb.password");
             String groupCollection = config.getString("mongodb.groupCollection");
             String animationCollection = config.getString("mongodb.animationCollection");
-            ((MongoDisplayStorage) DisplayAPI.getStorage(LoadMethod.MONGODB)).createConnection(
-                    cString,
-                    databaseName,
-                    groupCollection,
-                    animationCollection
-            );
+            if (cString == null || cString.isBlank()){
+                ((MongoDisplayStorage) DisplayAPI.getStorage(LoadMethod.MONGODB)).createConnection(
+                        host,
+                        port,
+                        databaseName,
+                        username,
+                        password,
+                        groupCollection,
+                        animationCollection
+                );
+            }
+            else{
+                ((MongoDisplayStorage) DisplayAPI.getStorage(LoadMethod.MONGODB)).createConnection(
+                        cString,
+                        databaseName,
+                        groupCollection,
+                        animationCollection
+                );
+            }
+
         }
 
         if (config.getBoolean("mysql.enabled")){
