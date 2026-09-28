@@ -1,6 +1,6 @@
 package net.donnypz.displayentityutils;
 
-import net.donnypz.displayentityutils.managers.DisplayStorage;
+import net.donnypz.displayentityutils.database.DisplayStorage;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationPlayer;
 import net.donnypz.displayentityutils.utils.bdengine.convert.common.BDEConversionHandler;
@@ -11,6 +11,9 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public final class DisplayAPI {
 
@@ -29,9 +32,7 @@ public final class DisplayAPI {
 
     private static final String legacyPartTagPrefix = "deu.parttag_";
 
-    static DisplayStorage LOCAL_STORAGE;
-    static DisplayStorage MYSQL_STORAGE;
-    static DisplayStorage MONGODB_STORAGE;
+    static Map<LoadMethod, DisplayStorage> storages = new HashMap<>();
     static AnimationPlayer.AnimationPlayerProvider ANIMATION_PLAYER_SERVICE;
     static BDEConversionHandler BDE_CONVERSION_HANDLER;
     static Scheduler SCHEDULER;
@@ -113,20 +114,7 @@ public final class DisplayAPI {
     }
 
     public static DisplayStorage getStorage(@NotNull LoadMethod method){
-        switch(method){
-            case LOCAL -> {
-                return LOCAL_STORAGE;
-            }
-            case MYSQL -> {
-                return MYSQL_STORAGE;
-            }
-            case MONGODB -> {
-                return MONGODB_STORAGE;
-            }
-            default -> {
-                return null;
-            }
-        }
+        return storages.get(method);
     }
 
     public static Scheduler getScheduler(){

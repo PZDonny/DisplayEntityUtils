@@ -41,9 +41,16 @@ jobs:
           gh release create "$TAG" \
             "plugin/target/displayentityutils-$TAG.jar" \
             --verify-tag \
-            --title "DEU $TAG" \
+            --title "$TAG" \
             --notes-file "docs/release-notes/$TAG.md" \
             --generate-notes
+
+      - name: Trigger Build on Jitpack
+        background: true
+        continue-on-error: true
+        run: |
+          curl -L --fail --retry 3 --retry-delay 7 \
+            "https://jitpack.io/com/github/PZDonny/DisplayEntityUtils/${TAG}/build.log"
 
       - name: Get Release body
         id: release_notes
@@ -61,7 +68,7 @@ jobs:
         with:
           token: ${{ secrets.MODRINTH_TOKEN }}
           project: ${{ vars.MODRINTH_ID }}
-          name: DEU ${{ env.TAG }}
+          name: ${{ env.TAG }}
           version: ${{ env.TAG }}
           changelog: ${{ steps.release_notes.outputs.body }}
           loaders: |-

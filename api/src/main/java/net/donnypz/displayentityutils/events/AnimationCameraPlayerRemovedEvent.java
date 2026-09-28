@@ -1,7 +1,6 @@
 package net.donnypz.displayentityutils.events;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.ActiveGroup;
-import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimator;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayAnimation;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -12,8 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 /**
- * Called when a {@link DisplayAnimator} starts playing a {@link SpawnedDisplayAnimation}.
- * This is called once on an animator of the type {@link DisplayAnimator.AnimationType#LOOP}.
+ * Called when a player is removed from their animation camera view.
  */
 public class AnimationCameraPlayerRemovedEvent extends Event{
     private static final HandlerList handlers = new HandlerList();

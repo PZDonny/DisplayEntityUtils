@@ -1,8 +1,9 @@
 package net.donnypz.displayentityutils;
 
+import net.donnypz.displayentityutils.database.MYSQLDisplayStorage;
+import net.donnypz.displayentityutils.database.MongoDisplayStorage;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
-import net.donnypz.displayentityutils.managers.MYSQLManager;
-import net.donnypz.displayentityutils.managers.MongoManager;
+import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.managers.PluginFolders;
 import net.donnypz.displayentityutils.utils.controller.DisplayController;
 import net.kyori.adventure.text.Component;
@@ -54,25 +55,61 @@ public final class ConfigUtils {
         if (config.getBoolean("mongodb.enabled")){
             DisplayConfig.isMongoEnabled = true;
             String cString = config.getString("mongodb.connectionString");
+            String host = config.getString("mongodb.host");
+            int port = config.getInt("mongodb.port");
             String databaseName = config.getString("mongodb.database");
+            String username = config.getString("mongodb.username");
+            String password = config.getString("mongodb.password");
             String groupCollection = config.getString("mongodb.groupCollection");
             String animationCollection = config.getString("mongodb.animationCollection");
-            MongoManager.createConnection(cString, databaseName, groupCollection, animationCollection);
+            if (cString == null || cString.isBlank()){
+                ((MongoDisplayStorage) DisplayAPI.getStorage(LoadMethod.MONGODB)).createConnection(
+                        host,
+                        port,
+                        databaseName,
+                        username,
+                        password,
+                        groupCollection,
+                        animationCollection
+                );
+            }
+            else{
+                ((MongoDisplayStorage) DisplayAPI.getStorage(LoadMethod.MONGODB)).createConnection(
+                        cString,
+                        databaseName,
+                        groupCollection,
+                        animationCollection
+                );
+            }
+
         }
 
         if (config.getBoolean("mysql.enabled")){
             DisplayConfig.isMYSQLEnabled = true;
             String username = config.getString("mysql.username");
             String password = config.getString("mysql.password");
+
             if (!config.getString("mysql.connectionURL").isBlank()){
-                MYSQLManager.createConnection(config.getString("mysql.connectionURL"), username, password);
+                String connectionUrl  = config.getString("mysql.connectionURL");
+                ((MYSQLDisplayStorage) DisplayAPI.getStorage(LoadMethod.MYSQL)).createConnection(
+                        connectionUrl,
+                        username,
+                        password
+                );
             }
             else{
                 String database = config.getString("mysql.database");
                 String host = config.getString("mysql.host");
                 int port = config.getInt("mysql.port");
                 boolean useSSL = config.getBoolean("mysql.useSSL");
-                MYSQLManager.createConnection(host, port, database, username, password, useSSL);
+                ((MYSQLDisplayStorage) DisplayAPI.getStorage(LoadMethod.MYSQL)).createConnection(
+                        host,
+                        port,
+                        database,
+                        username,
+                        password,
+                        useSSL
+                );
             }
         }
 

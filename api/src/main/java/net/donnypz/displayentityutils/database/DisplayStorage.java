@@ -1,4 +1,4 @@
-package net.donnypz.displayentityutils.managers;
+package net.donnypz.displayentityutils.database;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
@@ -25,6 +25,4 @@ public interface DisplayStorage {
     @NotNull List<String> getGroupTags();
 
     @NotNull List<String> getAnimationTags();
-
-
 }

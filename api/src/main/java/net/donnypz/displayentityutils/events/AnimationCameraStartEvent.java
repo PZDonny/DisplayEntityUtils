@@ -16,8 +16,7 @@ import java.util.HashSet;
 import java.util.UUID;
 
 /**
- * Called when a {@link DisplayAnimator} starts playing a {@link SpawnedDisplayAnimation}.
- * This is called once on an animator of the type {@link DisplayAnimator.AnimationType#LOOP}.
+ * Called when an animation camera begins its camera path
  */
 public class AnimationCameraStartEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
@@ -29,7 +28,12 @@ public class AnimationCameraStartEvent extends Event implements Cancellable {
     int startFrameId;
     private boolean isCancelled = false;
 
-    public AnimationCameraStartEvent(ActiveGroup<?> group, DisplayAnimator animator, SpawnedDisplayAnimation animation, Collection<Player> players, int startFrameId, UUID cameraUUID){
+    public AnimationCameraStartEvent(ActiveGroup<?> group,
+                                     DisplayAnimator animator,
+                                     SpawnedDisplayAnimation animation,
+                                     Collection<Player> players,
+                                     int startFrameId,
+                                     UUID cameraUUID){
         super(!Bukkit.isPrimaryThread());
         this.group = group;
         this.animation = animation;

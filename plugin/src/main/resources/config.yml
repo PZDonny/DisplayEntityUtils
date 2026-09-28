@@ -8,20 +8,25 @@ localStorageEnabled: true
 #The database and collections will automatically be created if it does not exist already
 mongodb:
   enabled: false
-  connectionString: ""
+  host: "localhost"
+  port: 27017
   database: "DisplayEntityUtils"
+  username: "user"
+  password: "password"
   groupCollection: "saved_displays"
   animationCollection: "saved_animations"
+  #Using a connection string will override settings above
+  connectionString: ""
 
 mysql:
   enabled: false
   host: "localhost"
   port: 3306
-  database: "mydb"
-  username: "root"
+  database: "displayentityutils"
+  username: "user"
   password: "password"
   useSSL: false
-#Using connection url will override settings above
+#Using a connection url will override settings above
   connectionURL: ""
 
 #Determine whether plugin commands should be registered and usable
@@ -97,7 +102,7 @@ autoCulling:
   heightCullingAdder: 1.0
 
 #Optionally cache animations after retrieving them from a storage location.
-#This option prevents constant server freezes/lag when retrieving animations at the cost of using more memory
+#This option can prevent server freezes/lag when retrieving animations at the cost of using more memory
 cacheAnimations:
   enabled: true
 
