@@ -428,9 +428,22 @@ public final class DisplayGroupManager {
      * @return boolean whether the save was successful
      */
     public static boolean saveDisplayEntityGroup(@NotNull LoadMethod loadMethod, @NotNull DisplayEntityGroup displayEntityGroup, @Nullable Player saver) {
-        if (displayEntityGroup.getTag() == null || !loadMethod.isEnabled()) {
+        if (!loadMethod.isEnabled()){
+            if (saver != null) {
+                saver.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to save display entity group", NamedTextColor.RED)));
+                saver.sendMessage(Component.text("| Storage location is not enabled.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+            }
             return false;
         }
+
+        if (displayEntityGroup.getTag() == null) {
+            if (saver != null) {
+                saver.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to save display entity group", NamedTextColor.RED)));
+                saver.sendMessage(Component.text("| The group does not have a tag.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+            }
+            return false;
+        }
+
         return DisplayAPI.getStorage(loadMethod).saveDisplayEntityGroup(displayEntityGroup, saver);
     }
 

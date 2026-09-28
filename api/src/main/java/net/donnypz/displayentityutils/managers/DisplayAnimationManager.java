@@ -81,9 +81,22 @@ public final class DisplayAnimationManager {
      * @return boolean whether the save was successful
      */
     public static boolean saveDisplayAnimation(@NotNull LoadMethod loadMethod, @NotNull DisplayAnimation displayAnimation, @Nullable Player saver){
-        if (displayAnimation.getAnimationTag() == null || !loadMethod.isEnabled()){
+        if (!loadMethod.isEnabled()){
+            if (saver != null) {
+                saver.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to save animation", NamedTextColor.RED)));
+                saver.sendMessage(Component.text("| Storage location is not enabled.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+            }
             return false;
         }
+
+        if (displayAnimation.getAnimationTag() == null) {
+            if (saver != null) {
+                saver.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Failed to save animation", NamedTextColor.RED)));
+                saver.sendMessage(Component.text("| The animation does not have a tag.", NamedTextColor.GRAY, TextDecoration.ITALIC));
+            }
+            return false;
+        }
+
         boolean success = DisplayAPI.getStorage(loadMethod).saveDisplayAnimation(displayAnimation, saver);
         if (success){
            attemptCacheAnimation(displayAnimation.getAnimationTag(), displayAnimation.toSpawnedDisplayAnimation());
@@ -104,7 +117,7 @@ public final class DisplayAnimationManager {
                 if (!DisplayConfig.overwritexistingSaves()){
                     if (saver != null){
                         saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save animation <light_purple>JSON <red>locally!"));
-                        saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
+                        saver.sendMessage(Component.text("| Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
                     }
                     return false;
                 }
