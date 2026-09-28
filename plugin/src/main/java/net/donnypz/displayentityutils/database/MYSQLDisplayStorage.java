@@ -233,7 +233,6 @@ public final class MYSQLDisplayStorage implements DBDisplayStorage {
                 saver.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Failed to save "+displayName+" to MYSQL!"));
                 saver.sendMessage(Component.text("Save with tag already exists!", NamedTextColor.GRAY, TextDecoration.ITALIC));
             }
-            e.printStackTrace();
             return false;
         }
         catch(SQLException | IOException e){
