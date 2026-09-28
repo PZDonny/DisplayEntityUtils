@@ -11,7 +11,7 @@ mongodb:
   host: "localhost"
   port: 27017
   database: "DisplayEntityUtils"
-  username: "root"
+  username: "user"
   password: "password"
   groupCollection: "saved_displays"
   animationCollection: "saved_animations"
@@ -22,8 +22,8 @@ mysql:
   enabled: false
   host: "localhost"
   port: 3306
-  database: "mydb"
-  username: "root"
+  database: "displayentityutils"
+  username: "user"
   password: "password"
   useSSL: false
 #Using a connection url will override settings above
@@ -102,7 +102,7 @@ autoCulling:
   heightCullingAdder: 1.0
 
 #Optionally cache animations after retrieving them from a storage location.
-#This option prevents constant server freezes/lag when retrieving animations at the cost of using more memory
+#This option can prevent server freezes/lag when retrieving animations at the cost of using more memory
 cacheAnimations:
   enabled: true
 
