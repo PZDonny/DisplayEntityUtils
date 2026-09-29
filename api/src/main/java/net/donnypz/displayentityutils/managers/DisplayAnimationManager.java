@@ -324,17 +324,6 @@ public final class DisplayAnimationManager {
         }
     }
 
-
-    /**
-     * Get the animation tags of all saved {@link DisplayAnimation}s in a storage location.
-     * @param loadMethod of the search location
-     * @return a list of all animations by their group tag
-     */
-    public static @NotNull List<String> getSavedDisplayAnimations(@NotNull LoadMethod loadMethod){
-        if (!loadMethod.isEnabled()) return Collections.emptyList();
-        return DisplayAPI.getStorage(loadMethod).getAnimationTags();
-    }
-
     /**
      * Get a {@link DisplayAnimation} from a JSON string
      * @param json JSON of a saved {@link DisplayAnimation}
