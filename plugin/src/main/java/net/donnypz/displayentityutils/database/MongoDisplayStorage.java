@@ -10,6 +10,7 @@ import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.kyori.adventure.text.Component;
@@ -157,6 +158,11 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
             e.printStackTrace();
             Bukkit.getConsoleSender().sendMessage(Component.text("There was an error closing the connection to the MongoDB Database", NamedTextColor.RED));
         }
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return LoadMethod.MONGODB.isEnabled();
     }
 
     @Override

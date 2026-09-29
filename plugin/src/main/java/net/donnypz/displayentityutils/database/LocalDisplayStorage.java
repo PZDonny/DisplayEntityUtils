@@ -3,6 +3,7 @@ package net.donnypz.displayentityutils.database;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.managers.PluginFolders;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
@@ -21,6 +22,12 @@ import java.util.zip.GZIPOutputStream;
 
 public final class LocalDisplayStorage implements DisplayStorage {
 
+    @Override
+    public boolean isEnabled() {
+        return LoadMethod.LOCAL.isEnabled();
+    }
+
+    @Override
     public boolean saveDisplayEntityGroup(@NotNull DisplayEntityGroup displayEntityGroup, @Nullable Player saver){
         try{
             ByteArrayOutputStream byteOut = new ByteArrayOutputStream();

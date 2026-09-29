@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface DisplayStorage {
 
+    boolean isEnabled();
+
     boolean saveDisplayEntityGroup(@NotNull DisplayEntityGroup group, @Nullable Player saver);
 
     void deleteDisplayEntityGroup(@NotNull String group, @Nullable Player deleter);
