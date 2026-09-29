@@ -1,8 +1,11 @@
 package net.donnypz.displayentityutils.managers;
 
+import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
+import net.donnypz.displayentityutils.database.DisplayStorage;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Storage locations for saving, deleting, and retrieving a saved {@link DisplayEntityGroup} or {@link DisplayAnimation}
@@ -42,6 +45,10 @@ public enum LoadMethod{
                 return false;
             }
         }
+    }
+
+    public @NotNull DisplayStorage getDisplayStorage(){
+        return DisplayAPI.getStorage(this);
     }
 
     public String getDisplayName() {
