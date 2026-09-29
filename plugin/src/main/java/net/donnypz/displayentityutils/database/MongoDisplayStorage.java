@@ -6,6 +6,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.Sorts;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
@@ -55,12 +56,11 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
             String animationCollection
     ){
         String connectionString = String.format(
-                "mongodb://%s:%s@%s:%d/%s",
+                "mongodb://%s:%s@%s:%d",
                 username,
                 password,
                 host,
-                port,
-                databaseName
+                port
         );
 
         this.createConnection(
