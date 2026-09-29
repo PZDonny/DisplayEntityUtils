@@ -16,6 +16,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
@@ -40,7 +43,7 @@ public final class LocalDisplayStorage implements DisplayStorage {
 
             byte[] data = byteOut.toByteArray();
 
-            File saveFile = new File(PluginFolders.groupSaveFolder, "/"+displayEntityGroup.getTag()+DisplayEntityGroup.fileExtension);
+            File saveFile = new File(PluginFolders.groupSaveFolder, "/"+displayEntityGroup.getTag()+DisplayEntityGroup.FILE_EXTENSION);
             if (saveFile.exists()){
                 if (!DisplayConfig.overwritexistingSaves()){
                     if (saver != null){
@@ -69,8 +72,9 @@ public final class LocalDisplayStorage implements DisplayStorage {
         }
     }
 
+    @Override
     public void deleteDisplayEntityGroup(@NotNull String tag, @Nullable Player deleter){
-        File saveFile = new File(PluginFolders.groupSaveFolder, "/"+tag+DisplayEntityGroup.fileExtension);
+        File saveFile = new File(PluginFolders.groupSaveFolder, "/"+tag+DisplayEntityGroup.FILE_EXTENSION);
         if (saveFile.exists()){
             saveFile.delete();
             if (deleter != null){
@@ -83,14 +87,16 @@ public final class LocalDisplayStorage implements DisplayStorage {
         }
     }
 
+    @Override
     public @Nullable DisplayEntityGroup getDisplayEntityGroup(@NotNull String tag){
-        File saveFile = new File(PluginFolders.groupSaveFolder, "/"+tag+DisplayEntityGroup.fileExtension);
+        File saveFile = new File(PluginFolders.groupSaveFolder, "/"+tag+DisplayEntityGroup.FILE_EXTENSION);
         if (!saveFile.exists()){
             return null;
         }
         return DisplayGroupManager.getGroup(saveFile);
     }
 
+    @Override
     public boolean saveDisplayAnimation(@NotNull DisplayAnimation displayAnimation, @Nullable Player saver){
         try{
             ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -103,7 +109,7 @@ public final class LocalDisplayStorage implements DisplayStorage {
             byte[] data = byteOut.toByteArray();
             byteOut.close();
 
-            File saveFile = new File(PluginFolders.animSaveFolder, "/"+displayAnimation.getAnimationTag()+DisplayAnimation.fileExtension);
+            File saveFile = new File(PluginFolders.animSaveFolder, "/"+displayAnimation.getAnimationTag()+DisplayAnimation.FILE_EXTENSION);
             if (saveFile.exists()){
                 if (DisplayConfig.overwritexistingSaves()){
                     saveFile.delete();
@@ -138,8 +144,9 @@ public final class LocalDisplayStorage implements DisplayStorage {
 
 
 
+    @Override
     public void deleteDisplayAnimation(@NotNull String tag, @Nullable Player deleter){
-        File saveFile = new File(PluginFolders.animSaveFolder, "/"+tag+DisplayAnimation.fileExtension);
+        File saveFile = new File(PluginFolders.animSaveFolder, "/"+tag+DisplayAnimation.FILE_EXTENSION);
         if (saveFile.exists()){
             saveFile.delete();
             if (deleter != null){
@@ -152,41 +159,78 @@ public final class LocalDisplayStorage implements DisplayStorage {
         }
     }
 
+    @Override
     public @Nullable DisplayAnimation getDisplayAnimation(@NotNull String tag){
-        File saveFile = new File(PluginFolders.animSaveFolder, "/"+tag+DisplayAnimation.fileExtension);
+        File saveFile = new File(PluginFolders.animSaveFolder, "/"+tag+DisplayAnimation.FILE_EXTENSION);
         if (!saveFile.exists()){
             return null;
         }
         return DisplayAnimationManager.getAnimation(saveFile);
     }
 
+    @Override
     public @NotNull List<String> getGroupTags(){
-        List<String> tags = new ArrayList<>();
-        File groupFolder = new File(PluginFolders.groupSaveFolder, "/");
-        if (!groupFolder.exists() || groupFolder.listFiles() == null){
-            return tags;
-        }
-        for (File file : groupFolder.listFiles()){
-            if (file.getName().contains(DisplayEntityGroup.fileExtension)){
-                tags.add(file.getName().replace(DisplayEntityGroup.fileExtension, ""));
-            }
+        return getTags(PluginFolders.groupSaveFolder, DisplayEntityGroup.FILE_EXTENSION);
+    }
 
+    @Override
+    public @NotNull List<String> getGroupTags(int page, int size) {
+        return getTags(PluginFolders.groupSaveFolder, DisplayEntityGroup.FILE_EXTENSION, page, size);
+    }
+
+    @Override
+    public @NotNull List<String> getAnimationTags(){
+        return getTags(PluginFolders.animSaveFolder, DisplayAnimation.FILE_EXTENSION);
+    }
+
+    @Override
+    public @NotNull List<String> getAnimationTags(int page, int size) {
+        return getTags(PluginFolders.animSaveFolder, DisplayAnimation.FILE_EXTENSION, page, size);
+    }
+
+    private List<String> getTags(File saveFolder, String fileExtension){
+        List<String> tags = new ArrayList<>();
+        File animFolder = new File(saveFolder, "/");
+        if (!animFolder.exists()) return tags;
+
+        File[] files = animFolder.listFiles();
+        if (files == null) return tags;
+
+        for (File file : files){
+            String fileName = file.getName();
+            if (fileName.endsWith(fileExtension)){
+                tags.add(fileName.replace(fileExtension, ""));
+            }
         }
         return tags;
     }
 
-    public @NotNull List<String> getAnimationTags(){
+    private List<String> getTags(File saveFolder, String fileExtension, int page, int size){
         List<String> tags = new ArrayList<>();
-        File animFolder = new File(PluginFolders.animSaveFolder, "/");
-        if (!animFolder.exists() || animFolder.listFiles() == null){
+
+        int offset = CommonDisplayStorageUtils.getPageOffset(page, size);
+        int skipped = 0;
+        int count = 0;
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(saveFolder.toPath())) {
+            for (Path path : stream) {
+                if (!Files.isRegularFile(path)) continue;
+
+                String fileName = path.getFileName().toString();
+                if (!fileName.endsWith(fileExtension)) continue;
+
+                if (skipped++ < offset) continue;
+
+                String tag = fileName.substring(0, fileName.length() - fileExtension.length());
+                tags.add(tag);
+
+                if (++count >= size) {
+                    break;
+                }
+            }
+        } catch (IOException e) {
             return tags;
         }
-        for (File file : animFolder.listFiles()){
-            if (file.getName().contains(DisplayAnimation.fileExtension)){
-                tags.add(file.getName().replace(DisplayAnimation.fileExtension, ""));
-            }
-
-        }
-        return tags;
+            return tags;
     }
 }

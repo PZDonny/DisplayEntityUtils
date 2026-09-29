@@ -33,4 +33,8 @@ class CommonDisplayStorageUtils {
         byteOut.close();
         return data;
     }
+
+    static int getPageOffset(int page, int size){
+        return (page - 1) * size;
+    }
 }

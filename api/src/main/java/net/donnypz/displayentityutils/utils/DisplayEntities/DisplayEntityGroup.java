@@ -26,7 +26,7 @@ public final class DisplayEntityGroup implements Serializable{
 
     @Serial
     private static final long serialVersionUID = 99L;
-    public static final String fileExtension = ".deg";
+    public static final String FILE_EXTENSION = ".deg";
 
     DisplayEntityGroup(SpawnedDisplayEntityGroup spawnedGroup){
         this.tag = spawnedGroup.getTag();

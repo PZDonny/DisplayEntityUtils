@@ -198,8 +198,64 @@ public final class MYSQLDisplayStorage implements DBDisplayStorage {
     }
 
     @Override
+    public @NotNull List<String> getGroupTags(int page, int size) {
+        return getTags(GROUP_TABLE, page, size);
+    }
+
+    @Override
     public @NotNull List<String> getAnimationTags(){
         return getTags(ANIMATION_TABLE);
+    }
+
+    @Override
+    public @NotNull List<String> getAnimationTags(int page, int size) {
+        return getTags(ANIMATION_TABLE, page, size);
+    }
+
+    private List<String> getTags(String tableName){ //internally set table name
+        if (!isConnected()) return Collections.emptyList();
+        List<String> tags = new ArrayList<>();
+        String retrieve = "SELECT "+TAG_COLUMN+" FROM "+tableName+";";
+
+        try(Connection connection = getConnection();
+            Statement statement = connection.createStatement();
+            ResultSet results = statement.executeQuery(retrieve)){
+
+            while(results.next()){
+                tags.add(results.getString(TAG_COLUMN));
+            }
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        return tags;
+    }
+
+    private List<String> getTags(String tableName, int page, int size){ //internally set table name
+        if (!isConnected()) return new ArrayList<>();
+        List<String> tags = new ArrayList<>();
+
+        int offset = CommonDisplayStorageUtils.getPageOffset(page, size);
+        String retrieve =
+                """
+                    SELECT %s FROM %s
+                    ORDER BY %s
+                    LIMIT %d
+                    OFFSET %d
+                """.formatted(TAG_COLUMN, tableName, TAG_COLUMN, size, offset);
+
+        try(Connection connection = getConnection();
+            Statement statement = connection.createStatement();
+            ResultSet results = statement.executeQuery(retrieve)){
+
+            while(results.next()){
+                tags.add(results.getString(TAG_COLUMN));
+            }
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        return tags;
     }
 
     private boolean saveEntity(String tag, Object entity, String tableName, String displayName, Player saver){
@@ -318,22 +374,5 @@ public final class MYSQLDisplayStorage implements DBDisplayStorage {
         }
     }
 
-    private List<String> getTags(String tableName){ //internally set table name
-        if (!isConnected()) return Collections.emptyList();
-        List<String> tags = new ArrayList<>();
-        String retrieve = "SELECT "+TAG_COLUMN+" FROM "+tableName+";";
 
-        try(Connection connection = getConnection();
-            Statement statement = connection.createStatement();
-            ResultSet results = statement.executeQuery(retrieve)){
-
-            while(results.next()){
-                tags.add(results.getString(TAG_COLUMN));
-            }
-        }
-        catch(SQLException e){
-            e.printStackTrace();
-        }
-        return tags;
-    }
 }

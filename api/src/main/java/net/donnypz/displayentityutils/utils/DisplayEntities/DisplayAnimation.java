@@ -20,7 +20,7 @@ public final class DisplayAnimation implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 99L;
-    public static final String fileExtension = ".deanim";
+    public static final String FILE_EXTENSION = ".deanim";
 
 
     DisplayAnimation(){

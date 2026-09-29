@@ -26,5 +26,9 @@ public interface DisplayStorage {
 
     @NotNull List<String> getGroupTags();
 
+    @NotNull List<String> getGroupTags(int page, int size);
+
     @NotNull List<String> getAnimationTags();
+
+    @NotNull List<String> getAnimationTags(int page, int size);
 }
