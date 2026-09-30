@@ -357,6 +357,7 @@ public class GizmoSessionImpl implements GizmoSession {
             ActivePartSelection<?> sel = DEUUser.getOrCreateUser(player).getSelectedPartSelection();
             if (sel == null) return null;
 
+            player.setVelocity(new Vector());
             activeDrag = hoveredSelector.getDrag(player, this);
         }
         return activeDrag;
