@@ -139,7 +139,8 @@ public enum Permission {
     BDENGINE_SPAWN_MODEL("deu.bdengine.spawnmodel"),
     BDENGINE_IMPORT("deu.bdengine.import");
 
-    static{
+
+    public static void registerPermissions(){
         for (Permission permission : Permission.values()){
             registerPermission(permission);
         }
