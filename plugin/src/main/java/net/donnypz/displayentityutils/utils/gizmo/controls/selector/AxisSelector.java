@@ -1,11 +1,12 @@
 package net.donnypz.displayentityutils.utils.gizmo.controls.selector;
 
+import net.donnypz.displayentityutils.utils.gizmo.controls.ControlType;
 import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 
 public abstract class AxisSelector extends Selector{
 
-    AxisSelector(GizmoAxis axis) {
-        super(axis);
+    AxisSelector(GizmoAxis axis, ControlType controlType) {
+        super(axis, controlType);
     }
 
     public static TranslationAxisSelector x() {

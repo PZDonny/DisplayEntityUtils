@@ -6,11 +6,13 @@ import org.bukkit.Color;
 public abstract class Control {
 
     protected final GizmoAxis axis;
+    private final ControlType controlType;
     public static final float MAX_DISTANCE = 15.0f;
     public static final float MAX_DISTANCE_SQUARED = MAX_DISTANCE*MAX_DISTANCE;
 
-    protected Control(GizmoAxis axis){
+    protected Control(GizmoAxis axis, ControlType controlType) {
         this.axis = axis;
+        this.controlType = controlType;;
     }
 
     public void glow(ActiveGroup<?> gizmo) {
@@ -31,6 +33,10 @@ public abstract class Control {
 
     public GizmoAxis getAxis() {
         return axis;
+    }
+
+    public ControlType getControlType() {
+        return controlType;
     }
 
     public abstract String getTag();

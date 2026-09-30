@@ -7,6 +7,7 @@ import net.donnypz.displayentityutils.utils.gizmo.GizmoSelectionMode;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
 import net.donnypz.displayentityutils.utils.gizmo.TranslationMode;
+import net.donnypz.displayentityutils.utils.gizmo.controls.ControlType;
 import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoTitleUtil;
 import net.kyori.adventure.text.Component;
@@ -34,7 +35,7 @@ public abstract class TranslationDrag extends Drag {
     protected final Vector3f[] currentAxesDir;
 
     public TranslationDrag(Player player, GizmoSessionImpl gizmo, GizmoAxis axis) {
-        super(axis);
+        super(axis, ControlType.TRANSLATION);
         this.gizmo = gizmo;
         this.originalAxes = axis.getDirections();
         this.currentAxesDir = IntStream.range(0, 2)

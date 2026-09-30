@@ -5,6 +5,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSelectionMode;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
+import net.donnypz.displayentityutils.utils.gizmo.controls.ControlType;
 import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoMathUtil;
 import org.bukkit.Location;
@@ -31,7 +32,7 @@ public class RotationDrag extends Drag {
     private final Vector3f lastDirection = new Vector3f();
 
     public RotationDrag(Player player, GizmoSessionImpl gizmo, GizmoAxis axis) {
-        super(axis);
+        super(axis, ControlType.ROTATION);
         this.gizmo = gizmo;
         this.originalAxis = axis.getDirections()[0];
         this.pivotPoint = gizmo.getGizmoModel().getLocation().toVector().toVector3f();

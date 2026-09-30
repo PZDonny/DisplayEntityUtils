@@ -6,6 +6,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.concurrent.GroupTele
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSelectionMode;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
+import net.donnypz.displayentityutils.utils.gizmo.controls.ControlType;
 import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoTitleUtil;
 import net.kyori.adventure.text.Component;
@@ -31,7 +32,7 @@ public class ScaleDrag extends Drag {
     private final Vector3f lastHitPoint;
 
     public ScaleDrag(Player player, GizmoSessionImpl gizmo, GizmoAxis axis) {
-        super(axis);
+        super(axis, ControlType.SCALE);
 
         this.gizmo = gizmo;
         this.originalAxis = axis.getDirections()[0];

@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.gizmo.controls.selector;
 
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
+import net.donnypz.displayentityutils.utils.gizmo.controls.ControlType;
 import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Control;
@@ -10,8 +11,8 @@ import org.bukkit.entity.Player;
 
 public abstract class Selector extends Control {
 
-    public Selector(GizmoAxis axis) {
-        super(axis);
+    public Selector(GizmoAxis axis, ControlType controlType) {
+        super(axis, controlType);
     }
 
     public abstract float intersect(GizmoSpace gizmoSpace, Player player, Location gizmoLocation);
