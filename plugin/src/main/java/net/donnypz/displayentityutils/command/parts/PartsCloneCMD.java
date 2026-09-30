@@ -63,12 +63,14 @@ public class PartsCloneCMD extends PartsSubCommand {
         if (!oArgs.isValidOptions()) return false;
 
         String tag = oArgs.getOption(ADD_TAG);
-        if (!DisplayUtils.isValidTag(tag) || tag.isBlank()) {
-            DisplayEntityPluginCommand.invalidTag(player, tag);
-            return false;
-        }
-        else{
-            clonedPart.addTag(tag);
+        if (!tag.isBlank()){
+            if (!DisplayUtils.isValidTag(tag)){
+                DisplayEntityPluginCommand.invalidTag(player, tag);
+                return false;
+            }
+            else{
+                clonedPart.addTag(tag);
+            }
         }
 
         player.sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Part cloned!", NamedTextColor.GREEN)));
