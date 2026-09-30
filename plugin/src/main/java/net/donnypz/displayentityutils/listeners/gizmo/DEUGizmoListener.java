@@ -180,6 +180,8 @@ public class DEUGizmoListener implements Listener {
     private void switchSelectionMode(Player player){
         DEUUser user = DEUUser.getUser(player);
         if (user != null && user.getSelectedPartSelection() instanceof SinglePartSelection){
+            GizmoTitleUtil.showCannotChangeSelectionMode(player);
+            player.playSound(player, Sound.BLOCK_NOTE_BLOCK_COW_BELL, 1, 0.8f);
             return;
         }
         GizmoSessionImpl gizmo = (GizmoSessionImpl) getGizmoSession(player);
