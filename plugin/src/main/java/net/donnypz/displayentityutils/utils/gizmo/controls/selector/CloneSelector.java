@@ -3,16 +3,20 @@ package net.donnypz.displayentityutils.utils.gizmo.controls.selector;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
-import net.donnypz.displayentityutils.utils.gizmo.controls.drag.ScaleDrag;
 import org.bukkit.entity.Player;
 
-public class ScaleSelector extends CubeSelector{
-    public ScaleSelector(GizmoAxis axis) {
-        super(axis);
+public class CloneSelector extends CubeSelector {
+    public CloneSelector() {
+        super(GizmoAxis.CENTER);
+    }
+
+    @Override
+    public String getTag() {
+        return axis.getTag();
     }
 
     @Override
     public Drag getDrag(Player player, GizmoSessionImpl gizmo) {
-        return new ScaleDrag(player, gizmo, axis);
+        return null;
     }
 }
