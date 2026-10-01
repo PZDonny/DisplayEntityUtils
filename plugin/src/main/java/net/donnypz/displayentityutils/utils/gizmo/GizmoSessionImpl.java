@@ -115,10 +115,7 @@ public class GizmoSessionImpl implements GizmoSession {
         return gizmoModel;
     }
 
-    public void teleport(Location location) {
-        if (!valid) return;
-        gizmoModel.teleport(location, true);
-    }
+
 
     public void setPitch(float pitch) {
         gizmoModel.setPitch(pitch, false);
@@ -191,6 +188,12 @@ public class GizmoSessionImpl implements GizmoSession {
     public void teleport(Vector direction) {
         if (!valid) return;
         gizmoModel.teleport(direction, direction.length());
+    }
+
+    @Override
+    public void teleport(Location location) {
+        if (!valid) return;
+        gizmoModel.teleport(location, true);
     }
 
     @Override
