@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.gizmo.controls.selector;
 
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
+import net.donnypz.displayentityutils.utils.gizmo.controls.ControlType;
 import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.TranslationPlaneDrag;
@@ -17,7 +18,7 @@ public class TranslationPlaneSelector extends Selector {
     private float size = 0.25f;
 
     TranslationPlaneSelector(GizmoAxis axis) {
-        super(axis);
+        super(axis, ControlType.TRANSLATION);
         Vector3f[] axes = axis.getDirections();
         Vector3f axis1 = axes[0];
         Vector3f axis2 = axes[1];

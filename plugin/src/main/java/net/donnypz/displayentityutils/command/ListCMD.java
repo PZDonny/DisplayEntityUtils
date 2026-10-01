@@ -1,8 +1,7 @@
 package net.donnypz.displayentityutils.command;
 
 import net.donnypz.displayentityutils.DisplayAPI;
-import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
-import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.database.DisplayStorage;
 import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -19,6 +18,7 @@ public class ListCMD extends ConsoleUsableSubCommand {
     int minLength;
     private final int STORAGE_INDEX;
     private final int PAGE_NUMBER_INDEX;
+    private final int PAGE_SIZE = 6;
     boolean listsGroups;
 
     public ListCMD(Component incorrectUsageMessage, int minLength, boolean listsGroups) {
@@ -54,22 +54,6 @@ public class ListCMD extends ConsoleUsableSubCommand {
                 return;
             }
 
-            List<String> tags = listsGroups ?
-                    DisplayGroupManager.getSavedDisplayEntityGroups(loadMethod)
-                    :
-                    DisplayAnimationManager.getSavedDisplayAnimations(loadMethod);
-
-            sender.sendMessage(DisplayAPI.pluginPrefixLong);
-            sender.sendMessage(MiniMessage.miniMessage().deserialize("Storage Location: <yellow>" + loadMethod.getDisplayName()));
-            if (tags.isEmpty()) {
-                sender.sendMessage(Component.text("That storage location is empty!", NamedTextColor.RED));
-                return;
-            }
-
-            if (sender instanceof Player) {
-                sender.sendMessage(Component.text("Click to a listed item to " + (listsGroups ? "spawn" : "select") + " it", NamedTextColor.GRAY));
-            }
-
             int pageNumber = 1;
             if (args.length > minLength) {
                 try {
@@ -78,14 +62,29 @@ public class ListCMD extends ConsoleUsableSubCommand {
                 }
             }
 
-            int end = pageNumber * 6;
-            int start = end - 6;
+            DisplayStorage storage = DisplayAPI.getStorage(loadMethod);
 
-            for (int i = start; i < end; i++) {
-                if (i >= tags.size()) {
-                    break;
-                }
-                String tag = tags.get(i);
+            if (!storage.isEnabled()){
+                sender.sendMessage(DisplayAPI.pluginPrefix
+                        .append(Component.text("Storage location is not enabled!", NamedTextColor.RED)));
+                return;
+            }
+            List<String> tags = listsGroups
+                    ? storage.getGroupTags(pageNumber, PAGE_SIZE)
+                    : storage.getAnimationTags(pageNumber, PAGE_SIZE);
+
+            sender.sendMessage(DisplayAPI.pluginPrefixLong);
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("Storage Location: <yellow>" + loadMethod.getDisplayName()));
+            if (tags.isEmpty()) {
+                sender.sendMessage(Component.text("| Nothing to list on this page.", NamedTextColor.GRAY));
+                return;
+            }
+
+            if (sender instanceof Player) {
+                sender.sendMessage(Component.text("Click to a listed item to " + (listsGroups ? "spawn" : "select") + " it", NamedTextColor.GRAY));
+            }
+
+            for (String tag : tags) {
                 sender.sendMessage(getMessage(tag, loadMethod));
             }
             sender.sendMessage(Component.text("----------" + "Page " + pageNumber + "----------", NamedTextColor.GRAY));

@@ -738,19 +738,6 @@ public final class DisplayGroupManager {
                 .fromJson(jsonObject, DisplayEntityGroup.class);
     }
 
-
-
-    /**
-     * Get the group tags of all saved {@link DisplayEntityGroup}s in a storage location.
-     * @param loadMethod of the search location
-     * @return a list of all groups by their group tag
-     */
-    @ApiStatus.Internal
-    public static @NotNull List<String> getSavedDisplayEntityGroups(@NotNull LoadMethod loadMethod) {
-        if (!loadMethod.isEnabled()) return Collections.emptyList();
-        return DisplayAPI.getStorage(loadMethod).getGroupTags();
-    }
-
     @ApiStatus.Internal
     public static void addPersistentPacketGroup(@NotNull PacketDisplayEntityGroup group, @NotNull Location location){
         if (group.isPersistent()) return;

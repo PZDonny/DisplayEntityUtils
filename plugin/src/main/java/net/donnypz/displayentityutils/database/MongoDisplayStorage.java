@@ -6,10 +6,12 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.Sorts;
 import net.donnypz.displayentityutils.DisplayAPI;
 import net.donnypz.displayentityutils.DisplayConfig;
 import net.donnypz.displayentityutils.managers.DisplayAnimationManager;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
+import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.kyori.adventure.text.Component;
@@ -54,12 +56,11 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
             String animationCollection
     ){
         String connectionString = String.format(
-                "mongodb://%s:%s@%s:%d/%s",
+                "mongodb://%s:%s@%s:%d",
                 username,
                 password,
                 host,
-                port,
-                databaseName
+                port
         );
 
         this.createConnection(
@@ -160,6 +161,11 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
     }
 
     @Override
+    public boolean isEnabled() {
+        return LoadMethod.MONGODB.isEnabled();
+    }
+
+    @Override
     public boolean saveDisplayEntityGroup(@NotNull DisplayEntityGroup displayEntityGroup, @Nullable Player saver){
         String tag = displayEntityGroup.getTag();
         return saveEntity(
@@ -238,8 +244,50 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
     }
 
     @Override
+    public @NotNull List<String> getGroupTags(int page, int size) {
+        return getTags(GROUP_COLLECTION, page, size);
+    }
+
+    @Override
     public @NotNull List<String> getAnimationTags(){
         return getTags(ANIMATION_COLLECTION);
+    }
+
+    @Override
+    public @NotNull List<String> getAnimationTags(int page, int size) {
+        return getTags(ANIMATION_COLLECTION, page, size);
+    }
+
+    private List<String> getTags(MongoCollection<Document> collection){
+        if (!isConnected()) return new ArrayList<>();
+
+        return collection.find()
+                .projection(
+                        Projections.fields(
+                                Projections.include(TAG_FIELD),
+                                Projections.excludeId()
+                        )
+                )
+                .map(doc -> doc.getString(TAG_FIELD))
+                .into(new ArrayList<>());
+    }
+
+    private List<String> getTags(MongoCollection<Document> collection, int page, int size){
+        if (!isConnected()) return new ArrayList<>();
+        int offset = CommonDisplayStorageUtils.getPageOffset(page, size);
+
+        return collection.find()
+                .skip(offset)
+                .limit(size)
+                .sort(Sorts.ascending(TAG_FIELD))
+                .projection(
+                        Projections.fields(
+                                Projections.include(TAG_FIELD),
+                                Projections.excludeId()
+                        )
+                )
+                .map(doc -> doc.getString(TAG_FIELD))
+                .into(new ArrayList<>());
     }
 
 
@@ -310,20 +358,6 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
         if (deleter != null){
             deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved "+displayName+" does not exist in MongoDB database!"));
         }
-    }
-
-    private List<String> getTags(MongoCollection<Document> collection){
-        if (!isConnected()) return new ArrayList<>();
-
-        return collection.find()
-                .projection(
-                        Projections.fields(
-                                Projections.include(TAG_FIELD),
-                                Projections.excludeId()
-                        )
-                )
-                .map(doc -> doc.getString(TAG_FIELD))
-                .into(new ArrayList<>());
     }
 
     private Document getGroupDocument(String tag){

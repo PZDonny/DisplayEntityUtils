@@ -371,6 +371,7 @@ public final class DisplayUtils {
     /**
      * Get the {@link SpawnedDisplayEntityGroup} passengers, with a specific group tag, riding an entity
      * @param vehicleEntity the entity
+     * @param groupTag the group tag
      * @return a list
      */
     public static List<SpawnedDisplayEntityGroup> getGroupPassengers(@NotNull Entity vehicleEntity, @NotNull String groupTag){
@@ -839,7 +840,8 @@ public final class DisplayUtils {
 
     /**
      * Remove a part tag from an entity
-     * @param tag the tag to remove from this part
+     * @param entity the entity to remove the tag from
+     * @param tag the tag to remove
      */
     public static void removeTag(@NotNull Entity entity, @NotNull String tag){
         removeFromPDCList(entity, tag, DisplayKeys.Part.PART_TAGS);
@@ -847,6 +849,7 @@ public final class DisplayUtils {
 
     /**
      * Remove part tags from an entity
+     * @param entity the entity to remove the tag from
      * @param tags the tags to remove from this part
      */
     public static void removeTags(@NotNull Entity entity, @NotNull List<String> tags){
@@ -885,6 +888,7 @@ public final class DisplayUtils {
 
     /**
      * Gets the part tags belonging to an entity
+     * @param entity the entity
      * @return The part's part tags.
      */
     public static @NotNull List<String> getTags(@NotNull Entity entity){
@@ -902,6 +906,7 @@ public final class DisplayUtils {
 
     /**
      * Determine whether a part entity has a part tag
+     * @param entity the entity
      * @param tag the tag to check for
      * @return true if this part has the tag
      */

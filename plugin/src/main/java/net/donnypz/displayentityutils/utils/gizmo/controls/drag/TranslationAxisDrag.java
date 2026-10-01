@@ -25,7 +25,6 @@ public class TranslationAxisDrag extends TranslationDrag {
 
             rotation.transform(super.currentAxesDir[0]).normalize();
         }
-
     }
 
     @Override
@@ -55,10 +54,23 @@ public class TranslationAxisDrag extends TranslationDrag {
                 :
                 new Vector3f(super.lastHitPoint); //behind player camera
 
-        distance = Math.min(distance, MAX_LOOK_DISTANCE*gizmo.getScale());
+        distance = Math.min(distance, MAX_LOOK_DISTANCE * gizmo.getScale());
 
         return new Vector3f(playerEyePos)
                 .fma(distance, ray);
+    }
+
+    @Override
+    protected Vector3f getMovementAmounts(Player player, Vector3f delta) {
+        return new Vector3f(delta.dot(currentAxesDir[0]), 0, 0);
+    }
+
+    @Override
+    protected Vector3f[] getMovementVectors(Vector3f movementAmounts) {
+        float movementAmount = movementAmounts.x;
+        Vector3f movement = super.currentAxesDir[0].mul(movementAmount, new Vector3f());
+        Vector3f movementTranslate = super.originalAxes[0].mul(movementAmount, new Vector3f());
+        return new Vector3f[]{movement, movementTranslate};
     }
 
     //plane's normal, faces the player, but still perpendicular to axis.
@@ -68,15 +80,5 @@ public class TranslationAxisDrag extends TranslationDrag {
         return new Vector3f(playerLookDir)
                 .sub(new Vector3f(super.currentAxesDir[0]).mul(dotProduct))
                 .normalize();
-    }
-
-    @Override
-    public Vector3f[] getMovementVectors(Player player, Vector3f delta){
-        Vector3f currentAxis = super.currentAxesDir[0];
-        float movementAmount = delta.dot(currentAxis);
-
-        Vector3f movement = new Vector3f(currentAxis).mul(movementAmount);
-        Vector3f movementTranslate = new Vector3f(super.originalAxes[0]).mul(movementAmount);
-        return new Vector3f[]{movement, movementTranslate};
     }
 }

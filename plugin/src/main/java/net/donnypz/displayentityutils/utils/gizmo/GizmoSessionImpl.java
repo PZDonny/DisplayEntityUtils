@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.gizmo;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.command.group.GroupCMD;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
@@ -9,10 +10,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.controls.Control;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
-import net.donnypz.displayentityutils.utils.gizmo.controls.selector.RotationSelector;
-import net.donnypz.displayentityutils.utils.gizmo.controls.selector.ScaleSelector;
-import net.donnypz.displayentityutils.utils.gizmo.controls.selector.Selector;
-import net.donnypz.displayentityutils.utils.gizmo.controls.selector.AxisSelector;
+import net.donnypz.displayentityutils.utils.gizmo.controls.selector.*;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoTitleUtil;
 import net.donnypz.displayentityutils.utils.relativepoints.RelativePointUtils;
 import net.donnypz.displayentityutils.utils.version.folia.Scheduler;
@@ -21,6 +19,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +36,7 @@ public class GizmoSessionImpl implements GizmoSession {
     public static final int SCAN_FREQUENCY = 1;
 
     private final PacketDisplayEntityGroup gizmoModel;
+    private final Snap snap;
     private TranslationMode translationMode = TranslationMode.TELEPORT;
     private GizmoSpace gizmoSpace = GizmoSpace.LOCAL;
     private GizmoSelectionMode selectionMode = GizmoSelectionMode.GROUP;
@@ -63,6 +64,10 @@ public class GizmoSessionImpl implements GizmoSession {
     public GizmoSessionImpl(Player player, Location spawnLocation) {
         this.playerUUID = player.getUniqueId();
         this.deuUser = DEUUser.getOrCreateUser(player);
+        this.snap = new Snap(this);
+
+        //Clone Selector
+        this.selectors.add(new CloneSelector());
 
         //Translate Axis
         this.selectors.add(AxisSelector.x());
@@ -115,10 +120,7 @@ public class GizmoSessionImpl implements GizmoSession {
         return gizmoModel;
     }
 
-    public void teleport(Location location) {
-        if (!valid) return;
-        gizmoModel.teleport(location, true);
-    }
+
 
     public void setPitch(float pitch) {
         gizmoModel.setPitch(pitch, false);
@@ -134,6 +136,10 @@ public class GizmoSessionImpl implements GizmoSession {
 
     public void setLastInteractionItemDrop(boolean lastInteractionItemDrop){
         this.lastInteractionItemDrop = lastInteractionItemDrop;
+    }
+
+    public Snap getSnap() {
+        return snap;
     }
 
     @Override
@@ -191,6 +197,12 @@ public class GizmoSessionImpl implements GizmoSession {
     public void teleport(Vector direction) {
         if (!valid) return;
         gizmoModel.teleport(direction, direction.length());
+    }
+
+    @Override
+    public void teleport(Location location) {
+        if (!valid) return;
+        gizmoModel.teleport(location, true);
     }
 
     @Override
@@ -357,7 +369,32 @@ public class GizmoSessionImpl implements GizmoSession {
             ActivePartSelection<?> sel = DEUUser.getOrCreateUser(player).getSelectedPartSelection();
             if (sel == null) return null;
 
+            player.setVelocity(new Vector());
             activeDrag = hoveredSelector.getDrag(player, this);
+            if (activeDrag == null &&  hoveredSelector instanceof CloneSelector) {
+                boolean result;
+                if (sel instanceof MultiPartSelection<?> m){
+                    ActiveGroup<?> clonedGroup = m.getGroup().clone(m.getLocation());
+                    result = GroupCMD.selectGroupSilentSuccess(player, clonedGroup, false, true);
+                }
+                else{
+                    ActivePart clonedPart = sel.getSelectedPart().clone();
+                    SinglePartSelection newSelection = new SinglePartSelection((SpawnedDisplayEntityPart) clonedPart);
+
+                    DEUUser user = DEUUser.getUser(player);
+                    user.setSelectedPartSelection(newSelection, false);
+                    result = true;
+                }
+
+                if (result) {
+                    player.sendMessage(DisplayAPI.pluginPrefix
+                            .append(Component.text("Selection cloned!", NamedTextColor.GREEN)));
+                    player.playSound(player, Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, 1.25f);
+
+                    Location gizmoLoc = gizmoModel.getLocation();
+                    gizmoLoc.getWorld().spawnParticle(Particle.END_ROD, gizmoLoc, 10, 0.1,0.1,0.1,0.1f);
+                }
+            }
         }
         return activeDrag;
     }

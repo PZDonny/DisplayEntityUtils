@@ -5,6 +5,7 @@ import ch.njol.skript.util.Version;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
+import net.donnypz.displayentityutils.command.Permission;
 import net.donnypz.displayentityutils.database.*;
 import net.donnypz.displayentityutils.listeners.autogroup.DEULoadingListeners;
 import net.donnypz.displayentityutils.listeners.bdengine.BDEngineConversionListener;
@@ -91,6 +92,8 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         else{
             getComponentLogger().warn(Component.text("bStats disabled on server using dev version."));
         }
+
+        Permission.registerPermissions();
         getServer().getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
     }
 

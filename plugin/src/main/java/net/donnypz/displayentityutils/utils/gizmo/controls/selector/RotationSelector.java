@@ -2,6 +2,7 @@ package net.donnypz.displayentityutils.utils.gizmo.controls.selector;
 
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
+import net.donnypz.displayentityutils.utils.gizmo.controls.ControlType;
 import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
 import net.donnypz.displayentityutils.utils.gizmo.controls.drag.RotationDrag;
@@ -16,7 +17,7 @@ public class RotationSelector extends Selector {
     private float ringThickness = 0.075f;
 
     RotationSelector(GizmoAxis axis) {
-        super(axis);
+        super(axis, ControlType.ROTATION);
     }
 
     public static RotationSelector x() {

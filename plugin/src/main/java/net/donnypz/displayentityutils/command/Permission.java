@@ -1,5 +1,8 @@
 package net.donnypz.displayentityutils.command;
 
+import net.donnypz.displayentityutils.DisplayAPI;
+import org.bukkit.plugin.PluginManager;
+
 public enum Permission {
     HELP("deu.help"),
     RELOAD("deu.reload"),
@@ -135,6 +138,21 @@ public enum Permission {
     BDENGINE_CONVERT_DATAPACK("deu.bdengine.convertdp"),
     BDENGINE_SPAWN_MODEL("deu.bdengine.spawnmodel"),
     BDENGINE_IMPORT("deu.bdengine.import");
+
+
+    public static void registerPermissions(){
+        for (Permission permission : Permission.values()){
+            registerPermission(permission);
+        }
+    }
+
+    private static void registerPermission(Permission permission){
+        PluginManager pm = DisplayAPI.getPlugin().getServer().getPluginManager();
+        if (pm.getPermission(permission.getPermission()) == null){
+            pm.addPermission(new org.bukkit.permissions.Permission(permission.getPermission()));
+        }
+    }
+
 
 
     private final String permission;

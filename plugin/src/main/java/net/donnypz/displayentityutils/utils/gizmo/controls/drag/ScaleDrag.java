@@ -6,13 +6,17 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.concurrent.GroupTele
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSelectionMode;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
+import net.donnypz.displayentityutils.utils.gizmo.Snap;
+import net.donnypz.displayentityutils.utils.gizmo.controls.ControlType;
 import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
+import net.donnypz.displayentityutils.utils.gizmo.util.GizmoMathUtil;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoTitleUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
 import org.joml.Quaternionf;
@@ -30,8 +34,11 @@ public class ScaleDrag extends Drag {
 
     private final Vector3f lastHitPoint;
 
+    private float totalScaleChange;
+    private float appliedSnapScale;
+
     public ScaleDrag(Player player, GizmoSessionImpl gizmo, GizmoAxis axis) {
-        super(axis);
+        super(axis, ControlType.SCALE);
 
         this.gizmo = gizmo;
         this.originalAxis = axis.getDirections()[0];
@@ -41,21 +48,45 @@ public class ScaleDrag extends Drag {
 
     @Override
     public void updatePosition(Player player) {
-        if (lastHitPoint == null)
-            return;
+        if (player.isSneaking()) return;
+        if (lastHitPoint == null) return;
 
         Vector3f hit = playerRayAndPlaneCollision(player);
-
         Vector3f delta = hit.sub(lastHitPoint, new Vector3f());
 
         lastHitPoint.set(hit);
 
         float movementAmount = delta.dot(currentAxis);
 
-        if (Math.abs(movementAmount) < 1e-6f)
-            return;
+        if (Math.abs(movementAmount) < 1e-6f) return;
 
-        applyScale(movementAmount);
+        float scaleDelta = movementAmount * 2f;
+        Snap snap = gizmo.getSnap();
+        float scaleSnapValue = snap.getSnapValue();
+
+        //No snapping
+        if (!snap.isEnabled() || scaleSnapValue <= 0){
+            applyScale(scaleDelta);
+            return;
+        }
+
+        totalScaleChange += scaleDelta;
+
+        float snappedScale = GizmoMathUtil.getSnappedValue(totalScaleChange, scaleSnapValue);
+
+        float deltaScale = snappedScale - appliedSnapScale;
+
+        if (Math.abs(deltaScale) < 1e-6f) return;
+
+        float lastAppliedSnapScale = appliedSnapScale;
+        appliedSnapScale = snappedScale;
+
+        if (!applyScale(deltaScale)){
+            this.appliedSnapScale = lastAppliedSnapScale;
+            this.totalScaleChange -= scaleDelta;
+        }
+        player.playSound(player, Sound.BLOCK_NOTE_BLOCK_HAT, 1, 1);
+
     }
 
     private void computeCurrentAxisDirection() {
@@ -119,48 +150,50 @@ public class ScaleDrag extends Drag {
                 .normalize();
     }
 
-    private void applyScale(float movementAmount) {
-
-        float scaleDelta = movementAmount * 2f;
-
+    private boolean applyScale(float scaleDelta) {
         ActivePartSelection<?> selection =
                 DEUUser.getOrCreateUser(gizmo.getPlayerUUID())
                         .getSelectedPartSelection();
 
         if (gizmo.getSelectionMode() == GizmoSelectionMode.PART || selection instanceof SinglePartSelection) {
             ActivePart part = selection.getSelectedPart();
-            if (part == null) return;
+            if (part == null) return false;
 
             if (part.isDisplay()) {
                 scaleDisplay(part, scaleDelta);
-            } else if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
+            }
+            else if (part.getType() == SpawnedDisplayEntityPart.PartType.INTERACTION) {
                 if (axis == GizmoAxis.Y) {
                     part.setInteractionHeight(part.getInteractionHeight() + scaleDelta);
-                } else {
+                }
+                else {
                     part.setInteractionWidth(part.getInteractionWidth() + scaleDelta);
                 }
-            } else if (part.getType() == SpawnedDisplayEntityPart.PartType.MANNEQUIN) {
+            }
+            else if (part.getType() == SpawnedDisplayEntityPart.PartType.MANNEQUIN) {
                 part.setMannequinScale(part.getMannequinScale() + scaleDelta);
             }
-        } else if (selection instanceof MultiPartSelection<?> multi) {
+        }
+        else if (selection instanceof MultiPartSelection<?> multi) {
             ActiveGroup<?> group = multi.getGroup();
 
             float scale = group.getScaleMultiplier() + scaleDelta;
             if (scale < 0.1f) {
-                return;
+                return false;
             }
 
             if (gizmo.getSelectionMode() == GizmoSelectionMode.FILTER && group.getSize() != multi.getSize()) {
                 GizmoTitleUtil.show(Bukkit.getPlayer(gizmo.getPlayerUUID()),
                         Component.text("Scale Failed", NamedTextColor.RED),
                         MiniMessage.miniMessage().deserialize("<red>⚠ <gray>Filtered selection cannot be scaled separately <red>⚠"));
-
-            } else {
+            }
+            else {
                 GroupTeleportCompletableFuture future = group.scale(scale, GizmoSessionImpl.SCAN_FREQUENCY + 1, true);
                 //block thread until non-display teleports complete
                 if (future != null) future.block();
             }
         }
+        return true;
     }
 
     private void scaleDisplay(ActivePart part, float scaleDelta) {

@@ -3,30 +3,28 @@ package net.donnypz.displayentityutils.utils.gizmo.controls.selector;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
 import net.donnypz.displayentityutils.utils.gizmo.controls.ControlType;
 import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
-import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
-import net.donnypz.displayentityutils.utils.gizmo.controls.drag.Drag;
-import net.donnypz.displayentityutils.utils.gizmo.controls.drag.TranslationAxisDrag;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoMathUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.joml.Vector3f;
 
-public class TranslationAxisSelector extends AxisSelector {
+public abstract class CubeSelector extends AxisSelector {
 
-    private final Vector3f localStart;
-    private final Vector3f localEnd;
-    private float radius = 0.075f;
+    protected final Vector3f localStart;
+    protected final Vector3f localEnd;
+    protected float radius = 0.125f;
 
-    TranslationAxisSelector(GizmoAxis axis) {
-        super(axis, ControlType.TRANSLATION);
+    public CubeSelector(GizmoAxis axis) {
+        super(axis, ControlType.SCALE);
         this.localStart = axis.getDirections()[0]
-                .mul(0.1125f);
-        this.localEnd = axis.getDirections()[0];
+                .mul(1.2f);
+        this.localEnd = axis.getDirections()[0]
+                .mul(1.40f);
     }
 
     @Override
     public String getTag() {
-        return axis.getTag();
+        return axis.getScaleTag();
     }
 
 
@@ -61,8 +59,30 @@ public class TranslationAxisSelector extends AxisSelector {
                 .sub(axisStart);
 
         float axisLength = axisDir.length();
-        axisDir.normalize();
 
+        //Point selector
+        if (axisLength < 1e-6f) { // ~ 0
+            // Point selector
+            Vector3f toPoint = new Vector3f(axisStart)
+                    .sub(rayOrigin);
+
+            float distanceAlongRay = toPoint.dot(ray);
+
+            if (distanceAlongRay < 0) {
+                return -1;
+            }
+
+            Vector3f closestPointOnRay = new Vector3f(rayOrigin)
+                    .fma(distanceAlongRay, ray);
+
+            if (closestPointOnRay.distance(axisStart) > radius) {
+                return -1;
+            }
+
+            return distanceAlongRay;
+        }
+
+        axisDir.normalize();
 
         Vector3f axisStartToRayOrigin = new Vector3f(rayOrigin)
                 .sub(axisStart);
@@ -113,10 +133,5 @@ public class TranslationAxisSelector extends AxisSelector {
         GizmoMathUtil.scale(localStart, oldScale, scaleMultiplier);
         GizmoMathUtil.scale(localEnd, oldScale, scaleMultiplier);
         radius = (radius / oldScale) * scaleMultiplier;
-    }
-
-    @Override
-    public Drag getDrag(Player player, GizmoSessionImpl gizmo) {
-        return new TranslationAxisDrag(player, gizmo, axis);
     }
 }

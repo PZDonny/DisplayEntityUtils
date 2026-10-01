@@ -6,6 +6,8 @@ import org.joml.Vector3f;
 import java.util.Arrays;
 
 public enum GizmoAxis {
+    CENTER(Color.WHITE, "pivot", new Vector3f(0,0,0)),
+
     //axes
     X(Color.RED, "move_x", new Vector3f(1, 0, 0)),
     Y(Color.LIME, "move_y", new Vector3f(0, 1, 0)),

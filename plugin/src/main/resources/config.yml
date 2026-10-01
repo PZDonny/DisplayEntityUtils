@@ -10,7 +10,7 @@ mongodb:
   enabled: false
   host: "localhost"
   port: 27017
-  database: "DisplayEntityUtils"
+  database: "displayentityutils"
   username: "user"
   password: "password"
   groupCollection: "saved_displays"
