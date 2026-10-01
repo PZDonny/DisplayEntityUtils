@@ -50,4 +50,34 @@ public class GizmoTitleUtil {
                 MiniMessage.miniMessage().deserialize("<red>Cannot change selection mode for single entity"));
     }
 
+    public static void showSnapStatus(Player player, boolean status){
+        showSubtitle(player, MiniMessage.miniMessage().deserialize(
+                "<gray>\uD83E\uDDF2 <gold>Snapping: "
+                        +
+                            (
+                                    status
+                                        ? "<green>ENABLED"
+                                        : "<red>DISABLED"
+                            )
+                        +
+                        " <gray>\uD83E\uDDF2"
+        ));
+    }
+
+    public static void showSnapValue(Player player, Snap snap, ControlType controlType) {
+        show(
+                player,
+                Component.text(controlType.name(), NamedTextColor.LIGHT_PURPLE),
+                MiniMessage.miniMessage().deserialize(
+                        "<gray>\uD83E\uDDF2 <aqua>Snap Value: <yellow>" + snap.getSnapValue()
+
+                                + (
+                                controlType == ControlType.ROTATION
+                                        ? " degrees "
+                                        : " blocks "
+                        )
+                                +
+                                "<gray>\uD83E\uDDF2"
+                ));
+    }
 }

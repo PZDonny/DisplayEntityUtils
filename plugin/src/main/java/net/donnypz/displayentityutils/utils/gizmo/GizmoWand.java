@@ -30,6 +30,7 @@ public class GizmoWand {
 
         player.sendMessage(DisplayAPI.pluginPrefix
                 .append(Component.text("Gizmo wand added to your inventory!", NamedTextColor.GREEN)));
+        player.sendMessage(Component.text("| Controls in wand's item lore", NamedTextColor.GRAY, TextDecoration.ITALIC));
         player.playSound(player, Sound.ENTITY_ITEM_PICKUP, 1, 1);
     }
 
@@ -59,31 +60,57 @@ public class GizmoWand {
     }
 
     private static void buildItem() {
-        if (gizmoItemStack == null) {
+        //if (gizmoItemStack == null) {
             gizmoItemStack = new ItemStack(Material.STICK);
             gizmoItemStack.editMeta(meta -> {
-                meta.displayName(MiniMessage.miniMessage().deserialize("<reset><bold><yellow>DEU</bold> <aqua>Gizmo Wand"));
+                meta.displayName(MiniMessage.miniMessage()
+                        .deserialize("<reset><bold><yellow>DEU</bold> <aqua>Gizmo Wand")
+                        .decoration(TextDecoration.ITALIC, false));
                 meta.lore(List.of(
-                        MiniMessage.miniMessage().deserialize("<green>L-CLICK<gray>: Select Axis")
+                        MiniMessage.miniMessage().deserialize("<#87e09c>L-CLICK<gray>: Select Axis")
                                 .decoration(TextDecoration.ITALIC, false),
-                        MiniMessage.miniMessage().deserialize("<#b5deb4>L-CLICK (With selected Axis)<gray>: Unlink Gizmo/Move pivot")
+                        MiniMessage.miniMessage().deserialize("<#f07787>R-CLICK (With selected Axis)<gray>: Deselect Axis")
                                 .decoration(TextDecoration.ITALIC, false),
+                        MiniMessage.miniMessage().deserialize("<#dce8e0>L-CLICK (With selected Axis)<gray>: Unlink Gizmo/Move pivot")
+                                .decoration(TextDecoration.ITALIC, false),
+
+
+                        Component.empty(),
+
+                        Component.text("Sneak + Offhand (", TextColor.fromHexString("#a3bdd9"))
+                                .append(Component.keybind("key.sneak"))
+                                .append(Component.text(" + "))
+                                .append(Component.keybind("key.swapOffhand"))
+                                .append(Component.text(")"))
+                                .append(Component.text(": Toggle Snapping", NamedTextColor.GRAY))
+                                .decoration(TextDecoration.ITALIC, false),
+                        MiniMessage.miniMessage().deserialize("<#966496>Scroll (With selected Axis)<gray>: Change Snapping Value")
+                                .decoration(TextDecoration.ITALIC, false),
+
+                        Component.empty(),
+
                         MiniMessage.miniMessage().deserialize("<gold>R-CLICK <gray>: Switch Selection Mode (Group/Filter/Part)")
-                                .decoration(TextDecoration.ITALIC, false),
-                        MiniMessage.miniMessage().deserialize("<red>R-CLICK (With selected Axis)<gray>: Deselect Axis")
                                 .decoration(TextDecoration.ITALIC, false),
                         Component.text("Offhand (", NamedTextColor.YELLOW)
                                 .append(Component.keybind("key.swapOffhand"))
                                 .append(Component.text(")"))
                                 .append(Component.text(": Toggle Space (Local/World)", NamedTextColor.GRAY))
                                 .decoration(TextDecoration.ITALIC, false),
-                        Component.text("Drop Item (", TextColor.color(150, 100, 150))
+                        Component.text("Drop Item (", TextColor.fromHexString("#c4f054"))
                                 .append(Component.keybind("key.drop"))
                                 .append(Component.text(")"))
                                 .append(Component.text(": Toggle Translation Mode (Translate/Teleport)", NamedTextColor.GRAY))
                                 .decoration(TextDecoration.ITALIC, false),
+
+
                         Component.empty(),
-                        MiniMessage.miniMessage().deserialize("<aqua>/deu gizmo help <gray>- for additional tools")
+
+                        MiniMessage.miniMessage().deserialize("<#bcf7dd>L-CLICK (Pivot / <white>White Cube<#bcf7dd>): <gray>Clone Selection")
+                                .decoration(TextDecoration.ITALIC, false),
+
+                        Component.empty(),
+
+                        MiniMessage.miniMessage().deserialize("<white>/deu gizmo help <gray>- for additional tools")
                                 .decoration(TextDecoration.ITALIC, false),
                         Component.text("Gizmo Model by: illystray", NamedTextColor.DARK_GRAY)
                                 .decoration(TextDecoration.ITALIC, false)
@@ -91,6 +118,6 @@ public class GizmoWand {
                 PersistentDataContainer pdc = meta.getPersistentDataContainer();
                 pdc.set(DisplayKeys.Gizmo.WAND, PersistentDataType.BOOLEAN, true);
             });
-        }
+       // }
     }
 }

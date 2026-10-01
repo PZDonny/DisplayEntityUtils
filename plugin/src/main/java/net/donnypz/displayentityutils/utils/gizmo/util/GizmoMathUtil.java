@@ -23,4 +23,8 @@ public class GizmoMathUtil {
         vector3f.y = (vector3f.y / oldScale) * newScale;
         vector3f.z = (vector3f.z / oldScale) * newScale;
     }
+
+    public static float getSnappedValue(float totalChange, float snapValue){
+        return Math.round(totalChange / snapValue) * snapValue;
+    }
 }

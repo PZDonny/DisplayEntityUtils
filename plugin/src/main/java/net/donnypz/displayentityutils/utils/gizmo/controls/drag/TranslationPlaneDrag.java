@@ -57,30 +57,50 @@ public class TranslationPlaneDrag extends TranslationDrag {
                 :
                 new Vector3f(super.lastHitPoint); //behind player camera
 
-        distance = Math.min(distance, MAX_LOOK_DISTANCE* gizmo.getScale());
+        distance = Math.min(distance, MAX_LOOK_DISTANCE * gizmo.getScale());
 
         return new Vector3f(playerEyePos)
                 .fma(distance, ray);
     }
 
-    private Vector3f createPlaneNormal(){
-        return new Vector3f(super.currentAxesDir[0])
-                .cross(super.currentAxesDir[1])
-                .normalize();
+    @Override
+    protected Vector3f getMovementAmounts(Player player, Vector3f delta) {
+        return new Vector3f(
+                delta.dot(currentAxesDir[0]), //axis1
+                delta.dot(currentAxesDir[1]), //axis2
+                0
+        );
     }
 
     @Override
-    public Vector3f[] getMovementVectors(Player player, Vector3f delta){
-        float movementAmountAxis1 = delta.dot(super.currentAxesDir[0]);
-        float movementAmountAxis2 = delta.dot(super.currentAxesDir[1]);
+    protected Vector3f[] getMovementVectors(Vector3f movementAmounts) {
+        float movementAmountAxis1 = movementAmounts.x;
+        float movementAmountAxis2 = movementAmounts.y;
 
-        Vector3f movement = new Vector3f(super.currentAxesDir[0])
-                .mul(movementAmountAxis1)
-                .add(new Vector3f(super.currentAxesDir[1]).mul(movementAmountAxis2));
+        Vector3f movement =
+                new Vector3f(
+                        super.currentAxesDir[0])
+                        .mul(movementAmountAxis1)
+                        .add(
+                                new Vector3f(super.currentAxesDir[1])
+                                        .mul(movementAmountAxis2)
+                        );
 
         Vector3f movementTranslate =
-                new Vector3f(super.originalAxes[0]).mul(movementAmountAxis1)
-                        .add(new Vector3f(super.originalAxes[1]).mul(movementAmountAxis2));
-        return new Vector3f[]{movement, new Vector3f(movementTranslate)};
+                new Vector3f(
+                        super.originalAxes[0])
+                        .mul(movementAmountAxis1)
+                        .add(
+                                new Vector3f(super.originalAxes[1])
+                                        .mul(movementAmountAxis2)
+                        );
+
+        return new Vector3f[]{movement, movementTranslate};
+    }
+
+    private Vector3f createPlaneNormal() {
+        return new Vector3f(super.currentAxesDir[0])
+                .cross(super.currentAxesDir[1])
+                .normalize();
     }
 }

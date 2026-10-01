@@ -5,10 +5,12 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.*;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSelectionMode;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSessionImpl;
 import net.donnypz.displayentityutils.utils.gizmo.GizmoSpace;
+import net.donnypz.displayentityutils.utils.gizmo.Snap;
 import net.donnypz.displayentityutils.utils.gizmo.controls.ControlType;
 import net.donnypz.displayentityutils.utils.gizmo.controls.GizmoAxis;
 import net.donnypz.displayentityutils.utils.gizmo.util.GizmoMathUtil;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -30,6 +32,9 @@ public class RotationDrag extends Drag {
 
     //prev dir from gizmo to player's looking dir
     private final Vector3f lastDirection = new Vector3f();
+
+    private float totalAngleChange;
+    private float appliedSnapAngle;
 
     public RotationDrag(Player player, GizmoSessionImpl gizmo, GizmoAxis axis) {
         super(axis, ControlType.ROTATION);
@@ -68,7 +73,9 @@ public class RotationDrag extends Drag {
 
     @Override
     public void updatePosition(Player player) {
+        if (player.isSneaking()) return;
         if (!gizmo.isLinked()) return;
+
         Vector3f hit = playerRayAndPlaneCollision(player);
         if (hit == null) {
             return;
@@ -85,11 +92,32 @@ public class RotationDrag extends Drag {
 
         lastDirection.set(currentDirection);
 
-        if (Math.abs(angle) < 1e-6f) {
+        if (Math.abs(angle) < 1e-6f) return;
+
+        totalAngleChange += angle;
+
+        Snap snap = gizmo.getSnap();
+        float snapValueDeg = snap.getSnapValue();
+
+        //No snapping
+        if (!snap.isEnabled() || snapValueDeg <= 0){
+            applyToPlayerSelection(angle);
             return;
         }
 
-        applyToPlayerSelection(angle);
+        float snapValueRad = (float) Math.toRadians(snapValueDeg);
+
+        float snappedAngle = GizmoMathUtil.getSnappedValue(totalAngleChange, snapValueRad);
+
+        float delta = snappedAngle - appliedSnapAngle;
+
+        if (Math.abs(delta) < 1e-6f) return;
+
+        appliedSnapAngle = snappedAngle;
+
+        applyToPlayerSelection(delta);
+        player.playSound(player, Sound.BLOCK_NOTE_BLOCK_HAT, 1, 1);
+
     }
 
     private void applyToPlayerSelection(float angle) {

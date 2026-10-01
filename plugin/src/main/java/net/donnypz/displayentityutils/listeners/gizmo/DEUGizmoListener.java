@@ -63,7 +63,7 @@ public class DEUGizmoListener implements Listener {
         if (!GizmoManager.isGizmoWand(item)) return;
 
         e.setCancelled(true);
-        GizmoSessionImpl gizmo = (GizmoSessionImpl) getGizmoSession(player);
+        GizmoSessionImpl gizmo = getGizmoSession(player);
         if (gizmo == null) return;
 
         if (gizmo.hasActiveControl()){
@@ -81,7 +81,7 @@ public class DEUGizmoListener implements Listener {
         if (!player.hasPermission(Permission.GIZMO_USE.getPermission())) return;
         if (e.getHand() == EquipmentSlot.OFF_HAND) return;
 
-        GizmoSessionImpl gizmo = (GizmoSessionImpl) getGizmoSession(player);
+        GizmoSessionImpl gizmo = getGizmoSession(player);
         if (gizmo == null) return;
         if (gizmo.isLastInteractionItemDrop()){
             gizmo.setLastInteractionItemDrop(false);
@@ -112,7 +112,15 @@ public class DEUGizmoListener implements Listener {
         int oldSlot = e.getPreviousSlot();
         ItemStack newItem = player.getInventory().getItem(newSlot);
         ItemStack oldItem = player.getInventory().getItem(oldSlot);
-        setGizmoScanning(player, newItem, oldItem);
+
+        boolean cancelEvent = changeGizmoSnapValue(player, newSlot, oldSlot);
+        //Snapping
+        if (cancelEvent){
+            e.setCancelled(true);
+        }
+        else{
+            setGizmoScanning(player, newItem, oldItem);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -121,6 +129,7 @@ public class DEUGizmoListener implements Listener {
         int slot = e.getSlot();
         ItemStack newItem = e.getNewItemStack();
         ItemStack oldItem = e.getOldItemStack();
+
         if (slot != player.getInventory().getHeldItemSlot()) return;
         setGizmoScanning(player, newItem, oldItem);
     }
@@ -132,7 +141,13 @@ public class DEUGizmoListener implements Listener {
 
         if (!GizmoManager.isGizmoWand(toOffhand)) return;
         e.setCancelled(true);
-        switchSpace(player);
+
+        if (player.isSneaking()){
+            toggleSnapping(player);
+        }
+        else{
+            switchSpace(player);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -144,13 +159,13 @@ public class DEUGizmoListener implements Listener {
         e.setCancelled(true);
         switchTranslationMode(player);
 
-        GizmoSessionImpl gizmo = (GizmoSessionImpl) getGizmoSession(player);
+        GizmoSessionImpl gizmo = getGizmoSession(player);
         if (gizmo == null) return;
         gizmo.setLastInteractionItemDrop(true);
     }
 
     private void switchTranslationMode(Player player){
-        GizmoSessionImpl gizmo = (GizmoSessionImpl) getGizmoSession(player);
+        GizmoSessionImpl gizmo = getGizmoSession(player);
         if (gizmo == null) return;
         TranslationMode mode = gizmo.getTranslationMode();
 
@@ -165,7 +180,7 @@ public class DEUGizmoListener implements Listener {
     }
 
     private void switchSpace(Player player){
-        GizmoSessionImpl gizmo = (GizmoSessionImpl) getGizmoSession(player);
+        GizmoSessionImpl gizmo = getGizmoSession(player);
         if (gizmo == null) return;
         GizmoSpace gizmoSpace = gizmo.getGizmoSpace();
 
@@ -177,6 +192,16 @@ public class DEUGizmoListener implements Listener {
         player.playSound(player, Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, 1, 1.2f);
     }
 
+    private void toggleSnapping(Player player){
+        GizmoSessionImpl gizmo = getGizmoSession(player);
+        if (gizmo == null) return;
+        Snap snap = gizmo.getSnap();
+
+        snap.setEnabled(!snap.isEnabled());
+        GizmoTitleUtil.showSnapStatus(player, snap.isEnabled());
+        player.playSound(player, Sound.BLOCK_NOTE_BLOCK_HAT, 1, 1.2f);
+    }
+
     private void switchSelectionMode(Player player){
         DEUUser user = DEUUser.getUser(player);
         if (user != null && user.getSelectedPartSelection() instanceof SinglePartSelection){
@@ -184,7 +209,7 @@ public class DEUGizmoListener implements Listener {
             player.playSound(player, Sound.BLOCK_NOTE_BLOCK_COW_BELL, 1, 0.8f);
             return;
         }
-        GizmoSessionImpl gizmo = (GizmoSessionImpl) getGizmoSession(player);
+        GizmoSessionImpl gizmo = getGizmoSession(player);
         if (gizmo == null) return;
         GizmoSelectionMode mode = gizmo.getSelectionMode();
 
@@ -197,7 +222,7 @@ public class DEUGizmoListener implements Listener {
     }
 
     private void setGizmoStatus(Player player, boolean leftClick) {
-        GizmoSessionImpl gizmo = (GizmoSessionImpl) getGizmoSession(player);
+        GizmoSessionImpl gizmo = getGizmoSession(player);
         if (gizmo == null) return;
 
         if (leftClick) {
@@ -240,9 +265,36 @@ public class DEUGizmoListener implements Listener {
         gizmo.setScanning(true);
     }
 
-    private GizmoSession getGizmoSession(Player player) {
+    private boolean changeGizmoSnapValue(Player player, int newSlot, int oldSlot){ //boolean = cancel event?
+        GizmoSessionImpl gizmo = getGizmoSession(player);
+        if (gizmo == null) return false;
+
+        if (!gizmo.isScanning() || !gizmo.isDragging()) return false;
+
+        int difference = newSlot - oldSlot;
+
+        boolean isScrollDown;
+        if (difference == 1 || difference == -8) {
+            isScrollDown = true;
+        } else if (difference == -1 || difference == 8) {
+            isScrollDown = false;
+        }
+        else{ //used number keys instead of scroll-wheel
+            return true;
+        }
+
+        Snap snap = gizmo.getSnap();
+        snap.update(isScrollDown);
+
+        Drag drag = gizmo.getDragControl();
+        GizmoTitleUtil.showSnapValue(player, snap, drag.getControlType());
+        player.playSound(player, Sound.BLOCK_NOTE_BLOCK_HAT, 1, 1.2f);
+        return true;
+    }
+
+    private GizmoSessionImpl getGizmoSession(Player player) {
         DEUUser user = DEUUser.getUser(player);
         if (user == null) return null;
-        return user.getGizmo();
+        return (GizmoSessionImpl) user.getGizmo();
     }
 }

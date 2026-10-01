@@ -1,6 +1,7 @@
 package net.donnypz.displayentityutils.utils.gizmo;
 
 import net.donnypz.displayentityutils.DisplayAPI;
+import net.donnypz.displayentityutils.command.group.GroupCMD;
 import net.donnypz.displayentityutils.events.GroupSpawnedEvent;
 import net.donnypz.displayentityutils.managers.DEUUser;
 import net.donnypz.displayentityutils.managers.DisplayGroupManager;
@@ -18,6 +19,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +36,7 @@ public class GizmoSessionImpl implements GizmoSession {
     public static final int SCAN_FREQUENCY = 1;
 
     private final PacketDisplayEntityGroup gizmoModel;
+    private final Snap snap;
     private TranslationMode translationMode = TranslationMode.TELEPORT;
     private GizmoSpace gizmoSpace = GizmoSpace.LOCAL;
     private GizmoSelectionMode selectionMode = GizmoSelectionMode.GROUP;
@@ -60,6 +64,10 @@ public class GizmoSessionImpl implements GizmoSession {
     public GizmoSessionImpl(Player player, Location spawnLocation) {
         this.playerUUID = player.getUniqueId();
         this.deuUser = DEUUser.getOrCreateUser(player);
+        this.snap = new Snap(this);
+
+        //Clone Selector
+        this.selectors.add(new CloneSelector());
 
         //Translate Axis
         this.selectors.add(AxisSelector.x());
@@ -128,6 +136,10 @@ public class GizmoSessionImpl implements GizmoSession {
 
     public void setLastInteractionItemDrop(boolean lastInteractionItemDrop){
         this.lastInteractionItemDrop = lastInteractionItemDrop;
+    }
+
+    public Snap getSnap() {
+        return snap;
     }
 
     @Override
