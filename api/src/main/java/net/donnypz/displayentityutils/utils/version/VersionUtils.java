@@ -26,13 +26,10 @@ public final class VersionUtils {
     public static final boolean IS_26_1 = Bukkit.getUnsafe().getProtocolVersion() >= 775;
     public static final boolean IS_26_2 = Bukkit.getUnsafe().getProtocolVersion() >= 776;
 
-    public static final boolean IS_DEV_VERSION;
     private static Particle ENTITY_EFFECT_PARTICLE;
     private static Particle ITEM_PARTICLE;
 
     static{
-        String pluginVer = DisplayAPI.getPlugin().getPluginMeta().getVersion();
-        IS_DEV_VERSION = isDevVersion(pluginVer);
         setParticles();
     }
 
@@ -47,23 +44,32 @@ public final class VersionUtils {
     }
 
     public static boolean isDevVersion(){
-        return IS_DEV_VERSION;
+        return isDevVersion(DisplayAPI.getPlugin().getPluginMeta().getVersion());
     }
 
     @ApiStatus.Internal
-    public static boolean isDevVersion(@NotNull String version){
+    static boolean isDevVersion(@NotNull String version){
         String clean = cleanVersionString(version);
         return !version.equals(clean);
     }
 
     @ApiStatus.Internal
     public static @NotNull String cleanVersionString(@NotNull String version){
-        return version.replaceAll("[^0-9.]", "");
+        String[] versionNumbers = version.split("\\.");
+
+        return versionNumbers[0] +
+                "." +
+                versionNumbers[1] +
+                "." +
+                versionNumbers[2].split("-")[0];
     }
 
     public static boolean isCurrentOlderThan(@NotNull String comparedVersion){
-        String current = getPluginVersion();
-        String cleanCurrent = VersionUtils.cleanVersionString(current);
+        return isOlderThan(getPluginVersion(), comparedVersion);
+    }
+
+    static boolean isOlderThan(@NotNull String version,@NotNull String comparedVersion){
+        String cleanCurrent = VersionUtils.cleanVersionString(version);
         String cleanComparedVersion = VersionUtils.cleanVersionString(comparedVersion);
 
         String[] currentArr = cleanCurrent.split("\\.");
