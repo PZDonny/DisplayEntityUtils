@@ -84,33 +84,46 @@ public final class MongoDisplayStorage extends DBDisplayStorage {
         if (!this.canConnect(databaseName, groupCollection, animationCollection)) return;
 
         DisplayAPI.getScheduler().runAsync(() -> {
-            try{
-                ConnectionString cString = new ConnectionString(connectionString);
-                MongoClientSettings settings = MongoClientSettings.builder()
-                        .applyConnectionString(cString)
-                        .serverApi(ServerApi.builder()
-                                .version(ServerApiVersion.V1)
-                                .build())
-                        .build();
-
-                client = MongoClients.create(settings);
-                database = client.getDatabase(databaseName);
-
-                this.createIfNotExisting(groupCollection);
-                this.createIfNotExisting(animationCollection);
-
-                GROUP_COLLECTION = database.getCollection(groupCollection);
-                ANIMATION_COLLECTION = database.getCollection(animationCollection);
-
-                logger.info(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <green>MongoDB!")));
-                isConnected = true;
-            }
-            catch (IllegalArgumentException | MongoException e){
-                isConnected = false;
-                logger.error(Component.text("There was an error connecting to the MongoDB Database!", NamedTextColor.RED));
-                e.printStackTrace();
-            }
+            connect(
+                    connectionString,
+                    databaseName,
+                    groupCollection,
+                    animationCollection
+            );
         });
+    }
+
+    void connect(
+            String connectionString,
+            String databaseName,
+            String groupCollection,
+            String animationCollection
+    ) {
+        try {
+            ConnectionString cString = new ConnectionString(connectionString);
+            MongoClientSettings settings = MongoClientSettings.builder()
+                    .applyConnectionString(cString)
+                    .serverApi(ServerApi.builder()
+                            .version(ServerApiVersion.V1)
+                            .build())
+                    .build();
+
+            client = MongoClients.create(settings);
+            database = client.getDatabase(databaseName);
+
+            this.createIfNotExisting(groupCollection);
+            this.createIfNotExisting(animationCollection);
+
+            GROUP_COLLECTION = database.getCollection(groupCollection);
+            ANIMATION_COLLECTION = database.getCollection(animationCollection);
+
+            logger.info(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <green>MongoDB!")));
+            isConnected = true;
+        } catch (IllegalArgumentException | MongoException e) {
+            isConnected = false;
+            logger.error(Component.text("There was an error connecting to the MongoDB Database!", NamedTextColor.RED));
+            e.printStackTrace();
+        }
     }
 
     private boolean canConnect(
