@@ -340,7 +340,7 @@ public final class MYSQLDisplayStorage extends DBDisplayStorage {
             }
 
             statement.setString(1, tag);
-            statement.executeUpdate(delete);
+            statement.executeUpdate();
             if (deleter != null){
                 deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted "+displayName+" from MYSQL database!"));
             }
