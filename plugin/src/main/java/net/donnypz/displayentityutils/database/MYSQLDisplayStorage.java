@@ -347,7 +347,9 @@ public final class MYSQLDisplayStorage extends DBDisplayStorage {
         }
         catch(SQLException e){
             e.printStackTrace();
-            deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved "+displayName+" does not exist in MYSQL database!"));
+            if (deleter != null){
+                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved "+displayName+" does not exist in MYSQL database!"));
+            }
         }
     }
 
