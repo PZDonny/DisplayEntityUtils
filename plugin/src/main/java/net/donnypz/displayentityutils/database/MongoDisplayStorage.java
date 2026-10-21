@@ -207,7 +207,7 @@ public final class MongoDisplayStorage extends DBDisplayStorage {
     @Override
     public @Nullable DisplayEntityGroup getDisplayEntityGroup(@NotNull String tag){
         if (!isConnected) return null;
-        Document doc = getGroupDocument(tag);
+        Document doc = getDocument(GROUP_COLLECTION, tag);
         if (doc == null){
             return null;
         }
@@ -245,7 +245,7 @@ public final class MongoDisplayStorage extends DBDisplayStorage {
         if (!isConnected){
             return null;
         }
-        Document doc = getAnimationDocument(tag);
+        Document doc = getDocument(ANIMATION_COLLECTION, tag);
         if (doc == null){
             return null;
         }
@@ -324,7 +324,7 @@ public final class MongoDisplayStorage extends DBDisplayStorage {
                     .append(TAG_FIELD, tag)
                     .append(fieldName, data);
 
-            Document existing = getGroupDocument(tag);
+            Document existing = getDocument(collection, tag);
             if (existing != null){
                 if (DisplayConfig.overwritexistingSaves()){
                     Bson updateOperation = new Document ("$set", doc);
@@ -364,7 +364,7 @@ public final class MongoDisplayStorage extends DBDisplayStorage {
             Player deleter
     ){
         if (!isConnected()) return;
-        Document doc = getGroupDocument(tag);
+        Document doc = getDocument(collection, tag);
         if (doc != null){
             collection.deleteOne(doc);
             if (deleter != null){
@@ -377,14 +377,16 @@ public final class MongoDisplayStorage extends DBDisplayStorage {
         }
     }
 
-    private Document getGroupDocument(String tag){
-        return GROUP_COLLECTION.find(new Document(TAG_FIELD, tag))
-                .first();
-    }
-
-    private Document getAnimationDocument(String tag){
-        return ANIMATION_COLLECTION.find(new Document(TAG_FIELD, tag))
-                .first();
+    private Document getDocument(MongoCollection<Document> collection, String tag){
+        if (collection == GROUP_COLLECTION){
+            return GROUP_COLLECTION.find(new Document(TAG_FIELD, tag))
+                    .first();
+        }
+        else if (collection == ANIMATION_COLLECTION){
+            return ANIMATION_COLLECTION.find(new Document(TAG_FIELD, tag))
+                    .first();
+        }
+        else return null;
     }
 
 }
