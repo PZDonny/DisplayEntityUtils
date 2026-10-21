@@ -11,7 +11,7 @@ import java.util.List;
 
 public abstract class DisplayStorage {
 
-    private final Logger logger;
+    protected final Logger logger;
 
     public DisplayStorage(Logger logger) {
         this.logger = logger;
