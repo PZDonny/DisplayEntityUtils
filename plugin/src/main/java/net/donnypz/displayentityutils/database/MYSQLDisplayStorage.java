@@ -11,6 +11,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.dbutils.DbUtils;
 import org.bukkit.Bukkit;
@@ -43,7 +44,7 @@ public final class MYSQLDisplayStorage extends DBDisplayStorage {
     private boolean connected = false;
     private HikariDataSource dataSource;
 
-    public MYSQLDisplayStorage(Logger logger) {
+    public MYSQLDisplayStorage(ComponentLogger logger) {
         super(logger);
     }
 

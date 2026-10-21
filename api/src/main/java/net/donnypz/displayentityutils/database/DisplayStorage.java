@@ -2,18 +2,18 @@ package net.donnypz.displayentityutils.database;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 
 import java.util.List;
 
 public abstract class DisplayStorage {
 
-    protected final Logger logger;
+    protected final ComponentLogger logger;
 
-    public DisplayStorage(Logger logger) {
+    public DisplayStorage(ComponentLogger logger) {
         this.logger = logger;
     }
 

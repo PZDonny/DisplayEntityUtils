@@ -14,7 +14,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 
 import java.io.*;
 import java.nio.file.DirectoryStream;
@@ -25,7 +24,7 @@ import java.util.List;
 
 public final class LocalDisplayStorage extends DisplayStorage {
 
-    public LocalDisplayStorage(Logger logger) {
+    public LocalDisplayStorage(ComponentLogger logger) {
         super(logger);
     }
 

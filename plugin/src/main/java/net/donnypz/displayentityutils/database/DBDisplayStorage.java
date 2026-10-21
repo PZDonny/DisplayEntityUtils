@@ -1,10 +1,10 @@
 package net.donnypz.displayentityutils.database;
 
-import org.slf4j.Logger;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 
 public abstract class DBDisplayStorage extends DisplayStorage {
 
-    public DBDisplayStorage(Logger logger) {
+    public DBDisplayStorage(ComponentLogger logger) {
         super(logger);
     }
 

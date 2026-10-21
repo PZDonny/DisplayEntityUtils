@@ -17,6 +17,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -25,7 +26,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -47,7 +47,7 @@ public final class MongoDisplayStorage extends DBDisplayStorage {
     private MongoDatabase database;
     private boolean isConnected = false;
 
-    public MongoDisplayStorage(Logger logger) {
+    public MongoDisplayStorage(ComponentLogger logger) {
         super(logger);
     }
 
