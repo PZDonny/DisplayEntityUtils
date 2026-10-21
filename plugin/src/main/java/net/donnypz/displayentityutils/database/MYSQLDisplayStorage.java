@@ -71,40 +71,48 @@ public final class MYSQLDisplayStorage extends DBDisplayStorage {
             return;
         }
         DisplayAPI.getScheduler().runAsync(() -> {
-            try {
-                //Set Data Source
-                dataSource = new HikariDataSource();
-                dataSource.setJdbcUrl(url);
-                dataSource.setUsername(username);
-                dataSource.setPassword(password);
-
-                dataSource.setMinimumIdle(3);
-                dataSource.setMaximumPoolSize(6);
-
-                //Test Connection
-                Connection connection = dataSource.getConnection();
-
-
-                //Create Default Table
-                Statement statement = connection.createStatement();
-                String groupTableSQL = "CREATE TABLE IF NOT EXISTS saved_displays(tag VARCHAR(128) UNIQUE, display_group BLOB)";
-                statement.execute(groupTableSQL);
-
-                String animTableSQL = "CREATE TABLE IF NOT EXISTS saved_animations(tag VARCHAR(128) UNIQUE, display_anim BLOB)";
-                statement.execute(animTableSQL);
-
-
-                DbUtils.closeQuietly(statement);
-                DbUtils.closeQuietly(connection);
-
-                Bukkit.getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <blue>MYSQL!")));
-                connected = true;
-            } catch (SQLException e) {
-                e.printStackTrace();
-                Bukkit.getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(Component.text("There was an error connecting to the MYSQL database", NamedTextColor.RED)));
-                closeConnection();
-            }
+            connect(url, username, password);
         });
+    }
+
+    void connect(
+            String url,
+            String username,
+            String password
+    ) {
+        try {
+            //Set Data Source
+            dataSource = new HikariDataSource();
+            dataSource.setJdbcUrl(url);
+            dataSource.setUsername(username);
+            dataSource.setPassword(password);
+
+            dataSource.setMinimumIdle(3);
+            dataSource.setMaximumPoolSize(6);
+
+            //Test Connection
+            Connection connection = dataSource.getConnection();
+
+
+            //Create Default Table
+            Statement statement = connection.createStatement();
+            String groupTableSQL = "CREATE TABLE IF NOT EXISTS saved_displays(tag VARCHAR(128) UNIQUE, display_group BLOB)";
+            statement.execute(groupTableSQL);
+
+            String animTableSQL = "CREATE TABLE IF NOT EXISTS saved_animations(tag VARCHAR(128) UNIQUE, display_anim BLOB)";
+            statement.execute(animTableSQL);
+
+
+            DbUtils.closeQuietly(statement);
+            DbUtils.closeQuietly(connection);
+
+            Bukkit.getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <blue>MYSQL!")));
+            connected = true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Bukkit.getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(Component.text("There was an error connecting to the MYSQL database", NamedTextColor.RED)));
+            closeConnection();
+        }
     }
 
     @Override
