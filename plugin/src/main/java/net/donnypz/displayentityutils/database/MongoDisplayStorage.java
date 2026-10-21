@@ -17,11 +17,11 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.Binary;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,13 +30,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.*;
 
-public final class MongoDisplayStorage implements DBDisplayStorage {
+public final class MongoDisplayStorage extends DBDisplayStorage {
 
-    private static MongoCollection<Document> GROUP_COLLECTION;
+    static MongoCollection<Document> GROUP_COLLECTION;
     private static final String GROUP_FIELD = "displayGroup";
     private static final String GROUP_DISPLAY_NAME = "display entity group";
 
-    private static MongoCollection<Document> ANIMATION_COLLECTION;
+    static MongoCollection<Document> ANIMATION_COLLECTION;
     private static final String ANIMATION_FIELD = "displayAnimation";
     private static final String ANIMATION_DISPLAY_NAME = "animation";
 
@@ -45,6 +45,10 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
     private MongoClient client;
     private MongoDatabase database;
     private boolean isConnected = false;
+
+    public MongoDisplayStorage(ComponentLogger logger) {
+        super(logger);
+    }
 
     public void createConnection(
             String host,
@@ -80,33 +84,46 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
         if (!this.canConnect(databaseName, groupCollection, animationCollection)) return;
 
         DisplayAPI.getScheduler().runAsync(() -> {
-            try{
-                ConnectionString cString = new ConnectionString(connectionString);
-                MongoClientSettings settings = MongoClientSettings.builder()
-                        .applyConnectionString(cString)
-                        .serverApi(ServerApi.builder()
-                                .version(ServerApiVersion.V1)
-                                .build())
-                        .build();
-
-                client = MongoClients.create(settings);
-                database = client.getDatabase(databaseName);
-
-                this.createIfNotExisting(groupCollection);
-                this.createIfNotExisting(animationCollection);
-
-                GROUP_COLLECTION = database.getCollection(groupCollection);
-                ANIMATION_COLLECTION = database.getCollection(animationCollection);
-
-                Bukkit.getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <green>MongoDB!")));
-                isConnected = true;
-            }
-            catch (IllegalArgumentException | MongoException e){
-                isConnected = false;
-                Bukkit.getConsoleSender().sendMessage(Component.text("There was an error connecting to the MongoDB Database!", NamedTextColor.RED));
-                e.printStackTrace();
-            }
+            connect(
+                    connectionString,
+                    databaseName,
+                    groupCollection,
+                    animationCollection
+            );
         });
+    }
+
+    void connect(
+            String connectionString,
+            String databaseName,
+            String groupCollection,
+            String animationCollection
+    ) {
+        try {
+            ConnectionString cString = new ConnectionString(connectionString);
+            MongoClientSettings settings = MongoClientSettings.builder()
+                    .applyConnectionString(cString)
+                    .serverApi(ServerApi.builder()
+                            .version(ServerApiVersion.V1)
+                            .build())
+                    .build();
+
+            client = MongoClients.create(settings);
+            database = client.getDatabase(databaseName);
+
+            this.createIfNotExisting(groupCollection);
+            this.createIfNotExisting(animationCollection);
+
+            GROUP_COLLECTION = database.getCollection(groupCollection);
+            ANIMATION_COLLECTION = database.getCollection(animationCollection);
+
+            logger.info(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <green>MongoDB!")));
+            isConnected = true;
+        } catch (IllegalArgumentException | MongoException e) {
+            isConnected = false;
+            logger.error(Component.text("There was an error connecting to the MongoDB Database!", NamedTextColor.RED));
+            e.printStackTrace();
+        }
     }
 
     private boolean canConnect(
@@ -117,7 +134,7 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
         if (isConnected()) return false;
 
         if (databaseName.isBlank() || groupCollection.isBlank() || animationCollection.isBlank()){
-            Bukkit.getConsoleSender().sendMessage(Component.text("There was an error connecting to the MongoDB Database! Database and/or Collection names are empty!", NamedTextColor.RED));
+            logger.error(Component.text("There was an error connecting to the MongoDB Database! Database and/or Collection names are empty!", NamedTextColor.RED));
             isConnected = false;
             return false;
         }
@@ -155,8 +172,8 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
         }
         catch(MongoException e){
             isConnected = false;
+            logger.error(Component.text("There was an error closing the connection to the MongoDB Database", NamedTextColor.RED));
             e.printStackTrace();
-            Bukkit.getConsoleSender().sendMessage(Component.text("There was an error closing the connection to the MongoDB Database", NamedTextColor.RED));
         }
     }
 
@@ -190,7 +207,7 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
     @Override
     public @Nullable DisplayEntityGroup getDisplayEntityGroup(@NotNull String tag){
         if (!isConnected) return null;
-        Document doc = getGroupDocument(tag);
+        Document doc = getDocument(GROUP_COLLECTION, tag);
         if (doc == null){
             return null;
         }
@@ -228,7 +245,7 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
         if (!isConnected){
             return null;
         }
-        Document doc = getAnimationDocument(tag);
+        Document doc = getDocument(ANIMATION_COLLECTION, tag);
         if (doc == null){
             return null;
         }
@@ -307,7 +324,7 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
                     .append(TAG_FIELD, tag)
                     .append(fieldName, data);
 
-            Document existing = getGroupDocument(tag);
+            Document existing = getDocument(collection, tag);
             if (existing != null){
                 if (DisplayConfig.overwritexistingSaves()){
                     Bson updateOperation = new Document ("$set", doc);
@@ -347,7 +364,7 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
             Player deleter
     ){
         if (!isConnected()) return;
-        Document doc = getGroupDocument(tag);
+        Document doc = getDocument(collection, tag);
         if (doc != null){
             collection.deleteOne(doc);
             if (deleter != null){
@@ -360,14 +377,15 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
         }
     }
 
-    private Document getGroupDocument(String tag){
-        return GROUP_COLLECTION.find(new Document(TAG_FIELD, tag))
-                .first();
+    private Document getDocument(MongoCollection<Document> collection, String tag){
+        if (collection == GROUP_COLLECTION){
+            return GROUP_COLLECTION.find(new Document(TAG_FIELD, tag))
+                    .first();
+        }
+        else if (collection == ANIMATION_COLLECTION){
+            return ANIMATION_COLLECTION.find(new Document(TAG_FIELD, tag))
+                    .first();
+        }
+        else return null;
     }
-
-    private Document getAnimationDocument(String tag){
-        return ANIMATION_COLLECTION.find(new Document(TAG_FIELD, tag))
-                .first();
-    }
-
 }

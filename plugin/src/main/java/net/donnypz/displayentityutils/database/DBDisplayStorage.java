@@ -1,15 +1,21 @@
 package net.donnypz.displayentityutils.database;
 
-public interface DBDisplayStorage extends DisplayStorage {
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+
+public abstract class DBDisplayStorage extends DisplayStorage {
+
+    public DBDisplayStorage(ComponentLogger logger) {
+        super(logger);
+    }
 
     /**
      * Check if this Database store is connected
      * @return a boolean
      */
-    boolean isConnected();
+    public abstract boolean isConnected();
 
     /**
      * Close this active database connection
      */
-    void closeConnection();
+    public abstract void closeConnection();
 }

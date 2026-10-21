@@ -10,6 +10,7 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -21,9 +22,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.GZIPOutputStream;
 
-public final class LocalDisplayStorage implements DisplayStorage {
+public final class LocalDisplayStorage extends DisplayStorage {
+
+    public LocalDisplayStorage(ComponentLogger logger) {
+        super(logger);
+    }
 
     @Override
     public boolean isEnabled() {
@@ -33,15 +37,7 @@ public final class LocalDisplayStorage implements DisplayStorage {
     @Override
     public boolean saveDisplayEntityGroup(@NotNull DisplayEntityGroup displayEntityGroup, @Nullable Player saver){
         try{
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-            GZIPOutputStream gzipOut = new GZIPOutputStream(byteOut);
-            ObjectOutputStream objOut = new ObjectOutputStream(gzipOut);
-            objOut.writeObject(displayEntityGroup);
-
-            gzipOut.close();
-            objOut.close();
-
-            byte[] data = byteOut.toByteArray();
+            byte[] data = CommonDisplayStorageUtils.toByteArray(displayEntityGroup);
 
             File saveFile = new File(PluginFolders.groupSaveFolder, "/"+displayEntityGroup.getTag()+DisplayEntityGroup.FILE_EXTENSION);
             if (saveFile.exists()){
@@ -54,6 +50,7 @@ public final class LocalDisplayStorage implements DisplayStorage {
                 }
                 saveFile.delete();
             }
+
             saveFile.createNewFile();
             FileOutputStream fileOut = new FileOutputStream(saveFile);
             fileOut.write(data);
@@ -99,15 +96,7 @@ public final class LocalDisplayStorage implements DisplayStorage {
     @Override
     public boolean saveDisplayAnimation(@NotNull DisplayAnimation displayAnimation, @Nullable Player saver){
         try{
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-            GZIPOutputStream gzipOut = new GZIPOutputStream(byteOut);
-            ObjectOutputStream objOut = new ObjectOutputStream(gzipOut);
-            objOut.writeObject(displayAnimation);
-            gzipOut.close();
-            objOut.close();
-
-            byte[] data = byteOut.toByteArray();
-            byteOut.close();
+            byte[] data = CommonDisplayStorageUtils.toByteArray(displayAnimation);
 
             File saveFile = new File(PluginFolders.animSaveFolder, "/"+displayAnimation.getAnimationTag()+DisplayAnimation.FILE_EXTENSION);
             if (saveFile.exists()){

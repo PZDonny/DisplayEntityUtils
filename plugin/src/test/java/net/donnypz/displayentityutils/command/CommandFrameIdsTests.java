@@ -13,7 +13,7 @@ public class CommandFrameIdsTests {
             "1,2",
             "9,3,5",
     })
-    void tests(String idString){
+    void shouldBeValidFrameIds(String idString){
         assertNotNull(CMDUtils.commaSeparatedIDs(idString));
     }
 

@@ -11,9 +11,9 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.dbutils.DbUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,13 +26,13 @@ import java.util.Collections;
 import java.util.List;
 
 
-public final class MYSQLDisplayStorage implements DBDisplayStorage {
+public final class MYSQLDisplayStorage extends DBDisplayStorage {
 
-    private static final String GROUP_TABLE = "saved_displays";
+    static final String GROUP_TABLE = "saved_displays";
     private static final String GROUP_COLUMN = "display_group";
     private static final String GROUP_DISPLAY_NAME = "display entity group";
 
-    private static final String ANIMATION_TABLE = "saved_animations";
+    static final String ANIMATION_TABLE = "saved_animations";
     private static final String ANIMATION_COLUMN = "display_anim";
     private static final String ANIMATION_DISPLAY_NAME = "animation";
 
@@ -41,6 +41,10 @@ public final class MYSQLDisplayStorage implements DBDisplayStorage {
 
     private boolean connected = false;
     private HikariDataSource dataSource;
+
+    public MYSQLDisplayStorage(ComponentLogger logger) {
+        super(logger);
+    }
 
     public void createConnection(
             String host,
@@ -66,40 +70,48 @@ public final class MYSQLDisplayStorage implements DBDisplayStorage {
             return;
         }
         DisplayAPI.getScheduler().runAsync(() -> {
-            try {
-                //Set Data Source
-                dataSource = new HikariDataSource();
-                dataSource.setJdbcUrl(url);
-                dataSource.setUsername(username);
-                dataSource.setPassword(password);
-
-                dataSource.setMinimumIdle(3);
-                dataSource.setMaximumPoolSize(6);
-
-                //Test Connection
-                Connection connection = dataSource.getConnection();
-
-
-                //Create Default Table
-                Statement statement = connection.createStatement();
-                String groupTableSQL = "CREATE TABLE IF NOT EXISTS saved_displays(tag VARCHAR(128) UNIQUE, display_group BLOB)";
-                statement.execute(groupTableSQL);
-
-                String animTableSQL = "CREATE TABLE IF NOT EXISTS saved_animations(tag VARCHAR(128) UNIQUE, display_anim BLOB)";
-                statement.execute(animTableSQL);
-
-
-                DbUtils.closeQuietly(statement);
-                DbUtils.closeQuietly(connection);
-
-                Bukkit.getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <blue>MYSQL!")));
-                connected = true;
-            } catch (SQLException e) {
-                e.printStackTrace();
-                Bukkit.getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(Component.text("There was an error connecting to the MYSQL database", NamedTextColor.RED)));
-                closeConnection();
-            }
+            connect(url, username, password);
         });
+    }
+
+    void connect(
+            String url,
+            String username,
+            String password
+    ) {
+        try {
+            //Set Data Source
+            dataSource = new HikariDataSource();
+            dataSource.setJdbcUrl(url);
+            dataSource.setUsername(username);
+            dataSource.setPassword(password);
+
+            dataSource.setMinimumIdle(3);
+            dataSource.setMaximumPoolSize(6);
+
+            //Test Connection
+            Connection connection = dataSource.getConnection();
+
+
+            //Create Default Table
+            Statement statement = connection.createStatement();
+            String groupTableSQL = "CREATE TABLE IF NOT EXISTS saved_displays(tag VARCHAR(128) UNIQUE, display_group BLOB)";
+            statement.execute(groupTableSQL);
+
+            String animTableSQL = "CREATE TABLE IF NOT EXISTS saved_animations(tag VARCHAR(128) UNIQUE, display_anim BLOB)";
+            statement.execute(animTableSQL);
+
+
+            DbUtils.closeQuietly(statement);
+            DbUtils.closeQuietly(connection);
+
+            logger.info(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <blue>MYSQL!")));
+            connected = true;
+        } catch (SQLException e) {
+            logger.error(DisplayAPI.pluginPrefix.append(Component.text("There was an error connecting to the MYSQL database", NamedTextColor.RED)));
+            e.printStackTrace();
+            closeConnection();
+        }
     }
 
     @Override
@@ -124,7 +136,7 @@ public final class MYSQLDisplayStorage implements DBDisplayStorage {
         return connected;
     }
 
-    private Connection getConnection(){
+    Connection getConnection(){
         try{
             return dataSource.getConnection();
         }
@@ -284,7 +296,6 @@ public final class MYSQLDisplayStorage implements DBDisplayStorage {
                 }
             }
             statement.executeUpdate();
-            blobStream.close();
             if (saver != null) {
                 saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved "+displayName+" to MYSQL!"));
             }
@@ -325,14 +336,16 @@ public final class MYSQLDisplayStorage implements DBDisplayStorage {
             }
 
             statement.setString(1, tag);
-            statement.executeUpdate(delete);
+            statement.executeUpdate();
             if (deleter != null){
                 deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <light_purple>Successfully deleted "+displayName+" from MYSQL database!"));
             }
         }
         catch(SQLException e){
             e.printStackTrace();
-            deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved "+displayName+" does not exist in MYSQL database!"));
+            if (deleter != null){
+                deleter.sendMessage(MiniMessage.miniMessage().deserialize("- <red>Saved "+displayName+" does not exist in MYSQL database!"));
+            }
         }
     }
 

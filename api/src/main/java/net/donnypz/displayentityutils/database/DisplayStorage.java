@@ -2,33 +2,40 @@ package net.donnypz.displayentityutils.database;
 
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayAnimation;
 import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface DisplayStorage {
+public abstract class DisplayStorage {
 
-    boolean isEnabled();
+    protected final ComponentLogger logger;
 
-    boolean saveDisplayEntityGroup(@NotNull DisplayEntityGroup group, @Nullable Player saver);
+    public DisplayStorage(ComponentLogger logger) {
+        this.logger = logger;
+    }
 
-    void deleteDisplayEntityGroup(@NotNull String group, @Nullable Player deleter);
+    public abstract boolean isEnabled();
 
-    @Nullable DisplayEntityGroup getDisplayEntityGroup(@NotNull String tag);
+    public abstract boolean saveDisplayEntityGroup(@NotNull DisplayEntityGroup group, @Nullable Player saver);
 
-    boolean saveDisplayAnimation(@NotNull DisplayAnimation animation, @Nullable Player saver);
+    public abstract void deleteDisplayEntityGroup(@NotNull String group, @Nullable Player deleter);
 
-    void deleteDisplayAnimation(@NotNull String tag, @Nullable Player deleter);
+    public @Nullable abstract DisplayEntityGroup getDisplayEntityGroup(@NotNull String tag);
 
-    @Nullable DisplayAnimation getDisplayAnimation(@NotNull String tag);
+    public abstract boolean saveDisplayAnimation(@NotNull DisplayAnimation animation, @Nullable Player saver);
 
-    @NotNull List<String> getGroupTags();
+    public abstract void deleteDisplayAnimation(@NotNull String tag, @Nullable Player deleter);
 
-    @NotNull List<String> getGroupTags(int page, int size);
+    public @Nullable abstract DisplayAnimation getDisplayAnimation(@NotNull String tag);
 
-    @NotNull List<String> getAnimationTags();
+    public @NotNull abstract List<String> getGroupTags();
 
-    @NotNull List<String> getAnimationTags(int page, int size);
+    public @NotNull abstract List<String> getGroupTags(int page, int size);
+
+    public @NotNull abstract List<String> getAnimationTags();
+
+    public @NotNull abstract List<String> getAnimationTags(int page, int size);
 }

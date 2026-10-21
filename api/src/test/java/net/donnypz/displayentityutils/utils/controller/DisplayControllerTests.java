@@ -51,9 +51,10 @@ public class DisplayControllerTests {
 
     private DisplayController testConfig(String configName, String packageName){
         DisplayController controller;
-        try (InputStream stream = getClass().getResourceAsStream("/test/controllers/"+packageName+"/" + configName + ".yml")) {
-            InputStreamReader reader = new InputStreamReader(stream);
-
+        try (
+                InputStream stream = getClass().getResourceAsStream("/test/controllers/"+packageName+"/" + configName + ".yml");
+                InputStreamReader reader = new InputStreamReader(stream))
+        {
             YamlConfiguration config = YamlConfiguration.loadConfiguration(reader);
             controller = DisplayControllerReader.read(
                     config,
@@ -62,7 +63,7 @@ public class DisplayControllerTests {
                     logger,
                     false
             );
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             throw new RuntimeException(e);
         }
 
