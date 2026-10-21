@@ -299,7 +299,6 @@ public final class MYSQLDisplayStorage extends DBDisplayStorage {
                 }
             }
             statement.executeUpdate();
-            blobStream.close();
             if (saver != null) {
                 saver.sendMessage(MiniMessage.miniMessage().deserialize("- <green>Successfully saved "+displayName+" to MYSQL!"));
             }
