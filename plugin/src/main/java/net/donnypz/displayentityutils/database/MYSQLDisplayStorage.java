@@ -14,11 +14,9 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.dbutils.DbUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -30,11 +28,11 @@ import java.util.List;
 
 public final class MYSQLDisplayStorage extends DBDisplayStorage {
 
-    private static final String GROUP_TABLE = "saved_displays";
+    static final String GROUP_TABLE = "saved_displays";
     private static final String GROUP_COLUMN = "display_group";
     private static final String GROUP_DISPLAY_NAME = "display entity group";
 
-    private static final String ANIMATION_TABLE = "saved_animations";
+    static final String ANIMATION_TABLE = "saved_animations";
     private static final String ANIMATION_COLUMN = "display_anim";
     private static final String ANIMATION_DISPLAY_NAME = "animation";
 
@@ -112,7 +110,6 @@ public final class MYSQLDisplayStorage extends DBDisplayStorage {
         } catch (SQLException e) {
             logger.error(DisplayAPI.pluginPrefix.append(Component.text("There was an error connecting to the MYSQL database", NamedTextColor.RED)));
             e.printStackTrace();
-            Bukkit.getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(Component.text("There was an error connecting to the MYSQL database", NamedTextColor.RED)));
             closeConnection();
         }
     }
@@ -139,7 +136,7 @@ public final class MYSQLDisplayStorage extends DBDisplayStorage {
         return connected;
     }
 
-    private Connection getConnection(){
+    Connection getConnection(){
         try{
             return dataSource.getConnection();
         }

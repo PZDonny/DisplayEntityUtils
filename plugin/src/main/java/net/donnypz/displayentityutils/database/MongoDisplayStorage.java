@@ -32,11 +32,11 @@ import java.util.*;
 
 public final class MongoDisplayStorage extends DBDisplayStorage {
 
-    private static MongoCollection<Document> GROUP_COLLECTION;
+    static MongoCollection<Document> GROUP_COLLECTION;
     private static final String GROUP_FIELD = "displayGroup";
     private static final String GROUP_DISPLAY_NAME = "display entity group";
 
-    private static MongoCollection<Document> ANIMATION_COLLECTION;
+    static MongoCollection<Document> ANIMATION_COLLECTION;
     private static final String ANIMATION_FIELD = "displayAnimation";
     private static final String ANIMATION_DISPLAY_NAME = "animation";
 
@@ -388,5 +388,4 @@ public final class MongoDisplayStorage extends DBDisplayStorage {
         }
         else return null;
     }
-
 }
