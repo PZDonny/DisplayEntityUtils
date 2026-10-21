@@ -107,9 +107,10 @@ public final class MYSQLDisplayStorage extends DBDisplayStorage {
             DbUtils.closeQuietly(statement);
             DbUtils.closeQuietly(connection);
 
-            Bukkit.getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <blue>MYSQL!")));
+            logger.info(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <blue>MYSQL!")));
             connected = true;
         } catch (SQLException e) {
+            logger.error(DisplayAPI.pluginPrefix.append(Component.text("There was an error connecting to the MYSQL database", NamedTextColor.RED)));
             e.printStackTrace();
             Bukkit.getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(Component.text("There was an error connecting to the MYSQL database", NamedTextColor.RED)));
             closeConnection();

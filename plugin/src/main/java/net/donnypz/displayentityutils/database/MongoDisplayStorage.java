@@ -22,7 +22,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.Binary;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -103,12 +102,12 @@ public final class MongoDisplayStorage extends DBDisplayStorage {
                 GROUP_COLLECTION = database.getCollection(groupCollection);
                 ANIMATION_COLLECTION = database.getCollection(animationCollection);
 
-                Bukkit.getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <green>MongoDB!")));
+                logger.info(DisplayAPI.pluginPrefix.append(MiniMessage.miniMessage().deserialize("<aqua>Successfully connected to <green>MongoDB!")));
                 isConnected = true;
             }
             catch (IllegalArgumentException | MongoException e){
                 isConnected = false;
-                Bukkit.getConsoleSender().sendMessage(Component.text("There was an error connecting to the MongoDB Database!", NamedTextColor.RED));
+                logger.error(Component.text("There was an error connecting to the MongoDB Database!", NamedTextColor.RED));
                 e.printStackTrace();
             }
         });
@@ -122,7 +121,7 @@ public final class MongoDisplayStorage extends DBDisplayStorage {
         if (isConnected()) return false;
 
         if (databaseName.isBlank() || groupCollection.isBlank() || animationCollection.isBlank()){
-            Bukkit.getConsoleSender().sendMessage(Component.text("There was an error connecting to the MongoDB Database! Database and/or Collection names are empty!", NamedTextColor.RED));
+            logger.error(Component.text("There was an error connecting to the MongoDB Database! Database and/or Collection names are empty!", NamedTextColor.RED));
             isConnected = false;
             return false;
         }
@@ -160,8 +159,8 @@ public final class MongoDisplayStorage extends DBDisplayStorage {
         }
         catch(MongoException e){
             isConnected = false;
+            logger.error(Component.text("There was an error closing the connection to the MongoDB Database", NamedTextColor.RED));
             e.printStackTrace();
-            Bukkit.getConsoleSender().sendMessage(Component.text("There was an error closing the connection to the MongoDB Database", NamedTextColor.RED));
         }
     }
 
