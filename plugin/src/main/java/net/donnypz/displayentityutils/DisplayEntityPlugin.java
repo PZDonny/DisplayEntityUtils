@@ -1,7 +1,5 @@
 package net.donnypz.displayentityutils;
 
-import ch.njol.skript.Skript;
-import ch.njol.skript.util.Version;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import net.donnypz.displayentityutils.command.DisplayEntityPluginCommand;
@@ -12,35 +10,14 @@ import net.donnypz.displayentityutils.listeners.bdengine.BDEngineConversionListe
 import net.donnypz.displayentityutils.listeners.entity.DEUEntityListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUInteractionListener;
 import net.donnypz.displayentityutils.listeners.entity.DEUMannequinEditorListener;
-import net.donnypz.displayentityutils.listeners.entity.mythic.DEUMythicListener;
 import net.donnypz.displayentityutils.listeners.gizmo.DEUGizmoListener;
 import net.donnypz.displayentityutils.listeners.player.*;
-import net.donnypz.displayentityutils.listeners.player.essentials.DEUEssentialsListener;
-import net.donnypz.displayentityutils.managers.LoadMethod;
 import net.donnypz.displayentityutils.managers.PluginFolders;
-import net.donnypz.displayentityutils.skript.SkriptTypes;
-import net.donnypz.displayentityutils.skript.active.ActiveModule;
-import net.donnypz.displayentityutils.skript.animation.AnimatorModule;
-import net.donnypz.displayentityutils.skript.framepoints.FramePointsModule;
-import net.donnypz.displayentityutils.skript.events.SimpleEvents;
-import net.donnypz.displayentityutils.skript.group.packetgroup.PacketGroupModule;
-import net.donnypz.displayentityutils.skript.misc.MiscModule;
-import net.donnypz.displayentityutils.skript.group.activegroup.ActiveGroupModule;
-import net.donnypz.displayentityutils.skript.group.spawnedgroup.SpawnedGroupModule;
-import net.donnypz.displayentityutils.skript.io.IOModule;
-import net.donnypz.displayentityutils.skript.parts.PartsModule;
-import net.donnypz.displayentityutils.skript.partfilter.PartFilterModule;
-import net.donnypz.displayentityutils.skript.player.PlayerModule;
-import net.donnypz.displayentityutils.utils.DisplayEntities.AnimationPlayerProviderImpl;
 import net.donnypz.displayentityutils.utils.DisplayEntities.SpawnedDisplayEntityGroup;
 import net.donnypz.displayentityutils.utils.DisplayEntities.machine.MachineState;
-import net.donnypz.displayentityutils.utils.bdengine.convert.common.BDEConversionHandlerImpl;
 import net.donnypz.displayentityutils.utils.controller.DisplayControllerUtils;
-import net.donnypz.displayentityutils.utils.version.VersionUtils;
-import net.donnypz.displayentityutils.utils.version.folia.SchedulerImpl;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.EventHandler;
@@ -50,8 +27,6 @@ import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
 import org.skriptlang.skript.addon.SkriptAddon;
-
-import java.util.Map;
 
 public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
 
@@ -69,29 +44,14 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         DisplayAPI.plugin = this;
-        Map<LoadMethod, DisplayStorage> storages = DisplayAPI.storages;
-        storages.put(LoadMethod.LOCAL, new LocalDisplayStorage(getSLF4JLogger()));
-        storages.put(LoadMethod.MONGODB, new MongoDisplayStorage(getSLF4JLogger()));
-        storages.put(LoadMethod.MYSQL, new MYSQLDisplayStorage(getSLF4JLogger()));
-
-        DisplayAPI.ANIMATION_PLAYER_SERVICE = new AnimationPlayerProviderImpl();
-        DisplayAPI.BDE_CONVERSION_HANDLER = new BDEConversionHandlerImpl();
-        DisplayAPI.SCHEDULER = new SchedulerImpl();
+        DisplayAPIInitializer.initializeImpls(this.getSLF4JLogger());
 
         getConfig().options().copyDefaults(true);
         reloadPlugin(true);
         ConfigUtils.registerDisplayControllers();
-        initializeDependencies();
+        DisplayAPIInitializer.initializeDependencies(this);
         registerListeners();
         checkFolia();
-
-        boolean isDevVersion = VersionUtils.isDevVersion();
-        if (!isDevVersion){
-            initializeBStats();
-        }
-        else{
-            getComponentLogger().warn(Component.text("bStats disabled on server using dev version."));
-        }
 
         Permission.registerPermissions();
         getServer().getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Plugin Enabled!", NamedTextColor.GREEN)));
@@ -115,54 +75,6 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         }
     }
 
-    private void initializeDependencies(){
-        //MythicMobs
-        DisplayAPI.isMythicMobsInstalled = Bukkit.getPluginManager().isPluginEnabled("MythicMobs");
-        if (DisplayAPI.isMythicMobsInstalled){
-            Bukkit.getPluginManager().registerEvents(new DEUMythicListener(), this);
-        }
-
-        DisplayAPI.isLibsDisguisesInstalled = Bukkit.getPluginManager().isPluginEnabled("LibsDisguises");
-        DisplayAPI.isViaVerInstalled = Bukkit.getPluginManager().isPluginEnabled("ViaVersion");
-        DisplayAPI.isWorldEditInstalled = Bukkit.getPluginManager().isPluginEnabled("WorldEdit");
-        DisplayAPI.isPAPIInstalled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
-        DisplayAPI.isEssentialsInstalled = Bukkit.getPluginManager().isPluginEnabled("Essentials");
-        if (DisplayAPI.isEssentialsInstalled){
-            Bukkit.getPluginManager().registerEvents(new DEUEssentialsListener(), this);
-        }
-
-        //Skript
-        DisplayAPI.isSkriptInstalled = Bukkit.getPluginManager().isPluginEnabled("Skript");
-        if (DisplayAPI.isSkriptInstalled) registerSkript();
-    }
-
-    private void registerSkript(){
-        if (Skript.getVersion().isSmallerThan(new Version(2,14,0))){
-            getServer().getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Skript Version below 2.10.0 Detected! Skript Syntax Disabled!", NamedTextColor.RED)));
-            DisplayAPI.isSkriptInstalled = false;
-        }
-        else{
-            addon = Skript.instance().registerAddon(DisplayEntityPlugin.class, "DisplayEntityUtils");
-            addon.loadModules(
-                    new ActiveModule(),
-                    new AnimatorModule(),
-                    new FramePointsModule(),
-                    new ActiveGroupModule(),
-                    new PacketGroupModule(),
-                    new SpawnedGroupModule(),
-                    new IOModule(),
-                    new MiscModule(),
-                    new PartFilterModule(),
-                    new PartsModule(),
-                    new PlayerModule()
-            );
-            addon.localizer().setSourceDirectories("lang", null);
-            SimpleEvents.register();
-            new SkriptTypes();
-            getServer().getConsoleSender().sendMessage(DisplayAPI.pluginPrefix.append(Component.text("Skript Syntax Enabled!", NamedTextColor.GREEN)));
-        }
-    }
-
     private void registerListeners(){
         Bukkit.getPluginManager().registerEvents(this, this);
         Bukkit.getPluginManager().registerEvents(new DEULoadingListeners(), this);
@@ -177,11 +89,6 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new DEUPlayerTeleportListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUInteractionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DEUMannequinEditorListener(), this);
-    }
-
-    private void initializeBStats(){
-        int pluginID = 24875;
-        new Metrics(this, pluginID);
     }
 
 
