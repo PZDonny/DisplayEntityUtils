@@ -5,30 +5,37 @@ import net.donnypz.displayentityutils.utils.DisplayEntities.DisplayEntityGroup;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.util.List;
 
-public interface DisplayStorage {
+public abstract class DisplayStorage {
 
-    boolean isEnabled();
+    private final Logger logger;
 
-    boolean saveDisplayEntityGroup(@NotNull DisplayEntityGroup group, @Nullable Player saver);
+    public DisplayStorage(Logger logger) {
+        this.logger = logger;
+    }
 
-    void deleteDisplayEntityGroup(@NotNull String group, @Nullable Player deleter);
+    public abstract boolean isEnabled();
 
-    @Nullable DisplayEntityGroup getDisplayEntityGroup(@NotNull String tag);
+    public abstract boolean saveDisplayEntityGroup(@NotNull DisplayEntityGroup group, @Nullable Player saver);
 
-    boolean saveDisplayAnimation(@NotNull DisplayAnimation animation, @Nullable Player saver);
+    public abstract void deleteDisplayEntityGroup(@NotNull String group, @Nullable Player deleter);
 
-    void deleteDisplayAnimation(@NotNull String tag, @Nullable Player deleter);
+    public @Nullable abstract DisplayEntityGroup getDisplayEntityGroup(@NotNull String tag);
 
-    @Nullable DisplayAnimation getDisplayAnimation(@NotNull String tag);
+    public abstract boolean saveDisplayAnimation(@NotNull DisplayAnimation animation, @Nullable Player saver);
 
-    @NotNull List<String> getGroupTags();
+    public abstract void deleteDisplayAnimation(@NotNull String tag, @Nullable Player deleter);
 
-    @NotNull List<String> getGroupTags(int page, int size);
+    public @Nullable abstract DisplayAnimation getDisplayAnimation(@NotNull String tag);
 
-    @NotNull List<String> getAnimationTags();
+    public @NotNull abstract List<String> getGroupTags();
 
-    @NotNull List<String> getAnimationTags(int page, int size);
+    public @NotNull abstract List<String> getGroupTags(int page, int size);
+
+    public @NotNull abstract List<String> getAnimationTags();
+
+    public @NotNull abstract List<String> getAnimationTags(int page, int size);
 }

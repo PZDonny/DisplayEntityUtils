@@ -14,6 +14,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.io.*;
 import java.nio.file.DirectoryStream;
@@ -21,9 +22,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.GZIPOutputStream;
 
-public final class LocalDisplayStorage implements DisplayStorage {
+public final class LocalDisplayStorage extends DisplayStorage {
+
+    public LocalDisplayStorage(Logger logger) {
+        super(logger);
+    }
 
     @Override
     public boolean isEnabled() {
@@ -54,6 +58,7 @@ public final class LocalDisplayStorage implements DisplayStorage {
                 }
                 saveFile.delete();
             }
+
             saveFile.createNewFile();
             FileOutputStream fileOut = new FileOutputStream(saveFile);
             fileOut.write(data);

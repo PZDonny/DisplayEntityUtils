@@ -70,9 +70,9 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     public void onEnable() {
         DisplayAPI.plugin = this;
         Map<LoadMethod, DisplayStorage> storages = DisplayAPI.storages;
-        storages.put(LoadMethod.LOCAL, new LocalDisplayStorage());
-        storages.put(LoadMethod.MONGODB, new MongoDisplayStorage());
-        storages.put(LoadMethod.MYSQL, new MYSQLDisplayStorage());
+        storages.put(LoadMethod.LOCAL, new LocalDisplayStorage(getSLF4JLogger()));
+        storages.put(LoadMethod.MONGODB, new MongoDisplayStorage(getSLF4JLogger()));
+        storages.put(LoadMethod.MYSQL, new MYSQLDisplayStorage(getSLF4JLogger()));
 
         DisplayAPI.ANIMATION_PLAYER_SERVICE = new AnimationPlayerProviderImpl();
         DisplayAPI.BDE_CONVERSION_HANDLER = new BDEConversionHandlerImpl();

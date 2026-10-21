@@ -17,6 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -26,7 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-public final class MYSQLDisplayStorage implements DBDisplayStorage {
+public final class MYSQLDisplayStorage extends DBDisplayStorage {
 
     private static final String GROUP_TABLE = "saved_displays";
     private static final String GROUP_COLUMN = "display_group";
@@ -41,6 +42,10 @@ public final class MYSQLDisplayStorage implements DBDisplayStorage {
 
     private boolean connected = false;
     private HikariDataSource dataSource;
+
+    public MYSQLDisplayStorage(Logger logger) {
+        super(logger);
+    }
 
     public void createConnection(
             String host,

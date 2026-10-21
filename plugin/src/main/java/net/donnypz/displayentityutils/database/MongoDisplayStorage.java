@@ -25,12 +25,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.*;
 
-public final class MongoDisplayStorage implements DBDisplayStorage {
+public final class MongoDisplayStorage extends DBDisplayStorage {
 
     private static MongoCollection<Document> GROUP_COLLECTION;
     private static final String GROUP_FIELD = "displayGroup";
@@ -45,6 +46,10 @@ public final class MongoDisplayStorage implements DBDisplayStorage {
     private MongoClient client;
     private MongoDatabase database;
     private boolean isConnected = false;
+
+    public MongoDisplayStorage(Logger logger) {
+        super(logger);
+    }
 
     public void createConnection(
             String host,
