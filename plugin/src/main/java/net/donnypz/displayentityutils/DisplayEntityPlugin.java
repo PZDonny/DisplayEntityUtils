@@ -44,7 +44,7 @@ public final class DisplayEntityPlugin extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         DisplayAPI.plugin = this;
-        DisplayAPIInitializer.initializeImpls(this.getSLF4JLogger());
+        DisplayAPIInitializer.initializeImpls(this.getComponentLogger());
 
         getConfig().options().copyDefaults(true);
         reloadPlugin(true);

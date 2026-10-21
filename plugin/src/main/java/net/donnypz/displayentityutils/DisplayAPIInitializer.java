@@ -28,9 +28,9 @@ import net.donnypz.displayentityutils.utils.version.VersionUtils;
 import net.donnypz.displayentityutils.utils.version.folia.SchedulerImpl;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.slf4j.Logger;
 
 import java.util.Map;
 
@@ -39,7 +39,7 @@ public final class DisplayAPIInitializer {
     private DisplayAPIInitializer() {
     }
 
-    public static void initializeImpls(Logger logger) {
+    public static void initializeImpls(ComponentLogger logger) {
         DisplayAPI.ANIMATION_PLAYER_SERVICE = new AnimationPlayerProviderImpl();
         DisplayAPI.BDE_CONVERSION_HANDLER = new BDEConversionHandlerImpl();
         DisplayAPI.SCHEDULER = new SchedulerImpl();
